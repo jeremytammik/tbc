@@ -1,0 +1,17 @@
+<!-- User Interface, SDK Samples -->
+
+<h3>Picking a Point</h3>
+
+<p>I am regularly asked by developers how to pick a point in Revit. This is currently not possible. The wish has been registered, but there are no plans to provide this functionality in the short term. The only interactive selection methods available in the API are the PickOne() and WindowSelect() methods on the Selection class in the Autodesk.Revit namespace, which prompt the user to select one or several building elements.</p>
+
+<p>If you really need the user to specify a point somewhere in the model, you can look at some of the SDK samples for an idea how the lack of a point selection mechanism on the Revit graphics screen can be circumvented.</p>
+
+<p>For instance, the CurtainWallGrid sample displays a form with two tabs in it. The first tab is designed for the user to create a new curtain wall. To do so, she needs to specify the wall start and end points for the wall baseline. This is done graphically on a canvas representing the XY plane in the model.</p>
+
+<p>Once the curtain wall has been created, the next tab can be used to graphically define the grid lines on it. This time, a canvas displaying the wall face is shown, and the user can interactively add, delete and move grid lines around.</p>
+
+<p>Several other SDK samples also display their own little graphics windows allowing user interaction to specify points in space or on selected objects. They include NewOpenings, NewPathReinforcement, and ShaftHolePuncher, to name a few.</p>
+
+<p>I hope this provides some ideas and a starting point for you in case you happen to run into this requirement.</p>
+
+<p>By the way, if you make use of the PickOne() and WindowSelect() methods, note that you can also use the StatusbarTip property to define the message displayed in the Revit status bar to prompt the user what selection to make. If you need to display more information, you can also show a temporary modeless little form of your own while prompting for the selection.</p>
