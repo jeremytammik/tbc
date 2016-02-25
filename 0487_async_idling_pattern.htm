@@ -1,0 +1,46 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Daren Thomas , Daren@Work: A Pattern For Asynchronously Updating Revit Documents 
+http://darenatwork.blogspot.com/2010/11/pattern-for-asynchronously-updating.html
+http://darenatwork.blogspot.com/2010/11/pattern-for-asynchronously-updating.html?showComment=1290983566234_AIe9_BFS-cNYJOZK91EvBIa40mGU-RTN6vnkGfWgFMnCdrEeudtyynHcEHF2edkqaIqWmxpZeGH4gBWc020m2ti7ogrfzWH1EXW_yRmt2JMVhZIolwLYdWzTPWyuGWf85cmexnGMdB9TdH4MBMHsszPL5CezBg9fEc0SjvBV-DKtiQ8z1_OwHWK3Z1S9tPy8bPgB1naEAGSl7Wngic1USUqn6aVxAed0UFY8hBfAZH6obQQY4t2CX5HiTq4mGlGvslfG5oVLuELLUebCxMkaF9E1QYiAYUQOMUtZswJ2SvaZzW17b1kCb5Q4n6ugyUPnANeDoPsBmf1Gebhij81sLaCDABG_jsoAYCl5wS2RwDBcTjDKBEWCX0M1LKRFvSmZODukdtifBzWsw6ITasrldYKZZ0AreyWc2A3ZR0HblzWSuwPAzekXZ3TE_ZKmpO3FRHHYkSS4439MVAkyK4V8OHAvVAtKif_mg0b1rORGzGaqpFamUEu_88ADNrHgZjzKsxCmQOn6C8fEN-0AX7SSl34kcNGJSuaNSrK4_DwpTXKsIQmmTHoCPESRQi_HbhGrbHJqk5wOWQ8Gm8ZKk2QJ6-ClDRrsPNGnICcy40nyfcRKB-GSBOMsot4Gjcy93EGDy-rJX8u0VlyYs_-wEqpCcQsroKQCJWaiiP9x_Ngz3EYETnNvbUyDDSI3u7vYBKyOostokTUymw4gz99VXYQB0n9gXSvRWpo3JA#c6247934297630962599
+
+-->
+
+<h3>Pattern for Semi-Asynchronous Idling API Access</h3>
+
+<p>Here is another wonderful contribution from Daren Thomas: 
+
+<a href="http://darenatwork.blogspot.com/2010/11/pattern-for-asynchronously-updating.html">
+A Pattern for Asynchronously Updating Revit Documents</a>.
+
+<p>As an attentive reader of this blog, you will certainly remember one of my favourite and most powerful recent projects, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless loose connector navigator</a>.
+
+It retrieves and displays a list of unconnected MEP connectors in a modeless dialogue box.
+Being modeless, the dialogue is not within the context of a Revit external command Execute method, nor any other Revit API call-back, and thus has no access to the Revit API, which does not permit 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous access</a>.
+
+Happily, the Idling event provides a workaround for that.
+
+<p>The modeless loose connector navigator demonstrates a solution for handling a very specialised need, accessing the Revit API semi-asynchronously to highlight the elements with loose connectors.
+
+<p>Daren's post generalises this solution, allowing a modeless dialogue to queue up a whole collection of actions to be taken, which can then be picked up and processed by the Idling event handler the next time it becomes active.
+A wonderful generic solution, including neat features such as:
+
+<ul>
+<li>Use of the generic Queue template class.
+<li>Use of the generic Action delegate, cf. <a href="http://geekswithblogs.net/BlackRabbitCoder/archive/2010/09/09/c.net-five-final-little-wonders-that-make-code-better-3.aspx">5. Generic Delegates</a>.
+<li>Locking support to protect against simultaneous access to the queue from the modeless dialogue and the Idling event.
+<li>Use of .NET =&gt; lambda statements to execute the queued-up tasks.
+</ul>
+
+<p>A truly beautiful job, Daren. 
+Thank you!

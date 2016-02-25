@@ -1,0 +1,667 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Collector Benchmark</h3>
+
+<p>After all the preparation creating a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/performance-profiling.html">
+profiling tool</a>,
+
+let us now put it to use on the Revit 2011 collectors, which is one of the areas that has been most heavily reworked in this release and at the same time affects more applications than any other, in fact just about every single one.
+This has led to a rather huge post for today, but I really wanted to share these important results with just as soon as possible.
+
+<p>First of all, what is this all about?
+Here is a quick first introduction to the Revit 2011 filtering and pointers to further reading:
+
+<h4>New Element Iteration Interfaces</h4>
+
+<p>The element iteration part of the Revit API has been completely redesigned.
+This will affect virtually all existing add-ins, since they all need to access elements to query or modify their properties.
+The new API is much more aligned and provides better access to internal optimised functionality within Revit, providing a significant speed increase and smaller memory footprint.
+Here are some of its advantages:
+
+<ul>
+<li>Iterate and filter elements from a document, or only elements from an arbitrary list of element ids, or elements visible in a view (replacing View.Elements).
+<li>Clearly identify so-called quick filters which are designed for best performance and do not expand the element in memory when evaluating whether it passes the filter.
+<li>Use chained shortcuts which automatically apply commonly used filters:
+
+<pre class="code">
+collector
+&nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; .ContainedInDesignOption( myDesignOptionId );
+</pre>
+
+<li>Logically group more than two filters.
+<li>Match derived types automatically when using the type filter and type filter shortcut.
+<li>Iterate elements from all design options or from any specific design option.
+<li>Process the collector results using foreach statements and LINQ queries:
+
+<pre class="code">
+<span class="teal">IEnumerable</span>&lt;<span class="teal">FamilySymbol</span>&gt; symbols =
+&nbsp; <span class="blue">from</span> <span class="teal">FamilySymbol</span> fs <span class="blue">in</span> collector
+&nbsp; <span class="blue">where</span> fs.Family.Name == familyName
+&nbsp; <span class="blue">select</span> fs;
+</pre>
+
+</ul>
+
+<p>The element filtering is performed by FilteredElementCollector instances which are instantiated for a given document, view or list of elements to work with.
+Numerous filtering options can be applied, and a collection of elements matching the specified criteria is returned.
+This collection supports further filtering using .NET functionality such as foreach and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/language-integrated-query-linq.html">
+LINQ</a>.
+
+<p>Here is a small VSTA sample that looks for a specific family and returns all its symbols:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> MyTest()
+{
+&nbsp; <span class="blue">string</span> familyName = <span class="maroon">&quot;Single-Flush&quot;</span>;
+&nbsp; <span class="teal">Document</span> doc = <span class="blue">this</span>.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="green">// get the family we want</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> fec
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; fec.OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Family</span>&gt; families =
+&nbsp; &nbsp; <span class="blue">from</span> <span class="teal">Family</span> f <span class="blue">in</span> fec
+&nbsp; &nbsp; <span class="blue">where</span> f.Name == familyName
+&nbsp; &nbsp; <span class="blue">select</span> f;
+&nbsp;
+&nbsp; <span class="green">// get the symbols of that family</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbolFilter</span> fsf
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FamilySymbolFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; families.First&lt;<span class="teal">Family</span>&gt;().Id );
+&nbsp;
+&nbsp; fec = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; fec.WherePasses( fsf );
+&nbsp;
+&nbsp; <span class="green">// list them</span>
+&nbsp;
+&nbsp; StringBuilder str = <span class="blue">new</span> StringBuilder();
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> fs <span class="blue">in</span> fec )
+&nbsp; &nbsp; str.Append( fs.Name + <span class="maroon">&quot;\n&quot;</span> );
+&nbsp;
+&nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show(
+&nbsp; &nbsp; str.ToString(),
+&nbsp; &nbsp; <span class="maroon">&quot;FamilySymbols of &quot;</span> + familyName );
+}
+</pre>
+
+<p>Further information on this topic is provided in the Revit 2011 SDK, in the API Reference RevitAPI.chm, in the sections on What’s New and Element Iteration API, and also in the Developer Guide.
+
+<p>So with the introduction out of the way, let's get on with our research and analysis to find out how to make optimal use of it.
+
+
+<h4>Benchmarking Element Iteration Collectors</h4>
+
+<p>I implemented a new command CmdCollectorPerformance in The Building Coder sample application, the first pure Revit 2011 one.
+It performs the following three steps:
+
+<ol>
+<li>Create a largish number of levels for us to play making use of the CreateLevel helper method, which simply creates a new level at a given elevation.
+<li>BenchmarkAllLevels &ndash;
+     Benchmark various approaches to using
+     filtered collectors to retrieve
+     all levels in the model,
+     and measure the time required to
+     create IList and List collections from them.
+<li>BenchmarkSpecificLevel &ndash;
+     Benchmark using a parameter filter versus
+     various kinds of post processing of the
+     results returned by the filtered element
+     collector to find the level specified by
+     iLevel.
+</ol>
+
+<h4>Setting up the Test Model</h4>
+
+<p>We simply use a number of levels as a test set.
+Here is the code used to create an individual level:
+
+<pre class="code">
+<span class="teal">Level</span> CreateLevel( <span class="blue">int</span> elevation )
+{
+&nbsp; <span class="teal">Level</span> level = _doc.Create.NewLevel( elevation );
+&nbsp; level.Name = <span class="maroon">&quot;Level &quot;</span> + elevation.ToString();
+&nbsp; <span class="blue">return</span> level;
+}
+</pre>
+
+<p>This loop is used to drive it to create a large number of levels:
+
+<pre class="code">
+&nbsp; <span class="blue">int</span> maxLevel = 1000;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 3; i &lt; maxLevel; ++i )
+&nbsp; {
+&nbsp; &nbsp; CreateLevel( i );
+&nbsp; }
+</pre>
+
+<p>If this is run in a default new Revit Architecture model, we will end up with the two pre-defined levels 1 and 2 plus newly generated ones numbered up to 999 for a total of 999 levels in all.
+
+<h4>Test Methods to Retrieve all Levels</h4>
+
+<p>In the following benchmarking tests, I always included a test using an empty method that does nothing at all, just to ensure that the minimal overhead of calling the method and running the test itself is negligible compared to the functionality that I am actually benchmarking.
+That is the reason for implementing these pretty trivial test methods:
+
+<pre class="code">
+<span class="teal">Element</span> EmptyMethod( <span class="teal">Type</span> type )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+&nbsp;
+<span class="teal">Element</span> EmptyMethod( <span class="teal">Type</span> type, <span class="blue">string</span> name )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>Here are the basic minimal collector methods which we need to get any access at all to the Revit database elements:
+
+<ul>
+<li>GetNonElementTypeElements &ndash; Return all non ElementType elements.
+<li>GetElementsOfType &ndash; Return a collector of all elements of the given type.
+<li>GetFirstElementOfType &ndash; Return the first element of the given type without any further filtering.
+</ul>
+
+<p>The first is used to return all elements which are not derived from ElementType.
+This is used to compare the time required to check the type of elements manually against the time it takes the dedicated Revit filtering functionality used by GetElementsOfType to do the same thing.
+
+<pre class="code">
+<span class="teal">FilteredElementCollector</span> GetNonElementTypeElements()
+{
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; .WhereElementIsNotElementType();
+}
+&nbsp;
+<span class="teal">FilteredElementCollector</span> GetElementsOfType(
+&nbsp; <span class="teal">Type</span> type )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; .OfClass( type );
+}
+&nbsp;
+<span class="teal">Element</span> GetFirstElementOfType(
+&nbsp; <span class="teal">Type</span> type )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; .OfClass( type )
+&nbsp; &nbsp; .FirstElement();
+}
+</pre>
+
+<p>Here are two methods that use explicit coding and a LINQ query to filter for a specific element type:
+
+<ul>
+<li>GetElementsOfTypeUsingExplicitCode &ndash;
+     Return a list of all elements matching
+     the given type using explicit code to test
+     the element type.
+<li>GetElementsOfTypeUsingLinq &ndash;
+     Return a list of all elements matching
+     the given type using a LINQ query to test
+     the element type.
+</ul>
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetElementsOfTypeUsingExplicitCode(
+&nbsp; <span class="teal">Type</span> type )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetNonElementTypeElements();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; b = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e.GetType().Equals( type ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; b.Add( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> b;
+}
+&nbsp;
+<span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; GetElementsOfTypeUsingLinq(
+&nbsp; <span class="teal">Type</span> type )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetNonElementTypeElements();
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; b =
+&nbsp; &nbsp; <span class="blue">from</span> e <span class="blue">in</span> a
+&nbsp; &nbsp; <span class="blue">where</span> e.GetType().Equals( type )
+&nbsp; &nbsp; <span class="blue">select</span> e;
+&nbsp;
+&nbsp; <span class="blue">return</span> b;
+}
+</pre>
+
+<p>The performance of these is then compared with GetElementsOfType using the OfClass method to achieve the same thing.
+
+<h4>Benchmarking Retrieval of all Levels</h4>
+
+<p>Here is the mainline code that we use to drive the benchmarking of the time required to retrieve all levels in different ways:
+
+<pre class="code">
+&nbsp; <span class="blue">int</span> nLevels = GetElementsOfType( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; .ToElements().Count;
+&nbsp;
+&nbsp; <span class="blue">int</span> nRuns = 1000;
+&nbsp;
+&nbsp; <span class="teal">JtTimer</span> totalTimer = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;TOTAL TIME&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( totalTimer )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nRuns; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; BenchmarkAllLevels( nLevels );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; totalTimer.Report( <span class="maroon">&quot;Retrieve all levels:&quot;</span> );
+</pre>
+
+<p>The interesting question now is what exactly happens in the BenchmarkAllLevels method, and what the reported results look like.
+
+<p>BenchmarkAllLevels takes one argument, the count of levels, which is simply used to verify that the results from some of the test methods make sense.
+It benchmarks several different approaches to using filtered collectors to retrieve all levels in the model and measure the time required to create IList and List collections from them:
+
+<pre class="code">
+<span class="blue">void</span> BenchmarkAllLevels( <span class="blue">int</span> nLevels )
+{
+&nbsp; <span class="teal">Type</span> t = <span class="blue">typeof</span>( <span class="teal">Level</span> );
+&nbsp; <span class="blue">int</span> n;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Empty method *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; EmptyMethod( t );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;NotElementType *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; &nbsp; = GetNonElementTypeElements();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;NotElementType as IList *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; a
+&nbsp; &nbsp; &nbsp; = GetNonElementTypeElements().ToElements();
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels &lt;= n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all non-element-type elements&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;NotElementType as List *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; GetNonElementTypeElements() );
+&nbsp;
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels &lt;= n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all non-element-type elements&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Explicit&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a
+&nbsp; &nbsp; &nbsp; = GetElementsOfTypeUsingExplicitCode( t );
+&nbsp;
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels == n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all levels&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Linq&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; a =
+&nbsp; &nbsp; &nbsp; GetElementsOfTypeUsingLinq( t );
+&nbsp;
+&nbsp; &nbsp; n = a.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels == n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all levels&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Linq as List&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; GetElementsOfTypeUsingLinq( t ) );
+&nbsp;
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels == n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all levels&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Collector&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; &nbsp; = GetElementsOfType( t );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Collector as IList&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; a
+&nbsp; &nbsp; &nbsp; = GetElementsOfType( t ).ToElements();
+&nbsp;
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels == n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all levels&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Collector as List&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; GetElementsOfType( t ) );
+&nbsp;
+&nbsp; &nbsp; n = a.Count;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( nLevels == n,
+&nbsp; &nbsp; <span class="maroon">&quot;expected to retrieve all levels&quot;</span> );
+}
+</pre>
+
+<p>Here are the results of running this, i.e. 1000 repetitions of retrieving all the 999 levels in several different ways:
+
+<pre>
+------------------------------------------------------------------------
+Retrieve all levels:
+ Percentage   Seconds   Calls   Process
+------------------------------------------------------------------------
+      0.00%      0.00    1000   Empty method *
+      0.01%      0.01    1000   NotElementType *
+      0.02%      0.03    1000   Collector
+      3.85%      7.95    1000   Collector as IList
+      6.42%     13.26    1000   Collector as List
+      9.24%     19.07    1000   NotElementType as IList *
+     20.03%     41.37    1000   Explicit
+     20.07%     41.46    1000   Linq
+     20.12%     41.54    1000   NotElementType as List *
+     20.21%     41.73    1000   Linq as List
+    100.00%    206.51       1   TOTAL TIME
+------------------------------------------------------------------------
+</pre>
+
+<p>The entries marked with an asterisk * do not perform the full operation that the others complete.
+They have been added to measure specific minimum overhead delays.
+For example, we call an empty method to determine the overhead of the function call itself and to prove that this is completely negligible in comparison to the overall time.
+
+<p>There are lots of things to point out here:
+
+<ul>
+<li>The calls to the empty method really are negligible.
+<li>The three calls to NotElementType return over 3000 elements, i.e. more than just the levels, and do not have any overhead for filtering out any specific type.
+They also give us an idea of the overhead required to convert the collector results to a generic IList and List instance.
+As one might expect, creating a List causes a significantly larger overhead than an IList.
+An IList is returned directly by the collector ToElements method, whereas a List requires an explicit call to a copy constructor.
+<li>The pure collector call using OfClass is fastest and easiest. Again, conversion to IList or List is much more expensive than the filtering operation itself.
+<li>Using explicit code or LINQ to filter is a thousand times as expensive as using the built-in collector filtering.
+<li>There is hardly any performance difference between using LINQ or explicit code.
+</ul>
+
+<p>I find these results very interesting and illuminating.
+
+<p>The really good news is that the Revit filtering is extremely efficient, and anything you add to it, such as converting the results to generic List, will cost much more time than the filtering operation itself.
+
+<p>I want to discuss the results of selecting an individual element as well, but I will have to postpone that until after Easter, because I am really running out of time here.
+
+<p>Or no, I will just cut it really short.
+
+
+<h4>Benchmarking Retrieval of a Specific Named Level</h4>
+
+<p>The following BenchmarkSpecificLevel method lists the various tests that I implemented and compared to retrieve a specific named element.
+It benchmarks the use of a parameter filter versus
+     various kinds of post processing of the
+     results returned by the filtered element
+     collector to find the level specified by the iLevel argument:
+
+<pre class="code">
+<span class="blue">void</span> BenchmarkSpecificLevel( <span class="blue">int</span> iLevel )
+{
+&nbsp; <span class="teal">Type</span> t = <span class="blue">typeof</span>( <span class="teal">Level</span> );
+&nbsp; <span class="blue">string</span> name = <span class="maroon">&quot;Level &quot;</span> + iLevel.ToString();
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Empty method *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = EmptyMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Collector with no name check *&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level = GetFirstElementOfType( t );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Parameter filter&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = GetFirstNamedElementOfTypeUsingParameterFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Explicit&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = GetFirstNamedElementOfTypeUsingExplicitCode(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Linq&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = GetFirstNamedElementOfTypeUsingLinq(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Anonymous named&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = GetFirstNamedElementOfTypeUsingAnonymousButNamedMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+&nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Anonymous&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> level
+&nbsp; &nbsp; &nbsp; = GetFirstNamedElementOfTypeUsingAnonymousMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; t, name );
+&nbsp; }
+}
+</pre>
+
+<p>Ah yes, we still have not presented all the test methods that we are comparing yet.
+They are:
+
+<ul>
+<li>GetFirstNamedElementOfTypeUsingExplicitCode &ndash; Return the first element of the given type and name using explicit code.
+<li>GetFirstNamedElementOfTypeUsingLinq &ndash; Return the first element of the given type and name using LINQ.
+<li>GetFirstNamedElementOfTypeUsingAnonymousButNamedMethod &ndash; Return the first element of the given type and name using an anonymous method to define a named method.
+<li>GetFirstNamedElementOfTypeUsingAnonymousMethod &ndash; Return the first element of the given type and name using an anonymous method.
+</ul>
+
+<pre class="code">
+<span class="teal">Element</span> GetFirstNamedElementOfTypeUsingExplicitCode(
+&nbsp; <span class="teal">Type</span> type,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetElementsOfType( type );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// explicit iteration and manual checking of a property:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">Element</span> ret = <span class="blue">null</span>;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e.Name.Equals( name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ret = e;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> ret;
+}
+&nbsp;
+<span class="teal">Element</span> GetFirstNamedElementOfTypeUsingLinq(
+&nbsp; <span class="teal">Type</span> type,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetElementsOfType( type );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// using LINQ:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; elementsByName =
+&nbsp; &nbsp; <span class="blue">from</span> e <span class="blue">in</span> a
+&nbsp; &nbsp; <span class="blue">where</span> e.Name.Equals( name )
+&nbsp; &nbsp; <span class="blue">select</span> e;
+&nbsp;
+&nbsp; <span class="blue">return</span> elementsByName.First&lt;<span class="teal">Element</span>&gt;();
+}
+&nbsp;
+<span class="teal">Element</span> GetFirstNamedElementOfTypeUsingAnonymousButNamedMethod(
+&nbsp; <span class="teal">Type</span> type,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetElementsOfType( type );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// using an anonymous method to define a named method:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; nameEquals = e =&gt; e.Name.Equals( name );
+&nbsp; <span class="blue">return</span> a.First&lt;<span class="teal">Element</span>&gt;( nameEquals );
+}
+&nbsp;
+<span class="teal">Element</span> GetFirstNamedElementOfTypeUsingAnonymousMethod(
+&nbsp; <span class="teal">Type</span> type,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetElementsOfType( type );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// using an anonymous method:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">return</span> a.First&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; e =&gt; e.Name.Equals( name ) );
+}
+</pre>
+
+<p>The most important method of all, as we shall see, is the one making use of the Revit filtering API to search for the named level.
+Setting up a parameter filter is a little bit convoluted, since you need to make use of a number of different helper classes to specify separately the provider, evaluator, rule and filter, but have a look further down to convince yourself that it is worthwhile.
+This method returns the first element of the given type and name using a parameter filter:
+
+<pre class="code">
+<span class="teal">Element</span> GetFirstNamedElementOfTypeUsingParameterFilter(
+&nbsp; <span class="teal">Type</span> type,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = GetElementsOfType( type );
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.ELEM_NAME_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; provider, evaluator, name, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="blue">return</span> a.WherePasses( filter ).FirstElement();
+}
+</pre>
+
+<p>I drive this by selecting some target level at random and searching for it by name, and repeating that 1000 times over, as follows:
+
+<pre class="code">
+&nbsp; nRuns = 1000;
+&nbsp; <span class="teal">Random</span> rand = <span class="blue">new</span> <span class="teal">Random</span>();
+&nbsp; totalTimer.Restart( <span class="maroon">&quot;TOTAL TIME&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( totalTimer )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nRuns; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> iLevel = rand.Next( 1, maxLevel );
+&nbsp; &nbsp; &nbsp; BenchmarkSpecificLevel( iLevel );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; totalTimer.Report(
+&nbsp; &nbsp; <span class="maroon">&quot;Retrieve specific named level:&quot;</span> );
+</pre>
+
+<p>Here are the results of running this test, i.e. 1000 repetitions of retrieving one specific level from the 999 levels in the model by searching for it by name:
+
+<pre>
+---------------------------------------------------------------
+Retrieve specific named level:
+ Percentage   Seconds   Calls   Process
+---------------------------------------------------------------
+      0.00%      0.00    1000   Empty method *
+      0.16%      0.10    1000   Collector with no name check *
+     12.65%      7.96    1000   Parameter filter
+     21.60%     13.60    1000   Anonymous named
+     21.75%     13.70    1000   Explicit
+     21.85%     13.76    1000   Anonymous
+     21.88%     13.77    1000   Linq
+    100.00%     62.96       1   TOTAL TIME
+---------------------------------------------------------------
+</pre>
+
+<p>Again, the entries marked with an asterisk * do not do the full job and are just included  for baseline comparison purposes.
+The empty method entry does nothing at all.
+The collector with no name check collects all levels and simply returns the first one without checking its name.
+
+<p>The important conclusions that I draw from this are:
+
+<ul>
+<li>Once again, making use of the Revit filtering API by using the parameter filter is by far the most efficient approach.
+The parameter filter is a slow filter, not a quick one, but it is still a lot faster than resorting to any other means.
+<li>There is virtually no performance difference at all between explicit coding, LINQ, and using generic algorithms with anonymous methods.
+</ul>
+
+<p>Once again, very illuminating, I would say.
+
+<p>In quintessence, you should do everything that you possibly can using the Revit filters, and avoid all post-processing and manual if at all possible.
+
+<p>Here is
+
+<a href="zip/bc_11_63.zip">
+version 2011.0.0.63</a>
+
+of the complete Building Coder source code and Visual Studio solution including the new CmdCollectorPerformance external command and the JtTimer profiling classes.</p>
+
+<p>I hope this keeps you happily informed and occupied over Easter and wish you good luck searching for eggs.
+
+<p>Since I am giving the Revit API training class in Warsaw next week, the posts may become sparse for a while.
+
+<p><strong>Correction:</strong> Please note that the method GetFirstNamedElementOfTypeUsingParameterFilter does not work properly using the built-in parameter ELEM_NAME_PARAM, because it should be looking at DATUM_TEXT instead.
+For more details, please refer to the subsequent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">
+element name parameter filter correction</a>.

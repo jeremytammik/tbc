@@ -1,0 +1,150 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06938483 [How to remove image imports from a RVT] -->
+
+<h3>Remove Imported JPG and BMP Images</h3>
+
+<p>Here is a query which helps understand how imported files are handled by Revit and how they can be removed from the model.
+
+<p><strong>Question:</strong> I want to remove imported images like JPG and BMP files from my Revit model.
+
+<p>I tried to use a filtered element collector, apply its WhereElementIsNotElementType filter, select all elements whose name ends in ".jpg", and then delete them in a separate loop, but that does not seem to do it. 
+Some other similar attempts also failed.
+
+<p>How can I achieve this, please?
+
+<p><strong>Answer:</strong> I created a new external command CmdRemoveImportedJpgs in The Building Coder samples to test this.
+
+<p>The approach you describe really does not work. 
+Next, I used my element listed and searched for all elements which name included the substring ".jpg", and that led me in the right direction:
+
+<p>I added one important twist to the description you provide above: I first delete all non-ElementType elements whose element name ends with ".jpg" before deleting the element types with that property.
+This is the little helper predicate method I use to test the element name:
+
+<pre class="code">
+<span class="blue">bool</span> ElementNameEndsWithJpg( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="blue">string</span> s = e.Name;
+&nbsp;
+&nbsp; <span class="blue">return</span> 3 &lt; s.Length &amp;&amp; s.EndsWith( <span class="maroon">&quot;.jpg&quot;</span> );
+}
+</pre>
+
+<p>For full coverage, you obviously need to take into account all the other filename extension permutations pointed out by Rudolf in his comment below.
+
+<p>Here is the complete code of my external command implementation:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( ElementNameEndsWithJpg( e ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; idsDeleted = <span class="blue">null</span>;
+&nbsp; <span class="teal">Transaction</span> t;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = ids.Count;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Delete non-ElementType '.jpg' elements&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; idsDeleted = doc.Delete( ids );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> m = ( <span class="blue">null</span> == idsDeleted )
+&nbsp; &nbsp; ? 0
+&nbsp; &nbsp; : idsDeleted.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;Selected {0} non-ElementType element{1}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} successfully deleted.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), m ) );
+&nbsp;
+&nbsp; col = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .WhereElementIsElementType();
+&nbsp;
+&nbsp; ids.Clear();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( ElementNameEndsWithJpg( e ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; n = ids.Count;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Delete element type '.jpg' elements&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; idsDeleted = doc.Delete( ids );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; m = ( <span class="blue">null</span> == idsDeleted ) ? 0 : idsDeleted.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;Selected {0} element type{1}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} successfully deleted.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), m ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>This seems to do the trick for me all right.
+
+<p>To test it, I created a new Revit model and inserted one single image named "jeremy_philippe_partha_jim.jpg".
+
+<p>Running the CmdRemoveImportedJpgs external command on it produces the following messages in the Visual Studio debug output window:
+
+<pre class="code">
+Raster Images <161178 jeremy_philippe_partha_jim.jpg>
+Selected 1 non-ElementType element, 1 successfully deleted.
+
+ElementType <161176 jeremy_philippe_partha_jim.jpg>
+Raster Images <161177 jeremy_philippe_partha_jim.jpg>
+Selected 2 element types, 2 successfully deleted.
+</pre>
+
+<p>This shows that the image import generated two ElementType objects and one non-ElementType one, and all were successfully deleted.
+
+<p>Apparently, your initial approach does not work because it is not possible to delete the ElementType objects without first removing the non-ElementType one.
+
+<p>Note that they have three sequential element ids. 
+The raster image element with the id 161178 requires the existence of the other two.
+
+<p>Here is 
+
+<a href="zip/bc_12_97.zip">
+version 2012.0.97.0</a> of
+
+The Building Coder samples including the new command.

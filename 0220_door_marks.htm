@@ -1,0 +1,193 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253112 [Previous Mark# list] -->
+
+<h3>Door Marks</h3>
+
+<p>Here is a question from H&aring;vard Dagsvik of
+
+<a href="http://www.cad-q.com/no">
+Cad Quality as</a>
+
+on door marks.
+It can obviously be generalised to other model marks in the BIM as well.
+
+<p><strong>Question:</strong> One of the best documentation features of Revit is the function assigning numeric values to the Mark parameters.
+If you insert 5 doors they are marked 1-5.
+Now if door 3 and 5 are deleted, then a new door will still start its mark on 6.
+Even if the project is closed and reopened, the next door still gets Mark# 6.
+That means there has to be a list inside Revit somewhere of the mark numbers that previously has been used, and Revit avoids reusing those numbers again.
+Is there a way through the API to get to that list?
+And somehow manipulate it to make Revit start counting on our choice of number?
+</p>
+
+<p><strong>Answer:</strong> Using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+RvtMgdDbg</a> BIM
+
+debugging and analysis tool or the Revit API introduction labs
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/deeper-parameter-exploration.html">
+built-in parameter checker</a> to
+
+explore various element parameters, I see that the Mark parameter is accessible through the built-in parameters ALL_MODEL_MARK.
+This is a read-write parameter:</p>
+
+<pre>
+ALL_MODEL_MARK  Mark  String/Text  read-write  4
+</pre>
+
+<p>You can therefore obtain a list of all door marks by filtering for all door instances and reading their ALL_MODEL_MARK parameter value.
+
+<p>I do not believe that you can manipulate Revit to influence the automatic mark counting setting used by the automatic assignment, but what you certainly can do is implement an external command which renumbers existing door instances by changing the value of their  ALL_MODEL_MARK parameter value in any way you please.
+
+<p>To demonstrate reading and listing all existing door marks as well as modifying the marks of existing doors, I created a new Building Coder sample command CmdListMarks, which implements the following functionality:
+
+<ul>
+<li>Select all door instances in the model.
+<li>Iterate over the selected door instances.
+<li>Create a dictionary whose keys are all door marks in the model and mapping each mark to a list of all doors with that mark.
+<li>Print out the sorted dictionary contents.
+<li>If any door elements have been selected prior to running the command, modify their door marks to a predefined hardcoded value "42".
+</ul>
+
+<p>Here is the output produced by running this command in a small model with four doors with the marks 1, 2 and 4, where 4 is duplicated on two doors.
+
+<pre>
+4 doors found.
+3 door marks found:
+  1: 1 door
+  2: 1 door
+  4: 2 doors
+</pre>
+
+<p>If I select the two doors marked 4 and run the command again, their marks are modified to 42.
+Running it yet again lists the new mark settings:
+
+<pre>
+4 doors found.
+3 door marks found:
+  1: 1 door
+  2: 1 door
+  42: 2 doors
+</pre>
+
+<p>Here is the complete code of the new external command:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> _modify_existing_marks = <span class="blue">true</span>;
+<span class="blue">const</span> <span class="blue">string</span> _the_answer = <span class="maroon">&quot;42&quot;</span>;
+&nbsp;
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; &nbsp; = app.Create.Filter;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; doors
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f1 = cf.NewTypeFilter(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = doc.get_Elements( f, doors );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} door{1} found.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;&gt; marks
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> door <span class="blue">in</span> doors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> mark = door.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK )
+&nbsp; &nbsp; &nbsp; &nbsp; .AsString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !marks.ContainsKey( mark ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; marks.Add( mark, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; marks[mark].Add( door );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; marks.Keys );
+&nbsp;
+&nbsp; &nbsp; keys.Sort();
+&nbsp;
+&nbsp; &nbsp; n = keys.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} door mark{1} found{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> mark <span class="blue">in</span> keys )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; n = marks[mark].Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0}: {1} door{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; mark, n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; n = 0; <span class="green">// count how many elements are modified</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( _modify_existing_marks )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementSet</span> els = doc.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> els )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Doors
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == e.Category.Id.Value )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( _the_answer );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ++n;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// return Succeeded only if we wish to commit </span>
+&nbsp; <span class="green">// the transaction to modify the database:</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> 0 &lt; n
+&nbsp; &nbsp; ? <span class="teal">CmdResult</span>.Succeeded
+&nbsp; &nbsp; : <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>The command returns Succeeded only if the BIM has actually been modified, otherwise Failed.
+This ensures that the document dirty flag stored in its
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/document-ismodified-property.html">
+IsModified property</a> is
+
+not set unnecessarily.
+
+<p>Here is
+
+<a href="zip/bc11047.zip">
+version 1.1.0.47</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>

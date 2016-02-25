@@ -1,0 +1,220 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit Install Location</h3>
+
+<p>Quite a while back, we discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-install-path-and-product-guids.html">
+Revit install path and product GUIDs</a>.
+
+Last week, Jim Bish of
+
+<a href="http://www.inlettechnology.com">
+Inlet Technology</a> wrote me a nice message making use of that and including VB code demonstrating how to use the install path and also how to determine the product GUID from the registry without having to manually type it in or copy and paste it from a table.
+
+<p><strong>Jim says</strong>: It has always been my policy to give back to others as they have given to me.
+Here are two functions that will retrieve the ProductCode and subsequently, the InstallLocation of Revit Structure 2010.  It can be modified for any install of Revit, and is primarily used to get a path to the revit.ini file for Appends, and Repairs, and Uninstalls of my External Commands and External Applications.
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> GetRevitProductCode()
+
+&nbsp; <span class="blue">Dim</span> key <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; = <span class="maroon">&quot;SOFTWARE\Autodesk\Revit\Autodesk Revit Structure 2010&quot;</span>
+
+&nbsp; <span class="blue">Using</span> rgk1 <span class="blue">As</span> RegistryKey _
+&nbsp; &nbsp; = Registry.LocalMachine.OpenSubKey(key)
+
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> sSubkeyName <span class="blue">As</span> <span class="blue">String</span> <span class="blue">In</span> _
+&nbsp; &nbsp; &nbsp; rgk1.GetSubKeyNames()
+
+&nbsp; &nbsp; &nbsp; <span class="blue">Using</span> rgk2 <span class="blue">As</span> RegistryKey _
+&nbsp; &nbsp; &nbsp; &nbsp; = rgk1.OpenSubKey(sSubkeyName)
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> rgk2.GetValue(<span class="maroon">&quot;ProductCode&quot;</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> generatedExceptionName <span class="blue">As</span> Exception
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(<span class="maroon">&quot;Error Occured&quot;</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+<span class="blue">End</span> <span class="blue">Function</span>
+
+<span class="blue">Public</span> <span class="blue">Function</span> GetRevitInstallLocation( _
+&nbsp; <span class="blue">ByVal</span> sProdCode <span class="blue">As</span> <span class="blue">String</span>)
+
+&nbsp; <span class="blue">Dim</span> key <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; = <span class="maroon">&quot;SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall&quot;</span>
+
+&nbsp; <span class="blue">Using</span> rgk1 <span class="blue">As</span> RegistryKey _
+&nbsp; &nbsp; = Registry.LocalMachine.OpenSubKey(key)
+
+&nbsp; &nbsp; <span class="blue">Using</span> rgk2 <span class="blue">As</span> RegistryKey _
+&nbsp; &nbsp; &nbsp; = rgk1.OpenSubKey(sProdCode)
+
+&nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> rgk2.GetValue(<span class="maroon">&quot;InstallLocation&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> generatedExceptionName <span class="blue">As</span> Exception
+&nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(<span class="maroon">&quot;Error Occured&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>I used these two functions as a basis for implementing a new Building Coder sample command CmdInstallLocation to ensure that this useful functionality is easily found and available.
+It determines and lists the product code and the install location for the currently executing Revit application and also tries to do so for all three flavours, Architecture, MEP and Structure.
+On my system, the result of running it looks like this:</p>
+
+<center>
+<img src="img/install_location.png" alt="Revit install locations"/>
+</center>
+
+<p>I factored out various useful bits of functionality from Jim's code as follows:
+
+<p>Define the Revit product and Windows uninstall registry paths:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _reg_path_uninstall
+&nbsp; = <span class="maroon">@&quot;SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall&quot;</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> _reg_path_for_flavour
+&nbsp; = <span class="maroon">@&quot;SOFTWARE\Autodesk\Revit\Autodesk Revit {0} 2010&quot;</span>;
+</pre>
+
+<p>Note that the registry path for the Revit product is actually a format string which still needs to be populated with the Revit product flavour.
+The correct string to specify the flavour can be obtained directly from the ProductType enumeration.
+We use it in the following function which returns the final Revit product registry path:</p>
+
+<pre class="code">
+<span class="blue">string</span> RegPathForFlavour( <span class="teal">ProductType</span> flavour )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( _reg_path_for_flavour, flavour );
+}
+</pre>
+
+<p>We also need methods to extract data from the registry.
+In one case, we use the Revit product registry path to determine the product key, which is located in the value named ProductCode in the subkey named Components.
+In the other case, we determine the Revit install location from the value named InstallLocation in the subkey specified by the product code in the Windows uninstall key.
+Both of these values' data type is string.
+Due to these two similar access paths, I can implement one single function to read the data:</p>
+
+<pre class="code">
+<span class="blue">string</span> GetSubkeyValue(
+&nbsp; <span class="blue">string</span> reg_path_key,
+&nbsp; <span class="blue">string</span> subkey_name,
+&nbsp; <span class="blue">string</span> value_name )
+{
+&nbsp; <span class="blue">using</span>( <span class="teal">RegistryKey</span> key
+&nbsp; &nbsp; = <span class="teal">Registry</span>.LocalMachine.OpenSubKey( reg_path_key ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">RegistryKey</span> subkey
+&nbsp; &nbsp; &nbsp; = key.OpenSubKey( subkey_name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> subkey.GetValue( value_name ) <span class="blue">as</span> <span class="blue">string</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Defined like this, making use of the method for the two cases described above is extremely simple:</p>
+
+<pre class="code">
+<span class="blue">string</span> GetRevitProductCode( <span class="blue">string</span> reg_path_product )
+{
+&nbsp; <span class="blue">return</span> GetSubkeyValue( reg_path_product,
+&nbsp; &nbsp; <span class="maroon">&quot;Components&quot;</span>, <span class="maroon">&quot;ProductCode&quot;</span> );
+}
+&nbsp;
+<span class="blue">string</span> GetRevitInstallLocation( <span class="blue">string</span> product_code )
+{
+&nbsp; <span class="blue">return</span> GetSubkeyValue( _reg_path_uninstall,
+&nbsp; &nbsp; product_code, <span class="maroon">&quot;InstallLocation&quot;</span> );
+}
+</pre>
+
+<p>We define a little helper method to format the data obtained for presentation in the message box:</p>
+
+<pre class="code">
+<span class="blue">string</span> FormatData(
+&nbsp; <span class="blue">string</span> description,
+&nbsp; <span class="blue">string</span> version_name,
+&nbsp; <span class="blue">string</span> product_code,
+&nbsp; <span class="blue">string</span> install_location )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format
+&nbsp; &nbsp; ( <span class="maroon">&quot;{0}: {1}&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\nProduct code: {2}&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\nInstall location: {3}&quot;</span>,
+&nbsp; &nbsp; description,
+&nbsp; &nbsp; version_name,
+&nbsp; &nbsp; product_code,
+&nbsp; &nbsp; install_location );
+}
+</pre>
+
+<p>Finally we can put it all together into the mainline code of our external command's Execute function.
+First, we look at the currently executing Revit application.
+The application Product property provides the ProductType, which can be used to obtain the registry path for this flavour of Revit, determine its product code and from that the install location.
+Next we loop through all three ProductType enumeration values and check for other installed flavours of Revit as well.
+The final result is displayed in the message box shown above:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+<span class="blue">string</span> reg_path_product
+&nbsp; = RegPathForFlavour( app.Product );
+&nbsp;
+<span class="blue">string</span> product_code
+&nbsp; = GetRevitProductCode( reg_path_product );
+&nbsp;
+<span class="blue">string</span> install_location
+&nbsp; = GetRevitInstallLocation( product_code );
+&nbsp;
+<span class="blue">string</span> msg = FormatData(
+&nbsp; <span class="maroon">&quot;Running application&quot;</span>,
+&nbsp; app.VersionName,
+&nbsp; product_code,
+&nbsp; install_location );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">ProductType</span> p <span class="blue">in</span>
+&nbsp; <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">ProductType</span> ) ) )
+{
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; reg_path_product = RegPathForFlavour( p );
+&nbsp;
+&nbsp; &nbsp; product_code = GetRevitProductCode(
+&nbsp; &nbsp; &nbsp; reg_path_product );
+&nbsp;
+&nbsp; &nbsp; install_location = GetRevitInstallLocation(
+&nbsp; &nbsp; &nbsp; product_code );
+&nbsp;
+&nbsp; &nbsp; msg += FormatData(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;\n\nInstalled product&quot;</span>,
+&nbsp; &nbsp; &nbsp; p.ToString(),
+&nbsp; &nbsp; &nbsp; product_code,
+&nbsp; &nbsp; &nbsp; install_location );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; }
+}
+&nbsp;
+<span class="teal">Util</span>.InfoMsg( msg );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11048.zip">
+version 1.1.0.48</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>Many thanks to Jim for providing the original VB code snippets and the idea for this post!</p>

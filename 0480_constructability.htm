@@ -1,0 +1,48 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Ritchie Jackson Re: Roller-Coaster Reception Facility -->
+
+<h3>Complexity versus Constructability</h3>
+
+<p>Here is another contribution from Ritchie Jackson of the
+
+<a href="http://www.aac.bartlett.ucl.ac.uk">
+Adaptive Architecture and Computation</a> programme
+
+at UCL, the
+
+<a href="http://en.wikipedia.org/wiki/University_College_London">
+University College London</a>, who 
+
+recently showed us his code and results working with 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/blends-hermite-splines-and-derivatives.html">
+blends, Hermite splines and derivatives</a>.
+
+This time Ritchie addresses the theme of how to ensure and demonstrate the constructability of complex doubly curved shapes:
+
+<p>With contemporary international focus on the design of complex, double-curved forms I thought I'd use the API to try and rationalise the process as an aid to fabrication and assembly.</p>
+
+<p>Using a Roller-Coaster Reception Facility as a test rig, a 3D-spline was sketched in a conceptual mass family and the points exported to create setouts for C# driven components in a generic model family. The latter was purposely chosen to force simplification of geometry in order to address the buildability question, with all elements being reduced to planar forms (arcs and lines)</p>
+
+<p>The images below outline the process. Although the 3D spline cannot be visualised in the generic model family, it can still be used as an underlying generator for geometry. It was evaluated at regular intervals along its length to provide setout points for the arc sub-components. The division number was progressively increased until the component junctions visually appeared to be smooth (tangents almost co-linear). Curve derivatives were extracted at these points and the tangent vectors used to create plane-normals for the cross-bracing and rafters:-</p>
+
+<center>
+<img src="img/ritchie-RollerCoaster-Setout.jpg" alt="Roller-Coaster Setout"/>
+</center>
+
+<p>The bracing points were tapered via linear interpolation and the rafter spans adjusted using a sine function:-</p>
+
+<center>
+<img src="img/ritchie-RollerCoaster-Model.jpg" alt="Roller-Coaster Model"/>
+</center>
+
+<p>Finally, a reception desk was added using a similar process (spline as generator) to give a sense of scale to the project:-</p>
+
+<center>
+<img src="img/ritchie-RollerCoaster-Render.jpg" alt="Roller-Coaster Render"/>
+</center>
+
+<p>Many thanks to Ritchie for these inspiring ideas and images!

@@ -1,0 +1,399 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1250837 [Pressure drop]
+  1252959 [Constraints]
+  1253788 [Ribbon Tab]
+  C:\a\j\adn\case\bsd\1253788\src\ModelessRevitDialog\ModelessRevitDialog.sln
+
+ -->
+
+<h3>Modeless Pressure Drop Tool</h3>
+
+<p>This weekend I went with a couple of men friends to spend two days together in Arcegno near 
+
+<a href="http://en.wikipedia.org/wiki/Locarno">
+Locarno</a>.
+
+One afternoon we went climbing together in Ponte Brolla at the end of the Maggia Valley.
+We did some very easy climbs, because some of us were absolute beginners, Jimmy (4b), Ostro (5a), Mekka (4c), and Muckel (5b), wonderful 
+
+<a href="http://www.spadout.com/wiki/index.php/Slab">
+slab climbing</a>
+
+on the big, clean, warm sloping rock face. 
+The next day we went on a hike from Aurigeno, a few kilometres up the Maggia Valley, up to Capoli (1001 m), Prada, and Chegg, to beautiful old stone houses on a mountain path with no connection to any road and even a group of tipis and a view out over the Lago Maggiore.
+Just before boarding the train back into the colder and moister north, I took a very nice long walk along the bank of the lake from Locarno out toward Tenero in order to savour the beautiful clear and sunny Sunday afternoon.
+
+<p>Back home again I return to the Revit API and BIM analysis.
+One simple BIM exploration required in the MEP HVAC domain is analysis of the pressure drop caused in a ventilation system by the various duct and fitting elements.
+
+<p>What would the ideal user interface for such an analysis tool look like?
+
+<p>One very minimalistic approach would be to hover over or pick the duct or fitting element of interest and see the result immediately displayed, wouldn't it?
+
+<p>This minimalistic interface can actually easily be implemented using the current Revit API, as we demonstrated in our discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+modeless dialogues</a>.
+
+A modeless dialogue is especially useful for interactive exploration of the Revit model, since the dialogue box and the Revit user interface both remain active at the same time.
+
+<p>Joel Karr of
+
+<a href="http://www.cadworks.net">
+CADworks</a> created
+
+a very sweet little implementation of just this kind of modeless 
+
+<a href="zip/PressureDropTool.zip">
+pressure drop tool</a> with 
+
+a number of interesting aspects, such as:
+
+<ul>
+<li>The command loop managing user interaction to select elements and control the modeless dialogue.
+<li>Functionality to determine the pressure drop data from a given Revit element.
+<li>Displaying the data to the user, which can be achieved very simply using an appropriate data container.
+</ul>
+
+<p>Joel shows us how to harness some powerful .NET framework functionality to implement the complete tool with a minimum of coding.
+
+<p>The tool is launched by invoking an external command. 
+This displays a modeless dialogue which initially has no data to display:</p>
+
+<center>
+<img src="img/pressure_drop_2.png" alt="Pressure drop tool"/>
+</center>
+
+<p>As long as it is running, it prompts the user to select a duct or fitting element.
+Every time an element is selected, the dialogue updates to reflect the pressure drop in the selected element:</p>
+
+<center>
+<img src="img/pressure_drop_3.png" alt="Pressure drop of a fitting"/>
+</center>
+
+<p>As soon as the form is closed, the command terminates.
+
+<p>You will probably be surprised to see how little code is required to achieve this.
+It takes much more text to describe it thoroughly in words, though:
+
+<ul>
+<li><a href="#1">Data container</a>.
+<li><a href="#2">Modeless form</a>.
+<li><a href="#3">Determining the pressure drop</a>.
+<li><a href="#4">Command loop</a>.
+<li><a href="#5">Retrieve Revit window handle</a>.
+<li><a href="#6">Retrieve pressure drop from selected element</a>.
+<li><a href="#7">Displaying the data in the form</a>.
+<li><a href="#8">Caveat</a>.
+<li><a href="#9">Source code</a>.
+</ul>
+
+<p>Let's start by looking at Joel's minimalistic data container class:</p>
+
+
+<a name="1"></a>
+
+<h4>Data Container</h4>
+
+<p>Here is a note from Joel on implementing his modeless pressure drop tool based on the original
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+modeless dialogue</a> sample:
+
+<p style="color:darkblue">I changed up your modeless dialogue a little bit to store the selection in a data class.  
+That way when I dispose the form I can dispose the selection and change the using Boolean to false.  
+Then it can exit the while loop of the form.
+
+<p>The data container makes use of the 
+
+<!-- C:\a\doc\revit\blog\164_three_hints.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/three-coding-and-performance-hints.html">
+auto-implemented properties</a> which 
+
+enables a very succinct implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Data</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">bool</span> UsingWindow { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="teal">bool</span> GetElements { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> PressureDrop { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="teal">Selection</span> Selection { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> Data()
+&nbsp; {
+&nbsp; &nbsp; UsingWindow = <span class="blue">true</span>;
+&nbsp; &nbsp; GetElements = <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>The two Boolean member variables are used to control the flow in the main command loop.
+The other two store the current interactive user selection in Revit and the pressure drop calculated for the currently selected element.
+It can't get much shorter than that, can it?
+
+
+<a name="2"></a>
+
+<h4>Modeless dialogue form</h4>
+
+<p>The modeless dialogue used to display the data basically just defines the label to receive the pressure drop value.
+The only code that needs to be added to the automatically generated Visual Studio designer code is the data container instance member and its initialisation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">WindowHandleForm</span> : <span class="teal">Form</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Data</span> CDWKSData { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> WindowHandleForm(<span class="teal">Data</span> data)
+&nbsp; {
+&nbsp; &nbsp; InitializeComponent();
+&nbsp;
+&nbsp; &nbsp; CDWKSData = data;
+&nbsp; }
+}
+</pre>
+
+
+<p>We will see below how the pressure drop value is retrieved from the Revit database and sent to the label in the form.
+
+
+
+<a name="3"></a>
+
+<h4>Determining the Pressure Drop</h4>
+
+<p>Now we come to the central question of querying the Revit element for its pressure drop.
+
+<p><strong>Question:</strong> I would like to be able to see the result of Revit's Pressure Drop Calculations for duct fittings.  
+I can choose the ASHRAE Table and the Loss Method but would like to see the result as the Pressure Drop parameter similar to the straight ducts.
+Is there a way to use the Pressure Drop Calculator through the API?  
+Or is there a way to make this show?
+Here is the area I would like to see populated:</p>
+
+<center>
+<img src="img/pressure_drop_0.png" alt="Pressure drop data"/>
+</center>
+
+<p>On a duct elbow, I looked at the value of the built-in parameter RBS_PressureDrop, but it is null when it is not filled out through the user interface.
+The value is not filled in automatically when I view the duct fitting through Revit.  
+I need a method that actually calculates the pressure drop for a fitting.  
+To do this by hand, an engineer can look at the size of the fitting, select the correct ASHRAE table, and then look up the value.  
+Revit does this automatically but does not display the result.
+
+<p><strong>Answer:</strong> This data is available from the connectors, not the fitting itself.
+You can use the Connector.PressureDrop property, which returns the instantaneous pressure drop of a given connector, calculated according to system.
+This means that to determine the pressure drop of fitting, such as a duct elbow, you need to iterate over its connectors and retrieve the data from them.
+The pressure drop of the elbow maps to the one of the connectors on this family instance. 
+The Connector.PressureDrop property will not return a null value. 
+Here is a pseudo-code snippet:
+
+<pre class="code">
+double get_pressure_drop( 
+  FamilyInstance ductElbow )
+{
+  foreach( Connector c in 
+    ductElbow.MEPmodel.ConnectorManager.ConnectorSet )
+  {
+    if( this connector c is the one required )
+    {
+      break;
+    }
+  }
+  return c.PressureDrop;
+}
+</pre>
+
+<a name="4"></a>
+
+<h4>Command Loop</h4>
+
+<p>Now we need to tie together the code accessing the pressure drop data to populate and drive the modeless form.
+How does this all fit together to provide the useful functionality presented above?
+
+<p>Here is the entire definition of the external command class with the mainline code of its Execute method, including three collapsed code regions which we expand and explore in more detail below:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">static</span> <span class="teal">WindowHandle</span> _hWndRevit = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">#region</span> <u><b>Get Revit Window Handle</b></u>
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.<span class="teal">Application</span> app 
+&nbsp; &nbsp; &nbsp; = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Data</span> data = <span class="blue">new</span> <span class="teal">Data</span>();
+&nbsp; &nbsp; data.Selection = doc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">WindowHandleForm</span> f 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">WindowHandleForm</span>( data ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; f.Show( _hWndRevit );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( data.UsingWindow )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( data.GetElements )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Clear Selection and Pressure Drop Value:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Selection.Elements.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.PressureDrop = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// User Selects an Element:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Selection.StatusbarTip 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;Please select a duct fitting.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Selection.PickOne();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelElementSet</span> ss = data.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">#region</span> <u><b>Process Selection for Pressure Drop</b></u>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">#region</span> <u><b>Send Information to Window Label</b></u>
+
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Note how the Boolean UsingWindow and GetElements member variables of the data container class are used to control the flow and termination of the loop.
+
+
+<a name="5"></a>
+
+<h4>Retrieving the Revit Window Handle</h4>
+
+<p>The window handle is retrieved and stored in a WindowHandle helper class using the same code as in the initial discussion of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+modeless dialogue</a>:
+
+<pre class="code">
+<span class="blue">#region</span> Get Revit Window Handle
+<span class="blue">if</span> (<span class="blue">null</span> == _hWndRevit)
+{
+&nbsp; <span class="teal">Process</span> process
+&nbsp; &nbsp; = <span class="teal">Process</span>.GetCurrentProcess();
+&nbsp;
+&nbsp; <span class="teal">IntPtr</span> h = process.MainWindowHandle;
+&nbsp;
+&nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">WindowHandle</span>(h);
+}
+<span class="blue">#endregion</span> <span class="green">// Get Revit Window Handle</span>
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Retrieving the Pressure Drop from a Selected Element</h4>
+
+<p>Here is the final resulting code to retrieve the pressure drop data from any applicable selected element, be it a duct or a fitting:
+
+<pre class="code">
+<span class="blue">#region</span> Process Selection for Pressure Drop
+
+<span class="blue">foreach</span> (<span class="teal">Element</span> e <span class="blue">in</span> ss)
+{
+&nbsp; <span class="blue">if</span> (e <span class="blue">is</span> <span class="teal">Duct</span>)
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = e <span class="blue">as</span> <span class="teal">Duct</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p
+&nbsp; &nbsp; &nbsp; = duct.ParametersMap.get_Item( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Pressure Drop&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; data.PressureDrop = p.AsDouble();
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span> (e <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; <span class="green">//&amp;&amp; e.Category.Name == &quot;Duct Fittings&quot;</span>
+&nbsp; &nbsp; &amp;&amp; e.Category.Id.Value.Equals( 
+&nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_DuctFitting ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fitting = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span> (<span class="teal">Connector</span> c <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; fitting.MEPModel.ConnectorManager.Connectors)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> (c.PressureDrop &gt; data.PressureDrop)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; data.PressureDrop = c.PressureDrop;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">#endregion</span>
+</pre>
+
+<p>Identifying a duct element is easy, since the Revit API defines a dedicated class for it.
+In that case, the pressure drop is available directly from the corresponding "Pressure Drop" element parameter.
+
+<p>On the other hand, a fitting is a family instance with a 'Duct Fittings' category, which we obviously identify using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/language-independent-category-access.html">
+language independent built-in category comparison</a>.
+
+If the selection is a fitting we need to loop through its connectors and retrieve the highest pressure drop value from those instead.
+Multiple branch fittings would need to return a different pressure drop value for each branch.
+
+
+<a name="7"></a>
+
+<h4>Displaying the Data in the Form</h4>
+
+<p>To display the pressure drop in the modeless form, we simply loop through all the form's controls until we find one named lblPressure, and then set its window text:
+
+<pre class="code">
+<span class="blue">#region</span> Send Information to Window Label
+&nbsp;
+<span class="blue">foreach</span>( System.Windows.Forms.<span class="teal">Control</span> control
+&nbsp; <span class="blue">in</span> f.Controls.Find( <span class="maroon">&quot;lblPressure&quot;</span>, <span class="blue">true</span> ) )
+{
+&nbsp; control.Text = <span class="teal">Math</span>.Round( 
+&nbsp; &nbsp; data.PressureDrop, 4 ).ToString();
+}
+<span class="blue">#endregion</span>
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Caveat</h4>
+
+<p>Only use modeless dialogues if you really know what you are doing.
+In general, 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/export-family-instance-to-gbxml.html#1">modal dialogues</a> are 
+
+preferable because they are more robust, and easier to understand and implement.
+Revit is basically treating all external commands as modal, and the API is only partially functional once the command has returned.
+In this example, the command actually does not return before the modeless form is closed, so that is a non-issue in this case.
+
+
+<a name="9"></a>
+
+<h4>Source code</h4>
+
+<p>Here is the complete 
+
+<a href="zip/PressureDropTool.zip">
+PressureDropTool</a>
+
+source code and Visual Studio solution.</p>
+

@@ -1,0 +1,397 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!-- 
+  1250969 [Apply a shared Parameter to a model group]
+  SPR #171272 [API wish: add shared parameter to model group]
+  1251151 [Storing information specific to to instances of the system family Model Group]
+  1250677 [parameters shared application]
+  SPR #171201: bind parameter to model lines
+-->
+
+<h3>Model Group Shared Parameter</h3>
+
+<p>Several people have recently been struggling with adding shared parameters to model groups, including myself.
+Since I had such a hard time finally setting up a reliable working solution, I thought I would share some of the steps and pitfalls with you.
+These are some of the issues that made it hard for me:
+
+<ul>
+<li>You cannot add <strong>visible</strong> shared parameters to a model group, only <strong>invisible</strong> ones.</li>
+<li>You cannot retrieve the model group category from the Document.Settings.Categories property.</li>
+<li>Various error messages are misleading.</li>
+</ul>
+
+<p>When you finally succeed in circumnavigating these obstacles, all works well.
+In the code sample below, I show how to set up shared parameters for several different categories:
+
+<ul>
+<li>The standard category Doors.</li>
+<li>The system category Walls.</li>
+<li>The Model Groups category.</li>
+<li>The Model Lines category.</li>
+</ul>
+
+<p>Note that this is one of the few cases where something can be done through the API that is not possible in the user interface. 
+In the user interface, shared parameters cannot be defined for model groups or model lines.
+This is reflected in the Category.AllowsBoundParameters property, which indicates if a category can 
+have visible shared or project parameters. 
+If it is false, the category may not be bound to visible shared parameters using the BindingMap. 
+Please note that non-user-visible parameters can still be bound to these categories.
+
+<p>We already made several forays into the realm of shared parameters in previous posts, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/defining-a-new-parameter.html">
+creation of a new shared parameter</a>
+
+and how to determine whether shared parameters can be added to certain elements, such as an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/adding-a-shared-parameter-to-a-dwg-file.html">
+inserted DWG file</a> 
+
+and an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/adding-a-shared-parameter-to-an-rfa-file.html">
+RFA file</a>.
+
+Performance issues were also addressed, both for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/parameter-modification-performance.html">
+modification of a parameter value</a>
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/parameter-binding-performance.html">
+parameter binding</a>.
+
+<h3>Accessing the Model Groups Category</h3>
+
+<p>To test attaching a shared parameter to model groups, I created a sample model group through the Revit user interface by selecting Annotate &gt; Detail Group &gt; Create Group, ensuring that the 'Model' radio button is toggled on, and selecting some model elements to add to the group.
+
+<p>When I look at the resulting group with RvtMgdDbg using Add-Ins &gt; RvtMgdDbg &gt; Snoop Db... &gt; Group, selecting the model group I just created, I can verify that its category name is 'Model Groups' and the built-in category is OST_IOSModelGroups.
+
+<p>I tried to use this value in the 
+
+<a href="zip/rac_labs_2009-06-24.zip">
+Revit API introduction labs</a>
+
+Lab4_3_1_CreateAndBindSharedParam by setting 
+
+<pre class="code">
+  static public BuiltInCategory Target 
+    = BuiltInCategory.OST_IOSModelGroups;
+</pre>
+
+<p>Unfortunately, when I do so, the step which actually creates the parameter binding between the shared parameter definition and the category set containing the designated target category throws an exception:
+
+<pre class="code">
+  doc.ParameterBindings.Insert( 
+    fireRatingParamDef, binding );
+</pre>
+
+<p>The exception message states that "Object reference not set to an instance of an object."
+
+<p>In later attempts, I discovered that we cannot obtain the model groups category from the Document.Settings.Categories collection at all.
+The typical way to access it would be using 
+
+<pre class="code">
+  doc.Settings.Categories.get_Item( BuiltInCategory.OST_IOSModelGroups );
+</pre>
+
+<p>This returns null. 
+An alternative method which is not recommended is to use the language dependent category name "Model Groups" as a target string instead of the language independent built-in category enumeration value. 
+Doing so throws an exception, SystemInvalidOperationException "Operation is not valid due to the current state of the object."
+
+<p>Yet another way to obtain the model group category is to query it from an existing model group in the project.
+This is implemented in the following helper method GetCategory, which returns a valid category for a given built-in enumeration value. 
+Note that in the case of model groups, it requires the existence of at least one such group in the project to work. 
+This limitation could be removed by inserting a dummy group on the fly, querying it for its category, and then deleting it again.
+Also note that for all other built-in categories except the model groups, we simply access the document categories collection in the normal way.
+There may actually be other built-in categories which require some kind of special handling as well, but I am currently not aware of any:
+
+<pre class="code">
+<span class="teal">Category</span> GetCategory( <span class="teal">Application</span> app, <span class="teal">BuiltInCategory</span> target )
+{
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">Category</span> cat = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( target.Equals( <span class="teal">BuiltInCategory</span>.OST_IOSModelGroups ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// determine model group category:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; &nbsp; &nbsp; = app.Create.Filter;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; modelGroups
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> fType = cf.NewTypeFilter(
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Group</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Filter fType = cf.NewTypeFilter( // this works as well</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; typeof( GroupType ) );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> fCategory = cf.NewCategoryFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_IOSModelGroups );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> f = cf.NewLogicAndFilter(
+&nbsp; &nbsp; &nbsp; fType, fCategory );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == doc.get_Elements( f, modelGroups ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please insert a model group.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> cat;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; cat = modelGroups[0].Category;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; cat = doc.Settings.Categories.get_Item( target );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error obtaining document {0} category: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; target.ToString(), ex.Message ) );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> cat;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == cat )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to obtain the document {0} category.&quot;</span>,
+&nbsp; &nbsp; &nbsp; target.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> cat;
+}
+</pre>
+
+<h3>Creating the Shared Parameter</h3>
+
+<p>Once we have determined the categories we wish to bind the shared parameter to, the rest of the steps are pretty straightforward and remain unchanged from the existing labs sample code.
+
+<p>We need to ensure that the newly created shared parameter is set to invisible for model groups, otherwise the binding will fail. 
+This applies to all categories whose property AllowsBoundParameters return false.
+
+<p>The error message produced by attempting to bind a visible shared parameter to a category whose AllowsBoundParameters is set false is rather misleading, because it simply states that "Binding the parameter to the category Model Groups is not allowed".
+
+<p>This message may also be generated when a parameter by the same name already exists.
+Be careful to remove all potentially conflicting shared parameters before running any tests.
+I now check through the user interface using Manage &gt; Shared Parameters and select Parameters: &gt; [group name] &gt; Delete &gt; Yes &gt; OK to remove any previously created definitions from the shared parameter definition file before relaunching my test command to add a new one again.
+
+<p>Here is the CreateSharedParameter method that I implemented to create a new shared parameter for a given category:
+
+<pre class="code">
+<span class="blue">bool</span> CreateSharedParameter( 
+&nbsp; <span class="teal">Application</span> app, 
+&nbsp; <span class="teal">Category</span> cat, 
+&nbsp; <span class="blue">int</span> nameSuffix )
+{
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// get or set the current shared params filename:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">string</span> filename 
+&nbsp; &nbsp; = app.Options.SharedParametersFilename;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 == filename.Length )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = _filename;
+&nbsp; &nbsp; <span class="teal">StreamWriter</span> stream;
+&nbsp; &nbsp; stream = <span class="blue">new</span> <span class="teal">StreamWriter</span>( path );
+&nbsp; &nbsp; stream.Close();
+&nbsp; &nbsp; app.Options.SharedParametersFilename = path;
+&nbsp; &nbsp; filename = app.Options.SharedParametersFilename;
+&nbsp; }
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// get the current shared params file object:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">DefinitionFile</span> file 
+&nbsp; &nbsp; = app.OpenSharedParameterFile();
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == file )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error getting the shared params file.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// get or create the shared params group:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">DefinitionGroup</span> group 
+&nbsp; &nbsp; = file.Groups.get_Item( _groupname );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == group )
+&nbsp; {
+&nbsp; &nbsp; group = file.Groups.Create( _groupname );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == group )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error getting the shared params group.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// set visibility of the new parameter:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">bool</span> visible = cat.AllowsBoundParameters;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// get or create the shared params definition:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">string</span> defname = _defname + nameSuffix.ToString();
+&nbsp;
+&nbsp; <span class="teal">Definition</span> definition = group.Definitions.get_Item( 
+&nbsp; &nbsp; defname );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == definition )
+&nbsp; {
+&nbsp; &nbsp; definition = group.Definitions.Create( 
+&nbsp; &nbsp; &nbsp; defname, _deftype, visible );
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == definition )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error in creating shared parameter.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// create the category set containing our category for binding:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">CategorySet</span> catSet = app.Create.NewCategorySet();
+&nbsp; catSet.Insert( cat );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// bind the param:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Binding</span> binding = app.Create.NewInstanceBinding( 
+&nbsp; &nbsp; &nbsp; catSet );
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// we could check if it is already bound, </span>
+&nbsp; &nbsp; <span class="green">// but it looks like insert will just ignore </span>
+&nbsp; &nbsp; <span class="green">// it in that case:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; doc.ParameterBindings.Insert( definition, binding );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error binding shared parameter to category {0}: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; cat.Name, ex.Message ) );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+}
+</pre>
+
+<h3>Putting it Together</h3>
+
+<p>With the two methods listed above in place, the rest of the code for the new external command CmdCreateSharedParams is pretty minimal.
+First, we define a couple of pretty arbitrary constants for the shared parameters filename, group name, parameter name prefix and type:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _filename = <span class="maroon">&quot;C:/tmp/SharedParams.txt&quot;</span>;
+<span class="blue">const</span> <span class="blue">string</span> _groupname = <span class="maroon">&quot;The Building Coder Parameters&quot;</span>;
+<span class="blue">const</span> <span class="blue">string</span> _defname = <span class="maroon">&quot;SP&quot;</span>;
+<span class="teal">ParameterType</span> _deftype = <span class="teal">ParameterType</span>.Number;
+</pre>
+
+<p>What element types are we interested in? 
+
+<ul>
+<li>We start with the standard SDK FireRating example, whcih uses BuiltInCategory.OST_Doors.
+<li>We use BuiltInCategory.OST_Walls to demonstrate that the same technique works with system families just as well as with standard ones.
+<li>To attach shared parameters to 
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/adding-a-shared-parameter-to-a-dwg-file.html">
+inserted DWG files</a>,
+which generate their own category on the fly, we can also identify the category by category name instead of built-in category enumeration.
+This is commented out here, so we do not have to deal with the additional complexity of mixing strings and built-in enumeration values.
+<li>We can attach shared parameters to model groups.
+Unfortunately, this does not work in the same way as the others, because we cannot retrieve the category from the document Settings.Categories collection, neither using the built-in category enumeration value nor the category name.
+We implemented the special switch for that case in the GetCategories method presented above, so that we can obtain the category from an existing instance of a group instead.
+<li>Model lines.
+</ul>
+
+<p>Here is the list of these built-in categories that we use to drive the shared parameter creation loop, followed by the implementation of the command mainline and creation loop in the external command Execute method:
+
+<pre class="code">
+<span class="teal">BuiltInCategory</span>[] targets = <span class="blue">new</span> <span class="teal">BuiltInCategory</span>[] {
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors,
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_Walls,
+&nbsp; <span class="green">//&quot;Drawing1.dwg&quot;, // inserted DWG file</span>
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_IOSModelGroups, 
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_Lines <span class="green">// model lines</span>
+};
+
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> target <span class="blue">in</span> targets )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Category</span> cat = GetCategory( app, target );
+&nbsp; &nbsp; CreateSharedParameter( app, cat, ++i );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>So you can actually add a shared parameter to a model group after all. Hooray!
+
+<p>Here is
+
+<a href="zip/bc11036.zip">
+version 1.1.0.36</a>
+
+of the complete Visual Studio solution with the new command.</p>
+
+<p>I am also providing the current version of the 
+
+<a href="zip/rac_labs_2009-06-24.zip">
+Revit API introduction labs</a>
+
+here.
+It includes an updated implementation of Lab 4-3-1, which now also includes this workaround to support adding a shared parameter to the model group category.
+
+<h3>First Response</h3>
+
+<p>Here is some enthusiastic response from Henrik Bengtsson of 
+
+<a href="http://www.lindab.se">
+Lindab</a>
+
+after trying this out:
+
+<span style="color:darkblue">
+
+<p>Now it is much clearer. And it works like a rocket !!!!!!!!
+
+<p>I simply implemented your function for retrieving the Category via the doc.Elements(Filter, List), and included a small IF statement for ordinary cases and the Model Groups case. One good idea was to include the Visibility settings in my shared parameters class, so that it takes care of the visibility setting depending on the AllowsBoundParameters property no matter what the user wants to create when he uses the class... Thanks again for the smashing answer...
+
+<p>You have really done a great job here!!!!
+
+</span>
+
+<p><strong>Question:</strong>
+Are there any other families that you know can be handled via the GetCategory solution, like Model Groups?
+
+<p><strong>Answer:</strong>
+No, I am currently not aware of any other categories that require the special handling I implemented for Model Groups, but possibly more would crop up with extensive testing. You could actually simply loop through all the built-in category enumeration values and try to retrieve a category from the document categories collection for each.

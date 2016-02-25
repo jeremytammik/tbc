@@ -1,0 +1,131 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266310 [CurtainGrid.Cells misreporting CurveLoops?] -->
+
+<h3>Iterating Over an Unordered Set Property</h3>
+
+<p>Here is a simple question that recently came up on iterating over the panel cells in a curtain grid:
+
+<p><strong>Question:</strong> I'm noticing some odd behaviour when dealing with CurtainCell.CurveLoops and CurtainCell.PlanarizedCurveLoops taken from CurtainGrid.Cells.  It appears that one of the loops is missing and another one of the loops is duplicated.
+
+<p>I am iterating over the cells using the following code and displaying a message listing the loop edge coordinates:
+
+<pre class="code">
+<span class="blue">Dim</span> cell <span class="blue">As</span> CurtainCell
+&nbsp;
+<span class="blue">For</span> i <span class="blue">As</span> <span class="blue">Integer</span> = 0 <span class="blue">To</span> cg.Cells.Size - 1
+&nbsp; cell = cg.Cells(i)
+&nbsp;
+&nbsp; msg += vbCrLf + vbCrLf + <span class="maroon">&quot;i=&quot;</span> + i.ToString
+&nbsp; msg += vbCrLf + <span class="maroon">&quot;CurveLoops&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> iCounter <span class="blue">As</span> <span class="blue">Integer</span> = 0
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> cArr <span class="blue">As</span> CurveArray <span class="blue">In</span> cell.CurveLoops
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> c <span class="blue">As</span> Curve <span class="blue">In</span> cArr
+&nbsp;
+&nbsp; &nbsp; &nbsp; iCounter += 1
+&nbsp;
+&nbsp; &nbsp; &nbsp; msg += vbCrLf + iCounter.ToString _
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;. &quot;</span> + Util.CurveToString(c)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; <span class="blue">Next</span>
+&nbsp;
+<span class="blue">Next</span>
+&nbsp;
+MsgBox(msg)
+</pre>
+
+<p>Here are the cells I am examining:</p>
+
+<center>
+<img src="img/curtain_grid_cells.png" alt="Curtain grid cells"/>
+</center>
+
+<p>The resulting dialogue box displays the cell curve loop coordinates like this:</p>
+
+<center>
+<img src="img/CellCurveLoopsJt.png" alt="Cell curve loop coordinates"/>
+</center>
+
+<p>As you can see, one loop is missing and the other is duplicated.
+
+<p>Is this normal behaviour?
+
+<p>Also, I noticed that every time I run the query the order in which they are received changes.
+
+<p><strong>Answer:</strong> First, I converted your code to iterate using for each instead:
+
+<pre class="code">
+<span class="blue">Dim</span> cg <span class="blue">As</span> CurtainGrid = w.CurtainGrid
+&nbsp;
+<span class="blue">Dim</span> msg <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;# Cells = &quot;</span> _
+&nbsp; + cg.Cells.Size.ToString
+&nbsp;
+<span class="blue">Dim</span> cell <span class="blue">As</span> CurtainCell
+<span class="blue">Dim</span> i <span class="blue">As</span> <span class="blue">Integer</span> = 0
+&nbsp;
+<span class="blue">For</span> <span class="blue">Each</span> cell <span class="blue">In</span> cg.Cells
+&nbsp;
+&nbsp; msg += vbCrLf + vbCrLf + <span class="maroon">&quot;i=&quot;</span> + i.ToString
+&nbsp; msg += vbCrLf + <span class="maroon">&quot;CurveLoops&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> iCounter <span class="blue">As</span> <span class="blue">Integer</span> = 0
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> cArr <span class="blue">As</span> CurveArray <span class="blue">In</span> cell.CurveLoops
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> c <span class="blue">As</span> Curve <span class="blue">In</span> cArr
+&nbsp;
+&nbsp; &nbsp; &nbsp; iCounter += 1
+&nbsp;
+&nbsp; &nbsp; &nbsp; msg += vbCrLf + iCounter.ToString _
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;. &quot;</span> + Util.CurveToString(c)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; i += 1
+&nbsp;
+<span class="blue">Next</span>
+&nbsp;
+MsgBox(msg)
+</pre>
+
+<p>Lo and behold, the problem is resolved, and here are the correct curve loops and their coordinates:</p>
+
+<center>
+<img src="img/CellCurveLoopsJtForeach.png" alt="Cell curve loop coordinates using Foreach"/>
+</center>
+
+<p>The problem has nothing to do with whether you use For and indexing or For Each, though.
+For Each loops operate in the same manner as a For i = loop.
+The indexing is provided by extension methods from Linq.
+
+<p>The problem is due to the fact that each call to CurtainGrid.Cells returns a new set.
+
+<p>The set returned is unordered, so there is no guarantee that one set will have its elements in the same order as another.
+
+<p>In your original code, you were calling cg.Cells(i) and thus requesting a new differently ordered set to be returned on each iteration step of the loop.
+
+<p>You can get a reliable indexed access if you obtain and store one single reference to the set once, rather than accessing it in each iteration within the loop:
+
+<pre class="code">
+<span class="blue">Dim</span> cgSet <span class="blue">As</span> CurtainCellSet = cg.Cells
+
+<span class="blue">For</span> i <span class="blue">As</span> <span class="blue">Integer</span> = 0 <span class="blue">To</span> cgSet.Size - 1
+&nbsp; <span class="blue">Dim</span> cell <span class="blue">As</span> CurtainCell = cgSet(i)
+
+  ...
+</pre>
+
+<p>I have seen several examples in the Revit API where you have to be very aware of the effect of calling a property and storing the result.
+
+<p>In most cases so far, the issue has been calling a property, storing the result in a variable, modifying the value of that variable, and expecting the underlying property to have changed. That is not the case, since the variable just stores a copy of the original value, and the original is not modified by modifying the copy stored in the variable.
+
+<p>In this case, it is the other way round, sort of: each call to the property returns a different result, so we have to store the property value from one single call in a constant variable to ensure that it remains unchanged during the iteration process.

@@ -1,0 +1,198 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  Autodesk University 2009
+  CP222-3 Analyze Geometry of Buildings Using the Autodesk Revit API -- Scott Conover
+  C:\a\doc\revit\au\2009\doc2\AU09_CP222-3_Analyze_Geometry_Revit_API.pdf
+
+-->
+
+<h3>Curves</h3>
+
+<p>This is part 4 of Scott Conover's AU 2009 class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>.
+
+<h4>Curve Types</h4>
+
+<p>Revit uses a variety of curve types to represent curve geometry in a document. 
+The curve types and corresponding Revit API classes include:
+
+<ul>
+<li>Bounded line &ndash; Line
+<li>Unbound line &ndash; Line
+<li>Arc &ndash; Arc
+<li>Circle &ndash; Arc
+<li>Elliptical arc &ndash; Ellipse
+<li>Ellipse &ndash; Ellipse
+<li>NURBS &ndash; NurbSpline
+<li>Hermite &ndash; HermiteSpline
+</ul>
+
+<p>Here are the definitions and some notes on each of these curve types:
+
+<ul>
+<li>Bounded line: 
+A line segment defined by its endpoints. 
+Obtain endpoints from Curve.get_Endpoint().
+
+<li>Unbounded line: An infinite line defined by a location and direction. 
+Identify these with Curve.IsBound.
+Evaluate point and tangent vector at raw parameter zero to find the input parameters for the equation of the line.
+
+<li>Arc:
+A bound circular arc.
+Begin and end at a certain angle. 
+These angles can be obtained by the raw parameter values at each end of the arc.
+
+<li>Circle:
+An unbound circle.
+Identify with Curve.IsBound.
+Use raw parameter for evaluation (from 0 to 2&pi;).
+
+<li>Elliptical arc:
+A bound elliptical segment.
+
+<li>Ellipse:
+An unbound ellipse.
+Identify with Curve.IsBound. 
+Use raw parameter for evaluation (from 0 to 2&pi;).
+
+<li>Nurbs spline:
+A non-uniform rational B-spline.
+Used for splines sketched in various Revit tools, plus imported geometry.
+
+<li>Hermite spline:
+A spline interpolate between a set of points.
+Used for tools like Curve by Points and flexible ducts/pipes, plus imported geometry.
+</ul>
+
+<h4>Mathematical representation</h4>
+
+<p>Mathematical representations of all of the Revit curve types are given in Appendix A of Scott's
+
+<a href="">handout document</a>, 
+
+and we include them here as well for easy online access.
+This section describes the curve types encountered in Revit geometry, their properties, and their mathematical representations.
+
+<h5>Bounded Line</h5>
+
+<p>Bound lines are defined by their endpoints. 
+In the Revit API, obtain the endpoints of the line from the Curve-level get_EndPoint() method.
+
+<p>The equation for a point on a bound line in terms of the normalized parameter 'u' and the line endpoints is</p>
+
+<div align="center">P(u) = P<sub>1</sub> + u (P<sub>2</sub> - P<sub>1</sub>)</div>
+
+<h5>Unbound lines</h5>
+
+<p>Unbound lines are handled specially in the Revit API. 
+Most curve properties cannot be used, however, Evaluate and ComputeDerivatives can be used to obtain locations along the curve when a raw parameter is provided.
+
+<p>The equation for a point for an unbound line in terms of the raw parameter 'u', the line origin P and normalized direction vector V is</p>
+
+<div align="center">P(u) = P<sub>0</sub> + u V</div>
+
+<h5>Arcs and Circles</h5>
+
+<p>Arcs and Circles are represented in the Revit API by the Arc class. 
+They are defined in terms of their radius, center and vector normal to the plane of the arc, which are accessible in the Revit API directly from the Arc class as properties.</p>
+
+<p>Circles have the IsBound property set to true. 
+This means they can only be evaluated by using a raw parameter (range from 0 to 2&pi;), and the equation for a point on the circle in terms of the raw parameter is</p>
+
+<div align="center">P(u) = C + r ( n<sub>x</sub> cos(u) + n<sub>y</sub> sin(u) )</div>
+
+<p>Here the assumption is made that the circle lies in the XY plane.</p>
+
+<p>Arcs begin and end at a certain angle. 
+These angles can be obtained by the raw parameter values at each end of the arc, and angular values between these values can be plugged into the same equation as above.</p>
+
+<h5>Ellipse and Elliptical Arcs</h5>
+
+<p>Ellipses and elliptical arcs segments are represented in the Revit API by the Ellipse class. 
+Similar to arcs and circles, they are defined in a given plane in terms of their X and Y radii, center, and vector normal to the plane of the ellipse.</p>
+
+<p>Full ellipses have the IsBound property set to true. 
+Similar to circles, they can be evaluated via raw parameter values between 0 and 2&pi;:</p>
+
+<div align="center">P(u) = C + n<sub>x</sub> r<sub>x</sub> cos(u) + n<sub>y</sub> r<sub>y</sub> sin(u)</div>
+
+<h5>NurbSpline</h5>
+
+<p>NURBS (non-uniform rational B-splines) are used for spline segments sketched by the user as curves or portions of 3D object sketches. 
+They are also used to represent some types of imported geometry data.</p>
+
+<p>The data for the NurbSpline include:</p>
+
+<ul>
+<li>The control points array P, of length n + 1.
+<li>The weights array w, also of length n + 1.
+<li>The curve degree, whose value is equal to one less than the curve order k.
+<li>The knot vector N, of length n + k + 1.
+</ul>
+
+<p>The parametric formula for a point on the curve is given by</p>
+
+<div align="center">P(u) = &sum; P<sub>i</sub> w<sub>i</sub> N<sub>i,k</sub>(u) &nbsp; / &nbsp; &sum; w<sub>i</sub> N<sub>i,k</sub>(u)</div>
+
+<p>The sums are over i = 0,...n, and u is limited to the interval 0 &lt; u &le; u<sub>max</sub>.
+
+<h5>HermiteSpline</h5>
+
+<p>Hermite splines are used for curves which are interpolated between a set of control points, like Curve by Points and flexible ducts and pipes in MEP. 
+They are also used to represent some types of imported geometry data. 
+In the Revit API, the HermiteSpline class offers access to the arrays of points, tangent vectors and parameters through the ControlPoints, Tangents, and Parameters properties.</p>
+
+<p>The equation for the curve between two nodes in a Hermite spline is</p>
+
+<div align="center">P(u) = h<sub>00</sub>(u) P<sub>k</sub> + (u<sub>k+1</sub> - u<sub>k</sub>) h<sub>10</sub>(u) M<sub>k</sub> + h<sub>01</sub>(u) P<sub>k+1</sub> + (u<sub>k+1</sub> - u<sub>k</sub>) h<sub>11</sub>(u) M<sub>k+1</sub></div>
+
+<p>Here P<sub>k</sub> and P<sub>k+1</sub> represent the points at each node, M<sub>k</sub> and M<sub>k+1</sub> the tangent vectors, and u<sub>k</sub> and u<sub>k+1</sub> the parameters at the nodes, and the basis functions are:</p>
+
+<div align="center">h<sub>00</sub>(u) = 2u<sup>3</sup> - 3u<sup>2</sup> + 1
+<br/>h<sub>10</sub>(u) = u<sup>3</sup> - 2u<sup>2</sup> + u
+<br/>h<sub>01</sub>(u) = - 2u<sup>3</sup> + 3u<sup>2</sup>
+<br/>h<sub>11</sub>(u) = u<sup>3</sup> - u<sup>2</sup></div>
+
+<h4>Curve analysis and processing</h4>
+
+<p>There are several Curve members which are tools suitable for use in geometric analysis. 
+In some cases, these APIs do more than you might expect by a quick review of their names.
+We will discuss three of them:
+
+<ul>
+<li>Intersect
+<li>Project
+<li>Tessellate
+</ul>
+
+<h5>Intersect</h5>
+
+<p>The Intersect method allows you compare two curves to find how they differ or how they are similar. It can be used in the manner you might expect, to obtain the point or point(s) where two curves intersect one another, but it can also be used to identify:
+
+<ul>
+<li>Collinear lines
+<li>Overlapping lines
+<li>Identical curves
+<li>Totally distinct curves with no intersections
+</ul>
+
+<p>The return value identifies these different results, and the output IntersectionSetResult contains information on the intersection point(s).
+
+<h5>Project</h5>
+
+<p>The Project method projects a point onto the curve and returns information about the nearest point on the curve, its parameter, and the distance from the projection point.
+
+<h5>Tessellate</h5>
+
+<p>This method splits the curve into a series of linear segments, accurate within a default tolerance. For Curve.Tessellate, the tolerance is slightly larger than 1/16'. This tolerance of approximation is the tolerance used internally by Revit as adequate for display purposes.
+
+<p>Note that only lines may be split into output of only two tessellation points; non-linear curves will always output more than two points, even if the curve has an extremely large radius which might mathematically equate to a straight line.
+
+<p>In the next instalment of this series, we will look the Revit API handling of faces.

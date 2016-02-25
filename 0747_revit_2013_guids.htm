@@ -1,0 +1,198 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">
+td.j571
+{
+  border-color: darkgrey;
+  border-width: 1px;
+  border-style: solid;
+}
+.j571r
+{
+  border-color: darkgrey;
+  border-width: 1px;
+  border-style: solid;
+  text-align: right;
+}
+</style>
+</head>
+
+<!--
+
+1268450 [Vanguard: Revit 2012 Registry Product GUIDs...]
+1268548 [[Vanguard] Revit Product GUIDs]
+06911267 [Student Version]
+
+-->
+
+<h3>Revit 2013 Product GUIDs and GUID Algorithm</h3>
+
+<p>Every year anew, people ask for the Revit product GUIDs used to identify the Revit installation and stored in the Windows registry under
+
+<ul>
+<li>HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall
+</ul>
+
+<p>There are different keys for each of the three Revit flavours, plus the Revit 2013 one-box solution, and for 32 and 64 bit operating systems.
+
+<p>We discussed this topic in the past for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-install-path-and-product-guids.html">
+Revit 2010 and previous versions</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-product-guids.html">
+Revit 2011</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/product-guids-for-revit-2012-and-forever-more.html">
+Revit 2012</a>,
+
+when the 'perpetual GUID algorithm' was introduced.
+
+<p>The install path is much less of an issue nowadays, since you now use an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/network-access-to-add-in-manifest-and-icons.html">
+add-in manifest</a> to
+
+inform Revit how to load your add-in, and the add-in manifest path is well known.
+
+<p>It is actually recommended to install .NET add-ins for both AutoCAD and Revit
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/11/updated-version-of-screenshot-now-available.html">
+in or under the same directory as acad.exe and revit.exe</a>,
+
+respectively: "It's safest to place assemblies at a location beneath the calling executable."
+
+<p>The best way to determine the Revit install location is to use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">
+RevitAddInUtility</a>,
+
+which provides an API for an installer to query that and also to generate an add-in manifest file from the relevant properties you specify.
+The same RevitAddInUtility assembly DLL works transparently on both 32 and 64 bits.
+
+
+<a name="2"></a>
+
+<h4>Revit Product GUIDs up to Revit 2013</h4>
+
+<p>Still, the product GUID may be important for other uses.
+Here is the updated list including the GUIDs for the initial Revit 2013 versions:</p>
+
+<table>
+<tr><td class="j571" rowspan="8">2013</td><td class="j571" rowspan="4">64 bit</td><td class="j571">RAC</td><td class="j571">7346B4A0-1300-0110-0409-705C0D862004</td></tr>
+<tr><td class="j571">RST</td><td class="j571">7346B4A0-1300-0210-0409-705C0D862004</td></tr>
+<tr><td class="j571">RME</td><td class="j571">7346B4A0-1300-0310-0409-705C0D862004</td></tr>
+<tr><td class="j571">One-Box</td><td class="j571">7346B4A0-1300-0510-0409-705C0D862004</td></tr>
+<tr><td class="j571" rowspan="4">32 bit</td><td class="j571">RAC</td><td class="j571">7346B4A0-1300-0100-0409-705C0D862004</td></tr>
+<tr><td class="j571">RST</td><td class="j571">7346B4A0-1300-0200-0409-705C0D862004</td></tr>
+<tr><td class="j571">RME</td><td class="j571">7346B4A0-1300-0300-0409-705C0D862004</td></tr>
+<tr><td class="j571">One-Box</td><td class="j571">7346B4A0-1300-0500-0409-705C0D862004</td></tr>
+
+<tr><td class="j571" rowspan="6">2012</td><td class="j571" rowspan="3">64 bit</td><td class="j571">RAC</td><td class="j571">7346B4A0-1200-0110-0409-705C0D862004</td></tr>
+<tr><td class="j571">RST</td><td class="j571">7346B4A0-1200-0210-0409-705C0D862004</td></tr>
+<tr><td class="j571">RME</td><td class="j571">7346B4A0-1200-0310-0409-705C0D862004</td></tr>
+<tr><td class="j571" rowspan="3">32 bit</td><td class="j571">RAC</td><td class="j571">7346B4A0-1200-0100-0409-705C0D862004</td></tr>
+<tr><td class="j571">RST</td><td class="j571">7346B4A0-1200-0200-0409-705C0D862004</td></tr>
+<tr><td class="j571">RME</td><td class="j571">7346B4A0-1200-0300-0409-705C0D862004</td></tr>
+
+<tr><td class="j571" rowspan="6">2011</td><td class="j571" rowspan="3">64 bit</td><td class="j571">RAC</td><td class="j571">94D463D0-2B13-4181-9512-B27004B1151A</td></tr>
+<tr><td class="j571">RST</td><td class="j571">23853368-22DD-4817-904B-DB04ADE9B0C8</td></tr>
+<tr><td class="j571">RME</td><td class="j571">C31F3560-0007-4955-9F65-75CB47F82DB5</td></tr>
+<tr><td class="j571" rowspan="3">32 bit</td><td class="j571">RAC</td><td class="j571">4AF99FCA-1D0C-4D5A-9BFE-0D4376A52B23</td></tr>
+<tr><td class="j571">RST</td><td class="j571">0EE1FCA9-7474-4143-8F22-E7AD998FACBF</td></tr>
+<tr><td class="j571">RME</td><td class="j571">CCCB80C8-5CC5-4EB7-89D0-F18E405F18F9</td></tr>
+
+<tr><td class="j571" rowspan="6">2010</td><td class="j571" rowspan="3">64 bit</td><td class="j571">RAC</td><td class="j571">2A8EEE2F-4A9E-43d8-AA07-EC8A316B2DEB</td></tr>
+<tr><td class="j571">RST</td><td class="j571">BC9C0A08-DEA4-4138-A7FB-8F68866DB0C1</td></tr>
+<tr><td class="j571">RME</td><td class="j571">A1BD042B-8A6F-4e37-92A3-78921BB45B05</td></tr>
+<tr><td class="j571" rowspan="3">32 bit</td><td class="j571">RAC</td><td class="j571">572FBF5D-3BAA-42ff-A468-A54C2C0A17C3</td></tr>
+<tr><td class="j571">RST</td><td class="j571">939D29FC-B82D-42a7-BB1E-8E3F121505CC</td></tr>
+<tr><td class="j571">RME</td><td class="j571">5C8281B1-B927-495a-A0FF-AB4BDFAE505C</td></tr>
+
+<tr><td class="j571" rowspan="6">2009</td><td class="j571" rowspan="3">64 bit</td><td class="j571">RAC</td><td class="j571">D2466208-7348-4214-B01E-7BC8729E2BD3</td></tr>
+<tr><td class="j571">RST</td><td class="j571">B354FCF5-CF64-4fa2-AA84-9D9B2A6FA649</td></tr>
+<tr><td class="j571">RME</td><td class="j571">4A98F976-01B5-40e8-A496-AEFD85C3A446</td></tr>
+<tr><td class="j571" rowspan="10">32 bit</td><td class="j571">RAC</td><td class="j571">A3A37DA6-70C0-497C-BCB1-148E9EC1D32E</td></tr>
+<tr><td class="j571">RST</td><td class="j571">C4B3B3C3-2EE9-48D3-9BF5-4443F7ECF759</td></tr>
+<tr><td class="j571">RME</td><td class="j571">E3781DCB-A650-4E66-9B74-67A1B17F052C</td></tr>
+
+<tr><td class="j571" rowspan="3">2008</td><td class="j571">RAC</td><td class="j571">4A11206C-4377-49E8-911E-B11548658FF3</td></tr>
+<tr><td class="j571">RST</td><td class="j571">8D0AE0BB-4FE5-491D-A284-3B363F02E639</td></tr>
+<tr><td class="j571">RME</td><td class="j571">60A2743E-C881-4880-94ED-96445E38616F</td></tr>
+
+<tr><td class="j571r">9.0</td><td class="j571">Revit Building</td><td class="j571">D11DB6CB-0332-4735-B312-B919741D975E</td></tr>
+<tr><td class="j571r">3</td><td class="j571">RST</td><td class="j571">3F11CEE0-D30D-41ce-8522-922B5D8BB324</td></tr>
+<tr><td class="j571r">8.1</td><td class="j571">Revit Building</td><td class="j571">7EBC0489-5E47-498D-BE31-B094484612E9</td></tr>
+<tr><td class="j571r">2</td><td class="j571">RST</td><td class="j571">BE814F63-629D-4fd8-B628-1437AC10F9D4</td></tr>
+</table>
+
+
+<a name="2"></a>
+
+<h4>Perpetual Revit Product GUID Algorithm</h4>
+
+<p>As you can see above, all Revit GUIDs from Revit 2012 onwards have a strong similarity with each other.
+
+<p>This is because they are generated according to the following pattern:
+
+<pre class="code">
+    {7346B4At-uuvv-wwxy-zzzz-705C0D862004}
+</pre>
+
+
+<p>The alphabetical characters above stand for:
+
+<ol style="list-style-type:lower-alpha" start="20">
+<li>[0/1]: ProductCode/UpgradeCode
+<li>[12, 13, ...]: Major release version [12, 13]
+<li>[00, 01, ...]: Release subversion
+<li>[01/02/03/05]: RAC/RST/RME/One-Box
+<li>[0/1]: Win32/x64
+<li>[0/1]: Global/Language Pack
+<li>[0409...]: Language
+</ol>
+
+<hr>
+
+<p>Internal only:
+
+<ol type="a" start="20">
+<li>[0/1/2/3/...]: ProductCode/UpgradeCode/Patch Version (2 == UR1)
+<li>[12, 13, ...]: Major release version [12, 13]
+<li>[00, 01, ...]: Release subversion
+<li>[01/02/03/04/05/06/07]: RAC/RST/RME/RLT/RVT/RS/Vasari
+<li>[0/1]: Win32/x64
+<li>[0/1]: Global/Language Pack
+<li>[0409...]: Language
+</ol>
+
+<hr>
+
+<p>The last item, represented by 'z', identifies the language.
+It uses the hexadecimal
+
+<a href="http://msdn.microsoft.com/en-us/library/cc233965.aspx">
+LCID</a> or
+
+language code identifier.
+The ones supported by Revit are listed in the following table:</p>
+
+<table>
+<tr><th class="j571r">lang</th><th class="j571r">.NET code</th><th class="j571r">HEX LCID</th><th class="j571r">DEC LCID</th><th class="j571r">Language</th><th class="j571r">Codepage</th></tr>
+<tr><td class="j571r">chs</td><td class="j571r">zh-CN</td><td class="j571r">0804</td><td class="j571r">2052</td><td class="j571r">Chinese Simpl.</td><td class="j571r">936</td></tr>
+<tr><td class="j571r">cht</td><td class="j571r">zh-TW</td><td class="j571r">0404</td><td class="j571r">1028</td><td class="j571r">Chinese Trad.</td><td class="j571r">950</td></tr>
+<tr><td class="j571r">csy</td><td class="j571r">cs-CZ</td><td class="j571r">0405</td><td class="j571r">1029</td><td class="j571r">Czech</td><td class="j571r">1250</td></tr>
+<tr><td class="j571r">deu</td><td class="j571r">de-DE</td><td class="j571r">0407</td><td class="j571r">1031</td><td class="j571r">German</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">enu</td><td class="j571r">en-US</td><td class="j571r">0409</td><td class="j571r">1033</td><td class="j571r">English</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">esp</td><td class="j571r">es-ES</td><td class="j571r">040A</td><td class="j571r">1034</td><td class="j571r">Spanish</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">fra</td><td class="j571r">fr-FR</td><td class="j571r">040C</td><td class="j571r">1036</td><td class="j571r">French</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">hun</td><td class="j571r">hu-HU</td><td class="j571r">040E</td><td class="j571r">1038</td><td class="j571r">Hungarian</td><td class="j571r">1250</td></tr>
+<tr><td class="j571r">ita</td><td class="j571r">it-IT</td><td class="j571r">0410</td><td class="j571r">1040</td><td class="j571r">Italian</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">jpn</td><td class="j571r">ja-JP</td><td class="j571r">0411</td><td class="j571r">1041</td><td class="j571r">Japanese</td><td class="j571r">932</td></tr>
+<tr><td class="j571r">kor</td><td class="j571r">ko-KR</td><td class="j571r">0412</td><td class="j571r">1042</td><td class="j571r">Korean</td><td class="j571r">949</td></tr>
+<tr><td class="j571r">plk</td><td class="j571r">pl-PL</td><td class="j571r">0415</td><td class="j571r">1045</td><td class="j571r">Polish</td><td class="j571r">1250</td></tr>
+<tr><td class="j571r">ptb</td><td class="j571r">pt-BR</td><td class="j571r">0416</td><td class="j571r">1046</td><td class="j571r">Portuguese Brazil</td><td class="j571r">1252</td></tr>
+<tr><td class="j571r">rus</td><td class="j571r">ru-RU</td><td class="j571r">0419</td><td class="j571r">1049</td><td class="j571r">Russian</td><td class="j571r">1251</td></tr>
+</table>
+
+<p>Applying this algorithm to the different Revit 2013 flavours produces the values listed in the table above.

@@ -1,0 +1,112 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07099386 [Retrieve image from embedded resource] -->
+
+<h3>Retrieve Embedded Resource Image</h3>
+
+<p>I had my first haircut since January this weekend  :-)
+
+<p>The reason I had such a long break from that task is that I shaved my head completely in January.
+I had been thinking of doing that sometime in my life ever since I was a teenager, but I was always way too scared to actually put it into practice.
+In the meantime, three of my four kids already showed me how easy it is, and they all looked good, which reduced the threshold somewhat.
+I mentioned it to my son Christopher back in November, and he immediately responded with "well, I have a machine for that; let's get down to it right away."
+I was not that brave, but when he brought up the topic again in January, I was finally ready for it:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-01-12_haircut/haircut-small.gif" alt="Shaving Jeremy's head"/>
+</center>
+
+<p>His friend Naomi took pictures of the process and Christopher made an animated GIF from them.
+
+<p>I had associated many things with it, such as letting go, clearing up, connecting to the spiritual, getting lighter, accessing my own embedded resources etc...
+It was a good feeling  :-)
+
+<p>Anyway, today is the day for
+
+<a href="http://en.wikipedia.org/wiki/Leaving_on_a_Jet_Plane">
+leaving, on a jet plane</a>
+
+(<a href="http://www.lyrics007.com/John%20Denver%20Lyrics/Leaving%20on%20a%20Jet%20Plane%20Lyrics.html">lyrics</a>),
+
+for the
+
+<a href="http://www.cvent.com/events/devcamp-2012/event-summary-56817a3b57614f8eb59ea05fcd59bc32.aspx">
+AEC DevCamp</a>
+
+in Boston.
+
+<p>Here is one last little not-so-spiritual and rather down-to-earth Revit API item before I pack and go.
+
+<p>Ah, no, yet one more intersting thing to point out that you should not miss: one of the "rarest of predictable celestial phenomena" is taking place tomorrow, June 5: a
+
+<a href="http://en.wikipedia.org/wiki/Transit_of_Venus,_2012">
+transit of Venus in front of the sun</a>.
+
+
+<p><strong>Question:</strong> Can you please provide some insight and sample code on how to retrieve an image from the resources embedded in a DLL?
+
+<p>I am writing an add-in that creates its own Revit ribbon.
+
+<p>I can access image files stored in separate external files without any problems, but I would like to deploy a single DLL without having to include a folder full of images.
+
+<p>Thank you very much!
+
+
+<p><strong>Answer:</strong> Please take a look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/string-search-adn-plugin-of-the-month.html">
+String Search ADN Plugin of the Month</a>.
+
+It demonstrates exactly what you are asking for.
+
+<p>The method that is probably of greatest interest to you is the NewBitmapImage one in the external application implementation class App:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Load a new icon bitmap from embedded resources.</span>
+&nbsp; <span class="gray">///</span><span class="green"> For the BitmapImage, make sure you reference </span>
+&nbsp; <span class="gray">///</span><span class="green"> WindowsBase and PresentationCore, and import </span>
+&nbsp; <span class="gray">///</span><span class="green"> the System.Windows.Media.Imaging namespace. </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">BitmapImage</span> NewBitmapImage(
+&nbsp; &nbsp; <span class="teal">Assembly</span> a,
+&nbsp; &nbsp; <span class="blue">string</span> imageName )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// to read from an external file:</span>
+&nbsp; &nbsp; <span class="green">//return new BitmapImage( new Uri(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; Path.Combine( _imageFolder, imageName ) ) );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Stream</span> s = a.GetManifestResourceStream(
+&nbsp; &nbsp; &nbsp; &nbsp; _namespace_prefix + imageName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BitmapImage</span> img = <span class="blue">new</span> <span class="teal">BitmapImage</span>();
+&nbsp;
+&nbsp; &nbsp; img.BeginInit();
+&nbsp; &nbsp; img.StreamSource = s;
+&nbsp; &nbsp; img.EndInit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> img;
+&nbsp; }
+</pre>
+
+<p>It is used like this in to populate the push button image data:
+
+<pre class="code">
+&nbsp; d.Image = NewBitmapImage( exe, <span class="maroon">&quot;Img1.png&quot;</span> );
+&nbsp; d.LargeImage = NewBitmapImage( exe, <span class="maroon">&quot;Img2.png&quot;</span> );
+&nbsp; d.ToolTipImage = NewBitmapImage( exe, <span class="maroon">&quot;Img3.png&quot;</span> );
+</pre>
+
+<p>Obviously the images have to be included in the project files and marked as embedded resources in the Visual Studio IDE, and the path within the project has to match.
+
+<p>All of that is demonstrated by the StringSearch sample.
+
+
+<p>Actually, since I was working on it recently anyway, here is an
+
+<a href="file:///C:/a/src/revit/plugin/string_search/zip/StringSearch2013.zip">
+updated version of the source code for Revit 2013</a>,
+
+including the entire Visual Studio solution and add-in manifest.

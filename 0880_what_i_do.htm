@@ -1,0 +1,275 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+07956536 [如何获取墙的材质厚度、名称等属性]
+07953471 [How to check if any transaction is open]
+-->
+
+<h3>What I Do, Wall Layers and Open Transactions</h3>
+
+<p>One of my tasks today and tonight will be a minimal little contribution to an internal ADN meeting, where I was asked to explain briefly to my colleagues in just a couple of minutes what my job involves and what I have been up to for the last couple of months.
+Tonight, since we have a session each for the western and eastern hemisphere, and the eastern one will require me to set my alarm for 2:30 tomorrow morning.
+
+<p>I thought I might as well share the result here with you also, to provide a rough idea for all of what my everyday work looks like.
+
+<p>Further down I'll also mention two recent cases, dealing with:</p>
+
+<ul>
+<li>Determining <a href="#2">wall layer materials, areas and volumes</a></li>
+<li>Determining <a href="#3">whether a transaction is open</a></li>
+<li>The <a href="#4">Application IsQuiescent property</a></li>
+</ul>
+
+
+
+<h4>What I Do</h4>
+
+<p>My spontaneous picture of my work life is that I never do anything at all except dealing with ADN cases and writing The Building Coder blog.</p>
+
+<center>
+<img src="img/jt_2012_1.png" alt="Hello, I am Jeremy"/>
+</center>
+
+<p>My main motivation is probably solving problems, but maybe even stronger than that an urge to help people in whatever manner possible.
+
+<p>Unfortunately for me, I seem to often find it more helpful just to shuffle information around that I receive from others, rather than performing my own research.
+I would love to spend more time programming and exploring new issues myself, rather than managing information provided by others.
+
+<p>I have a large number of other interests besides that, such as reading, languages, nature, sports, especially climbing, dancing,
+
+<a href="http://en.wikipedia.org/wiki/5Rhythms">5rhythms</a> and
+
+dj-ing.
+
+<p>I also have four grown up kids who have left home by now and are out in the world doing their own things, such as
+
+<a href="https://soundcloud.com/allerdings">composing their own music</a>.
+
+<p>Job-wise, I recently switched from a Windows computer to a Mac and still enthusiastic about that, busy retraining my fingers and compiling open source software.
+I am a keyboard user and avoid touching the mouse or using the GUI whenever possible.
+It will take much longer to train my fingers to all the new shortcuts, but they are starting to adapt.
+I am overjoyed at having a Unix command console now again, after a couple of decades of cmd.exe.
+
+<p>When I offered to talk, I said that I would only be able to cover 30 seconds, since all I do is handle cases and blog, and that is  quickly said.
+
+<p>Of course I also do some work creating presentations and conducting trainings at conferences and events such as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/the-champions-roundtable-at-au.html">AU</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-the-view-mep-and-link-apis.html">2</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-python-ui-server-and-framework-apis.html">3</a>) or
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-one.html">DevCamp</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html">2</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devlab-and-room-separation.html">lab</a>).
+
+<p>Jim suggested I could mention my visit to Australia.</p>
+
+<p>Yes, indeed, I went there and gave a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-one.html">Revit API</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html">training</a>,
+
+followed by a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">three-day DevLab</a>.
+
+It really was a great learning experience and good fun.
+Some of the participants were extremely well versed in the Revit product usage, and the importance of knowing the product in depth before embarking on any add-in development plans was strongly reinforced.</p>
+
+<center>
+<img src="img/jt_2012_2.png" alt="Revit API training in Australia"/>
+</center>
+
+<p>In spite of that, I spent a while with one of the participants discussing how to implement a family and a command to toggle the family instance state between two conditions, until we discovered that we could save hundreds of lines of code, family complexity, workflow development and user training by just using the existing functionality already provided by Revit: define two different types for the two states, and let the user switch via the instance properties using standard built-in tools &ndash; a very impressive experience, cool.</p>
+
+<center>
+<img src="img/jt_2012_3.png" alt="Cool Australian Revit users"/>
+</center>
+
+
+<a name="1"></a>
+
+<h4>What I Actually Did</h4>
+
+<p>That said, I do indeed spend almost all my time with cases and the blog.
+In 2012 ADN provided a couple of hands-on classroom trainings.
+The trend in some highly developed areas of the world seems to be going away from hands-on face-to-face trainings and meetings and moving towards virtual interactions and blogging instead.
+
+<p>So, to answer the question more precisely, I put together some statistics on the time I spent on various tasks in the year 2012 in per cent:</p>
+
+<ul>
+<li>44% &ndash; ADN cases, special support cases, learning new Revit API features cases, newsletter articles
+<li>17% &ndash; Conferences: Autodesk University, DevCamp, DevDays, webcasts
+<li>14% &ndash; Admin including meetings and participating in trainings
+<li>13% &ndash; Blogging
+<li>6% &ndash; Providing hands-on Revit API training
+<li>6% &ndash; Other stuff, including cloud & mobile, plug-in development, Mac learning and setup
+</ul>
+
+<center>
+<img src="img/jt_2012_4.png" alt="Detailed activity statistics"/>
+</center>
+
+<p>I was a bit surprised by some of these results and find them interesting.
+Maybe you do too.
+
+<p>The results are rather skewed, actually, since a lot of the work I do for the blog stems from case answering, trainings, and conference preparations, so maybe it would be more realistic to classify something between a fifth and a third of the case, conference and training work as blogging instead.</p>
+
+<p>Basically, the intention of the blog is to eliminate the need for questions via ADN cases and discussion forum threads, and simultaneously the latter feed the former.</p>
+
+<p>You could even go to the extreme of saying teat the blog is a filter for everything I do: if it is useful for the blog and can be shared in public, it is worthwhile doing; if not, not.</p>
+
+<p>Therefore, let's return to the Revit API and present some notes on the two cases I mentioned above.</p>
+
+
+<a name="2"></a>
+
+<h4>Determining Wall Layer Materials, Areas and Volumes</h4>
+
+<p>I recently started looking at foreign language cases as well as English ones, just for fun.
+I am very impressed by the advances in automatic translation.
+Here is a question on wall layers:</p>
+
+<p><strong>Question:</strong> 如何获取墙的材质厚度、名称等属性
+
+<p>我想请问下墙分层材料能够获取哪些信息？</p>
+
+<p>我通过PickObject()获得墙（基本墙 外部 带砖与金属立筋龙骨复合墙）的Element，
+再通过Element.Materials访问到MaterialSet，遍历得到各个Material信息，可得到墙的各个材质，
+再根据Element.GetMaterialArea(Material)、Element.GetMaterialVolume(Material)获得该Material的体积和表面积。
+单独墙体利用“体积/表面积”得到该Material的厚度是否正确？
+相交墙、曲面墙的情况呢？
+是否有API可以直接访问到该Material的厚度值？</p>
+
+<p>Simply passing that though Google translate yields the following:
+
+<p>How to get the wall thickness of the material, the name and other attributes?
+
+<p>I would like to ask the next wall of layered materials able to get what information?
+
+<p>I PickObject wall (the wall externally with bricks and metal studs keel composite wall) Element.
+By Element.Materials access to MaterialSet, traverse various Material available wall material.
+According Element.GetMaterialArea (Material), Element.GetMaterialVolume (Material) to obtain the volume and surface area of the Material.
+Separate wall volume / surface area of the Material thickness is correct?
+Intersecting walls, curved wall?
+API can directly access to the thickness of the Material value?
+
+<p><strong>Answer:</strong> Just as you say, the GetMaterialArea and GetMaterialVolume methods will return the volume and surface area of specific materials used within a wall.
+
+<p>This should work just fine for curved and intersecting walls as well.
+
+<p>You can also traverse the wall compound structure yourself to obtain more detailed information.
+Here is my very first discussion exploring
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">wall compound layers</a>.
+
+<p>Another exploration of this topic looks at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/compound-wall-layer-volumes.html">extracting material volumes</a>.
+
+<p>The access to the wall layers has been significantly enhanced since then, by the introduction of the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/updating-wall-compound-layer-structure.html">
+read-write compound layer structure</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html#1264438">
+
+access in Revit 2012</a>, but the basic principles still apply just the same.
+
+<p>If you need more exact values than those returned by the built-in API methods, you can also split the wall into separate parts for a detailed analysis.
+
+<p>Here is a discussion describing such an approach used to determine the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">
+exact corner points of the various layers in the internal structure</a>.
+
+<p>This apparently helped, at least to get started in further exploration of this topic.
+
+
+
+<a name="3"></a>
+
+<h4>Determining Whether a Transaction is Open</h4>
+
+<p>The other case was in English right from the start:</p>
+
+<p><strong>Question:</strong> My Revit add-in presents a modeless form to my users.
+How can I check from that context whether any other commands or transactions are open in Revit?
+
+<p>For example, the 'insert doors' command may be active.
+
+<p>If Revit is already waiting for user input, e.g. to insert a door, trying to start a transaction causes an error.
+It would be useful to be able to check whether a transaction is already in progress.
+
+<p><strong>Answer:</strong> As you hopefully know, the implementation to handle the Idling event needs to be really clean and clear and is a little bit tricky.
+
+<p>Therefore, I strongly suggest basing anything you do on the ModelessForm_IdlingEvent and ModelessForm_ExternalEvent SDK samples introduced in Revit 2013.
+
+<p>If you implemented your Idling event handler in any other way in the past, it might be a good idea revisiting it now and comparing notes with those samples.
+
+<p>Also note that using an external event is often a little bit simpler and more appropriate than using an Idling event handler.
+
+<p>Please look at the implementation of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html">
+my own tooltip</a> for a more detailed explanation.
+
+<p>Basically, you never, ever, need to check for yourself whether a transaction is open at all.
+
+<p>Why? Because, to check whether a transaction is open, you need to use the Revit API. You cannot use the Revit API, though, unless you are in a valid Revit API context.
+
+<p>Mostly, when you are in a valid Revit API context, it is clear whether or not you can start a new transaction, since it depends to a large extent on the event handler that is currently being called.
+
+<p>Therefore, if your requirement is what I imagine it to be, I would simply suggest that you implement whatever you want to achieve based on the Revit SDK samples mentioned, and you will not need any further checks whether or not you can start a transaction, since it will be obvious: when your Idling event handler or external event Execute method is called, you can do what you like, and at all other times you can do nothing at all
+
+<p>Of course, in addition to being allowed to start a transaction at all, you may also have some restrictions due to read-only project documents etc., that also need to be gracefully dealt with.
+
+<p>Two methods are provided which may help with this: Document.IsModifiable andDocument.IsReadOnly.
+Look at the Revit API help file RevitAPI.chm for further oinformation on their application and usage.</p>
+
+
+
+<a name="4"></a>
+
+<h4>The Application IsQuiescent Property</h4>
+
+<p>In addition to this, the Revit API does provide the Application.IsQuiescent property to check whether the application is quiescent.
+Unfortiunately, this method is not really useful for anything at all in the API right now.
+
+<p>Firstly, it is not at all related to transactions, thus one cannot make any assumption about starting a new transaction based on this.
+If any document in the current application is in editing mode or an in-place family is being edited, it returns false.
+Otherwise, true will be returned.
+That might correspond pretty well to what you are looking for.
+<!-- Unfortunately, this method also requires a valid Revit API context.-->
+In reality, this property is by far not as useful as the two other ones mentioned above.
+
+<p>So, secondly, what it does tell you is whether you are currently in a command or edit mode or not.
+However, as pointed out above, as an API programmer, you already know that.
+For example, in your own external command, the method would return False, all the time.
+Ditto in many events and updaters.
+On the other hand, it should return True when called from Idling event, which again is obvious.
+
+<p>Just as a background information, this method was implemented in a very early attempt to mimic the AutoCAD API.
+<!--However, it does not work similarly in Revit, and is never use internally for anything at all.-->
+However, due to significant differences, the quiescent state is not equally important in Revit, and thus the method ends up not actually being used in any Revit code.
+
+<p><strong>Response:</strong> Thank you, that helped.
+
+<p>I'm making a 'Content Library' function as a modeless form in Revit.
+The form is intended to be open beside Revit when users work.
+
+<p>It provides content (RFA families) either by browsing by category or searching on family name, family type name, parameter name or parameter value on each of the family types.
+
+<p>The families are located by default on a website using REST. The database behind the website contains information about the family types, its parameters, and also thumbnails and a DWFX file of the RFA.
+For users with slow internet connections I made it possible to change provider to connect to content in a local database instead of the online website.
+
+<p>The above worked fine until I implemented SendKey Esc x 2 to cancel insert family in Revit.
+
+<p>When you mentioned the Idling event I looked through my code again and found the 'load family into Revit' function called from outside the Idling event.
+After moving this call into the Idling event handler all worked fine. :-)

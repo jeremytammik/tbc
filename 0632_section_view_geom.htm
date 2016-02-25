@@ -1,0 +1,56 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1271433 [Member Geometry] -->
+
+<h3>Section View Geometry</h3>
+
+<p>We have looked at many examples of retrieving 
+
+<a href="http://thebuildingcoder.typepad.com/blog/geometry">
+geometry</a> from
+
+the Revit model in the past. 
+So far, we always dealt with view independent geometry. 
+It is also easy to obtain section view geometry for an element from Revit. 
+Here is a case that highlights that, brought up by Saeed Karshenas of 
+
+<a href="http://www.marquette.edu/eng/civil_environmental/facstaff_karshenas.shtml">
+Marquette University</a>:
+
+<p><strong>Question:</strong> Is there a way to get the geometry of a partial element in a section box? 
+Not geometry of the whole element, but the part of the element that is visible in a section box. 
+
+<p><strong>Answer:</strong> If you simply supply the element id of the section view to the options that you pass in to the Element Geometry property, the geometry returned will match what you see in that view, including cuts and sections etc., as explained by the Revit help file RevitAPI.chm: 
+
+<h4 style="color:darkblue">Options.View Property</h4>
+
+<p style="color:darkblue">The view used for geometry extraction.</p>
+
+<p style="color:darkblue">If a view-specific version of an element exists, it will be extracted in the retrieval of geometry. Also, the detail level of the geometry will be taken from the view's detail level.</p>
+
+<p><strong>Response:</strong> Thank you, that solution works fine. I used it to achieve the following in a mixture of C# and C++: 
+
+<ul>
+<li>Read a Revit element (in C#). 
+<li>If the element has geometry, for each face extract vertices, indices and face normal. If face is not planar calculate the normal for each face triangle (in C#). 
+<li>Transfer element geometry to GPU memory (in C++). 
+<li>Use OpenGL library to draw the element (in C++). 
+<li>Create a camera to view the element (C++) 
+<li>Repeat the above steps for all model elements. 
+</ul>
+
+<p>Here is an example of a model that I applied this to:</p>
+
+<center>
+<img src="img/section_view_model1.png" alt="Complete model"/>
+</center>
+
+<p>The result of extracting the section view looks like this:</p>
+
+<center>
+<img src="img/section_view_model2.png" alt="Section view model"/>
+</center>
+
+<p>Many thanks to Saeed for this nice illustration of using the section view geometry option!

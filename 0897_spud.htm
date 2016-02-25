@@ -1,0 +1,119 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08042699 [Part types in family editor]
+Subject: RE: RME family editor part type classes -- 08042699
+
+-->
+
+<h3>Adjustable Versus Perpendicular Spud</h3>
+
+<p>I recently presented an explanation of some Revit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/content-localisation.html#3">
+MEP family editor part type classes</a>,
+
+which led to a follow-up:
+
+<p><strong>Question:</strong> Thank you for the detailed answer about the duct fittings.
+I have a similar problem with one of the pipe fittings, namely spud. I know what a spud is, but not the difference between an adjustable and a perpendicular one.</p>
+
+<p>Can you explain the actual difference, please?</p>
+
+<p>Here is an image with some different spuds that I collected:</p>
+
+<center>
+<img src="img/spud2.jpg" alt="Spuds"/>
+</center>
+
+
+<p><strong>Answer:</strong> Spuds are analogous to taps in ductwork, which also have adjustable and perpendicular part types.
+
+<p>Their difference is probably best described by example.
+Here are two smaller branches, both routed from the larger main at 45 degrees:</p>
+
+<center>
+<img src="img/spud_adjust_perp.png" alt="Adjustable and perpendicular spuds"/>
+</center>
+
+<p>The adjustable tap on the left adjusted to accommodate the 45-degree route.
+
+<p>The perpendicular tap on the right is constrained to tap perpendicularly off the main.
+Then, an elbow is automatically inserted after a short duct length to route the branch to the picked point.
+
+<p>Many thanks to Martin Schmid for this explanation.</p>
+
+<!--
+
+<a name="2"></a>
+
+<h4>Determining Purgeable Elements</h4>
+
+<p>A question that crops up from time to time and is rather hard to answer exactyl and exhaustively is on purgeable elements:</p>
+
+the <p><strong>Question:</strong> What is the best way to get all of the elements that can be purged? I can use WhereElementIsElementType filter to return all types, and WhereElementISNotElementType to return instances, but comparing the two lists does not leave me with the purgable result. I could compare individual lists of types (i.e. family symbol and family instance), but that seems prone to error. Is there any good way to get this information out of the model?
+
+<p><strong>Answer:</strong> Yes, the Revit API does not currently provide any direct method to determine this.
+
+<p>Let's see what can be done about it anyway already.
+
+<p>When you say "all of the elements that can be purged", that can be a pretty huge task.
+
+<p>I would suggest breaking that down into individual sub-tasks for different types of purgeable elements, which will require pretty different handling.
+
+<p>For example, I implemented a method DeleteUnnamedNonHostingReferencePlanes to find and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html#2">
+delete all reference planes not hosting any elements</a>.
+
+<p>An explicit reference to the term purge is used in the post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">
+removing unused text note types</a>.
+
+<p>One way to determine whether a certain element A is required by another one B is to delete A and check the return value of the Delete method, which provides a list of deleted element ids. In some cases, B is deleted as well, and its element id is included the resulting list of deleted element ids. This is used by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+object relationship analyser</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">VB</a>).
+
+<p>The deletion can be made temporary by encapsulating it in a transaction that is later rolled back. Here is a discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+the temporary transaction trick</a> including
+
+a list of numerous usage examples, and later
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+touched up slightly</a>.
+
+
+<p>When you have access to a one-way relationship between two classes of objects, e.g. pointers from doors, windows and openings hosted in walls to their respective wall host elements, you can easily invert the relationship to determine the list of hosted object for each host. This is demonstrated in my discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+relationship inverter</a> in
+
+one of the very first blog posts.
+
+<p>The rest of your query deals with types only, which is a small subset of the potentially purgeable elements.
+
+<p>A similar one-way relationship as the one between hosted objects and their hosts is defined between non-element types and types, since the former provide a property named GetTypeId pointing to the type. You could make use of this in a similar manner to find all unused types as follows:
+
+<ol>
+<li>Determine all non-type elements using WhereElementISNotElementType
+
+<li>Iterate over all non-type elements. Determine the element id of each one, and build a dictionary D of the inverse relationship, mapping type element id to a list or the elements using that type.
+
+<li>Use WhereElementIsElementType to determine all element types. Iterate over them. For each type, check D to see how many elements are referencing it. If D has no entry for this type, it is not being used and can be deleted.
+</ol>
+
+<p>There is no guarantee whatsoever that this will really work, though, since there may be any number of exceptional cases that need to be handled differently on a cases by case base.
+
+<p>You can try this out, though, see whether you corrupt the database in any way, test thoroughly, possibly add handling of all special cases that you encounter, and maybe achieve your goal  in the long run.
+
+-->

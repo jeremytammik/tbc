@@ -1,0 +1,102 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+http://thebuildingcoder.typepad.com/blog/2010/06/highlight-elements.html?cid=6a00e553e168978833017744869c64970d#comment-6a00e553e168978833017744869c64970d
+
+A Facebook User has replied to your comment:
+
+Hi, Jeremy,
+
+I found how to update the 'properties' window, And If I invoke the function OpenAndActivateDocument()of class UIApplication firstly, then highlight elements like this blog you wrote, the 'properties' window can be updated.
+
+But firstly you should guarantee that the document you want to highlight should not be the active document, so I create a empty rvt file, then invoke OpenAndActivateDocument() to active, now the document which elements want to highlight isn't active document, then I invoke OpenAndActivateDocument() again to active the document which elements want to highlight and highlight elements like this blog you wrote, and don't forget to close the empty rvt file at last. By this way can refresh the 'properties' window info.
+
+September 05, 2012 at 02:17 
+
+SPR #174047 [Programmatic selection does not trigger UI to display Element Properties]
+SPR #170844 [Programmatic selection does not trigger UI to display Element Properties or Change]
+SPR #224836 [Property palette not reacting to programmatic changes of selection]
+
+-->
+
+<h3>Updating Properties and Announcing Revit LT</h3>
+
+<p>Today, exceptionally, a second post, partly to highlight an interesting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/highlight-elements.html?cid=6a00e553e168978833017744869c64970d#comment-6a00e553e168978833017744869c64970d">
+comment</a> submitted by
+
+Jinshou on how to programmatically trigger a 
+
+<a href="#2">
+refresh of the Revit element properties window</a>, 
+
+and partly to announce a non-API issue, totally non-API, the imminent arrival of 
+
+<a href="#3">
+Autodesk Revit LT</a>.
+
+
+<a name="2"></a>
+
+<h4>Refreshing Revit Element Properties</h4>
+
+<p>If I first invoke the UIApplication OpenAndActivateDocument method, then 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/highlight-elements.html">
+highlight elements</a> as 
+
+described in a previous post, the 'properties' window is updated.
+
+<p>The trick is that in order to call OpenAndActivateDocument on the document containing the elements to highlight, you have to first ensure that it is not the active document.
+To achieve this, I:
+
+<ul>
+<li>Create an empty RVT file.
+<li>Invoke OpenAndActivateDocument to activate that.
+<li>Invoke OpenAndActivateDocument again on the document of interest.
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/highlight-elements.html">
+Highlight the elements</a>.
+<li>Don't forget to close the empty RVT file when finished.
+</ul>
+
+<p>Many thanks to Jinshou for this interesting hint.
+
+
+<a name="3"></a>
+
+<h4>Announcing Autodesk Revit LT </h4>
+
+<p>For the nonce, here is an announcement completely unrelated to the Revit API.
+In fact, the product announced is specifically designed to not be customisable.
+
+<p>Autodesk today announced Autodesk Revit LT software, a new addition to its award winning family of Revit software products. 
+Designed for architects, designers and building industry professionals using 2D workflows who are looking to transition to the Building Information Modeling (BIM) process, Autodesk Revit LT software delivers a focused 3D application to help users create higher-quality and more accurate designs and documentation.
+
+<p>"Autodesk Revit LT reflects our commitment to provide architects, designers and building professionals, particularly those in small firms, the tools they need to ease the transition to get started with &ndash; and take advantage of &ndash; a BIM workflow," said Amar Hanspal, Autodesk senior vice president, information modeling products.  
+"With Revit LT, customers can deliver higher-quality, more accurate designs and documentation &ndash; allowing them to bring projects to market faster and save time and money."
+
+<p>Autodesk Revit LT is built on the Revit platform for BIM and allows users to create designs efficiently with 3D, real-world building objects to produce reliable, coordinated documentation faster.  
+Revit-based applications help deliver better coordination and quality, and can contribute to higher profitability for architects, design professionals and the rest of the building team. 
+Some of the benefits of Revit LT include:
+
+<ul>
+<li>Work more efficiently with a single, coordinated model that allows users to concurrently design and document building projects. Autodesk Revit LT automatically manages iterative changes to building models throughout the documentation process. As a result, a consistent representation of the building is maintained, helping to improve drawing coordination and reducing errors.
+<li>Design and visualize in 3D. Revit LT allows users to see their designs virtually, improving their understanding of the building and its spaces, and helping them communicate design ideas to clients more clearly and effectively.
+<li>Create photorealistic renderings in the cloud. Users who purchase Autodesk Subscription with Revit LT can render in the cloud directly from the Revit LT interface, enabling them to produce compelling, photorealistic visualizations without tying up their desktop
+<li>Exchange designs in the DWG or RVT file formats. Produce designs in the DWG file format, and experience fluid file exchange with project team members using other Autodesk Revit software applications.
+</ul>
+
+<h5>Availability</h5>
+
+<p>Autodesk Revit LT 2013 is scheduled to be available within the month in North America and in select countries worldwide. 
+The product is available as a standalone version and as part of the new AutoCAD Revit LT Suite 2013, which includes both Autodesk Revit LT 2013 and AutoCAD LT 2013.   
+Product availability varies by country. 
+Details and purchasing options are available at 
+
+<a href="http://www.autodesk.com/revitlt">www.autodesk.com/revitlt</a>
+

@@ -1,0 +1,117 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08163347 [How to get unit in revit]
+
+-->
+
+<h3>Units and RevitLookup</h3>
+
+<p>Here is a typical question from a Revit API newbie that prompts me to reiterate some important basic beginner information on units and the RevitLookup tool for exploring the Revit database:
+
+<p><strong>Question:</strong> How can I retrieve the length and mass units from a Revit document?</p>
+
+<p><strong>Answer:</strong> The internal Revit database length unit is always imperial feet.
+
+<p>That cannot be changed, so there is you answer for that.
+
+<p>Similarly, the internal database unit for weight is kg, as far as I know.
+
+
+<a name="2"></a>
+
+<h4>Revit Database Units</h4>
+
+<p>In fact, most internal Revit database units except length are
+
+<a href="http://en.wikipedia.org/wiki/International_System_of_Units">
+SI units</a>,
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">
+length is handled differently</a>.
+
+<p>The user interface can display other units, set up just as the user prefers.
+They can also be modified programmatically, as demonstrated by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/unit-suffix-and-the-projectunit-sdk-sample.html">ProjectUnit SDK sample</a>.</p>
+
+<p>You can determine any internal database unit by setting the value of a given parameter using it on some Revit element to a specific number, e.g. 1.0, in the user interface.
+
+<p>You can then use <a href="#3">RevitLookup</a> to examine the parameter's resulting underlying database value.
+
+<p>The quotient between the user display and the underlying database values provides a factor that you can use to convert between user display and internal database units and enables you to determine what the internal database unit actually is.
+
+<p>This topic has been discussed exhaustively on The Building Coder blog.
+In fact, one of the very first posts ever is still perfectly valid.
+It deals with and covers all the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">
+fundamental facts of units</a>.
+
+<p>We presented a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">
+unit conversion tool</a> and
+
+updated it for Revit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">2011</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/revit-2013-unit-conversion-utility.html">2013</a>.
+
+
+<p>Many other aspects of this topic are collected in The Building Coder
+
+<a href="http://thebuildingcoder.typepad.com/blog/units">
+units category</a>.
+
+
+<a name="3"></a>
+
+<h4>RevitLookup</h4>
+
+<p>I mentioned RevitLookup above.
+This is one of the most important tools, both for developers and end users, that you absolutely must be aware of.
+
+<p>It was formerly named RvtMgdDbg.
+This
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+detailed description</a> still
+
+calls it so.
+
+<p>Here are
+
+<a href="http://whatrevitwants.blogspot.de/2010/06/how-to-view-revit-database-2011-secret.html">
+step-by-step installation instructions</a> for
+
+Revit 2011 that pretty much still apply.
+There is even a
+
+<a href="http://www.youtube.com/watch?v=mkkWdrnSwCw">
+video demonstrating the installation for Revit 2013</a>.
+
+<p>RevitLookup is included in the Revit SDK available from the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>,
+
+which also includes all the other important material for
+
+<a href="http://thebuildingcoder.typepad.com/blog/getting_started">
+getting started with the Revit API</a>.
+
+Here is also an updated version with a
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/revitlookupaddin-manifest-file-.html">
+corrected add-in manifest file</a>
+
+to simplify the installation.
+
+<p>I hope that fully answers your question and helps you get started successfully.</p>

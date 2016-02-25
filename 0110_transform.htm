@@ -1,0 +1,149 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Transform</h3>
+
+<p>In some upcoming posts, I would like to take a look at the how to handle transformations of Revit elements, as well as locations of nested linked files.
+Before we get into that, let us take a closer look at the underlying Revit API Transform class.
+We briefly mentioned it in the discussion of the Revit API
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/geometry-librar.html">
+geometry library</a>,
+
+and demonstrated some basic use of it for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+transforming a polygon</a>
+
+from 3D to 2D.</p>
+
+<p>The Revit API Transform class is defined in the Autodesk.Revit.Geometry namespace and represents a transformation of the affine 3-space.
+It provides the typical properties and methods expected for a transformation class:</p>
+
+<ul>
+<li>Multiply, multiply two transforms.</li>
+<li>ScaleBasis, scale the basis vectors.</li>
+<li>ScaleBasisAndOrigin, scale the basis vectors and the origin.</li>
+<li>Basis, BasisX, BasisY, BasisZ, return the base axes.</li>
+<li>Determinant, return the determinant.</li>
+<li>HasReflection, to tell whether this transformation is a reflection.</li>
+<li>Identity, the identity transformation.</li>
+<li>Inverse, the inverse transformation.</li>
+<li>IsConformal, to tell whether this transformation is <a href="http://en.wikipedia.org/wiki/Conformal_map">conformal</a>.</li>
+<li>IsIdentity, to tell whether this transformation is the identity.</li>
+<li>IsTranslation, to tell whether this transformation is a translation.</li>
+<li>Origin, the origin. </li>
+<li>Reflection, returns a transformation that reflects about a specified plane.</li>
+<li>Rotation, returns a transformation that rotates by a specified angle about a specified axis and point.</li>
+<li>Scale, return the scale of the transformation.</li>
+<li>Translation, returns a transformation that translates by a specified vector.</li>
+</ul>
+
+<p>In some other APIs, transformations are handled by matrices.
+The Revit API generally tries to address a higher level of abstraction, so the class is defined as a generic transformation class, and the underlying implementation is not explicitly exposed by the API.</p>
+
+<p>The Creation.Application does not provide any methods to create transform objects.
+A Transform instance can be created using the new operator as a copy constructor, or by using some of the static methods of the Transform class.
+The transform default constructor initializes it to identity:</p>
+
+<pre class ="code">
+<span class="teal">Transform</span> trans1, trans2, trans3;
+</pre>
+
+<p>Here are examples of using the static Transform class methods to define rotation, translation, scaling and mirroring transforms:</p>
+
+<pre class ="code">
+<span class="teal">XYZ</span> ptOrigin = <span class="teal">XYZ</span>.Zero;
+<span class="teal">XYZ</span> ptXAxis = <span class="teal">XYZ</span>.BasisX;
+<span class="teal">XYZ</span> ptYAxis = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+trans1 = <span class="teal">Transform</span>.get_Rotation( <span class="green">// rotation</span>
+&nbsp; ptOrigin, ptXAxis, 90 );
+&nbsp;
+trans2 = <span class="teal">Transform</span>.get_Translation( <span class="green">// translation</span>
+&nbsp; ptXAxis );
+&nbsp;
+trans1 = trans2.ScaleBasis( 2.0 ); <span class="green">// scaling</span>
+&nbsp;
+<span class="teal">Plane</span> plane1 = creApp.NewPlane(
+&nbsp; ptXAxis, ptYAxis );
+&nbsp;
+trans3 = <span class="teal">Transform</span>.get_Reflection( <span class="green">// mirror</span>
+&nbsp; plane1 );
+</pre>
+
+<p>One simple use of a transform is to translate a point:</p>
+
+<pre class ="code">
+p3 = trans1.OfPoint( p2 );
+</pre>
+
+<p>Some further examples are given by the Revit API
+
+<a href="zip/rac_tips_20090303.zip">
+tips and tricks sample code</a>,
+
+in the region '1. XYZ and Transform' in RevitGeometry.cs.
+Besides these transforms, they also show how to invert and concatenate transformations.</p>
+
+<p>The polygon transformation is implemented by code in the region 'Transform 3D plane to horizontal' in The Building Coder sample code external command class
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+CmdWallProfileArea</a>,
+
+specifically in the methods GetTransformToZ and ApplyTransform:</p>
+
+<pre class ="code">
+<span class="teal">Transform</span> GetTransformToZ( <span class="teal">XYZ</span> v )
+{
+&nbsp; <span class="teal">Transform</span> t;
+&nbsp;
+&nbsp; <span class="blue">double</span> a = <span class="teal">XYZ</span>.BasisZ.Angle( v );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsZero( a ) )
+&nbsp; {
+&nbsp; &nbsp; t = <span class="teal">Transform</span>.Identity;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> axis = <span class="teal">Util</span>.IsEqual( a, <span class="teal">Math</span>.PI )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">XYZ</span>.BasisX
+&nbsp; &nbsp; &nbsp; : v.Cross( <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; t = <span class="teal">Transform</span>.get_Rotation( <span class="teal">XYZ</span>.Zero,
+&nbsp; &nbsp; &nbsp; axis, a );
+&nbsp; }
+&nbsp; <span class="blue">return</span> t;
+}
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; ApplyTransform(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygon,
+&nbsp; <span class="teal">Transform</span> t )
+{
+&nbsp; <span class="blue">int</span> n = polygon.Count;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygonTransformed
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( n );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> polygon )
+&nbsp; {
+&nbsp; &nbsp; polygonTransformed.Add( t.OfPoint( p ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> polygonTransformed;
+}
+</pre>
+
+<p>GetTransformToZ calculates the rotation required to transform a planar polygon from its arbitrary orientation in 3D space to a plane parallel to the XY plane.
+The algorithm used is described in detail in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+transforming a polygon</a>.
+
+ApplyTransform applies the rotation to the 3D polygon to obtain a rotated copy which is parallel to the XY plane.
+It does so by iterating through the points of the original polygon and calculating the rotated point using Transform.OfPoint on each.</p>
+

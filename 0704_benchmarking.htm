@@ -1,0 +1,94 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1272952 [retrieving all elements from a view] 
+Rahul Shah Add timer to find out total time
+
+-->
+
+<h3>Timer Code for Benchmarking</h3>
+
+<p>Two topics today:
+
+<ul>
+<li><a href="#1">Benchmarking add-ins</a>
+<li><a href="#2">Hands-on training</a>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Benchmarking Add-ins</h4>
+
+<p>Just like most programming issues, many Revit API tasks can be achieved in numerous different ways.
+The optimal approach often depends on your individual needs.
+The only way to find out which one that may be is to test it.
+In order to test it effectively, you need to measure the results.
+One of the most important aspects is often the time required, the execution performance.
+Measuring a short duration of time precisely makes use of a timer.
+The .NET framework provides several timer classes for this purpose.
+Here is a related question that just came up on this topic:
+
+
+<p><strong>Question:</strong> How can I add a timer to my Revit 2012 C# code to find out how much time it takes to execute the whole command?
+Is there a way to add a form to show total time taken to run the command?
+I am not quite sure how to wrap the timer class around Revit code.
+
+
+<p><strong>Answer:</strong> The Building Coder samples include several examples of benchmarking both entire commands and individual function calls or sections of code.
+
+<p>They define the JtTimer class, which is one possible wrapper for the .NET Stopwatch class that you may find useful.
+Besides the Stopwatch wrapper, it also implements a TimeRegistry for keeping track of and summing up the results a number of different Stopwatch instances:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/performance-profiling.html">Performance profiling</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">Collector benchmark</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">Parameter filter benchmark</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">Filtered element collectors</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/level-filter-benchmark.html">Level filter benchmark</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Purging text note types</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/c-and-net-little-wonders.html">The Stopwatch class</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/xml-family-usage-report.html">XML family usage report</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/type-filter-benchmark-update.html">Type filter benchmark</a>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Hands-on Revit API Trainings</h4>
+
+<p>If you are interested in face-to-face hands-on training in the Revit API, you should take a regular look at the ADN
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Training Course Schedule</a> and
+
+enter "Revit API" as the course name.
+
+Here is the short
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=6364883">
+course description</a>.
+
+<p>The next scheduled class that I will be conducting is taking place in Munich, Germany, starting April 25<sup>th</sup>
+
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=6703509&siteID=123112&cname=Revit%20API,%20Munich,%20Apr%2025%202012,%20201213">register</a>).
+
+<p>If you are interested in participating in a class, you will benefit enormously by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+preparing appropriately</a>. 
+
+<!-- for a hands-on training -->
+
+The material we provide for that can also be used just as well to efficiently learn the basics of the Revit API for yourself all on your own.

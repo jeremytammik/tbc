@@ -1,0 +1,170 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Running Language Code and More Exporters</h3>
+
+<p>An optimal add-in consists of a completely language independent core application with additional localised resources.
+
+<p>Localised resources for different languages can be identified by language tags, e.g. the hexadecimal LCID or language code identifier used by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/product-guids-for-revit-2012-and-forever-more.html">
+Revit Product GUID</a>.
+
+Here is a more 
+
+<a href="http://en.wikipedia.org/wiki/BCP_47">
+complete overview</a> of 
+
+several different language tag systems.
+
+<p><strong>Question:</strong> Is it possible to determine the language of Revit via the API at run-time?  
+
+<p>For example, when you click F1 for help when hovering over a ribbon control, it takes you to a URL made up of the command help ID, application, year, and language code, e.g.:
+
+<ul>
+<li>
+<a href="http://wikihelp.autodesk.com/enu?adskContextId=HID_SITE_TOPO_SURFACE&product=Revit&release=2013&language=enu">
+http://wikihelp.autodesk.com/<b>enu</b>?adskContextId=HID_SITE_TOPO_SURFACE&product=Revit&release=2013&language=<b>enu</b></a>
+</ul>
+
+<p>I would like to determine the correct language code for the running version of Revit in order to provide version and language specific help for my own add-in.
+
+<p>How can this be achieved, please?
+
+<p><strong>Answer:</strong> There is no direct API to obtain the language code, but you can query the corresponding LanguageType enumeration value from the ControlledApplication Language property. The ControlledApplication instance is provided by the UIControlledApplication ControlledApplication property in the external application OnStartup method.
+
+<p>Here is a helper method to convert from the LanguageType enumeration value to the corresponding three-letter language code:
+
+<pre class="code">
+<span class="blue">string</span> LanguageCode( <span class="teal">LanguageType</span> lt )
+{
+&nbsp; <span class="blue">switch</span>( lt )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Chinese_Simplified:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;CHS&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Chinese_Traditional:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;CHT&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Czech:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;CSY&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.German:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;DEU&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.English_USA:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;ENU&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Spanish:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;ESP&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.French:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;FRA&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Hungarian:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;HUN&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Italian:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;ITA&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Japanese:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;JPN&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Korean:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;KOR&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Polish:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;PLK&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Brazilian_Portuguese:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;PTB&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Russian:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;RUS&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">LanguageType</span>.Dutch:
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;NLD&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>A minimal OnStartup method making use of it might look like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="teal">LanguageType</span> lt 
+&nbsp; &nbsp; = a.ControlledApplication.Language;
+&nbsp;
+&nbsp; <span class="blue">string</span> language_code = LanguageCode( lt );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Revit language code is &quot;</span> 
+&nbsp; &nbsp; + language_code + <span class="maroon">&quot;.&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>This prints the following message on my English version of Revit:
+
+<pre>
+Revit language code is ENU.
+</pre>
+
+<p>For completeness' sake, here is 
+
+<a href="zip/RunningLanguage.zip">
+RunningLanguage.zip</a> containing 
+
+the full source code, Visual Studio solution and add-in manifest of an albeit trivial little add-in exercising this.
+
+<p>Thank you to Martin Schmid and Scott Conover for exploring this issue.
+
+
+<a name="2"></a>
+
+<h4>More Revit Model Exporters</h4>
+
+<p>To follow up the discussion of my quick and dirty Revit model 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">
+OBJ exporter</a>, 
+
+I want to point out that <a href="http://adndevblog.typepad.com/aec/adam-nagy.html">Adam Nagy</a> completed
+
+his series of posts on the 
+
+<a href="http://adndevblog.typepad.com/aec">AEC DevBlog</a> on 
+
+a Revit model exporter and viewer for iOS using an even more minimalistic custom data format for uploading to the cloud and viewing on an iOS mobile device:</p>
+
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-1.html">Part 1</a>: Revit add-in to upload geometry data to a storage service</li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-2.html">Part 2</a>: An iOS application to download and display the model using OpenGL</li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-3.html">Part 3</a>: Interactive view orientation and manipulation using gestures</li>
+</ul>
+
+<p>While the OBJ format I looked at is more heavy-weight than Adam's minimal custom format, my implementation includes some other enhancements which make it quite effective as well.
+
+<p>I have also heard of other home-grown viewer implementations with some support for switchback, individual element tagging and object identification based on VRML and on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">
+Unity gaming engine</a>.
+
+<p>If you are interested in a finely tuned exporter with more complete coverage and control over what gets exported, you might want to take a look at the open source 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/revit-2012-stl-exporter-released-as-open-source.html">
+STL exporter</a>.
+
+<p>Finally, for high-end exporter requirements, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-ifc-exporter-released-as-open-source.html">
+Revit IFC exporter</a> is 
+
+also open source.
+
+<p>So you have lots of options here!
+

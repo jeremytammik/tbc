@@ -1,0 +1,225 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259654 [How to get revisions for the sheet?] -->
+
+<h3>Pre-, Post- and Pick Select</h3>
+
+<p>Today is a holiday in Neuch&acirc;tel,
+
+<a href="http://en.wikipedia.org/wiki/Ascension_Day">
+Ascension Day</a>,
+
+and it is raining cats and dogs.
+
+<p>I recently explored an issue with accessing the revision data in a Revit model, and made strong use of my beloved element lister and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/deeper-parameter-exploration.html">built-in parameter checker</a> tools.
+
+I already discussed their use for various analysis purposes such as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploring element parameters</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">
+accessing the title block information of a sheet</a>.
+
+<p>In many cases, such an exploration involves looking at the parameters of an element that is not visible on the screen and therefore cannot be picked interactively.
+I used to use the standard Revit user interface to select such elements, picking Manage &gt; Inquiry &gt; Select by ID and typing in the element id I am interested in.
+
+<p>Doing this repeatedly, I thought I could save myself a couple of clicks by integrating this into the built-in param4ter checker, or rather into the utility method GetSingleSelectedElementOrPrompt which it uses.
+The previous version already supported pre- and post-selection, i.e. an element could be selected either before or after launching the command.
+To implement this, the method simply checks the contents of the current selection set.
+If exactly one element is selected, that is used, otherwise the user is prompted to select an element on the screen.
+
+<p>I decided to enhance this to allow either on-screen selection or typing in the element id.
+
+<p>To do so, I first need a dialogue with a text entry field for typing it, so I implemented a new ElementIdForm class with the following graphical user interface:</p>
+
+<center>
+<img src="img/elementidform.png" alt="ElementIdForm"/>
+</center>
+
+<p>Its code it pretty trivial, it just maintains a string variable for the typed-in element id and reacts to the clicks on the three buttons. If the pick button is clicked, the element id is set to the empty string and a dialogue result OK is returned, which informs the GetSingleSelectedElementOrPrompt that an interactive pick selection is required.
+
+<p>Here is the code for GetSingleSelectedElementOrPrompt, checking for a single preselected element, displaying the element id form otherwise, and reacting to the result of that:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span>
+&nbsp; GetSingleSelectedElementOrPrompt(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc )
+{
+&nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp; <span class="teal">ElementSet</span> ss = uidoc.Selection.Elements;
+&nbsp; <span class="blue">if</span>( 1 == ss.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementSetIterator</span> iter = ss.ForwardIterator();
+&nbsp; &nbsp; iter.MoveNext();
+&nbsp; &nbsp; e = iter.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> sid;
+&nbsp; &nbsp; <span class="teal">DialogResult</span> result = <span class="teal">DialogResult</span>.OK;
+&nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">null</span> == e &amp;&amp; <span class="teal">DialogResult</span>.OK == result )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">ElementIdForm</span> form
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIdForm</span>() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; result = form.ShowDialog();
+&nbsp; &nbsp; &nbsp; &nbsp; sid = form.ElementId;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == result )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == sid.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e = r.Element;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span>.Parse(( sid ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e = uidoc.Document.get_Element( id );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Invalid element id '{0}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sid ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> e;
+}
+</pre>
+
+
+<p>I added one little enhancement to the parameter values displayed as well.
+In previous versions, the value sting was displayed in addition to the raw database value.
+This is especially useful for real-valued data, in which case the value string displays value converted to the current the user selected unit.
+For element ids, a description of the element including its name and category is displayed in addition to the raw integer value.
+I now also added code to display the corresponding built-in category name for a negative element id.
+This may not always be appropriate, but in many cases it is.
+
+<p>Here is the code for determining what the minimum and maximum built-in category enumeration values are:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">int</span> _min_bic = 0;
+<span class="blue">static</span> <span class="blue">int</span> _max_bic = 0;
+&nbsp;
+<span class="blue">static</span> <span class="blue">void</span> SetMinAndMaxBuiltInCategory()
+{
+&nbsp; <span class="teal">Array</span> a = <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">BuiltInCategory</span> ) );
+&nbsp; _max_bic = a.Cast&lt;<span class="blue">int</span>&gt;().Max();
+&nbsp; _min_bic = a.Cast&lt;<span class="blue">int</span>&gt;().Min();
+}
+</pre>
+
+<p>This helper method checks whether a given integer value lies within this range and returns a string displaying the corresponding BuiltInCategory enumeration value:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> BuiltInCategoryString( <span class="blue">int</span> i )
+{
+&nbsp; <span class="blue">if</span>( 0 == _min_bic )
+&nbsp; {
+&nbsp; &nbsp; SetMinAndMaxBuiltInCategory();
+&nbsp; }
+&nbsp; <span class="blue">return</span> (_min_bic &lt; i &amp;&amp; i &lt; _max_bic )
+&nbsp; &nbsp; ? <span class="maroon">&quot; &quot;</span> + ((<span class="teal">BuiltInCategory</span>) i).ToString()
+&nbsp; &nbsp; : <span class="blue">string</span>.Empty;
+}
+</pre>
+
+<p>The code we use to display the additional information for an element id now looks like this:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> s;
+&nbsp; <span class="blue">if</span>( <span class="teal">StorageType</span>.ElementId == param.StorageType
+&nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = param.AsElementId();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = id.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = i.ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; + BuiltInCategoryString( i );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( id );
+&nbsp; &nbsp; &nbsp; s = ElementDescription( e, <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>For example, let's explore the parameters of a newly added revision element.
+
+<p>I opened a project with a few sheets in it and ran the command Lab2_1_Elements to save all its elements to a file, which I renamed to RevitElementsBeforeRevision.txt.
+I then added a new revision via View &gt; Revisions &gt; Add &gt; Per Sheet &gt; Apply &gt; OK and listed the elements to a second file RevitElementsAfterRevision.txt.
+The difference between the two files shows that one single element was added:
+
+<pre>
+C:\tmp\ &gt;diff 
+  RevitElementsBeforeRevision.txt
+  RevitElementsAfterRevision.txt
+2720a2721
+&gt; Id=129893; Class=Element; Category=Revision; Name=Revisions;</pre>
+
+<p>This element cannot be picked on the screen, but I can enter its id 129893 into my new element id entry form to select it for displaying its parameters, which show up like this:</p>
+
+<center>
+<img src="img/revision_parameters.png" alt="Revision parameters"/>
+</center>
+
+<p>Note that the built-in category enumeration value is now displayed in both raw integer and descriptive string form.
+
+<p>For completeness sake, here is the same data in text format:
+
+<pre>
+Revision 'Revisions' 129893 Instance Built-in Parameters
+
+DESIGN_OPTION_ID                      Design Option        ElementId       read-only  -1                          -1
+EDITED_BY                             Edited by            String/Text     read-only
+ELEM_CATEGORY_PARAM                   Category             ElementId       read-only  -2006070 OST_Revisions      -2006070
+ELEM_CATEGORY_PARAM_MT                Category             ElementId       read-only  -2006070 OST_Revisions      -2006070
+ELEM_DELETABLE_IN_FAMILY              Deletable            Integer/YesNo   read-write                             1
+ELEM_FAMILY_AND_TYPE_PARAM            Family and Type      ElementId       read-write -1                          -1
+ELEM_FAMILY_PARAM                     Family               ElementId       read-write -1                          -1
+ELEM_PARTITION_PARAM                  Workset              Integer         read-write                             0
+ELEM_TYPE_PARAM                       Type                 ElementId       read-write -1                          -1
+ELEMENT_LOCKED_PARAM                  Locked               Integer/YesNo   read-write                             0
+ID_PARAM                              Id                   ElementId       read-only  Revision 'Revisions' 129893 129893
+PHASE_CREATED                         Phase Created        ElementId       read-write -1                          -1
+PHASE_DEMOLISHED                      Phase Demolished     ElementId       read-write -1                          -1
+PROJECT_REVISION_ENUMERATION          Numbering            Integer/Integer read-only                              0
+PROJECT_REVISION_REVISION_DATE        Revision Date        String/Text     read-only                              Date 2
+PROJECT_REVISION_REVISION_DESCRIPTION Revision Description String/Text     read-only                              Revision 2
+PROJECT_REVISION_REVISION_ISSUED      Issued               Integer/YesNo   read-only                              0
+PROJECT_REVISION_REVISION_ISSUED_BY   Issued by            String/Text     read-only
+PROJECT_REVISION_REVISION_ISSUED_TO   Issued to            String/Text     read-only
+PROJECT_REVISION_REVISION_NUM         Revision Number      String/Text     read-only
+PROJECT_REVISION_SEQUENCE_NUM         Revision Sequence    Integer/Integer read-only                              2
+SYMBOL_ID_PARAM                       Type Id              ElementId       read-only  -1                          -1
+UNIFORMAT_CODE                        Assembly Code        String/Text     read-write
+UNIFORMAT_DESCRIPTION                 Assembly Description String/Text     read-only
+</pre>
+
+<p>To see the truncated lines, copy and paste them to an editor.
+
+<p>I trust you will find these tools as useful as I do.
+
+<p>Here is today's snapshot of my current version of the
+
+<a href="zip/rac_labs_2010-05-13.zip">
+Revit API introduction labs</a>,
+
+including the element lister Lab2_1_Elements and the built-in parameter checker commands described above.

@@ -1,0 +1,129 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1257915 [NewSweptBlend] -->
+
+<h3>NewSweptBlend</h3>
+
+<p>I am still awfully busy preparing for upcoming Revit API trainings and should be working more for that and less on the blog, actually.
+Anyway, here an important nugget if information from another case handled by my colleagues Phil Xia and Saikat Bhattacharya on how to set up the input profile for the NewSweptBlend method.
+We already described the recommended approach for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging form creation problems</a>,
+
+and it obviously applies to the NewSweptBlend method as well, but the information provided here concerning the input curves to the NewSweptBlend method is required in addition to that and not provided in the Revit API documentation.
+
+<p><strong>Question:</strong> The following method CreateNewSweptBlend based on the GenericModelCreation SDK sample CreateGenericModel method creates a valid swept blend form:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> CreateNewSweptBlend( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">if</span>( !doc.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please run this command in a family document.&quot;</span> );
+&nbsp; }
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp 
+&nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; <span class="teal">CurveArrArray</span> curvess0 
+&nbsp; &nbsp; = creapp.NewCurveArrArray();
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> curves0 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p00 = creapp.NewXYZ( 0, 7.5, 0 );
+&nbsp; <span class="teal">XYZ</span> p01 = creapp.NewXYZ( 0, 15, 0 );
+&nbsp;
+&nbsp; <span class="green">// changing Z to 1 in the following line fails:</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p02 = creapp.NewXYZ( -1, 10, 0 );
+&nbsp;
+&nbsp; curves0.Append( creapp.NewLineBound( p00, p01 ) );
+&nbsp; curves0.Append( creapp.NewLineBound( p01, p02 ) );
+&nbsp; curves0.Append( creapp.NewLineBound( p02, p00 ) );
+&nbsp; curvess0.Append( curves0 );
+&nbsp;
+&nbsp; <span class="teal">CurveArrArray</span> curvess1 = creapp.NewCurveArrArray();
+&nbsp; <span class="teal">CurveArray</span> curves1 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p10 = creapp.NewXYZ( 7.5, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> p11 = creapp.NewXYZ( 15, 0, 0 );
+&nbsp;
+&nbsp; <span class="green">// changing the Z value in the following line fails:</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p12 = creapp.NewXYZ( 10, -1, 0 );
+&nbsp;
+&nbsp; curves1.Append( creapp.NewLineBound( p10, p11 ) );
+&nbsp; curves1.Append( creapp.NewLineBound( p11, p12 ) );
+&nbsp; curves1.Append( creapp.NewLineBound( p12, p10 ) );
+&nbsp; curvess1.Append( curves1 );
+&nbsp;
+&nbsp; <span class="teal">SweepProfile</span> sweepProfile0 
+&nbsp; &nbsp; = creapp.NewCurveLoopsProfile( curvess0 );
+&nbsp;
+&nbsp; <span class="teal">SweepProfile</span> sweepProfile1 
+&nbsp; &nbsp; = creapp.NewCurveLoopsProfile( curvess1 );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> pnt10 = <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt11 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 20, 0 );
+&nbsp; <span class="teal">Curve</span> curve = creapp.NewLineBound( pnt10, pnt11 );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> normal = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> splane = CreateSketchPlane( 
+&nbsp; &nbsp; doc, normal, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SweptBlend</span> sweptBlend = doc.FamilyCreate.NewSweptBlend( 
+&nbsp; &nbsp; &nbsp; <span class="blue">true</span>, curve, splane, sweepProfile0, sweepProfile1 );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;NewSweptBlend exception: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">return</span>;
+}
+</pre>
+
+<p>But if I change the Z coordinate value of points p02 and p12 to 1 instead of 0, it throws an invalid operation exception. 
+Which rule is being broken when I change the Z value of both p02 and p12, please?
+Does the curve have to be perpendicular to the sweep profiles?
+
+<p><strong>Answer:</strong> First of all, here is a summary of the suggestion we already made for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging form creation problems</a>:
+
+one way to investigate issues like this is to change the code so that it creates model lines instead of only internal lines and remove the call to NewSweptBlend.
+Then you can try selecting the model lines to manually create the blend in the user interface. 
+If the operation succeeds through the UI and not through the API, that would indicate a problem in the API.
+
+<p>In this case, the problem is neither in the user interface nor the API, but simply in the definition of the input curves and the NewSweptBlend method documentation.
+The Revit API help file RevitAPI.chm states the following requirements for the two input profiles bottomProfile and topProfile:
+
+<ul>
+<li>Type: Autodesk.Revit.DB.SweepProfile.
+<li>It should consist of only one curve loop. 
+<li>The input profile must be in one plane.
+</ul>
+
+<p>After some research and discussion, we determined that the input profile curve loop must be in the XY plane, implying that the Z coordinates must all be zero. 
+Revit will calculate the profile planes with the input path curve and then transforms the XY plane curve loop to the right profile plane internally. 
+In other words, you need to define the curve profiles to be 2D and located in the XY plane, i.e. set the XYZ input points' Z coordinates to zero.
+Unfortunately, the documentation does not mention the XY plane, it just says that the curves should be in one plane.
+Once I set all the Z coordinates to zero, it works fine.
+
+<p>Since we did not previously have any examples of calls to NewSeptBlend in the Building Coder samples, I added a new command CmdNewSweptBlend to it.
+Here is
+
+<a href="zip/bc11064.zip">
+version 1.1.0.64</a>
+
+of the complete Building Coder source code and Visual Studio solution including the new CmdNewSweptBlend external command.</p>
+
+<p>Many thanks to Phil and Saikat for this solution! 

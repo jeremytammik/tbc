@@ -1,0 +1,131 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Editing a Group Take Two</h3>
+
+<p>I am publishing this now, on November 11, 2011, at 11:11 my time, to celebrate this unique and yet completely arbitrary time and date in our calendar history.
+I hope you appreciate it and celebrated that moment in your own way as well  :-)
+
+<p>I discussed various aspects of programmatically handling Revit element groups in the past, such as how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html">
+create</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/rename-a-group.html">
+rename</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html">
+edit</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/deleting-a-group.html">
+delete</a> them.
+
+<p>In a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html?cid=6a00e553e1689788330162fbe9f033970d#comment-6a00e553e1689788330162fbe9f033970d">
+comment</a> on 
+
+the discussion on editing groups, YarUnderoaker asked for further clarification on how to implement the ungrouping and recreation of a group to make changes to it:
+
+<p><strong>Question:</strong> I cannot figure out how to do as stated in the recommendations: 
+"You can programmatically ungroup, make the change, regroup and then swap the other instances of the old group to the new group to get the same effect." 
+
+<p>Please, can you give a simple example?
+
+<p><strong>Answer:</strong> My colleague Saikat Bhattacharya put together some sample code to answer this for you.
+It performs the following steps:
+
+<ul>
+<li>Prompt user to select a group.
+<li>Ungroup it.
+<li>Create an element set of all its members except the first.
+<li>Create a new group using the element set.
+<li>Change the new group type to the old group type.
+</ul>
+
+<p>Here is the complete code to implement the mainline Execute method of the external command:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Prompt user to select existing group</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Group</span> grpExisting = doc.GetElement( 
+&nbsp; &nbsp; &nbsp; uidoc.Selection.PickObject( <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select an existing group&quot;</span> ) ) <span class="blue">as</span> <span class="teal">Group</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> name = grpExisting.Name;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Ungroup the group</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Ungroup and delete&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> grpElements = grpExisting.Ungroup();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create element set for new group</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> newgrpElements = <span class="blue">new</span> <span class="teal">ElementSet</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> counter = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> grpElements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == counter )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Delete the first group element</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Delete( e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; newgrpElements.Insert( e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; ++counter;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create new group</span>
+&nbsp;
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Group&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Group</span> grpNew = doc.Create.NewGroup( 
+&nbsp; &nbsp; &nbsp; newgrpElements );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the name of the previous group type </span>
+&nbsp; &nbsp; <span class="green">// and change the new group type to previous </span>
+&nbsp; &nbsp; <span class="green">// group type to retain the previous group </span>
+&nbsp; &nbsp; <span class="green">// configuration</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> coll 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">GroupType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">GroupType</span>&gt; grpTypes 
+&nbsp; &nbsp; &nbsp; = <span class="blue">from</span> <span class="teal">GroupType</span> g <span class="blue">in</span> coll 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> g.Name == name <span class="blue">select</span> g;
+&nbsp;
+&nbsp; &nbsp; grpNew.GroupType = grpTypes.First&lt;<span class="teal">GroupType</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>I hope this clarifies the process.
+
+<p>Many thanks to Saikat for sharing this!

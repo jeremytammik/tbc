@@ -1,0 +1,161 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Katsuaki Takamizawa, RE: Geometries from a beam joined with columns
+SPR #196915 [t: Revit SDK Developer Guide 20.5 Example: Retrieve Geometry Data from a Beam]
+
+-->
+
+<h3>Joined Beam Geometry Access</h3>
+
+<p>We have already discussed situations where an element's geometry needs to be accessed in various ways depending on the circumstances, such as the retrieval of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/unmodified-element-geometry.html">
+unmodified element geometry</a> or
+
+the different approaches required to access 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/retrieving-column-and-stair-geometry.html">
+column and stair geometry</a>,
+
+depending on whether the element has its own solid definition or is reusing the solid defined by the symbol it references.
+
+Here is a similar solution to obtain the geometry of a beam joined with columns from my colleagues Katsuaki Takamizawa and Harry Mattison:
+
+<p><strong>Question:</strong> The NewRebar SDK sample works well with a standalone beam and can access the edges of the beam geometry using the following sequence of calls, illustrated using RevitLookup:</p>
+
+<center>
+<img src="img/snoop_joined_beam_geom_1.png" alt=""/>
+</center>
+
+<p>However, it rejects a beam joined with columns because it cannot access its edges.  
+In this case, the edges can be obtained differently like this:</p>
+
+<center>
+<img src="img/snoop_joined_beam_geom_2.png" alt=""/>
+</center>
+
+<p>Should the access to edges (and geometry in general) be implemented differently depending on whether a beam is joined or not?
+We need to find the beam coordinates to add rebars to it.
+
+<p><strong>Answer:</strong> I am unable to reproduce the problem you describe.
+
+<p>The following code used with a specific file finds the same number of edges for both the joined and non-joined beams.
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdGetColumnGeometry</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> options = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; &nbsp; options.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geomElement = doc
+&nbsp; &nbsp; &nbsp; .Selection.PickObject( <span class="teal">ObjectType</span>.Element )
+&nbsp; &nbsp; &nbsp; .Element.get_Geometry( options );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> edgeCount = 0;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> geomElement.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geomObj <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = geomObj 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( inst != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geomElem 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = inst.GetSymbolGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Object</span> o <span class="blue">in</span> geomElem.Objects )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = o <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> edgeArray 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; edgeCount += edgeArray.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, <span class="maroon">&quot;Edges: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + edgeCount.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p><strong>Response:</strong> The problem seems to be specific to concrete beams. 
+The code above did not find the geometry objects of a concrete beam joined with columns. 
+
+<p><strong>Answer:</strong> You are right in that, depending on the specific element and condition, the GeometryElement may contain the desired geometry as a Solid or GeometryInstance. 
+The following code handles both of these cases, as described in Chapter 20 of the Developer Guide:
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> doc = commandData.Application
+&nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">Options</span> options = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; options.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geomElement = doc.Selection
+&nbsp; &nbsp; .PickObject( <span class="teal">ObjectType</span>.Element )
+&nbsp; &nbsp; .Element.get_Geometry( options );
+&nbsp;
+&nbsp; <span class="blue">int</span> ctr = 0;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj 
+&nbsp; &nbsp; <span class="blue">in</span> geomElement.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( geomObj <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FaceArray</span> faces = ( ( <span class="teal">Solid</span> ) geomObj ).Faces;
+&nbsp; &nbsp; &nbsp; ctr += faces.Size;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( geomObj <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = geomObj 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( inst != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geomElem 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = inst.GetSymbolGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Object</span> o <span class="blue">in</span> geomElem.Objects )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = o <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ctr += solid.Faces.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, <span class="maroon">&quot;Faces: &quot;</span> + ctr );
+}
+</pre>
+
+<p><strong>Response:</strong> Thank you, your code above and also the code in Chapter 20.5 of the developer guide worked for the concrete beam. 

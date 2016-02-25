@@ -1,0 +1,260 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08308495 [migrating Revit2013 C# app into Revit2014]
+Henny Van Der Pol, van der Pol-Consulting
+
+08298470 [Possible API Bug - Color Red/Blue Reversed?]
+CoderBoy
+
+08258022 [Update the linked DXF element By API]
+Dusan Polcer, AB Studio Consulting + Engineering, spol.s r.o
+
+08298118 [Truss Family]
+Shweta Agashe, SoftTech Engineers Pvt Ltd.
+
+08298110 [Extraction of Stringer details of Stair Object using API 2012]
+Shweta Agashe, SoftTech Engineers Pvt Ltd.
+
+-->
+
+<h3>Migrating a Built-in Category and Other Things</h3>
+
+<p>Here is a category related issue that appeared when migrating from the Revit 2013 to the Revit 2014 API, plus a several other  typical simple little Revit API questions from the last day or two:</p>
+
+<ul>
+<li><a href="#2">Migrating the room separation lines built-in category</a></li>
+<li><a href="#3">Storage of RGB colour values for materials</a></li>
+<li><a href="#4">Updating a DXF link</a></li>
+<li><a href="#5">Retrieving truss family elements</a></li>
+<li><a href="#6">Retrieving stair stringer data</a></li>
+<li><a href="#7">Storing custom data</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Migrating the Room Separation Lines Built-in Category</h4>
+
+<p><strong>Question:</strong> I get the following error while migrating my C# code from Revit 2013 to Revit 2014:
+
+<ul>
+<li>'Autodesk.Revit.DB.BuiltInCategory' does not contain a definition for 'OST_AreaSeparationLines'</li>
+</ul>
+
+<p>It is caused by the following line of code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; collection
+&nbsp; &nbsp; = collector.OfCategory(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_AreaSeparationLines )
+&nbsp; &nbsp; &nbsp; .ToElements();
+</pre>
+
+<p>Do you have any solution to suggest?</p>
+
+<p><strong>Answer:</strong> The easiest way to fix this kind of issue is to look at an element that has this category using RevitLookup in Revit 2013, and then load the same model and see what category it has in Revit 2014.
+
+<p><strong>Response:</strong> That worked!
+
+<p>It seems to be called OST_RoomSeparationLines now.
+
+<p>Problem solved.</p>
+
+
+<a name="3"></a>
+
+<h4>Storage of RGB Colour Values for Materials</h4>
+
+<p><strong>Question:</strong> I looked at a material element 'Color' parameter value today.
+This parameter values comes back as an integer.
+
+<p>It appears to me to have the red and blue values reversed.
+
+<p>When looking at the 'Site &ndash; Earth' material in the rac_advanced_sample_project included with Revit, the Color <b>property</b> on the material class returns material.Color.Red=97, material.Color.Green=75 and material.Color.Blue=62, which is also what the Revit GUI shows in 'Manage Materials'.
+I checked on an online colour generator web site and it looks the same as in the Revit GUI, a dirty brown colour.
+
+<p>However, the integer number that comes back from the 'Color' <b>parameter</b> on the material element is 4082529, which when converted to RGB values using online converters, comes back as Red=62, Green=75 and Blue=97, which is a bluish colour.
+The Red and Blue values appear to be reversed.
+
+<p>I would have expected the integer 6376254 to be returned for this colour instead.
+
+<p>Can you explain this, please?
+
+
+<p><strong>Answer:</strong> Yes, easily.
+
+<p>This is actually working as expected.
+
+<p>Revit uses the Windows convention of storing colours as an
+
+<a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd183449%28v=vs.85%29.aspx">
+RGB COLORREF value</a> in
+
+a DWORD (32 bit integer) that specifies "The low-order byte contains a value for the relative intensity of red; the second byte contains a value for green; and the third byte contains a value for blue".
+
+<p>In other words it is (A)BGR and not (A)RGB.
+
+<p>This corresponds to the value of the integer returned from a Color parameter.
+
+
+
+<a name="4"></a>
+
+<h4>Updating a DXF Link</h4>
+
+<p><strong>Question:</strong> I have created a DXF link DXF using the following code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">DWGImportOptions</span> opt = <span class="blue">new</span> <span class="teal">DWGImportOptions</span>();
+&nbsp; <span class="teal">ElementId</span> linkId;
+&nbsp;
+&nbsp; <span class="blue">if</span>( doc.Link( <span class="maroon">&quot;C:\\tmp\\test.dxf&quot;</span>,
+&nbsp; &nbsp; opt, doc.ActiveView, <span class="blue">out</span> linkId ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( linkId );
+&nbsp; &nbsp; <span class="teal">ImportInstance</span> i = e <span class="blue">as</span> <span class="teal">ImportInstance</span>;
+&nbsp; }
+</pre>
+
+<p>Later, the DXF is modified by an external application.
+
+<p>Is it possible to programmatically force Revit to reload the link?
+
+<p>I think I could also delete the ImportInstance and create a new one, but I don't how to get the proper DWGImportOptions and DXF file path from the existing ImportInstance.</p>
+
+
+<p><strong>Answer:</strong> Yes, this can easily be achieved.
+You can use the RevitLinkType.Unload method to unload it first, and then call RevitLinkType.Reload to reload the updated DXF file.</p>
+
+<p>The imported DXF file has the type of CADLinkType.
+Just as you say, you could also delete the link and import it again.</p>
+
+<p>You can find the imported DXF ImportInstance's original path by calling the ExternalFileReference.GetPath method, and the
+ExternalFileUtils.GetExternalRefernce method will return the ImportInstance's ExternalFileReference object.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Retrieving Truss Family Elements</h4>
+
+<p><strong>Question:</strong> How can I retrieve a truss element family instance?
+
+<p><strong>Answer:</strong> This is a very basic question, answered many times over in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/getting-started-with-the-revit-api.html">
+Revit API getting started material</a>.
+
+<p>I recommend that you take a look at that material, work through the 'My First Revit Plugin' and DevTV tutorials, install the Revit SDK, RevitLookup, RvtSamples, and then answer that question for yourself.</p>
+
+<p>I'll just give you one little additional hint to help get you started:</p>
+
+<p>Every access to a Revit database element is achieved using a filtered element collector.</p>
+
+<p>To retrieve all truss family instances, you could use something like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Truss );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// e is a truss family instance</span>
+&nbsp; }
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Retrieval of Stair Stringer Data</h4>
+
+<p><strong>Question:</strong> I want to access the values of the stair stringer height and thickness properties on a stair element.
+How can I achieve this, please?
+
+<p>I tried using the built-in parameters STAIRS_ATTR_STRINGER_THICKNESS and STAIRS_ATTR_STRINGER_HEIGTH, but the value being returned is null. I am also unable to get the family symbol of the stair element.</p>
+
+
+<p><strong>Answer:</strong> The two parameters that you are trying to access are stored on the stair type, not the stair itself.
+
+<p>The stair type is represented by the ElementType class, not FamilySymbol.
+
+<p>You can access the stair type and the two desired paramaters like this:
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> doc = stair.Document;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> id = stair.GetTypeId();
+&nbsp;
+&nbsp; <span class="teal">ElementType</span> type = doc.get_Element( id )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ElementType</span>;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> pThick = type.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STAIRS_ATTR_STRINGER_THICKNESS );
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> pHeight = type.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STAIRS_ATTR_STRINGER_HEIGHT );
+&nbsp;
+&nbsp; <span class="blue">double</span> thick = pThick.AsDouble();
+&nbsp; <span class="blue">double</span> height = pHeight.AsDouble();
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Storing Custom Data</h4>
+
+<p><strong>Response:</strong> I need more than just the path.
+I would like to retrieve other DWGImportOptions parameters as well.
+Is it possible to get them somehow?
+
+<p><strong>Answer:</strong> I don't think there is any way to retrieve all the ImportInstance's DWGImportOptions.
+
+<p>Since the DXF file was imported by your own code, you can easily work around that gap by storing the DWGImportOptions property values of interest in the ImportInstance object.
+
+<p>You can use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">
+extensible storage</a>
+
+(<a href="http://wikihelp.autodesk.com/Revit/enu/2014/Help/3665-Developers/0135-Advanced135/0136-Storing_136/0141-Extensib141">wiki</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/storage">category</a>)
+
+to store custom data on Revit elements.
+
+<p>When you use this, you can later read back the settings from the extensible storage data.
+
+<!--
+<hr>
+
+<a name="3"></a>
+
+<h4>Lauching Revit using Process.Start</h4>
+
+<p><strong>Question:</strong>
+
+Weird issue. I'm launching Revit from a typical Windows.Form PushButton using:
+
+System.Diagnostics.Process.Start(@"C:\Program Files\Autodesk\Revit Architecture 2013\Program\Revit.exe");
+
+When Revit opens, I get the message, 'The path you have specified for the default family template files is invalid' (see: Default Templates invalid.png)
+
+If I then click the Applications menu (Revit pulldown at top/left of Revit window), click Options and select: File Locations, all my template files are missing (see missing.png).
+
+If I launch Revit using the delevered desktop icon this does not happen (see: not-missing.png). Is there a way to use Process() to open Revit correctly?
+
+<p><strong>Answer:</strong>
+when you start a process from the windows desktop icon, you also specify the start-up directory.
+
+Process.Start also includes this possibility.
+
+try using that.
+
+you can also specify other environment settings.
+
+simply ensure that all environment settings set up by Process.Start exactly match the settings generated by the windows desktop launch icon.
+-->

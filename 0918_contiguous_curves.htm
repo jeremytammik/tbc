@@ -1,0 +1,1204 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Sort and Orient Curves to Form a Contiguous Loop</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I need to determine the boundary loop polygons to represent the furniture and equipment family instances for manipulation on the mobile device.
+
+<p>To display a polygon using SVG in the mobile device browser, I obviously need a set of contiguous and sorted curve elements forming a closed loop.</p>
+
+<p>I mentioned using the Revit API ExtrusionAnalyzer class to determine the plan view boundary outline for the family instances.
+On testing that approach, I discovered that the results it returns are unsorted.</p>
+
+<p>For instance, I analysed the ExtrusionAnalyzer output for the standard Revit furniture content 'Desk 1525 x 762mm'.
+In plan view, it can appear like this:</p>
+
+<center>
+<img src="img/room_with_furniture.png" alt="Plan view of room with furniture" width="400"/>
+</center>
+
+<p>The desk includes lots of internal geometry that is not visible in plan view:</p>
+
+<center>
+<img src="img/desk_and_chair.png" alt="Desk and chair" width="200"/>
+</center>
+
+<p>As a result, the information returned by the ExtrusionAnalyzer is much more complex than the simple rectangle one might expect.
+In fact, it returns ten separate closed loops, and the first one consists of eight curves.</p>
+
+<p>To check whether they are contiguous and correctly sorted, here is a list of their end points:</p>
+
+<pre>
+  (2.74,8.38,0) --&gt; (2.74,8.46,0)
+  (2.74,8.38,0) --&gt; (2.76,8.38,0)
+  (2.76,8.38,0) --&gt; (2.76,8.44,0)
+  (2.76,8.44,0) --&gt; (3.05,8.44,0)
+  (3.05,8.44,0) --&gt; (3.05,8.38,0)
+  (3.05,8.38,0) --&gt; (3.08,8.38,0)
+  (3.08,8.46,0) --&gt; (3.08,8.38,0)
+  (2.74,8.46,0) --&gt; (3.08,8.46,0)
+</pre>
+
+<p>You can see quite easily that they are not contiguous.
+For instance, the end point at (2.74,8.46) of the first curve equals the start point of the last.</p>
+
+<p>If you look more carefully still, you will notice that some of the curves require reversing to connect to their neighbours.</p>
+
+<p>These observations and considerations led to the implementation of the following curve sorting and orientation method.</p>
+
+<p>Its end point matching comparison relies on the standard Revit precision, which is around one sixteenth of an inch.
+Since the built-in Revit database length unit is feet, I define the following fuzz factor for that:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _inch = 1.0 / 12.0;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _sixteenth = _inch / 16.0;
+</pre>
+
+<p>Further, the curve reversal is implemented by creating a completely new curve.
+Therefore, the creation application has to be provided for generating these:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create a new curve with the same </span>
+<span class="gray">///</span><span class="green"> geometry in the reverse direction.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;orig&quot;&gt;</span><span class="green">The original curve.</span><span class="gray">&lt;/param&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">The reversed curve.</span><span class="gray">&lt;/returns&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;throws cref=&quot;NotImplementedException&quot;&gt;</span><span class="green">If the </span>
+<span class="gray">///</span><span class="green"> curve type is not supported by this utility.</span><span class="gray">&lt;/throws&gt;</span>
+<span class="blue">static</span> <span class="teal">Curve</span> CreateReversedCurve(
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp,
+&nbsp; <span class="teal">Curve</span> orig )
+{
+&nbsp; <span class="blue">if</span>( !IsSupported( orig ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CreateReversedCurve for type &quot;</span>
+&nbsp; &nbsp; &nbsp; + orig.GetType().Name );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( orig <span class="blue">is</span> <span class="teal">Line</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> creapp.NewLineBound(
+&nbsp; &nbsp; &nbsp; orig.GetEndPoint( 1 ),
+&nbsp; &nbsp; &nbsp; orig.GetEndPoint( 0 ) );
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( orig <span class="blue">is</span> <span class="teal">Arc</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> creapp.NewArc( orig.GetEndPoint( 1 ),
+&nbsp; &nbsp; &nbsp; orig.GetEndPoint( 0 ),
+&nbsp; &nbsp; &nbsp; orig.Evaluate( 0.5, <span class="blue">true</span> ) );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CreateReversedCurve - Unreachable&quot;</span> );
+&nbsp; }
+}
+</pre>
+
+<p>With this support in hand, we can go ahead and implement the SortCurvesContiguous method:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Sort a list of curves to make them correctly </span>
+<span class="gray">///</span><span class="green"> ordered and oriented to form a closed loop.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SortCurvesContiguous(
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp,
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; curves,
+&nbsp; <span class="blue">bool</span> debug_output )
+{
+&nbsp; <span class="blue">int</span> n = curves.Count;
+&nbsp;
+&nbsp; <span class="green">// Walk through each curve (after the first) </span>
+&nbsp; <span class="green">// to match up the curves in order</span>
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Curve</span> curve = curves[i];
+&nbsp; &nbsp; <span class="teal">XYZ</span> endPoint = curve.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( debug_output )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} endPoint {1}&quot;</span>, i,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( endPoint ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find curve with start point = end point</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> found = (i + 1 &gt;= n);
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = i + 1; j &lt; n; ++j )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p = curves[j].GetEndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If there is a match end-&gt;start, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// this is the next curve</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _sixteenth &gt; p.DistanceTo( endPoint ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} start point, swap with {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; j, i + 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( i + 1 != j )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> tmp = curves[i + 1];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves[i + 1] = curves[j];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves[j] = tmp;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; found = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = curves[j].GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If there is a match end-&gt;end, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// reverse the next curve</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _sixteenth &gt; p.DistanceTo( endPoint ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( i + 1 == j )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} end point, reverse {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; j, i + 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves[i + 1] = CreateReversedCurve(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creapp, curves[j] );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} end point, swap with reverse {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; j, i + 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> tmp = curves[i + 1];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves[i + 1] = CreateReversedCurve(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creapp, curves[j] );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves[j] = tmp;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; found = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( !found )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;SortCurvesContiguous:&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; non-contiguous input curves&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>This is obviously not the most effective sorting algorithm in the world, but it should do for the hopefully simple cases I expect to encounter.</p>
+
+<p>This method includes an option for verbose logging to the Visual Studio debug output window.
+This is what it produces for the unsorted list of input points provided above:</p>
+
+<pre>
+  0 endPoint (2.74,8.46,0)
+  7 start point, swap with 1
+  1 endPoint (3.08,8.46,0)
+  6 start point, swap with 2
+  2 endPoint (3.08,8.38,0)
+  5 end point, swap with reverse 3
+  3 endPoint (3.05,8.38,0)
+  4 end point, reverse 4
+  4 endPoint (3.05,8.44,0)
+  5 end point, reverse 5
+  5 endPoint (2.76,8.44,0)
+  6 end point, reverse 6
+  6 endPoint (2.76,8.38,0)
+  7 end point, reverse 7
+  7 endPoint (2.74,8.38,0)
+</pre>
+
+<p>The complete output for the entire desk looks like this after sorting and rearranging all ten loops using the SortCurvesContiguous method and converting the results from Revit XYZ coordinates to my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html">
+2D integer-based loop</a> representation in millimetres:</p>
+
+<pre>
+FamilyInstance Furniture Desk &lt;212646 1525 x 762mm&gt; has 10 loops:
+  0: (836,2555), (836,2580), (937,2580), (937,2555), (931,2555), (931,2574), (842,2574), (842,2555)
+  1: (1954,2580), (1954,2555), (1961,2555), (1961,2574), (2050,2574), (2050,2555), (2056,2555), (2056,2580)
+  2: (683,2542), (683,1780), (2208,1780), (2208,2542), (1802,2542), (1802,1831), (1090,1831), (1090,2542)
+  3: (664,2561), (664,1761), (2227,1761), (2227,2561)
+  4: (683,2440), (785,2440), (785,2542), (683,2542)
+  5: (785,1780), (785,1882), (683,1882), (683,1780)
+  6: (2107,1882), (2107,1780), (2208,1780), (2208,1882)
+  7: (2107,2542), (2107,2440), (2208,2440), (2208,2542)
+  8: (702,2542), (702,2555), (1071,2555), (1071,2542)
+  9: (1821,2542), (1821,2555), (2189,2555), (2189,2542)
+</pre>
+
+<p>I hope you can make good use of this method in your own add-ins as well.</p>
+
+<p>Happy Easter!</p>
+
+<center>
+<img src="img/easter_bunny_postcard_1907.jpg" alt="Happy Easter!" width="300"/>
+</center>
+
+
+
+<!--
+
+It includes
+
+and listed the start
+
+Here is an example from a ???</p>
+
+/a/doc/revit/blog/img/room_with_furniture.png
+
+/a/doc/revit/blog/img/desk_and_chair.png
+
+<a name="2"></a>
+
+<h4></h4>
+
+<a href="">
+</a>
+
+<pre class="code">
+</pre>
+
+
+<center>
+<img src="img/.png" alt="" width="300"/>
+</center>
+
+<p>The original start and end points of the boundary segments for this room are reported as follows:</p>
+
+<pre>
+</pre>
+
+
+<p>Anyway, here is
+
+<a href="zip/GetRoomLoops.zip">GetRoomLoops.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.
+
+
+
+<hr>
+
+<pre>
+
+(9.03,10.13,0) -- (-14.59,10.13,0)
+(-14.59,10.13,0) -- (-14.59,1.93,0)
+(-14.59,1.93,0) -- (-2.45,1.93,0)
+(-2.45,1.93,0) -- (-2.45,-3.98,0)
+(-2.45,-3.98,0) -- (9.03,-3.98,0)
+(9.03,-3.98,0) -- (9.03,10.13,0)
+(0.98,-0.37,0) -- (0.98,1.93,0)
+(0.98,1.93,0) -- (5.57,1.93,0)
+(5.57,1.93,0) -- (5.57,-0.37,0)
+(5.57,-0.37,0) -- (0.98,-0.37,0)
+Room Rooms <212639 Room 1> has 2 loops:
+  0: (2753,3087), (-4446,3087), (-4446,587), (-746,587), (-746,-1212), (2753,-1212)
+  1: (298,-112), (298,587), (1698,587), (1698,-112)
+(2.74,8.38,0) -- (2.74,8.46,0)
+(2.74,8.38,0) -- (2.76,8.38,0)
+(2.76,8.38,0) -- (2.76,8.44,0)
+(2.76,8.44,0) -- (3.05,8.44,0)
+(3.05,8.44,0) -- (3.05,8.38,0)
+(3.05,8.38,0) -- (3.08,8.38,0)
+(3.08,8.46,0) -- (3.08,8.38,0)
+(2.74,8.46,0) -- (3.08,8.46,0)
+0 endPoint (2.742005185, 8.464883544, 0.000000000)
+7 start point, swap with 1
+1 endPoint (3.075338518, 8.464883544, 0.000000000)
+6 start point, swap with 2
+2 endPoint (3.075338518, 8.381550211, 0.000000000)
+5 end point, swap with reverse 3
+3 endPoint (3.054505185, 8.381550211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (3.054505185, 8.444050211, 0.000000000)
+5 end point, reverse 5
+5 endPoint (2.762838518, 8.444050211, 0.000000000)
+6 end point, reverse 6
+6 endPoint (2.762838518, 8.381550211, 0.000000000)
+7 end point, reverse 7
+7 endPoint (2.742005185, 8.381550211, 0.000000000)
+(2.74,8.38,0) -- (2.74,8.46,0)
+(2.74,8.46,0) -- (3.08,8.46,0)
+(3.08,8.46,0) -- (3.08,8.38,0)
+(3.08,8.38,0) -- (3.05,8.38,0)
+(3.05,8.38,0) -- (3.05,8.44,0)
+(3.05,8.44,0) -- (2.76,8.44,0)
+(2.76,8.44,0) -- (2.76,8.38,0)
+(2.76,8.38,0) -- (2.74,8.38,0)
+(6.41,8.46,0) -- (6.41,8.38,0)
+(6.41,8.38,0) -- (6.43,8.38,0)
+(6.43,8.44,0) -- (6.43,8.38,0)
+(6.72,8.44,0) -- (6.43,8.44,0)
+(6.72,8.38,0) -- (6.72,8.44,0)
+(6.72,8.38,0) -- (6.75,8.38,0)
+(6.75,8.38,0) -- (6.75,8.46,0)
+(6.75,8.46,0) -- (6.41,8.46,0)
+0 endPoint (6.411952691, 8.381550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (6.432786025, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (6.432786025, 8.444050211, 0.000000000)
+3 end point, reverse 3
+3 endPoint (6.724452691, 8.444050211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (6.724452691, 8.381550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (6.745286025, 8.381550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (6.745286025, 8.464883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (6.411952691, 8.464883544, 0.000000000)
+(6.41,8.46,0) -- (6.41,8.38,0)
+(6.41,8.38,0) -- (6.43,8.38,0)
+(6.43,8.38,0) -- (6.43,8.44,0)
+(6.43,8.44,0) -- (6.72,8.44,0)
+(6.72,8.44,0) -- (6.72,8.38,0)
+(6.72,8.38,0) -- (6.75,8.38,0)
+(6.75,8.38,0) -- (6.75,8.46,0)
+(6.75,8.46,0) -- (6.41,8.46,0)
+(2.24,8.34,0) -- (2.24,5.84,0)
+(2.24,5.84,0) -- (7.25,5.84,0)
+(7.25,5.84,0) -- (7.25,8.34,0)
+(7.25,8.34,0) -- (5.91,8.34,0)
+(5.91,8.34,0) -- (5.91,6.01,0)
+(5.91,6.01,0) -- (3.58,6.01,0)
+(3.58,6.01,0) -- (3.58,8.34,0)
+(3.58,8.34,0) -- (2.24,8.34,0)
+0 endPoint (2.242005185, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (7.245286025, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (7.245286025, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (5.911952691, 8.339883544, 0.000000000)
+4 start point, swap with 4
+4 endPoint (5.911952691, 6.006550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (3.575338518, 6.006550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (3.575338518, 8.339883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (2.242005185, 8.339883544, 0.000000000)
+(2.24,8.34,0) -- (2.24,5.84,0)
+(2.24,5.84,0) -- (7.25,5.84,0)
+(7.25,5.84,0) -- (7.25,8.34,0)
+(7.25,8.34,0) -- (5.91,8.34,0)
+(5.91,8.34,0) -- (5.91,6.01,0)
+(5.91,6.01,0) -- (3.58,6.01,0)
+(3.58,6.01,0) -- (3.58,8.34,0)
+(3.58,8.34,0) -- (2.24,8.34,0)
+(2.18,8.4,0) -- (2.18,5.78,0)
+(2.18,5.78,0) -- (7.31,5.78,0)
+(7.31,5.78,0) -- (7.31,8.4,0)
+(7.31,8.4,0) -- (2.18,8.4,0)
+0 endPoint (2.179505185, 5.777383544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (7.307786025, 5.777383544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (7.307786025, 8.402383544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (2.179505185, 8.402383544, 0.000000000)
+(2.18,8.4,0) -- (2.18,5.78,0)
+(2.18,5.78,0) -- (7.31,5.78,0)
+(7.31,5.78,0) -- (7.31,8.4,0)
+(7.31,8.4,0) -- (2.18,8.4,0)
+(2.24,8.01,0) -- (2.58,8.01,0)
+(2.58,8.01,0) -- (2.58,8.34,0)
+(2.58,8.34,0) -- (2.24,8.34,0)
+(2.24,8.34,0) -- (2.24,8.01,0)
+0 endPoint (2.575338518, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (2.575338518, 8.339883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (2.242005185, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (2.242005185, 8.006550211, 0.000000000)
+(2.24,8.01,0) -- (2.58,8.01,0)
+(2.58,8.01,0) -- (2.58,8.34,0)
+(2.58,8.34,0) -- (2.24,8.34,0)
+(2.24,8.34,0) -- (2.24,8.01,0)
+(2.58,5.84,0) -- (2.58,6.17,0)
+(2.58,6.17,0) -- (2.24,6.17,0)
+(2.24,6.17,0) -- (2.24,5.84,0)
+(2.24,5.84,0) -- (2.58,5.84,0)
+0 endPoint (2.575338518, 6.173216877, 0.000000000)
+1 start point, swap with 1
+1 endPoint (2.242005185, 6.173216877, 0.000000000)
+2 start point, swap with 2
+2 endPoint (2.242005185, 5.839883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (2.575338518, 5.839883544, 0.000000000)
+(2.58,5.84,0) -- (2.58,6.17,0)
+(2.58,6.17,0) -- (2.24,6.17,0)
+(2.24,6.17,0) -- (2.24,5.84,0)
+(2.24,5.84,0) -- (2.58,5.84,0)
+(6.91,6.17,0) -- (6.91,5.84,0)
+(6.91,5.84,0) -- (7.25,5.84,0)
+(7.25,5.84,0) -- (7.25,6.17,0)
+(7.25,6.17,0) -- (6.91,6.17,0)
+0 endPoint (6.911952691, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (7.245286025, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (7.245286025, 6.173216877, 0.000000000)
+3 start point, swap with 3
+3 endPoint (6.911952691, 6.173216877, 0.000000000)
+(6.91,6.17,0) -- (6.91,5.84,0)
+(6.91,5.84,0) -- (7.25,5.84,0)
+(7.25,5.84,0) -- (7.25,6.17,0)
+(7.25,6.17,0) -- (6.91,6.17,0)
+(6.91,8.34,0) -- (6.91,8.01,0)
+(6.91,8.01,0) -- (7.25,8.01,0)
+(7.25,8.01,0) -- (7.25,8.34,0)
+(7.25,8.34,0) -- (6.91,8.34,0)
+0 endPoint (6.911952691, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (7.245286025, 8.006550211, 0.000000000)
+2 start point, swap with 2
+2 endPoint (7.245286025, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (6.911952691, 8.339883544, 0.000000000)
+(6.91,8.34,0) -- (6.91,8.01,0)
+(6.91,8.01,0) -- (7.25,8.01,0)
+(7.25,8.01,0) -- (7.25,8.34,0)
+(7.25,8.34,0) -- (6.91,8.34,0)
+(2.3,8.34,0) -- (2.3,8.38,0)
+(3.51,8.34,0) -- (2.3,8.34,0)
+(3.51,8.34,0) -- (3.51,8.38,0)
+(2.3,8.38,0) -- (3.51,8.38,0)
+0 endPoint (2.304505185, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (3.512838518, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (3.512838518, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (2.304505185, 8.339883544, 0.000000000)
+(2.3,8.34,0) -- (2.3,8.38,0)
+(2.3,8.38,0) -- (3.51,8.38,0)
+(3.51,8.38,0) -- (3.51,8.34,0)
+(3.51,8.34,0) -- (2.3,8.34,0)
+(5.97,8.34,0) -- (5.97,8.38,0)
+(5.97,8.34,0) -- (7.18,8.34,0)
+(7.18,8.34,0) -- (7.18,8.38,0)
+(5.97,8.38,0) -- (7.18,8.38,0)
+0 endPoint (5.974452691, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (7.182786025, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (7.182786025, 8.339883544, 0.000000000)
+3 end point, reverse 3
+3 endPoint (5.974452691, 8.339883544, 0.000000000)
+(5.97,8.34,0) -- (5.97,8.38,0)
+(5.97,8.38,0) -- (7.18,8.38,0)
+(7.18,8.38,0) -- (7.18,8.34,0)
+(7.18,8.34,0) -- (5.97,8.34,0)
+FamilyInstance Furniture Desk <212646 1525 x 762mm> has 10 loops:
+  0: (836,2555), (836,2580), (937,2580), (937,2555), (931,2555), (931,2574), (842,2574), (842,2555)
+  1: (1954,2580), (1954,2555), (1961,2555), (1961,2574), (2050,2574), (2050,2555), (2056,2555), (2056,2580)
+  2: (683,2542), (683,1780), (2208,1780), (2208,2542), (1802,2542), (1802,1831), (1090,1831), (1090,2542)
+  3: (664,2561), (664,1761), (2227,1761), (2227,2561)
+  4: (683,2440), (785,2440), (785,2542), (683,2542)
+  5: (785,1780), (785,1882), (683,1882), (683,1780)
+  6: (2107,1882), (2107,1780), (2208,1780), (2208,1882)
+  7: (2107,2542), (2107,2440), (2208,2440), (2208,2542)
+  8: (702,2542), (702,2555), (1071,2555), (1071,2542)
+  9: (1821,2542), (1821,2555), (2189,2555), (2189,2542)
+(-3.38,8.38,0) -- (-3.38,8.46,0)
+(-3.38,8.38,0) -- (-3.36,8.38,0)
+(-3.36,8.38,0) -- (-3.36,8.44,0)
+(-3.36,8.44,0) -- (-3.06,8.44,0)
+(-3.06,8.44,0) -- (-3.06,8.38,0)
+(-3.06,8.38,0) -- (-3.04,8.38,0)
+(-3.04,8.46,0) -- (-3.04,8.38,0)
+(-3.38,8.46,0) -- (-3.04,8.46,0)
+0 endPoint (-3.376761219, 8.464883544, 0.000000000)
+7 start point, swap with 1
+1 endPoint (-3.043427886, 8.464883544, 0.000000000)
+6 start point, swap with 2
+2 endPoint (-3.043427886, 8.381550211, 0.000000000)
+5 end point, swap with reverse 3
+3 endPoint (-3.064261219, 8.381550211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (-3.064261219, 8.444050211, 0.000000000)
+5 end point, reverse 5
+5 endPoint (-3.355927886, 8.444050211, 0.000000000)
+6 end point, reverse 6
+6 endPoint (-3.355927886, 8.381550211, 0.000000000)
+7 end point, reverse 7
+7 endPoint (-3.376761219, 8.381550211, 0.000000000)
+(-3.38,8.38,0) -- (-3.38,8.46,0)
+(-3.38,8.46,0) -- (-3.04,8.46,0)
+(-3.04,8.46,0) -- (-3.04,8.38,0)
+(-3.04,8.38,0) -- (-3.06,8.38,0)
+(-3.06,8.38,0) -- (-3.06,8.44,0)
+(-3.06,8.44,0) -- (-3.36,8.44,0)
+(-3.36,8.44,0) -- (-3.36,8.38,0)
+(-3.36,8.38,0) -- (-3.38,8.38,0)
+(0.29,8.46,0) -- (0.29,8.38,0)
+(0.29,8.38,0) -- (0.31,8.38,0)
+(0.31,8.44,0) -- (0.31,8.38,0)
+(0.61,8.44,0) -- (0.31,8.44,0)
+(0.61,8.38,0) -- (0.61,8.44,0)
+(0.61,8.38,0) -- (0.63,8.38,0)
+(0.63,8.38,0) -- (0.63,8.46,0)
+(0.63,8.46,0) -- (0.29,8.46,0)
+0 endPoint (0.293186287, 8.381550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (0.314019620, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (0.314019620, 8.444050211, 0.000000000)
+3 end point, reverse 3
+3 endPoint (0.605686287, 8.444050211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (0.605686287, 8.381550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (0.626519620, 8.381550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (0.626519620, 8.464883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (0.293186287, 8.464883544, 0.000000000)
+(0.29,8.46,0) -- (0.29,8.38,0)
+(0.29,8.38,0) -- (0.31,8.38,0)
+(0.31,8.38,0) -- (0.31,8.44,0)
+(0.31,8.44,0) -- (0.61,8.44,0)
+(0.61,8.44,0) -- (0.61,8.38,0)
+(0.61,8.38,0) -- (0.63,8.38,0)
+(0.63,8.38,0) -- (0.63,8.46,0)
+(0.63,8.46,0) -- (0.29,8.46,0)
+(-3.88,8.34,0) -- (-3.88,5.84,0)
+(-3.88,5.84,0) -- (1.13,5.84,0)
+(1.13,5.84,0) -- (1.13,8.34,0)
+(1.13,8.34,0) -- (-0.21,8.34,0)
+(-0.21,8.34,0) -- (-0.21,6.01,0)
+(-0.21,6.01,0) -- (-2.54,6.01,0)
+(-2.54,6.01,0) -- (-2.54,8.34,0)
+(-2.54,8.34,0) -- (-3.88,8.34,0)
+0 endPoint (-3.876761219, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (1.126519620, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (1.126519620, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-0.206813713, 8.339883544, 0.000000000)
+4 start point, swap with 4
+4 endPoint (-0.206813713, 6.006550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (-2.543427886, 6.006550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (-2.543427886, 8.339883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (-3.876761219, 8.339883544, 0.000000000)
+(-3.88,8.34,0) -- (-3.88,5.84,0)
+(-3.88,5.84,0) -- (1.13,5.84,0)
+(1.13,5.84,0) -- (1.13,8.34,0)
+(1.13,8.34,0) -- (-0.21,8.34,0)
+(-0.21,8.34,0) -- (-0.21,6.01,0)
+(-0.21,6.01,0) -- (-2.54,6.01,0)
+(-2.54,6.01,0) -- (-2.54,8.34,0)
+(-2.54,8.34,0) -- (-3.88,8.34,0)
+(-3.94,8.4,0) -- (-3.94,5.78,0)
+(-3.94,5.78,0) -- (1.19,5.78,0)
+(1.19,5.78,0) -- (1.19,8.4,0)
+(1.19,8.4,0) -- (-3.94,8.4,0)
+0 endPoint (-3.939261219, 5.777383544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (1.189019620, 5.777383544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (1.189019620, 8.402383544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-3.939261219, 8.402383544, 0.000000000)
+(-3.94,8.4,0) -- (-3.94,5.78,0)
+(-3.94,5.78,0) -- (1.19,5.78,0)
+(1.19,5.78,0) -- (1.19,8.4,0)
+(1.19,8.4,0) -- (-3.94,8.4,0)
+(-3.88,8.01,0) -- (-3.54,8.01,0)
+(-3.54,8.01,0) -- (-3.54,8.34,0)
+(-3.54,8.34,0) -- (-3.88,8.34,0)
+(-3.88,8.34,0) -- (-3.88,8.01,0)
+0 endPoint (-3.543427886, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-3.543427886, 8.339883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-3.876761219, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-3.876761219, 8.006550211, 0.000000000)
+(-3.88,8.01,0) -- (-3.54,8.01,0)
+(-3.54,8.01,0) -- (-3.54,8.34,0)
+(-3.54,8.34,0) -- (-3.88,8.34,0)
+(-3.88,8.34,0) -- (-3.88,8.01,0)
+(-3.54,5.84,0) -- (-3.54,6.17,0)
+(-3.54,6.17,0) -- (-3.88,6.17,0)
+(-3.88,6.17,0) -- (-3.88,5.84,0)
+(-3.88,5.84,0) -- (-3.54,5.84,0)
+0 endPoint (-3.543427886, 6.173216877, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-3.876761219, 6.173216877, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-3.876761219, 5.839883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-3.543427886, 5.839883544, 0.000000000)
+(-3.54,5.84,0) -- (-3.54,6.17,0)
+(-3.54,6.17,0) -- (-3.88,6.17,0)
+(-3.88,6.17,0) -- (-3.88,5.84,0)
+(-3.88,5.84,0) -- (-3.54,5.84,0)
+(0.79,6.17,0) -- (0.79,5.84,0)
+(0.79,5.84,0) -- (1.13,5.84,0)
+(1.13,5.84,0) -- (1.13,6.17,0)
+(1.13,6.17,0) -- (0.79,6.17,0)
+0 endPoint (0.793186287, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (1.126519620, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (1.126519620, 6.173216877, 0.000000000)
+3 start point, swap with 3
+3 endPoint (0.793186287, 6.173216877, 0.000000000)
+(0.79,6.17,0) -- (0.79,5.84,0)
+(0.79,5.84,0) -- (1.13,5.84,0)
+(1.13,5.84,0) -- (1.13,6.17,0)
+(1.13,6.17,0) -- (0.79,6.17,0)
+(0.79,8.34,0) -- (0.79,8.01,0)
+(0.79,8.01,0) -- (1.13,8.01,0)
+(1.13,8.01,0) -- (1.13,8.34,0)
+(1.13,8.34,0) -- (0.79,8.34,0)
+0 endPoint (0.793186287, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (1.126519620, 8.006550211, 0.000000000)
+2 start point, swap with 2
+2 endPoint (1.126519620, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (0.793186287, 8.339883544, 0.000000000)
+(0.79,8.34,0) -- (0.79,8.01,0)
+(0.79,8.01,0) -- (1.13,8.01,0)
+(1.13,8.01,0) -- (1.13,8.34,0)
+(1.13,8.34,0) -- (0.79,8.34,0)
+(-3.81,8.34,0) -- (-3.81,8.38,0)
+(-2.61,8.34,0) -- (-3.81,8.34,0)
+(-2.61,8.34,0) -- (-2.61,8.38,0)
+(-3.81,8.38,0) -- (-2.61,8.38,0)
+0 endPoint (-3.814261219, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (-2.605927886, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (-2.605927886, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-3.814261219, 8.339883544, 0.000000000)
+(-3.81,8.34,0) -- (-3.81,8.38,0)
+(-3.81,8.38,0) -- (-2.61,8.38,0)
+(-2.61,8.38,0) -- (-2.61,8.34,0)
+(-2.61,8.34,0) -- (-3.81,8.34,0)
+(-0.14,8.34,0) -- (-0.14,8.38,0)
+(-0.14,8.34,0) -- (1.06,8.34,0)
+(1.06,8.34,0) -- (1.06,8.38,0)
+(-0.14,8.38,0) -- (1.06,8.38,0)
+0 endPoint (-0.144313713, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (1.064019620, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (1.064019620, 8.339883544, 0.000000000)
+3 end point, reverse 3
+3 endPoint (-0.144313713, 8.339883544, 0.000000000)
+(-0.14,8.34,0) -- (-0.14,8.38,0)
+(-0.14,8.38,0) -- (1.06,8.38,0)
+(1.06,8.38,0) -- (1.06,8.34,0)
+(1.06,8.34,0) -- (-0.14,8.34,0)
+FamilyInstance Furniture Desk <212801 1525 x 762mm> has 10 loops:
+  0: (-1028,2555), (-1028,2580), (-927,2580), (-927,2555), (-933,2555), (-933,2574), (-1022,2574), (-1022,2555)
+  1: (89,2580), (89,2555), (96,2555), (96,2574), (185,2574), (185,2555), (191,2555), (191,2580)
+  2: (-1181,2542), (-1181,1780), (343,1780), (343,2542), (-62,2542), (-62,1831), (-774,1831), (-774,2542)
+  3: (-1200,2561), (-1200,1761), (362,1761), (362,2561)
+  4: (-1181,2440), (-1079,2440), (-1079,2542), (-1181,2542)
+  5: (-1079,1780), (-1079,1882), (-1181,1882), (-1181,1780)
+  6: (242,1882), (242,1780), (343,1780), (343,1882)
+  7: (242,2542), (242,2440), (343,2440), (343,2542)
+  8: (-1162,2542), (-1162,2555), (-793,2555), (-793,2542)
+  9: (-43,2542), (-43,2555), (324,2555), (324,2542)
+(-13.01,8.38,0) -- (-13.01,8.46,0)
+(-13.01,8.38,0) -- (-12.99,8.38,0)
+(-12.99,8.38,0) -- (-12.99,8.44,0)
+(-12.99,8.44,0) -- (-12.69,8.44,0)
+(-12.69,8.44,0) -- (-12.69,8.38,0)
+(-12.69,8.38,0) -- (-12.67,8.38,0)
+(-12.67,8.46,0) -- (-12.67,8.38,0)
+(-13.01,8.46,0) -- (-12.67,8.46,0)
+0 endPoint (-13.006026311, 8.464883544, 0.000000000)
+7 start point, swap with 1
+1 endPoint (-12.672692978, 8.464883544, 0.000000000)
+6 start point, swap with 2
+2 endPoint (-12.672692978, 8.381550211, 0.000000000)
+5 end point, swap with reverse 3
+3 endPoint (-12.693526311, 8.381550211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (-12.693526311, 8.444050211, 0.000000000)
+5 end point, reverse 5
+5 endPoint (-12.985192978, 8.444050211, 0.000000000)
+6 end point, reverse 6
+6 endPoint (-12.985192978, 8.381550211, 0.000000000)
+7 end point, reverse 7
+7 endPoint (-13.006026311, 8.381550211, 0.000000000)
+(-13.01,8.38,0) -- (-13.01,8.46,0)
+(-13.01,8.46,0) -- (-12.67,8.46,0)
+(-12.67,8.46,0) -- (-12.67,8.38,0)
+(-12.67,8.38,0) -- (-12.69,8.38,0)
+(-12.69,8.38,0) -- (-12.69,8.44,0)
+(-12.69,8.44,0) -- (-12.99,8.44,0)
+(-12.99,8.44,0) -- (-12.99,8.38,0)
+(-12.99,8.38,0) -- (-13.01,8.38,0)
+(-9.34,8.46,0) -- (-9.34,8.38,0)
+(-9.34,8.38,0) -- (-9.32,8.38,0)
+(-9.32,8.44,0) -- (-9.32,8.38,0)
+(-9.02,8.44,0) -- (-9.32,8.44,0)
+(-9.02,8.38,0) -- (-9.02,8.44,0)
+(-9.02,8.38,0) -- (-9,8.38,0)
+(-9,8.38,0) -- (-9,8.46,0)
+(-9,8.46,0) -- (-9.34,8.46,0)
+0 endPoint (-9.336078805, 8.381550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-9.315245471, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (-9.315245471, 8.444050211, 0.000000000)
+3 end point, reverse 3
+3 endPoint (-9.023578805, 8.444050211, 0.000000000)
+4 end point, reverse 4
+4 endPoint (-9.023578805, 8.381550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (-9.002745471, 8.381550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (-9.002745471, 8.464883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (-9.336078805, 8.464883544, 0.000000000)
+(-9.34,8.46,0) -- (-9.34,8.38,0)
+(-9.34,8.38,0) -- (-9.32,8.38,0)
+(-9.32,8.38,0) -- (-9.32,8.44,0)
+(-9.32,8.44,0) -- (-9.02,8.44,0)
+(-9.02,8.44,0) -- (-9.02,8.38,0)
+(-9.02,8.38,0) -- (-9,8.38,0)
+(-9,8.38,0) -- (-9,8.46,0)
+(-9,8.46,0) -- (-9.34,8.46,0)
+(-13.51,8.34,0) -- (-13.51,5.84,0)
+(-13.51,5.84,0) -- (-8.5,5.84,0)
+(-8.5,5.84,0) -- (-8.5,8.34,0)
+(-8.5,8.34,0) -- (-9.84,8.34,0)
+(-9.84,8.34,0) -- (-9.84,6.01,0)
+(-9.84,6.01,0) -- (-12.17,6.01,0)
+(-12.17,6.01,0) -- (-12.17,8.34,0)
+(-12.17,8.34,0) -- (-13.51,8.34,0)
+0 endPoint (-13.506026311, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-8.502745471, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-8.502745471, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-9.836078805, 8.339883544, 0.000000000)
+4 start point, swap with 4
+4 endPoint (-9.836078805, 6.006550211, 0.000000000)
+5 start point, swap with 5
+5 endPoint (-12.172692978, 6.006550211, 0.000000000)
+6 start point, swap with 6
+6 endPoint (-12.172692978, 8.339883544, 0.000000000)
+7 start point, swap with 7
+7 endPoint (-13.506026311, 8.339883544, 0.000000000)
+(-13.51,8.34,0) -- (-13.51,5.84,0)
+(-13.51,5.84,0) -- (-8.5,5.84,0)
+(-8.5,5.84,0) -- (-8.5,8.34,0)
+(-8.5,8.34,0) -- (-9.84,8.34,0)
+(-9.84,8.34,0) -- (-9.84,6.01,0)
+(-9.84,6.01,0) -- (-12.17,6.01,0)
+(-12.17,6.01,0) -- (-12.17,8.34,0)
+(-12.17,8.34,0) -- (-13.51,8.34,0)
+(-13.57,8.4,0) -- (-13.57,5.78,0)
+(-13.57,5.78,0) -- (-8.44,5.78,0)
+(-8.44,5.78,0) -- (-8.44,8.4,0)
+(-8.44,8.4,0) -- (-13.57,8.4,0)
+0 endPoint (-13.568526311, 5.777383544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-8.440245471, 5.777383544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-8.440245471, 8.402383544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-13.568526311, 8.402383544, 0.000000000)
+(-13.57,8.4,0) -- (-13.57,5.78,0)
+(-13.57,5.78,0) -- (-8.44,5.78,0)
+(-8.44,5.78,0) -- (-8.44,8.4,0)
+(-8.44,8.4,0) -- (-13.57,8.4,0)
+(-13.51,8.01,0) -- (-13.17,8.01,0)
+(-13.17,8.01,0) -- (-13.17,8.34,0)
+(-13.17,8.34,0) -- (-13.51,8.34,0)
+(-13.51,8.34,0) -- (-13.51,8.01,0)
+0 endPoint (-13.172692978, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-13.172692978, 8.339883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-13.506026311, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-13.506026311, 8.006550211, 0.000000000)
+(-13.51,8.01,0) -- (-13.17,8.01,0)
+(-13.17,8.01,0) -- (-13.17,8.34,0)
+(-13.17,8.34,0) -- (-13.51,8.34,0)
+(-13.51,8.34,0) -- (-13.51,8.01,0)
+(-13.17,5.84,0) -- (-13.17,6.17,0)
+(-13.17,6.17,0) -- (-13.51,6.17,0)
+(-13.51,6.17,0) -- (-13.51,5.84,0)
+(-13.51,5.84,0) -- (-13.17,5.84,0)
+0 endPoint (-13.172692978, 6.173216877, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-13.506026311, 6.173216877, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-13.506026311, 5.839883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-13.172692978, 5.839883544, 0.000000000)
+(-13.17,5.84,0) -- (-13.17,6.17,0)
+(-13.17,6.17,0) -- (-13.51,6.17,0)
+(-13.51,6.17,0) -- (-13.51,5.84,0)
+(-13.51,5.84,0) -- (-13.17,5.84,0)
+(-8.84,6.17,0) -- (-8.84,5.84,0)
+(-8.84,5.84,0) -- (-8.5,5.84,0)
+(-8.5,5.84,0) -- (-8.5,6.17,0)
+(-8.5,6.17,0) -- (-8.84,6.17,0)
+0 endPoint (-8.836078805, 5.839883544, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-8.502745471, 5.839883544, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-8.502745471, 6.173216877, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-8.836078805, 6.173216877, 0.000000000)
+(-8.84,6.17,0) -- (-8.84,5.84,0)
+(-8.84,5.84,0) -- (-8.5,5.84,0)
+(-8.5,5.84,0) -- (-8.5,6.17,0)
+(-8.5,6.17,0) -- (-8.84,6.17,0)
+(-8.84,8.34,0) -- (-8.84,8.01,0)
+(-8.84,8.01,0) -- (-8.5,8.01,0)
+(-8.5,8.01,0) -- (-8.5,8.34,0)
+(-8.5,8.34,0) -- (-8.84,8.34,0)
+0 endPoint (-8.836078805, 8.006550211, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-8.502745471, 8.006550211, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-8.502745471, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-8.836078805, 8.339883544, 0.000000000)
+(-8.84,8.34,0) -- (-8.84,8.01,0)
+(-8.84,8.01,0) -- (-8.5,8.01,0)
+(-8.5,8.01,0) -- (-8.5,8.34,0)
+(-8.5,8.34,0) -- (-8.84,8.34,0)
+(-13.44,8.34,0) -- (-13.44,8.38,0)
+(-12.24,8.34,0) -- (-13.44,8.34,0)
+(-12.24,8.34,0) -- (-12.24,8.38,0)
+(-13.44,8.38,0) -- (-12.24,8.38,0)
+0 endPoint (-13.443526311, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (-12.235192978, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (-12.235192978, 8.339883544, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-13.443526311, 8.339883544, 0.000000000)
+(-13.44,8.34,0) -- (-13.44,8.38,0)
+(-13.44,8.38,0) -- (-12.24,8.38,0)
+(-12.24,8.38,0) -- (-12.24,8.34,0)
+(-12.24,8.34,0) -- (-13.44,8.34,0)
+(-9.77,8.34,0) -- (-9.77,8.38,0)
+(-9.77,8.34,0) -- (-8.57,8.34,0)
+(-8.57,8.34,0) -- (-8.57,8.38,0)
+(-9.77,8.38,0) -- (-8.57,8.38,0)
+0 endPoint (-9.773578805, 8.381550211, 0.000000000)
+3 start point, swap with 1
+1 endPoint (-8.565245471, 8.381550211, 0.000000000)
+2 end point, reverse 2
+2 endPoint (-8.565245471, 8.339883544, 0.000000000)
+3 end point, reverse 3
+3 endPoint (-9.773578805, 8.339883544, 0.000000000)
+(-9.77,8.34,0) -- (-9.77,8.38,0)
+(-9.77,8.38,0) -- (-8.57,8.38,0)
+(-8.57,8.38,0) -- (-8.57,8.34,0)
+(-8.57,8.34,0) -- (-9.77,8.34,0)
+FamilyInstance Furniture Desk <213000 1525 x 762mm> has 10 loops:
+  0: (-3963,2555), (-3963,2580), (-3862,2580), (-3862,2555), (-3868,2555), (-3868,2574), (-3957,2574), (-3957,2555)
+  1: (-2845,2580), (-2845,2555), (-2838,2555), (-2838,2574), (-2749,2574), (-2749,2555), (-2743,2555), (-2743,2580)
+  2: (-4116,2542), (-4116,1780), (-2591,1780), (-2591,2542), (-2997,2542), (-2997,1831), (-3709,1831), (-3709,2542)
+  3: (-4135,2561), (-4135,1761), (-2572,1761), (-2572,2561)
+  4: (-4116,2440), (-4014,2440), (-4014,2542), (-4116,2542)
+  5: (-4014,1780), (-4014,1882), (-4116,1882), (-4116,1780)
+  6: (-2692,1882), (-2692,1780), (-2591,1780), (-2591,1882)
+  7: (-2692,2542), (-2692,2440), (-2591,2440), (-2591,2542)
+  8: (-4097,2542), (-4097,2555), (-3728,2555), (-3728,2542)
+  9: (-2978,2542), (-2978,2555), (-2610,2555), (-2610,2542)
+(-11.75,4.93,0) -- (-11.75,5.06,0)
+(-11.75,4.93,0) -- (-11.69,4.93,0)
+(-11.69,4.93,0) -- (-11.69,4.94,0)
+(-9.91,4.94,0) -- (-11.69,4.94,0)
+(-9.91,4.94,0) -- (-9.91,4.93,0)
+(-9.91,4.93,0) -- (-9.85,4.93,0)
+(-9.85,5.06,0) -- (-9.85,4.93,0)
+(-9.85,5.06,0) -- (-9.91,5.06,0)
+(-9.91,5.06,0) -- (-9.91,5.01,0)
+(-9.91,5.01,0) -- (-11.69,5.01,0)
+(-11.69,5.01,0) -- (-11.69,5.06,0)
+(-11.69,5.06,0) -- (-11.75,5.06,0)
+0 endPoint (-11.750776967, 5.059043649, 0.000000000)
+11 end point, swap with reverse 1
+1 endPoint (-11.685160170, 5.059043649, 0.000000000)
+10 end point, swap with reverse 2
+2 endPoint (-11.685160170, 5.009831050, 0.000000000)
+9 end point, swap with reverse 3
+3 endPoint (-9.913506626, 5.009831050, 0.000000000)
+8 end point, swap with reverse 4
+4 endPoint (-9.913506626, 5.059043649, 0.000000000)
+7 end point, swap with reverse 5
+5 endPoint (-9.847889828, 5.059043649, 0.000000000)
+6 start point, swap with 6
+6 endPoint (-9.847889828, 4.927810053, 0.000000000)
+7 end point, reverse 7
+7 endPoint (-9.913506626, 4.927810053, 0.000000000)
+8 end point, reverse 8
+8 endPoint (-9.913506626, 4.944214253, 0.000000000)
+9 start point, swap with 9
+9 endPoint (-11.685160170, 4.944214253, 0.000000000)
+10 end point, reverse 10
+10 endPoint (-11.685160170, 4.927810053, 0.000000000)
+11 end point, reverse 11
+11 endPoint (-11.750776967, 4.927810053, 0.000000000)
+(-11.75,4.93,0) -- (-11.75,5.06,0)
+(-11.75,5.06,0) -- (-11.69,5.06,0)
+(-11.69,5.06,0) -- (-11.69,5.01,0)
+(-11.69,5.01,0) -- (-9.91,5.01,0)
+(-9.91,5.01,0) -- (-9.91,5.06,0)
+(-9.91,5.06,0) -- (-9.85,5.06,0)
+(-9.85,5.06,0) -- (-9.85,4.93,0)
+(-9.85,4.93,0) -- (-9.91,4.93,0)
+(-9.91,4.93,0) -- (-9.91,4.94,0)
+(-9.91,4.94,0) -- (-11.69,4.94,0)
+(-11.69,4.94,0) -- (-11.69,4.93,0)
+(-11.69,4.93,0) -- (-11.75,4.93,0)
+(-11.69,5.04,0) -- (-11.69,4.98,0)
+(-11.69,4.98,0) -- (-9.91,4.98,0)
+(-9.91,4.98,0) -- (-9.91,5.04,0)
+(-9.91,5.04,0) -- (-11.69,5.04,0)
+0 endPoint (-11.685160170, 4.978455973, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-9.913506626, 4.978455973, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-9.913506626, 5.044470934, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-11.685160170, 5.044470934, 0.000000000)
+(-11.69,5.04,0) -- (-11.69,4.98,0)
+(-11.69,4.98,0) -- (-9.91,4.98,0)
+(-9.91,4.98,0) -- (-9.91,5.04,0)
+(-9.91,5.04,0) -- (-11.69,5.04,0)
+
+
+(-11.69,3.63,0) -- (-9.91,3.63,0)
+(-9.91,3.63,0) -- (-9.91,5.17,0)
+(-9.91,5.17,0) -- (-11.69,5.17,0)
+(-11.69,5.17,0) -- (-11.69,3.63,0)
+0 endPoint (-9.913506626, 3.634929486, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-9.913506626, 5.173873045, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-11.685160170, 5.173873045, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-11.685160170, 3.634930408, 0.000000000)
+(-11.69,3.63,0) -- (-9.91,3.63,0)
+(-9.91,3.63,0) -- (-9.91,5.17,0)
+(-9.91,5.17,0) -- (-11.69,5.17,0)
+(-11.69,5.17,0) -- (-11.69,3.63,0)
+FamilyInstance Furniture Chair - Office <214027 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214027 Office Chair> has 3 loops:
+  0: (-3581,1502), (-3581,1542), (-3561,1542), (-3561,1527), (-3021,1527), (-3021,1542), (-3001,1542), (-3001,1502), (-3021,1502), (-3021,1507), (-3561,1507), (-3561,1502)
+  1: (-3561,1538), (-3561,1517), (-3021,1517), (-3021,1538)
+  2: (-3561,1108), (-3021,1108), (-3021,1577), (-3561,1577)
+(-2.09,4.93,0) -- (-2.09,5.06,0)
+(-2.09,4.93,0) -- (-2.02,4.93,0)
+(-2.02,4.93,0) -- (-2.02,4.94,0)
+(-0.25,4.94,0) -- (-2.02,4.94,0)
+(-0.25,4.94,0) -- (-0.25,4.93,0)
+(-0.25,4.93,0) -- (-0.19,4.93,0)
+(-0.19,5.06,0) -- (-0.19,4.93,0)
+(-0.19,5.06,0) -- (-0.25,5.06,0)
+(-0.25,5.06,0) -- (-0.25,5.01,0)
+(-0.25,5.01,0) -- (-2.02,5.01,0)
+(-2.02,5.01,0) -- (-2.02,5.06,0)
+(-2.02,5.06,0) -- (-2.09,5.06,0)
+0 endPoint (-2.088703477, 5.059043649, 0.000000000)
+11 end point, swap with reverse 1
+1 endPoint (-2.023086679, 5.059043649, 0.000000000)
+10 end point, swap with reverse 2
+2 endPoint (-2.023086679, 5.009831050, 0.000000000)
+9 end point, swap with reverse 3
+3 endPoint (-0.251433135, 5.009831050, 0.000000000)
+8 end point, swap with reverse 4
+4 endPoint (-0.251433135, 5.059043649, 0.000000000)
+7 end point, swap with reverse 5
+5 endPoint (-0.185816338, 5.059043649, 0.000000000)
+6 start point, swap with 6
+6 endPoint (-0.185816338, 4.927810053, 0.000000000)
+7 end point, reverse 7
+7 endPoint (-0.251433135, 4.927810053, 0.000000000)
+8 end point, reverse 8
+8 endPoint (-0.251433135, 4.944214253, 0.000000000)
+9 start point, swap with 9
+9 endPoint (-2.023086679, 4.944214253, 0.000000000)
+10 end point, reverse 10
+10 endPoint (-2.023086679, 4.927810053, 0.000000000)
+11 end point, reverse 11
+11 endPoint (-2.088703477, 4.927810053, 0.000000000)
+(-2.09,4.93,0) -- (-2.09,5.06,0)
+(-2.09,5.06,0) -- (-2.02,5.06,0)
+(-2.02,5.06,0) -- (-2.02,5.01,0)
+(-2.02,5.01,0) -- (-0.25,5.01,0)
+(-0.25,5.01,0) -- (-0.25,5.06,0)
+(-0.25,5.06,0) -- (-0.19,5.06,0)
+(-0.19,5.06,0) -- (-0.19,4.93,0)
+(-0.19,4.93,0) -- (-0.25,4.93,0)
+(-0.25,4.93,0) -- (-0.25,4.94,0)
+(-0.25,4.94,0) -- (-2.02,4.94,0)
+(-2.02,4.94,0) -- (-2.02,4.93,0)
+(-2.02,4.93,0) -- (-2.09,4.93,0)
+(-2.02,5.04,0) -- (-2.02,4.98,0)
+(-2.02,4.98,0) -- (-0.25,4.98,0)
+(-0.25,4.98,0) -- (-0.25,5.04,0)
+(-0.25,5.04,0) -- (-2.02,5.04,0)
+0 endPoint (-2.023086679, 4.978455973, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-0.251433135, 4.978455973, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-0.251433135, 5.044470934, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-2.023086679, 5.044470934, 0.000000000)
+(-2.02,5.04,0) -- (-2.02,4.98,0)
+(-2.02,4.98,0) -- (-0.25,4.98,0)
+(-0.25,4.98,0) -- (-0.25,5.04,0)
+(-0.25,5.04,0) -- (-2.02,5.04,0)
+
+
+(-2.02,3.63,0) -- (-0.25,3.63,0)
+(-0.25,3.63,0) -- (-0.25,5.17,0)
+(-0.25,5.17,0) -- (-2.02,5.17,0)
+(-2.02,5.17,0) -- (-2.02,3.63,0)
+0 endPoint (-0.251433135, 3.634929486, 0.000000000)
+1 start point, swap with 1
+1 endPoint (-0.251433135, 5.173873045, 0.000000000)
+2 start point, swap with 2
+2 endPoint (-2.023086679, 5.173873045, 0.000000000)
+3 start point, swap with 3
+3 endPoint (-2.023086679, 3.634930408, 0.000000000)
+(-2.02,3.63,0) -- (-0.25,3.63,0)
+(-0.25,3.63,0) -- (-0.25,5.17,0)
+(-0.25,5.17,0) -- (-2.02,5.17,0)
+(-2.02,5.17,0) -- (-2.02,3.63,0)
+FamilyInstance Furniture Chair - Office <214138 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214138 Office Chair> has 3 loops:
+  0: (-636,1502), (-636,1542), (-616,1542), (-616,1527), (-76,1527), (-76,1542), (-56,1542), (-56,1502), (-76,1502), (-76,1507), (-616,1507), (-616,1502)
+  1: (-616,1538), (-616,1517), (-76,1517), (-76,1538)
+  2: (-616,1108), (-76,1108), (-76,1577), (-616,1577)
+(4.14,4.93,0) -- (4.14,5.06,0)
+(4.14,4.93,0) -- (4.21,4.93,0)
+(4.21,4.93,0) -- (4.21,4.94,0)
+(5.98,4.94,0) -- (4.21,4.94,0)
+(5.98,4.94,0) -- (5.98,4.93,0)
+(5.98,4.93,0) -- (6.05,4.93,0)
+(6.05,5.06,0) -- (6.05,4.93,0)
+(6.05,5.06,0) -- (5.98,5.06,0)
+(5.98,5.06,0) -- (5.98,5.01,0)
+(5.98,5.01,0) -- (4.21,5.01,0)
+(4.21,5.01,0) -- (4.21,5.06,0)
+(4.21,5.06,0) -- (4.14,5.06,0)
+0 endPoint (4.144892324, 5.059043649, 0.000000000)
+11 end point, swap with reverse 1
+1 endPoint (4.210509122, 5.059043649, 0.000000000)
+10 end point, swap with reverse 2
+2 endPoint (4.210509122, 5.009831050, 0.000000000)
+9 end point, swap with reverse 3
+3 endPoint (5.982162665, 5.009831050, 0.000000000)
+8 end point, swap with reverse 4
+4 endPoint (5.982162665, 5.059043649, 0.000000000)
+7 end point, swap with reverse 5
+5 endPoint (6.047779463, 5.059043649, 0.000000000)
+6 start point, swap with 6
+6 endPoint (6.047779463, 4.927810053, 0.000000000)
+7 end point, reverse 7
+7 endPoint (5.982162665, 4.927810053, 0.000000000)
+8 end point, reverse 8
+8 endPoint (5.982162665, 4.944214253, 0.000000000)
+9 start point, swap with 9
+9 endPoint (4.210509122, 4.944214253, 0.000000000)
+10 end point, reverse 10
+10 endPoint (4.210509122, 4.927810053, 0.000000000)
+11 end point, reverse 11
+11 endPoint (4.144892324, 4.927810053, 0.000000000)
+(4.14,4.93,0) -- (4.14,5.06,0)
+(4.14,5.06,0) -- (4.21,5.06,0)
+(4.21,5.06,0) -- (4.21,5.01,0)
+(4.21,5.01,0) -- (5.98,5.01,0)
+(5.98,5.01,0) -- (5.98,5.06,0)
+(5.98,5.06,0) -- (6.05,5.06,0)
+(6.05,5.06,0) -- (6.05,4.93,0)
+(6.05,4.93,0) -- (5.98,4.93,0)
+(5.98,4.93,0) -- (5.98,4.94,0)
+(5.98,4.94,0) -- (4.21,4.94,0)
+(4.21,4.94,0) -- (4.21,4.93,0)
+(4.21,4.93,0) -- (4.14,4.93,0)
+(4.21,5.04,0) -- (4.21,4.98,0)
+(4.21,4.98,0) -- (5.98,4.98,0)
+(5.98,4.98,0) -- (5.98,5.04,0)
+(5.98,5.04,0) -- (4.21,5.04,0)
+0 endPoint (4.210509122, 4.978455973, 0.000000000)
+1 start point, swap with 1
+1 endPoint (5.982162665, 4.978455973, 0.000000000)
+2 start point, swap with 2
+2 endPoint (5.982162665, 5.044470934, 0.000000000)
+3 start point, swap with 3
+3 endPoint (4.210509122, 5.044470934, 0.000000000)
+(4.21,5.04,0) -- (4.21,4.98,0)
+(4.21,4.98,0) -- (5.98,4.98,0)
+(5.98,4.98,0) -- (5.98,5.04,0)
+(5.98,5.04,0) -- (4.21,5.04,0)
+
+
+(4.21,3.63,0) -- (5.98,3.63,0)
+(5.98,3.63,0) -- (5.98,5.17,0)
+(5.98,5.17,0) -- (4.21,5.17,0)
+(4.21,5.17,0) -- (4.21,3.63,0)
+0 endPoint (5.982162665, 3.634929486, 0.000000000)
+1 start point, swap with 1
+1 endPoint (5.982162665, 5.173873045, 0.000000000)
+2 start point, swap with 2
+2 endPoint (4.210509122, 5.173873045, 0.000000000)
+3 start point, swap with 3
+3 endPoint (4.210509122, 3.634930408, 0.000000000)
+(4.21,3.63,0) -- (5.98,3.63,0)
+(5.98,3.63,0) -- (5.98,5.17,0)
+(5.98,5.17,0) -- (4.21,5.17,0)
+(4.21,5.17,0) -- (4.21,3.63,0)
+FamilyInstance Furniture Chair - Office <214409 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214409 Office Chair> has 3 loops:
+  0: (1263,1502), (1263,1542), (1283,1542), (1283,1527), (1823,1527), (1823,1542), (1843,1542), (1843,1502), (1823,1502), (1823,1507), (1283,1507), (1283,1502)
+  1: (1283,1538), (1283,1517), (1823,1517), (1823,1538)
+  2: (1283,1108), (1823,1108), (1823,1577), (1283,1577)
+
+</pre>
+-->

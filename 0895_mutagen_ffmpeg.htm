@@ -1,0 +1,390 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>MP3 Manipulation Using Python, Mutagen and Ffmpeg</h3>
+
+<p>Today is an education day, and I am taking another look at displaying a 2D view of a Revit model on mobile devices using SVG.
+
+<p>I started off doing so quite a while back, implementing a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/room-polygon-and-furniture-picker-in-svg.html">
+room polygon and furniture picker in SVG</a>.</p>
+
+<p>That implementation displays a read-only view of the model, useful for picking and identifying elements, e.g. for querying or adding metadata to them.</p>
+
+<p>Today I plan to go one step further, though, and enable translation and rotation of the furniture and other family instances.</p>
+
+<p>To do so, I think it might be helpful to encapsulate the SVG interaction using a slightly higher-level toolkit such as the
+
+<a href="http://raphaeljs.com/">Raphaël JavaScript library</a>.</p>
+
+<p>I'll let you know how I do next week.</p>
+
+<p>Right now, though, I'll first mention some completely different topics that I played with last week-end, completely unrelated to the Revit API, but still of a technical nature, related to MP3 music file tag manipulation and analysis:</p>
+
+<ul>
+<li><a href="#2">Globally swapping MP3 artist and album artist tags</a></li>
+<li><a href="#3">Extracting M3U playlist information from Songbird</a></li>
+<li><a href="#4">Comparing erroneous Mutagen MP3 track duration with ffmpeg</a></li>
+</ul>
+
+<p>The reason I mention them here is that I had to spend some time getting these scripts to work.
+During my research, I saw that many others have encountered similar issues, and thought it worthwhile sharing my solutions with you.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Globally Swapping MP3 Artist and Album Artist Tags</h4>
+
+<p>I started DJ-ing in the past few years and put together a largish collection of music for that.</p>
+
+<p>I obviously try to keep it clean and organised, storing all files in MP3, avoiding other strange partially unsupported formats, using open source tools to play an manipulate the tracks etc.</p>
+
+<p>When I initially started, I was somewhat bewildered by the various tags, and ended up depending mainly on the artist, album and title triple to organise everything and also define the directory structure in which the physical files are stored.</p>
+
+<p>A while back, I gradually discovered that actually, the album artist tag is more suited for this purpose.</p>
+
+<p>Often, an album is produced with one single album artist, and each track on the album features additional guest artists.
+I obviously do not want to create separate top-level folders for each of these tracks.</p>
+
+<p>Therefore, I was faced with the problem of switching my entire tagging structure to use album artist instead of artist to define the directory structure.</p>
+
+<p>In my collection, the contents of these two tags are identical in many cases, in which case the issue is trivial.</p>
+
+<p>In other tracks, the album artist has not yet been defined, which also makes it easy to fix, since all it requires is copying the artist to the album artist.</p>
+
+<p>If both have been defined and differ, however, I swap their contents.</p>
+
+I use
+
+<a href="http://python.org">Python</a> and
+
+<a href="http://code.google.com/p/mutagen">Mutagen</a>.
+
+The latter includes a helpful short
+
+<a href="http://code.google.com/p/mutagen/wiki/Tutorial">
+tutorial</a>.
+
+I also found the introduction on
+
+<a href="http://mydl.itweb.co.za/index.php?option=com_myblog&show=1046123&Itemid=29">
+writing ID3 tags using Python and Mutagen for dummies</a> very
+
+useful.
+
+<p>Here is the resulting Python script to achieve this (copy to a text editor or view source to see the truncated lines in full):</p>
+
+<pre class="code">
+<span style='color:#696969; '>#!/usr/bin/python</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># mp3swapartist.py</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># swap mp3 artist and album artist tags</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># I set up my whole music collection using a directory structure</span>
+<span style='color:#696969; '># based on artist/album/trackno - title. Now I realise that</span>
+<span style='color:#696969; '># album artist is the proper tag to use for that structure.</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># Copyright (C) 2013 Jeremy Tammik</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#800000; font-weight:bold; '>import</span> glob<span style='color:#808030; '>,</span> os<span style='color:#808030; '>,</span> re<span style='color:#808030; '>,</span> sys
+<span style='color:#800000; font-weight:bold; '>from</span> mutagen<span style='color:#808030; '>.</span>mp3 <span style='color:#800000; font-weight:bold; '>import</span> MP3
+<span style='color:#800000; font-weight:bold; '>from</span> mutagen<span style='color:#808030; '>.</span>id3 <span style='color:#800000; font-weight:bold; '>import</span> TPE1<span style='color:#808030; '>,</span> TPE2
+
+<span style='color:#800000; font-weight:bold; '>def</span> swap_artist<span style='color:#808030; '>(</span> filepath <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Swap mp3 artist and album artist tags."</span>
+
+  <span style='color:#800000; font-weight:bold; '>assert</span> filepath<span style='color:#808030; '>.</span>lower<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>.</span>endswith<span style='color:#808030; '>(</span> <span style='color:#0000e6; '>'.mp3'</span> <span style='color:#808030; '>)</span>
+
+  <span style='color:#800000; font-weight:bold; '>try</span><span style='color:#808030; '>:</span>
+
+    audio <span style='color:#808030; '>=</span> MP3<span style='color:#808030; '>(</span> filepath <span style='color:#808030; '>)</span>
+
+    old_artist <span style='color:#808030; '>=</span> unicode<span style='color:#808030; '>(</span> audio<span style='color:#808030; '>[</span><span style='color:#0000e6; '>'TPE1'</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>assert</span> <span style='color:#008c00; '>0</span> <span style='color:#808030; '>&lt;</span> <span style='color:#e34adc; '>len</span><span style='color:#808030; '>(</span> old_artist <span style='color:#808030; '>)</span>
+
+    old_album_artist <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>''</span>
+
+    <span style='color:#800000; font-weight:bold; '>if</span> audio<span style='color:#808030; '>.</span>has_key<span style='color:#808030; '>(</span> <span style='color:#0000e6; '>'TPE2'</span> <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+      old_album_artist <span style='color:#808030; '>=</span> unicode<span style='color:#808030; '>(</span> audio<span style='color:#808030; '>[</span><span style='color:#0000e6; '>'TPE2'</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>)</span>
+
+    s <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>"original artist '%s', album artist '%s'"</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>old_artist<span style='color:#808030; '>,</span> old_album_artist<span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#008c00; '>0</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#e34adc; '>len</span><span style='color:#808030; '>(</span> old_album_artist <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+      <span style='color:#696969; '># copy artist to album artist</span>
+      s <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>' - added album artist'</span>
+      audio<span style='color:#808030; '>.</span>tags<span style='color:#808030; '>.</span>add<span style='color:#808030; '>(</span> TPE2<span style='color:#808030; '>(</span> encoding<span style='color:#808030; '>=</span><span style='color:#008c00; '>3</span><span style='color:#808030; '>,</span> text<span style='color:#808030; '>=</span>old_artist <span style='color:#808030; '>)</span> <span style='color:#808030; '>)</span>
+      audio<span style='color:#808030; '>.</span>tags<span style='color:#808030; '>.</span>save<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>elif</span> old_artist <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> old_album_artist<span style='color:#808030; '>:</span>
+      <span style='color:#696969; '># swap artist and album artist</span>
+      s <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>' swapped'</span>
+      audio<span style='color:#808030; '>.</span>tags<span style='color:#808030; '>.</span>add<span style='color:#808030; '>(</span> TPE2<span style='color:#808030; '>(</span> encoding<span style='color:#808030; '>=</span><span style='color:#008c00; '>3</span><span style='color:#808030; '>,</span> text<span style='color:#808030; '>=</span>old_artist <span style='color:#808030; '>)</span> <span style='color:#808030; '>)</span>
+      audio<span style='color:#808030; '>.</span>tags<span style='color:#808030; '>.</span>add<span style='color:#808030; '>(</span> TPE1<span style='color:#808030; '>(</span> encoding<span style='color:#808030; '>=</span><span style='color:#008c00; '>3</span><span style='color:#808030; '>,</span> text<span style='color:#808030; '>=</span>old_album_artist <span style='color:#808030; '>)</span> <span style='color:#808030; '>)</span>
+      audio<span style='color:#808030; '>.</span>tags<span style='color:#808030; '>.</span>save<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>else</span><span style='color:#808030; '>:</span>
+      s <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>' retained'</span>
+
+    <span style='color:#800000; font-weight:bold; '>print</span> filepath <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>':'</span><span style='color:#808030; '>,</span> s
+
+  <span style='color:#800000; font-weight:bold; '>except</span> <span style='color:#e34adc; '>StandardError</span><span style='color:#808030; '>,</span> err<span style='color:#808030; '>:</span>
+    <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>'Error:'</span><span style='color:#808030; '>,</span> <span style='color:#e34adc; '>str</span><span style='color:#808030; '>(</span> err <span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> <span style='color:#0000e6; '>"in '%s'"</span> <span style='color:#808030; '>%</span> filepath
+
+<span style='color:#800000; font-weight:bold; '>def</span> main<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Walk a directory tree and swap all mp3 artist and album artist tags."</span>
+
+  <span style='color:#e34adc; '>dir</span> <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'.'</span>
+
+  <span style='color:#800000; font-weight:bold; '>for</span> root<span style='color:#808030; '>,</span> dirs<span style='color:#808030; '>,</span> files <span style='color:#800000; font-weight:bold; '>in</span> os<span style='color:#808030; '>.</span>walk<span style='color:#808030; '>(</span> <span style='color:#e34adc; '>dir</span> <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> filename <span style='color:#800000; font-weight:bold; '>in</span> files<span style='color:#808030; '>:</span>
+      <span style='color:#800000; font-weight:bold; '>if</span> filename<span style='color:#808030; '>.</span>lower<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>.</span>endswith<span style='color:#808030; '>(</span> <span style='color:#0000e6; '>'.mp3'</span> <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+        filepath <span style='color:#808030; '>=</span> os<span style='color:#808030; '>.</span>path<span style='color:#808030; '>.</span>join<span style='color:#808030; '>(</span> root<span style='color:#808030; '>,</span> filename <span style='color:#808030; '>)</span>
+        swap_artist<span style='color:#808030; '>(</span> filepath <span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#e34adc; '>__name__</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>"__main__"</span><span style='color:#808030; '>:</span>
+  main<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+</pre>
+
+<p>It worked perfectly and instantaneously on a 40 GB collection of over 6000 tracks.</p>
+
+<p>Note the use of the audio.tags.save method instead of audio.save, as recommended by
+
+<a href="http://mydl.itweb.co.za/index.php?option=com_myblog&blogger=mandibleclaw&Itemid=">mandibleclaw</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Extracting M3U Playlist Information from Songbird</h4>
+
+<p>One of the players I use to listen to music is
+
+<a href="http://getsongbird.com">Songbird</a>.<p>
+
+<p>It includes a number of pretty neat features.
+One of the ones I like best is the search function, which picks up the target string from absolutely everywhere, including in comment fields etc.</p>
+
+<p>It is also completely incomprehensibly utterly lacking in some other areas.
+For example, although it will import an M3U playlist, there is no way to export one.
+Purportedly, add-ins exist for doing so, but in spite of extensive searching I have not been able to find and install one that works for my up-to-date version 2.1.0.</p>
+
+<p>I would like to extract the full path name and duration of tracks, as seen here in the Songbird user interface:</p>
+
+<center>
+<img src="img/mp3_songbird.png" alt="Songbird Playlist" width="400"/>
+</center>
+
+<p>The only way I found so far to access any of the playlist data at all is to select all files and copy to the clipboard.
+That produces text containing a comma-separated list of the artist, album and track tag contents.
+Of course, I implemented a python script to convert that to the actual file names  :-)</p>
+
+<p>It basically just puts together a slash-separated file path from the comma-separated data provided and uses the Python glob module to find out what the track number is, which may or may not be included in the path:</p>
+
+<pre style='color:#000000;background:#ffffff;'>
+<span style='color:#696969; '>#!/usr/bin/env python</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># songbird_to_m3u.py - convert the file tags exported by songbird to m3u playlist</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># Artist, Album, Title --></span>
+<span style='color:#696969; '># /m/Artist/Album/Track*Title.mp3</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># cat songbird_export.txt | songbird_to_m3u.py > songbird_export.m3u</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#800000; font-weight:bold; '>import</span> glob<span style='color:#808030; '>,</span> os<span style='color:#808030; '>,</span> sys
+
+nOk <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span>
+nFailed <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span>
+
+<span style='color:#800000; font-weight:bold; '>while</span> <span style='color:#e34adc; '>True</span><span style='color:#808030; '>:</span>
+  <span style='color:#800000; font-weight:bold; '>try</span><span style='color:#808030; '>:</span> line <span style='color:#808030; '>=</span> <span style='color:#e34adc; '>raw_input</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+  <span style='color:#800000; font-weight:bold; '>except</span><span style='color:#808030; '>:</span> <span style='color:#800000; font-weight:bold; '>break</span>
+
+  a <span style='color:#808030; '>=</span> line<span style='color:#808030; '>.</span>split<span style='color:#808030; '>(</span> <span style='color:#0000e6; '>', '</span> <span style='color:#808030; '>)</span>
+
+  <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#008c00; '>3</span> <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#e34adc; '>len</span><span style='color:#808030; '>(</span>a<span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+    sys<span style='color:#808030; '>.</span>stderr<span style='color:#808030; '>.</span>write<span style='color:#808030; '>(</span> line <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>'\n'</span> <span style='color:#808030; '>)</span>
+    nFailed <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span>
+    <span style='color:#800000; font-weight:bold; '>continue</span>
+
+  p <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'/m/'</span> <span style='color:#808030; '>+</span> a<span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>'/'</span> <span style='color:#808030; '>+</span> a<span style='color:#808030; '>[</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>'/*'</span> <span style='color:#808030; '>+</span> a<span style='color:#808030; '>[</span><span style='color:#008c00; '>2</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>'.mp3'</span>
+  a <span style='color:#808030; '>=</span> glob<span style='color:#808030; '>.</span>glob<span style='color:#808030; '>(</span> p <span style='color:#808030; '>)</span>
+
+  <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#008c00; '>1</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#e34adc; '>len</span><span style='color:#808030; '>(</span>a<span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+    <span style='color:#800000; font-weight:bold; '>print</span> a<span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span>
+    nOk <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span>
+  <span style='color:#800000; font-weight:bold; '>else</span><span style='color:#808030; '>:</span>
+    sys<span style='color:#808030; '>.</span>stderr<span style='color:#808030; '>.</span>write<span style='color:#808030; '>(</span> line <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>'\n'</span> <span style='color:#808030; '>)</span>
+    nFailed <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span>
+
+sys<span style='color:#808030; '>.</span>stderr<span style='color:#808030; '>.</span>write<span style='color:#808030; '>(</span> <span style='color:#0000e6; '>'%s files passed, %s failed.\n'</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>nOk<span style='color:#808030; '>,</span> nFailed<span style='color:#808030; '>)</span> <span style='color:#808030; '>)</span>
+</pre>
+
+<p>The '/m/' prefix is a link that I created in the file system root folder to my user-specific music folder:</p>
+
+<pre>
+lrwxr-xr-x 1 root wheel 21 Nov 14 19:42 m -> /Users/tammikj/Music/
+</pre>
+
+<p>Unix is so good.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Comparing Erroneous Mutagen MP3 Track Duration with Ffmpeg</h4>
+
+<p>As I mentioned above, I would like to determine the duration of a track as well as retrieving its absolute path to populate a M3U playlist.
+
+</p>Happily, Mutagen provides this feature; it is immediately available via
+
+<pre>
+  audio = MP3( path )
+  seconds = audio.info.length
+</pre>
+
+<p>Unfortunately, the time reported by Mutagen is sometimes blatantly wrong.</p>
+
+<p>Researching this on the Internet, I discover that the problem is well known.</p>
+
+<p>One suggestion was to use the incredibly powerful conversion package
+
+<a href="http://www.ffmpeg.org">ffmpeg</a> instead,
+
+and that is what I ended up doing.</p>
+
+<p>This involves launching the ffmpeg executable to analyse each track in turn and capture the output it produces, which is printed to the standard error stream stderr instead of the standard output stream stdout.</p>
+
+<p>I can use the Python subprocess.check_output method to launch the command and retrieve its output.
+Since ffmpeg returns with a non-zero error code and the check_output method traps that, I had to append a call to 'exit 0' to cancel the non-zero error code returned by ffmpeg.</p>
+
+<p>I use a regular expression to extract the duration value from the ffmpeg stderr output, and the Python strip method to remove the leading zeroes and colons from that.</p>
+
+<p>Here is a Python script to read a playlist, query and list both the Mutagen and ffmpeg duration values:</p>
+
+<pre style='color:#000000;background:#ffffff;'>
+<span style='color:#696969; '>#!/usr/bin/python</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#696969; '># mp3duration.py - retrieve the length of the tracks in the playlist and calculate the total</span>
+<span style='color:#696969; '>#</span>
+<span style='color:#800000; font-weight:bold; '>import</span> glob<span style='color:#808030; '>,</span> os<span style='color:#808030; '>,</span> re<span style='color:#808030; '>,</span> subprocess<span style='color:#808030; '>,</span> sys
+<span style='color:#800000; font-weight:bold; '>from</span> mutagen<span style='color:#808030; '>.</span>mp3 <span style='color:#800000; font-weight:bold; '>import</span> MP3
+
+_find_duration <span style='color:#808030; '>=</span> re<span style='color:#808030; '>.</span><span style='color:#e34adc; '>compile</span><span style='color:#808030; '>(</span> <span style='color:#0000e6; '>'.*Duration: ([0-9:]+)'</span><span style='color:#808030; '>,</span> re<span style='color:#808030; '>.</span>MULTILINE <span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>def</span> min_sec_to_seconds<span style='color:#808030; '>(</span> ms <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Convert a minutes:seconds string representation to the appropriate time in seconds."</span>
+  a <span style='color:#808030; '>=</span> ms<span style='color:#808030; '>.</span>split<span style='color:#808030; '>(</span><span style='color:#0000e6; '>':'</span><span style='color:#808030; '>)</span>
+  <span style='color:#800000; font-weight:bold; '>assert</span> <span style='color:#008c00; '>2</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#e34adc; '>len</span><span style='color:#808030; '>(</span> a <span style='color:#808030; '>)</span>
+  <span style='color:#800000; font-weight:bold; '>return</span> <span style='color:#e34adc; '>float</span><span style='color:#808030; '>(</span>a<span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>*</span> <span style='color:#008c00; '>60</span> <span style='color:#808030; '>+</span> <span style='color:#e34adc; '>float</span><span style='color:#808030; '>(</span>a<span style='color:#808030; '>[</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span><span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>def</span> seconds_to_min_sec<span style='color:#808030; '>(</span> secs <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Return a minutes:seconds string representation of the given number of seconds."</span>
+  mins <span style='color:#808030; '>=</span> <span style='color:#e34adc; '>int</span><span style='color:#808030; '>(</span>secs<span style='color:#808030; '>)</span> <span style='color:#808030; '>/</span> <span style='color:#008c00; '>60</span>
+  secs <span style='color:#808030; '>=</span> <span style='color:#e34adc; '>int</span><span style='color:#808030; '>(</span>secs <span style='color:#808030; '>-</span> <span style='color:#808030; '>(</span>mins <span style='color:#808030; '>*</span> <span style='color:#008c00; '>60</span><span style='color:#808030; '>)</span><span style='color:#808030; '>)</span>
+  <span style='color:#800000; font-weight:bold; '>return</span> <span style='color:#0000e6; '>"%d:%02d"</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>mins<span style='color:#808030; '>,</span> secs<span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>def</span> retrieve_length<span style='color:#808030; '>(</span> playlist_filename <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Determine length of tracks listed in the given input files (e.g. playlists)."</span>
+
+  <span style='color:#800000; font-weight:bold; '>print</span> playlist_filename <span style='color:#808030; '>+</span> <span style='color:#0000e6; '>' duration:'</span>
+
+  <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#800000; font-weight:bold; '>not</span> os<span style='color:#808030; '>.</span>path<span style='color:#808030; '>.</span>exists<span style='color:#808030; '>(</span> playlist_filename <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+    <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>"Error: specified playlist '%s' does not exist.\n"</span> <span style='color:#808030; '>%</span> playlist_filename
+    <span style='color:#800000; font-weight:bold; '>raise</span> <span style='color:#e34adc; '>SystemExit</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>)</span>
+
+  f <span style='color:#808030; '>=</span> <span style='color:#e34adc; '>open</span><span style='color:#808030; '>(</span> playlist_filename <span style='color:#808030; '>)</span>
+  lines <span style='color:#808030; '>=</span> f<span style='color:#808030; '>.</span>readlines<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+  f<span style='color:#808030; '>.</span>close<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+
+  total_mutagen <span style='color:#808030; '>=</span> <span style='color:#008000; '>0.0</span>
+  total_ffmpeg <span style='color:#808030; '>=</span> <span style='color:#008000; '>0.0</span>
+
+  <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>'%8s%8s%8s  %s'</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span><span style='color:#0000e6; '>'mutagen'</span><span style='color:#808030; '>,</span> <span style='color:#0000e6; '>'m:s'</span><span style='color:#808030; '>,</span> <span style='color:#0000e6; '>'ffmpeg'</span><span style='color:#808030; '>,</span> <span style='color:#0000e6; '>'track'</span><span style='color:#808030; '>)</span>
+
+  <span style='color:#800000; font-weight:bold; '>for</span> line <span style='color:#800000; font-weight:bold; '>in</span> lines<span style='color:#808030; '>:</span>
+    path <span style='color:#808030; '>=</span> line<span style='color:#808030; '>.</span>strip<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#800000; font-weight:bold; '>not</span> path <span style='color:#800000; font-weight:bold; '>or</span> path<span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'#'</span><span style='color:#808030; '>:</span>
+      <span style='color:#800000; font-weight:bold; '>continue</span>
+
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#800000; font-weight:bold; '>not</span> os<span style='color:#808030; '>.</span>path<span style='color:#808030; '>.</span>exists<span style='color:#808030; '>(</span> path <span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+      <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>"Error: specified music file '%s' does not exist.\n"</span> <span style='color:#808030; '>%</span> path
+      <span style='color:#800000; font-weight:bold; '>raise</span> <span style='color:#e34adc; '>SystemExit</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>2</span><span style='color:#808030; '>)</span>
+
+    audio <span style='color:#808030; '>=</span> MP3<span style='color:#808030; '>(</span> path <span style='color:#808030; '>)</span>
+    seconds <span style='color:#808030; '>=</span> audio<span style='color:#808030; '>.</span>info<span style='color:#808030; '>.</span>length
+
+    ffmpeg <span style='color:#808030; '>=</span> subprocess<span style='color:#808030; '>.</span>check_output<span style='color:#808030; '>(</span>
+      <span style='color:#0000e6; '>'ffmpeg -i "%s"; exit 0'</span> <span style='color:#808030; '>%</span> path<span style='color:#808030; '>,</span>
+      shell <span style='color:#808030; '>=</span> <span style='color:#e34adc; '>True</span><span style='color:#808030; '>,</span>
+      stderr <span style='color:#808030; '>=</span> subprocess<span style='color:#808030; '>.</span>STDOUT <span style='color:#808030; '>)</span>
+
+    match <span style='color:#808030; '>=</span> _find_duration<span style='color:#808030; '>.</span>search<span style='color:#808030; '>(</span> ffmpeg <span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> match<span style='color:#808030; '>:</span> ffmpeg <span style='color:#808030; '>=</span> match<span style='color:#808030; '>.</span>group<span style='color:#808030; '>(</span> <span style='color:#008c00; '>1</span> <span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>else</span><span style='color:#808030; '>:</span> ffmpeg <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'--'</span>
+
+    ffmpeg <span style='color:#808030; '>=</span> ffmpeg<span style='color:#808030; '>.</span>lstrip<span style='color:#808030; '>(</span><span style='color:#0000e6; '>'0:'</span><span style='color:#808030; '>)</span>
+
+    <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>'%8.1f%8s%8s  %s'</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>seconds<span style='color:#808030; '>,</span> seconds_to_min_sec<span style='color:#808030; '>(</span>seconds<span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> ffmpeg<span style='color:#808030; '>,</span> path <span style='color:#808030; '>)</span>
+
+    total_mutagen <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> seconds
+    total_ffmpeg <span style='color:#808030; '>+</span><span style='color:#808030; '>=</span> min_sec_to_seconds<span style='color:#808030; '>(</span> ffmpeg <span style='color:#808030; '>)</span>
+
+  s <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'-'</span> <span style='color:#808030; '>*</span> <span style='color:#008c00; '>6</span>
+  <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>'%8s%8s%8s  %s'</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>s<span style='color:#808030; '>,</span> s<span style='color:#808030; '>,</span> s<span style='color:#808030; '>,</span> s <span style='color:#808030; '>)</span>
+  <span style='color:#800000; font-weight:bold; '>print</span> <span style='color:#0000e6; '>'%8.1f%8s%8s  %s'</span> <span style='color:#808030; '>%</span> <span style='color:#808030; '>(</span>total_mutagen<span style='color:#808030; '>,</span> seconds_to_min_sec<span style='color:#808030; '>(</span>total_mutagen<span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> seconds_to_min_sec<span style='color:#808030; '>(</span>total_ffmpeg<span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> <span style='color:#0000e6; '>'total'</span> <span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>def</span> main<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>:</span>
+  <span style='color:#0000e6; '>"Determine length of tracks listed in the given input files (e.g. playlists)."</span>
+
+  <span style='color:#800000; font-weight:bold; '>for</span> pattern <span style='color:#800000; font-weight:bold; '>in</span> sys<span style='color:#808030; '>.</span>argv<span style='color:#808030; '>[</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>:</span><span style='color:#808030; '>]</span><span style='color:#808030; '>:</span>
+    filelist <span style='color:#808030; '>=</span> glob<span style='color:#808030; '>.</span>glob<span style='color:#808030; '>(</span> pattern <span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> filename <span style='color:#800000; font-weight:bold; '>in</span> filelist<span style='color:#808030; '>:</span>
+      retrieve_length<span style='color:#808030; '>(</span> filename <span style='color:#808030; '>)</span>
+
+<span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#e34adc; '>__name__</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'__main__'</span><span style='color:#808030; '>:</span>
+  main<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+</pre>
+
+<p>Here is the result of running this script on the playlist shown above in Songbird:</p>
+
+<pre>
+LerchenWave-2013-02.m3u duration:
+ mutagen     m:s  ffmpeg  track
+   282.2    4:42    4:42  /m/Hildegard Von Bingen/Illumination/04 - Red River Falling.mp3
+   305.8    5:05    5:05  /m/Beats Antique/Blind Threshold/02 Runaway.mp3
+   129.5    2:09    2:09  /m/Hugues Le Bars/Musiques pour Versailles/12 - Lausann's Blues.mp3
+  1121.4   18:41    8:08  /m/DJ Vish/Goa/09 Titel 09.mp3
+   217.2    3:37    3:37  /m/Gontiti/In the Garden/07 - Kurt's Stroll Through Town.mp3
+   272.0    4:32    4:36  /m/Beats Antique/Contraption/03 - Junktion.mp3
+   356.8    5:56    5:56  /m/Red Fulka/We Are One/02 Disco Shamans.mp3
+   447.1    7:27    3:14  /m/Stray Cats/The Very Best Of/03 Stray Cat Strut.mp3
+   292.2    4:52    4:51  /m/Dunkelbunt/Morgenlandfahrt/14 Istanbul 1.26 AM ft. Orient Expressions (dunkelbunt remix).mp3
+   218.6    3:38    3:38  /m/Wax Tailor/Electro Swing 2/01 - Say Yes.mp3
+   806.2   13:26    5:51  /m/The Chemical Brothers/Further/05 Horse Power.mp3
+   165.1    2:45    2:45  /m/Uri Caine/Rio/12 - Samba da Terra.mp3
+   345.6    5:45    2:30  /m/Spike Jones/Spike Jones Goes Crazy/13 Black Bottom.mp3
+   394.6    6:34    2:51  /m/Ländlerkapelle Carlo Brunner/Urichigi Tänzli/03 Grüezi Wohl Frau Stirnimaa.mp3
+   583.7    9:43    4:14  /m/Giora Feidman/The Dance Of Joy/02 Rue Du Bac.mp3
+   436.6    7:16    3:10  /m/Michael Nyman/Man on Wire/3 Gymnopédies Gymnopédie No 1.mp3
+  1036.4   17:16    7:31  /m/Büdi Siebert/Namaste/04 Lotus Call 1 Varja Guru Mantra.mp3
+  ------  ------  ------  ------
+  7411.2  123:31   74:48  total
+</pre>
+
+<p>As you can see, out of a total of 17 tracks, the duration is reported identical for 7 and differs significantly for 8.
+One track is off by just a single second, and another by four.
+Ffmpeg produces the exact same times as Songbird does on all except the track that is off by four seconds, where Mutagen is in agreement with Songbird instead, surprisingly enough.</p>
+
+<p>Rather strange, isn't it?
+But interesting.</p>
+
+<p>Anyway, I hope that this is of use to you if you ever run into similar issues, or even if you just want to see a couple of examples of using these tools for simple MP3 manipulation and analysis tasks.</p>
+
+<p>And now back again to SVG, and ultimately, the Revit API...</p>

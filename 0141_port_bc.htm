@@ -1,0 +1,180 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Porting the Building Coder Samples</h3>
+
+<p>Today is actually a bridging day here in Neuch&acirc;tel, following the 
+
+<a href="http://en.wikipedia.org/wiki/Ascension_Day">
+Ascension Day</a>
+
+holiday yesterday. 
+I want to finish off a few urgent things before going on vacation for the next two weeks with my kids, so I am taking the opportunity to post this anyway.</p>
+
+<p>I finally got around to porting the Building Coder sample code to the Revit 2010 API.
+I was leaving it in 2009 for as long as possible so as not to force anybody to update too early.
+On the other hand, I hope that this is not too late either, and that nobody has been waiting urgently for a 2010 port.
+Now, on this replacement machine I am working on, I no longer have Revit 2009 or Visual Studio 2005 installed, so I am forced to update in order to use the samples at all.
+Simply opening the solution file in Visual Studio 2008 and compiling fails, and we will discuss why and how to fix this.
+I actually expected the recompilation on 2010 to be completely trivial, but some issues did crop up which are worth mentioning.</p>
+
+<p>Here is a list of the errors on simply opening the Visual Studio 2005 solution in Visual Studio 2008 and recompiling.
+For the sake of better readability, I removed the full path name of the source files.
+Copy to an editor to see the full line length:</p>
+
+<pre>
+------ Build started: Project: BuildingCoder, Configuration: Debug Any CPU ------
+c:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:DEBUG;TRACE /reference:"..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk Revit Architecture 2010\Program\RevitAPI.dll" /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /debug+ /debug:full /optimize- /out:obj\Debug\BuildingCoder.dll /resource:obj\Debug\BuildingCoder.CmdLinkedFileElementsForm.resources /resource:obj\Debug\BuildingCoder.CmdWindowHandleForm.resources /target:library CmdAzimuth.cs CmdBoundingBox.cs CmdColumnRound.cs CmdLinkedFileElements.cs CmdLinkedFileElementsForm.cs CmdLinkedFileElementsForm.Designer.cs CmdListRailingTypes.cs CmdNestedInstanceGeo.cs CmdNewArea.cs CmdNewBeamTypeInstance.cs CmdNewColumnTypeInstance.cs CmdEditFloor.cs CmdFilterPerformance.cs CmdGetMaterials.cs CmdLinkedFiles.cs CmdListViews.cs CmdNewRailing.cs CmdOmniClassParams.cs CmdPlanTopology.cs CmdRoomWallAdjacency.cs CmdSlabBoundaryArea.cs CmdSlopedWall.cs CmdTransformedCoords.cs CmdWallLayerVolumes.cs CmdWallProfileArea.cs CmdListWalls.cs CmdRelationshipInverter.cs CmdSlabSides.cs CmdSlabBoundary.cs CmdWallDimensions.cs CmdWallLayers.cs CmdWallProfile.cs CmdWindowHandle.cs CmdWindowHandleForm.cs CmdWindowHandleForm.Designer.cs Creator.cs Properties\AssemblyInfo.cs Util.cs CmdWallNeighbours.cs
+CmdWallNeighbours.cs(64,26): error CS0029: Cannot implicitly convert type 'Autodesk.Revit.ElementArray' to 'System.Collections.Generic.List<Autodesk.Revit.Element>'
+CmdNewBeamTypeInstance.cs(83,14): error CS1502: The best overloaded method match for 'Autodesk.Revit.Document.LoadFamily(string, out Autodesk.Revit.Elements.Family)' has some invalid arguments
+CmdNewBeamTypeInstance.cs(83,40): error CS1620: Argument '2' must be passed with the 'out' keyword
+CmdNewColumnTypeInstance.cs(90,14): error CS1502: The best overloaded method match for 'Autodesk.Revit.Document.LoadFamily(string, out Autodesk.Revit.Elements.Family)' has some invalid arguments
+CmdNewColumnTypeInstance.cs(90,40): error CS1620: Argument '2' must be passed with the 'out' keyword
+CmdColumnRound.cs(35,44): error CS1061: 'Autodesk.Revit.Elements.Family' does not contain a definition for 'SolidForms' and no extension method 'SolidForms' accepting a first argument of type 'Autodesk.Revit.Elements.Family' could be found (are you missing a using directive or an assembly reference?)
+CmdColumnRound.cs(39,35): error CS1061: 'Autodesk.Revit.Elements.Sketch' does not contain a definition for 'CurveLoop' and no extension method 'CurveLoop' accepting a first argument of type 'Autodesk.Revit.Elements.Sketch' could be found (are you missing a using directive or an assembly reference?)
+CmdNestedInstanceGeo.cs(165,50): error CS1061: 'Autodesk.Revit.Elements.Family' does not contain a definition for 'Components' and no extension method 'Components' accepting a first argument of type 'Autodesk.Revit.Elements.Family' could be found (are you missing a using directive or an assembly reference?)
+
+Compile complete -- 8 errors, 0 warnings
+========== Build: 0 succeeded or up-to-date, 1 failed, 0 skipped ==========
+</pre>
+
+<p>The first error CS0029 is reporting that an 'Autodesk.Revit.ElementArray' cannot be converted to a generic list of elements in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/wall-graph.html">
+CmdWallNeighbours</a>.
+
+This makes perfect sense, because get_ElementsAtJoin now returns an instance of the custom Revit API collection class ElementArray instead of a standard generic collection class provided by .NET.
+Therefore, we also have to modify the following iteration over the collection returned.
+Actually, the only change required is to replace the property Count by Size.</p>
+
+<p>The next four errors are trivial to fix, CS1502 and CS1620 in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html">
+CmdNewBeamTypeInstance</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+CmdNewColumnTypeInstance</a>.
+
+They are all four caused by the second argument of one of the overloads of the LoadFamily method changing from a reference to an output argument, so the keyword 'ref' needs to be replaced by 'out'.</p>
+
+<p>The two CS1061 errors in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/cylindrical-column.html">
+CmdColumnRound</a>
+
+occur in the method IsColumnRound, which was written to demonstrate an approach that can only be used in the Revit 2009 API.
+The classes used have been removed in the Revit 2010 API, so this method can no longer be compiled.
+Since it is not used anyway, I can simply comment it out.</p>
+
+<p>The only serious change is required to fix the error CS1061 in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+CmdNestedInstanceGeo</a>.
+
+There we use the Revit 2009 API property FamilyInstance.Symbol.Family.Components to obtain the nested family instances within the top level family instance.
+This is what the original code looks like:</p>
+
+<pre class="code">
+<span class="teal">ElementSet</span> components = inst.Symbol.Family.Components;
+n = components.Size;
+</pre>
+
+<p>The Components property has been removed in the Revit 2010 API, since we can iterate through the elements of a family just like any other document.
+Here is a note about this from in the description of the family API in the What's New section of the RevitAPI.chm help file:
+
+<p style="color:darkblue">"New document methods - Document.LoadFamily and Document.EditFamily - are introduced to bring families from the Family Editor to the Project environment and vice versa.  These methods can be used to examine the contents of the family in terms of its elements, parameters and types; as a result, the properties of Family which access the contents have been removed (Family.SolidForms, Family.VoidForms, Family.Components, Family.LoadedSymbols, Family.Others)."
+
+<p>Therefore, we have to port the code from the 2009 to the 2010 API.
+We can use doc.EditFamily to obtain a Document instance for the family document, and then work with its elements using the standard document element access methods as follows:</p>
+
+<pre class="code">
+<span class="teal">Document</span> fdoc = doc.EditFamily( inst.Symbol.Family );
+
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; components = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+fdoc.get_Elements( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ), components );
+n = components.Count;
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11032.zip">
+version 1.1.0.32</a>
+
+of the complete Visual Studio 2008 solution of The Building Coder sample code.
+This is the first version for Revit 2010, and the first one using Visual Studio 2008 instead of 2005.</p>
+
+
+<h3>RvtSamples Conversion from 2009 to 2010</h3>
+
+<p>As you probably know by now, I use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+RvtSamples</a>
+
+to load the external commands defined by the Revit SDK samples into Revit.
+I also use it to provide access to all my additional sample commands by making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+include functionality</a>
+
+I implemented, which is now part of the standard SDK distribution.</p>
+
+<p>The format used in the text file RvtSamples.txt used to drive RvtSamples changed from Revit 2009 to 2010 in order to add support for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/revit-2010-ribbon-api.html">
+ribbon Add-Ins tab</a>
+
+and button images.</p>
+
+<p>For Revit 2009, RvtSamples expected four lines of information for each entry to specify a hierarchical menu item definition for an external command.
+The entry for the first Building Coder command looks like this:</p>
+
+<pre>
+/&ADN/&Bc/List Walls
+List wall lengths and areas
+C:\...\BuildingCoder.dll
+BuildingCoder.CmdListWalls
+</pre>
+
+<p>This specifies that a menu entry ADN &gt; Bc &gt; List walls should be generated in the Revit menu system.
+Selecting it in the user interface launches the external command defined by the BuildingCoder.CmdListWalls class loaded from the specified assembly.</p>
+
+<p>In Revit 2010, there is no longer a hierarchical menu system to install menu entries in.
+Instead, all external commands are located in the ribbon Add-Ins tab, either under the External Tools pull down button or in an additional pane defined by an external application.
+Optionally, buttons can be specified as well.
+Therefore, the new 2010 RvtSamples format for defining a similar entry uses seven lines which might look like this:</p>
+
+<pre>
+ADN Bc
+List Walls
+List wall lengths and areas
+LargeImage:
+Image:
+C:\...\BuildingCoder.dll
+BuildingCoder.CmdListWalls
+</pre>
+
+<p>I used regular expressions in the Visual Studio search and replace dialogue to convert from old format to the new one.
+I start the search and replace dialogue with Edit &gt; Find and Replace &gt; Quick Replace, and then enter the following regular search expression in 'Find what':
+
+<pre>
+/&ADN/&Bc/{.*}\n{.*}\n
+</pre>
+
+It specifies a line starting with "/&ADN/&Bc/" and followed by anything at all, which is tagged, followed by another line, whose contents are also tagged.
+The first tagged expression is the menu entry, the second is the description.
+I enter the following in 'Replace with':</p>
+
+<pre>
+ADN Bc\n\1\n\2\nLargeImage:\nImage:\n
+</pre>
+
+<p>That splits the menu entry text and description onto separate lines, followed by two additional lines for the optional large and small images.</p>
+
+<p>Applying this search and replace action to the example shown above achieves the desired conversion, making it easy and comfortable to reliably convert the entire list of entries.</p>

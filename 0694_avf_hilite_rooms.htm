@@ -1,0 +1,380 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+340_element_events.htm:<li>Ch
+379_webcam_image.htm:Another
+380_revitwebcam.htm:The secon
+418_rst_dmu.htm:&nbsp; &nbsp;
+560_revit_2012_api.htm:<li>Ge
+572_devdays_online.htm:<li>Up
+
+-->
+
+<h3>Using AVF to Display Intersections and Highlight Rooms</h3>
+
+<p>We held a DevLab in Gothenburg yesterday with lots of interesting things to discuss with our Scandinavian developer guests.
+Today we are in Munich, Germany.
+So is 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/12/back-in-munich.html">Kean</a>  :-)
+
+<p>One of the topics that came up yesterday is a thing I have been wanting to write about for over a year now and never gotten around to, the use of the AVF or Analysis Visualisation Framework to display temporary geometry to the user.
+
+<p>I used it myself to display a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">
+live webcam image on a building element</a>,
+
+and Saikat used it in the AVF part of his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html">
+structural AVF and DMU sample</a>,
+
+although I only documented the DMU or Dynamic Model Update aspect of it in detail.
+
+<p>This kind of use of the AVF is also demonstrated by the Revit SDK sample GeometryCreation_BooleanOperation. 
+It creates geometry solids using the GeometryCreationUtils and BooleanOperationUtils classes and displays them in a view using AVF.
+
+
+<a name="2"></a>
+
+<h4>FindColumns Using Geometry Creation and Booleans</h4>
+
+<p>Transient AVF visualisation was used very impressively in the presentation of new geometry functionality at the developer conferences last year. 
+
+<!--
+385_devcamp_whats_new.htm:<li><a href="http://thebuildingcoder.typepad.com/blog/
+2010/01/findreferencesbydirection.html">FindColumns</a>
+572_devdays_online.htm:<li>Updated version of the FindColumns SDK sample, using
+new geometry and AVF API features instead of FindReferencesByDirection to find a
+nd display all intersections between walls and columns.
+694_avf_hilite_rooms.htm:You may and should be aware of the FindColumns example
+of using the FindReferencesByDirection method to determine collisions between wa
+lls and columns.
+-->
+
+You may and should be aware of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">FindColumns</a>
+
+example of using the FindReferencesByDirection method to determine collisions between walls and columns in a situation like this:</p>
+
+<center>
+<img src="img/wall_column_intersections.png" alt="Wall and column intersections" width="400"/>
+</center>
+
+<p>As I mentioned in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/devdays-2010-online-with-revit-2012-api-news.html#3">
+DevDays 2010 Online with Revit 2012 API news</a>,
+
+it was converted to use the exact wall and column geometry instead of the original approximate ray tracing approach, and the results are displayed exactly by hiding the wall and column categories in the view and displaying their intersection solids using AVF instead.
+
+<p>It defines two commands:
+
+<ul>
+<li>HighlightIntersectionsCommand to determine and display the intersections, and 
+<li>RestoreViewCommand to restore the view afterwards, i.e. reset the wall and column category visibility in the view.
+</ul>
+
+<p>Here is the original 3D view of the situation:</p>
+
+<center>
+<img src="img/wall_column_intersections_3d.png" alt="3D view of wall and column intersections"/>
+</center>
+
+<p>Running HighlightIntersectionsCommand performs the following steps:
+
+<ul>
+<li>Hide the wall and column categories in the current view.
+<li>Set up an AVF view.
+<li>Collect all walls and column elements.
+<li>Query them for their solid geometry.
+<li>Calculate their intersections.
+<li>List and display the results.
+</ul>
+
+<p>Here is the list of the resulting intersections:</p>
+
+<center>
+<img src="img/wall_column_intersections_result.png" alt="Wall and column intersection results"/>
+</center>
+
+<p>This is what the intersection geometry looks like in AVF:</p>
+
+<center>
+<img src="img/wall_column_intersections_avf.png" alt="Wall and column intersection solids in AVF"/>
+</center>
+
+<p>As said, you can call RestoreViewCommand afterwards to restore the view by resetting the wall and column category visibility in the view.
+
+<p>For your reference, here is 
+
+<a href="zip/Geometry2012.zip">Geometry2012.zip</a> containing the C# sample code and Visual Studio solution together the suitable sample model to run it in.
+
+<p>So all of that is really important stuff from last year that I have been dying to publish for such a long time and never gotten around to.
+Finally!
+
+
+<a name="3"></a>
+
+<h4>Highlight Rooms Using AVF in VB</h4>
+
+<p>I passed the geometry sample on to Betina Mette Zimmermann of 
+
+<a href="http://www.nti.dk">
+NTI CAD Center A/S</a> in 
+
+Denmark, and she converted it to VB and modified it to highlight the room geometry returned by the Room.ClosedShell method instead of wall and column intersections within half an hour:
+
+<pre class="code">
+<span class="blue">#Region</span> <span class="maroon">&quot;Namespaces&quot;</span>
+<span class="blue">Imports</span> System
+<span class="blue">Imports</span> System.Collections.Generic
+<span class="blue">Imports</span> Autodesk.Revit.ApplicationServices
+<span class="blue">Imports</span> Autodesk.Revit.Attributes
+<span class="blue">Imports</span> Autodesk.Revit.DB
+<span class="blue">Imports</span> Autodesk.Revit.DB.Analysis
+<span class="blue">Imports</span> Autodesk.Revit.DB.Architecture
+<span class="blue">Imports</span> Autodesk.Revit.UI
+<span class="blue">Imports</span> Autodesk.Revit.UI.Selection
+<span class="blue">#End</span> <span class="blue">Region</span>
+&nbsp;
+&lt;<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Manual)&gt;
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">Command</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> schemaId <span class="blue">As</span> <span class="blue">Integer</span> = -1
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute(
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>,
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) _
+&nbsp; <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> <span class="teal">UIDocument</span> = commandData.Application.ActiveUIDocument
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> <span class="teal">Document</span> = uidoc.Document
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> transaction <span class="blue">As</span> <span class="teal">Transaction</span> = <span class="blue">New</span> <span class="teal">Transaction</span>(doc)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> col <span class="blue">As</span> <span class="teal">FilteredElementCollector</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">New</span> <span class="teal">FilteredElementCollector</span>(uidoc.Document)
+&nbsp;
+&nbsp; &nbsp; &nbsp; col.WhereElementIsNotElementType.ToElements()
+&nbsp; &nbsp; &nbsp; col.OfCategory(<span class="teal">BuiltInCategory</span>.OST_Rooms)
+&nbsp;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> value <span class="blue">As</span> <span class="blue">Double</span> = 1.0
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> room <span class="blue">As</span> <span class="teal">Room</span> <span class="blue">In</span> col
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> geo <span class="blue">As</span> <span class="teal">GeometryElement</span> = room.ClosedShell()
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> solid <span class="blue">As</span> <span class="teal">Solid</span> = GetGeometry(geo)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> solid <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PaintSolid(doc, solid, value)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; value = value + 1
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; transaction.Start(<span class="maroon">&quot;Hide Walls&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> categories <span class="blue">As</span> <span class="teal">Categories</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = uidoc.Document.Settings.Categories
+&nbsp;
+&nbsp; &nbsp; &nbsp; SetCategoryInvisible( _
+&nbsp; &nbsp; &nbsp; &nbsp; categories, <span class="teal">BuiltInCategory</span>.OST_Walls,
+&nbsp; &nbsp; &nbsp; &nbsp; uidoc.ActiveView)
+&nbsp;
+&nbsp; &nbsp; &nbsp; transaction.Commit()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp; &nbsp; &nbsp; message = ex.Message
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Failed
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Sub</span> SetCategoryInvisible( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> categories <span class="blue">As</span> <span class="teal">Categories</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> bic <span class="blue">As</span> <span class="teal">BuiltInCategory</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> view <span class="blue">As</span> <span class="teal">View</span>)
+&nbsp;
+&nbsp; &nbsp; SetCategoryVisibility(categories, bic, view, <span class="blue">False</span>)
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Shared</span> <span class="blue">Sub</span> SetCategoryVisibility( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> categories <span class="blue">As</span> <span class="teal">Categories</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> bic <span class="blue">As</span> <span class="teal">BuiltInCategory</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> view <span class="blue">As</span> <span class="teal">View</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> visible <span class="blue">As</span> <span class="blue">Boolean</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> category <span class="blue">As</span> <span class="teal">Category</span> = categories.Item(bic)
+&nbsp; &nbsp; category.Visible(view) = visible
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> GetGeometry( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> geomElem <span class="blue">As</span> <span class="teal">GeometryElement</span>) <span class="blue">As</span> <span class="teal">Solid</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> geomObj <span class="blue">As</span> <span class="teal">GeometryObject</span> <span class="blue">In</span> geomElem.Objects
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">' Walls and some columns will have a solid </span>
+&nbsp; &nbsp; &nbsp; <span class="green">' directly in its geometry</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> geomObj <span class="blue">Is</span> <span class="teal">Solid</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> solid <span class="blue">As</span> <span class="teal">Solid</span> = <span class="blue">DirectCast</span>(geomObj, <span class="teal">Solid</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> solid.Volume &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> solid
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">' Some columns will have a instance </span>
+&nbsp; &nbsp; &nbsp; <span class="green">' pointing to symbol geometry</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> geomObj <span class="blue">Is</span> <span class="teal">GeometryInstance</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> geomInst <span class="blue">As</span> <span class="teal">GeometryInstance</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">DirectCast</span>(geomObj, <span class="teal">GeometryInstance</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' Instance geometry is obtained so that the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' intersection works as expected without </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' requiring transformation</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> instElem <span class="blue">As</span> <span class="teal">GeometryElement</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = geomInst.GetInstanceGeometry()
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> instObj <span class="blue">As</span> <span class="teal">GeometryObject</span> <span class="blue">In</span> instElem.Objects
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> instObj <span class="blue">Is</span> <span class="teal">Solid</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> solid <span class="blue">As</span> <span class="teal">Solid</span> = <span class="blue">DirectCast</span>(instObj, <span class="teal">Solid</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> solid.Volume &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> solid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">Nothing</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Sub</span> PaintSolid( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> <span class="teal">Document</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> s <span class="blue">As</span> <span class="teal">Solid</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> value <span class="blue">As</span> <span class="blue">Double</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> <span class="teal">Application</span> = doc.Application
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> view <span class="blue">As</span> <span class="teal">View</span> = doc.ActiveView
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> view.AnalysisDisplayStyleId _
+&nbsp; &nbsp; &nbsp; = <span class="teal">ElementId</span>.InvalidElementId <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; CreateAVFDisplayStyle(doc, view)
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> sfm <span class="blue">As</span> <span class="teal">SpatialFieldManager</span> _
+&nbsp; &nbsp; &nbsp; = <span class="teal">SpatialFieldManager</span>.GetSpatialFieldManager(view)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> sfm <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; sfm = <span class="teal">SpatialFieldManager</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; .CreateSpatialFieldManager(view, 1)
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> schemaId &lt;&gt; -1 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> results <span class="blue">As</span> <span class="teal">IList</span>(<span class="blue">Of</span> <span class="blue">Integer</span>) _
+&nbsp; &nbsp; &nbsp; &nbsp; = sfm.GetRegisteredResults()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> results.Contains(schemaId) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; schemaId = -1
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> schemaId = -1 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> resultSchema1 <span class="blue">As</span> <span class="blue">New</span> <span class="teal">AnalysisResultSchema</span>( _
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;PaintedSolid&quot;</span>, <span class="maroon">&quot;Description&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; schemaId = sfm.RegisterResult(resultSchema1)
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> faces <span class="blue">As</span> <span class="teal">FaceArray</span> = s.Faces
+&nbsp; &nbsp; <span class="blue">Dim</span> trf <span class="blue">As</span> <span class="teal">Transform</span> = <span class="teal">Transform</span>.Identity
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> face <span class="blue">As</span> <span class="teal">Face</span> <span class="blue">In</span> faces
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> idx <span class="blue">As</span> <span class="blue">Integer</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = sfm.AddSpatialFieldPrimitive(face, trf)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> uvPts <span class="blue">As</span> <span class="teal">IList</span>(<span class="blue">Of</span> <span class="teal">UV</span>) = <span class="blue">New</span> <span class="teal">List</span>(<span class="blue">Of</span> <span class="teal">UV</span>)()
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> doubleList <span class="blue">As</span> <span class="blue">New</span> <span class="teal">List</span>(<span class="blue">Of</span> <span class="blue">Double</span>)()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> valList <span class="blue">As</span> <span class="teal">IList</span>(<span class="blue">Of</span> <span class="teal">ValueAtPoint</span>) _
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">New</span> <span class="teal">List</span>(<span class="blue">Of</span> <span class="teal">ValueAtPoint</span>)()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> bb <span class="blue">As</span> <span class="teal">BoundingBoxUV</span> = face.GetBoundingBox()
+&nbsp; &nbsp; &nbsp; uvPts.Add(bb.Min)
+&nbsp; &nbsp; &nbsp; doubleList.Add(value)
+&nbsp; &nbsp; &nbsp; valList.Add(<span class="blue">New</span> <span class="teal">ValueAtPoint</span>(doubleList))
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> pnts <span class="blue">As</span> <span class="blue">New</span> <span class="teal">FieldDomainPointsByUV</span>(uvPts)
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> vals <span class="blue">As</span> <span class="blue">New</span> <span class="teal">FieldValues</span>(valList)
+&nbsp;
+&nbsp; &nbsp; &nbsp; sfm.UpdateSpatialFieldPrimitive( _
+&nbsp; &nbsp; &nbsp; &nbsp; idx, pnts, vals, schemaId)
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Sub</span> CreateAVFDisplayStyle( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> <span class="teal">Document</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> view <span class="blue">As</span> <span class="teal">View</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> t <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc)
+&nbsp; &nbsp; t.Start(<span class="maroon">&quot;Create AVF Style&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> coloredSurfaceSettings <span class="blue">As</span> _
+&nbsp; &nbsp; &nbsp; <span class="blue">New</span> <span class="teal">AnalysisDisplayColoredSurfaceSettings</span>()
+&nbsp;
+&nbsp; &nbsp; coloredSurfaceSettings.ShowGridLines = <span class="blue">True</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> colorSettings <span class="blue">As</span> _
+&nbsp; &nbsp; &nbsp; <span class="blue">New</span> <span class="teal">AnalysisDisplayColorSettings</span>()
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> legendSettings <span class="blue">As</span> _
+&nbsp; &nbsp; &nbsp; <span class="blue">New</span> <span class="teal">AnalysisDisplayLegendSettings</span>()
+&nbsp;
+&nbsp; &nbsp; legendSettings.ShowLegend = <span class="blue">False</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> analysisDisplayStyle <span class="blue">As</span> <span class="teal">AnalysisDisplayStyle</span> _
+&nbsp; &nbsp; &nbsp; = analysisDisplayStyle.CreateAnalysisDisplayStyle( _
+&nbsp; &nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;Paint Solid&quot;</span>, coloredSurfaceSettings, _
+&nbsp; &nbsp; &nbsp; &nbsp; colorSettings, legendSettings)
+&nbsp;
+&nbsp; &nbsp; view.AnalysisDisplayStyleId = analysisDisplayStyle.Id
+&nbsp;
+&nbsp; &nbsp; t.Commit()
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>To test this, I created the following Revit model of a cow hotel, implemented according to a design suggested by Jim Quanci in the Gothenburg airport:</p>
+
+<center>
+<img src="img/highlight_rooms_cow_hotel.png" alt="Jim's cow hotel"/>
+</center>
+
+<p>Here are the resulting highlighted rooms using AVF:</p>
+
+<center>
+<img src="img/highlight_rooms_cow_hotel_shaded.png" alt="Cow hotel rooms highlighted"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/HighlightRooms.zip">HighlightRooms.zip</a> containing 
+
+the VB code and complete Visual Studio solution for this command.
+
+<p>Many thanks to Betina for implementing and sharing this!
+

@@ -1,0 +1,161 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Replacing Built-In Revit Commands and Their Ids</h3>
+
+<p>One main focus of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a> features
+
+is better support for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+add-in integration</a>.
+
+This includes the possibility for an add-in to replace an existing Revit command with its own implementation. 
+Note that you cannot call an existing command, just replace it entirely. 
+
+<p>Such a command replacement is demonstrated in a very simple form by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/developer-center-and-sdk-update.html#21">
+DisableCommand SDK sample</a>,
+
+which disables a command by replacing its implementation with a simple popup message.
+
+<p>A slightly more complex example is given by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">
+UIAPI SDK sample</a>,
+
+which implements and installs an alternative command binding for the Design Model command to start up a new family freshly created from the conceptual mass template and display its 3D view.
+
+<p>These are the steps to replace a built-in Revit command:
+
+<ul>
+<li>Determine the RevitCommandId to replace by examining the journal file and searching for the name of the original command.
+<li>Create an AddInCommandBinding for this command id.
+<li>Provide an alternate implementation for the command binding.
+</ul>
+
+
+<a name="2"></a>
+
+<h4>List of all Revit Command Ids</h4>
+
+
+<p>To simplify the first step, Victor Chekalin aka Виктор Чекалин now presents a list of all Revit command ids,
+
+<p>In Victor's own words:
+
+<p>I'm learning the ability to replace a Revit command with my own add-in implementation. 
+To replace a command, I must know CommandId of the command which I want to replace. 
+The help tells me I can find a CommandId in the journal file. 
+So the Revit SDK help doesn't contains full list of CommandIds.  
+I have decided to correct this mistake and create that list.
+
+<p>I thought this information will be useful for you and other developers and send you the list of all command ids in both 
+
+<a href="zip/CommandIds.txt">
+text</a> and 
+
+<a href="zip/CommandIds.xslx">
+Excel</a>
+
+format.
+
+<p><strong>Question:</strong> Wow!
+How did you create this list?
+
+<p><strong>Answer:</strong> It is my little secret how I've got it. Joke  :-)
+
+<p>At first I thought the commands must be described somewhere.
+I searched for the text 'ID_EXPORT_IFC' (the command name from the Dev Days Online &ndash; Revit 2013 API) in all files at the Revit Program folder. 
+So I found the UIFramework.dll file. 
+I opened this file in the text editor and saw XML data containing command descriptions.
+
+<p>Next steps were very easy. 
+I saved this part of the UIFramework.dll file to the XML file and read the XML data:
+
+<pre class="code">
+<span class="blue">private</span> IEnumerable&lt;InternalCommandDef&gt; 
+&nbsp; ReadCommandsFromFile()
+{
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> streamReader 
+&nbsp; &nbsp; = File.OpenText( <span class="maroon">@&quot;C:\Users\ChekalinVV&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\Documents\Revit\Revit2013SDK&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\RevitUICommands.xml&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> reader = XmlReader.Create( 
+&nbsp; &nbsp; &nbsp; streamReader ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( reader.Read() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( reader.Name.Equals( <span class="maroon">&quot;Command&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; InternalCommandDef commandDef 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> InternalCommandDef();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( reader.MoveToAttribute( <span class="maroon">&quot;Path&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; commandDef.Path = reader.Value;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( reader.MoveToAttribute( <span class="maroon">&quot;CommandId&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; commandDef.CommandId = reader.Value;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">yield</span> <span class="blue">return</span> commandDef;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Retrieve get CommandId info for each command and write it to the text file:
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> textFile = File.CreateText( 
+&nbsp; &nbsp; <span class="maroon">@&quot;C:\Users\ChekalinVV\Documents\Revit&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\Revit2013SDK\RevitUICommands.txt&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> command <span class="blue">in</span> commands )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">RevitCommandId</span> commandId = <span class="teal">RevitCommandId</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .LookupCommandId( command.CommandId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( commandId == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; command.CanHaveBinding 
+&nbsp; &nbsp; &nbsp; &nbsp; = commandId.CanHaveBinding;
+&nbsp;
+&nbsp; &nbsp; &nbsp; command.Id = commandId.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; textFile.WriteLine( <span class="maroon">&quot;{0}\t{1}\t{2}\t{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; command.CommandId,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; command.Path,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; command.Id,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; command.CanHaveBinding );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">/* It is just a joke</span>
+&nbsp;
+<span class="green">&nbsp; &nbsp; &nbsp; if( !commandId.HasBinding </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; commandId.CanHaveBinding )</span>
+<span class="green">&nbsp; &nbsp; &nbsp; {</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; var commandBinding =</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; App.ControlledApplication</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CreateAddInCommandBinding(commandId);</span>
+&nbsp;
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; commandBinding.Executed += OnCommandExecute;</span>
+<span class="green">&nbsp; &nbsp; &nbsp; }</span>
+<span class="green">&nbsp; &nbsp; &nbsp; */</span>
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>It is not necessary to get full CommandId properties, but I wanted to retrieve the CanHaveBinding property for all commands. 
+As I can see only two commands cannot have binding: Undo and Redo commands. 
+Although I try to bind ID_APP_EXIT command (just for test because it was the first command I found in the journal files). 
+It binds without any errors but doesn't work.
+
+<p>Very many thanks to Victor for this interesting research and the useful comprehensive list!

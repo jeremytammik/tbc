@@ -1,0 +1,280 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Multi-Version Add-in</h3>
+
+<p>This is blog post number 800, in case you are interested.
+I'll celebrate that fact by going out for a run in the woods after posting.
+
+<p>As we all saw when migrating add-ins from Revit 2012 to Revit 2013, the new version requires an add-in to be compiled using the .NET framework version 4.0.
+In spite of this, a Revit 2012 add-in can still be loaded into Revit 2013.
+I created a sample to prove this.
+
+<p>Not only can a Revit 2012 add-in be loaded into Revit 2013, it can even use .NET reflection to access new Revit 2013 API functionality, provided you know what you are doing.
+
+<p>Here is the question that motivated me to look into this topic again:
+
+
+<p><strong>Question:</strong> While migrating to the Revit 2013 API, I ran into problems similar to the ones encountered while
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/migrate-building-coder-samples-to-revit-2013.html">
+migrating The Building Coder samples</a>.
+
+<p>I would like to develop an add-in which is backwards compatible with the previous version of Revit, supporting for example both Revit 2012 and Revit 2013 in one .NET assembly DLL.
+
+<p>Is that possible at all?
+
+
+<p><strong>Answer:</strong> Yes, this is absolutely possible.
+
+<p>This is the complete short answer: in general, the Revit API assemblies are upwards compatible. 
+If you create an add-in using the Revit 2012 API assemblies and make no use of Revit 2013 API features, and all the Revit 2012 API features that you do make use of remained unchanged in Revit 2013, then you can load and execute your 2012 add-in in Revit 2013.
+
+<p>I created a sample to prove this, as part of my 
+
+<a href="http://labs.autodesk.com/utilities/revit_estorage">
+eStorage for Revit</a> EstoreFile 
+
+sample application, available from the Autodesk Labs
+
+<a href="http://labs.autodesk.com/utilities/ADN_plugins/catalog">
+ADN Plugin of the Month Catalog</a>.
+
+<p>EstoreFile stores and manages the contents of external files in Revit extensible storage on selected elements in the BIM model. 
+
+<p>It was originally created and described as part of the samples for the Autodesk University 2011 extensible storage
+
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9263&amp;jid=1725932">
+class</a> and 
+
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9726&amp;jid=1725932">
+lab</a>,
+
+as explained in the overview of the AU 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-and-aec-api-classes-at-autodesk-university.html">
+Revit and AEC API sessions</a>,
+
+and updated for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-one.html#2">
+AEC DevCamp</a> with 
+
+an additional external command added to support the new Revit 2013
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#5">
+DataStorage element</a>.
+
+<p>Two important requirements were added when packaging the EstoreFile command as a separate plug-in of the month for the labs:
+
+<ul>
+<li>Support for both Revit 2012 and Revit 2013.
+<li>Support for a help file.
+</ul>
+
+<p>One of the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+Revit 2013 add-in integration features</a> is 
+
+support for contextual help: the user can simply hit F1 on an add-in command button to bring up an Internet URL or a local help file entry.
+
+<p>The contextual help functionality is provided by the ContextualHelp class in the Autodesk.Revit.UI namespace.
+I can therefore use the presence of this class to determine whether my add-in is running in Revit 2013 (or later), or an earlier release.
+At the same time, I can store the System.Type of this class to use reflection to access its functionality:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve the Revit 2013 ContextualHelp class </span>
+&nbsp; <span class="gray">///</span><span class="green"> type if it exists.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Type</span> _contextual_help_type = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Call this method once only to set the </span>
+&nbsp; <span class="gray">///</span><span class="green"> ContextualHelp class type if it exists.</span>
+&nbsp; <span class="gray">///</span><span class="green"> This can be used for a runtime detection </span>
+&nbsp; <span class="gray">///</span><span class="green"> whether we are running in Revit 2012 or 2013.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> SetContextualHelpType()
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create an instance of the RevitAPIUI.DLL </span>
+&nbsp; &nbsp; <span class="green">// assembly to query its type information:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Assembly</span> rvtApiUiAssembly 
+&nbsp; &nbsp; &nbsp; = <span class="teal">Assembly</span>.GetAssembly( <span class="blue">typeof</span>( <span class="teal">UIDocument</span> ) );
+&nbsp;
+&nbsp; &nbsp; _contextual_help_type = rvtApiUiAssembly.GetType( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Autodesk.Revit.UI.ContextualHelp&quot;</span> );
+&nbsp; }
+</pre>
+
+<p>Now, seeing as I compile this application using the Revit 2012 API, I have no direct access to the new Revit 2013 functionality.
+
+<p>If I wish to make use of it anyway, I can do so using .NET reflection to determine the methods and properties on the system type and making calls to those.
+
+<p>In this case, given a PushButtonData instance 'd', I want to instantiate a new ContextualHelp instance 'ch' and set it on 'd'.
+The code to achieve this in Revit 2013 looks like this:
+
+<pre class="code">
+&nbsp; ContextualHelp ch = <span class="blue">new</span> ContextualHelp(
+&nbsp; &nbsp; ContextualHelpType.ChmFile, helppath );
+&nbsp;
+&nbsp; d.SetContextualHelp( ch );
+</pre>
+
+<p>The same thing can be achieved using reflection like this:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Assign the add-in help file to the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given ribbon push button contextual help.</span>
+&nbsp; <span class="gray">///</span><span class="green"> This method checks for Revit 2013 at runtime</span>
+&nbsp; <span class="gray">///</span><span class="green"> and uses .NET Reflection to access the </span>
+&nbsp; <span class="gray">///</span><span class="green"> ContextualHelp class and SetContextualHelp</span>
+&nbsp; <span class="gray">///</span><span class="green"> method which are not available in the </span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit 2012 API.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> AddContextualHelp( <span class="teal">PushButtonData</span> d, <span class="blue">int</span> i )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Invoke constructor:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConstructorInfo</span>[] ctors 
+&nbsp; &nbsp; &nbsp; = _contextual_help_type.GetConstructors();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">int</span> contextualHelpType_ChmFile = 3;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">object</span> instance = ctors[0].Invoke(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { 
+&nbsp; &nbsp; &nbsp; contextualHelpType_ChmFile, 
+&nbsp; &nbsp; &nbsp; HelpPath } ); <span class="green">// + &quot;#&quot; + i.ToString()</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Set the help topic URL</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> property = _contextual_help_type
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;HelpTopicUrl&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; property.SetValue( instance, i.ToString(), <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Invoke SetContextualHelp method:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Type</span> pbdType = d.GetType();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> method = pbdType.GetMethod( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;SetContextualHelp&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; method.Invoke( d, <span class="blue">new</span> <span class="blue">object</span>[] { instance } );
+&nbsp; }
+</pre>
+
+<p>The external application OnStartup method makes use of this by performing the following steps:
+
+<ul>
+<li>Determine the contextual help System.Type and infer from its presence whether we are running in Revit 2012 or 2013.
+<li>If we are running in 2013, we can use the contextual help functionality to display the help file, so the separate help command implemented for Revit 2012 is removed.
+Therefore, I also remove the reference to that command in the help text displayed by the expanded tooltip text.
+<li>Determine the help file path.
+<li>Create the ribbon panel and populate it with buttons for all the commands.
+<li>If we are in 2013, skip adding the help command and add contextual help to each of the other commands instead.
+</ul>
+
+<p>Here is the entire OnStartup method source code:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="blue">int</span> i;
+&nbsp;
+&nbsp; SetContextualHelpType();
+&nbsp;
+&nbsp; <span class="blue">if</span>( HasContextualHelp )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Remove the description of the help command </span>
+&nbsp; &nbsp; <span class="green">// from the long tooltip add-in overview</span>
+&nbsp;
+&nbsp; &nbsp; i = _long_description_tooltip_overview
+&nbsp; &nbsp; &nbsp; .IndexOf( <span class="maroon">&quot;\r\n\r\nHelp: &quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 &lt; i, <span class="maroon">&quot;expected to find &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;description of help command in long &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;description tootip overview&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _long_description_tooltip_overview 
+&nbsp; &nbsp; &nbsp; = _long_description_tooltip_overview
+&nbsp; &nbsp; &nbsp; &nbsp; .Substring( 0, i );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">ControlledApplication</span> c = a.ControlledApplication;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;EstoreFile: Running in {0} {1}.{2}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;so contecxtual help is {3}available.&quot;</span>, 
+&nbsp; &nbsp; c.VersionName, c.VersionNumber, c.VersionBuild, 
+&nbsp; &nbsp; (HasContextualHelp ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;not &quot;</span>) ) );
+&nbsp;
+&nbsp; <span class="teal">Assembly</span> exe = <span class="teal">Assembly</span>.GetExecutingAssembly();
+&nbsp; <span class="blue">string</span> dllpath = exe.Location;
+&nbsp; <span class="blue">string</span> dir = <span class="teal">Path</span>.GetDirectoryName( dllpath );
+&nbsp; _help_path = <span class="teal">Path</span>.Combine( dir, _help_filename );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( _help_path ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Please ensure that the EstoreFile &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;help file {0} is located in the same &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; folder as the add-in assembly DLL:\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;'{1}'.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; System.Windows.<span class="teal">MessageBox</span>.Show( 
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( s, _help_filename, dir ),
+&nbsp; &nbsp; &nbsp; _name, System.Windows.<span class="teal">MessageBoxButton</span>.OK, 
+&nbsp; &nbsp; &nbsp; System.Windows.<span class="teal">MessageBoxImage</span>.Error );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">string</span> className = GetType().FullName.Replace(
+&nbsp; &nbsp; <span class="maroon">&quot;App&quot;</span>, <span class="maroon">&quot;Cmd&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">RibbonPanel</span> rp = a.CreateRibbonPanel( _text );
+&nbsp;
+&nbsp; i = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> cmd <span class="blue">in</span> _commands )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( HasContextualHelp &amp;&amp; cmd.Equals( <span class="maroon">&quot;Help&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> d = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; cmd, cmd, dllpath, className + cmd );
+&nbsp;
+&nbsp; &nbsp; d.ToolTip = _tips[i];
+&nbsp;
+&nbsp; &nbsp; d.Image = NewBitmapImage( exe, 
+&nbsp; &nbsp; &nbsp; cmd + <span class="maroon">&quot;16.png&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; d.LargeImage = NewBitmapImage( exe, 
+&nbsp; &nbsp; &nbsp; cmd + <span class="maroon">&quot;32.png&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; d.LongDescription = _long_tips[i] 
+&nbsp; &nbsp; &nbsp; + _long_description_tooltip_overview;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( HasContextualHelp )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; AddContextualHelp( d, ++i );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; rp.AddItem( d );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>For the complete source code, Visual Studio solution, and add-in manifest, please refer to the Autodesk Labs
+
+<a href="http://labs.autodesk.com/utilities/revit_estorage">
+eStorage for Revit</a> download.
+
+<p>I trust this answers your question and provides a neat sample to boot.

@@ -1,0 +1,246 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Revit 2010 Ribbon API</h3>
+
+<p>I am currently sitting in Stockholm, preparing a visit to a Revit developer here and enjoying the wonderful Swedish nature in May.
+On Saturday I cut a couple of cubic meters of beautiful birch wood for heating with my friend Alexander in Huddinge, and on Sunday we went together with another class mate Lasse for a walk in the woods and around the lakes and marshes in Roslagen north of Stockholm, specifically to the three lakes Stora Harsjön, Lilla Harsjön and 
+
+<a href="http://sv.wikipedia.org/wiki/T%C3%A4rnan">
+Tärnan</a>, 
+
+where we used to go camping on the weekends as school boys thirty-five years ago.
+We saw lots of rare birds and plants and enjoyed the wonderful clear blue Scandinavian air and sky and stillness, so unlike anything you can see and feel in central Europe.
+Now I am back to setting up my development system again on my temporary replacement computer, and getting ready for the training I am giving in the next few days.
+
+<p>The topic of accessing and modifying the Revit ribbon user interface was addressed by a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html?cid=6a00e553e1689788330115705e1423970b#comment-6a00e553e1689788330115705e1423970b">
+comment from Jake</a>
+
+and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html?cid=6a00e553e168978833011570604384970b#comment-6a00e553e168978833011570604384970b">
+ensuing discussion</a>.
+
+Here, we will just discuss the basic Revit ribbon API functionality.</p>
+
+<p>Revit 2010 has a completely new look and feel due to the ribbon based user interface, familiar to many from the Microsoft Office and AutoCAD 2009 and 2010 products. 
+The ribbon interface simplifies the usage for new users and reacts to the design context to provide immediate access to suitable functionality based on the current modelling requirements.
+Unlike AutoCAD based products, this change is not optional. 
+There is no way to turn this off and switch back to the old UI.</p>
+
+<p>The Revit API has been extended in order to enable Revit external applications to make use of the ribbon.
+Here is an overview of the Revit 2010 ribbon API, which was also discussed in the recent 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/revit-api-introduction-webcast.html">
+Revit programming webcast</a>, 
+
+and a few related questions that cropped up.</p>
+
+<p>The ribbon contains a number of tabs, which are automatically activated depending on the current design context.
+This is helpful both for new users to discover relevant commands and for experienced users to have convenient access to them.
+Each tab can contain any number of panels, which in turn can host various user interface widgets.</p>
+
+<p>All external application and external command related user interface items are located in the Add-Ins tab. 
+This tab is displayed as soon as an external application or command is added to the Revit.ini file. 
+External commands are listed under the 'External Tools' button.
+External applications can create their own ribbon panels and populate them with push buttons and pull-down buttons in either a normal, single or stacked fashion with the option of two or three layers.</p>
+
+<p>Existing external application will need to migrate their old toolbar or menu based user interface to the ribbon.
+The ribbon API is the only GUI customization API in Revit 2010.
+It is quite straight-forward to use.
+Although the ribbon is based on the Windows Presentation Foundation WPF, no WPF knowledge is needed to make use of the Revit ribbon API.</p>
+
+<p>The API enables you to add your custom ribbon panels and populate them with various types of buttons. 
+The buttons can be push or pull-down ones, in a single row or in a stacked layout with two or three rows.
+Unfortunately, you cannot currently create your own separate ribbon tabs.
+
+<p>In addition to the programming aspect, the Revit SDK also includes documentation with guidelines for designing your custom ribbon and icons. 
+This is to ensure that your application integrates well with the standard Revit UI. 
+The documents are located in the SDK folder and also explain the terminology used in the ribbon API:</p>
+
+<ul>
+<li>Ribbon design guidelines.pdf
+<li>Autodesk Icon Guidelines.pdf
+</ul>
+
+<p>The new ribbon related classes in Revit are:</p>
+
+<ul>
+<li>RibbonPanel, a ribbon panel in the Add-Ins tab containing ribbon items.
+<li>RibbonItem, a button, push or pull-down.
+<li>PushButton and PushButtonData to manage push button information.
+<li>PulldownButton and PulldownButtonData to manage pull-down button information
+</ul>
+
+<p>The usage of the ribbon API is demonstrated by the Ribbon SDK sample application, which is an external application creating its own ribbon panel and showing how to create the various types of ribbon items programmatically.
+It adds the following elements to the Add-Ins tab:</p>
+
+<ul>
+<li>Two add-in application ribbon panels.
+<li>A push button 'Create Wall'.
+<li>A three-layered stacked button.
+<li>A pull-down button 'Move Walls'.
+<li>Push buttons used to display add-in panel info.</li>
+<li>Separators.
+<li>Tooltips.
+</ul>
+
+<p>This is what the result looks like in the user interface:</p>
+
+<img src="img/ribbon_sdk_sample.jpg" alt="Ribbon SDK sample"/>
+
+<p>The figure shows the two ribbon panels called 'Ribbon Sample' and 'Add-in Panel Info'. 
+The first panel, on the left, has one push button called 'Create Wall', and a three-layered stacked button next to it showing 'Delete Last Wall' at the top. 
+Notice that the third stacked button, 'Move Walls', is a pull-down button.  
+You can also add tooltips to and separators between buttons.
+
+<p>Here is the relevant part of the code, the method CreateRibbons, which is called from the external application OnStartup method:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> CreateRibbons(
+&nbsp; ControlledApplication application )
+{
+&nbsp; <span class="green">// application path</span>
+&nbsp; <span class="blue">string</span> pathRibbon
+&nbsp; &nbsp; = GetType().Assembly.Location;
+&nbsp;
+&nbsp; <span class="blue">string</span> pathAddIn
+&nbsp; &nbsp; = pathRibbon.Replace(<span class="maroon">"Ribbon.dll"</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">"AddInCommands.dll"</span>);
+&nbsp;
+&nbsp; <span class="blue">string</span> bitmapFolder
+&nbsp; &nbsp; = <span class="teal">Path</span>.GetDirectoryName(pathRibbon);
+&nbsp;
+<span class="blue">&nbsp; # region</span> create RibbonPanel with PushButtons, 'create wall' and 'delete walls'
+&nbsp;
+&nbsp; <span class="blue">string</span> firstPanelName = <span class="maroon">"PushButtons"</span>;
+&nbsp;
+&nbsp; RibbonPanel ribbonPanelPushButtons
+&nbsp; &nbsp; = application.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; firstPanelName );
+&nbsp;
+&nbsp; PushButton pushButtonCreateWall
+&nbsp; &nbsp; = ribbonPanelPushButtons.AddPushButton(
+&nbsp; &nbsp; <span class="maroon">"createWall"</span>, <span class="maroon">"Create Wall"</span>, pathAddIn,
+&nbsp; &nbsp; <span class="maroon">"Revit.SDK.Samples.Ribbon.CS.CreateWall"</span> );
+&nbsp;
+&nbsp; pushButtonCreateWall.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"Create a wall on level 1."</span>;
+&nbsp;
+&nbsp; pushButtonCreateWall.LargeImage
+&nbsp; &nbsp; = <span class="blue">new</span> BitmapImage(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> Uri( <span class="teal">Path</span>.Combine( bitmapFolder,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"CreateWall.bmp"</span>), UriKind.Absolute ) );
+&nbsp;
+&nbsp; ribbonPanelPushButtons.AddSeparator();
+&nbsp;
+&nbsp; PushButton pushButtonDeleteWalls
+&nbsp; &nbsp; = ribbonPanelPushButtons.AddPushButton(
+&nbsp; &nbsp; <span class="maroon">"deleteWalls"</span>, <span class="maroon">"Delete Walls"</span>, pathAddIn,
+&nbsp; &nbsp; <span class="maroon">"Revit.SDK.Samples.Ribbon.CS.DeleteWalls"</span> );
+&nbsp;
+&nbsp; pushButtonDeleteWalls.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"Delete all the walls in active document."</span>;
+&nbsp;
+&nbsp; pushButtonDeleteWalls.LargeImage
+&nbsp; &nbsp; = <span class="blue">new</span> BitmapImage(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> Uri( <span class="teal">Path</span>.Combine( bitmapFolder,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"DeleteWalls.bmp"</span>), UriKind.Absolute ) );
+&nbsp;
+<span class="blue">&nbsp; # endregion</span>
+&nbsp;
+<span class="blue">&nbsp; # region</span> create RibbonPanel with a pulldownButton which contains two MenuItems, 'move walls'
+&nbsp;
+&nbsp; <span class="blue">string</span> secondPanelName = <span class="maroon">"PulldownButtons"</span>;
+&nbsp;
+&nbsp; RibbonPanel ribbonPanelPulldowns
+&nbsp; &nbsp; = application.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; secondPanelName );
+&nbsp;
+&nbsp; PulldownButton pulldownMoveWall
+&nbsp; &nbsp; = ribbonPanelPulldowns.AddPulldownButton(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"moveWall"</span>, <span class="maroon">"Move Walls"</span>);
+&nbsp;
+&nbsp; pulldownMoveWall.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"Move all the walls in X or Y direction"</span>;
+&nbsp;
+&nbsp; pulldownMoveWall.LargeImage
+&nbsp; &nbsp; = <span class="blue">new</span> BitmapImage(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> Uri( <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; bitmapFolder, <span class="maroon">"MoveWall.bmp"</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; UriKind.Absolute ) );
+&nbsp;
+&nbsp; RibbonMenuItem moveX
+&nbsp; &nbsp; = pulldownMoveWall.AddItem(
+&nbsp; &nbsp; <span class="maroon">"X Direction"</span>, pathAddIn,
+&nbsp; &nbsp; <span class="maroon">"Revit.SDK.Samples.Ribbon.CS.XMoveWalls"</span> );
+&nbsp;
+&nbsp; moveX.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"move all walls 10 feet in X direction."</span>;
+&nbsp;
+&nbsp; RibbonMenuItem moveY
+&nbsp; &nbsp; = pulldownMoveWall.AddItem(
+&nbsp; &nbsp; <span class="maroon">"Y Direction"</span>, pathAddIn,
+&nbsp; &nbsp; <span class="maroon">"Revit.SDK.Samples.Ribbon.CS.YMoveWalls"</span> );
+&nbsp;
+&nbsp; moveY.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"move all walls 10 feet in Y direction."</span>;
+&nbsp;
+<span class="blue">&nbsp; # endregion</span>
+&nbsp;
+<span class="blue">&nbsp; # region</span> create RibbonPanel with "Add-in Panel Info" button
+&nbsp;
+&nbsp; <span class="blue">string</span> thirdPanelName
+&nbsp; &nbsp; = <span class="maroon">"Add-in Panel Info"</span>;
+&nbsp;
+&nbsp; RibbonPanel ribbonPanelOutputlInfo
+&nbsp; &nbsp; = application.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; thirdPanelName );
+&nbsp;
+&nbsp; PushButton pushButtonOutputlInfo
+&nbsp; &nbsp; = ribbonPanelOutputlInfo.AddPushButton(
+&nbsp; &nbsp; <span class="maroon">"outputlInfo"</span>,
+&nbsp; &nbsp; <span class="maroon">"Output Add-in Panel Info"</span>,
+&nbsp; &nbsp; pathAddIn,
+&nbsp; &nbsp; <span class="maroon">"Revit.SDK.Samples.Ribbon.CS.OutputPanelInfo"</span> );
+&nbsp;
+&nbsp; pushButtonOutputlInfo.ToolTip
+&nbsp; &nbsp; = <span class="maroon">"Output info of all the Add-In RibbonPanels."</span>;
+&nbsp;
+&nbsp; pushButtonOutputlInfo.LargeImage
+&nbsp; &nbsp; = <span class="blue">new</span> BitmapImage(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> Uri(<span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; bitmapFolder,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"OutputAddInPanelInfo.bmp"</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; UriKind.Absolute ) );
+&nbsp;
+<span class="blue">&nbsp; # endregion</span>
+}
+</pre>
+
+<p>Here is another question regarding the ribbon user interface and its customisation facilities:</p>
+
+<!-- 1248147 [Customizing the Ribbon in Revit 2010] -->
+
+<h4>User Interface Customisation</h4>
+
+<p><strong>Question:</strong>
+Is there a way to customize the ribbon toolbars in Revit 2010?
+There is no right-click menu item for 'Customize' like in AutoCAD Architecture.</p>
+
+<p><strong>Answer:</strong>
+
+The only customization possibility I see in the user interface is provided by the 'User Interface' button in the View tab.
+This provides control of the visibility of the navigation bar, project browser, status bar, recent files list and project browser settings:</p>
+
+<img src="img/ribbon_user_interface.jpg" alt="Ribbon user interface button"/>
+
+<p>As stated above, the Revit API allows applications to add UI elements to the ribbon, but only in the Add-Ins tab, and only certain types of ribbon items, as illustrated by the Ribbon SDK sample.</p>
+
+<p>Many thanks to my colleagues Adam Nagy and Saikat Bhattacharya for providing the basis for this summary.</p>

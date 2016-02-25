@@ -1,0 +1,322 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Nested Instance Geometry</h3>
+
+<p>This is in response to a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/geometry-viewer.html?cid=6a00e553e1689788330115705bbc01970b#comment-6a00e553e1689788330115705bbc01970b">
+query from Benson</a>
+
+about the structure and geometry of nested family instances.
+In the answer, we also present some useful comparison operators which enable us to use Revit XYZ points and vectors as keys in generic .NET dictionaries, and sort them lexicographically, as well as utility functions for extracting and listing all the vertices of a solid.
+Here is the original query, slightly rephrased:</p>
+
+<p><strong>Question:</strong>
+I would like to obtain the internal hierarchy defined within a family instance, but its geometry only returns a flat list of solids.
+
+<p>For example: a top level family instance F includes one column C0, and two nested family instances F1 and F2.
+F1 includes two more columns C1 and C2, and F2 includes two further columns C3 and C4.
+The result I am trying to achieve is the geometry with the associated hierarchy:</p>
+
+<pre>
+  F
+  }
+  +-- C0
+  }
+  +-- F1
+  }   }
+  }   +-- C1
+  }   }
+  }   +-- C2
+  }
+  +-- F2
+      }
+      +-- C3
+      }
+      +-- C4
+</pre>
+
+<p>Here are my steps to create the family instances in this structure:
+
+<ol>
+<li>Run Revit 2009.
+<li>Select File > New > Family and open a metric template such as Metric Funiture.rft.
+<li>Delete all objects in the new family project, switch to 3D view.
+<li>Select File > Load from Library > Load Family and select an RFA file, with a column in it.
+<li>Now, we can find the column in the project browser panel > Families > Columns.
+<li>Select this column, right click on it, and select "Create Instance".
+Repeat step 6, so we now have two columns in the family project.
+<li>Save the project as myFamily1.rfa, then click File > Save As to save it again as myFamily2.rfa.
+Now, we have two family projects myFamily1.rfa and myFamily2.rfa.
+<li>Repeat steps 2, 3, and 4, this time selecting a column family, myFamily1, and myFamily2.
+<li>Create instances of the column, myFamily1, myFamily2 in the current family project like step 6.
+<li>Save the project as myFamily3.rfa.
+<li>Create a normal project, for instance named Project1.rvt, using File > New > Project.
+<li>Load myFamily3.rfa like step 4.
+<li>Add an instance of myFamily3 like step 6.
+</ol>
+
+<p>Now we have the structure shown above, with F represented by myFamily3, and F1 and F2 by myFamily1 and myFamily2 respectively.
+
+<p><strong>Answer:</strong>
+The geometry of the top level family instance F does indeed just contain a flat list of solids.
+You can obtain some information about the hierarchical structure of the nested family instances by recursively exploring the family instance symbol family components.
+For a given family instance a, they are accessible through a.Symbol.Family.Components.
+These components include information about their location within the containing family.
+Using this information, you can build up the structure you seek.</p>
+
+<p>I created the project as you suggest and analysed the geometry and symbol family components of the
+top level family instance F.
+I used a rectangular column, so each of the columns is a simple quadrilateral with six faces.</p>
+
+<p>In the geometry of the top level family instance F, I see one instance object.
+The important properties of a geometry instance are its Symbol, SymbolGeometry, and Transform:</p>
+
+<ul>
+<li>Symbol, the symbol element that this object is referring to.
+<li>SymbolGeometry, the geometric representation of the symbol.
+<li>Transform, the affine transformation of the symbol into the instance coordinate space.
+</ul>
+
+<p>In my case, the symbol geometry contains six solids.
+One of these is empty, i.e. has no edges or faces, so I simply ignore that one.
+The remaining five represent the five different column instances visible in the project.
+These five different instances can be differentiated by the different face vertex coordinates.</p>
+
+<p>To explore and compare complex geometry like that of a solid, it is important to have some powerful tools at your disposal to reduce the amount of detailed information you have to analyse and compare.
+In this case, in order to display the solids in an easily read fashion, I implemented a helper method named GetVertices to extract the vertices of a solid and store them in a sorted list in a XYZArray.</p>
+
+<p>GetVertices iterates over all the faces of the given solid, triangulates each face, and iterates over the vertices of the resulting mesh.
+These are added into a container, which is designed to ensure that every vertex occurs once only.
+I implement this container by using a generic dictionary class and attaching an equality comparison class which ensures that almost equal points are regarded as being exactly equal, allowing for some fuzziness due to numerical imprecision.
+Here is the definition of my XyzEqualityComparer class:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">XyzEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">XYZ</span>&gt;
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> p.AlmostEqual( q );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.PointString( p ).GetHashCode();
+&nbsp; }
+}
+</pre>
+
+<p>The hash code calculation could certainly be optimised by avoiding the detour through a string representation, but this is the quickest and easiest solution that came to mind. 
+I am not sure that it will work reliably under all circumstances, though. 
+It is probably necessary to increase the precision in the string representation generated by PointString to match the precision used by the AlmostEqual method.</p>
+
+<p>With this equality comparer, we can employ the standard .NET generic dictionary class using Revit XYZ points and vectors as dictionary keys.</p>
+
+<p>In order to further facilitate the comparison of solids with each other, I sort their vertices before storing them into the array.
+The sorting process requires another fuzzy comparison routine, a Compare function which determines whether a given point is larger than, equal to, or smaller than another one, and correspondingly returns 1, 0 or -1.
+We define this comparison algorithm by comparing the X, Y and Z coordinates in the canonical order.
+If all three are almost equal, the two points are considered equal.
+Otherwise, the first pair of coordinates to differ is used to determine whether the first point is considered to be greater or smaller than the second.
+Here is the implementation of this comparison method:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">double</span> _eps = 1.0e-9;
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsZero( <span class="blue">double</span> a )
+{
+&nbsp; <span class="blue">return</span> _eps &gt; <span class="teal">Math</span>.Abs( a );
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsEqual( <span class="blue">double</span> a, <span class="blue">double</span> b )
+{
+&nbsp; <span class="blue">return</span> IsZero( b - a );
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> Compare( <span class="blue">double</span> a, <span class="blue">double</span> b )
+{
+&nbsp; <span class="blue">return</span> IsEqual( a, b ) ? 0 : ( a &lt; b ? -1 : 1 );
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> Compare( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+{
+&nbsp; <span class="blue">int</span> diff = Compare( p.X, q.X );
+&nbsp; <span class="blue">if</span>( 0 == diff ) {
+&nbsp; &nbsp; diff = Compare( p.Y, q.Y );
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == diff ) {
+&nbsp; &nbsp; &nbsp; diff = Compare( p.Z, q.Z );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> diff;
+}
+</pre>
+
+
+<p>With these two comparison helpers in place, I can implement my GetVertices helper method to extract a sorted list of solid vertices and store them in a sorted manner in a XYZArray like this:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> GetVertices( <span class="teal">XYZArray</span> vertices, <span class="teal">Solid</span> s )
+{
+&nbsp; <span class="teal">Debug</span>.Assert( 0 &lt; s.Edges.Size,
+&nbsp; &nbsp; <span class="maroon">"expected a non-empty solid"</span> );
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> s.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Mesh</span> m = f.Triangulate();
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> m.Vertices )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !a.ContainsKey( p ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; a.Add( p, 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &plusmn;&plusmn;a[p];
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( a.Keys );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 8 == keys.Count,
+&nbsp; &nbsp; <span class="maroon">"expected eight vertices for a rectangular column"</span> );
+&nbsp;
+&nbsp; keys.Sort( <span class="teal">Util</span>.Compare );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 3 == a[p],
+&nbsp; &nbsp; &nbsp; <span class="maroon">"expected every vertex of solid to appear in exactly three faces"</span> );
+&nbsp;
+&nbsp; &nbsp; vertices.Append( p );
+&nbsp; }
+}
+</pre>
+
+<p>The two assertions checking the total number of vertices, 8, and the number of coincident vertices in each corner, 3, are only valid for this special case, where I am looking at quadrilateral columns.
+They will be removed in a future version, if I make use of this method for more general cases.</p>
+
+<p>With this code in place, I can easily retrieve a sorted list of each of the solids' vertices for display and comparison purposes.</p>
+
+<p>I used the code you provided in your original comment as a basis for a new command
+named CmdNestedInstanceGeo, specifically tailored to explore this situation.
+It first iterates over the solids contained in the top level family instance geometry and lists their vertices.
+It then explores the family instance components and lists their names and location points.
+Here is the code for the Execute methods that implements this:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp;
+<span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll( a, doc,
+&nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) ) )
+{
+&nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; ? <span class="maroon">"Please select some family instances."</span>
+&nbsp; &nbsp; : <span class="maroon">"No family instances found."</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+<span class="teal">FamilyInstance</span> inst = a[0] <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+<span class="teal">Options</span> opts = app.Create.NewGeometryOptions();
+<span class="teal">GeoElement</span> geoElement = inst.get_Geometry( opts );
+&nbsp;
+<span class="teal">GeometryObjectArray</span> a1 = geoElement.Objects;
+<span class="blue">int</span> n = a1.Size;
+&nbsp;
+<span class="teal">Debug</span>.Print(
+&nbsp; <span class="maroon">"Family instance geometry has {0} geometry object{1}{2}"</span>,
+&nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+<span class="blue">int</span> i = 0;
+<span class="blue">foreach</span>( <span class="teal">GeometryObject</span> o1 <span class="blue">in</span> a1 )
+{
+&nbsp; <span class="teal">GeoInstance</span> geoInstance = o1 <span class="blue">as</span> <span class="teal">GeoInstance</span>;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geoInstance )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeoElement</span> symbolGeo = geoInstance.SymbolGeometry;
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> a2 = symbolGeo.Objects;
+
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> o2 <span class="blue">in</span> a2 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> s = o2 <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != s &amp;&amp; 0 &lt; s.Edges.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> vertices = app.Create.NewXYZArray();
+&nbsp; &nbsp; &nbsp; &nbsp; GetVertices( vertices, s );
+&nbsp; &nbsp; &nbsp; &nbsp; n = vertices.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"Solid {0} has {1} vertices{2} {3}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i++, n, <span class="teal">Util</span>.DotOrColon( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointArrayString( vertices ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="teal">ElementSet</span> components = inst.Symbol.Family.Components;
+n = components.Size;
+&nbsp;
+<span class="teal">Debug</span>.Print(
+&nbsp; <span class="maroon">"Family instance symbol family has {0} component{1}{2}"</span>,
+&nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> components )
+{
+&nbsp; <span class="teal">LocationPoint</span> lp = e.Location <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"{0} at {1}"</span>,
+&nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; <span class="teal">Util</span>.PointString( lp.Point ) );
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>It accesses the one and only family instance in the file and stores it in 'inst'.
+It then iterates over its geometry, extracts the vertices from each solid, and lists them in the debug output window.
+Here is the result of that listing:</p>
+
+<pre>
+Family instance geometry has 1 geometry object:
+Solid 0 has 8 vertices: (32.15,8.02,0), (32.15,8.02,13.12), (32.15,9.57,0), (32.15,9.57,13.12), (34.15,8.02,0), (34.15,8.02,13.12), (34.15,9.57,0), (34.15,9.57,13.12)
+Solid 1 has 8 vertices: (28.24,3.23,0), (28.24,3.23,13.12), (28.24,4.79,0), (28.24,4.79,13.12), (30.24,3.23,0), (30.24,3.23,13.12), (30.24,4.79,0), (30.24,4.79,13.12)
+Solid 2 has 8 vertices: (16,7.4,0), (16,7.4,13.12), (16,8.96,0), (16,8.96,13.12), (18,7.4,0), (18,7.4,13.12), (18,8.96,0), (18,8.96,13.12)
+Solid 3 has 8 vertices: (12.08,2.61,0), (12.08,2.61,13.12), (12.08,4.17,0), (12.08,4.17,13.12), (14.09,2.61,0), (14.09,2.61,13.12), (14.09,4.17,0), (14.09,4.17,13.12)
+Solid 4 has 8 vertices: (10.16,-4.19,0), (10.16,-4.19,13.12), (10.16,-2.19,0), (10.16,-2.19,13.12), (12.16,-4.19,0), (12.16,-4.19,13.12), (12.16,-2.19,0), (12.16,-2.19,13.12)
+</pre>
+
+<p>These lines are probably too long to be displayed in their entirety, but the main thing is to see that we have five identical solids which only differ from each other by a translation. You can see the full lines by copying and posting them into an editor.</p>
+
+<p>The command next iterates over the family instance symbol family components, just like you suggested, and lists each one of these together with its location point:</p>
+
+<pre>
+Family instance symbol family has 3 components:
+Columns M_Rectangular Column <2384 610 x 610mm> at (11.16,-3.19,0)
+Furniture myFamily1 <3525 myFamily1> at (-2.48,2.65,0)
+Furniture myFamily2 <4665 myFamily2> at (13.68,3.26,0)
+</pre>
+
+<p>As you can see, the column instance C0 and the two furniture family instances myFamily1 and myFamily2 are listed.
+Diving into myFamily1 in the debugger and again traversing into its family instance components, I see the two nested columns C1 and C2, and so on.
+We could enhance the code to traverse this structure recursively.</p>
+
+<p>If you look at the location points of these instances and compare them with the offsets between the five solids, you can determine the correspondence between the internal nested structure and the detailed geometrical representation.</p>
+
+<p>In this case, we defined our families extremely haphazardly, which makes it harder to understand the results. In a well designed family, I would expect both the structure and the locations of internal components to be less arbitrary.</p>
+
+<p>I hope that this exploration helps you understand the structure, and provides some useful tools to explore it further.</p>
+
+<p>Here is
+
+<a href="zip/bc10032.zip">
+version 1.0.0.32</a>
+
+of the complete Visual Studio solution with the new command.</p>

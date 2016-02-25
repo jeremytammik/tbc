@@ -1,0 +1,109 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Processor Architecture Mismatch Warning and Key Hook</h3>
+
+<p>In the past ten days, I migrated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/removing-deprecated-api-compilation-warnings.html">
+The Building Coder samples</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+ADN training labs</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/the-adn-sample-adnrme-for-revit-mep-2014.html">
+MEP</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/adn-training-material-for-revit-structure-2014.html">
+Structural</a> sample material from Revit 2013 to 2014.
+
+<p>In all of these migrations, I lamented the processor architecture mismatch warning MSB3270 saying
+
+<i>There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=x86", "AMD64". This mismatch may cause runtime failures. Please consider changing the targeted processor architecture of your project through the Configuration Manager so as to align the processor architectures between your project and references, or take a dependency on references with a processor architecture that matches the targeted processor architecture of your project.</i></p>
+
+<p>This behaviour is in new in .NET 4.5 and meant to be "helpful",
+
+<a href="http://connect.microsoft.com/VisualStudio/feedback/details/759796/mismatch-between-the-processor-architecture-of-the-project-being-built-msil-and-the-processor-architecture-of-the-reference">
+according to Microsoft</a>.
+
+Unfortunately, it is not all that helpful for us Revit add-in developers.
+
+<p>Of course, there is some level of "danger" if you reference an architecture-specific DLL with an "AnyCPU" one.
+But that's exactly what Revit provides in offering a .NET API to its native codebase.
+
+<p>Here are a couple of possibilities how the owner of an add-in project can deal with this warning:</p>
+
+<ol>
+<li>Change it to be 32-bit or 64-bit specific. This is not an option for samples where they should build against either architecture, or for add-ins which are intended to work anywhere in Revit.</li>
+
+<li>Use the workaround described in the link,
+
+<a href="http://connect.microsoft.com/VisualStudio/feedback/details/759796/mismatch-between-the-processor-architecture-of-the-project-being-built-msil-and-the-processor-architecture-of-the-reference">
+setting ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch=false</a>.
+
+This can be done either by adding a property into your project file, or by setting an environment variable, or by using /p if you're running msbuild.exe. </li>
+
+<li>Ignore it.</li>
+</ol>
+
+<p>Here is
+
+<a href="http://andypottsblog.blogspot.ch/2012/08/installing-net-45-or-vsnet-2012-causes.html">Andrew Potts' take on the issue</a>.</p>
+
+<p>For The Building Coder samples, I am aiming for option 2, setting the following property in the project file to turn the warning off:</p>
+
+<pre class="prettyprint">
+&lt;PropertyGroup&gt;
+  &lt;ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;
+    None
+  &lt;/ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;
+&lt;/PropertyGroup&gt;
+</pre>
+
+<p>I did not see any hint on how to add this to the project file through the Visual Studio IDE, so I simply edited BuildingCoder.csproj as a text file using Notepad and added the lines above as a new property group just above all existing ones.</p>
+
+<p>It works fine, the offending warning is no  longer shown, and I am down to just the
+
+<a href="zip/bc_migr_2014_i.txt">
+two expected warnings</a> about
+
+use of the obsolete TitleBlocks property and FindReferencesWithContextByDirection method.</p>
+
+<p>Here is the updated
+
+<a href="zip/bc_14_100_4.zip">
+version 2014.0.100.4</a> of
+
+The Building Coder samples, in case you would like examine the resulting project file yourself directly.</p>
+
+
+<!-- 08456533 [press Escape key event] -->
+
+<a name="2"></a>
+
+<h4>Using a Windows Keyboard Hook to Handle Keys in a Revit Add-in</h4>
+
+<p>My fellow ADN DevTech engineer
+
+<a href="http://adndevblog.typepad.com/aec/augusto-goncalves.html">Augusto Goncalves</a>
+
+just published a nice sample showing how to
+
+<a href="http://adndevblog.typepad.com/aec/2013/06/capture-escape-key-on-revit.html">capture the Escape key</a>,
+
+or any other keyboard interaction, for that matter, by setting a Windows hook using the Win32 SetWindowsHookEx API method in the add-in OnStartup and OnShutdown calls.
+
+<p>It is actually a follow-up of a previous post by
+
+<a href="http://adndevblog.typepad.com/manufacturing/xiaodong-liang.html">Xiaodong Liang</a>
+
+for handling the Tab, Enter and Escape keys in a modeless form displayed by an
+
+<a href="http://adndevblog.typepad.com/manufacturing/2012/08/tab-key-not-working-in-modeless-form-displayed-by-add-in.html">
+Inventor add-in</a>.</p>
+
+<p>This kind of interaction can be useful e.g. to control or interrupt a long Revit process, either using input from a modeless form or just a keyboard hit with no form at all being displayed.</p>
+
+<p>Thank you Augusto for this useful hint!</p>

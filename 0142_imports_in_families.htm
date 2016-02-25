@@ -1,0 +1,333 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Imports in Families</h3>
+
+<p>I will have left on vacation once again by the time this is posted.
+In case you  wonder why I am on vacation so much, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/back-again.html">
+trip to Italy</a>
+
+in March and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/more-questions.html">
+wonderful experiences</a>
+
+I had there were actually to use up last year's contingent.
+Now I am getting started on this years', going off on a climbing and driving trip to southern France with my two sons Christopher and Cornelius, especially to the 
+
+<a href="http://en.wikipedia.org/wiki/Provence">
+Provence</a>
+
+and 
+
+<a href="http://en.wikipedia.org/wiki/Avignon">
+Avignon</a>
+
+to visit my mother, sister and nephew.
+So I will be posting a bit less or not at all for the coming two weeks.</p>
+
+<p>Before leaving, though, here is an interesting and practically oriented question by my colleague Martin Schmid of Autodesk.
+I wrote a new command for The Building Coder samples to answer it, which may even be useful for some in everyday life.
+Martin is an experienced AutoCAD MEP and Revit MEP expert and application engineer and helped me a lot with the preparation of the
+
+<a href="http://au.autodesk.com/?nd=class&session_id=2658">
+Revit MEP API class</a>
+
+at Autodesk University.
+
+<p><strong>Question:</strong>
+How hard do you think it would be to put together a quick bit of code that would:
+
+<ol type="a">
+<li>Iterate over all family definitions in a project.
+<li>For each family definition, identify if there are any ‘import symbols’, i.e., imported DWG, SAT, DXF and other non-native Revit geometry?
+</ol>
+
+<p>The reason I ask is that performance is degraded if very complex geometry is imported.
+Some complaints about performance were caused by such complex imported geometry.
+
+<p>I have an example demonstrating slow graphics generation in a mechanical view with an ‘offending’ family.
+It takes more than 30 seconds to zoom in on the area with the ‘bad’ family.
+In the family editor, one can see that there is an imported DXF symbol at that location.
+If you return to the project and delete the offending family instances, the zoom is nearly instantaneous.
+
+<p>Unfortunately, it is difficult to isolate these family instances.
+I am hoping there is a simple way to check families using the API, instead of the rote manual inspection method I have relied on so far.
+
+<p>Do you think you could bang something together on this?
+I’ve got another large customer dataset to wade through, and was hoping for some help!</p>
+
+<p><strong>Answer:</strong>
+This is not at all hard to do.
+Here is a description of an algorithm that achieves what you need:</p>
+
+<ul>
+<li>Select all family instances.
+<li>For each instance, open the corresponding family definition.
+<li>Within the family definition, list all imported symbols.
+</ul>
+
+<p>We could also select the families themselves directly, without going over the instances first.
+I chose not to do so in the code presented below, because then we have to deal with various built-in families that are not actually used and we are not interested in anyway.
+
+<p>Here is the approach I have taken in more detail.
+I added an additional step to ensure every family is processed only once, even if multiple family instances refer to it.
+To achieve this, I create a dictionary mapping the family name to the family, and insert the families used by the family instances only if not already present.
+This way, I can later also process the families in alphabetical order, to make it easier to analyse the report produced.
+In-place families cannot be opened for editing, so we need to skip those.
+I am currently not aware of any way to examine their contents.
+Here are the detailed steps:</p>
+
+<ul>
+<li>Select all family instances.
+<li>For each instance, determine its family.
+<li>Add an entry to the family dictionary, if not already present.
+<li>Sort the family dictionary keys.
+<li>Open each non-in-place family and search for ImportInstance elements.
+<li>List the total count and symbol names of all import instances found.
+</ul>
+
+<p>I added a new command class CmdImportsInFamilies to implement this functionality.
+Here is the source code of its Execute method:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; instances = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ),
+&nbsp; &nbsp; instances );
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; families
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> i <span class="blue">in</span> instances )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = i.Symbol.Family;
+&nbsp; &nbsp; <span class="blue">if</span>( !families.ContainsKey( family.Name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; families[family.Name] = family;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; families.Keys );
+&nbsp;
+&nbsp; keys.Sort();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> key <span class="blue">in</span> keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = families[key];
+&nbsp; &nbsp; <span class="blue">if</span>( family.IsInPlace )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Family '{0}' is in-place.&quot;</span>, key );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> fdoc = doc.EditFamily( family );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; imports = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; &nbsp; fdoc.get_Elements( <span class="blue">typeof</span>( <span class="teal">ImportInstance</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; imports );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = imports.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Family '{0}' contains {1} import instance{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; key, n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> ( 0 &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ImportInstance</span> i <span class="blue">in</span> imports )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; '{0}'&quot;</span>, i.ObjectType.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>As usual, we return Failed when not modifying the database in any way, so that Revit understands that no changes were made to the project and no dirty flags need to be set.</p>
+
+<p>I expect that this approach may need some tweaking to achieve the exact functionality you require, but I hope it provides a useful starting point at least.</p>
+
+<p>After some initial testing, Martin came up with two requests for improvement:</p>
+
+<ul>
+<li>One thing I’m wondering about is that a family can have families nested in it. Have you considered that?</li>
+<li>In the attached project, the ‘Duplex Receptacle’ family has a nested ‘Annotation Symbol’ called ‘Duplex Annotation’.
+That ‘Duplex Annotation’ has a DWG nested in it.
+How can one inspect the annotation symbol for imports?</li>
+</ul>
+
+<p>The initial solution above does indeed not take into account nested families.</p>
+
+<p>Regarding the annotation symbols, we can in fact access the families used by them by making use of the property sequence AnnotationSymbol &gt; AsFamilyInstance &gt; Symbol &gt; Family and then proceeding in the same way as for standard family symbols.
+
+<p>In order to adapt the code to support these two enhancements, I implemented two separate helper methods:</p>
+
+<ul>
+<li><strong>GetFamilies</strong> to retrieve all families used by the family instances and annotation symbols in the given document and return a dictionary mapping the family name to the corresponding family object.</li>
+<li><strong>ListImportsAndSearchForMore</strong> to list all import instances in all the given families, retrieve nested families within them, and recursively search in them as well.
+</ul>
+
+<p>Here is the source code for GetFamilies, taking an input document argument and returning a dictionary as described:</p>
+
+<pre class="code">
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; GetFamilies( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; families
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; instances = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ),
+&nbsp; &nbsp; instances );
+&nbsp;
+&nbsp; <span class="blue">foreach</span> ( <span class="teal">FamilyInstance</span> i <span class="blue">in</span> instances )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = i.Symbol.Family;
+&nbsp; &nbsp; <span class="blue">if</span> ( !families.ContainsKey( family.Name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; families[family.Name] = family;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; annotations = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">AnnotationSymbol</span> ),
+&nbsp; &nbsp; annotations );
+&nbsp;
+&nbsp; <span class="blue">foreach</span> ( <span class="teal">AnnotationSymbol</span> a <span class="blue">in</span> annotations )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = a.AsFamilyInstance.Symbol.Family;
+&nbsp; &nbsp; <span class="blue">if</span> ( !families.ContainsKey( family.Name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; families[family.Name] = family;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> families;
+}
+</pre>
+
+<p>The two loops collect all family instances and annotation symbols and determine their families, respectively.</p>
+
+<p>Here is the source code for ListImportsAndSearchForMore. Besides the input document argument and the dictionary of all families to list and explore further recursively, it also takes an argument indicating the recursion level, which is used to indent the output report appropriately according to the nesting level of the nested families:</p>
+
+<pre class="code">
+<span class="blue">void</span> ListImportsAndSearchForMore(
+&nbsp; <span class="blue">int</span> recursionLevel,
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; families )
+{
+&nbsp; <span class="blue">string</span> indent
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="blue">string</span>( <span class="maroon">' '</span>, 2 * recursionLevel );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; families.Keys );
+&nbsp;
+&nbsp; keys.Sort();
+&nbsp;
+&nbsp; <span class="blue">foreach</span> ( <span class="blue">string</span> key <span class="blue">in</span> keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = families[key];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span> ( family.IsInPlace )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( indent
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Family '{0}' is in-place.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; key );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> fdoc = doc.EditFamily( family );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; imports = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; &nbsp; fdoc.get_Elements( <span class="blue">typeof</span>( <span class="teal">ImportInstance</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; imports );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = imports.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( indent
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Family '{0}' contains {1} import instance{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; key, n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> ( 0 &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span> ( <span class="teal">ImportInstance</span> i <span class="blue">in</span> imports )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( indent
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp; '{0}'&quot;</span>, i.ObjectType.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; nestedFamilies
+&nbsp; &nbsp; &nbsp; &nbsp; = GetFamilies( fdoc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ListImportsAndSearchForMore(
+&nbsp; &nbsp; &nbsp; &nbsp; recursionLevel + 1, fdoc, nestedFamilies );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Using these two helper functions, the source code for the mainline of the Execute method is reduced to very little:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Family</span>&gt; families
+&nbsp; &nbsp; = GetFamilies( doc );
+&nbsp;
+&nbsp; ListImportsAndSearchForMore( 0, doc, families );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>Running this in a project containing one family with an import symbol and another family with nested families within it produces the following output in the debug output window displayed by Debug &gt; Windows &gt; Output:</p>
+
+<pre>
+Family 'Family1' contains 1 import instance:
+  'xr.dwg'
+Family 'myFamily3' contains 0 import instances.
+  Family 'M_Rectangular Column' contains 0 import instances.
+  Family 'myFamily1' contains 0 import instances.
+    Family 'M_Rectangular Column' contains 0 import instances.
+  Family 'myFamily2' contains 0 import instances.
+    Family 'M_Rectangular Column' contains 0 import instances.
+</pre>
+
+<p>In another project containing an annotation symbol with a nested family with an import symbol, it produces the following:</p>
+
+<pre>
+Family 'Duplex Receptacle' contains 0 import instances.
+  Family 'Duplex Annotation' contains 1 import instance:
+    'star.dwg'
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11033.zip">
+version 1.1.0.33</a>
+
+of the complete Visual Studio solution with the new command.</p>

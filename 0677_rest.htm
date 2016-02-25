@@ -1,0 +1,135 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit Server REST API</h3>
+
+<p>I am currently in Paris giving a Revit API training, last thing before taking off for Autodesk University end of next week.
+Meanwhile, one little item which just dropped into my mailbox is the call to vote on the AUGI wish list:
+
+<h4>AUGI Wish List</h4>
+
+<p>AUGI, the 
+
+<a href="http://www.augi.com">
+Autodesk User Group International</a>, 
+
+needs you to choose your top ten wish list items to help define the final Top Ten to be presented to Autodesk during the AUGI Annual Meeting. You can only vote on products you use, defined in your membership profile. The vote concerns the following products: AutoCAD, AutoCAD Civil 3D, Inventor, Revit Architecture, Revit MEP, and Revit Structure. AUGI needs you to vote on the wish lists for those six. If you use any of them, please log into your AUGI account to see the lists and then visit <a href="http://www.augi.com/wishlist">www.augi.com/wishlist</a> to vote. Voting will close on 01:00:00 a.m. GMT, Tuesday November 29, 2011.
+
+
+<a name="2"></a>
+
+<h4>Revit Server REST API</h4>
+
+<p>Another interesting item is the following article by my colleague Adam Nagy, an introduction to an important Revit 2012 API feature that I have not mentioned here at all yet, the Revit Server REST API:
+
+<p>Autodesk Revit Server is an application that allows Revit users to use worksharing features over the wide area network (WAN). 
+Typically, we place one central server over WAN and multiple local servers over local area network (LAN) which connect to the central server. 
+With such an environment, multiple Revit users can work together more seamlessly on a single Revit model beyond the geographical boundaries. 
+Revit Server is a part of Revit install since the 2012 versions of Revit software products. 
+You can find the full documentation about Revit Server on WikiHelp.
+
+<p>Revit Server provides a public API based on 
+
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">
+REST</a> or 
+
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">
+REpresentational State Transfer</a>. 
+
+You can use the API for server administration tasks, such as querying information about a server, a specific folder, history and thumbnail of a specific model. You can also manage data on a server, such as locking/unlocking the server, and copying/renaming/deleting a folder and a model.
+
+<h4>REST</h4>
+
+<p>Since the Revit Server API is REST based, it is a good idea to familiarize yourself with the REST concept first. 
+REST is a style of software architecture for distributed hypermedia systems such as the World Wide Web.  
+If you are not familiar with REST, you can find a good introduction to it in this
+
+<a href="http://www.infoq.com/articles/rest-introduction">
+Brief Introduction to REST</a>.
+
+<h4>Getting Started with Revit Server REST API</h4>
+
+<p>You can find the detailed full documentation about the Revit Server REST API under the Revit SDK folder:
+
+<ul>
+<li>[SDK folder]\Revit Server SDK\Revit Server REST API Reference.pdf
+</ul>
+
+<p>In order to call a Revit Server REST API function, you need to create an HTTP request. You can do that in various ways in .NET, e.g. by creating a System.Net.Webrequest:
+
+<pre class="code">
+WebRequest request =
+  WebRequest.Create(
+    "http://<host>/RevitServerAdminRESTService"
+    + "/AdminRESTService.svc" );
+</pre>
+
+<p>You simply have to specify the URI address that the request is targeting. 
+Then you can specify the type of request (GET, PUT, POST, etc).
+
+<pre class="code">
+  request.Method = "GET";
+</pre>
+
+<p>As the API reference points it out, you also need to provide information in the request header.  
+You can add the necessary name-value pairs to the it like this:
+
+<pre class="code">
+  request.Headers.Add( "User-Name", "Adam" );
+</pre>
+
+<p>You also have to add a command string that will specify what information you are requesting. You need to append it to the service URI separated by a slash character '/':
+
+<pre class="code">
+  WebRequest.Create(
+    "http://<host>/RevitServerAdminRESTService"
+    + "/AdminRESTService.svc/serverProperties" );
+</pre>
+
+<p>If you need to get information from a specific folder or file, you also need to specify the path to it with each folder-subfolder separated by a vertical bar character '|'. 
+The root folder is represented by '|':
+
+<pre class="code">
+  WebRequest.Create(
+    "http://<host>/RevitServerAdminRESTService"
+    + "/AdminRESTService.svc/|Folder|SubFolder|File/history");
+</pre>
+
+<p>Depending on the actual request, the result will be different. But each time, it is organized using the
+
+<a href="http://en.wikipedia.org/wiki/JSON">
+json</a> or 
+
+<a href="http://en.wikipedia.org/wiki/JSON">
+JavaScript Object Notation</a> or format. 
+
+You can convert the json data to xml format in .NET and then read it using XmlDictionaryReader:
+
+<pre class="code">
+  XmlDictionaryReader jsonReader =
+    JsonReaderWriterFactory.CreateJsonReader(
+      request.GetResponse().GetResponseStream(), 
+      quotas );
+</pre>
+
+<p>A complete sample project using this technology can be found on the ADN site under
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=16739482&linkID=4901650">
+Revit Server 2012 REST API Samples and Documents</a>.
+
+It is a getting started sample demonstrating the usage of the Revit Server REST API to connect to a Revit Server and query its content:</p>
+
+<center>
+<img src="img/rest_viewer_sample.png" alt="Revit Server Viewer sample project"/>
+</center>
+
+<p>Here is a 
+
+<a href="zip/revitserverviewer.zip">copy for non-ADN-members</a>.
+
+ADN members are allowed to access it as well  :-)
+
+<p>I hope you'll have fun with this new technology.
+
+<p>Many thanks to Adam for this overview and sample code!

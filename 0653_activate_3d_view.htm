@@ -1,0 +1,119 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1272025 [Change active view] -->
+
+<h3>Activate a 3D View</h3>
+
+<p>Here is a simple question on making use of the ActiveView setter, which is new in Revit 2012:
+
+<p><strong>Question:</strong> I heard that Revit 2012 exposes an API to change the active view.
+
+<p>I would like to change the active view to 3D with the Detail Level set to Fine and Visual Style set to Realistic. 
+
+<p>Could you please show me the correct way to change the active view to the one I want?
+
+<p><strong>Answer:</strong> I already discussed 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/set-the-visual-style-of-a-view.html">
+setting the visual style for a view</a>,
+
+so we can make use of that here.
+
+<p>To answer the rest of your query, I created a little sample application for you which says (and does) it all.
+
+<p>It is short and sweet, so I can present it here in its entire glory; 
+first, here is a helper method Get3dView to retrieve a suitable 3D view using a filtered element collector:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve a suitable 3D view from document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">View3D</span> Get3dView( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View3D</span> v <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != v,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;never expected a null view to be returned&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; from filtered element collector&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Skip view template here because view </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// templates are invisible in project </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// browser</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !v.IsTemplate )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> v;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>The external command Execute mainline makes use of this method to determine and activate the 3D view to use and set up the Detail Level and Visual Style parameters:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find a suitable 3D view:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view = Get3dView( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Sorry, no suitable 3D view found&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Must set view before starting the transaction,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// otherwise an exception is thrown saying </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// &quot;Cannot change the active view of a modifiable </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// document (with a transaction currently open).&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uidoc.ActiveView = view;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Must start a transaction in order to set the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// parameters on the view:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Change to 3D view&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; view.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .VIEW_DETAIL_LEVEL ).Set( 3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; view.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .MODEL_GRAPHICS_STYLE ).Set( 6 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The one and only slightly tricky part is that writing to the ActiveView property to switch the view requires no transaction to be active, whereas setting the parameters does.
+
+<p>For completeness sake, here is 
+
+<a href="zip/ChangeTo3dView.zip">ChangeTo3dView.zip</a> containing 
+
+the entire project, source code and add-in manifest file for this command.

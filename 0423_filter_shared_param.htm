@@ -1,0 +1,99 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1261539 [ElementParameterFilter with Shared Parameter] -->
+
+<h3>ElementParameterFilter with a Shared Parameter</h3>
+
+<p>I thought I had already covered everything I could on filtered element collectors, but far failed.
+Here is a pretty obvious question that just came up on using an ElementParameterFilter with a shared parameter:
+
+<p><strong>Question:</strong> I have successfully used element parameter filter to find elements with a particular parameter value, using 'built-in' parameters, such as BuiltInParameter.ELEM_ROOM_NUMBER.
+
+<p>What I want to do now, is to use a similar filter to find all elements that have a value for a shared parameter.  For example:
+
+<p>I have a shared parameter called "ROOM_LINK" and I want to find any elements in the model that have a value for ROOM_LINK.
+
+<p>In this case, ROOM_LINK is applicable to Rooms and Generic Models.
+
+<p>If it is necessary or helpful, this could be done with a non-shared Project parameter, but I think using a shared parameter is more appropriate.
+
+<p>Do you have a little sample of code to show how to use a shared parameter (or other non-built-in parameter) in a filter?
+
+<p><strong>Answer:</strong> Congratulations on your successful use of the element parameter filter.
+
+<p>As you probably noticed, I already published a couple of discussions of related topics, and two of these are specifically on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html">
+parameter filters</a> with an appended 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">
+little correction</a>.
+
+The parameter filter post includes a list of pointers to other filtered element collector examples.
+
+<p>When using a parameter filter, you have to set up the ParameterValueProvider.
+
+<p>Its constructor always takes an element id as an argument.
+
+<p>In the samples I discussed so far, this element id argument was defined by converting a built-in parameter enumeration value.
+
+<p>The element id can however also be the real element id of any given real parameter, which can be retrieved by any of the normal means, e.g. by display name like in the following code:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ParamFilterTest</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> wall = uidoc.Selection.PickObject( 
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.UI.Selection.<span class="teal">ObjectType</span>.Element )
+&nbsp; &nbsp; &nbsp; .Element <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> parameter = wall.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unconnected Height&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterValueProvider</span> pvp 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( parameter.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterNumericRuleEvaluator</span> fnrv 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterRule</span> fRule 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterDoubleRule</span>( pvp, fnrv, 20, 1E-6 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> filter 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( fRule );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find walls with unconnected height </span>
+&nbsp; &nbsp; <span class="green">// less than or equal to 20: </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> lessOrEqualFilter 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( fRule, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; lessOrEqualFounds 
+&nbsp; &nbsp; &nbsp; = collector.WherePasses( lessOrEqualFilter )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Walls )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, <span class="maroon">&quot;Walls found: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + lessOrEqualFounds.Count );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Retrieving the parameter by display name should work like this for a shared parameter as well.

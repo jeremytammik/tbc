@@ -1,0 +1,156 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256898 ["Beam Material" parameter NULL for familyinstance] -->
+
+<h3>Ensure Valid Material is Set</h3>
+
+<p>In some of the very early posts, we explored how to access the materials assigned to an individual
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/element-materials.html">element</a>, a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/family-instance-materials.html">family instance</a>, or a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/wall-solid-versus-face-materials.html">wall</a>.
+
+However, we never presented anything to handle materials set at the category level.
+Here is recent case handled by my colleague Saikat Bhattacharya on how to ensure that the material of a beam or column is set to a valid value, either at the element or category level:
+
+<p><strong>Question:</strong> I am trying to extract the material associated with a framing or column family instance using the following code:
+
+<pre class="code">
+<span class="green">''' </span><span class="gray">&lt;summary&gt;</span>
+<span class="green">''' Return the element id of the material for a given RST element.</span>
+<span class="green">''' </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">Shared</span> <span class="blue">Function</span> MaterialId( _
+&nbsp; <span class="blue">ByRef</span> familyComponent <span class="blue">As</span> FamilyInstance, _
+&nbsp; <span class="blue">ByRef</span> revit <span class="blue">As</span> Application) <span class="blue">As</span> <span class="blue">String</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> Document = revit.ActiveDocument
+&nbsp;
+&nbsp; <span class="blue">Dim</span> oParameter <span class="blue">As</span> Parameter
+&nbsp; <span class="blue">Dim</span> o <span class="blue">As</span> <span class="blue">Object</span>
+&nbsp; <span class="blue">Dim</span> uid <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> o <span class="blue">In</span> familyComponent.Parameters
+&nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> <span class="blue">TypeOf</span> o <span class="blue">Is</span> Parameter <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Continue</span> <span class="blue">For</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; oParameter = <span class="blue">DirectCast</span>(o, Parameter)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> parameterName <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; &nbsp; = oParameter.Definition.Name
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> (parameterName = <span class="maroon">&quot;Column Material&quot;</span> <span class="blue">Or</span> _
+&nbsp; &nbsp; &nbsp; parameterName = <span class="maroon">&quot;Beam Material&quot;</span>) <span class="blue">And</span> _
+&nbsp; &nbsp; &nbsp; oParameter.StorageType = StorageType.ElementId <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> e <span class="blue">As</span> Element _
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.Element(oParameter.AsElementId())
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> e <span class="blue">Is</span> Material <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; uid = e.UniqueId
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span> o
+&nbsp;
+&nbsp; Debug.Assert(<span class="blue">Not</span> <span class="blue">String</span>.IsNullOrEmpty(uid))
+&nbsp;
+&nbsp; <span class="blue">Return</span> uid
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+This code works fine with the Revit Structure 2009 API but not with Revit Structure 2010.
+I don't see any explanation for this change in the 'API changes and Additions' document.
+I also notice that if I run the snoop tool on a family instance and select the 'Beam Material' parameter in the ParameterSet, I see a null value in some cases in 2010 whereas there is a valid value in 2009.
+The code I used is similar to the Materials SDK sample.
+
+<p><strong>Answer:</strong> I did a quick check by creating a set of columns and framing instances in RST 2010.
+Using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">RvtMgdDbg</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2009/10/rvtmgddbg-for-revit-2010.html">for 2010</a>)
+
+snoop tool, I was able to see the material assigned to the family instances.
+It does seem to work in 2010 in most circumstances.
+However in some models, a null material value is returned.
+This has to do with the beam or column material being set to 'By Category' in the element properties dialogue.
+So we can refine your question to the following:
+
+<ul>
+<li>How do I obtain a family instance element material through the API if its material is set to 'By Category'?
+<li>How can I set the material for the entire category through the API?
+</ul>
+
+<p>Looking at a specific model in more detail, I see that you can check whether the ByCategory material information is null though the user interface by looking at Manage &gt; Project Settings &gt; Settings &gt; Object styles.
+In this dialogue, you can see that the material information for structural columns and beams can be null.
+In this case, we will see a null value using RvtMgdDbg even though at the instance level it is set to ByCategory.
+
+<p>I implemented the following code to help answer both your questions.
+It returns the family instance element material, either for the given instance or the entire category.
+If no element material is specified and the ByCategory material information is null, it creates a new material named GoodConditionMat on the fly and assigns it at the category level:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Material</span> GetMaterial(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">FamilyInstance</span> fi )
+{
+&nbsp; <span class="teal">Material</span> material = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> p <span class="blue">in</span> fi.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Definition</span> def = p.Definition;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// the material is stored as element id:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( p.StorageType == <span class="teal">StorageType</span>.ElementId
+&nbsp; &nbsp; &nbsp; &amp;&amp; def.ParameterGroup == <span class="teal">BuiltInParameterGroup</span>.PG_MATERIALS
+&nbsp; &nbsp; &nbsp; &amp;&amp; def.ParameterType == <span class="teal">ParameterType</span>.Material )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> materialId = p.AsElementId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( -1 == materialId.Value )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// invalid element id, so we assume </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the material is &quot;By Category&quot;:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi.Category )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; material = fi.Category.Material;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == material )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MaterialOther</span> mat
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.Settings.Materials.AddOther(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;GoodConditionMat&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; mat.Color = <span class="blue">new</span> <span class="teal">Color</span>( 255, 0, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fi.Category.Material = mat;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; material = fi.Category.Material;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; material = doc.Settings.Materials.get_Item(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; materialId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> material;
+}
+</pre>
+
+<p>Once this code is executed, you can see that the new material is now assigned at category level too:</p>
+
+<center>
+<img src="img/category_material.png" alt="Category material"/>
+</center>
+
+<p>Many thanks to Saikat for this solution!

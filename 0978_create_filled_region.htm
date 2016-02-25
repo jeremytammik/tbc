@@ -1,0 +1,72 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 08185782 [Revit API : création de zones de masquage] -->
+
+<h3>Create a Filled Region to use as a Mask</h3>
+
+<p>I am off in the mountains again today, after a long break due to bad weather and too many other activities.</p>
+
+<p>Meanwhile, here is a pretty old item that has been hanging around in my to-do list for much too long, so let's get it out there to you:</p>
+
+<p><strong>Question:</strong> How can I programmatically create a masked region?</p>
+
+<p><strong>Answer:</strong> I am sorry to say you currently cannot.
+
+<p>Hoewever, one of the API features added in Revit 2013 was the abiility to create a filled region.
+
+<p>The FilledRegion class was extended to offer the ability to create a new filled region, get its boundaries, and apply a linestyle to all its boundary segments.
+
+<p>So, while there is no straightforward method to create a mask region, the closest we can get is by creating a filled region using the FilledRegion.Create method.
+However, a filled region is not the same object as a mask region.
+A filled region has a fill pattern, and its type can be changed.
+The mask region type cannot be changed.
+If you set a filled region's fill pattern to a solid blank pattern, it will look like a mask region.
+
+<p>Here is a sample code fragment showing how to create a FilledRegion object:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> fillRegionTypes
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FilledRegionType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">FilledRegionType</span>&gt; myPatterns =
+&nbsp; &nbsp; &nbsp; <span class="blue">from</span> pattern <span class="blue">in</span> fillRegionTypes.Cast&lt;<span class="teal">FilledRegionType</span>&gt;()
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> pattern.Name.Equals( <span class="maroon">&quot;Diagonal Crosshatch&quot;</span> )
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> pattern;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FilledRegionType</span> frt <span class="blue">in</span> fillRegionTypes )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; profileloops
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] points = <span class="blue">new</span> <span class="teal">XYZ</span>[5];
+&nbsp; &nbsp; points[0] = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 0.0, 0.0 );
+&nbsp; &nbsp; points[1] = <span class="blue">new</span> <span class="teal">XYZ</span>( 10.0, 0.0, 0.0 );
+&nbsp; &nbsp; points[2] = <span class="blue">new</span> <span class="teal">XYZ</span>( 10.0, 10.0, 0.0 );
+&nbsp; &nbsp; points[3] = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 10.0, 0.0 );
+&nbsp; &nbsp; points[4] = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 0.0, 0.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveLoop</span> profileloop = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 4; i++ )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( points[i],
+&nbsp; &nbsp; &nbsp; &nbsp; points[i + 1] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; profileloop.Append( line );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; profileloops.Add( profileloop );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> activeViewId = doc.ActiveView.Id;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilledRegion</span> filledRegion = <span class="teal">FilledRegion</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, frt.Id, activeViewId, profileloops );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+</pre>
+
+<p>You could simulate the creation of a mask region by modifying this to find a filled region type whose fill pattern is blank.</p>

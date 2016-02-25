@@ -1,0 +1,147 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Volume Computation Enable</h3>
+
+<p>We discussed abstract 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/convex-hull-and-volume-computation.html">
+volume computation</a>
+
+of a convex hull or cloud of points last week.
+Revit can also compute certain volumes, of course, for instance the volume of rooms. 
+However, this functionality is not automatically enabled.
+To switch it on you need to set a certain toggle called VolumeComputationEnable on the document settings volume calculation options.
+Unfortunately, there is a slight issue with the API documentation on this property ...
+
+<p><strong>Question:</strong>
+When I try turn on the value of the VolumeComputationEnable property so I can export the volumes of rooms, the value doesn't change. 
+
+<p>This is the code that I use for modify this property:
+
+<pre>
+Dim revitapp As Autodesk.Revit.Application _
+  = revitCommandData.Application
+
+Dim activedoc As Autodesk.Revit.Document _ 
+  = revitapp.ActiveDocument
+
+activedoc.Settings.VolumeCalculationSetting _
+  .VolumeCalculationOptions.VolumeComputationEnable _
+  = True
+</pre>
+
+<p><strong>Answer:</strong>
+The code sample on the VolumeCalculationOptions.VolumeComputationEnable property in the Revit API help file does not work. It says that one can set the property using 
+
+<pre class="code">
+  doc.Settings.VolumeCalculationSetting
+    .VolumeCalculationOptions
+    .VolumeComputationEnable = true;
+</pre>
+
+<p>This code snippet will not work, because VolumeCalculationOptions is a value class and just returns information about the current status. Therefore you need to write it back to the VolumeCalculationSetting property to turn on the computation.
+One has to use something like this instead:
+
+<pre class="code">
+&nbsp; <span class="teal">VolumeCalculationOptions</span> options 
+&nbsp; &nbsp; = doc.Settings.VolumeCalculationSetting
+&nbsp; &nbsp; &nbsp; .VolumeCalculationOptions;
+&nbsp;
+&nbsp; options.VolumeComputationEnable = <span class="blue">true</span>;
+&nbsp;
+&nbsp; doc.Settings.VolumeCalculationSetting
+&nbsp; &nbsp; .VolumeCalculationOptions = options;
+</pre>
+
+<p>I copied the sample code from the API document and removed one line to create this little reporting method which does not modify anything:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> GetRoomDimensions( 
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="teal">Room</span> room )
+{
+&nbsp; <span class="blue">string</span> roominfo = <span class="maroon">&quot;\nRoom dimensions:&quot;</span>;
+&nbsp; roominfo += <span class="maroon">&quot;\nVolume: &quot;</span> + room.Volume;
+&nbsp; roominfo += <span class="maroon">&quot;\nArea: &quot;</span> + room.Area;
+&nbsp; roominfo += <span class="maroon">&quot;\nPerimeter: &quot;</span> + room.Perimeter;
+&nbsp; roominfo += <span class="maroon">&quot;\nUnbounded height: &quot;</span> 
+&nbsp; &nbsp; + room.UnboundedHeight;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( roominfo );
+}
+</pre>
+
+<p>Then I implemented the following external command to test it and verify that it works fine now:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">ElementSet</span> a = doc.Selection.Elements;
+&nbsp; <span class="teal">Room</span> room = <span class="blue">null</span>;
+&nbsp; <span class="blue">foreach</span> ( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span> ( e <span class="blue">is</span> <span class="teal">Room</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == room )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Please select a room.&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;VolumeComputationEnable = {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; (doc.Settings.VolumeCalculationSetting
+&nbsp; &nbsp; &nbsp; &nbsp; .VolumeCalculationOptions
+&nbsp; &nbsp; &nbsp; &nbsp; .VolumeComputationEnable
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;true&quot;</span> : <span class="maroon">&quot;false&quot;</span>) );
+&nbsp;
+&nbsp; &nbsp; GetRoomDimensions( doc, room );
+
+&nbsp; &nbsp; <span class="green">// turn on volume calculations:</span>
+
+&nbsp; &nbsp; <span class="teal">VolumeCalculationOptions</span> options 
+&nbsp; &nbsp; &nbsp; = doc.Settings.VolumeCalculationSetting
+&nbsp; &nbsp; &nbsp; &nbsp; .VolumeCalculationOptions;
+&nbsp;
+&nbsp; &nbsp; options.VolumeComputationEnable = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; doc.Settings.VolumeCalculationSetting
+&nbsp; &nbsp; &nbsp; .VolumeCalculationOptions = options;
+&nbsp;
+&nbsp; &nbsp; GetRoomDimensions( doc, room );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+}
+</pre>
+
+<p>Here is the log displayed in the debug output window after selecting a sample room and running this command:
+
+<pre>
+VolumeComputationEnable = false
+
+Room dimensions:
+Volume: 0
+Area: 73.6251472502946
+Perimeter: 36.745406824147
+Unbounded height: 13.1233595800525
+
+Room dimensions:
+Volume: 966.209281499929
+Area: 73.6251472502946
+Perimeter: 36.745406824147
+Unbounded height: 13.1233595800525
+</pre>

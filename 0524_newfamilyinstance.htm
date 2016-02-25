@@ -1,0 +1,91 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266242 [Family Insert Type] -->
+
+<h3>NewFamilyInstance Overloads</h3>
+
+<p>We have discussed a number of issues with finding the right one of the numerous overloads of the NewFamilyInstance method for placing instances of a specific family.
+Here is another question on this, which provides a welcome opportunity to summarise what we have looked at so far:
+
+<p><strong>Question:</strong> I have a case where I want to insert a series of families with a statement like this:
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyInstance</span> instance =
+&nbsp; &nbsp; documentProject.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; location, symbol,
+&nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+</pre>
+
+<p>This works fine as long as it is a simple family with an insertion point.  
+It doesn't work if the family is hosted or if the insertion requires two points.  
+How can I determine which type of insert the family requires?  
+
+<p><strong>Answer:</strong> You are absolutely right. 
+The NewFamilyInstance method has a number of overloads, and you need to select the correct one depending on various characteristics of the family you are inserting an instance from. 
+This is discussed in the developer guide in section 12.3.5 'Creating FamilyInstance Objects'. 
+The issue has also come up a number of times in the past here on the blog in the following situations:
+
+<!--
+094_insert_column.htm
+096_insert_beam.htm
+149_slanted_column.htm
+152_curved_beam.htm
+200_electrical_and_lighting.htm
+250_nested_family.htm
+289_insert_sprinkler.htm
+337_beam_requires_curve.htm
+388_regen_required.htm
+395_set_tag_type.htm
+412_beam_maker.htm
+428_flex_duct_start_tangent.htm
+450_place_detail_inst.htm
+471_place_site_component.htm > TestAllOverloads
+475_place_furniture.htm
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">Column</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html">Beam</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/creating-a-slanted-column.html">Slanted column</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/creating-a-curved-beam.html">Curved Beam</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/electrical-settings-and-lighting-fixtures.html">Lighting fixture</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">Nested family</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/insert-facehosted-sprinkler.html">Face hosted sprinkler</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/beam-requires-curve.html">All beams require a curve</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html">Regeneration after placement</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/set-tag-type.html">Door and door tag</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/beam-maker-using-a-void-extrusion-to-cut.html">Beam with a void</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/08/flex-duct-start-tangent.html">Flex duct and fitting</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/place-detail-instance.html">Detail instance</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-site-component.html">Site component</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-furniture-instance.html">Furniture</a>
+</ul>
+
+<p>The second-last post includes the definition of a method named 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-site-component.html">
+TestAllOverloads</a> which 
+
+enables you to try out all possible overloads of the NewFamilyInstance method to see which one works best for a specific family.
+
+<p>The best hint of all was provided 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/newfamilyinstance-overloads.html?cid=6a00e553e1689788330167650dbed9970b#comment-6a00e553e1689788330167650dbed9970b">
+below</a> by 
+
+<a href="http://www.youtube.com/user/rolandohijar/videos">
+Rolando Hijar</a> after 
+
+the initial publication of this.
+He points out that the hosting behavior of a family can be determined by accessing the built-in parameter FAMILY_HOSTING_BEHAVIOR:
+
+<pre class="code">
+  int hosttype 
+    = family.get_Parameter(
+      BuiltInParameter.FAMILY_HOSTING_BEHAVIOR )
+      .AsInteger();
+</pre>
+
+<p>I hope these examples give you enough to get started with, at least!

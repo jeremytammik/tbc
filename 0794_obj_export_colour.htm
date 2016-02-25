@@ -1,0 +1,114 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>OBJ Model Exporter with Colours</h3>
+
+<p>I discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html">
+first take of my OBJ exporter</a> last
+
+week, still lacking colour support.
+
+<p>Adding colours turned out to be more complex than I had expected, and the result as it currently stands includes a couple of kludges, I'm afraid.
+
+<p>Still, for a quick hack it does a decent job of getting a rough idea across.
+For instance, here is the result of exporting the basic sample project rac_basic_sample_project.rvt included in the Revit product distribution:</p>
+
+<center>
+<img src="img/obj_export_basic_model_inst.png" alt="Basic sample model in OBJ"/>
+</center>
+
+<p>The resulting OBJ file size is 363 KB, and here is the element count for that export operation:</p>
+
+<center>
+<img src="img/obj_export_basic_model_inst_msg.png" alt="Basic sample model element counts"/>
+</center>
+
+<p>I added code to access the element category's material and colour, as well as the material and colour of an individual face of the solid, in case it has been overridden.
+I also added support for a default colour, in case my algorithm produced nothing useful.
+
+<p>Some of the places I looked to learn about OBJ materials were the
+
+<a href="http://www.cs.clemson.edu/~dhouse/courses/405/docs/brief-obj-file-format.html">
+OBJ file format</a>, a 
+
+<a href="http://local.wasp.uwa.edu.au/~pbourke/dataformats/mtl">
+very detailed MTL format</a> description and a 
+
+<a href="http://people.sc.fsu.edu/~jburkardt/data/mtl/mtl.html">
+shorter one</a> including pointers to sample MTL files.
+
+Unfortunately, the specific link of greatest interest to me, to definitions of simple primary color materials, does not work.
+
+<p>Just like the vertices, the colours also need to be added to a lookup table in order to avoid duplication.
+For an OBJ model, colours are defined by materials, which are specified in a separate material library file with the extension MTL, so the exported no created two parallel files.
+For simplicity's sake, I just defined the ambient and diffuse colours for my materials and named them using the hexadecimal representation of the Revit colour byte values.
+The first couple of entries in my material file look like this:
+
+<pre>
+newmtl C0C0C0
+Ka 0.75 0.75 0.75
+Kd 0.75 0.75 0.75
+newmtl DBDBDB
+Ka 0.85546875 0.85546875 0.85546875
+Kd 0.85546875 0.85546875 0.85546875
+newmtl 453B2C
+Ka 0.26953125 0.171875 0.23046875
+Kd 0.26953125 0.171875 0.23046875
+newmtl 7F7F7F
+Ka 0.49609375 0.49609375 0.49609375
+Kd 0.49609375 0.49609375 0.49609375
+newmtl 000000
+Ka 0 0 0
+Kd 0 0 0
+newmtl A7CAE4
+Ka 0.65234375 0.890625 0.7890625
+Kd 0.65234375 0.890625 0.7890625
+newmtl DCCBAA
+Ka 0.859375 0.6640625 0.79296875
+Kd 0.859375 0.6640625 0.79296875
+</pre>
+
+<p>In the OBJ file, I start out by specifying the material library with this initial statement:
+
+<pre>
+mtllib jbasic2.mtl
+</pre>
+
+<p>The usemtl statement specifies which material to use, followed by faces referring to the vertex indices:
+
+<pre>
+usemtl DBDBDB
+f 210 212 310
+f 310 212 311
+f 311 312 313
+f 311 313 310
+f 314 315 211
+f 211 209 314
+</pre>
+
+<p>Here is 
+
+<a href="zip/ObjExport.zip">
+ObjExport.zip</a> including
+
+the entire source code, Visual Studio solution and add-in manifest for the OBJ exporter in its current state.
+
+<p>I would be glad to hear from you if you find this useful, and even more so if you discover possible enhancements to it.
+
+<p>The next step will be to explore how to make the model view ubiquitously available to mobile devices.
+
+<p>One tool for cloud-based access to 3D content that I just heard of is 
+
+<a href="http://sunglass.io">
+Sunglass</a>,
+
+supporting integration of desktop CAD and storage utilities such as Dropbox and, especially interesting for developers, including API access.
+
+<p><strong>Addendum:</strong> Do not use the obsolete ObjExport code provided above, since it does not handle multiple solids in the way required for a valid and complete export.
+Please refer to the updated version 2 supporting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-multiple-solid-support.html">
+multiple solids per element</a> instead.

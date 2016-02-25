@@ -1,0 +1,109 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Convex Hull and Volume Computation</h3>
+
+<p>Max raised an interesting question in a comment on the discussion on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+calculation of 2D polygon areas</a>:</p>
+
+<p><strong>Question:</strong>
+If I have an array of 3d points, how can I do to get volume information?</p>
+
+<p><strong>Answer:</strong>
+The answer is maybe not quite as easy as you expected.
+To calculate that volume, you have to solve two tasks:</p>
+
+<ul>
+<li>Determine the
+
+<a href="http://en.wikipedia.org/wiki/Convex_hull">
+convex hull</a>
+
+of the given point cloud.</li>
+<li>Calculate the volume of the resulting 3D
+
+<a href="http://en.wikipedia.org/wiki/Polyhedron">
+polyhedron</a>.</li>
+
+</ul>
+
+<p>Both of these steps are non-trivial.
+A number of different
+
+<a href="http://en.wikipedia.org/wiki/Convex_hull_algorithms">
+convex hull algorithms</a>
+
+exist both for the two-dimensional and for higher dimensional cases.
+
+Several open source libraries for solid modelling or computational geometry implement these.
+One of the best known and most reliable tools which is specifically targeted at these two issues is
+
+<a href="http://www.qhull.org">
+Qhull</a>.
+
+Here is the blurb from its home page:</p>
+
+<p style="color:darkblue">Qhull computes the convex hull, Delaunay triangulation, Voronoi diagram, halfspace intersection about a point, furthest-site Delaunay triangulation, and furthest-site Voronoi diagram.
+The source code runs in 2-d, 3-d, 4-d, and higher dimensions.
+Qhull implements the Quickhull algorithm for computing the convex hull.
+It handles roundoff errors from floating point arithmetic.
+It computes volumes, surface areas, and approximations to the convex hull.</p>
+
+<p>I downloaded the current version of Qhull to explore exactly what you might be able to use for your purposes.
+The Qhull distribution includes a list of sample programs.
+One of these is qconvex, and one of its output options is FA to compute total area and volume of the input points, which is pretty exactly what you want.</p>
+
+<p>Now how can you make use of this inside the Revit API?</p>
+
+<p>Qhull is implemented in standard C, the Revit API is a .NET environment.
+The easiest way to make use of C source code from .NET is to compile a DLL and call it from .NET.
+In this case you would need to analyse the source code for the qconvex program, which is contained in the file qconvex.c, and package the required functionality in a DLL that you make accessible from .NET.</p>
+
+<p>The relevant lines of code from qconvex.c are:</p>
+
+<pre class="code">
+  qh_checkflags (qh qhull_command, hidden_options);
+  qh_initflags (qh qhull_command);
+  points= qh_readpoints (&numpoints, &dim, &ismalloc);
+  qh_init_B (points, numpoints, dim, ismalloc);
+  qh_qhull();
+  qh_check_output();
+  qh_produce_output();
+</pre>
+
+<p>This program reads its input from a file or the console standard input stream, performs its calculations, and produces its output into a file or the standard output stream.
+You would need to adapt this to pass the information from and to the .NET calling application.</p>
+
+<p>Another alternative, possible much simpler, but obviously less efficient, would be to set up the .NET application to write and read files in the expected Qhull input and output formats and then execute the unchanged qconvex executable provided by the Qhull package.</p>
+
+<p><strong>Reply</strong> from Max:
+Very good this library, but we need a wrapper for .NET, and how can I encapsulate this library in a C# project?</p>
+
+<p>What do you think about this alternative solution for
+
+<a href="http://www.codeproject.com/KB/scripting/PolyhedraVolumeCalc.aspx?display=Print">
+polyhedra volume calculation</a>?
+
+<p><strong>Answer:</strong>
+The polyhedra volume calculation article looks interesting, it seems like a simple approach for solving the second part of the problem, the volume calculation.
+It still needs to be ported from Java to .NET, though.
+It also does nothing to help you with the first part of the problem, the determination of the convex hull.</p>
+
+<p>Revit will not automatically provide a convex hull for a room or any element's faces and edges.
+Imagine an L-shaped room: its convex hull does not include some of the vertices of the walls in the inner corner.
+Imagine any shape at all that is not already convex. You need to eliminate all 'inner' vertices to obtain the convex hull.</p>
+
+<p>Regarding access to Qhull from .NET, I explained two methods for making use of the library from a .NET client above:</p>
+
+<ul>
+<li>Create a DLL from the C code, and implement a C function that can be called from .NET, read the input from .NET, and return the output to .NET.
+<li>Create a .NET application that writes and reads files in the expected Qhull input and output formats, and then execute the unchanged qconvex executable provided by the Qhull package as an external process using the files to communicate.
+Maybe you can use pipes instead of physical files on the disk.
+</ul>

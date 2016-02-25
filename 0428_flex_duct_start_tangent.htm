@@ -1,0 +1,113 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Flex Duct Start Tangent</h3>
+
+<p>Still zipping around in Pattaya with my brother Marcus, and still blogging a bit now and then as well ...
+
+<p>Here is a suggestion for a workaround to specify the start and end tangents of a flex duct or pipe that evolved through a recent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html?cid=6a00e553e168978833013485f297dc970c#comment-6a00e553e168978833013485f297dc970c">
+exchange</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html?cid=6a00e553e1689788330133f2dfa073970b#comment-6a00e553e1689788330133f2dfa073970b">
+of</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html?cid=6a00e553e1689788330134860dce69970c#comment-6a00e553e1689788330134860dce69970c">
+comments</a> with Zhu XiaoMeng:
+
+<p><strong>Question:</strong> In the Revit application UI, I can create a FlexDuct properly with the start tangent of the Hermite curve in a reasonable direction.
+But when I create a flex duct in the API, the start tangent is always horizontal. 
+How can I do the same thing in API as in the UI?
+
+<p>The initial code is as follows:
+
+<pre class="code">
+&nbsp; <span class="teal">FlexDuct</span> flexDuct = doc.Create.NewFlexDuct( 
+&nbsp; &nbsp; points, flexducttype );
+</pre>
+
+<p><strong>Answer:</strong> One thing to note regarding this is that it does not seem to be related to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/debugging-in-visual-studio-2010-express.html?cid=6a00e553e168978833013485ce109c970c#comment-6a00e553e168978833013485ce109c970c">
+Hermite spline issue</a> that we recently discussed.
+
+<p>Here is a suggestion for a possible workaround: 
+
+<ol>
+<li>Place a fitting with a connector temporarily where the direction of the connector matches the desired tangent. 
+<li>Place the flex duct or pipe and attach it to the connector. 
+<li>Delete the fitting.
+</ol>
+
+<p><strong>Response:</strong> I did as what you say, but I get confused with the second step.
+I placed a fitting with two side connectors in the right place, and then placed the flex duct in the right position, but they did not join. 
+So the tangent did not change. 
+So the point is: how can I get them joined?
+
+<p>Here is my current code:
+
+<pre class="code">
+&nbsp; <span class="teal">Family</span> fittingFamily 
+&nbsp; &nbsp; = lstElem.Where( e =&gt; e.Name == <span class="maroon">&quot;M_xyz&quot;</span> )
+&nbsp; &nbsp; .Select( e =&gt; e <span class="blue">as</span> <span class="teal">Family</span> )
+&nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> fittingType = fittingFamily
+&nbsp; &nbsp; .Symbols
+&nbsp; &nbsp; .ToList()
+&nbsp; &nbsp; .First();
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> fitLen = 1.5;
+&nbsp;
+&nbsp; <span class="blue">var</span> vectDown 
+&nbsp; &nbsp; = ( samplePoints[1] - samplePoints[0] )
+&nbsp; &nbsp; &nbsp; .Normalize();
+&nbsp;
+&nbsp; <span class="blue">var</span> fittPos = ptA - vectDown * fitLen;
+&nbsp;
+&nbsp; <span class="green">// vectAb is the vector pointing from </span>
+&nbsp; <span class="green">// ptA(samplePoints[First]) to </span>
+&nbsp; <span class="green">// ptB(samplePoints[Last])</span>
+&nbsp;
+&nbsp; <span class="green">//&nbsp; remove the z values (as the </span>
+&nbsp; <span class="green">// flexDuct first tangent do)</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> vectAbHoriz = <span class="blue">new</span> <span class="teal">XYZ</span>( vectAb.X, vectAb.Y, 0 );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fittingInstance 
+&nbsp; &nbsp; = _doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; fittPos, fittingType, 
+&nbsp; &nbsp; &nbsp; StructuralType.NonStructural );
+&nbsp;
+&nbsp; <span class="teal">Line</span> axis2 = _app.Create.NewLine( 
+&nbsp; &nbsp; fittPos, vectDown.CrossProduct( <span class="teal">XYZ</span>.BasisZ ), 
+&nbsp; &nbsp; <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="green">// rotate the fitting to the desired angle</span>
+&nbsp;
+&nbsp; <span class="blue">bool</span> success = _doc.Rotate( fittingInstance, 
+&nbsp; &nbsp; axis2, -vectDown.AngleTo( vectAbHoriz ) );
+&nbsp;
+&nbsp; SortedList valuePairs = <span class="blue">new</span> SortedList();
+&nbsp;
+&nbsp; valuePairs[<span class="maroon">&quot;xyz 01&quot;</span>] = fitLen;
+&nbsp;
+&nbsp; ChangeParametersValue( fittingInstance, valuePairs );
+&nbsp;
+&nbsp; <span class="teal">FlexDuct</span> flexDuct2 = CreateDuct( 
+&nbsp; &nbsp; samplePoints, flexDuctType );
+</pre>
+
+<p><strong>Answer:</strong> You probably have to explicitly connect them with each other as demonstrated in the AutoRoute and AvoidObstruction SDK samples.
+
+<p><strong>Response:</strong> Thank you, it's solved! 
+
+<p>Here is my way in case some one else encounters the same problem: 
+
+<p>Find the right connector of the fitting as well as the right connector of flexDuct, and call the connector ConnectTo method to join them. 
+
+<p>Before deleting the temporary fitting, call the document Regenerate method, otherwise the tangent will not change!
+
+<p>Very many thanks to Zhu XiaoMeng for this discussion and sharing the successful result!

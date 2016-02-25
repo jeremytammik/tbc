@@ -1,0 +1,110 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Model and Detail Curve Colour</h3>
+
+<p>We have had several questions on how to change the colour of model or detail curves.
+Here is an answer to this question from a recent case handled by Joe:
+
+<p><strong>Question:</strong> I am drawing a detail arc using the Revit API DetailArc class and
+trying to change its properties like colour, graphic style etc.
+How can this be achieved?
+
+<p><strong>Answer:</strong> You can change the detail arc line colour by changing the colour of the detail curve category's line style. 
+
+<p>Here is The Building Coder sample command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/detail-lines.html">
+CmdDetailCurves</a>
+
+demonstrating the creation of a few detail curves and enhanced to modify the line colour of their graphics style:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+<span class="green">// Create a geometry line</span>
+&nbsp;
+<span class="teal">XYZ</span> startPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+<span class="teal">XYZ</span> endPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp;
+<span class="teal">Line</span> geomLine = app.Create.NewLine(
+&nbsp; startPoint, endPoint, <span class="blue">true</span> );
+&nbsp;
+<span class="green">// Create a geometry arc</span>
+&nbsp;
+<span class="teal">XYZ</span> end0 = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 0, 0 );
+<span class="teal">XYZ</span> end1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 10 );
+<span class="teal">XYZ</span> pointOnCurve = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 0, 0 );
+&nbsp;
+<span class="teal">Arc</span> geomArc = app.Create.NewArc(
+&nbsp; end0, end1, pointOnCurve );
+&nbsp;
+<span class="green">// Create a geometry plane</span>
+&nbsp;
+<span class="teal">XYZ</span> origin = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+<span class="teal">XYZ</span> normal = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 1, 0 );
+&nbsp;
+<span class="teal">Plane</span> geomPlane = app.Create.NewPlane(
+&nbsp; normal, origin );
+&nbsp;
+<span class="green">// Create a sketch plane in current document</span>
+&nbsp;
+<span class="teal">SketchPlane</span> sketch = doc.Create.NewSketchPlane(
+&nbsp; geomPlane );
+&nbsp;
+<span class="green">// Create a DetailLine element using the </span>
+<span class="green">// newly created geometry line and sketch plane</span>
+&nbsp;
+<span class="teal">DetailLine</span> line = doc.Create.NewDetailCurve(
+&nbsp; view, geomLine ) <span class="blue">as</span> <span class="teal">DetailLine</span>;
+&nbsp;
+<span class="green">// Create a DetailArc element using the </span>
+<span class="green">// newly created geometry arc and sketch plane</span>
+&nbsp;
+<span class="teal">DetailArc</span> arc = doc.Create.NewDetailCurve(
+&nbsp; view, geomArc ) <span class="blue">as</span> <span class="teal">DetailArc</span>;
+&nbsp;
+<span class="green">// Change detail curve colour.</span>
+<span class="green">// Initially, this only affects the newly </span>
+<span class="green">// created curves. However, when the view </span>
+<span class="green">// is refreshed, all detail curves will </span>
+<span class="green">// be updated.</span>
+&nbsp;
+<span class="teal">GraphicsStyle</span> gs = arc.LineStyle <span class="blue">as</span> <span class="teal">GraphicsStyle</span>;
+&nbsp;
+gs.GraphicsStyleCategory.LineColor 
+&nbsp; = <span class="blue">new</span> <span class="teal">Color</span>( 250, 10, 10 );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>Note that you need to ensure that detail curves are visible in the view that you are working in in order to see the changes taking effect.
+
+<p>Also note that the newly defined colour will be applied to all detail curves after the view is refreshed or closed and reopened. 
+It is not possible to change one single detail line's colour individually in the long run.
+
+<p>Here are a couple of detail curves drawn in the default drawing before running this command:
+
+<center>
+<img src="img/detail_curves_1.png" alt="Default detail curves"/>
+</center>
+
+<p>Here are the new detail curves added by the command with their modified line colour:
+
+<center>
+<img src="img/detail_curves_2.png" alt="Detail curves with modified settings"/>
+</center>
+
+<p>When the view is refreshed or closed and reopened, all detail lines will adopt the new colour.
+
+<p>Here is
+
+<a href="zip/bc11058.zip">
+version 1.1.0.58</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the updated version of this command.</p>
+
+<p>Many thanks to Joe for handling this case!

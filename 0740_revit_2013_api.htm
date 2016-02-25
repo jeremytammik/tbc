@@ -1,0 +1,181 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2013 and its API</h3>
+
+<p>As you probably know by now, Revit 2013 has been released, with legions of
+
+<a href="http://usa.autodesk.com/revit">new features</a>.
+
+Here they are for
+
+<a href="http://usa.autodesk.com/revit/architectural-design-software">architecture</a>,
+
+<a href="http://usa.autodesk.com/revit/mep-engineering-software">MEP</a> and
+
+<a href="http://usa.autodesk.com/revit/structural-design-software">structural</a>.
+
+<p>Without further ado, let us take a look at its API.
+
+<h4>Overview</h4>
+
+<p>Just like in previous years, the API in the upcoming version of Revit sports truly impressive enhancements, both in quantity and quality. As always, a number of completely new features were added, and many features added in the 2012 timeframe were enhanced based on the new insights.
+
+<p>We will look at the following three areas: first, for background information and motivation, an introduction to the new product features, followed by enhancements of the existing API (the rice), and the completely new API functionality (the wine). Here are the main product feature additions and enhancements:
+
+<h4>Product Features</h4>
+
+<p>Revit 2012 introduced a whole new set of revolutionary features to support and integrate with the <b>construction, fabrication and engineering</b> process, especially the concepts of parts and assemblies. These have obviously been enhanced based on the experiences made. They affect areas such as construction modeling, fabrication, precast elements and reinforcement detailing. Other related areas of enhancement include point clouds, MEP piping system routing and numerous customer requests.
+
+<p>The Revit Server was provided with Revit 2012 and has been enhanced with new features and improved performance for <b>platform scalability</b>.
+
+<p>Several new features to support improved <b>countrification</b> were added, such as new stair and railing elements and access to their subcomponents, MEP centerlines, and a new IFC API.
+
+<p>The importance of <b>interoperability</b> with other products and product suites is growing, so Autodesk Revit now includes a Revit One Box option containing all three flavors for Architecture, MEP and Structure integrated into a single product with support for runtime switching of disciplines. Translation fidelity and Inventor interoperability is enhanced, add-ins can be integrated closer into Revit, and new view and visualization APIs are provided.
+
+<p>New physical properties, structural analysis in BIM, structural code checking, analysis visualization, analytical volumes and new MEP properties and calculation functionality enhance the <b>analysis and simulation</b> functionality.
+
+<h4>Revit API Enhancements</h4>
+
+<p>Looking at the enhancements provided in the new Revit API affecting existing add-ins, the effort required to migrate an existing add-in from the previous version is pretty minimal this time around. As always, efforts were made to change as little as possible and still keep up momentum. Add-ins must now be built using the .NET 4.0 framework, old-style collections have been replaced by generic .NET collections, the wall creation methods have been updated, the Document.Element properties have been better aligned with standard .NET conventions, and deprecated APIs have been cleaned up.
+
+<p>An area that does not affect add-ins but may still be of interest to developers is the replacement of the VSTA macro environment by the open source SharpDevelop IDE, which offers all the existing functionality plus some new features such as support for .NET 4.0.
+
+<p>A new ReferenceIntersector class simplifies the use of the FindReferencesWithContextByDirection method, the Idling event has been enhanced, and a new external event interface is defined to simplify interaction with external asynchronous processes, such as modeless dialogues.
+
+<h4>Revit API New Features</h4>
+
+<p>A lot of completely new API functionalities are provided in this release. It can be grouped in many different ways. I will group them them into these five containers:
+
+<ul>
+<li><a href="#2">Integration</a>
+<li><a href="#3">Analysis
+<li><a href="#4">Modelling
+<li><a href="#5">Interoperability
+<li><a href="#6">Miscellaneous
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Integration</h4>
+
+<p>One large goal encompassing many developer wish list items is the improvement of the user experience when using an add-in. This topic includes features that allow add-ins to integrate better into the Revit UI, and even vice versa, integrating a little piece of Revit functionality into an add-in by hosting a Revit view:
+
+<ul>
+<li>Discipline control to read and set the discipline status and control the disciplines under which an add-in's command is available.
+
+<li>Ribbon items can now provide contextual help, so the user can simply hit F1 on an add-in command button to bring up an Internet URL or a local help file entry.
+
+<li>API commands can be assigned keyboard shortcuts.
+
+<li>API commands can be moved to the quick access toolbar.
+
+<li>An add-in can replace an existing Revit command with its own implementation. Note that you cannot call an existing command, just replace it entirely. This functionality is also used by Autodesk's own add-ins to extend commands, e.g. the Render Gallery.
+
+<li>An add-in can embed a Revit view as WPF control inside its own dialogue for preview purposes, also supporting rendered views. An add-in can create a view showing exactly what needs to be communicated to the user and display this graphically.
+</ul>
+
+<center>
+<img src="img/2013_revit_view_in_wpf_control.png" alt="Revit view in WPF control" width="400"/>
+</center>
+
+<ul>
+<li>A new drag and drop API provides full control over drag and drop into Revit. A new more customizable interface added enables you to define any action you want to take at the end of the operation. This can be used to enable custom search capabilities and other workflows to drag arbitrary items into Revit.
+
+<li>The Options dialogue supports custom extensions using arbitrary WPF components.
+</ul>
+
+<center>
+<img src="img/2013_custom_options_wpf.png" alt="Revit Options dialogue with add-in defined custom tab using WPF controls" width="400"/>
+</center>
+
+<ul>
+<li>Revit progress bar events returning data to monitor time-consuming transactions, including
+<ul>
+<li>Caption &ndash; name of the current transaction or subtransaction.
+<li>Stage &ndash; type of progress event (Started, RangeChanged, PositionChanged, CaptionChanged, UserCancelled, Finished).
+<li>Position &ndash; numerical index between zero and UpperRange showing the number of completed steps.
+<li>UpperRange &ndash; total number of steps in the current transaction or subtransaction.
+<li>Cancel &ndash; cancels the current transaction in progress, if possible.
+<li>Cancellable &ndash; indicates if the current transaction can be cancelled.
+</ul>
+</ul>
+
+<p>All of these features were demonstrated at the DevDays 2011 by the Revit UI API demo sample application, which is available for ADN members together with all other DevDays presentations on the ADN Extranet at
+
+<a href="http://adn.autodesk.com">adn.autodesk.com</a> under "Events".
+
+I will hopefully get around to publishing the UI demo sample here on the public blog soon as well.
+
+<p>Besides all of these, here are even more new features enhancing add-in integration:
+
+<p>Some view types cannot be created programmatically in Revit 2012. The new view API enables an add-in to create all types of views and manipulate almost all settings, retrieve the view range for plan views, lock and unlock 3D views, and duplicate views. The new UIView class represents a view window and enables you to pan and zoom and determine its size for tiling etc., also useful for switchback functionality from other visualization environments to support better integration.
+
+<p>All settings in the Rendering Options dialogues are now exposed. The rendering itself cannot be launched programmatically yet, though.
+
+<p>The new schedule API enables an add-in to create schedules and add or remove fields and filters, control sorting and grouping, add, read, and place a schedule on a sheet or modify its placement, and access all the schedule data, e.g. to export to a text file.
+
+<p>A dedicated DataStorage element is included for managing extensible storage not associated with any specific BIM element.
+
+<p>A new External Event interface and framework provides a new API for interacting with asynchronous processes, e.g. a modeless dialogue, significantly simplifying the previous interaction requiring use of the Idling event. The Idling event itself has been enhanced to improve performance. A new External Services framework wraps external service functionality, enabling certain services such as analysis or calculations to be encapsulated and replaced, providing a basis for future MEP calculations and structural code checking.
+
+
+<a name="3"></a>
+
+<h4>Analysis</h4>
+
+<p>In Revit MEP 2012, you can only define one single default elbow, tee, etc., which is rather limiting. In Revit 2013, however, numerous different setting for different materials and sizes are supported. One of the major MEP API additions provides access to the routing preferences, as demonstrated by the new Routing Preference Analysis SDK sample. Other enhancements enable programmatic selection of pipe sizes, materials, fitting types, calculation of pipe and duct friction factors, better handling of duct and pipe sections with the new MEPSection base class, handling of viscosity and density at specified temperatures, read and write access to spare circuit values, and retrieval of the localized user-visible display strings for enumeration values.
+
+<p>New physical properties include a new class ThermalProperties, an additional structural material element, structural and thermal material assets that can be shared, and the ability to indicate if thermal information is included in the gbXML export.
+
+<p>The structural analytical model includes a new AnalyticalLink element type that can be user defined or automatically generated between two analytical elements and access to link properties like "fixity state".
+
+<p>The Analysis Visualization Framework AVF now better supports the structural analysis workflow, e.g. by including support for deformed shapes.
+
+<p>A Light and Light Group API provides new classes to get and set photometric data, including initial color and intensity, loss factor, color filter and dimming color.
+
+<p>The new ReferenceIntersector class mentioned above provides simplified and more performant ray-cast selection of elements using a given point and direction, similar to the existing FindReferencesWithContextByDirection method, with additional support for filtering the output, e.g. to collect elements, meshes, edges, curves, and faces.
+
+
+<a name="4"></a>
+
+<h4>Modeling</h4>
+
+<p>New classes have been implemented to create, read and modify stairs and railings, including curved stairs, and provide access to their annotations and subcomponents such as path, run, landing, continuous, top and hand rail.
+
+<center>
+<img src="img/2013_stairs_automation.png" alt="Programmatically generated stairs and railings" width="400"/>
+</center>
+
+<p>Reinforcement systems have been enhanced to support adding and removing individual subcomponents. A new class RebarInSystem represents an individual bar in a system. System members and curve boundaries are accessible, and system bars can be converted back and forth between the system and standard rebar. Welded wire mesh and fabric sheet elements have been added.
+
+<p>All the new construction modeling and assembly functionality includes full API access, e.g. to merge and exclude parts, create parts from linked elements, handle part separation profiles, and manage assembly views using the new AssemblyViewUtils class.
+
+
+<a name="5"></a>
+
+<h4>Interoperability</h4>
+
+<p>The IFC export implementation in Revit has switched to a more generic toolkit providing more options on what can be customized and how, and the IFC exporter source code is now available on SourceForge.
+
+<p>The update includes numerous data exchange API enhancements affecting DGN, DWF, DWG and DXF import and export. The Revit 2013 API also provides the ability to create Revit links.
+
+<p>Document and worksharing changes include new overloads for the OpenDocumentFile and OpenAndActivateDocument methods to help specify how Revit document should be opened, including detaching from central. This is still a work in progress.
+
+<p>A new class BasicFileInfo class provides access to certain basic information about a Revit model file without having to open the file itself.
+
+
+<a name="6"></a>
+
+<h4>Miscellaneous</h4>
+
+<p>That is still not all: a new SelectionFilterElement accesses filter type, a new class PhaseFilter creates, reads and writes phase filters, the Ceiling element has been exposed, NewAlignment can now align a line to a reference plane, a large number of powerful new geometry and sketching methods are provided, add-ins can now access and create filled regions, dimension pre- and suffixes are accessible, and much more!
+
+<p>All information above and more is provided in the What's New section of the Revit API help file RevitAPI.chm included with the Revit SDK.
+
+<p>Exciting stuff, eh?
+
+<p>Download Revit 2013 today and see for yourself!
+

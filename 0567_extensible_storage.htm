@@ -1,0 +1,148 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Extensible Storage</h3>
+
+<p>I mentioned the main new features of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+Revit 2012 API</a> and
+
+also pointed out that many important developer 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html">
+wishes have been resolved</a>.
+
+Here is another very fundamental and longstanding wish that has been addressed, more completely than anyone might have expected:
+
+<p><strong>Question:</strong> How can I store my custom application data inside the Revit file using the Revit API?
+
+<p><strong>Answer:</strong> One possibility is to use a shared parameter. This is a slightly convoluted operation and involves setting up the shared parameter text file appropriately. You have the option of whether a shared parameter should or should not be visible to the user. The whole procedure is demonstrated by the FireRating SDK sample and discussed in numerous blog posts:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/model-group-shared-parameter.html">Creating and using a shared parameter on various elements</a>.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/store-structured-data.html">Storing structured data in a Revit shared parameter</a>.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/store-project-data.html">Storing project data</a>.
+</ul>
+
+<p>In Revit 2012, one of the major API enhancements is the Extensible Storage mechanism. This offers a completely new storage facility for applications which is completely invisible to the user. It is the very first item described in the What's New section of the documentation on major enhancements:
+
+<h4>Extensible Storage</h4>
+
+<p>The Revit API now allows you to create your own class-like Schema data structures and attach instances of them to any Element in a Revit model. This functionality can be used to replace the technique of storing data in hidden shared parameters. Schema-based data is saved with the Revit model and allows for higher-level, metadata-enhanced, object-oriented data structures. Schema data can be configured to be readable and/or writable to all users, just a specific application vendor, or just a specific application from a vendor. The extensible storage classes are all found in the Autodesk.Revit.DB.ExtensibleStorage namespace:
+
+<ul>
+<li>Schema &ndash; contains a unique schema identifier, read/write permissions, and a collection of data Field objects.
+<li>Entity &ndash; an object containing data corresponding to a Schema that can be inserted into a Revit Element. 
+<li>Field &ndash; contains data name, type, and unit information and is used as the key to access corresponding data in an Entity.
+<li>SchemaBuilder &ndash; create Schema definitions.
+<li>FieldBuilder &ndash; a helper class used with SchemaBuilder when creating a new field. 
+</ul>
+
+<p>The following data types are currently supported: 
+
+<ul>
+<li>int 
+<li>short 
+<li>double 
+<li>float 
+<li>bool 
+<li>string 
+<li>Guid 
+<li>ElementId 
+<li>Autodesk.Revit.DB.UV 
+<li>Autodesk.Revit.DB.XYZ 
+<li>Array (as a System.Collections.Generic.IList&lt;T&gt;) 
+<li>Map (as a System.Collections.Generic.IDictionary&lt;TKey, TValue&gt; &ndash; all types are supported for keys except double, float, XYZ, and UV)
+<li>Autodesk.Revit.DB.ExtensibleStorage.Entity (an instance of another Schema, also known as a SubSchema) 
+</ul>
+
+<p>Simple usage of ExtensibleStorage:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create a data structure, attach it to a wall, </span>
+<span class="gray">///</span><span class="green"> populate it with data, and retrieve the data </span>
+<span class="gray">///</span><span class="green"> back from the wall</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">void</span> StoreDataInWall( 
+&nbsp; <span class="teal">Wall</span> wall, 
+&nbsp; <span class="teal">XYZ</span> dataToStore )
+{
+&nbsp; <span class="teal">Transaction</span> createSchemaAndStoreData
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( wall.Document, <span class="maroon">&quot;tCreateAndStore&quot;</span> );
+&nbsp;
+&nbsp; createSchemaAndStoreData.Start();
+&nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder = <span class="blue">new</span> <span class="teal">SchemaBuilder</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;720080CB-DA99-40DC-9415-E53F280AA1F0&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// allow anyone to read the object</span>
+&nbsp; schemaBuilder.SetReadAccessLevel( 
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Public );
+&nbsp;
+&nbsp; <span class="green">// restrict writing to this vendor only</span>
+&nbsp; schemaBuilder.SetWriteAccessLevel( 
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Vendor );
+&nbsp;
+&nbsp; <span class="green">// required because of restricted write-access</span>
+&nbsp; schemaBuilder.SetVendorId( <span class="maroon">&quot;ADSK&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// create a field to store an XYZ</span>
+&nbsp; <span class="teal">FieldBuilder</span> fieldBuilder = schemaBuilder
+&nbsp; &nbsp; .AddSimpleField( <span class="maroon">&quot;WireSpliceLocation&quot;</span>, 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">XYZ</span> ) );
+&nbsp;
+&nbsp; fieldBuilder.SetUnitType( <span class="teal">UnitType</span>.UT_Length );
+&nbsp;
+&nbsp; fieldBuilder.SetDocumentation( <span class="maroon">&quot;A stored &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;location value representing a wiring &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;splice in a wall.&quot;</span> );
+&nbsp;
+&nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;WireSpliceLocation&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Schema</span> schema = schemaBuilder.Finish(); <span class="green">// register the Schema object</span>
+&nbsp;
+&nbsp; <span class="green">// create an entity (object) for this schema (class)</span>
+&nbsp; <span class="teal">Entity</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; <span class="green">// get the field from the schema</span>
+&nbsp; <span class="teal">Field</span> fieldSpliceLocation = schema.GetField(
+&nbsp; &nbsp; <span class="maroon">&quot;WireSpliceLocation&quot;</span> );
+&nbsp;
+&nbsp; entity.Set&lt;<span class="teal">XYZ</span>&gt;( fieldSpliceLocation, dataToStore,
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span>.DUT_METERS ); <span class="green">// set the value for this entity</span>
+&nbsp;
+&nbsp; wall.SetEntity( entity ); <span class="green">// store the entity in the element</span>
+&nbsp;
+&nbsp; <span class="green">// get the data back from the wall</span>
+&nbsp; <span class="teal">Entity</span> retrievedEntity = wall.GetEntity( schema );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> retrievedData = retrievedEntity.Get&lt;<span class="teal">XYZ</span>&gt;(
+&nbsp; &nbsp; schema.GetField( <span class="maroon">&quot;WireSpliceLocation&quot;</span> ),
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span>.DUT_METERS );
+&nbsp;
+&nbsp; createSchemaAndStoreData.Commit();
+}
+</pre>
+
+<p>The Revit 2012 SDK includes a much more full-fledged example of making use of this technology, the ExtensibleStorageManager sample.
+
+<p>As Arno&scaron;t L&ouml;bel kindly pointed out, the VendorId specified above is the same as the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+new required VendorId tag in the add-in manifest</a>.
+
+ADSK is a vendor id used by Autodesk, and you should replace it by your own
+
+<a href="http://www.autodesk.com/symbreg">Autodesk Registered Developer Symbol RDS</a>.
+
+<!--
+<p>Finally, here is an article by Saikat Bhattacharya from our last ADN AEC newsletter which describes more details of the extensible storage mechanism: 
+
+<a href="zip/ExtensibleStorageAPI.rtf">ExtensibleStorageAPI.rtf</a>.
+-->
+
+<p>That should give you ample material to explore. Have fun!

@@ -1,0 +1,46 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Matt Mason Re: Interesting new behavior in 2013 -->
+
+<h3>Edit Family Requires No Transaction</h3>
+
+<p>I recently received a note from Matt Mason pointing out that the behaviour of the EditFamily method changed in Revit 2013, and a suggestion to highlight this fact.
+The suggestion is very valid, since his note was quickly followed up by a matching 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html?cid=6a00e553e1689788330168eaefdf61970c#comment-6a00e553e1689788330168eaefdf61970c">
+question</a> by 
+
+<a href="mailto:noclew@mit.edu">
+Woong Ki Sung</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html?cid=6a00e553e1689788330168eaefdf61970c#comment-6a00e553e1689788330168eaefdf61970c">
+reloading a family</a>, 
+
+who ran into the very same issue:
+
+<p><strong>Question:</strong> I am testing some code to edit family types in Revit 2013, and I have a transaction problem even though I set up manual transactions properly. 
+
+<p><a href="http://dl.dropbox.com/u/39185526/familyEdit.cs">The code</a> is 
+
+very simple, so could you please check? In advance, thank for your help.
+
+<p>Here is the answer by Matt:
+
+<p><strong>Answer:</strong> A quick note after I saw your recent post on upgrading add-ins.
+
+<p>I had an interesting case the other day:
+there is a new API requirement in 2013 that all transactions must be closed before calling EditFamily 
+&ndash; it throws an exception to that effect.
+
+<p>I hadn't really focused on this before, and the add-in in question was actually still set up for Automatic mode 
+&ndash; I had to convert my add-in to manual transaction mode so that I could control the transactions and close them all prior to calling EditFamily.
+
+<p>The remarks on the EditFamily method in the Revit 2013 API help file RevitAPI.chm now clearly state:
+
+<p style="color:darkblue">Gets the document of a loaded family to edit. This creates an independent copy of the family for editing. To apply the changes back to the family stored in the document, use the LoadFamily overload accepting IFamilyLoadOptions. 
+
+<p style="color:darkblue">This method may not be called if the document is currently modifiable (has an open transaction) or is in a read-only state. The method may not be called during dynamic updates. To test the document's current status, check the values of IsModifiable and IsReadOnly properties.
+
+<p>Many thanks to Matt for pointing this out!

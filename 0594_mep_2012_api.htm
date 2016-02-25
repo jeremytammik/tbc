@@ -1,0 +1,142 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+C:\a\doc\aec\newsletter\2011\2011_1\rme_2012_api.rtf 
+C:\a\lib\revit\2012\adn\doc\webcast\Revit 2012 API Updates_May19.pptx
+
+-->
+
+<h3>The Revit MEP 2012 API</h3>
+
+<p>The Revit 2012 API includes a number of important MEP specific enhancements, some completely new APIs have been added which are especially useful in the MEP domain, and last but not least, all of the many significant Revit platform enhancements are useful for MEP as well.
+<p>The major Revit MEP enhancements include:
+<ul>
+<li>Placeholder ducts and pipes
+<li>Duct and pipe insulation and lining
+<li>Read and write access to MEP pipe settings and sizes
+</ul>
+<p>A number of minor enhancements have also been made to the Revit MEP API, e.g. spare and space circuits, cable tray and conduit domain, connector, MEP system and space properties, and disconnection warnings.
+<p>Completely new APIs which are applicable to the MEP domain include:
+<ul>
+<li>Detailed energy analysis model API
+<li>Conceptual energy analysis API
+</ul>
+<p>Furthermore, the Revit platform API enhancements include some features which are especially useful in the MEP domain, such as new classes for the analysis of room and space 3D geometry, new geometry functionality, and new support for handling linked files.
+<p>Here is a very brief overview of the main product enhancements, followed by a more detailed look at the API features. For more information, please refer to the What's New section in the Revit API help file RevitAPI.chm, which is included in the Revit SDK, available from the <a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+<h4>Revit MEP 2012 Product Features</h4>
+<p>Here are some of the key features of Revit MEP 2012 from a product point of view:
+<ul>
+<li>Placeholder elements
+<li>Insulation and lining
+<li>Parallel pipe and conduit runs
+<li>Sloped piping enhancements: settings, tooltips, connection 
+<li>System browser enhancements: filtering, hovering and selection
+<li>System enhancements: graphic overrides and warnings, disconnect markers, materials, calculation control, connector labels
+</ul>
+<h4>Placeholder Ducts and Pipes</h4>
+<p>Revit MEP introduces placeholder elements which can be used to indicate a planned layout when the system itself has not been fully sized. You obtain maximum planning flexibility with a minimum of input. The placeholders can be converted into true duct and pipe elements later on. Placeholders can be assigned a size and slope. 
+<p>In the API, the following new properties identify placeholder ducts and pipes:
+<ul>
+<li>Duct.IsPlaceholder 
+<li>Pipe.IsPlaceholder 
+</ul>
+<p>These new static methods allow creation of placeholder ducts and pipes:
+<ul>
+<li>Duct.CreatePlaceholder 
+<li>Pipe.CreatePlaceholder 
+</ul>
+<p>New utility meds are exposed to convert a set of placeholder ducts and pipes to real 3D entities:
+<ul>
+<li>MechanicalUtils.ConvertDuctPlaceholders 
+<li>PlumbingUtils.ConvertPipePlaceholders
+</ul>
+<p>This functionality is demonstrated by the MepPlaceHolder sample in the 
+
+<!-- <a href="http://thebuildingcoder.typepad.com/blog/2011/04/devdays-2010-online-with-revit-2012-api-news.html">DevDays Online recording</a>. -->
+
+<a href="http://download.autodesk.com/media/adn/Revit%202012_API_Updates_May_19_2011.zip">Revit 2012 API webcast recording and material</a> (<a href="#2">see below</a>).
+
+It defines two external commands, CreatePlaceholders and ConvertPlaceholders.
+
+<!-- Updated source code for this sample is included in the Revit 2012 webcast support material, which is still in the process of being uploaded. -->
+
+
+<h4>Insulation and Lining</h4>
+<p>In previous versions of Revit, insulation and lining had to be modelled separately in the family definitions, practically tripling the amount of geometry that needed to be defined. In Revit 2012, insulation and lining can be added programmatically instead. In the user interface, insulation can now be added to an entire duct or pipe run in a single command, and lining to an entire duct run in a similar way. Fittings and flexible ducts and pipes can also be selected and processed.
+<p>The new API classes DuctInsulation, PipeInsulation, DuctLining and related types support read, write and create access to duct and pipe insulation and lining. In Revit 2012, these objects are now accessible as standalone elements related to their parent duct, pipe, or fitting.
+<h4>Pipe Settings and Sizes</h4>
+<p>MEP pipe settings are now accessible programmatically. The following new classes provide read and write access to them:
+<ul>
+<li>PipeSettings &ndash; The pipe settings. There is one object of this type in a document accessible through the static method GetPipeSettings. 
+<li>PipeSizeSettings &ndash; The main class to access pipe sizes. There is one object of this type in a document accessible through the static method GetPipeSizeSettings. Stores PipeConnections for each pipe material, using the id of the pipe material element as key to access. 
+<li>PipeSizeSettingIterator &ndash; An iterator to a set of items from PipeSizeSettings. Each item is a KeyValuePair<ElementId, PipeConnections>. 
+<li>PipeConnections &ndash; Represents a set of pipe connection types. Stores PipeSchedules per each pipe connection type, using the id of the pipe connection type as key to access. 
+<li>PipeConnectionIterator &ndash; An iterator to a set of items from PipeConnections. Each item is a KeyValuePair<ElementId, PipeSchedules>. 
+<li>PipeSchedules &ndash; Represents a set of pipe schedules. Stores PipeSizes per each pipe schedule type, using the id of the pipe schedule type as key to access. 
+<li>PipeScheduleIterator &ndash; An iterator to a set of items from PipeSchedules. Each item is a KeyValuePair<ElementId, PipeSizes>. 
+<li>PipeSizes &ndash; Stores a set of pipe sizes, with the ability to add and remove from the set as needed. 
+<li>PipeSizeIterator &ndash; An iterator to a set of MEP pipe sizes from PipeSizes. 
+<li>MEPSize &ndash; Stores the basic size information for an MEP duct, pipe, cable tray, or conduit. 
+</ul>
+
+
+<h4>Detailed Energy Analysis Model API</h4>
+<p>A new feature added to the Revit API that is of special interest in the MEP domain is the detailed energy analysis model API. It enables you to obtain and analyze the contents of a project's detailed energy analysis model, as seen in the Export to gbXML and the Heating and Cooling Loads features. This analysis produces an analytical thermal model from the physical model of a building. The analytical thermal model is composed of spaces, zones and planar surfaces that represent the actual volumetric elements of the building.
+<p>The method EnergyAnalysisDetailModel.Create generates the model, which can the be traversed using methods such as GetAnalyticalSpaces, Surfaces, Openings, ShadingSurfaces.
+<p>This is demonstrated by the new SDK sample EnergyAnalysisModel:</p>
+
+<center>
+<img src="img/EnergyAnalysisModel02.png" alt="EnergyAnalysisModel SDK sample"/>
+</center>
+
+
+<h4>Conceptual Energy Analysis API</h4>
+<p>A second new API deals with energy analysis on conceptual design models. New classes provide access to the elements and objects created by Revit to perform this kind of analysis, and using the Document.Export method with a MassGBXMLExportOptions instance supports export of a gBXML file containing conceptual energy analysis elements (mass elements) only.
+
+
+<h4>Small Enhancements and Changes</h4>
+<p>A number of small enhancements and changes have been made to the Revit MEP API:
+<p><u>Spare and space circuits:</u>
+The new property ElectricalSystem.CircuitType identifies the type of an electrical circuit (circuit, spare or space). The method ElectricalSystem.AddToCircuit now throws an exception when the system is a spare or space circuit. 
+<p><u>Cable tray and conduit domain:</u>
+The Autodesk.Revit.DB.Domain enumeration adds a new value to represent cable tray and conduit.
+<p><u>Connector:</u>
+New read-only properties have been added for the JointType, GenderType and EngagementLength.
+<p><u>MEPSystem:</u>
+The new property MEPSystem.IsEmpty identifies if the system currently contains no components.
+<p><u>Graphical warnings for disconnects:</u>
+The new 'show graphical warning' properties on the Application class and the matching setters control whether Revit MEP will highlight disconnects in systems graphically.
+<p><u>Space properties:</u>
+The new property Space.BaseHeatLoadOn indicates if the value of Space.LatentHeatGainperPerson and Space.SensibleHeatGainperPerson properties is the default value or if it is user-defined.   
+<p><u>Fitting methods:</u>
+The Document methods to create new fittings no longer remove unused or dangling curve connectors.
+
+
+<a name="2"></a>
+
+<h4>Revit 2012 API Webcast Recording</h4>
+
+<p>The material presented here was also discussed in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html">Revit 2012 API webcast</a>, 
+
+and before that in somewhat less detail in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/devdays-2010-online-with-revit-2012-api-news.html">DevDays Online presentation</a>.
+
+Recordings and sample material for both of these are now available from the 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_webcast_archive.php">ADN webcast recordings archive</a>.
+
+Filter for "Revit API" and "Developer Days Online: Revit" respectively, "English", and "Webcast".
+
+<p>Here are direct links to the 
+
+<a href="http://download.autodesk.com/media/adn/Revit%202012_API_Updates_May_19_2011.zip">Revit 2012 API webcast recording and material</a> and the 
+
+<a href="http://download.autodesk.com/media/adn/DevDay_Online-Revit_2012_API.zip">DevDays Online recording and material</a>, 
+
+respectively.

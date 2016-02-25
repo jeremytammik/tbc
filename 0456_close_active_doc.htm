@@ -1,0 +1,228 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1263326 [How to close active document?] -->
+
+<h3>Closing the Active Document and Why Not To</h3>
+
+<p>Here is a question raised and solved by Ren&eacute; Gerlach of
+
+<a href="http://www.cideon-software.com">
+CIDEON Software GmbH</a> in
+
+collaboration with Joe Ye, and an explanation by Arno&scaron;t L&ouml;bel explaining the associated dangers:
+
+<p><strong>Question:</strong> The documentation says that the overloads of the Document.Close method cannot close the active document. 
+How can this be handled anyway? 
+I really do want to programmatically close the active document.
+
+<p><strong>Answer:</strong> Revit does not currently expose any API to close the active document programmatically.
+
+<p>I think an alternative possible method might be to send a Windows message to Revit to mimic the operation: click the big 'R' button and then select the 'Close' menu item.
+
+<p>We discussed some related issues in the past, e.g. sending messages to Revit, determining its window handle, and working with modeless dialogues:
+
+<ul>
+<!-- 051 --><li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">Driving Revit from outside</a>
+<!-- 088 --><li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">Revit window handle and modeless dialogues</a>
+<!-- 229 --><li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">Dialogue clicker, also sends Windows messages</a>
+<!-- 233 --><li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/modeless-pressure-drop-tool.html">Modeless pressure drop tool</a>
+<!-- 260 --><li><a href="http://thebuildingcoder.typepad.com/blog/2009/12/au-and-automated-testing.html">Automated testing and an overview of previous automation solutions</a>
+<!-- 400 --><li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">Revit parent window</a>
+<!-- 407 --><li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">Modeless loose connectors</a>
+</ul>
+
+<p>Please be aware that sending keystrokes to Revit in this way is not part of the Revit API and is not officially supported by Autodesk.
+It is actually working around some safeguards built into the Revit API framework, so please note the 
+
+<a href="#3">
+disclaimer</a> below.
+
+The discussion below also explains why 
+
+<a href="#2">
+these kinds of workarounds are strongly discouraged</a>.
+
+<p>But first, here is the workaround that we later on so strongly discourage:
+
+<p><strong>Response:</strong> I initially tried to simply call the SendWait method to send a Ctrl + F4 keystroke to Revit as you suggest from within the external command implementation Execute method, but without any success:
+
+<pre class="code">
+&nbsp; <span class="teal">SendKeys</span>.SendWait( <span class="maroon">&quot;^{F4}&quot;</span> );
+</pre>
+
+<p>Ctrl + F4 is one possible keyboard shortcut to close the current document.
+
+<p>Since this simple attempt did not work, I next tried using it in a separate thread.
+The threaded solution works fine. 
+
+<p>Here is the full source code of a new Building Coder sample command CmdCloseDocument based on Ren&eacute;'s solution:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdCloseDocument</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> pDoc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ThreadPool</span>.QueueUserWorkItem( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WaitCallback</span>( CloseDocProc ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> CloseDocProc( <span class="blue">object</span> stateInfo )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// maybe we need some checks for the right </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// document, but this is a simple sample...</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SendKeys</span>.SendWait( <span class="maroon">&quot;^{F4}&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Launching this command closes the current document, just as desired.
+If it is the only open document, you end up in the Revit project overview screen.
+
+<p>Although this works well in our tests so far to close the activate document, we don't know whether this approach can be used to send shortcut keys to trigger other commands as well.
+
+<p>Many thanks to Joe and above all to Ren&eacute; for this solution.
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_76.zip -->
+
+<a href="zip/bc_11_76.zip">
+version 2011.0.76.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.
+
+<!--
+Joe also published this on the members-only ADN web site as technical solution 
+
+<a href="http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=15760284&linkID=4901650">
+JY20100928</a> [How to close the activate document via API].
+-->
+
+<a name="2"></a>
+
+<h4>Windows Message Workarounds Discouraged</h4>
+
+<p>Even if this method worked in Revit 2010...
+No cheating allowed...
+We just discussed a similar issue about sending a shortcut trying to launch a different Revit command and had less luck with that.
+A workaround to launch the command by sending a Windows message worked fine in Revit 2010 but no longer does so in Revit 2011.
+
+<p>This seems to be a tricky issue.  
+Adding or calling Revit native commands in the Add-Ins tab is not a supported scenario using the current Revit API.  
+
+
+<!--
+<p>If you can provide me a minimum, non confidential sample project code (possibly with 2010 and 2011, since the code changed), I will ask my team to take a look at it  to see if there is something they can do about it.  And if not, possibly log a change request so that at least it will be considered to work in 2012.  
+
+<p>Here is the code that works in 2010 but not in 2011:
+
+<pre>
+Public Function Execute(ByVal commandData As ExternalCommandData, ByRef message As String, ByVal elements As ElementSet) As IExternalCommand.Result Implements IExternalCommand.Execute
+        Try            
+            SendKeys.SendWait("FMB") ' FMB is a keyboard shortcut of the Area Boundary Line native command                      
+        Catch ex As Exception
+            FMUtil.logger.WriteLog("AreaBoundaryLineCommand.Execute.Exception: " & ex.ToString(), FMS.Logging.LoggingNet2.LogMode.Error)
+            MessageBox.Show(FMConstants.CONTACT_FM_SUPPORT_MESSAGE)
+            Return IExternalCommand.Result.Cancelled
+        End Try
+        Return IExternalCommand.Result.Succeeded
+      End Function
+</pre>
+
+<p>And define keyboard shortcuts for two native commands 'Area' and 'Area Boundary Line' in the Revit 2011 from View tab à User Interface à Keyboard Shorcuts
+-->
+
+<p>In spite of all our efforts, we have not been able to port some code that worked in Revit 2010 to Revit 2011.
+We used to send the shortcut string in a different thread, just as described above, but this still does not activate the Revit command.
+As we saw above, we can send the Ctrl + F4 shortcut to close the active document, but sending a standard Revit keyboard shortcut  to launch a Revit command fails.
+
+<!-- 
+
+FMB 
+the area boundary line command 
+call the AreaBoundaryLine command from an external command 
+
+-->
+
+<p>Here is an excerpt from a discussion with the development team about this topic and possible workarounds, answered by Arno&scaron;t L&ouml;bel:
+
+<p><strong>Question:</strong> Before giving up completely on solving this issue, I would like to hear your comments on it:
+
+<p>Could you think of any other possible things to try to make a shortcut used from an external command successfully launch a built-in Revit command? 
+We tried to achieve this by passing a keyboard shortcut through a Windows message, but it did not display the context tab.   
+
+<p>The same approach worked fine in Revit 2010.  
+
+<p>We are aware that this is not an officially supported usage scenario.  
+
+<p><strong>Answer:</strong> From my point of view, all the attempts mentioned are very dangerous indeed. 
+I would definitely not recommend building a commercial solution based on such approach.
+We do not claim and never have claimed to support sending shortcuts (or any other commands) to the main Revit window and I do not think we should do that in the future. 
+It is a wrong approach in my opinion. 
+What we want to do and what we will do is to implement 'the right way' to provide the features our users need. 
+If you need to use the area command, we will look into implementing it and exposing it in the Revit API. 
+
+<p>The claims that something hacky 'worked' in 2010 but does not work anymore in 2011, or vice versa, are all irrelevant. 
+Naturally, a lot of things can be achieved with the .NET or Windows API, but the Revit API does not support any of that for good reasons.
+
+<p>By the way, closing the active document from an external command using Windows messages as described above is a very nice way to crash Revit, eventually. 
+It bypasses the transaction protection we have implemented in the external command framework, as well as the protection we have in event framework.
+
+<p>It is one thing if an individual somewhere wants to do something experimental in his or her company only, for personal use, so to speak. 
+Another thing altogether would be if a developer builds an application based on such a technique and sells it as part of a solution. 
+The major problem is that the solution may work sometimes but not at other times. 
+It is really hard to tell and depends on various factors, such as what other external applications might also be installed on the system.
+When we say that we do not support it, it is only a half the fact; the truth is that we do not even have a safety features in place against tricks like that, therefore anything could happen from just crashing Revit to corrupting document(s).
+
+<p>I am rather surprised that we do not hear about crashes and problems caused by these keystroke messages more often (or maybe we do, but don't know what caused them).
+
+<!-- <p>That is my opinion. Scott's opinion may be different. -->
+
+<p><strong>Question:</strong> Yes, I completely agree with you.   
+Something similar to the AutoCAD API method sendCommandToExecute in the Revit API would be nice.  
+And in this case, allowing customization of ribbon in UI might eliminate the need for this in the first place.  
+
+<p>Thank you for strongly confirming that this approach is not supported.
+These various attempts often help make us aware of real developer needs, though.
+
+<p><strong>Answer:</strong> I totally agree with you. 
+We want to hear about users' and developers' needs and we want to make them happy. 
+Unfortunately, the Revit API users often feel like they do not need to tell us about their requirements because they can 'implement' it 'easily' themselves. 
+While we do encourage out users to experiment, any experimenting has limits.
+
+<p>I do not think I would like to even see anything similar to sendCommandToExecute in the Revit API. 
+We would need  a framework to support this workflow and I personally do not think it is necessary. 
+The goal is to implement the native Revit UI itself (with all its commands) simply utilizing the internal Revit API, and to also expose that as our public API. 
+That way, API clients can do whatever our UI does and do not need to use these dangerous and unnatural workarounds.
+
+<p>Many thanks to Arno&scaron;t for this clear and supportive answer!
+
+<a name="3"></a>
+
+<h4>Disclaimer</h4>
+
+<p>The Windows message approach described above is a risky workaround which you might resort to if you are in desperate need.
+Please be aware that this is not an officially supported usage by Autodesk.  
+It is not guaranteed to work under any conditions or in any past, present or future releases of Revit whatsoever. 
+If you use this, you are doing so at your own risk. 
+Autodesk hopes to expose an appropriate API for this functionality in future.

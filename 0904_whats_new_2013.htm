@@ -1,0 +1,1843 @@
+﻿<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+<body>
+
+<h1>What's New in the Revit 2013 API</h1>
+
+<p>This is the fourth and last instalment of a series publishing the information provided in the 'What's New' sections of the past few Revit API releases help file RevitAPI.chm.</p>
+
+<p>The first instalment covering
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">
+What's New in the Revit 2010 API</a> explains
+
+my motivation for this and provides an overview of the other releases.</p>
+
+<p>We now move on to the Revit 2013 API, looking at:</p>
+
+<ul>
+<li><a href="#2">Major changes and renovations</a></li>
+<li><a href="#3">Major enhancements</a></li>
+<li><a href="#4">Small enhancements &amp; API interface changes</a></li>
+</ul>
+
+<p>First, however, another update on my vacation.</p>
+
+
+<a name="1"></a>
+
+<h4>Turning North Again</h4>
+
+<p>I am still on holiday in Italy, so please do not expect any immediate responses to comments for a while.</p>
+
+<!--R-->
+<img src="file:///j/photo/jeremy/2013/2013-02-28_taranto/p1000259_jeremy_under_almond_tree.jpg" alt="Almond tree blossoming" width="200"/>
+
+<p>After withstanding a snowstorm further north, I did indeed find some warmth further south.</p>
+
+<p>Almond trees are in bloom, and the grass is as green as it will ever get.</p>
+
+<!--L-->
+<img src="file:///j/photo/jeremy/2013/2013-02-28_taranto/p1000290_alberobello_trulli_garden.jpg" alt="Alberobello trulli garden" width="200"/>
+
+<p>I explored the sweet Apulian local train system.</p>
+
+<!--R-->
+<img src="file:///j/photo/jeremy/2013/2013-02-28_taranto/p1000299_galatina_train_station.jpg" alt="Galatina train station" width="200"/>
+
+<p>We had some cold and rainy days in the south also.</p>
+
+<!--L-->
+<img src="file:///j/photo/jeremy/2013/2013-02-28_taranto/p1000322_portoselvaggio_torre_alto_cloud.jpg" alt="Portoselvaggio Torre Alto under stormy clouds" width="200"/>
+
+<p>Turning back northwards towards Napoli under splendid blue skies, I passed this house beside a cafe I visited changing trains in Taranto.</p>
+
+<!--R-->
+<img src="file:///j/photo/jeremy/2013/2013-02-28_taranto/p1000363_taranto_house_with_washing.jpg" alt="Taranto house with washing" width="200"/>
+
+<p>I walked the wonderful
+
+<a href="http://it.wikipedia.org/wiki/Sentiero_degli_Dei">
+Sentiero degli Dei</a> that
+
+I remember so well from my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/more-questions.html">
+visit in 2009</a>.</p>
+
+<!--L-->
+<img src="file:///j/photo/jeremy/2013/2013-03-02_napoli/p1000425_sentiero_degli_dei.jpg" alt="Sentiero degli Dei" width="200"/>
+
+<p>This time around, I started at the bottom, in Praiano, walked up to the Convento San Domenico, spent the night there, and walked on through Nocelle back down to Positano next morning.</p>
+
+<!--R-->
+<img src="file:///j/photo/jeremy/2013/2013-03-02_napoli/p1000431_positano.jpg" alt="Positano" width="200"/>
+
+<p>We had a terrible struggle to get there and back out again due to a bus strike.
+We finally reached Napoli, though, and first of all had a pizza.</p>
+
+<!--L-->
+<img src="file:///j/photo/jeremy/2013/2013-03-02_napoli/p1000444_pizzeria_costa_napoli.jpg" alt="Pizzeria Costa in Napoli" width="200"/>
+
+<p>The clouds returned and covered the Vesuvio.</p>
+
+<!--R-->
+<img src="file:///j/photo/jeremy/2013/2013-03-02_napoli/p1000452_vesuvio_in_clouds.jpg" alt="Vesuvio in clouds" width="200"/>
+
+<p>Spring is eagerly awaited here also, even inspiring the pasticceria.</p>
+
+<!--L-->
+<img src="file:///j/photo/jeremy/2013/2013-03-02_napoli/p1000455_spring_cakes.jpg" alt="Spring cakes" width="200"/>
+
+<p>Now for the last instalment of the previous Revit API releases' news, bringing us up to date with the current day.</p>
+
+
+
+
+<a name="2"></a>
+
+<h1>Major Changes and Renovations to the Revit 2013 API</h1>
+
+
+<h2>.NET 4.0 for compilation</h2>
+
+<p>All Revit components including RevitAPI.dll and RevitAPIUI.dll are now built with the .NET 4.0 compiler. Thus, add-in projects which reference Revit DLLs must be set as .NET 4.0 Framework projects as well.</p>
+
+
+<h2>New macro environment</h2>
+
+<p>VSTA has been replaced by SharpDevelop. This provides identical capabilities for macro creation, editing, and debugging as well as for deployment (application-level and document-level macros) and a simple upgrade procedure for existing macros.</p>
+<p>SharpDevelop also provides expanded IDE capabilities, .NET 4.0, extended refactoring tools, code analysis tools, a regular expression toolkit, and macro IDE add-in support.</p>
+
+
+<h2>Revit.ini registration disabled</h2>
+
+<p>Add-ins will no longer be read from Revit.ini. Revit will look only to .addin files in the machine-wide and user-specific locations when deciding what add-ins to load.</p>
+
+
+<h2>Document.Element properties replaced</h2>
+
+<p>The indexed properties:</p>
+
+<ul>
+<li>Document.Element[ElementId]
+<li>Document.Element[String]
+</ul>
+
+<p>have been replaced by methods:</p>
+
+<ul>
+<li>Document.GetElement(ElementId)
+<li>Document.GetElement(String)
+</ul>
+
+<p>The old indexed properties have been marked obsolete.</p>
+<p>The behavior for the new methods is identical to what they replaced.</p>
+
+
+<h2>Replacements for use of old-style collections</h2>
+
+<a name="ElementArray_and_ElementSet_are_now_obsolete"></a>
+
+<h3>ElementArray and ElementSet are now obsolete</h3>
+
+<p>With a few exceptions, API methods using ElementArray and ElementSet have been replaced with equivalents using .NET generic collections of ElementIds (ICollection&lt;ElementId&gt;).</p>
+<p>Some APIs have been obsoleted with no replacement; these methods are batch element creation methods which dated to the time when regeneration was automatic after every database change. Now that regeneration is manual, having separate batch creation methods provides no extra benefit as multiple element creation calls can be chained together with no delay caused by regeneration.
+Thus these methods are obsolete:</p>
+
+<ul>
+<li>ItemFactoryBase.NewTextNotes()
+<li>Creation.Document.NewRooms(List&lt;RoomCreationData&gt;)
+<li>Creation.Document.NewWalls() (all overloads)
+</ul>
+
+<p>When replacing calls to these methods, you should use the corresponding creation method which creates a single element in a loop, while delaying calls to Regenerate() until the loop has concluded. Because Regenerate() is delayed, you should not make inquiries to the newly created elements' geometry as a part of the loop.</p>
+
+
+<h3>Definitions and DefinitionGroups</h3>
+
+<p>These classes used to inherit from base classes consisting of old-style Revit API collections. The new versions of the classes offer the same functionality, but implement System.Collections.Generic.IEnumerable&lt;T&gt;.</p>
+<p>Code which referred to the older base class or its associated iterator will need to be changed to access members through iteration or the now-available LINQ methods.</p>
+<p>In addition, code which called ForwardIterator() or ReverseIterator() on these classes will need to be changed as the new version of the class does not offer these two legacy methods.</p>
+
+
+<h3>GeometryElement.Objects</h3>
+
+<p>The property</p>
+
+<ul>
+<li>GeometryElement.Objects
+</ul>
+
+<p>has been obsoleted. GeometryElement now inherits directly from IEnumerable&lt;GeometryObject&gt;, and it possible to directly iterate the contents of the GeometryElement using .NET and LINQ, if needed.</p>
+
+
+<h2>Replacements for wall creation methods</h2>
+
+<p>New wall creation APIs have been provided as a part of the Wall class:</p>
+
+<ul>
+<li>static Wall Create(Document document, Curve curve, ElementId levelId, bool structural) &ndash; Creates a new rectangular profile wall within the project using the default wall style.
+<li>static Wall Create(Document document, Curve curve, ElementId wallTypeId, ElementId levelId, double height, double offset, bool flip, bool structural) &ndash; Creates a new rectangular profile wall within the project using the specified wall type, height, and offset.
+<li>static Wall Create(Document document, IList&lt;Curve&gt; profile, bool structural) &ndash; Creates a non rectangular profile wall within the project using the default wall type:
+<li>static Wall Create(Document document, IList&lt;Curve &gt; profile, ElementId wallTypeId, ElementId levelId, bool structural) &ndash; Creates a non rectangular profile wall within the project using the specified wall type.
+<li>static Wall Create(Document document, IList&lt;Curve&gt; profile, ElementId wallTypeId, ElementId levelId, bool structural, XYZ normal) &ndash; Creates a non rectangular profile wall within the project using the specified wall type and normal vector.
+</ul>
+
+<p>These methods replace the obsolete methods on Autodesk.Revit.Creation.Document (NewWall() (all overloads)). The NewWalls() overloads are obsoleted without dedicated replacements, as described in the section
+
+<a href="#ElementArray_and_ElementSet_are_now_obsolete">
+ElementArray and ElementSet are now obsolete</a>.</p>
+
+
+<h2>Idling event and External Events</h2>
+
+
+
+<h3>Idling event frequency</h3>
+
+<p>The Idling event has been changed to offer two different modes of behavior. The default behavior has changed; pre-existing code that needs the original behavior will need to opt-in to the non-default behavior.</p>
+<p>In the default mode, a single raise of the event will be made each time Revit begins an idle session. Note that when the user is active in the Revit user interface, idle sessions begin whenever the mouse stops moving for a moment or when a command completes. However, if the user is not active in the user interface at all, Revit may not invoke additional idling sessions for quite some time; this means that your application may not be able to take advantage of time when the user leaves the machine completely idle for a period of time.</p>
+<p>In the non-default mode, your application forces Revit to keep the idling session open and to make repeated calls to your event subscriber. In this mode even if the user is totally inactive the Revit session will continue to make Idling calls to your application. However, this can result in performance degradation for the system on which Revit is running because the CPU remains fully engaged in serving Idling events during the Revit application's downtime.</p>
+<p>You can indicate the preference for the non-default Idling frequency by calling</p>
+
+<ul>
+<li>IdlingEventArgs.SetRaiseWithoutDelay()
+</ul>
+
+<p>each time the Idling event callback is made. Revit will revert to the default Idling frequency if this method is not called every time in your callback.</p>
+
+
+<h3>Idling event with no active document</h3>
+
+<p>The Idling event now is invoked when there is no document active in Revit.</p>
+
+
+<h3>External Events framework</h3>
+
+<p>The External Events framework is a new API framework tailored for asynchronous processing such as that which is needed to support modeless dialogs. It operates similarly to the Idling event with default frequency.</p>
+<p>With this framework, instead of implementing an event handler and implementing the handler to do nothing when there is no activity in your dialog, instead you do the following:</p>
+
+<ol>
+<li>Implement an external event by deriving from the interface:
+
+<ul>
+<li>IExternalEvent
+</ul>
+
+<li>Create an ExternalEvent with
+
+<ul>
+<li>ExternalEvent.Create()
+</ul>
+
+<li>When an event happens in your modeless UI where a Revit action needs to be taken, call
+
+<ul>
+<li>ExternalEvent.Raise()
+</ul>
+
+<li>Revit will wait for an available Idling timecycle and call the implementation of your event:
+
+<ul>
+<li>IExternalEvent.Execute()
+</ul>
+</ol>
+
+<p>This framework is more useful for modeless dialog developers because you can skip the default no-op implementation when nothing has happened, and tell Revit when there is some work you need to do in Revit. It also saves on the time required for Revit to make repeated calls to the Idling event when there is no actual work to be done.</p>
+
+
+<h3>Calling OpenAndActivateDocument during events</h3>
+
+<p>The UIApplication.OpenAndActivateDocument can now be invoked during events under the following conditions:</p>
+
+<ol>
+<li>When invoked from an External Event, not restrictions apply except for the original active document to be free of transactions and transaction groups.
+<li>When invoked from regular event handlers, the following restrictions apply:
+
+<ul>
+<li>There must be no active document open yet in Revit
+<li>The event must not be nested in other events or in execution external command
+</ul>
+</ol>
+
+
+<h2>Document &amp; worksharing changes</h2>
+
+
+
+<h3>Worksharing properties</h3>
+
+<p>The information required to identify a workshared file on the central or local locations have changed due to changes to RevitServer. As a result, the members</p>
+
+<ul>
+<li>Application.GetRevitServerNetworkHosts()
+<li>Application.CurrentRevitServerAccelerator
+<li>Document.WorksharingCentralFilename
+</ul>
+
+<p>replace the properties</p>
+
+<ul>
+<li>Application.CentralServerName
+<li>Application.LocalServerName
+<li>Document.GetWorksharingCentralModelPath()
+</ul>
+
+<p>The new members:</p>
+
+<ul>
+<li>Application.GetWorksharingCentralGUID(ServerPath serverModelPath)
+<li>Document.WorksharingCentralGUID
+</ul>
+
+<p>provides read access to the worksharing central GUID of the given server-based model. This is applicable only to workshared models saved in Revit 2013 or later.</p>
+
+
+<h3>New overloads for Application.OpenDocumentFile() and UIApplication.OpenAndActivateDocument()</h3>
+
+<p>The new overloads support parameters OpenOptions and OpenOptionsForUI, respectively, to specify how a Revit document should be opened. Both options classes currently offer the ability to detach the opened document from central if applicable.</p>
+<p>The property:</p>
+
+<ul>
+<li>OpenOptions.DetachFromCentralOption
+</ul>
+
+<p>can be set to DoNotDetach (the default) or DetachAndPreserve.</p>
+<p>The property:</p>
+
+<ul>
+<li>OpenOptionsForUI.DetachFromCentralOption
+</ul>
+
+<p>can be set to DoNotDetach (the default), DetachAndPreserveWorksets or DetachAndPrompt.</p>
+
+
+<h3>BasicFileInfo</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>BasicFileInfo
+</ul>
+
+<p>offers basic information about a Revit file, including worksharing status, Revit version, username and central path. The information can be extracted without fully opening the file.</p>
+
+
+<h2>Point cloud engine API changes</h2>
+
+<p>Because these are new methods in a pre-existing interface, existing code will have to be modified to implement the methods.</p>
+
+
+<h3>Free()</h3>
+
+<p>Unlike other Point Cloud interfaces in the Revit 2012 release, this interface did not offer a method to be called when Revit is finished with it.</p>
+<p>When Revit calls this function it indicates that the IPointCloudAccess interface is no longer going to be used and the provider of the interface can dispose of all allocated resources.</p>
+
+
+<h3>GetOffset()</h3>
+
+<p>Implement this method to return the offset stored in the point cloud. All points are assumed to be offset by the same offset vector. The offset should be expressed in the same units as used by the point coordinates (the scale conversion factor is not applied). The offset will be used by Revit if the user choose to place an instance relative to another point cloud (the "Auto &ndash; Origin To Last Placed" placement option).</p>
+
+
+<h3>CreatePointSetIterator()</h3>
+
+<p>A second overload with an additional argument &ndash; density &ndash; the desired number of points per unit area. Area is computed in native units of the point cloud.</p>
+
+
+<h2>IFC export APIs</h2>
+
+<p>The IFC export implementation in Revit has switched to a more generic toolkit. As a result, many of the APIs introduced in Revit 2012 to support customized IFC export have been removed and replaced, and new interfaces introduced that allow more flexibility in the data that is written to the IFC file. Autodesk recommends that any customization of IFC export begin with the implementation of the default Revit IFC exporter client, and that customizations written for 2012 be ported incrementally to support Revit 2013.</p>
+
+
+<h2>Construction Modeling changes</h2>
+
+<p>The following members are now obsolete:</p>
+
+<ul>
+<li>Part.GetDividedParents() &ndash; replaced with Part.GetSourceElementIds
+<li>PartMaker.GetDividedElementIds() &ndash; replaced with PartMaker.GetSourceElementIds
+<li>PartMaker.IsElementDivided() &ndash; replaced with PartMaker.IsSourceElement
+<li>PartMaker.SetDividedElementIds() &ndash; replaced with PartMaker.SetSourceElementIds
+<li>PartUtils.ArePartsValidForDivide -> replaced with PartUtils.AreElementsValidForDivide()
+</ul>
+
+<p>The following members are now obsolete &ndash; they are not being replaced with new members because the information they returned can be obtained by applying GetSourceElementIds recursively to source elements that are Parts.</p>
+
+<ul>
+<li>Part.OriginalDividedElementId
+<li>Part.ParentDividedElementId
+<li>PartUtils.GetDividedParent()
+</ul>
+
+<p>The following members are obsolete. Their replacements live on the PartMakerMethodToDivideVolumes class, which you can obtain for a given PartMaker using PartUtils.GetPartMakerMethodToDivideVolume():</p>
+
+<ul>
+<li>PartUtils.AreElementsValidIntersectingReferences()
+<li>PartUtils.IsValidSketchPlane()
+<li>PartUtils.SetOffsetForIntersectingReference()
+<li>PartUtils.GetOffsetForIntersectingReference()
+<li>PartUtils.PartMakerUsesReference()
+</ul>
+
+<p>The methods:</p>
+
+<ul>
+<li>AssemblyViewUtils.CreatePartList()
+<li>AssemblyViewUtils.CreateMaterialTakeoff()
+</ul>
+
+<p>now return ViewSchedule instead of View.</p>
+
+
+<h2>Structure changes</h2>
+
+
+
+<h3>Rebar.GetCenterlineCurves()</h3>
+
+<p>The overload taking one argument is now obsolete.</p>
+<p>The new three-argument Rebar.GetCenterlineCurves(Boolean, Boolean, Boolean) has arguments to control whether or not to:</p>
+
+<ul>
+<li>Adjust for self-intersection
+<li>Include hooks
+<li>Include bend radius curves (fillets)
+</ul>
+
+
+
+<h3>Rebar member changes</h3>
+
+<p>These members are now obsolete:</p>
+
+<ul>
+<li>Rebar.DistributionPath is replaced by Rebar.GetDistributionPath()
+<li>Rebar.Host is replaced by Rebar.GetHostId() and SetHostId()
+<li>Rebar.RebarShape is replaced by Rebar.RebarShapeId property
+<li>Rebar.BarType is obsoleted. Use the inherited GetTypeId() and ChangeTypeId()
+</ul>
+
+
+
+<h3>AreaReinforcement and PathReinforcement</h3>
+
+<h4>BarDescription class</h4>
+<p>The new RebarInSystem element replaces the <b>BarDescription</b> class. This class and related methods:</p>
+
+<ul>
+<li>AreaReinforcement.NumBarDescriptions()
+<li>AreaReinforcement.GetBarDescription()
+<li>PathReinforcement.NumBarDescriptions()
+<li>PathReinforcement.GetBarDescription()
+</ul>
+
+<p>are obsolete in 2013.</p>
+<p>When <b>ReinforcementSettings.HostStructuralRebar</b> is true, Area and Path Reinforcement elements create individual rebar elements that participate in views and schedules. The individual <b>RebarInSystem</b> elements have the same graphical representation and parameters as <b>Rebar</b> elements, and have the same API methods for inquiry. But the <b>RebarInSystem</b> elements are almost entirely controlled by their system element (Area or Path). Therefore they are missing most of the modification methods of the Rebar class.</p>
+<p>New methods:</p>
+
+<ul>
+<li>AreaReinforcement.GetRebarInSystemIds()
+<li>AreaReinforcement.RemoveAreaReinforcementSystem()
+<li>PathReinforcement.GetRebarInSystemIds()
+<li>PathReinforcement.RemovePathReinforcementSystem()
+</ul>
+
+
+
+<h2>MEP changes</h2>
+
+
+
+<h3>ConnectorProfileType, PartType</h3>
+
+<p>ConnectorProfileType enums are renamed to:</p>
+
+<ul>
+<li>Invalid, Round, Rectangular, Oval</li>
+</ul>
+
+<p>PartType::UndefinedPartType is renamed to PartType::Undefined.</p>
+
+
+<h3>ConnectorElement</h3>
+
+<p>Subclasses of ConnectorElement: PipeConnector, DuctConnector, and ElectricalConnector, are obsolete.</p>
+
+<ul>
+<li>IsPrimary &ndash; moved to ConnectorElement
+<li>AssignAsPrimary &ndash; moved to ConnectorElement
+<li>LinkedConnector &ndash; moved to ConnectorElement as GetLinkedConnectorElement and SetLinkedConnectorElement
+<li>Please query the parameters RBS_PIPE_CONNECTOR_SYSTEM_CLASSIFICATION_PARAM, RBS_DUCT_CONNECTOR_SYSTEM_CLASSIFICATION_PARAM, or RBS_ELEC_CIRCUIT_TYPE on ConnectorElement to obtain the PipeSystemType, DuctSystemType, and ElectricalSystemType values on the now obsolete PipeConnector, DuctConnector, and ElectricalConnector elements.
+</ul>
+
+<p>Connector element types can now be created using new methods:</p>
+
+<ul>
+<li>ConnectorElement.CreatePipeConnector()
+<li>ConnectorElement.CreateDuctConnector()
+<li>ConnectorElement.CreateElectricalConnector()
+<li>ConnectorElement.CreateConduitConnector()
+<li>ConnectorElement.CreateCableTrayConnector()
+</ul>
+
+<p>These methods replace the methods on Autodesk.Revit.Creation.FamilyItemFactory (NewDuctConnector, NewPipeConnector, NewElectricalConnector). Those methods are now obsolete.</p>
+
+
+<h2>Obsolete API Cleanup</h2>
+
+<p>Many API classes and methods previously marked Obsolete in Revit 2012 and earlier have been removed from the API.</p>
+
+
+<h3>Classes removed</h3>
+
+<ul>
+<li>MaterialConcrete, MaterialGeneric, MaterialOther, MaterialSteel, MaterialWood &ndash; all data is now accessed via the Material class
+<li>Autodesk.Revit.DB.ConstructionType &ndash; replaced by Autodesk.DB.Analysis.ConstructionType
+<li>SuspendUpdating &ndash; no longer needed because Automatic regeneration mode has been removed.Autodesk.Revit.UI.Macros.ApplicationEntryPoint
+<li>Autodesk.Revit.VSTA.ApplicationEntryPoint &ndash; replaced by Autodesk.Revit.UI.Macros.ApplicationEntryPoint
+<li>Autodesk.Revit.VSTA.DocumentEntryPoint &ndash; replaced by Autodesk.Revit.UI.Macros.DocumentEntryPoint
+<li>Autodesk.Revit.VSTA.IEntryPoint &ndash; replaced by Autodesk.Revit.UI.Macros.IEntryPoint
+<li>Autodesk.Revit.VSTA.AddInIdAttribute &ndash; replaced by Autodesk.Revit.UI.Macros.AddInIdAttribute
+<li>Autodesk.Revit.VSTA.VendorIdAttribute &ndash; replaced by Autodesk.Revit.UI.Macros.VendorIdAttribute
+</ul>
+
+
+
+<h3>Methods and properties removed</h3>
+
+<ul>
+<li>AnalysisDisplayLegend.Width &ndash; replaced by legend settings of AnalysisDisplayStyle.
+<li>AnalysisDisplayLegendSettings.SetTextTypeId(ElementId, Document)
+<li>AnalysisDisplayMarkersAndTextSettings.SetTextTypeId(ElementId, Document)
+<li>AnalyticalModel methods
+<ul>
+<li>IsValidAnalyticalProjectionType(AnalyticalDirection, AnalyticalProjectionType) replaced by IsValidProjectionType
+<li>GetAnalyticalProjectionDatumPlane(AnalyticalDirection ) replaced by GetAnalyticalProjectionDatumPlane(AnalyticalElementSelector, AnalyticalDirection)
+<li>IsValidDatumPlaneForProjection(AnalyticalDirection, ElementId ) replaced by IsValidProjectionDatumPlane
+<li>SetAnalyticalProjectionDatumPlane(AnalyticalDirection, ElementId ) replaced by setAnalyticalProjectionDatumPlane(AnalyticalElementSelector, AnalyticalDirection, ElementId)
+<li>SetAnalyticalOffset(XYZ) replaced by SetOffset
+<li>GetAnalyticalOffset() replaced by GetOffset
+<li>GetAnalyticalProjectionType(AnalyticalDirection) replaced by GetAnalyticalProjectionType(AnalyticalElementSelector, AnalyticalDirection)
+<li>SetAnalyticalProjectionType(AnalyticalDirection, AnalyticalProjectionType ) replaced by SetAnalyticalProjectionType(AnalyticalElementSelector, AnalyticalDirection, AnalyticalProjectionType)
+</ul>
+<li>IFCExportOptions.CurrentViewOnly
+<li>PointCloudFilter.GetFilterOutline() &ndash; replaced by PointCloudFilterUtils.GetFilteredOutline()
+<li>RebarHostData.HasCoverTypeForReference(Reference ) &ndash; replaced by IsFaceExposed()
+<li>SpatialFieldManager members
+<ul>
+<li>CurrentUnits replaced by AnalysisResultSchema.CurrentUnits and SpatialFieldManager.SetResultSchema()
+<li>UpdateSpatialFieldPrimitive(int, Autodesk.Revit.DB.Analysis.FieldDomainPoints, Autodesk.Revit.DB.Analysis.FieldValues)
+<li>SetUnits(System.Collections.Generic.IList&lt;System.String&gt;, System.Collections.Generic.IList&lt;double&gt;) replaced by AnalysisResultSchema.SetUnits() and SpatialFieldManager.SetResultSchema()
+<li>GetDescription() replaced by SpatialFieldManager.SetResultSchema() and AnalysisResultSchema.Description
+<li>SetDescription(System.String) replaced by AnalysisResultSchema.Description and SpatialFieldManager.SetResultSchema()
+</ul>
+<li>AnnotationSymbol.AsFamilyInstance
+<li>Area.Boundary &ndash; replaced by GetBoundarySegments(SpatialElementBoundaryOptions)
+<li>Element members
+<ul>
+<li>ObjectType replaced by GetTypeId() and ChangeTypeId()
+<li>SimilarObjectTypes replaced by GetValidTypes()
+</ul>
+<li>Materials members
+<ul>
+<li>AddOther(System.String) replaced by Material.Create
+<li>AddWood(System.String) replaced by Material.Create
+<li>AddConcrete(System.String) replaced by Material.Create
+<li>AddSteel(System.String) replaced by Material.Create
+<li>AddGeneric(System.String) replaced by Material.Create
+</ul>
+<li>PropertySetElement.Create(Document, MaterialAspect) replaced by PropertySetElement.Create(Document, StructuralAsset) and PropertySetElement.Create(Document, ThermalAsset)
+<li>Mullion.AsFamilyInstance
+<li>Panel.AsFamilyInstance
+<li>Rebar.IsShownInFrontOfGeometryInView[View] &ndash; replaced by IsUnobscuredInView() and SetUnobscuredInView()
+<li>PointOnEdge members
+<ul>
+<li>PointOnEdge(Autodesk.Revit.DB.Reference, double) replaced by PointLocationOnCurve
+<li>CurveParameter replaced by LocationOnCurve
+</ul>
+<li>Room.Boundary &ndash; replaced by GetBoundarySegments(SpatialElementBoundaryOptions)
+<li>Face.MaterialElement &ndash; replaced by MaterialElementId
+<li>Reference members
+<ul>
+<li>Element replaced by Document.GetElement(Reference)
+<li>GeometryObject replaced by Element.GetGeometryObjectFromReference(Reference)
+<li>Transform replaced by ReferenceByContext.GetInstanceTransform() after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection()
+<li>ProximityParameter replaced by ReferenceByContext.ProximityParameter after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection()
+</ul>
+<li>PipingSystem members
+<ul>
+<li>FluidType, FluidType is now a property of the system type. Get the system type, and set the parameter RBS_PIPE_FLUID_TYPE_PARAM directly
+<li>FluidTemperature, FluidTemperature is now a property of the system type. Get the system type, and set the parameter RBS_PIPE_FLUID_TEMPERATURE_PARAM directly
+<li>FluidDensity, FluidDensity is now a property of the system type. Get the system type, and set the parameter RBS_PIPE_FLUID_DENSITY_PARAM directly
+<li>FluidViscosity, FluidViscosity is now a property of the system type. Get the system type, and set the parameter RBS_PIPE_FLUID_VISCOSITY_PARAM directly
+</ul>
+<li>Space.Boundary &ndash; replaced by GetBoundarySegments(SpatialElementBoundaryOptions)
+<li>Application.LibraryPaths &ndash; replaced by GetLibraryPaths() and SetLibraryPaths()
+<li>ControlledApplication.LibraryPaths &ndash; replaced by GetLibraryPaths() and SetLibraryPaths()
+<li>Application.NewPointOnEdge(Autodesk.Revit.DB.Reference, double edgeParam) &ndash; replaced by other constructor that uses PointLocationOnCurve
+<li>Document members
+<ul>
+<li>Move() &ndash; all overloads &ndash; replaced by methods of ElementTransformUtils
+<li>Rotate() &ndash; all overloads &ndash; replaced by methods of ElementTransformUtils
+<li>Mirror() &ndash; all overloads &ndash; replaced by methods of ElementTransformUtils
+<li>Array() &ndash; all overloads &ndash; replaced by methods of LinearArray and RadialArray
+<li>ArrayWithoutAssociate() &ndash; all overloads &ndash; replaced by methods of LinearArray and RadialArray
+<li>SaveAs(System.String, bool) &ndash; replaced by SaveAs(String, SaveAsOptions)
+<li>FindReferencesByDirection() &ndash; replaced by FindReferencesWithContextByDirection() and ReferenceIntersector methods
+<li>ExternalFileReference &amp; ImportFileData &ndash; all methods and enums related to material paths
+<li>AbbreviationItem &ndash; empty class removed completely
+<li>WorksharingCentralFilename &ndash; replaced by GetWorksharingCentralModelPath()
+</ul>
+<li>ModelPathUtils.GetRevitServerPrefix() &ndash; RSN:// is the prefix string for Revit Server path.
+</ul>
+
+
+
+
+<a name="3"></a>
+
+<h1>Major Enhancements to the Revit API</h1>
+
+
+
+<h2>Stairs and railings API</h2>
+
+
+
+<h3>Stairs and stairs components</h3>
+
+<p>The new classes in the Autodesk.Revit.DB.Architecture namespace:</p>
+
+<ul>
+<li>Stairs
+<li>StairsType
+</ul>
+
+<p>provide access to new stairs elements in the Revit database. Note that these API classes only provide access to the Stairs created "by component" introduced in this release. Stairs elements created by sketch cannot be accessed as a Stairs object in the API. It is possible to identify both type of stairs using the BuiltInCategory OST_Stairs and the static method Stairs.IsByComponent() can identify an element id represents a by component stairs.</p>
+<p>The classes:</p>
+
+<ul>
+<li>StairsLanding
+<li>StairsLandingType
+<li>StairsRun
+<li>StairsRunType
+</ul>
+
+<p>provide access to the subcomponents and subcomponent types of the new Stairs elements.</p>
+
+
+<h3>Railings and railing components</h3>
+
+<p>The new classes in the Autodesk.Revit.DB.Architecture namespace:</p>
+
+<ul>
+<li>Railing
+<li>RailingType
+</ul>
+
+<p>provide access to the top level railing elements in the Revit database. Railings can be associated to a host, such as a stairs or a floor, or placed in space. Railings can be continuous or non-continuous. If non-continuous, only a limited level of access is provided.</p>
+
+
+<h3>Stairs annotations</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>CutMarkType
+</ul>
+
+<p>provides access to the properties and capabilities of a CutMark annotation which can be associated to stairs.</p>
+<p>The new classes</p>
+
+<ul>
+<li>StairsPath
+<li>StairsPathType
+</ul>
+
+<p>provide access to the stairs path annotation.</p>
+
+
+<h2>View API</h2>
+
+
+
+<h3>View Creation</h3>
+
+
+<p>Plan Views can now be created with the new ViewPlan.Create(document, viewFamilyTypeId, levelId) method.</p>
+<p>For example, a ceiling plan can be created as follows:</p>
+
+<pre>
+&nbsp; <span class="teal">Element</span> level = doc.GetElement(
+&nbsp; &nbsp; uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element ) ) <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ViewFamilyType</span>&gt; viewFamilyTypes
+&nbsp; &nbsp; = <span class="blue">from</span> elem <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewFamilyType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> type = elem <span class="blue">as</span> <span class="teal">ViewFamilyType</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> type.ViewFamily == <span class="teal">ViewFamily</span>.CeilingPlan
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> type;
+&nbsp;
+&nbsp; <span class="teal">ViewPlan</span> ceilingPlan = <span class="teal">ViewPlan</span>.Create(
+&nbsp; &nbsp; doc, viewFamilyTypes.First().Id, level.Id );
+&nbsp;
+&nbsp; ceilingPlan.Name = <span class="maroon">&quot;New Ceiling Plan for &quot;</span>
+&nbsp; &nbsp; + level.Name;
+&nbsp;
+&nbsp; ceilingPlan.DetailLevel = <span class="teal">ViewDetailLevel</span>.Fine;
+&nbsp;
+&nbsp; <span class="green">// 3D views can be created with </span>
+&nbsp; <span class="green">// View3D.CreateIsometric and </span>
+&nbsp; <span class="green">// View3D.CreatePerspective. </span>
+&nbsp; <span class="green">// The new ViewOrientation3D object is used to </span>
+&nbsp; <span class="green">// get or set the orientation of 3D views.</span>
+&nbsp;
+&nbsp; <span class="teal">View3D</span> view = <span class="teal">View3D</span>.CreateIsometric(
+&nbsp; &nbsp; doc, viewFamily3d );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> eyePosition = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 10 );
+&nbsp; <span class="teal">XYZ</span> upDirection = <span class="blue">new</span> <span class="teal">XYZ</span>( -1, 0, 1 );
+&nbsp; <span class="teal">XYZ</span> forwardDirection = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 0, 1 );
+&nbsp; view.SetOrientation( <span class="blue">new</span> <span class="teal">ViewOrientation3D</span>(
+&nbsp; &nbsp; eyePosition, upDirection, forwardDirection ) );
+</pre>
+
+
+<ul>
+<li>The ViewSection class now has methods that support the creation of Callout, Reference Callout, and Reference Section views.
+<li>Rendering views containing images imported from disk can be created using the new ImageView class and the ImageView.Create method.
+</ul>
+
+
+
+<h3>DisplayStyle</h3>
+
+<p>The enum DisplayStyle (with values including Wireframe, HLR, and Shading) has been added so the API can be used to get/set the new DisplayStyle property.</p>
+
+
+<h3>ViewDetailLevel</h3>
+
+<p>The enum ViewDetailLevel (with values Coarse, Medium, and Fine) has been added with get/set access to the new DetailLevel property.</p>
+
+
+<h3>ViewRange</h3>
+
+<p>The view range for plan views can now be retrieved via ViewPlan.GetViewRange().</p>
+
+
+<h3>3D View Locking</h3>
+
+<ul>
+<li>3D Views can now be locked and unlocked via the API with the methods SaveOrientationAndLock, RestoreOrientationAndLock, and Unlock.
+<li>The property IsLocked indicates if a view is currently locked.
+<li>NewTag can now be used in locked 3D Views.
+</ul>
+
+
+
+<h3>View.Duplicate</h3>
+
+<p>Views can now be duplicated via the API with the View.Duplicate(ViewDuplicateOption) method.</p>
+
+
+<h3>UIView class and UIDocument.GetOpenUIViews()</h3>
+
+<p>The UIView class has been added to represent a view window in the Revit user interface. GetOpenUIViews provides a list of all open views. UIView.GetWindowRectangle() returns a rectangle that describes the size and placement of the UIView window.</p>
+
+
+<h3>Pan and Zoom</h3>
+
+<p>The method</p>
+
+<ul>
+<li>UIView.ZoomAndCenterRectangle()
+</ul>
+
+<p>offers the ability to zoom and pan the active view to center on the input region of the model.</p>
+<p>The method</p>
+
+<ul>
+<li>UIView.GetZoomCorners()
+</ul>
+
+<p>returns the two points that define the corners of the view's rectangle in model coordinates.</p>
+
+
+<h3>PlanViewDirection</h3>
+
+<p>The enum PlanViewDirection has been added so API can be used to get/set the view direction to either Up or Down for StructuralPlan views.</p>
+
+
+<h3>ViewFamilyType class and ViewFamily enum</h3>
+
+<p>The ViewFamilyType class has been created to correspond to the Types seen in the UI's Properties dialog for each view. The ViewFamily enum (FloorPlan, Section, Legend, etc) specifies the family of the ViewFamilyType.</p>
+
+
+<h3>Temporary view modes</h3>
+
+<p>View.EnableRevealHiddenMode, View.EnableTemporaryAnalyticalDisplayMode, View.DisableTemporaryViewMode, and the TemporaryViewMode Enumeration have been added to allow control of temporary view modes.</p>
+
+
+<h2>Schedules</h2>
+
+
+
+<h3>Schedule API</h3>
+
+<p>Several new classses have been added to allow schedule views to be created, modified, and added to drawing sheets. Major new classes include:</p>
+
+<ul>
+<li>The ViewSchedule class that represents the schedule view. Its create methods are used to create new schedules.
+<li>The ScheduleField class for the inidivual fields in a schedule
+<li>The ScheduleSheetInstance class represents schedules placed on sheets. The create method creates an instance of a schedule on a sheet.
+<li>The ScheduleDefinition class defines the contents of a schedule view, including:
+<ol>
+<li>Basic properties that determine the kind of schedule, such as the schedule's category.
+<li>A set of fields that become the columns of the schedule.
+<li>Filters that restrict the set of elements visible in the schedule.
+<li>Sorting and grouping criteria.
+</ol>
+</ul>
+
+<h3>Running API commands in Schedule Views</h3>
+
+<p>API commands may now be active when a Schedule is active in the current document.</p>
+
+
+<h3>Schedule export</h3>
+
+<p>The ViewSchedule class has been added to the API and the method ViewSchedule.Export method exports an existing schedule to a text file.</p>
+
+
+<h2>Discipline controls</h2>
+
+<p>The properties:</p>
+
+<ul>
+<li>Application.IsArchitectureEnabled
+<li>Application.IsStructureEnabled
+<li>Application.IsStructuralAnalysisEnabled
+<li>Application.IsMassingEnabled
+<li>Application.IsEnergyAnalysisEnabled
+<li>Application.IsSystemsEnabled
+<li>Application.IsMechanicalEnabled
+<li>Application.IsMechanicalAnalysisEnabled
+<li>Application.IsElectricalEnabled
+<li>Application.IsElectricalAnalysisEnabled
+<li>Application.IsPipingEnabled
+<li>Application.IsPipingAnalysisEnabled
+</ul>
+
+<p>provide read and modify access to the available disciplines. Your application can read the properties to determine when to enable or disable aspects of the UI.</p>
+<p>Enabling and disabling disciplines is available only in Autodesk Revit (and not in any other Revit product). When a discipline's status is toggled, Revit's UI will be adjusted, and certain operations and features will be enabled or disabled as appropriate.</p>
+
+
+<h2>Rendering Options</h2>
+
+<p>The settings shown in the Rendering Options Dialog are exposed, allowing an API user can get and set Rendering Options for a 3d view.</p>
+<p>The new methods:</p>
+
+<ul>
+<li>View3D.GetRenderingSettings
+<li>View3D.SetRenderingSettings
+</ul>
+
+<p>gets or changes the rendering settings for the 3d view.</p>
+<p>The class</p>
+
+<ul>
+<li>RenderingSettings
+</ul>
+
+<p>offers properties and methods which correspond to the options in the UI dialog:</p>
+
+<ul>
+<li>RenderingSettings.UsesRegionRendering &ndash; Boolean value that indicates whether to use region rendering.
+<li>RenderingSettings.BackgroundStyle &ndash; The enum value that controls the background style for rendering.
+<li>RenderingSettings.ResolutionTarget &ndash; The resolution target.
+<li>RenderingSettings.PrinterResolution &ndash; The resolution level when using printer.
+<li>RenderingSettings.LightingSource &ndash; The lighting scheme type.
+<li>RenderingSettings.ResolutionValue &ndash; The rendering resolution in dots per inch (DPI).
+<li>RenderingSettings.GetBackgroundSettings() &ndash; Returns an object that represents the rendering background settings.
+<li>RenderingSettings.SetBackgroundSettings() &ndash; Changes the rendering background settings details for the current background style.
+<li>RenderingSettings.GetRenderingImageExposureSettings() &ndash; Returns an object that represents the rendering image exposure settings.
+<li>RenderingSettings.SetRenderingImageExposureSettings() &ndash; Changes the rendering image exposure settings.
+<li>RenderingSettings.GetRenderingQualitySettings() &ndash; Returns an object that represents the rendering quality settings.
+<li>RenderingSettings.SetRenderingQualitySettings() &ndash; Changes rendering quality settings.
+<li>RenderingSettings.GetRenderingRegionOutline() &ndash; Returns the outline of the rendering region.
+</ul>
+
+<p>The rendering properties are exposed with the following supplementary classes and enums:</p>
+
+<ul>
+<li>enum BackgroundImageFit &ndash; Represents the type of background image fit.
+<li>enum ResolutionTarget &ndash; Represents the resolution target (Screen or Printer) used for rendering.
+<li>enum PrinterResolution &ndash; Controls the resolution level for a printer target.
+<li>enum LightingSource &ndash; Represents the lighting scheme type.
+<li>enum RenderingQuality &ndash; Represents the rendering quality.
+<li>enum BackgroundStyle- Represents the background style.
+<li>class SkyBackgroundSettings &ndash; Represents the rendering sky background settings.
+<li>class ColorBackgroundSettings &ndash; Represents the rendering color background settings.
+<li>class ImageBackgroundSettings &ndash; Represents the rendering image background settings.
+<li>class RenderingImageExposureSettings &ndash; Represents the exposure settings of rendering.
+</ul>
+
+<p>Example: checking rendering options for a 3D view:</p>
+
+<pre>
+&nbsp; <span class="teal">RenderingSettings</span> renderingSettings
+&nbsp; &nbsp; = view3D.GetRenderingSettings();
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> newTran = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; doc, <span class="maroon">&quot;Change Rendering Settings&quot;</span> );
+&nbsp;
+&nbsp; newTran.Start();
+&nbsp;
+&nbsp; renderingSettings.BackgroundStyle
+&nbsp; &nbsp; = <span class="teal">BackgroundStyle</span>.Image;
+&nbsp;
+&nbsp; view3D.SetRenderingSettings( renderingSettings );
+&nbsp;
+&nbsp; newTran.Commit();
+</pre>
+
+
+<h2>Construction Modeling</h2>
+
+
+
+<h3>Linked element parents for parts</h3>
+
+<p>Parts can be created from linked elements. There are new overloads:</p>
+
+<ul>
+<li>PartUtils.CreateParts()
+<li>PartUtils.IsValidForCreateParts()
+<li>PartUtils.HasAssociatedParts()
+<li>PartUtils.GetAssociatedParts()
+<li>PartUtils.GetAssociatedPartMaker()
+</ul>
+
+<p>which accept LinkElementIds (representing the id of the element in the link). The existing Part utilities accepting ElementId have not been changed.</p>
+
+
+<h3>Merged parts</h3>
+
+<p>The methods:</p>
+
+<ul>
+<li>PartUtils.ArePartsValidForMerge()
+<li>PartUtils.CreateMergedPart()
+<li>PartUtils.FindMergeableClusters()
+<li>PartUtils.GetChainLengthToOriginal()
+<li>PartUtils.GetMergedParts()
+<li>PartUtils.IsMergedPart()
+</ul>
+
+<p>provide support for merging of parts.</p>
+
+
+<h3>Excluded parts</h3>
+
+<p>The new property</p>
+
+<ul>
+<li>Part.Excluded
+</ul>
+
+<p>allows identification and assignment of parts to be excluded.</p>
+
+
+<h3>Part category</h3>
+
+<p>The new members:</p>
+
+<ul>
+<li>Part.OriginalCategoryId
+<li>Part.GetSourceElementOriginalCategoryIds()
+</ul>
+
+<p>provide the ability to get and set the original category id for a given part.</p>
+
+
+<h3>Part division</h3>
+
+<p>Part divisions can now be assigned custom geometry divisions. The members:</p>
+
+<ul>
+<li>PartMakerMethodToDivideVolumes.ProfileMatch
+<li>PartMakerMethodToDivideVolumes.DivisionGap
+<li>PartMakerMethodToDivideVolumes.ProfileOffset
+<li>PartMakerMethodToDivideVolumes.SplitterProfileType
+<li>PartMakerMethodToDivideVolumes.ProfileFlipAcross
+<li>PartMakerMethodToDivideVolumes.ProfileFlipAlong
+<li>PartMakerMethodToDivideVolumes.GetSketchCurves()
+<li>PartMakerMethodToDivideVolumes.GetPlaneOfSketch()
+<li>PartMakerMethodToDivideVolumes.GetSplitRefsOffsets()
+<li>PartMakerMethodToDivideVolumes.CanBeDivisionProfile()
+</ul>
+
+<p>offer the ability to examine and control properties of the divisions.</p>
+
+
+<h3>Assembly views</h3>
+
+<p>The method</p>
+
+<ul>
+<li>AssemblyViewUtils.AcquireAssemblyViews()
+</ul>
+
+<p>transfers the assembly views owned by a source assembly instance to a target sibling assembly instance of the same assembly type.</p>
+
+
+<h3>Assembly instance transform and location</h3>
+
+<p>The methods</p>
+
+<ul>
+<li>AssemblyInstance.GetTransform()
+<li>AssemblyInstance.SetTransform()
+</ul>
+
+<p>provide read and write access to the transformation origin of the assembly. Changing this value causes the origin point to change relative to the assembly members (and does not move the assembly members). All assemblies of the same type should have changed their transforms by the same amount. For example, if you changed the transform of the assembly by a rotation of 90 degrees, then other assemblies should also have rotated their transform by 90 degrees.</p>
+<p>The inherited property</p>
+
+<ul>
+<li>AssemblyInstance.Location
+</ul>
+
+<p>also has been modified to return a the location for an AssemblyInstance.</p>
+
+
+<h2>Structure improvements</h2>
+
+
+
+<h3>New Rebar members</h3>
+
+<ul>
+<li>RebarShapeMatchesCurvesAndHooks() checks if rebarShape matches curves and hooks.
+<li>CreateFromCurvesAndShape() creates a new instance of a Rebar element with default shape parameters from the RebarShape
+<li>GetBarPositionTransform()
+<li>GetBarExistsAtPosition()
+<li>GetHookTypeId() and SetHookTypeId()
+<li>ScheduleMark property
+<li>TotalLength property
+<li>Volume property
+</ul>
+
+
+
+<h3>ReinforcementSettings</h3>
+
+<p>The new class <b>ReinforcementSettings</b> controls project settings that are accessible from the Reinforcement Settings dialog in the Revit UI. For 2013 the only supported setting is the <b>HostStructuralRebar</b> property, which is new for 2013 and affects the <b>AreaReinforcement</b> and <b>PathReinforcement</b> elements.</p>
+
+
+<h3>AreaReinforcement/PathReinforcement</h3>
+
+<p>AreaReinforcement and PathReinforcement now have types.</p>
+<p>The types &ndash; AreaReinforcementType and PathReinforcementType &ndash; contain only identity data.</p>
+<p>There is no change to the interface for creating Area and Path Reinforcement elements. A default, or most-recently-used type, is automatically assigned on element creation.</p>
+<p>New Area- and PathReinforcementTypes can be created using the following methods:</p>
+
+<ul>
+<li>(static) AreaReinforcementType AreaReinforcementType.Create(Document ADoc, AString Name)
+<li>(static) PathReinforcementType PathReinforcementType.Create(Document ADoc, AString Name)
+</ul>
+
+
+
+<h3>Analytical model</h3>
+
+<p>The new element type</p>
+
+<ul>
+<li>AnalyticalLink
+</ul>
+
+<p>can be created between two other Analytical Elements, e.g. an analytical beam and analytical column. There are two kinds of Links: user defined and automatically generated. Links have properties like "fixity state" that can be accessed via the API.</p>
+
+
+<h2>MEP improvements</h2>
+
+
+
+<h3>Routing Preferences</h3>
+
+<p>Revit MEP now supports a system for selecting preferred pipe and duct sizes, materials, and fitting types for use in an MEP project. The routing preferences API can be used to set routing preference policies for end users as well as to query which fittings and segments will be used given size criteria.</p>
+
+<ul>
+<li>property MEPCurveType.RoutingPreferenceManager &ndash; accesses the main routing preferences object for a give MEPCurve Type. Currently, PipeType and DuctType are the only MEPCurve types that support Routing Preferences.
+<li>class RoutingPreferenceManager &ndash; manages all routing preference rules for segments and fittings and allows the user to query which fitting or segment will be chosen by Revit, given a size condition.
+<li>classes RoutingCriterionBase and PrimarySizeCriterion &ndash; These classes manage criteria for selecting fittings and segments based on minimum and maximum size constraints.
+<li>class RoutingPreferenceRule &ndash; Manages one segment or fitting preference
+<li>classes RoutingCondition and RoutingConditions &ndash; Inputs to RoutingPreferenceManager.GetMEPPartId() to select fittings and segments based on their selection criteria.
+<li>class Segment &ndash; A class representing a length of MEPCurve that contains a material and set available sizes.
+<li>class PipeSegment &ndash; a subclass of Segment representing a length of pipe
+<ul>
+<li>PipeSegment.Create(ElementId materialId, ElementId scheduleId) &ndash; Creates a new PipeSegment of given material, schedule, and size list.
+</ul>
+<li>enum RoutingPreferenceRuleGroupType &ndash; Each routing preference rule is grouped according to what type of routing item it manages
+<ul>
+<li>Elbows
+<li>Junctions
+<li>Crosses
+<li>Transitions
+<li>Unions
+<li>MechanicalJoints
+<li>Segments
+<li>TransitionsRectangularToRound
+<li>TransitionsRectangularToOval
+<li>TransitionsOvalToRound
+</ul>
+</ul>
+
+
+
+<h3>MEP Sections</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>MEPSection
+</ul>
+
+<p>is the base class for duct and pipe section. It is a series of connected elements (segments &ndash; ducts or pipes, fittings, terminals and accessories). All section members should have same flow analysis properties: Flow, Size, Velocity, Friction and Roughness. One section member element which contains more than one connector can belongs to multiple section.</p>
+<p>For example: One Tee fitting that has 3 connectors usually belongs to 3 sections. One segment that connects to a tap will be divided into 2 sections</p>
+
+
+<h3>FluidType and FluidTemperature</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>FluidTemperature
+</ul>
+
+<p>represents the viscosity and density properties as defined at a certain temperature.</p>
+<p>The class</p>
+
+<ul>
+<li>FluidType
+</ul>
+
+<p>has been extended to provide read and write access to a collection of FluidTemperature objects which represent the fluid's properties at various temperatures.</p>
+
+
+<h3>Panel schedule &ndash; spare values</h3>
+
+<p>The new functions</p>
+
+<ul>
+<li>PanelScheduleView.GetSpareLoadValue()
+<li>PanelScheduleView.SetSpareLoadValue()
+<li>PanelScheduleView.GetSpareCurrentValue()
+<li>PanelScheduleViwe.SetSpareCurrentValue()
+</ul>
+
+<p>provide access to the parameter values of spare circuits.</p>
+
+
+<h3>LabelUtils</h3>
+
+<p>New overloads of</p>
+
+<ul>
+<li>LabelUtils.GetLabelFor()
+</ul>
+
+<p>have been added to supply the user-visible string matching members of the enums DuctLossMethodType, PipeLossMethodType, and PipeFlowState.</p>
+
+
+<h2>Physical Properties</h2>
+
+
+
+<h3>Thermal properties</h3>
+
+<p>Thermal properties of various elements have been enhanced in Revit 2013.</p>
+
+<ul>
+<li>Class ThermalProperties
+<ul>
+<li>Absorptance
+<li>HeatTransferCoefficient
+<li>Roughness
+<li>ThermalMass
+<li>ThermalResistance
+</ul>
+</ul>
+
+<p>This class is a property on the following types:</p>
+
+<ul>
+<li>ThermalProperties WallType.ThermalProperties
+<li>ThermalProperties FloorType.ThermalProperties
+<li>ThermalProperties CeilingType.ThermalProperties
+<li>ThermalProperties RoofType.ThermalProperties
+<li>ThermalProperties BuildingPadType.ThermalProperties
+<li>Class FamilyThermalProperties
+<ul>
+<li>AnalyticConstructionTypeId &ndash; This value corresponds to the 'id' property of a constructionType node in Constructions.xml, a supplied data library of thermal properties of common construction types.
+<li>HeatTransferCoefficient
+<li>SolarHeatGainCoefficient
+<li>ThermalResistance
+<li>VisualLightTransmittance
+<li>Find() &ndash; returns a FamilyThermalProperties object from an "id" string in Constructions.xml
+</ul>
+<li>FamilySymbol.GetThermalProperties() &ndash; Gets the thermal properties of a family symbol of a door, window, or curtain panel.
+<li>FamilySymbol.SetThermalProperties()-- Sets the thermal properties of a family symbol of a door, window, or curtain panel.
+</ul>
+
+<p>This class is a property on Door, Window, and Curtain Panel family symbols</p>
+
+<ul>
+<li>FamilyThermalProperties FamilySymbol.ThermalProperties
+</ul>
+
+
+
+<h3>Structural properties</h3>
+
+<p>Beam, Column, and Foundation family instances now support an ElementId of an additional structural Material element
+
+<ul>
+<li>ElementId FamilyInstance.StructuralMaterialId (Foundation, Beam, and Column instances)</li>
+</ul>
+
+<p>All compound structurals can now elect one layer in the structural to be used as the "structural" layer.</p>
+
+<ul>
+<li>int CompoundStructure.StructuralMaterialIndex
+<li>PropertySetElement now supports a StructuralAsset property via the GetStructuralAsset and SetStructuralAsset methods.
+</ul>
+
+<p>StructuralAsset contains named properties for various structural values, such as PoissonModulus and YoungModulus, that offer enhanced ease of use over the previous parameter-API based access to these same values.</p>
+
+
+<h3>Material assets</h3>
+
+<ul>
+<li>StructuralAsset &ndash; contains structural properties that can be set on materials via PropertySetElement and SetMaterialAspectByPropertySet()
+<li>ThermalAsset &ndash; contains thermal properties that can be set on materials via PropertySetElement and SetMaterialAspectByPropertySet()
+<li>PropertySetElement.Create() &ndash; now takes a StructuralAsset or ThermalAsset as a parameter instead of a MaterialAspect.
+</ul>
+
+
+
+<h3>GBXML Export</h3>
+
+<p>Thermal properties of building construction element types can now be set to use calculated values or pre-defined values from Constructions.xml with:
+
+<ul>
+<li>MEPBuildingConstruction.GetBuildingConstructionOverride
+<li>MEPBuildingConstruction.SetBuildingConstructionOverride
+</ul>
+
+<p>EnergyDataSettings.IncludeThermalProperties indicates if thermal information from model assemblies and components is included in GreenBuildingXML export of the detailed model.
+
+
+
+<h2>User interface API improvements</h2>
+
+
+
+<h3>Contextual help support</h3>
+
+<p>Items placed on the Ribbon can now be assigned an action for contextual help using</p>
+
+<ul>
+<li>RibbonItem.SetContextualHelp()
+</ul>
+
+<p>The options supported include linking to an external URL, launching a locally installed help file, or linking to a topic on the Autodesk help wiki.</p>
+<p>You can also invoke the same set of contextual help options at any arbitrary time within your add-in by creating a ContextualHelp object with the appropriate target location, and invoking</p>
+
+<ul>
+<li>ContextualHelp.Launch()
+</ul>
+
+
+
+<h3>Support for Keyboard Shortcuts and Quick Access Toolbar</h3>
+
+<p>API commands may now be assigned keyboard shortcuts, and those assignments will be preserved even if add-ins are added, removed or changed in subsequent sessions.</p>
+<p>API commands may also be moved to the Quick Access Toolbar, and that assignment will also be preserved even if add-ins are added, removed or changed in subsequent sessions.</p>
+
+
+<h3>Replace implementation of commands</h3>
+
+<p>It provides ability to replace the existing Revit command (located in any tab, application menu and right-click menus) implementation with add-in routine.</p>
+
+<ul>
+<li>RevitCommandId
+</ul>
+
+<p>The new class RevitCommandId provides ability to look up and retrieve an object representing Revit Command id given an id string. The id string of the command is the string which appears in the journal when the command is clicked, e.g. "ID_APP_EXIT".</p>
+
+<ul>
+<li>AddInCommandBinding
+</ul>
+
+<p>The new class AddInCommandBinding provides ability to override the Revit command implementation with Executed and CanExecute events.</p>
+
+<ul>
+<li>UIApplication.CreateAddInCommandBinding()
+<li>UIControlledApplication.CreateAddInCommandBinding()
+</ul>
+
+<p>These two new methods provide the ability to create a command binding with a given Revit command id.</p>
+
+
+<h3>Preview control</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>PreviewControl
+</ul>
+
+<p>provides the ability to embed an interactive Revit view as a WPF control inside a dialog.</p>
+
+
+<h3>Options dialog customization</h3>
+
+<p>Subscribe to the new event</p>
+
+<ul>
+<li>UIApplication.DisplayingOptionsDialog
+</ul>
+
+<p>to be notified when Revit is preparing the Options dialog for display. During the event callback, your application can call</p>
+
+<ul>
+<li>DisplayingOptionsDialogEventArgs.AddTab()
+</ul>
+
+<p>to add a new tab to the dialog. The contents of the panel shown when this new tab is selected are determined by the members assigned to the input class:</p>
+
+<ul>
+<li>TabbedDialogExtension
+</ul>
+
+
+
+<h3>Drag &amp; Drop support</h3>
+
+<p>The new methods</p>
+
+<ul>
+<li>UIApplication.DoDragDrop(ICollection&lt;String&gt;)
+<li>UIApplication.DoDragDrop(Object, IDropHandler)
+</ul>
+
+<p>initiate a drag and drop operation on the Revit user interface.</p>
+<p>The first method accepts a list of file names, which can be Revit files, import CAD and images, or some combination of the two. The second method accepts arbitrary data, and provides an IDropHandler callback to handle the drop of the data when the user completes it.</p>
+
+
+<h2>Translation API enhancements</h2>
+
+<p>Several updates have been made to the APIs related to data exchange and translation of models.</p>
+
+
+<h3>DGN import</h3>
+
+<p>The new method</p>
+
+<ul>
+<li>Document.Import(string, DGNImportOptions, View)
+</ul>
+
+<p>supports import of DGN files into Revit views.</p>
+
+
+<h3>DXF import</h3>
+
+<p>The method</p>
+
+<ul>
+<li>Document.Import(string, DWGImportOptions)
+</ul>
+
+<p>now also supports DXF files for import.</p>
+
+
+<h3>DWG and DXF export settings changes</h3>
+
+<p>The options supported for DWG and DXF export have been expanded. A new base class</p>
+
+<ul>
+<li>BaseExportOptions
+</ul>
+
+<p>supports all properties shared by DWG/DXF &amp; DGN export tasks. New properties include:</p>
+
+<ul>
+<li>BaseExportOptions.HideScopeBox
+<li>BaseExportOptions.HideReferencePlane
+<li>BaseExportOptions.HideUnreferenceViewTag
+</ul>
+
+
+
+<h3>DGN export</h3>
+
+<p>The options supported for DGN export have changed to match the new implementation of DGN export based on DWG supporting DGN V8. The previously existing class</p>
+
+<ul>
+<li>DGNExportOptions
+</ul>
+
+<p>thus offers many new properties inherited from the same base classes as DWGExportOptions.</p>
+<p>The property</p>
+
+<ul>
+<li>DGNExportOptions.TemplateFile
+</ul>
+
+<p>has been replaced with:</p>
+
+<ul>
+<li>DGNExportOptions.SeedName
+</ul>
+
+
+
+<h3>FBX Export</h3>
+
+<p>Three new options have been added:</p>
+
+<ul>
+<li>FBXExportOptions.UseLevelsOfDetail &ndash; true to use levels of detail, false otherwise
+<li>FBXExportOptions.LevelsOfDetailValue &ndash; the value of the levels of detail
+<li>FBXExportOptions.WithoutBoundaryEdges &ndash; true to export without boundary edges, false otherwise
+</ul>
+
+
+
+<h2>DividedPath</h2>
+
+<p>A DividedPath is an element supported in the massing environment that consists of a set of points distributed along a connected set of curves and edges. The points can be the result of a uniform distribution along the curves. The type of the distribution is determined by a selected 'layout'. The distance between the layout points depends on the curves, the layout, and layout specific settings. In addition, points can also be the result of intersecting the curves with other elements.</p>
+<p>The class</p>
+
+<ul>
+<li>DividedPath
+</ul>
+
+<p>exposes the interface for this element type. It permits creation of a new DividedPath from input curves and edges, as well as optionally, intersecting elements. It allows control over the layout type and parameters, as well as other miscellaneous settings.</p>
+
+
+<h2>Analysis Visualization Framework</h2>
+
+<p>The following additions have been made to support deformed shapes in analysis visualization display:</p>
+
+<ul>
+<li>AnalysisDisplayStyleDeformedShapeTextLabelType class
+<li>AnalysisDisplayDeformedShapeSettings class
+</ul>
+
+<p>A new override to CreateAnalysisDisplayStyle accepts an input argument of AnalysisDisplayDeformedShapeSettings</p>
+
+
+<h2>Revit Link creation</h2>
+
+<p>The API now contains two creation methods for Revit links.</p>
+
+<ul>
+<li>RevitLinkType.Create(Document, ModelPath, RevitLinkOptions) will create a new Revit link type and load the associated linked file into the document. This returns a RevitLinkLoadResult, which stores the ElementId of the newly-created RevitLinkType and contains any errors which occurred when trying to load the linked file (The RevitLinkLoadResultType enumeration contains the full list.)
+<li>RevitLinkInstance.Create(Document, ElementId) will create a new instance of an already-loaded RevitLinkType.
+</ul>
+
+
+
+<h2>FilledRegion</h2>
+
+<p>The class</p>
+
+<ul>
+<li>FilledRegion
+</ul>
+
+<p>has been extended to offer the ability to create Filled regions, to get the boundaries of the region, and to apply a linestyle to all boundary segments.</p>
+<p>The class</p>
+
+<ul>
+<li>FilledRegionType
+</ul>
+
+<p>has been added providing access to the visible properties of a filled region type.</p>
+
+
+<h2>Light API</h2>
+
+<p>The classes</p>
+
+<ul>
+<li>LightType
+<li>LightFamily
+</ul>
+
+<p>have been added to offer the ability to get and set photometric data and all other lighting parameters from both family instances in project documents and all family types in family documents. The LightType and LightFamily classes expose the same data except for light shape and distribution types which are only available from the LightFamily class.</p>
+<p>Some examples of lighting parameters exposed are;</p>
+
+<ul>
+<li>Initial color
+<li>Initial intensity
+<li>Loss factor
+<li>Color filter
+<li>Dimming color
+</ul>
+
+
+
+<h2>Light Group API</h2>
+
+<p>The classes</p>
+
+<ul>
+<li>LightGroupManager
+<li>LightGroup
+</ul>
+
+<p>have been added to offer the ability to manage light groups to allow control over which lights are used when rendering the scene.</p>
+<p>The LightGroupManager class gives the user the ability to</p>
+
+<ul>
+<li>Create a new light group
+<li>Delete an existing light group
+<li>Turn on or off all the lights in a light group
+<li>Turn on or off individual lights
+<li>Set the dimmer value for individual lights
+</ul>
+
+<p>The LightGroup class gives the user the ability to</p>
+
+<ul>
+<li>Get the name of a light group
+<li>Rename light group
+<li>Add a light to a light group
+<li>Remove a light from a light group
+</ul>
+
+<p>Light groups are used in rendering options to turn lights on or off when rendering.</p>
+
+
+<h2>ReferenceIntersector</h2>
+
+<p>The new class ReferenceIntersector allows ray-cast selection of elements, given a point and direction, similar to FindReferencesWithContextByDirection(), but with support for filtering the output based on element or reference type.</p>
+<p>The enum FindReferenceTarget is used with ReferenceIntersector to filter selection of elements, meshes, edges, curves, and faces.</p>
+<p>Key members of ReferenceIntersector</p>
+
+<ul>
+<li>ReferenceIntersector(ElementId targetElementId, FindReferenceTarget targetType, View3d view3d) &ndash; constructor specifying a single element to search for in the intersection test.
+<li>ReferenceIntersector(ElementIdSet targetElementIds, FindReferenceTarget targetType, View3d view3d) &ndash; constructor specifying a set of ElementIds to search for in the intersection test.
+<li>ReferenceIntersector(ElementFilter filter, FindReferenceTarget targetType, View3d view3d) &ndash; constructor specifying an ElementFilter for the intersection test.
+<li>Find(XYZ origin, XYZ direction) &ndash; Finds all references intersecting the origin-direction ray given the selection criteria set up in the ReferenceIntersector constructor
+<li>FindNearest (XYZ origin, XYZ direction) &ndash; Finds the reference closest to the origin in the origin-direction ray given the selection criteria set up in the ReferenceIntersector constructor
+</ul>
+
+
+
+
+<a name="4"></a>
+
+<h1>Small Enhancements &amp; API Interface Changes</h1>
+
+
+
+<h2>Elements &amp; filtering</h2>
+
+
+
+<h3>Element.PhaseCreated and Element.PhaseDemolished</h3>
+
+<p>These readonly properties have been obsoleted and replaced with read/write properties:</p>
+
+<ul>
+<li>Element.CreatedPhaseId
+<li>Element.DemolishedPhaseId
+</ul>
+
+<p>The new method Element.AllowsPhases() indicates whether these phase id properties can be modified for any given element.</p>
+
+
+<h3>Phase filter</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>PhaseFilter
+</ul>
+
+<p>and related types support read/write and create access to phase filters.</p>
+
+
+<h3>SelectionFilterElement</h3>
+
+<p>The new class</p>
+
+<ul>
+<li>SelectionFilterElement
+</ul>
+
+<p>provides access to a filter type which contains a selected set of element ids, rather than criteria based on parameters.</p>
+
+
+<h3>Ceiling, Floor and CeilingAndFloor</h3>
+
+<p>The newly exposed Ceiling class represents a ceiling in Revit. It inherits from CeilingAndFloor. The Floor class has been modified to also inherit from CeilingAndFloor.</p>
+
+
+<h2>Geometry &amp; sketching</h2>
+
+
+
+<h3>Split volumes</h3>
+
+<p>The new method:</p>
+
+<ul>
+<li>SolidUtils.SplitVolumes()
+</ul>
+
+<p>takes a solid which includes multiple disjoint enclosed volumes, and returns newly allocated Solids representing each volume. If no splitting was necessary, a copy of the input Solid is returned.</p>
+
+
+<h3>Solid tessellation</h3>
+
+<p>The new method:</p>
+
+<ul>
+<li>SolidUtils.TessellateSolidOrShell()
+</ul>
+
+<p>generates a single triangulated structure for the given input Solid (which could one or more fully closed volumes, or a shell of faces which do not form a closed volume). The function returns:</p>
+
+<ul>
+<li>TriangulatedSolidOrShell
+</ul>
+
+<p>which allows access to the stored triangulated components and triangles.</p>
+<p>Use the method:</p>
+
+<ul>
+<li>FacetingUtils.ConvertTrianglesToQuads()
+</ul>
+
+<p>with a TriangulationInterface object constructed from the TessellateSolidOrShell results to convert pairs of adjacent, coplanar triangles into quadrilaterals.</p>
+
+
+<h3>Face.Triangulate()</h3>
+
+<p>A new overload to Face.Triangulate() accepts a level of detail as an argument. Levels of detail close to 0 (the minimum) will result in coarser triangulations than levels of detail close to 1 (the maximum).</p>
+
+
+<h3>Ellipse &ndash; axes</h3>
+
+<p>The new properties:</p>
+
+<ul>
+<li>Ellipse.XDirection
+<li>Ellipse.YDirection
+</ul>
+
+<p>provide the unit vectors of the ellipse for the X and Y directions.</p>
+
+
+<h3>GeometryElement.GetBoundingBox()</h3>
+
+<p>This new method provides read access to the bounding box of a given geometry element.</p>
+
+
+<h3>ItemFactoryBase.NewAlignment()</h3>
+
+<p>This method can now align a line and a reference plane as well as all other geometry types from previous versions.</p>
+
+
+<h3>CylindricalHelix curve type</h3>
+
+<p>A new subclass of Curve has been introduced: CylindricalHelix. The class offers methods useful for reading and creating such curves.</p>
+<p>In this release, CylindricalHelix curves are used only in specific applications in stairs and railings, and should not be used or encountered when accessing curves of other Revit elements and geometry.</p>
+
+
+<h3>CurveLoop as IEnumerable&lt;Curve&gt;</h3>
+
+<p>The members of a CurveLoop can now be traversed, as CurveLoop implements IEnumerable&lt;Curve&gt;.</p>
+
+
+<h3>CurveElement &ndash; center point reference</h3>
+
+<p>The new property:</p>
+
+<ul>
+<li>CurveElement.CenterPointReference
+</ul>
+
+<p>returns a reference to the center of a curve if that curve is one that has a center (e.g. arcs, circles, elliptical arcs or ellipses). This reference can be used for dimensioning to the center point.</p>
+
+
+<h3>ModelCurve.ChangeToReferenceLine</h3>
+
+<p>ModelCurve.ChangeToReferenceLine is now supported in all family types, not just conceptual modeling.</p>
+
+
+<h3>NewSketchPlane(Document, Reference)</h3>
+
+<p>This new overload for NewSketchPlane in the ItemFactoryBase class supports creation of a sketch plane directly from a Reference representing a planar face.</p>
+
+
+<h2>Detailing &amp; Annotations</h2>
+
+<h3>MultiSegmentGrid class</h3>
+
+<p>This class has been added to the API to support multi-segment grids.</p>
+
+
+<h3>Grid geometry</h3>
+
+<p>Element.Geometry now supports Grids and MultiSegmentGrids, including the ability to see gaps and extents applied to the grid lines to form different segments.</p>
+
+
+<h3>Diameter dimensions</h3>
+
+<p>Revit now supports Diameter dimensions. The DimensionShape enumeration contains a new Diameter member. And there is a new creation method for diameter dimensions:</p>
+
+<ul>
+<li>FamilyItemFactory.NewDiameterDimension()
+</ul>
+
+
+
+<h3>DimensionSegment overrides</h3>
+
+<p>There are several new properties on DimensionSegment to override text properties.</p>
+
+<ul>
+<li>DimensionSegment.Prefix
+<li>DimensionSegment.Suffix
+<li>DimensionSegment.Above
+<li>DimensionSegment.Below
+<li>DimensionSegment.ValueOverride
+</ul>
+
+<p>These properties are also available on Dimension, for use with dimensions with just one segment.</p>
+
+
+<h3>Detail element draw order</h3>
+
+<p>The class</p>
+
+<ul>
+<li>DetailElementOrderUtils
+</ul>
+
+<p>has been added providing the ability to affect the draw order of detail elements (including FilledRegions)</p>
+
+
+<h2>Families &amp; content</h2>
+
+
+
+<h3>SpatialElementCalculationPoint</h3>
+
+<p>This class provides access to the "Room or Space Calculation Point" seen in families. The Spatial Element Calculation Point is graphically showed as a location point marker with a "snake" line from the origin of the family. If the Spatial Element Calculation Point is turned on, this point will be used as a search point for room and space relations for all instances of this family. The API offer creation, read and modification options for this object type.</p>
+
+
+<h3>RPC content assets</h3>
+
+<p>The AssetType enum now contains a value "Content", which can be used to enumerate the loaded RPC content assets in the Revit session.</p>
+
+
+<h3>NewFamilyInstance validation</h3>
+
+<p>Some validation has been added to overloads of NewFamilyInstance(). This validation is intended to prevent use of the incorrect overload for a given family symbol input. For specific details on the exceptional conditions which will be validated, consult the documentation.</p>
+
+
+<h3>Family.PlacementType</h3>
+
+<p>This new property provides information about the placement type for instances of the given family. PlacementType roughly maps to the overloads of NewFamilyInstance.</p>
+
+
+<h2>DataStorage element</h2>
+
+<p>The new DataStorage class represents an element that API applications can create logically organize different sets of ExtensibleStorage entities into separate elements. This allows an application to update one set of data in a local workshared project without locking other elements.</p>
+
+
+<h2>ApplicationInitialized event</h2>
+
+<p>The ControlledApplication object now supports an ApplicationInitialized event, which is called once the Revit application is fully initialized, after all external applications have been started and when the application is ready to work with documents.</p>
+
+
+<h2>ProgressChanged application event and ProgressChangedEventArgs</h2>
+
+<p>The application object now supports a ProgressChanged event and ProgressChangedEventsArgs object that returns progress bar data from time-consuming transactions.</p>
+
+<ul>
+<li>ProgressChangedEventArgs
+<ul>
+<li>Caption &ndash; The name of the current transaction or subtransaction in progress
+<li>Stage &ndash; The type of progress event (Started, RangeChanged, PositionChanged, CaptionChanged, UserCancelled, Finished)
+<li>Position &ndash; The numerical index between zero and UpperRange showing the number of completed steps of the current transaction or subtransaction
+<li>UpperRange &ndash; The total number of steps in the current transaction or subtransaction
+<li>Cancel &ndash; Cancels the current transaction in progress, if possible.
+<li>Cancellable &ndash; indicates if the current transaction can be cancelled.
+</ul>
+</ul>
+
+
+
+<h2>SiteLocation &ndash; PlaceName</h2>
+
+<p>The new property:</p>
+
+<ul>
+<li>SiteLocation.PlaceName
+</ul>
+
+<p>provides the place name of the site location.</p>
+
+
+<h2>Application.DefaultProjectTemplate</h2>
+
+<p>Provides the full path to the default template file for new project documents</p>
+
+
+<h2>UnitType, DisplayUnit and FamilyParameter updates</h2>
+
+<p>Many new units have been added to UnitType, DisplayUnitType and ParameterType.</p>
+<p>One UnitType was renamed: UT_TemperalExp was renamed to UT_ThermalExpansion.</p>
+<p>The corresponding ParameterType value (TemperalExp) was also renamed to ThermalExpansion.</p>
+
+
+<h2>BasePoint and BASEPOINT_ANGLETON_PARAM "True North" Parameter</h2>
+
+<p>The parameter to return the "True North" angle parameter "BASEPOINT_ANGLETON_PARAM" on the BasePoint object is now a double instead of a string.</p>
+
+
+<h2>Journaling of Add-in user interface</h2>
+
+<p>Revit now activates a tool to collect and journal certain actions which take place in the user interface provided by an add-in. The tool supports actions in both WPF and Windows Forms dialogs.</p>
+<p>Some actions and some components may not be fully recorded.</p>
+<p>This capability is useful to Autodesk in the event that a journal can be supplied from a Revit user indicating the presence of a software problem. Replay of add-in UI via journals is not supported.</p>
+
+
+
+<hr>
+<p style="text-align:center">End of document</p>
+<hr>
+
+<p>That completes the list of news in the Revit 2013 API from last year, A.D. 2012, bringing us up to date with the current release.</p>
+
+<p>As said, I look up information in these sections regularly, and still discover topics that I was previously not aware of, frequently leading me to research new Revit API classes and methods.</p>
+
+<p>Since this documentation was not previously available to online Internet searches, it required the extra effort of opening the individual help files and searching it release by release on the off chance of finding something hitherto unknown and useful for the task at hand.</p>
+
+<p>I hope making this information available online proves as helpful to you as it will to me!</p>
+
+</body>
+</html>

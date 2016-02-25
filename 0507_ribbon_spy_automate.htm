@@ -1,0 +1,505 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: TheBuildingCoder, some contribution -->
+
+<h3>Ribbon Spying and UI Automation</h3>
+
+<p>I hope you had a wonderful end of the last and beginning of the new year!
+
+<p>Happy New Year to you all!
+
+<p>I returned from the week of rest and was completely occupied with the backlog of ADN support cases in the past few days.
+
+<p>Here is a really heavy-duty post to get us started again, and started with a bang!
+
+<p>It revisits the never-ending and always popular issue of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/launching-a-revit-command.html">
+launching a Revit command programmatically</a>, 
+
+but this time based on some much more in-depth analysis of the Revit ribbon internals performed by Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a>.
+
+Here is what he discovered and has to say about it:
+
+<h4>Driving Revit from Outside</h4>
+
+<p>An interesting (and recurring) point is to 'drive Revit from outside'.
+<p>I know, you have discussed this many times, but I think that this will be a different approach:
+<p>Since Revit uses Ribbons, there is no way to click buttons or menu items just by sending Windows messages, as we could do it in Revit 2009.
+<p>If you take a close look using Spy++, you'll see that the whole RibbonBar is just a container, a Black Box:</p>
+
+<center>
+<img src="img/rh_spy.png" alt="Ribbon bar in Spy++" width="400"/>
+</center>
+
+<p>With Spy++, you cannot examine this container because it's a WPF element.
+<p>But using UISpy, you can see this:</p>
+
+<center>
+<img src="img/rh_uispy.png" alt="Ribbon bar in UISpy" width="400"/>
+</center>
+
+<p>In this case, the selected element is a single button. So, how we can invoke <b><i>any</i></b> button?
+<p>Assuming there is a new Addin panel called 'TestPanel' with a single button called 'TestButton', here is a way to press it from any application:
+
+<pre class="code">
+&nbsp; <span class="teal">AutomationElement</span> mainWndFromHandle 
+&nbsp; &nbsp; = <span class="teal">AutomationElement</span>.FromHandle( 
+&nbsp; &nbsp; &nbsp; _hWndRevit.Handle ); <span class="green">// the revit window handle</span>
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> nameRibbonCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.NameProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RibbonHostWindow&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> typeRibbonCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Pane );
+&nbsp;
+&nbsp; <span class="teal">AndCondition</span> andCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( 
+&nbsp; &nbsp; &nbsp; typeRibbonCondition, 
+&nbsp; &nbsp; &nbsp; nameRibbonCondition );
+&nbsp;
+&nbsp; ribbonWnd = mainWndFromHandle.FindFirst( 
+&nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, andCondition );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> aIDCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ADD_INS_TAB&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">AutomationElement</span> addinbutton 
+&nbsp; &nbsp; = ribbonWnd.FindFirst( 
+&nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, aIDCondition );
+&nbsp;
+&nbsp; <span class="green">// show addin panel by pressing the tab header</span>
+&nbsp;
+&nbsp; <span class="teal">InvokePattern</span> invPattern 
+&nbsp; &nbsp; = addinbutton.GetCurrentPattern( 
+&nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">InvokePattern</span>;
+&nbsp;
+&nbsp; invPattern.Invoke();
+&nbsp;
+&nbsp; <span class="green">// pause, so ribbon panels can re-arrange</span>
+&nbsp;
+&nbsp; System.Threading.<span class="teal">Thread</span>.Sleep( 1000 );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> aIDPanelCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ADD_INS_TAB_PanelBarScrollViewer&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">AutomationElement</span> addinPanel 
+&nbsp; &nbsp; = ribbonWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; aIDPanelCondition );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> aIDTestPanelCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CustomCtrl_%ADD_INS_TAB%TestPanel&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">AutomationElement</span> testPanel 
+&nbsp; &nbsp; = addinPanel.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; aIDTestPanelCondition );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> aIDContainerCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CustomCtrl_%CustomCtrl_%ADD_INS_TAB%TestPanel%TestButton_RibbonItemControl&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">AutomationElement</span> testContainer 
+&nbsp; &nbsp; = testPanel.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; aIDContainerCondition );
+&nbsp;
+&nbsp; <span class="teal">PropertyCondition</span> aIDTestButtonCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CustomCtrl_%CustomCtrl_%ADD_INS_TAB%TestPanel%TestButton&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">AutomationElement</span> testButton 
+&nbsp; &nbsp; = testContainer.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; aIDTestButtonCondition );
+&nbsp;
+&nbsp; <span class="teal">InvokePattern</span> invPatternButton 
+&nbsp; &nbsp; = testButton.GetCurrentPattern( 
+&nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">InvokePattern</span>;
+&nbsp;
+&nbsp; <span class="green">// now press our button via uiautomation</span>
+&nbsp;
+&nbsp; invPatternButton.Invoke();
+</pre>
+
+<p>Remarks:
+
+<ul>
+<li>Invisible RibbonItems cannot be pressed, so make sure the panel that contains them is visible.
+<li>Thus, if RibbonBar is collapsed, expand it before pressing buttons.
+<li>Give it some time; RibbonBar needs to re-arrange, this takes some milliseconds every time.
+<li>The hierarchy of the RibbonBar and its items (descendants) is different in 2010 and 2011; sometimes there is an AutomationID, but this ID may be not unique, so you have to combine ControlTypeProperty, NameProperty and/or AutomationIDProperty PropertyConditions to get an element.
+<li>Don't use TreeScope.Descendants; it's faster to search just in the TreeScope.Children list.
+<li>Store mainWindowHandle, ribbonWnd and other AutomationElements in global variables because it saves some time, but be aware because some items may become invalid while RibbonBar is switching.
+</ul>
+
+<p>This way, you can invoke any command from outside. In opposite to the OnIdling event, which cannot be fired if a modal dialogue is opened in Revit, this technique allows you to close even this (blocking) dialog from outside.
+<p>Also Revit standard commands can be invoked (e.g., creating a new Wall via GUI).
+<p>It even allows you to open a Revit file via GUI, avoiding the use of the Process.Start method.
+<p>Remark: in this example, I use some German control texts; in a localized application, this would be replaced by resource strings, or the AutomationElements would be got in a different manner. 
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> OpenRevitFile( <span class="blue">string</span> filePath )
+{
+&nbsp; <span class="green">// get the Revit 'R' button in the upper left corner</span>
+&nbsp; <span class="green">// FindWindowEx has been imported via P/Invoke</span>
+
+&nbsp; <span class="teal">IntPtr</span> startButtonHandle = FindWindowEx( 
+&nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero, <span class="teal">IntPtr</span>.Zero, <span class="maroon">&quot;AdApplicationButton&quot;</span>, 
+&nbsp; &nbsp; <span class="maroon">&quot;AdApplicationButton&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( startButtonHandle != <span class="teal">IntPtr</span>.Zero )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// SendMessage has been imported via P/Invoke</span>
+&nbsp;
+&nbsp; &nbsp; SendMessage( startButtonHandle, WM_LBUTTONDOWN, 
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero, <span class="teal">IntPtr</span>.Zero ); <span class="green">// click</span>
+&nbsp;
+&nbsp; &nbsp; SendMessage( startButtonHandle, WM_LBUTTONUP, 
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero, <span class="teal">IntPtr</span>.Zero ); <span class="green">// release</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// these lines should be known</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Process</span>[] processes = <span class="teal">Process</span>.GetProcessesByName( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Revit&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WindowHandle</span> _hWndRevit = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; processes.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> h = processes[0].MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; &nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">WindowHandle</span>( h );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( _hWndRevit != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// revit window</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> mainWndFromHandle 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">AutomationElement</span>.FromHandle( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _hWndRevit.Handle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// start menu</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idMenuCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Id_ApplicationMenuWindow&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> menuWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; = mainWndFromHandle.FindFirst( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, idMenuCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// start submenu</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idSubMenuCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;mFirstLevelMenuList&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// list</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> subMenuWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; = menuWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; idSubMenuCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// list item</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeItemCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.ListItem );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> nameItemCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.NameProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Autodesk.Windows.ApplicationMenuItem&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idItemCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ID_REVIT_FILE_OPEN&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andItemCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( idItemCondition, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeItemCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> openItemWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; = subMenuWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; andItemCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeButtonCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Button );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElementCollection</span> openButtons 
+&nbsp; &nbsp; &nbsp; &nbsp; = openItemWnd.FindAll( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeButtonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> openButton 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> openButtons )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeImageCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Image );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElementCollection</span> images 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openButton.FindAll( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeImageCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// search a button with an image</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( images.Count &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span> invPattern 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openButton.GetCurrentPattern( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">InvokePattern</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; invPattern.Invoke();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// open dialog window</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// pause while dialog is being opened</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( 700 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// re-read revit window components to find new dialog</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> nameOpenDlgCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.NameProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&#214;ffnen&quot;</span> ); <span class="green">// us-EN &quot;Open&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElementCollection</span> allOpenDlgs 
+&nbsp; &nbsp; &nbsp; &nbsp; = mainWndFromHandle.FindAll( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, nameOpenDlgCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> openOpenDlgWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> allOpenDlgs )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( openOpenDlgWnd.Current.LocalizedControlType 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="maroon">&quot;Dialogfeld&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// comboBox has also an&amp;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeComboBoxCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.ComboBox );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idComboBoxCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;13006&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andComboBoxCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( idComboBoxCondition, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeComboBoxCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> comboBoxWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openOpenDlgWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; andComboBoxCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// &amp;edit field</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeEditCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Edit );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idEditCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;1001&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andEditCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( idEditCondition, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeEditCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> editWnd 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = comboBoxWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; andEditCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( 900 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ValuePattern</span> valPattern 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = editWnd.GetCurrentPattern( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ValuePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">ValuePattern</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// paste file path into the edit field</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valPattern.SetValue( filePath );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// press ok button</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> idOpenButtonCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;1&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andOpenButtonCondition 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( idOpenButtonCondition, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeButtonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> openButton 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openOpenDlgWnd.FindFirst( <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; andOpenButtonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span> invPattern 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openButton.GetCurrentPattern( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InvokePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">InvokePattern</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( invPattern != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; invPattern.Invoke();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>P.S.: these code fragments may contain some typos; it could also be that one does it for 2010 and another for 2011 because this is old stuff that I played with months ago. 
+<p>But the code shows the way, so it's useful as well.
+<p>Before using this code, you need to import some UIAutomation dlls:</p>
+
+<center>
+<img src="img/rh_ui_automation_references.png" alt="UI automation references"/>
+</center>
+ 
+<p>There may be some better sources for UIAutomation in the Internet...
+
+
+<a name="app"></a>
+
+<h4>Stand-Alone Sample Application</h4>
+
+<p>Rudolf created a stand-alone Windows Forms project 
+
+<a href="">DrivingRevitViaUIAutomation</a> that 
+
+demonstrates the use of this approach.
+Since UIAutomation can drive any application, the mechanism is not restricted to Revit a add-in, but can be used there as well as in any other context.
+For instance, you also could drive 3dsmax or something else from outside.
+
+<p>By the way, while developing my Revit MDI window arranging tool, I discovered that AutoCAD has a window structure similar to Revit.
+This is of course not surprising because it's Autodesk's policy to make the products look similar.
+
+<p>DrivingRevitViaUIAutomation is adjusted to drive a German version of Revit 2011.
+<p>There are about three German literals in the code, describing some dialog titles.
+<p>It includes added comments like this: "Öffnen" // en-US:"Open"
+<p>These are the parts the user must replace by his own dialog titles if his Revit’s language is not German.
+<p>It may be necessary to adjust some pause intervals in the code.
+
+<p>This example demonstrates three steps:
+
+<ul>
+<li>Open a file.
+<li>Close a file (in fact, the active document); you can choose whether you want to save it before closing. 
+<li>Switch the current RibbonTab. Before selecting a Tab by pressing a TreeNode, you must read the Ribbon once, so the switching process will be faster because the Tabs are in a buffer.
+</ul>
+
+<p>The user interface initially looks like this, with a sample file that can be opened and buttons for closing it with and without saving and for populating the list of ribbon tabs:</p>
+
+<center>
+<img src="img/rh_ui_automation_sample.png" alt="UI automation sample application"/>
+</center>
+
+<p>Once the the list of ribbon tabs has been populated, each one of them can be clicked to activate it in the Revit user interface:</p>
+
+<center>
+<img src="img/rh_ui_automation_sample_populated.png" alt="UI automation sample application with populated ribbon tabs"/>
+</center>
+
+<p>The code uses a mix of the fast Window functions (P/Invoke) with the slow UIAutomation functions; this improves performance and may make a difference in more complex examples.
+
+<p>Regarding the language dependency: For example, the "open file" dialog is found by its title text, and in my example, this is "Öffnen".
+<p>Open this dialog manually, read the (English) title and replace the German expression in the code.
+<p>Additionally, this part is important:
+
+<pre class="code">
+&nbsp; <span class="teal">PropertyCondition</span> nameOpenDlgCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.NameProperty, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&#214;ffnen&quot;</span> ); <span class="green">// en-US: &quot;Open&quot;</span>
+&nbsp;
+&nbsp; <span class="teal">AndCondition</span> andOpenDlgCondition 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AndCondition</span>( nameOpenDlgCondition, 
+&nbsp; &nbsp; &nbsp; typeOpenDlgCondition );
+&nbsp;
+&nbsp; <span class="teal">Thread</span>.Sleep( 600 );
+&nbsp;
+&nbsp; <span class="teal">AutomationElementCollection</span> allOpenDlgs 
+&nbsp; &nbsp; = mainWndFromHandle.FindAll( 
+&nbsp; &nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, 
+&nbsp; &nbsp; &nbsp; nameOpenDlgCondition );
+&nbsp;
+&nbsp; <span class="green">//typeOpenDlgCondition andOpenDlgCondition</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> openOpenDlgWnd 
+&nbsp; &nbsp; <span class="blue">in</span> allOpenDlgs )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( openOpenDlgWnd.Current.LocalizedControlType 
+&nbsp; &nbsp; &nbsp; == <span class="maroon">&quot;Dialogfeld&quot;</span> ) <span class="green">// en-US: ?</span>
+&nbsp; &nbsp; {
+</pre>
+
+<p>If you are running an English version of Revit, you need to examine the LocalizedControlType for it; in fact, not for your Revit version but for your OS Language version.
+<p>Look at this screenshot taken from an English Revit residing in a German VM:
+
+<center>
+<img src="img/rh_uispy_en.png" alt="UISpy looking at an English version" width="400"/>
+</center>
+
+<p>The LocalizedControlType depends on OS Language; nonetheless, the dialog titles change according to Revit language.
+<p>You need to examine the LocalizedControlType by your own, I think, but it’s just one use of UISpy.
+
+<p>I think there might be a way to do it without any localization issues, but as I explained before, finding the correct AutomationElement is always a compromise between performance and elegance.
+<p>Sometimes there is no property that makes a AutomationElement individual, no AutomationID, just Controltype.Pane, for example.
+<p>If you just search by ControlType.Button, for example, it might be that you find some unwanted results, or, as I explained, the performance will decrease.
+<p><b>Combining the search conditions in the right way is the thing that matters.</b>
+<p>In Revit 2010, there were less AutomationIDs than in 2011, and some items shared their ID; e.g. there were some buttons with icons and others without icons, both for opening or closing files.
+<p>Getting the button with icon meant to see whether the button had children because all other Properties were identical &ndash; besides position, of course, but this may change...
+<p>It’s "workarounding" at its best.
+
+<p>Another last comment or two from Rudolf on this topic:
+
+<p>I am hoping that Revit's ribbon response time will decrease in future versions; if so, then the calls to System.Threading.Sleep( aLotOfTime ) can be changed to System.Threading.Sleep( justAMillisecond ).
+So I hope.
+
+<p>And, by the way, UISpy allows you to export the Window structure to an XML document, so you can browse this snapshot instead of the 'real' windows.
+
+<p>Very many thanks to Rudolf for this in-depth exploration which opens up many new possibilities!
+
+<p>Exploring this should keep you occupied for a while...
+
+<p>Once again I have to repeat the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#2">
+warning about the risks involved</a> with 
+
+using this, though, and also point back to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#3">
+disclaimer</a> accompanying 
+
+that warning.
+

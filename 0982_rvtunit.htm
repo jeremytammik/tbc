@@ -1,0 +1,149 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Steven Downing RE: Unit testing in revit
+
+https://github.com/ArupAus/RvtUnit/tree/master
+
+-->
+
+<h3>Revit Add-in Unit Testing</h3>
+
+<p>Here is a topic I have been flirting with for years, and never really got into seriously yet, except point to the efforts for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/unit-testing-in-revit.html">
+unit testing in Revit 2011</a> by
+
+Rod Howarth and Daren Thomas back in 2010.
+
+<p>Finally, the cavalry is galloping in to our rescue in the shape of Steven Downing, Ali Talebi and Yamin Tengono of
+
+<a href="http://www.arup.com">Arup</a>.
+
+<p>They implemented a very complete and advanced unit testing system for Revit add-ins enabling
+
+<a href="http://www.nunit.org">NUnit</a> as
+
+well as other test helpers like
+
+<a href="http://code.google.com/p/moq">Moq</a> to
+
+be used and including support for real-time addition of new tests, recompilation and reloading of add-ins, and re-running updated code and tests without restarting Revit.</p>
+
+<p>The entire
+
+<a href="https://github.com/ArupAus/RvtUnit">RvtUnit</a> project
+
+including a sample project demonstrating its use is hosted on GitHub.</p>
+
+<p>It includes a
+
+<a href="https://github.com/ArupAus/RvtUnit/blob/master/Getting%20Started.docx">
+getting started document</a> and a
+
+<a href="https://github.com/ArupAus/RvtUnit/blob/master/rvtUnit_Demo.mp4">
+demonstration video</a> showing the steps I just described:</p>
+
+<ul>
+<li>Launching the TestRunner external command</li>
+<li>Selecting a directory containing .NET assemblies defining tests to run</li>
+<li>The assembly DLL is loaded via a byte-code stream, so the actual file is not locked</li>
+<li>The tests to run are dynamically detected using custom attributes and .NET reflection</li>
+<li>Running the tests and reporting the unit test run results</li>
+<li>Switching to Visual Studio, adding a new test, recompiling</li>
+<li>Dynamically reloading, reparsing and retesting without leaving or restarting Revit</li>
+<li>Switching to Visual Studio again and adding a detailed test failure message, recompiling</li>
+<li>Reloading and retesting once again with the new message displayed</li>
+</ul>
+
+<p>I would suggest looking at the 2.5 minute demonstration video right away, first thing, to see the system in action and understand exactly what can be achieved and how:</p>
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/Zur6969ayxg" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Here is the detailed content of 'Getting Started.docx':</p>
+
+<ul>
+<li><a href="#2">Introduction</a></li>
+<li><a href="#3">RvtUnit project</a></li>
+<li><a href="#4">SampleTool project</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Introduction</h4>
+
+<p>RvtUnit is an example of how to achieve Unit Testing within Revit.  By running the NUnit runner inside Revit, we can unit test code which relies on the Revit API, without having to wrap the entire Revit API.</p>
+<p>The solution contains three projects:</p>
+
+<ul>
+<li>The RvtUnit project is the main project that runs the unit tests.</li>
+<li>The SampleTool project shows an example of a Revit IExternalCommand that includes unit tests.</li>
+<li>The Helpers project contains some code used by both the other projects.
+Notably, the RvtUnit project will store a reference to the ActiveUIDocument here, so the unit tests can pick it up.</li>
+</ul>
+
+<center>
+<img src="img/sd_rvtunit.png" alt="RvtUnit solution projects" width="200"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>RvtUnit Project</h4>
+
+<ul>
+<li>Designed using the <a href="http://en.wikipedia.org/wiki/Model_View_ViewModel">MVVM</a> pattern.</li>
+<li>References a custom build of NUnit which has been modified to load DLL's from a byte array, rather than from disk</li>
+<li>Allows user to select a directory of DLL's, and it will then load them and present a dialog which lets the user run some or all tests.</li>
+<li>Contains an 'AssemblyResolve' event handler, so that any dependencies of the DLL to be tested can also be loaded.  Since the assembly to be tested is loaded dynamically from a byte-array, the normal .NET Framework mechanism will not work.</li>
+<li>The Test runner will not execute the IExternalCommand of any DLL's.  It will simply load the DLL, look for any unit tests in the DLL and then run them.</li>
+</ul>
+
+
+<a name="4"></a>
+
+<h4>SampleTool Project</h4>
+
+<ul>
+<li>Contains an example of an IExternalCommand that includes some classes which are unit tested.</li>
+<li>The 'production code' and the 'test code' are compiled into the same DLL when the project is compiled in 'Debug' mode.</li>
+<li>The test code is omitted when the project is compiled in 'Release' mode.
+This is achieved by putting test code and references inside an ItemGroup that only compiles for Debug:</li>
+
+<pre class="code">
+<span class="blue">&lt;</span><span class="maroon">ItemGroup</span><span class="blue"> </span><span class="red">Condition</span><span class="blue">=</span>&quot;<span class="blue">'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">Reference</span><span class="blue"> </span><span class="red">Include</span><span class="blue">=</span>&quot;<span class="blue">Moq</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>..\rvtUnit\Lib\Moq.dll<span class="blue">&lt;/</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">Reference</span><span class="blue">&gt;</span>
+
+&nbsp; . . .
+
+<span class="blue">&nbsp; &lt;</span><span class="maroon">Compile</span><span class="blue"> </span><span class="red">Include</span><span class="blue">=</span>&quot;<span class="blue">Tests\UnitTests\HasParameter_Tests.cs</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">None</span><span class="blue"> </span><span class="red">Include</span><span class="blue">=</span>&quot;<span class="blue">Tests\Features\SetParameter.feature</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Generator</span><span class="blue">&gt;</span>SpecFlowSingleFileGenerator<span class="blue">&lt;/</span><span class="maroon">Generator</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LastGenOutput</span><span class="blue">&gt;</span>SetParameter.feature.cs<span class="blue">&lt;/</span><span class="maroon">LastGenOutput</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">None</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">ItemGroup</span><span class="blue">&gt;</span>
+</pre>
+
+<li>Contains standard unit tests, and Specflow tests.</li>
+<li>The Specflow test also use Moq, although a custom build of both Moq and Castle.Core are required, as the objects must be properly disposed at the end of the test.</li>
+<li>If you run the SampleTool from the Addins menu, it will be loaded from disk and the file locked as per normal.  You will then be unable to change, rebuild and reload it.</li>
+</ul>
+
+<h4>Conclusion</h4>
+
+<p>Jeremy adds: Wow. I have nothing left to add. Almost.</p>
+
+<p>The RvtUnit sample demonstrates a number of other important and exciting other features as well, such as support for multiple versions of Revit, ranging all the way from 2010 through 2014, so a thorough exploration of the source code provided is highly recommended.</p>
+
+<p>To run and test this, you need to start up Revit properly, stand-alone, not in the debugger from within the Visual Studio IDE.</p>
+
+<p>A huge thank-you to Steven, Ali and Yamin for this truly impressive framework!</p>

@@ -1,0 +1,293 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>VSTA to Stay and Updater to Go</h3>
+
+<p>As you may have heard from Kean, we have safely
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2010/12/arrived-in-mnchen.html">
+arrived in Munich, Germany</a> for
+
+the next developer conference, the biggest one in our European series.
+Actually, he only talks about his own arrival, but our arrival worked all right as well.
+
+<p>One topic that we are discussing at these conferences is cloud computing, so it was a funny coincidence to run into a nice big tangible cloud when we went out to have a dinner with our developer partners in
+
+<a href="http://www.heaven23.se">
+Heaven 23</a>
+
+in Gothenburg before departing for Munich:</p>
+
+<center>
+<img src="img/heaven23_cloud.jpg" alt="Heaven 23 cloud"/>
+</center>
+
+<p>The restaurant is on the 23<sup>rd</sup> floor of the
+
+<a href="http://sv.wikipedia.org/wiki/Hotel_Gothia_Towers">
+Gothia Towers</a> with
+
+a nice view down over
+
+<a href="http://en.wikipedia.org/wiki/Liseberg">
+Liseberg amusement park</a>:</p>
+
+<center>
+<img src="img/heaven23_view.jpg" alt="Heaven 23 view"/>
+</center>
+
+<p>As you can see, the cloud can be accessed through reflection as well as the web service  :-)
+
+<p>Meanwhile, here are some questions that cropped up several times at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/the-revit-api-track-at-au-2010.html">
+Autodesk University</a> and
+
+were mentioned during some of our meetings here in Europe as well:
+
+<ul>
+<li>Can we rely on <a href="#1">VSTA remaining</a>? We heard that VBA for AutoCAD went away; is there any risk of that happening with VSTA for Revit as well?
+<li>Can I use the Dynamic Model Update technology if I wish to distribute a model to customers without my add-in? <a href="#2">A warning message is displayed</a>. This is incomprehensible and worrying for the uninitiated user. How can I handle this gracefully, and best of all suppress it completely?
+<li>Can I <a href="#3">automate the removal of an updater</a> reference?
+</ul>
+
+
+<a name="1"></a>
+
+<h4>VSTA to Stay</h4>
+
+<p>VSTA is an acronym for Visual Studio Tools for Applications.
+It is included in every Revit installation, so every user has access to it.
+It provides an IDE or Integrated Development Environment for exploring the API and creating macros.
+The code is almost completely compatible with the .NET API we use for external commands and applications defined in standard add-ins.
+
+<p>Macros written in VSTA can easily be moved to an external add-in, and vice versa.
+
+<p>One advantage of VSTA is the ability to edit and continue, which is currently not supported by the Visual Studio environment when creating standard external add-ins.
+
+<p>Some developers and users have been careful about jumping onto VSTA, because it is a Microsoft product, analogous to the old VBA, Visual Basic for Applications.
+VBA has been around for quite a while and was included in AutoCAD.
+It is now being phased out, since Microsoft is reducing support for it.
+
+<p>As said, VSTA is here to stay.
+Here is a statement on this by Anthony Hauck, Revit Design Product Line Manager:
+
+<p>Autodesk is happy to announce an agreement with Microsoft to include the Visual Studio Tools for Applications (VSTA) development environment in all Revit products for the foreseeable future.
+Previous communications touching on the status of VSTA in Revit expressed some uncertainty as to its inclusion with future versions, but with the agreement concluded earlier this year we are pleased that VSTA will continue to be an important development option for users of the Revit API.
+
+
+<a name="2"></a>
+
+<h4>Removing an Updater Reference</h4>
+
+<p>One of the most powerful new API features in Revit 2011 is the Dynamic Model Update or DMU framework.
+It enables you to register an updater to be triggered by certain events, and also to react on these events within the same transaction that triggered them, as demonstrated by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#2">
+DynamicModelUpdate and DistanceToSurfaces SDK samples</a> and Saikat's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html">
+Structural DMU sample</a>.
+
+<p>However, when a Revit model is modified by an updater and then distributed to a client without the add-in installed, a warning message is displayed which is not comprehensible for an uninitiated user.
+
+<p>For example, I implemented a minimal DMU application and ran the updater in a model, saved it, and reopen it later without the add-in defining the updater loaded.
+The following message appeared:</p>
+
+<center>
+<img src="img/UpdaterWarning.png" alt="Updater warning"/>
+</center>
+
+<p>For completeness' sake, here is the
+
+<a href="zip/DummyUpdater.zip">DummyUpdater</a>
+
+application that I used to cause this message to appear.
+
+<p>How can I remove the reference to this updater from the model, in order to distribute it to a customer with no access to my add-in?
+
+<p>The very simplest answer is to tell you user to click on 'Do not warn about this updater again and continue working with the file', save the model, and continue working with it as normal.
+
+<p>However, many developers would prefer this message not to appear at all.
+
+<p>To achieve this, simply click on 'Do not warn about this updater again and continue working with the file' and save the model yourself and then pass it on to the customer.
+
+<p>The next time it is opened, the warning will no longer appear, because the reference to the updater has been removed.
+
+<p>Obviously, you need to well understand the consequences of removing this reference, and your application needs to be prepared to handle the situation in case it is ever loaded into the model again at a later stage, when changes may have been applied in its absence.
+
+
+<a name="3"></a>
+
+<h4>Automating Updater Removal</h4>
+
+<p>If you downloaded my sample DMU application above, you may have noted an empty add-in skeleton in it named RemoveUpdater.
+I was originally planning to implement an add-in which automates the process of opening a Revit model containing an updater reference to remove, clicking on the option mentioned above, and saving and closing the file.
+
+<p>When I looked at this a bit more closely, I thought that I could save myself some work by creating a journal file to do the job instead.
+It works really well.
+I did the following:
+
+<ol>
+<li>Copied my Revit document to C:\tmp\wall_updater_triggered.rvt.
+<li>Started up Revit.
+<li>Opened the file.
+<li>The warning message appears, I selected the appropriate option.
+<li>Saved the file to a new path wall_updater_triggered_removed.rvt.
+<li>Quit Revit.
+<li>Copied the resulting journal file journal.0575.txt to journal_remove_updater.txt.
+</ol>
+
+<p>As you probably know, the journal files are by default located in the Journals subfolder of the Revit installation directory.
+
+<p>Now I can automate the removal of the updater from any Revit model by creating a batch file which:
+
+<ol>
+<li>Copies the model to C:\tmp\wall_updater_triggered.rvt.
+<li>Starts up Revit with the journal file, e.g. using the command line listed below.
+<li>Moves the updated model from C:\tmp\wall_updater_triggered_removed.rvt to its final destination.
+</ol>
+
+<p>Here is the command line to drive Revit using the journal file; it is one single (long) line:
+
+<pre>
+"C:\Program Files\Autodesk\Revit Architecture 2011\Program\Revit.exe"
+  "C:\Program Files\Autodesk\Revit Architecture 2011\Journals
+    \journal_remove_updater.txt"
+</pre>
+
+<p>Obviously this could also be more cleanly implemented using the API, but that is left as an exercise for the reader.
+
+<p>Best regards to all from Munich!
+
+<!--
+
+Mikako –
+
+If you use an updater to modify a document, the client ID (along with certain other information like updater id and name) is stored in the document.  The next time you load the document without that updater running Revit will warn you about it.
+
+But there should be a number of choices coming from the warning:
+
+- Continue working with file
+- Do not warn about this updater again and continue working with file
+- Close without save
+- Save under different name and continue working
+
+Do not warn about this updater again should remove the association.
+
+Thanks,
+Scott
+
+From: Mikako Harada
+Sent: Tuesday, January 05, 2010 5:36 PM
+To: Harry Mattison; Saikat Bhattacharya; Jeremy Tammik
+Cc: Katsuaki Takamizawa; Adam Nagy; Joe Ye; Phil Xia; Scott Conover
+Subject: RE: Dymanic Model update sample
+Importance: Low
+
+Hello,
+
+Just a minor comment –
+
+It was there in alpha2.  I encountered it while preparing for the DevDay demo.
+
+I somehow got an impression that once I use a certain client ID, it remembers it somewhere.  Is it correct observation?
+(I think I needed to use completely new set of GUID to make it work. ).
+
+If so, if there a place where I can “refresh” it?
+
+(If not, maybe it was something else … please ignore.)
+
+-	Mikako
+
+From: Harry Mattison
+Sent: Thursday, December 24, 2009 8:46 AM
+To: Saikat Bhattacharya; Jeremy Tammik
+Cc: Mikako Harada; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye; Phil Xia; Scott Conover
+Subject: RE: Dymanic Model update sample
+
+Hi Saikat,
+
+This requirement was introduced relatively recently, so it is possible that it worked in Alpha 2 with a GUID mis-match.
+
+Harry
+
+From: Saikat Bhattacharya
+Sent: Thursday, December 24, 2009 12:46 AM
+To: Harry Mattison; Jeremy Tammik
+Cc: Mikako Harada; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye; Phil Xia; Scott Conover
+Subject: RE: Dymanic Model update sample
+
+Hi Harry:
+
+After I made the GUID of Add-in in the manifest file same as what exists in the code, it worked fine for me. Not sure if this was a requirement with Alpha 2 too, since I don’t remember making conscious effort to ensure both are the same (or maybe I did) and the sample used to work. Nevertheless, it works fine now and this information is definitely good to know.
+
+Thanks again
+Saikat
+
+From: Harry Mattison
+Sent: Thursday, December 24, 2009 2:01 AM
+To: Jeremy Tammik; Saikat Bhattacharya
+Cc: Mikako Harada; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye; Phil Xia; Scott Conover
+Subject: RE: Dymanic Model update sample
+
+Hi Jeremy,
+
+Yes, it is required. Removing it results in this error
+
+From: Jeremy Tammik
+Sent: Wednesday, December 23, 2009 2:35 PM
+To: Harry Mattison; Saikat Bhattacharya
+Cc: Mikako Harada; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye; Phil Xia; Scott Conover
+Subject: RE: Dymanic Model update sample
+
+hi harry,
+
+thank you for the info!
+
+is the ClientId field obligatory in the addin manifest, or optional?
+
+cheers
+
+jeremy
+
+From: Harry Mattison
+Sent: Wednesday, December 23, 2009 19:36
+To: Saikat Bhattacharya; Phil Xia; Scott Conover
+Cc: Mikako Harada; Jeremy Tammik; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye
+Subject: RE: Dymanic Model update sample
+
+Hi Saikat,
+
+The problem may be a mismatch between your addin file and the  AddInId in the WallUpdater class.
+
+I modified them as follows so the GUIDs match and the updater runs correctly.
+
+        static AddInId m_appId = new AddInId(new Guid("7DF81445-63A6-475f-B080-A66895C81B92"));
+
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+   <AddIn Type="Command">
+      <Text>Wall Updater Test</Text>
+      <Assembly>C:\Users\mattish\Desktop\DynamicModel\Iteration\bin\Debug\Iteration.dll</Assembly>
+      <ClientId>7DF81445-63A6-475f-B080-A66895C81B92</ClientId>
+      <FullClassName>Iteration.RegisterWallUpdate</FullClassName>
+   </AddIn>
+</RevitAddIns>
+
+
+From: Saikat Bhattacharya
+Sent: Wednesday, December 23, 2009 5:11 AM
+To: Phil Xia; Harry Mattison; Scott Conover
+Cc: Mikako Harada; Jeremy Tammik; Akira Kudo; Katsuaki Takamizawa; Adam Nagy; Joe Ye
+Subject: Dymanic Model update sample
+
+Hi Harry\Phil:
+
+If possible, can you please check why I am getting an internal error with the attached Dynamic model sample project. The error occurs at the RegisterUpdater line of code.
+
+Thanks
+Saikat
+
+-->

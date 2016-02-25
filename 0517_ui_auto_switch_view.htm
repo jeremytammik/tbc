@@ -1,0 +1,103 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: Some furter ideas for using UIAutomation -->
+
+<h3>Further Ideas for Using UI Automation and Galileo</h3>
+
+<p>Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a> recently 
+
+presented his results of exploring the Revit ribbon internals using UISpy,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/ribbon-spying-and-ui-automation.html">
+driving Revit using UI Automation</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/subscribing-to-ui-automation-events.html">
+subscribing to UI Automation events</a>.
+
+Here is another of his ideas of what can be achieved using this technique, plus some thoughts on the
+
+<a href="#2">
+Galileo project</a> that I mentioned on Friday:
+
+<h4>Automating Switch Windows</h4>
+
+<p>This screen snapshot shows the list of opened Revit files and views in the 'Switch Windows' dropdown list:</p>
+
+<center>
+<img src="img/switch_windows.png" alt="Switch Windows dropdown list"/>
+</center>
+
+<p>You could easily use UI Automation to set the active view or active project file by performing the following steps:
+
+<ul> 
+<li>Press the 'Switch Windows' button.
+<li>Wait some milliseconds.
+<li>Browse the popup list.
+<li>Select the entry matching your desired file and view name.
+<li>Invoke the list entry using the appropriate ControlPattern.
+</ul>
+
+<p>This is frequently requested wish list item.
+
+<p>Ah, and of course another point to be aware of:
+Pressing buttons may cause warning, error or other functional dialogs to appear, so you need one of the known workarounds to suppress or auto-click them.
+
+<p>There is yet another point to add:
+The user can make the file extensions disappear in Windows explorer; this will also affect the Revit application title.
+I haven't tested whether the list of opened views is affected, too.
+To be safe, one must take this into account when comparing the file name strings. 
+
+
+<a name="2"></a>
+
+<h4>Thoughts on Galileo</h4>
+
+<p>When reading your last blog entry about 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/bim-apps-project-galileo-and-piotrs-plug-in.html">
+Galileo</a>, I remembered this website
+
+<a href="http://www.procedural.com">
+www.procedural.com</a> about creating rule-based models on a city scale.
+
+It includes a section about rebuilding Pompeii, which is a really good example to show the approach.
+If you are able to reduce the "rules" of Roman architecture to some algorithms, the program will suggest a bunch of possible results.
+It's like a holodeck simulation in Star Trek.
+Think about playing with the parameters, e.g. "what would it look like if glass would have been much cheaper at this time", "how many people could have lived there if the 'insulae' would have had an additional floor", etc.
+Also think about ways of layout optimization...
+
+<p>In fact, this is analogous to Revit in the sense that everything is parameterized.
+In addition, this program also makes suggestions.
+In the case of procedural.com, there are input parameters and rules; after calculation, there is a result (To be honest, I don't know this program, but perhaps there could be x results).
+The resulting geometry is also parameterized, so you can modify fa&ccedil;ade patterns, move streets, etc. even after they've been created.
+
+<p>Both Revit and Galileo do not have the ability to suggest some geometry, they also do not offer geometric variations. 
+What the user can do is to assign DesignOptions, but he must do all the work on his own.
+
+<p>I think, Galileo could target a similar direction as Revit in the sense that a Revit project preserves the object relations between its elements, and Galileo seems just port this concept to a larger scale.
+
+<p>I guess that there is a mixture of intelligent and un-intelligent objects like in Revit because also Galileo seems to be able to import un-parameterized objects.
+Loosing object intelligence is the price that must be paid for interoperability with other CAD products.
+
+<p>Creating procedural models leads to an "architectural description language" in general.
+However, this differs from the Wikipedia definition of 
+
+<a href="http://en.wikipedia.org/wiki/Architecture_description_language">
+architecture description language</a>.
+
+That is not what I mean.
+
+<p>If you think about pattern recognition in the next stage of handling point clouds, it will be necessary to "describe" architectural layouts.
+Because this interpretation must be performed on each scale (city, quarter, block, building, fa&ccedil;ade, &), this "description language" should be developed in consideration of both Revit and Galileo.
+
+<p>"Interpreting point clouds" bears a likeness to "suggesting layouts", both of them work with probabilities.
+
+<p>Just some thoughts...
+
+<p>Once again, many thanks to Rudolf for his valuable thoughts and pointers!
+

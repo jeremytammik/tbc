@@ -1,0 +1,157 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Saikat Bhattacharya 
+FW: Quick query: Sun Direction via the API // material for a blog post
+
+-->
+
+<h3>Sun Direction, Shadow Calculation and Wizard Update</h3>
+
+<p>I enjoyed some wonderful hot sunny days since I returned from New England back to Switzerland.</p>
+
+<p>Summer finally arrived.
+A nice change after the rain and cold both here and in New Hampshire and Massachusetts.</p>
+
+<p>Talking about rain and sun leads up nicely to today's topic, on the sun direction and shadow calculation in a Revit BIM.
+
+<p>Before I get to that, though, I present an update of my Revit add-in wizards resulting in part from yesterday's post on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+processor architecture mismatch warning</a>:</p>
+
+<ul>
+<li><a href="#2">Visual Studio Revit add-in wizard update</a></li>
+<li><a href="#3">Calculating and marking shaded areas</a></li>
+<li><a href="#4">Determining sun direction</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Visual Studio Revit Add-in Wizard Update</h4>
+
+<p>I implemented updates of my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+Visual Studio wizards to generate new C# and VB Revit 2014 add-ins</a> yesterday,
+
+for two reasons:</p>
+
+<ul>
+<li>Suppress the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+processor architecture mismatch warning</a> by
+
+adding a property group to the Visual Studio project file &ndash; I always try to compile all my projects with zero warnings.</li>
+
+<li>Modified the Revit executable and API assembly paths to refer to Revit Onebox instead of the architectural flavour &ndash; the former was unavailable when I first installed Revit 2014.</li>
+</ul>
+
+<p>To install, simply copy the zip file of your choice to the matching Visual Studio project template folder in your local file system:</p>
+
+<ul>
+<li>
+<a href="zip/Revit2014AddinWizardCs2.zip">Revit2014AddinWizardCs2.zip</a> &ndash; copy to
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+</li>
+
+<li>
+<a href="zip/Revit2014AddinWizardVb2.zip">Revit2014AddinWizardVb2.zip</a> &ndash; copy to
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</li>
+</ul>
+
+<p>For all further details on this, links back to previous versions, other flavours, and tips on how to adapt the wizards for your own use, please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+initial 2014 version</a>.</p>
+
+<a name="3"></a>
+
+<h4>Calculating and Marking Shaded Areas</h4>
+
+<p>Determining the shaded areas in a model is obviously important for many areas of analysis.</p>
+
+<p>Assuming certain objects in the BIM cast a shade over others, is there a way to programmatically determine the shadowed areas?</p>
+
+<p>In fact, the Revit API provides a dedicated ExtrusionAnalyzer class for this very kind of calculation, which I made use of to determine the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+plan view furniture and equipment boundary loops</a> for
+
+my 2D cloud-based editor workflow.</p>
+
+<p>Is there a way to mark these areas in the model?</p>
+
+<p>That sounds rather complicated.
+You might be able to use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+Boolean operations for 2D polygons</a> and
+
+paint the shaded areas.</p>
+
+
+<a name="4"></a>
+
+<h4>Calculating Sun Direction for Shadow Calculation</h4>
+
+<p>This leads to the following</p>
+
+<p><strong>Question:</strong> I found code snippet showing how to use the ExtrusionAnalyzer class to calculate shadows in the material provided for the Autodesk University class on <i>Geometric Progression: Further Analysis of Geometry using Autodesk Revit 2012 API</i>.</p>
+
+<p>To make use of it, I also need to determine the sun direction using the Revit API.
+It obviously differs based on time of the day, location, etc.
+
+<p>How can I obtain the sun direction for any given project location, date and time, please?</p>
+
+
+<p><strong>Answer:</strong> The sun direction is available from the Sun and Shadows element.
+Of course, it always represents a single point in time (date, time) and not the complete range of possible sun directions.
+The sample takes this into account and recalculates shadows when the sun is moved to another date and time location via the user interface.
+
+<p>Here is the code to determine the sun direction from the sun and shadows settings:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ShadowCalculatorUtils</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> GetSunDirection( <span class="teal">View</span> view )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SunAndShadowSettings</span> sunSettings
+&nbsp; &nbsp; &nbsp; = view.SunAndShadowSettings;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> initialDirection = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//double altitude = sunSettings.Altitude;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> altitude = sunSettings.GetFrameAltitude(
+&nbsp; &nbsp; &nbsp; sunSettings.ActiveFrame );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> altitudeRotation = <span class="teal">Transform</span>
+&nbsp; &nbsp; &nbsp; .CreateRotation( <span class="teal">XYZ</span>.BasisX, altitude );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> altitudeDirection = altitudeRotation
+&nbsp; &nbsp; &nbsp; .OfVector( initialDirection );
+&nbsp;
+&nbsp; &nbsp; <span class="green">//double azimuth = sunSettings.Azimuth;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> azimuth = sunSettings.GetFrameAzimuth(
+&nbsp; &nbsp; &nbsp; sunSettings.ActiveFrame );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> actualAzimuth = 2 * <span class="teal">Math</span>.PI - azimuth;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> azimuthRotation = <span class="teal">Transform</span>
+&nbsp; &nbsp; &nbsp; .CreateRotation( <span class="teal">XYZ</span>.BasisZ, actualAzimuth );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> sunDirection = azimuthRotation.OfVector(
+&nbsp; &nbsp; &nbsp; altitudeDirection );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> sunDirection;
+&nbsp; }
+}
+</pre>

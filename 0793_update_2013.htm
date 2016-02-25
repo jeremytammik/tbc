@@ -1,0 +1,139 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Update API Assembly References and Wizards</h3>
+
+<p>I finally completed my disk clean-up and managed to install the Autodesk Building Design Suite Ultimate 2013. 
+Phew.
+
+
+<a name="2"></a>
+
+<h4>Update API Assembly References</h4>
+
+<p>That requires me to update the Revit API references in the projects I am working on accordingly.
+
+<p>In order to easily compile all the SDK samples, I always create copies of the Revit API assemblies in the default installation locations for Revit Architecture, MEP and Structure.
+
+<p>Here is the batch file cprvtapi.bat that I used to achieve this after installing the onebox version of Revit 2013:
+
+<pre>
+@echo off
+set a=C:\Program Files\Autodesk
+set b=Revit 2013\Program
+
+set c=Revit Architecture 2013\Program
+
+copy &quot;%a%\%b%\RevitAPI.dll&quot; &quot;%a%\%c%&quot;
+copy &quot;%a%\%b%\RevitAPIUI.dll&quot; &quot;%a%\%c%&quot;
+copy &quot;%a%\%b%\RevitAddInUtility.dll&quot; &quot;%a%\%c%&quot;
+
+set c=Revit MEP 2013\Program
+
+copy &quot;%a%\%b%\RevitAPI.dll&quot; &quot;%a%\%c%&quot;
+copy &quot;%a%\%b%\RevitAPIUI.dll&quot; &quot;%a%\%c%&quot;
+
+set c=Revit Structure 2013\Program
+
+copy &quot;%a%\%b%\RevitAPI.dll&quot; &quot;%a%\%c%&quot;
+copy &quot;%a%\%b%\RevitAPIUI.dll&quot; &quot;%a%\%c%&quot;
+
+set a=
+set b=
+set c=
+</pre>
+
+<!--
+<p>I also need to update my Visual Studio projects that are referencing the Quasar preview release Revit API assemblies, and specifying the corresponding executable as their debug target.
+I implemented a little utility named jhint.exe to handle the .NET assembly references back in 2007, and updated it now to handle the debug target as well.
+-->
+
+
+<a name="3"></a>
+
+<h4>Autodesk University Proposals Confirmed and Requested</h4>
+
+<p>I was notified yesterday that my AU proposals were accepted, so now I know where I will be spending my next birthday again.
+
+<p>I will be presenting two lectures and participating in one panel with members of the Revit API development team and ADN DevTech AEC workgroup:
+
+<ul>
+<li>CP4107 Let's face it: New Autodesk Revit 2013 UI API Functionality
+<li>CP4108 Revit MEP Programming: All Systems Go 
+<li>CP4109 Revit API Round Table: Meet the Champions 
+</ul>
+
+<p>One advantage of these two lectures is that the AEC DevCamp class material can be reused for preparing them:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#2">
+1-4 Revit 2013 UI API enhancements</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#5">
+2-7 Revit MEP API</a>
+</ul>
+
+<p>Another advantage is that they have consecutive numbers, making them easier to remember for me  :-)
+
+<p>Whereas the live AU proposals have been submitted and processed by now, the
+
+<a href="http://auspeaker.wordpress.com/2012/06/28/calling-all-au-virtual-proposals">
+Autodesk University Virtual call for proposals</a> just
+
+opened and we are eagerly awaiting your submissions.
+
+
+<a name="4"></a>
+
+<h4>Updated Revit Add-in Wizards for C# and VB</h4>
+
+<p>After finally installing the official release of Revit, I updated my Revit add-in wizard and also re-implemented the VB one.
+
+<p>Basically, all that needed doing was to replace all occurrences of "Revit Quasar RP" by "Revit 2013" in the *.csproj and *.vbproj project files.
+They occur in the StartProgram and HintPath tags.
+
+<p>The boiler-place code now creates a 'using' statement around the dummy transaction, and I changed the default version strings in the assembly properties from "1.0.0.0" to "1.0.*" to take advantage of the automatically generated build numbers.
+
+<p>For the full description of the wizards, please refer to these previous posts:
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64 bit versions</a> for C# and VB.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012</a> C# and VB version. 
+
+<li>Updated C# and VB versions placing
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#3">
+assembly DLL alongside add-in manifest</a> and
+
+including other changes.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/add-in-wizard-for-revit-2013.html">Revit 2013</a> wizard for C# only.
+
+</ul>
+
+<p>To install, simply copy the appropriate zip file to the Visual Studio C# or VB project template folder in your local file system:
+
+<ul>
+<li><a href="zip/Revit2013AddinWizardCs.zip">Revit2013AddinWizardCs.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+
+<li><a href="zip/Revit2013AddinWizardVb.zip">Revit2013AddinWizardVb.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</ul>

@@ -1,0 +1,137 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">
+td.j331
+{
+  border-color: darkgrey;
+  border-width: 1px;
+  border-style: solid;
+}
+</style>
+</head>
+
+<h3>Revit 2011 Product GUIDs</h3>
+
+<p>We discussed issues related to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-install-path-and-product-guids.html">
+Revit install path and the product GUIDs</a> for 
+
+versions up to and including Revit 2010 last year.
+The install path is less of an issue nowadays, since there is no longer a need to determine the location of Revit.ini to install an add-in, because you can use an add-in manifest file instead.
+Another more exciting reason is the availability of the new 
+
+<a href="#1">
+add-in utility DLL</a>
+
+described below.
+Still, the product GUID may be important for many other uses, so here is the updated list including the GUIDs for the Revit 2011 versions:</p>
+
+<table>
+<tr><td class="j331" rowspan="6">2011</td><td class="j331" rowspan="3">64 bit</td><td class="j331">RAC</td><td class="j331">94D463D0-2B13-4181-9512-B27004B1151A</td></tr>
+<tr><td class="j331">RME</td><td class="j331">C31F3560-0007-4955-9F65-75CB47F82DB5</td></tr>
+<tr><td class="j331">RST</td><td class="j331">23853368-22DD-4817-904B-DB04ADE9B0C8</td></tr>
+<tr><td class="j331" rowspan="3">32 bit</td><td class="j331">RAC</td><td class="j331">4AF99FCA-1D0C-4D5A-9BFE-0D4376A52B23</td></tr>
+<tr><td class="j331">RME</td><td class="j331">CCCB80C8-5CC5-4EB7-89D0-F18E405F18F9</td></tr>
+<tr><td class="j331">RST</td><td class="j331">0EE1FCA9-7474-4143-8F22-E7AD998FACBF</td></tr>
+
+<tr><td class="j331" rowspan="6">2010</td><td class="j331" rowspan="3">64 bit</td><td class="j331">RAC</td><td class="j331">2A8EEE2F-4A9E-43d8-AA07-EC8A316B2DEB</td></tr>
+<tr><td class="j331">RME</td><td class="j331">A1BD042B-8A6F-4e37-92A3-78921BB45B05</td></tr>
+<tr><td class="j331">RST</td><td class="j331">BC9C0A08-DEA4-4138-A7FB-8F68866DB0C1</td></tr>
+<tr><td class="j331" rowspan="3">32 bit</td><td class="j331">RAC</td><td class="j331">572FBF5D-3BAA-42ff-A468-A54C2C0A17C3</td></tr>
+<tr><td class="j331">RME</td><td class="j331">5C8281B1-B927-495a-A0FF-AB4BDFAE505C</td></tr>
+<tr><td class="j331">RST</td><td class="j331">939D29FC-B82D-42a7-BB1E-8E3F121505CC</td></tr>
+
+<tr><td class="j331" rowspan="6">2009</td><td class="j331" rowspan="3">64 bit</td><td class="j331">RAC</td><td class="j331">D2466208-7348-4214-B01E-7BC8729E2BD3</td></tr>
+<tr><td class="j331">RME</td><td class="j331">4A98F976-01B5-40e8-A496-AEFD85C3A446</td></tr>
+<tr><td class="j331">RST</td><td class="j331">B354FCF5-CF64-4fa2-AA84-9D9B2A6FA649</td></tr>
+<tr><td class="j331" rowspan="10">32 bit</td><td class="j331">RAC</td><td class="j331">A3A37DA6-70C0-497C-BCB1-148E9EC1D32E</td></tr>
+<tr><td class="j331">RME</td><td class="j331">E3781DCB-A650-4E66-9B74-67A1B17F052C</td></tr>
+<tr><td class="j331">RST</td><td class="j331">C4B3B3C3-2EE9-48D3-9BF5-4443F7ECF759</td></tr>
+
+<tr><td class="j331" rowspan="3">2008</td><td class="j331">RAC</td><td class="j331">4A11206C-4377-49E8-911E-B11548658FF3</td></tr>
+<tr><td class="j331">RME</td><td class="j331">60A2743E-C881-4880-94ED-96445E38616F</td></tr>
+<tr><td class="j331">RST</td><td class="j331">8D0AE0BB-4FE5-491D-A284-3B363F02E639</td></tr>
+<tr><td class="j331" align="right">9.0</td><td class="j331">Revit Building</td><td class="j331">D11DB6CB-0332-4735-B312-B919741D975E</td></tr>
+<tr><td class="j331" align="right">3</td><td class="j331">RST</td><td class="j331">3F11CEE0-D30D-41ce-8522-922B5D8BB324</td></tr>
+<tr><td class="j331" align="right">8.1</td><td class="j331">Revit Building</td><td class="j331">7EBC0489-5E47-498D-BE31-B094484612E9</td></tr>
+<tr><td class="j331" align="right">2</td><td class="j331">RST</td><td class="j331">BE814F63-629D-4fd8-B628-1437AC10F9D4</td></tr>
+</table>
+
+<p>ADN members may also refer to the technical solution
+
+<a href="http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=9647178&linkID=4901650">
+TS87598 [How to detect where Revit has been installed?]</a>
+
+<a name="1"></a>
+
+<h4>RevitAddinUtility</h4>
+
+<p>In the past, the Revit product GUIDs were often used to determine the Revit installation location.
+In Revit 2011, this can be achieved a lot simpler and safer by making use of the new RevitAddinUtility functionality.
+
+<p>RevitAddInUtility.dll is a new .NET utility class assembly which lives in the Revit Program folder, in the same location as Revit.exe, Revit.ini, and the Revit API DLLs.
+
+<p>The Revit SDK provides documentation on how to use it in its own little help file RevitAddInUtility.chm, as well as a sample application RevitAddInUtilitySample demonstrating its use.
+
+<p>The latter is located in the ExternalCommand2011 folder, which contains two separate very interesting sample applications:
+
+<ul>
+<li>RevitAddInUtilitySample
+<li>ExternalComandRegistration
+</ul>
+
+<p>Here is an excerpt from the documentation of these two in 'ReadMe_ExternalCommand 2011.docx':
+
+<span style="color:darkblue">
+
+<p>Two samples with the following functionality demonstrate how to use the new external command registration more effectively:
+
+<ul>
+<li>RevitAddInUtilitySample: Show how to use RevitAddInUtility to create and edit an add-in manifest file, retrieve information from the manifest file, and retrieve installed Revit product information.
+<li>New features of external command registration:
+<ol style="list-style-type:lower-roman">
+<li>Visibility mode: demonstrate how to control the visibility of each external command based on the different product and document types. 
+<li>IAvailabilityClass: demonstrate how to dynamically enable or disable individual external commands bases on the current user's selection or other application information.
+<li>Icon and tooltip: demonstrate how to define an external command's ribbon icon and tooltip.
+<li>Localization: demonstrate how to localise strings in the add-in manifest file.
+</ol>
+</ul>
+
+</span>
+
+<h4>Enthusiasm and Namespaces</h4>
+
+<p>Guy Robinson gives vent to some 
+
+<a href="http://redbolts.com/blog/post/2010/03/25/Yeah-Baby!!-Revit-2011-API-e28093-the-unofficial-4th-Discipline.aspx">
+enthusiasm</a> about 
+
+Revit 2011 and the new API 
+and provides a lot of interesting background information on and a pointer to a powerful tool for handling the 
+
+<a href="http://redbolts.com/blog/post/2010/03/27/Revit2011-API-e28093-Whate28099s-in-a-name.aspx">
+namespace refactoring</a> in 
+
+the Revit 2011 API, which might save a significant amount of porting time and effort.
+
+<h4>Revit 2011 API News Webcast</h4>
+
+<p>Kean Walmsley points out that we have yet another group of events that I forgot to mention on Sunday besides the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+DevCamp, Devlabs and API training classes</a>: 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2010/03/free-online-sessions-on-the-2011-products-and-their-apis.html">
+free online sessions on the 2011 products and their APIs</a>.
+
+The session on what's new in the Revit 2011 API is taking place on April 21<sup>st</sup>, and once again you can visit our 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+training schedule</a> (also accessible via 
+
+<a href="http://autodesk.com/apitraining">
+autodesk.com/apitraining</a> &gt; Schedule) to attend.
+
+He also points to some other product related sessions that may be interesting to you.
+

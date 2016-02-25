@@ -1,0 +1,64 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Unload Family Type</h3>
+
+<!-- 1250831 [unloading and loading family types] -->
+
+<p>We discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/addin-ribbon-panel-and-loading-one-single-type.html">
+loading of a single family type</a>
+
+just two days ago.
+Here is a related question that came up and was handled by Saikat Bhattacharya:</p>
+
+<p><strong>Question:</strong>
+How can I use the API to remove unused family types from a project?
+I know there is a command within Revit to do this, but we would like to automate the process.</p>
+
+<p><strong>Answer:</strong>
+You can unload a specific loaded family symbol from your project using the Document.Delete() method. 
+I tested this as follows:</p>
+
+<ul>
+<li>Load a specific column symbol "457 x 610mm".
+<li>Run an external command with the code below to filter out and iterate over all column elements, including symbols.
+<li>Apply the Delete method to remove and thus unload the specific symbol.
+</ul>
+
+<p>After running the code, the list of loaded family symbols displayed in the user interface confirmed that the specific family symbol was no longer present in the project.
+Here is the code for the external command Execute method:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">Filter</span> filter = app.Create.Filter.NewCategoryFilter(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Columns );
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = doc.get_Elements( filter );
+&nbsp;
+&nbsp; <span class="blue">while</span> ( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="blue">if</span> ( e.Name.Equals( <span class="maroon">&quot;457 x 610mm&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; doc.Delete( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Thank you Saikat for this solution!</p>

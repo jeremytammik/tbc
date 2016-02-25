@@ -1,0 +1,213 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add New Materials from List</h3>
+
+<p>I am happily back from
+
+<a href="http://en.wikipedia.org/wiki/Siem_Reap">
+Siem Reap</a> in
+
+Cambodia and the
+
+<a href="http://en.wikipedia.org/wiki/Angkor_Wat">
+ruins of Angkor Wat</a>
+
+(<a href="http://www.facebook.com/album.php?aid=68525&id=1019863650">more</a>
+<a href="http://www.facebook.com/album.php?aid=68592&id=1019863650">photos</a>):</p>
+
+<center>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p110.jpg" alt="Angkor Wat" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p133.jpg" alt="Angkor Wat" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p155.jpg" alt="Angkor Wat" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p157.jpg" alt="Angkor Wat" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p188.jpg" alt="Angkor Wat" width="400"/>
+</center>
+
+<p>Yesterday I visited the
+
+<a href="http://en.wikipedia.org/wiki/Grand_Palace">
+Grand Palace</a> and
+
+the
+
+<a href="http://en.wikipedia.org/wiki/Wat_Pho">
+reclining Buddha in Wat Pho</a> in Bangkok
+
+(<a href="http://www.facebook.com/album.php?aid=68594&id=1019863650">more photos</a>):</p>
+
+<center>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p258.jpg" alt="Grand Palace" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p272.jpg" alt="Grand Palace" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p298.jpg" alt="Reclining Buddha" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p299.jpg" alt="Reclining Buddha" width="400"/>
+</center>
+
+<!-- <p>The ruins have a number of interesting architectural, statical and artistic aspects: -->
+
+<p>Angkor Wat and Cambodia was absolutely wonderful, and I am really glad that I went there.
+The places I visited in Thailand were rather touristy, whereas in Cambodia I had the feeling of getting much more in touch with real people and life:</p>
+
+<center>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p196.jpg" alt="Child" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p220.jpg" alt="Children" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p230.jpg" alt="Temple" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p233.jpg" alt="People" width="400"/>
+<img src="/j/photo/jeremy/2010/2010-08-25_siem_reap/p241.jpg" alt="Monkey" width="400"/>
+</center>
+
+<p>Before going there I was thinking that I am not really all that interested in this kind of travelling, but the connection that I experienced there really motivated me to return again, and possibly visit Laos as well.
+One nice idea would be to go for a walk from northern Thailand along the western border of Laos all the way up to China.
+
+<p>Now I am staying with my brother Marcus in Pattaya again, picking up my computer before returning to Switzerland.
+
+<p>So, returning to Revit programming topics after this wonderful break from computers and the heart-warming dive into loving friendliness of Cambodian people...
+
+
+<h4>Importing and Creating New Materials from a List</h4>
+
+<p>Quite a while back, I discussed programmatically
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/new-material.html">
+adding a new material</a> to the Revit project.
+
+I would like to present a useful real-world application that takes this much further, created by Jinsol Kim of
+
+<a href="http:www.rcmsgroup.com">
+RCMS GROUP</a> to
+
+add an entire list of materials read from an Excel spreadsheet to a Revit project.
+
+Here is part of the discussions we had during the development and Jinsol's detailed description of the final process:
+
+<p><strong>Question:</strong> I am trying to add some material lists programmatically and running into some problems here.
+The materials are defined in Excel spreadsheets used as input and containing data such as
+
+<ul>
+<li>Material Name
+<ul>
+<li>Code
+<li>Title
+<li>Strength
+</ul>
+<li>Graphics
+<ul>
+<li>RGB colour
+<li>Rendering data
+</ul>
+<li>Identity
+<ul>
+<li>Filter criteria
+<li>Descriptive information
+<li>Custom parameters
+</ul>
+</ul>
+
+<p>I found a way to add materials like this:
+
+<pre>
+&nbsp; <span class="blue">string</span> newName = <span class="maroon">&quot;03 15 00&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">MaterialOther</span> myMaterial
+&nbsp; &nbsp; = doc.Settings.Materials.AddOther(
+&nbsp; &nbsp; &nbsp; newName );
+&nbsp;
+&nbsp; myMaterial.Color = <span class="blue">new</span> <span class="teal">Color</span>( 127, 127, 127 );
+&nbsp; myMaterial.Transparency = 0;
+</pre>
+
+<p>However, I cannot find out any parameters related to 'Identity'.
+In order to classify the material lists, I need to put values on 'Material Class'.
+How can I access that value, i.e. Materials &gt; Identity &gt; Material Class (Filter Criteria)?
+
+<p><strong>Answer:</strong> As said, we did discuss
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/new-material.html">
+adding a new material</a> quite
+
+a while back.
+
+<p>For the identity fields, you could simply add your own shared parameters to the model.
+
+<p>Using shared parameters, you can add arbitrary data to all elements of any category.
+
+<p><strong>Question:</strong> One more thing:
+If I create a shared parameter named 'Material Class' for example under the Materials and finishes group, then there seems to be no way for users to use the Material Class filter.
+Using the API, I will add up to about 2000 materials at once to avoid typing in every material in each project.
+Users might want to see only specific materials which belong to specific material class by filtering them out with material class.
+If the material class doesn't support filter by material class, then do you think I need to create a custom filter separately for it?
+
+<p>Here are the expected results, although created manually in this case:</p>
+
+<center>
+<img src="img/add_materials.png" alt="Added materials"/>
+</center>
+
+<p><strong>Answer:</strong> That looks a bit similar to the view filter, for which there is full API access as demonstrated by the ElementFilter/ViewFilters sample.
+Unfortunately, it looks to me as if the materials filter is not accessible in the same way.
+
+<p><strong>Question:</strong> I chose another way to solve how to maintain the material class name in the identity data of Materials.
+
+<p>First, I created a set of root materials manually with the proper Material Class and then duplicated them accordingly to appropriate master format division.
+
+<p>Here is a more detailed description:
+
+<p><strong>Step 1:</strong> Set up the basic materials manually within the project file to duplicate with 'Material Class'.
+
+<p>Note: The Material Class name should follow this format: 'CSI XX'.</p>
+
+<center>
+<img src="img/add_materials_step1.png" alt="Basic materials"/>
+</center>
+
+<p><strong>Step 2:</strong> Check all the material information in defined in the right format.
+
+<p>The input spreadsheet is read from C:\RevitAPI\MaterialList.xlsx.
+
+<p>Note 1: Graphics section doesn't allow an empty space. It should be filled with '0' or N/A.
+
+<p>Note 2: Material Class values should be equivalent to basic material class that will be used for duplication.</p>
+
+<center>
+<img src="img/add_materials_step2.png" alt="Input spreadsheet"/>
+</center>
+
+<p><strong>Step 3:</strong> Run the add-in and check that the materials were added successfully.</p>
+
+<center>
+<img src="img/add_materials_step3a.png" alt="Run the add-in"/>
+</center>
+
+<center>
+<img src="img/add_materials_step3b.png" alt="Add-in message"/>
+</center>
+
+<center>
+<img src="img/add_materials_step3c.png" alt="Added materials"/>
+</center>
+
+<p>Here is Jinsol's original
+
+<a href="zip/AddMaterials.pptx">
+Powerpoint version</a> of
+
+the detailed description, and here is
+
+<a href="zip/AddMaterials01.zip">
+AddMaterials01.zip</a> containing
+
+the complete Visual Studio solution and source code of the AddMaterials Revit add-in.
+
+<p>Thank you very much, Jinsol, for creating this solution and documenting and sharing it with us!
+
+<p><strong>Addendum:</strong> This utility has been updated.
+
+Please check out the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated.html">
+migration to Revit 2014</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated-again.html">
+enhancements in release 2014.0.0.1</a>.</p>
+

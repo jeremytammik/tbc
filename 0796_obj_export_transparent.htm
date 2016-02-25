@@ -1,0 +1,234 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>OBJ Model Exporter with Transparency Support</h3>
+
+<p>Tuesday evening the moon was full, the rain finally eased up a bit, the sky became completely clear, and I spent a couple of hours outside on a hill with a beautiful view, a group of friends, and a nice hot fire.</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-07-03_tuellinger_full_moon/img_1614_full_moon.jpg" alt="Full moon" width="400"/>
+</center>
+
+<p>On Wednesday I finally got to play hockey again with my Autodesk colleagues after a long period of missing out on that.
+I hope all US Americans enjoyed a nice 
+
+<a href="http://en.wikipedia.org/wiki/Independence_Day_%28United_States%29">
+Independence Day</a>.
+
+<p>The next days are filled with team meetings here in Neuch&acirc;tel, followed by our yearly Autodesk football tournament, taking place in Switzerland this year for the first time.
+Unfortunately, the date for that was fixed very late, and I had already made a prior appointment for a mountain tour this coming weekend, so I will not be able to participate unless the weather turns really bad and prohibits mountaineering.
+It's nice to have alternatives  :-)
+
+<p>The OBJ model exporter I am working on went through an unexpected number of iterations from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html">
+base functionality</a> through the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html">
+first version</a>, 
+
+then adding support for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-colours.html">
+colour</a> and processing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-multiple-solid-support.html">
+multiple solids per BIM element</a>.
+
+<p>The last update forced me to realise that I really do need to support transparency as well, just as Rudolf Honke initially
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html?cid=6a00e553e168978833017742c3ff3f970d#comment-6a00e553e168978833017742c3ff3f970d">
+suggested</a>.
+
+
+<a name="2"></a>
+
+<h4>Transparency in OBJ and Revit</h4>
+
+<p>Happily, the OBJ format and its associated 
+
+<a href="http://people.sc.fsu.edu/~jburkardt/data/mtl/mtl.html">
+MTL material libraries</a> 
+
+(<a href="http://local.wasp.uwa.edu.au/~pbourke/dataformats/mtl">details</a>)
+
+do support this.
+
+<p>In MTL, the transparency is written using either a 'd' or a 'Tr' statement with values ranging from 0.0 to 1.0, where 1.0 is opaque.
+This is the record generated for the glass in the basic sample model:
+
+<pre>
+newmtl 4B475A69
+Ka 0.27734375 0.3515625 0.41015625
+Kd 0.27734375 0.3515625 0.41015625
+d 0.25
+</pre>
+
+<p>Revit material transparency values lie between 0 and 100, where 100 is completely transparent and 0 opaque. 
+Here is the code that I am currently using to define a material library entry including transparency:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _mtl_newmtl_d 
+&nbsp; &nbsp; = <span class="maroon">&quot;newmtl {0}\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;Ka {1} {2} {3}\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;Kd {1} {2} {3}\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;d {4}&quot;</span>;
+&nbsp;
+&nbsp; s.WriteLine( _mtl_newmtl_d, 
+&nbsp; &nbsp; name, 
+&nbsp; &nbsp; color.Red / 256.0, 
+&nbsp; &nbsp; color.Green / 256.0,
+&nbsp; &nbsp; color.Blue / 256.0, 
+&nbsp; &nbsp; (100 - transparency) / 100.0 );
+</pre>
+
+<p>Here is an impression of the resulting view in the 
+
+<a href="http://bonzaiengine.com">
+Bonzai Engine</a> driven
+
+<a href="http://bonzaiengine.com/applet/modelviewer/modelviewer.php">
+online model viewer</a>,
+
+which was the only viewer I was able to find so far supporting transparency:</p>
+
+<center>
+<img src="img/obj_export_basic_model_transparent.png" alt="Sample model with transparency" width="400"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>Mingling Triangles, Colours and Transparency</h4>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html">
+first take</a> of 
+
+the exporter used a simple list of integers representing triples of vertex indices to store the triangular facets to export.
+
+<p>When I decided to add 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-colours.html">
+colour support</a> to
+
+the exporter and realised that the mutual ordering of triangles and colour definitions for subsequent faces needs preserving, I decided to store the colours in the same list.
+
+<p>Since the Revit colour red, green and blue values are encoded in byte data, i.e. only range from 0 to 255, I can squeeze all three of them into a single integer like this:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> ColorToInt( <span class="teal">Color</span> color )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ( (<span class="blue">int</span>) color.Red ) &lt;&lt; 16
+&nbsp; &nbsp; &nbsp; | ( (<span class="blue">int</span>) color.Green ) &lt;&lt; 8
+&nbsp; &nbsp; &nbsp; | (<span class="blue">int</span>) color.Blue;
+&nbsp; }
+</pre>
+
+<p>For each colour switch, I create a triple of integers using a -1 marker, followed by one integer holding the colour value and a final zero-valued integer to keep up the multiples of three.
+
+<p>When adding support for transparency, I made use of the fact that the maximum transparency value returned by Revit is 100. 
+Left shifting that value by 24 bits results in 100 * 2^24 = 1677721600, which is still small enough to fit into a signed integer, whose maximum value is 2^32 - 1 = 4294967295.
+To put this shorter, you might also say that I make use of the fact that 100 is smaller than 127 = 2^7 - 1  :-)
+
+<p>I can thus encode transparency as well as colour in a single signed integer like this, including some assertions to ensure my thinking is not completely off track and Revit is sticking to its agreements:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> ColorTransparencyToInt( 
+&nbsp; &nbsp; <span class="teal">Color</span> color,
+&nbsp; &nbsp; <span class="blue">int</span> transparency )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 &lt;= transparency,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected non-negative transparency&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 100 &gt;= transparency,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected transparency between 0 and 100&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">uint</span> trgb = ( (<span class="blue">uint</span>) transparency &lt;&lt; 24 )
+&nbsp; &nbsp; &nbsp; | (<span class="blue">uint</span>) ColorToInt( color );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">int</span>.MaxValue &gt; trgb,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected trgb smaller than max int&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">int</span>) trgb;
+&nbsp; }
+</pre>
+
+<p>These operations are reversed to extract the colour and transparency from the encoded integer like this:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">Color</span> IntToColor( <span class="blue">int</span> rgb )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Color</span>(
+&nbsp; &nbsp; &nbsp; (<span class="blue">byte</span>) ( ( rgb &amp; 0xFF0000 ) &gt;&gt; 16 ),
+&nbsp; &nbsp; &nbsp; (<span class="blue">byte</span>) ( ( rgb &amp; 0xFF00 ) &gt;&gt; 8 ),
+&nbsp; &nbsp; &nbsp; (<span class="blue">byte</span>) ( rgb &amp; 0xFF ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Color</span> IntToColorTransparency( 
+&nbsp; &nbsp; <span class="blue">int</span> trgb, 
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">int</span> transparency )
+&nbsp; {
+&nbsp; &nbsp; transparency = (<span class="blue">int</span>) ( ( ( (<span class="blue">uint</span>) trgb ) 
+&nbsp; &nbsp; &nbsp; &amp; 0xFF000000 ) &gt;&gt; 24 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> IntToColor( trgb );
+&nbsp; }
+</pre>
+
+<p>Since the materials referenced by the OBJ file need a name, I use a similar technique to generate that as well:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> ColorString( <span class="teal">Color</span> color )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> color.Red.ToString( <span class="maroon">&quot;X2&quot;</span> )
+&nbsp; &nbsp; &nbsp; + color.Green.ToString( <span class="maroon">&quot;X2&quot;</span> )
+&nbsp; &nbsp; &nbsp; + color.Blue.ToString( <span class="maroon">&quot;X2&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> ColorTransparencyString(
+&nbsp; &nbsp; <span class="teal">Color</span> color,
+&nbsp; &nbsp; <span class="blue">int</span> transparency )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> transparency.ToString( <span class="maroon">&quot;X2&quot;</span> )
+&nbsp; &nbsp; &nbsp; + ColorString( color );
+&nbsp; }
+</pre>
+
+<p>To find out what other exciting things happen to the data on its way out of the Revit model into the OBJ file, please have a look at the source code yourself.
+
+<p>Here is 
+
+<a href="zip/ObjExport3.zip">
+ObjExport3.zip</a> including
+
+the entire source code, Visual Studio solution and add-in manifest for the updated OBJ exporter version 3 including transparency support.
+
+<p>As far as I can tell, that concludes the OBJ export effort for now.
+Next steps may include looking into viewing this on a mobile device and getting it uploaded to the cloud to make it available there.
+I did define an abstract interface for the exporter, albeit very simple, in order to be able to replace the implementation to address other targets.
+The future will tell where this will lead us.
+
+
+<a name="4"></a>
+
+<h4>Getting Started with the Revit 2013 API</h4>
+
+<p>Most of the suggestions provided for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/getting-started-with-the-revit-2012-api.html">
+getting started with the Revit 2012 API</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+preparing for a hands on Revit API training</a> are
+
+still valid for Revit 2013 as well.
+
+<p>Still, for the sake of convenience and completeness, Mikako Harada updated the various pointers to the available materials and published an overview for 
+
+<a href="http://adndevblog.typepad.com/aec/2012/07/getting-started-with-revit-2013-api.html">
+getting started with the Revit 2013 API</a> that 
+
+is well worth taking a gander at.

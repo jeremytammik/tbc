@@ -1,0 +1,53 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- http://thebuildingcoder.typepad.com/blog/2009/09/detail-lines.html?cid=6a00e553e168978833012875c7c99d970c#comment-6a00e553e168978833012875c7c99d970c -->
+
+<h3>New Project Document</h3>
+
+<p>A short and simple 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/detail-lines.html?cid=6a00e553e168978833012875c7c99d970c#comment-6a00e553e168978833012875c7c99d970c">
+question</a> from Nadim on the NewProjectDocument method:
+
+<p><strong>Question:</strong> I am using 
+
+<pre class="code">
+<span class="teal">Document</span> doc = app.NewProjectDocument( 
+  <span class="blue">string</span> templateFile );
+</pre>
+
+<p>Revit shows that it is loading the template as it does usually when it creates a new document; however, it does not really create the new document.
+
+<p>Any idea why?
+
+<p><strong>Answer:</strong> I implemented a sample external command CmdNewProjectDoc to test it for you and it works fine for me:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _template_file_path 
+&nbsp; = <span class="maroon">&quot;C:/Documents and Settings/All Users&quot;</span>
+&nbsp; + <span class="maroon">&quot;/Application Data/Autodesk/RAC 2010&quot;</span>
+&nbsp; + <span class="maroon">&quot;/Metric Templates/DefaultMetric.rte&quot;</span>;
+&nbsp;
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = app.NewProjectDocument( 
+&nbsp; &nbsp; _template_file_path );
+&nbsp;
+&nbsp; doc.SaveAs( <span class="maroon">&quot;C:/tmp/new_project.rvt&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>After running the command, the new project file is created and saved in the expected location:
+
+<pre>
+2009-11-23  12:26  2,056,192 new_project.rvt
+</pre>

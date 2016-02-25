@@ -1,0 +1,317 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255675 [How to determine the corners of a rectangular duct] -->
+
+<h3>Rectangular Duct Corners</h3>
+
+<p>In between the series of background information from Scott's Autodesk University presentation on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+let's have a quick look at a practical application.
+
+<p>This is an MEP-specific issue on how to determine the corners of a rectangular duct.
+One approach to determine this information is to perform the following steps:
+
+<ul>
+<li>Analyse the duct geometry.
+<li>Extract its solid.
+<li>Iterate over the faces.
+<li>Select the face containing the rectangular connector.
+<li>Determine its four corners.
+</ul>
+
+<p>We explored the geometry of various elements in detail in the past, e.g.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">slab boundary</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/slab-side-faces.html">slab side faces</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">wall elevation profile</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygon areas and outer loop</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">3D polygon areas</a>, and
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/cylindrical-column.html">cylindrical columns</a>.
+
+We have also had a look at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/mep-connectors.html">
+MEP connectors</a> and 
+
+used the information contained in them, e.g. for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/modeless-pressure-drop-tool.html">
+modeless pressure drop tool</a>.
+
+This analysis now shows how these two sources of information, geometry and connectors, can be usefully combined.
+
+<p>The following solution comes from a case handled by Joe Ye and an implementation by Aaron and Vico in the Revit development team.
+
+<p><strong>Question:</strong> I need to determine the four corners at the end of a rectangular duct. 
+Given a connector at the end of the duct, I have been using the connector coordinate system transform and width and height properties to determine the corners like this:
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> p = connector.CoordinateSystem.OfPoint( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( connector.Width / 2, 
+&nbsp; &nbsp; &nbsp; connector.Height / 2, 0 ) );
+</pre>
+
+<p>This only seems to work if the duct is oriented such that the airflow is in the XY plane.
+
+<p>If the duct's airflow is along the Z axis so the duct is going up or down, I can calculate the corner like this: 
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> p = connector.CoordinateSystem.OfPoint( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( connector.Height / 2, 
+&nbsp; &nbsp; &nbsp; connector.Width / 2, 0 ) );
+</pre>
+
+<p>I seem to be missing something, because it seems like I shouldn't have to determine the duct's orientation. 
+Is there a more general solution to determining the corners of a rectangular duct? 
+Also, if the duct has been rotated, neither of these methods works.
+
+<p><strong>Answer:</strong> There is no direct access to the four corners, but they can easily be determined from the duct geometry in combination with the connector location:
+
+<ul>
+<li>Retrieve the duct geometry solid.
+<li>Retrieve the duct centre line and find the two rectangular end faces which are perpendicular to it.
+<li>Alternatively, find the planar rectangular face containing the connector.
+<li>Retrieve its four vertices to obtain the desired corner points.
+</ul>
+
+<p>I added a new external command CmdRectDuctCorners to The Building Coder sample application to demonstrate how these steps can be implemented.
+
+<p>This implementation also demonstrates making use of the .NET diagnostics Trace class to create a log file to write the data to, rather than using our customary approach of writing to the Visual Studio debug console window.
+Using the Trace class and writing to a file is useful for driving automated tests and comparing the results with an expected template output file, for instance.
+
+<p>We make use of the following helper methods:
+
+<ul>
+<li>GetFirstRectangularConnector &ndash; return the first rectangular connector of the given duct element.
+<li>FaceContainsConnector &ndash; return true if the given face of a solid contains the given connector.
+<li>AnalyseDuct &ndash; analyse the given duct element: determine its first rectangular connector, retrieve its solid, find the face containing the connector, and list its four vertices.
+</ul>
+
+<p>Here is the implementation of GetFirstRectangularConnector:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> GetFirstRectangularConnector( 
+&nbsp; <span class="teal">Duct</span> duct, 
+&nbsp; <span class="blue">out</span> <span class="teal">Connector</span> c1 )
+{
+&nbsp; c1 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">ConnectorSet</span> connectors 
+&nbsp; &nbsp; = duct.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; connectors.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ConnectorProfileType</span>.RectProfile 
+&nbsp; &nbsp; &nbsp; &nbsp; == c.Shape )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; c1 = c;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;Connector shape: &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + c.Shape );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> != c1;
+}
+</pre>
+
+<p>FaceContainsConnector is short and sweet.
+It uses Face.Project to determine the closest point on the face to the connector origin. 
+If it exists and the distance returned by the method is small, the connector is contained in the face:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> FaceContainsConnector(
+&nbsp; <span class="teal">Face</span> face,
+&nbsp; <span class="teal">Connector</span> c )
+{
+&nbsp; <span class="teal">XYZ</span> p = c.Origin;
+&nbsp;
+&nbsp; <span class="teal">IntersectionResult</span> result = face.Project( p );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> != result
+&nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( result.Distance ) &lt; 1e-9;
+}
+</pre>
+
+<p>The mainline of the command does the following:
+
+<ul>
+<li>Check that we really are running in Revit MEP. If that is not the case, we will not have access to the duct element's connector manager.
+<li>Set up the log file for the Trace mechanism.
+Its path and filename is determined from the location and name of the executing assembly with a suffix of the current date and an extension ".log".
+<li>Set up an error handler and manage exceptions, including final cleanup to ensure the trace mechanism is properly closed.
+<li>Iterate over the selected elements, check that each one really is a duct, and pass it into the analysis method.
+<li>Return Failed regardless of whether the analysis was successful or not, so that the database is not unnecessarily 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/document-ismodified-property.html">
+marked as dirty</a>
+
+even though nothing was modified.
+</ul>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+<span class="blue">if</span>( <span class="teal">ProductType</span>.MEP != app.Product )
+{
+&nbsp; message = <span class="maroon">&quot;Please run this command in Revit MEP.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">SelElementSet</span> sel = doc.Selection.Elements;
+&nbsp;
+<span class="blue">if</span>( 0 == sel.Size )
+{
+&nbsp; message = <span class="maroon">&quot;Please select some rectangular ducts.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// set up log file:</span>
+&nbsp;
+<span class="blue">string</span> log = <span class="teal">Assembly</span>.GetExecutingAssembly().Location 
+&nbsp; + <span class="maroon">&quot;.&quot;</span> + <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;yyyyMMdd&quot;</span> ) 
+&nbsp; + <span class="maroon">&quot;.log&quot;</span>;
+&nbsp;
+<span class="blue">if</span>( <span class="teal">File</span>.Exists( log ) )
+{
+&nbsp; <span class="teal">File</span>.Delete( log );
+}
+&nbsp;
+<span class="teal">TraceListener</span> listener 
+&nbsp; = <span class="blue">new</span> <span class="teal">TextWriterTraceListener</span>( log );
+&nbsp;
+<span class="teal">Trace</span>.Listeners.Add( listener );
+&nbsp;
+<span class="blue">try</span>
+{
+&nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;Begin&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// loop over all selected ducts:</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Duct</span> duct <span class="blue">in</span> sel )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == duct )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.TraceError( <span class="maroon">&quot;The selection is not a duct!&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// process each duct:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;========================&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;Duct: Id = &quot;</span> + duct.Id.Value );
+&nbsp;
+&nbsp; &nbsp; &nbsp; AnalyseDuct( duct );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+{
+&nbsp; <span class="teal">Trace</span>.WriteLine( ex.ToString() );
+}
+<span class="blue">finally</span>
+{
+&nbsp; <span class="teal">Trace</span>.Flush();
+&nbsp; listener.Close();
+&nbsp; <span class="teal">Trace</span>.Close();
+&nbsp; <span class="teal">Trace</span>.Listeners.Remove( listener );
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Finally, here is the AnalyseDuct method that does the real work:
+
+<ul>
+<li>Retrieve the duct's first rectangular connector.
+<li>Retrieve the duct geometry.
+<li>Extract the solid.
+<li>Iterate over its faces.
+<li>Find the face containing the connector.
+<li>List its four vertices to the log file.
+</ul>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> AnalyseDuct( <span class="teal">Duct</span> duct )
+{
+&nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">Connector</span> c1;
+&nbsp; <span class="blue">if</span>( !GetFirstRectangularConnector( duct, <span class="blue">out</span> c1 ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Trace</span>.TraceError( <span class="maroon">&quot;The duct is not rectangular!&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; opt.DetailLevel = <span class="teal">Options</span>.<span class="teal">DetailLevels</span>.Fine;
+&nbsp; &nbsp; <span class="teal">GeoElement</span> geoElement = duct.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geoElement.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> foundFace = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; foundFace = FaceContainsConnector( face, c1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( foundFace )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;==&gt; Four face corners:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">EdgeArray</span> a = face.EdgeLoops.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = e.Evaluate( 0.0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;Point = &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.PointString( p ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rc = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !foundFace )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Trace</span>.WriteLine( <span class="maroon">&quot;[Error] Face not found&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>This is the resulting log file output after running this command with a simple rectangular duct selected:
+
+<pre>
+Begin
+========================
+Duct: Id = 431526
+==> Four face corners:
+Point = (-18.27,4.66,8.53)
+Point = (-18.27,4.66,9.51)
+Point = (-18.27,3.67,9.51)
+Point = (-18.27,3.67,8.53)
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11058.zip">
+version 1.1.0.58</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>Many thanks to Joe for handling this case and to Aaron and Vico for the initial implementation!

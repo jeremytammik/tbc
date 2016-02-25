@@ -1,0 +1,47 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1263984 [Reference Plane] -->
+
+<h3>Plane Normal and Points on Plane</h3>
+
+<p><strong>Question:</strong> I have an origin point and a normal vector and wish to determine three points to create a reference plane. How can I calculate the third point using normal and origin?
+
+<p><strong>Answer:</strong> This is very elementary geometry. 
+If you have an origin point and a normal vector, you can easily calculate three points in a plane. 
+Conversely, if you have three points in a plane, it is easy to calculate the normal vector. 
+
+<p>Let 'x' denote the vector 
+
+<a href="http://en.wikipedia.org/wiki/Cross_product">
+cross product</a>. 
+
+<p>Given an origin point P and a normal vector N:
+
+<ul>
+<li>Select an arbitrary vector V that is not collinear with N, e.g. the X or Y axis. 
+<li>Set U = N x V to obtain a vector that is perpendicular to N. 
+<li>Set V = N x U to obtain another vector perpendicular to both N and V. 
+<li>Set Q = P + U and R = P + V to obtain three points P, Q and R in the plane.
+</ul>
+
+<p>Given three points P, Q and R in the plane:
+
+<ul>
+<li>Set V = Q - P and W = R - P to obtain two perpendicular vectors in the plane. 
+<li>Set N = V x W to obtain the plane normal.
+</ul>
+
+<p>I published a number of posts demonstrating this. 
+The most useful ones for you might be the ones describing the GetCurveNormal method:
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/detail-curve-must-be-in-plane.html">
+Detail curve must be in a plane</a>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/model-curve-creator.html">
+Model curve creator</a>
+</ul>

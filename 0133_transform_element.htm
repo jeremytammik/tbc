@@ -1,0 +1,228 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1249774 [How to apply a Transform to a FamilyInstance] -->
+
+<h3>Transform an Element</h3>
+
+<p><strong>Question:</strong>
+How can I apply a transformation to a Revit element or family instance?
+
+<p>I used to work in the AutoCAD API, where I could apply a transformation using the transformBy() method.
+It takes an AcGeMatrix3d parameter, which can represent a composed transformation including rotation, scaling, translation and mirroring.</p>
+
+<p>In the Revit API, I see the use of the 4x3 matrix represented by the Transform class, which I suppose serves the same purpose.
+However, I am unable to find a method like transformBy() to apply this transformation to a FamilyInstance or any other graphic element.</p>
+
+<p>Therefore, my questions are:</p>
+
+<ol>
+<li>Is there a way to apply a transformation matrix to a Revit element?</li>
+<li>Can this matrix be applied containing simultaneous rotation, translation and mirroring transformations?</li>
+<li>If there is no such function, how can I decompose a Transform to apply the transformation through the Move, Rotate and Mirror document commands?</li>
+</ol>
+
+<p><strong>Answer:</strong>
+As much as possible I would recommend to avoid comparing the AutoCAD and Revit APIs.
+In AutoCAD, everything is disconnected and anything can be done.
+In Revit, everything is totally parameterised and connected, and almost no independent manipulation of objects is possible, because almost everything affects almost everything else.</p>
+
+<p>For instance, imagine the effect of a transformation including a non-unit scale factor on a Revit element.
+In the case of a wall, the wall type includes information on the wall thickness.
+Blindly applying such a transformation to the wall would change its thickness, which would require it to change its type.
+This is a rather far-reaching modification, more than you might have expected, coming from an environment like AutoCAD.
+Therefore, the Revit API does not provide any method for scaling elements, or more generally applying general transformations to them.</p>
+
+<p>The FamilyInstance class provides a property Location, which can be used to find the physical location of an instance within project. It overrides the base class Element.Location, which provides the same functionality for generic elements. As the description says, it is a read-only property.</p>
+
+<p>The location object provides the ability to translate and rotate elements. More detailed location information and control can be found by using the derivatives of this object, such as LocationPoint and LocationCurve.</p>
+
+<p>You might be able to make use of the Location.Move and Rotate methods for your purposes:</p>
+
+<ul>
+<li>Move: move the element within the project by a specified vector.</li>
+<li>Rotate: rotate the element within the project by a specified number of degrees around a given axis.</li>
+</ul>
+
+<p>The document class provides similar methods to manipulate several elements simultaneously:</p>
+
+<ul>
+<li>Move: overloaded, moves one or more elements within the document by a specified vector.</li>
+<li>Rotate: overloaded, rotates one or more elements within the document by a specified number of degrees around a given axis.</li>
+</ul>
+
+<p>The overloads are provided so you can specify the affected elements by individual element or element id, or by a whole set of each respectively.</p>
+
+<p>The Document and Element classes also provide analogous methods to mirror one or more elements.</p>
+
+<p>In exact details of what you can and cannot do will obviously depend on the circumstances, such as what kind of elements you are manipulating and what transformations you wish to apply.</p>
+
+<p>The Revit API does not provide methods to decompose an arbitrary Transform instance, beyond the ones listed in the help file. For instance, you can check whether a transformation is a translation using IsTranslation, in which case the translation vector can be obtained from the Origin property.</p>
+
+<p>Decomposing a matrix in the manner you describe is not a trivial task. Here is some old Silicon Graphics C++ code I found which achieves this and also includes some documentation and references for further reading and research. More references and background information is provided by the Wikipedia article on
+
+<a href="http://en.wikipedia.org/wiki/Matrix_decomposition">
+matrix decomposition</a>:</p>
+
+<pre class="code">
+<span class="green">//</span>
+<span class="green">// Decompose a rotation into translation etc, based on scale</span>
+<span class="green">//</span>
+<span class="green">// Decomposes the matrix into a translation, rotation, scale,</span>
+<span class="green">// and scale orientation.&nbsp; Any projection information is discarded.</span>
+<span class="green">// The decomposition depends upon choice of center point for</span>
+<span class="green">// rotation and scaling, which is optional as the last parameter.</span>
+<span class="green">// Note that if the center is 0, decompose() is the same as</span>
+<span class="green">// factor() where "t" is translation, "u" is rotation, "s" is scaleFactor,</span>
+<span class="green">// and "r" is ScaleOrientattion.</span>
+<span class="green">//</span>
+<span class="blue">void</span>
+SbMatrix::getTransform(
+&nbsp; SbVec3f &amp; translation,
+&nbsp; SbRotation &amp; rotation,
+&nbsp; SbVec3f &amp; scaleFactor,
+&nbsp; SbRotation &amp; scaleOrientation,
+&nbsp; <span class="blue">const</span> SbVec3f &amp;center ) <span class="blue">const</span>
+{
+&nbsp; SbMatrix so, rot, proj;
+&nbsp; <span class="blue">if</span> (center != SbVec3f(0,0,0)) {
+&nbsp; &nbsp; <span class="green">// to get fields for a non-0 center, we</span>
+&nbsp; &nbsp; <span class="green">// need to decompose a new matrix "m" such</span>
+&nbsp; &nbsp; <span class="green">// that [-center][m][center] = [this]</span>
+&nbsp; &nbsp; <span class="green">// i.e., [m] = [center][this][-center]</span>
+&nbsp; &nbsp; <span class="green">// (this trick stolen from Showcase code)</span>
+&nbsp; &nbsp; SbMatrix m,c;
+&nbsp; &nbsp; m.setTranslate(-center);
+&nbsp; &nbsp; m.multLeft(*<span class="blue">this</span>);
+&nbsp; &nbsp; c.setTranslate(center);
+&nbsp; &nbsp; m.multLeft(c);
+&nbsp; &nbsp; m.factor(so,scaleFactor,rot,translation,proj);
+&nbsp; }
+&nbsp; <span class="blue">else</span> {
+&nbsp; &nbsp; <span class="blue">this</span>-&gt;factor(so,scaleFactor,rot,translation,proj);
+&nbsp; }
+&nbsp; scaleOrientation = so.transpose();&nbsp; <span class="green">// have to transpose because factor gives us transpose of correct answer.</span>
+&nbsp; rotation = rot;
+}
+
+<span class="green">//</span>
+<span class="green">// Factors a matrix m into 5 pieces: m = r s r^ u t, where r^</span>
+<span class="green">// means transpose of r, and r and u are rotations, s is a scale,</span>
+<span class="green">// and t is a translation. Any projection information is returned</span>
+<span class="green">// in proj.</span>
+<span class="green">//</span>
+<span class="green">// routines for matrix factorization taken from BAGS code, written by</span>
+<span class="green">// John Hughes (?).&nbsp; Original comment follows:</span>
+<span class="green">//</span>
+<span class="green">/* Copyright 1988, Brown Computer Graphics Group.&nbsp; All Rights Reserved. */</span>
+<span class="green">/* --------------------------------------------------------------------------</span>
+<span class="green">&nbsp;* This file contains routines to do the MAT3factor operation, which</span>
+<span class="green">&nbsp;* factors a matrix m:</span>
+<span class="green">&nbsp;*&nbsp; &nbsp; m = r s r^ u t, where r^ means transpose of r, and r and u are</span>
+<span class="green">&nbsp;* rotations, s is a scale, and t is a translation.</span>
+<span class="green">&nbsp;*</span>
+<span class="green">&nbsp;* It is based on the Jacobi method for diagonalizing real symmetric</span>
+<span class="green">&nbsp;* matrices, taken from Linear Algebra, Wilkenson and Reinsch, Springer-Verlag</span>
+<span class="green">&nbsp;* math series, Volume II, 1971, page 204.&nbsp; Call number QA251W623.</span>
+<span class="green">&nbsp;* In ALGOL!</span>
+<span class="green">&nbsp;* -------------------------------------------------------------------------*/</span>
+<span class="green">/*</span>
+<span class="green">&nbsp;* Variable declarations from the original source:</span>
+<span class="green">&nbsp;*</span>
+<span class="green">&nbsp;* n&nbsp; : order of matrix A</span>
+<span class="green">&nbsp;* eivec: true if eigenvectors are desired, false otherwise.</span>
+<span class="green">&nbsp;* a&nbsp; : Array [1:n, 1:n] of numbers, assumed symmetric!</span>
+<span class="green">&nbsp;*</span>
+<span class="green">&nbsp;* a&nbsp; : Superdiagonal elements of the original array a are destroyed.</span>
+<span class="green">&nbsp;*&nbsp; &nbsp; Diagonal and subdiagonal elements are untouched.</span>
+<span class="green">&nbsp;* d&nbsp; : Array [1:n] of eigenvalues of a.</span>
+<span class="green">&nbsp;* v&nbsp; : Array [1:n, 1:n] containing (if eivec = TRUE), the eigenvectors of</span>
+<span class="green">&nbsp;*&nbsp; &nbsp; a, with the kth column being the normalized eigenvector with</span>
+<span class="green">&nbsp;*&nbsp; &nbsp; eigenvalue d[k].</span>
+<span class="green">&nbsp;* rot&nbsp; : The number of jacobi rotations required to perform the operation.</span>
+<span class="green">&nbsp;*/</span>
+SbBool
+SbMatrix::factor(
+&nbsp; SbMatrix &amp; r,
+&nbsp; SbVec3f &amp; s,
+&nbsp; SbMatrix &amp; u,
+&nbsp; SbVec3f &amp; t,
+&nbsp; SbMatrix &amp; proj ) <span class="blue">const</span>
+{
+&nbsp; <span class="blue">double</span>&nbsp; &nbsp; det;&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">/* Determinant of matrix A&nbsp; &nbsp; */</span>
+&nbsp; <span class="blue">double</span>&nbsp; &nbsp; det_sign;&nbsp; &nbsp; <span class="green">/* -1 if det &lt; 0, 1 if det &gt; 0&nbsp; &nbsp; */</span>
+&nbsp; <span class="blue">double</span>&nbsp; &nbsp; scratch;
+&nbsp; <span class="blue">int</span>&nbsp; &nbsp; &nbsp; &nbsp; i, j;
+&nbsp; <span class="blue">int</span>&nbsp; &nbsp; &nbsp; &nbsp; junk;
+&nbsp; SbMatrix&nbsp; &nbsp; a, b, si;
+&nbsp; <span class="blue">float</span>&nbsp; &nbsp; evalues[3];
+&nbsp; SbVec3f&nbsp; &nbsp; evectors[3];
+&nbsp;
+&nbsp; a = *<span class="blue">this</span>;
+&nbsp; proj.makeIdentity();
+&nbsp; scratch = 1.0;
+&nbsp;
+&nbsp; <span class="blue">for</span> (i = 0; i &lt; 3; i++) {
+&nbsp; &nbsp; <span class="blue">for</span> (j = 0; j &lt; 3; j++) {
+&nbsp; &nbsp; &nbsp; a.matrix[i][j] *= scratch;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; t[i] = matrix[3][i] * scratch;
+&nbsp; &nbsp; a.matrix[3][i] = a.matrix[i][3] = 0.0;
+&nbsp; }
+&nbsp; a.matrix[3][3] = 1.0;
+&nbsp;
+&nbsp; <span class="green">/* (3) Compute det A. If negative, set sign = -1, else sign = 1 */</span>
+&nbsp; det = a.det3();
+&nbsp; det_sign = (det &lt; 0.0 ? -1.0 : 1.0);
+&nbsp; <span class="blue">if</span> (det_sign * det &lt; 1e-12)
+&nbsp; &nbsp; <span class="blue">return</span>(FALSE);&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// singular</span>
+&nbsp;
+&nbsp; <span class="green">/* (4) B = A * A^&nbsp; (here A^ means A transpose) */</span>
+&nbsp; b = a * a.transpose();
+&nbsp;
+&nbsp; b.jacobi3(evalues, evectors, junk);
+&nbsp;
+&nbsp; <span class="green">// find min / max eigenvalues and do ratio test to determine singularity</span>
+&nbsp;
+&nbsp; r = SbMatrix(evectors[0][0], evectors[0][1], evectors[0][2], 0.0,
+&nbsp; &nbsp; &nbsp; &nbsp;  evectors[1][0], evectors[1][1], evectors[1][2], 0.0,
+&nbsp; &nbsp; &nbsp; &nbsp;  evectors[2][0], evectors[2][1], evectors[2][2], 0.0,
+&nbsp; &nbsp; &nbsp; &nbsp;  0.0, 0.0, 0.0, 1.0);
+&nbsp;
+&nbsp; <span class="green">/* Compute s = sqrt(evalues), with sign. Set si = s-inverse */</span>
+&nbsp; si.makeIdentity();
+&nbsp; <span class="blue">for</span> (i = 0; i &lt; 3; i++) {
+&nbsp; &nbsp; s[i] = det_sign * sqrt(evalues[i]);
+&nbsp; &nbsp; si.matrix[i][i] = 1.0 / s[i];
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">/* (5) Compute U = R^ S! R A. */</span>
+&nbsp; u = r * si * r.transpose() * a;
+&nbsp;
+&nbsp; <span class="blue">return</span>(TRUE);
+}
+</pre>
+
+<p>I believe that if the matrix is mirroring, then the scaling vector produced by the decomposition above will have one or two negative and one or two positive components. If all three are either positive or negative, then it is not a mirroring.</p>
+
+<p>An easy way to determine whether a matrix is a mirroring transformation or not is to check its
+<a href="http://en.wikipedia.org/wiki/Determinant">
+determinant</a>.
+
+If it is negative, the transformation is a mirroring, I believe. Happily, the determinant is provided directly by the Revit API as a property of the Transform class.</p>
+
+<p>In Revit 2010, we have some updated API functionality affecting this area, specifically the Instance.Transformed method and geometry of Instances. There is a paragraph in the What's New section of the help file on this topic:</p>
+
+<span style="color:darkslateblue">
+
+<h4>Instance.Transformed[Transform] and geometry of Instances</h4>
+
+<p>This property has been removed.  Obtain the transformed geometry of the instance using Instance.GetInstanceGeometry(), Instance.GetSymbolGeometry(Transform) and Instance.GetInstanceGeometry(Transform).</p>
+
+</span>
+
+<p>The two overloads compute the geometric representation of the instance and a transformation it, respectively.</p>

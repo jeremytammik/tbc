@@ -1,0 +1,204 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<!-- 
+
+  store xml in rvt file
+  1246768 [How to store more complex user information in rvt file]
+  1247678 [Storage of additional elements/objects but not in the database]
+  1251151 [Storing information specific to to instances of the system family Model Group]
+
+-->
+
+<h3>Store Structured Data</h3>
+
+<p>After yesterday's exciting and successful
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-family-api-webcast.html">
+Revit Family API webcast</a>, 
+
+here is a complete and mature solution to a frequently asked question that I mulled over for some time.</p>
+
+<p><strong>Question:</strong>
+I read your post on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/model-group-shared-parameter.html">
+creating a shared parameter on the model group</a>, 
+
+which also shows how I can store arbitrary application data on almost any Revit element.
+However, due to the way that Revit parameters are defined, the type of the data item contained within the parameter is limited to Double, Integer, String or ElementId.
+What can I do to store arbitrary structured application data in a Revit project file?</p>
+
+<p><strong>Answer:</strong>
+Just as you say, the data types supported by Revit parameters are limited to integer, real, string or element id.
+The string data type will allow you to store any kind of data in a single parameter, as long as it is represented as a string.
+Obviously, any kind of data can be encoded into string format.
+You can either implement code to do this yourself, or make use of existing functionality provided by the .NET framework or other sources.</p>
+
+<p>In case you are worrying about the data size, you can store strings of any length in a Revit string-valued parameter.
+This technique has been used to store some pretty large strings in Revit parameters.
+As far as we know, the only limitation is memory size, but of course Revit has never been exhaustively tested in this context. 
+So please be aware, as always, that you are using this technique at your own risk!</p>
+
+<p>You can peek into the parameter string value using RvtMgdDbg; 
+although it will display only a certain maximum number of characters, you can still copy and paste the complete data into an editor using Ctrl + C and Ctrl + V.</p>
+
+<p>The final encoding of binary data to a string can be achieved using base64 encoding, for example, which is provided by the .NET Convert.ToBase64String method.
+The retrieval of the string data to a binary representation can be achieved using Convert.FromBase64String.</p>
+
+<p>The data being stored can also be compressed by using the 
+
+<a href="http://en.wikipedia.org/wiki/ZIP_(file_format)">
+zip file format</a>, 
+
+for instance with the 
+
+<a href="http://www.gzip.org/zlib">
+zlib library</a>
+
+implementing compression and decompression algorithms for the zip data specification.
+A port of zlib to C# is provided by 
+
+<a href="http://www.icsharpcode.net/OpenSource/SharpZipLib">
+#ziplib</a>,
+
+whose usage is discussed in this MSDN article including some 
+
+<a href="http://msdn.microsoft.com/en-us/magazine/cc164129.aspx">
+background info and an example usage</a>.
+Other links are provided in the article describing the file format.</p>
+
+<p>Once you have the structured binary data in its final form, whether compressed or not, some method to convert it to string format needs to be defined and implemented.
+A simple possibility is to implement a .NET class to hold the structured data and set the .NET attribute [Serializable] on it. 
+Then the .NET framework can automagically serialise it into a binary stream for you, which can then be either compressed or directly encoded into a base64 string for storage in the Revit string-valued parameter.</p>
+
+<p>Here is a more detailed description of the technique using the Serializable attribute:
+
+<h4>Generic Compound Parameters</h4>
+
+<p><strong>Question:</strong>
+How can we store any kind of custom data in a Revit model, be it a large XML file, a binary chunk, or other custom data? Shared parameters can be used to store text, numbers, URLs, Boolean Yes/No values, but not for any complex data structures such as custom objects and binary chunks. 
+
+<p><strong>Answer:</strong>
+If the complex data is converted to a string, it can be stored in any text parameter. Per-object data can be stored in the appropriate Revit element parameters, per-document data on the Project Information singleton.
+
+<p>Various techniques exist to package complex data structures into strings, i.e. algorithmically pack and unpack: XML serialisation, SOAP serialisation, custom XML, custom algorithms and more. The drawback of custom algorithms is obviously the  additional development effort required; furthermore, the resulting string size may be non-optimal. A simple solution is provided by the .NET framework: 
+
+<ul>
+<li>Declare the custom .NET class as [Serializable].
+<li>Serialise and deserialise it using a binary formatter.
+<li>Encode and decode the binary data to and from text using base64 encoding.
+</ul>
+
+<p>Converting from binary to text using only printable characters only causes a 33% size increase. Furthermore, it can be achieved in just a few lines of code in .NET.
+
+<p>Here is the skeleton of an example class declaration:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Serializable</span>()]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">B</span>
+  {
+    . . .
+  }
+</pre>
+
+<p>This code converts an instance 'obj' into a string which can be stored in a Revit parameter by serialising into a binary stream and then encoding the binary data in a base64 string:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">BinaryFormatter</span> f = <span class="blue">new</span> <span class="teal">BinaryFormatter</span>();
+&nbsp; <span class="teal">MemoryStream</span> stream = <span class="blue">new</span> <span class="teal">MemoryStream</span>();
+&nbsp; f.Serialize( stream, obj );
+&nbsp; stream.Position = 0;
+&nbsp;
+&nbsp; <span class="blue">long</span> n2 = stream.Length;
+&nbsp; <span class="blue">int</span> n = (<span class="blue">int</span>) n2;
+&nbsp; <span class="blue">byte</span>[] buf = <span class="blue">new</span> <span class="blue">byte</span>[n];
+&nbsp; stream.Read( buf, 0, n );
+&nbsp; <span class="blue">return</span> <span class="teal">Convert</span>.ToBase64String( buf );
+</pre>
+
+<p>To retrieve the data from Revit, the string is read from the parameter, decoded back to binary data, and deserialised:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">MemoryStream</span> s = <span class="blue">new</span> <span class="teal">MemoryStream</span>( <span class="teal">Convert</span>.FromBase64String( s64 ) );
+&nbsp; s.Position = 0;
+&nbsp;
+&nbsp; <span class="teal">BinaryFormatter</span> f = <span class="blue">new</span> <span class="teal">BinaryFormatter</span>();
+&nbsp; <span class="blue">return</span> f.Deserialize( s );
+</pre>
+
+<p>Additional notes:
+
+<ol>
+<li>Make sure to use invisible parameters to avoid any user interface issues.
+
+<li>If you already have other binary chunks, custom packed by yourself or otherwise, then you do not need the first part to serialise the class instance, but just the base64 encoding of the binary chunk.
+
+<li>If you implement the simplest form listed above, then deserialisation will work only if your DLL is located in the same folder as Revit.exe.
+If it is not, you will see an error saying something like this:
+</ol>
+
+<pre>
+System.Runtime.Serialization.SerializationException
+Unable to find assembly 'StoreData, Version=1.0.0.0, 
+  Culture=neutral, PublicKeyToken=null'.
+</pre>
+
+<p>One solution is to ensure that assembly resides in same directory as acad.exe or Revit.exe.
+To make it work regardless of where your DLL is located, you need a 
+
+<a href="http://www.codeproject.com/soap/Serialization_Samples.asp">
+custom deserialisation helper class</a>
+
+such as the following:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">sealed</span> <span class="blue">class</span> <span class="teal">JtLinkBinder</span> 
+&nbsp; : System.Runtime.Serialization.<span class="teal">SerializationBinder</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> System.<span class="teal">Type</span> BindToType( 
+&nbsp; &nbsp; <span class="blue">string</span> assemblyName, 
+&nbsp; &nbsp; <span class="blue">string</span> typeName )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Type</span>.GetType( <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}, {1}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; typeName, assemblyName ) );
+&nbsp; }
+}
+</pre>
+
+<p>Using the custom serialisation binder class, the deserialisation to convert the string back to binary data looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">BinaryFormatter</span> f = <span class="blue">new</span> <span class="teal">BinaryFormatter</span>();
+&nbsp; <span class="green">// add this line to avoid the &quot;unable to find assembly&quot; issue:</span>
+&nbsp; f.Binder = <span class="blue">new</span> <span class="teal">JtLinkBinder</span>(); 
+&nbsp; <span class="blue">return</span> f.Deserialize( s );
+</pre>
+
+<p>Here is a complete Visual Studio solution 
+
+<a href="zip/StoreData.zip">
+StoreData</a>
+
+implementing an example class and the storage functionality in a Revit parameter.</p>

@@ -1,0 +1,173 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1267736 [Load specific Type from Family] -->
+
+<h3>Loading Only Selected Family Types</h3>
+
+<p>As you probably know, the Revit API provides two methods to load family types, also known as symbols: LoadFamilySymbol, which loads an individual type, and LoadFamily, which loads the entire family and all the types it defines. Use of the latter method can be quite time consuming and wasteful, especially if you only require a few of the types included.
+
+<p>In the past we also discussed a couple of other issues on handling family types, such as
+
+<!--
+
+034_creating_family_symbol.htm
+150_unload_family_type.htm
+
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/creating-a-new-family-symbol.html">
+creating a new family type</a> using the Duplicate method
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/unload-family-type.html">
+unloading an unused type</a>.
+
+<p>Erez van Leeuwen of
+
+<a href="http://www.npqsolutions.com/cadnl">
+Nordined</a> voiced
+
+the interesting request of how to avoid the overhead of calling LoadFamily and loading all its types by presenting a list of the types to the user and asking her which ones are actually required, to which Saikat Bhattacharya came up with the following solution:
+
+<p><strong>Question:</strong> Revit provides multiple ways of loading a family.
+The two 'Load Families' options displayed in the Revit ribbon are
+
+<ul>
+<li>Home &gt; Component &gt; Load Family
+<li>Insert &gt; Load Family
+</ul>
+
+<p>The first one loads a family and places an instance of it, and the second one only loads the family.
+If the chosen family has a TXT file associated with it containing different types, Revit shows a popup window where you can select the types you want to load.
+
+<p>Using the API to load a family, I can choose between the LoadFamily and LoadFamilySymbol methods.
+Is there any other function I can use to load a family and have Revit pop up the dialog to choose which types I want loaded?
+
+<p>If this does not exist, can you tell me if there is a way to read which types exist within a family?
+
+
+<p><strong>Answer:</strong> There Revit API does not provide any method which will pop up a dialogue listing the types contained in a family.
+
+<p>You could load the entire family using the LoadFamily method and then use the Family.Symbols method to list all the types defined in it. The Revit API help file RevitAPI.chm does in fact include a code snippet showing how to iterate through all the symbols in a loaded family:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> GetInfoForSymbols( <span class="teal">Family</span> family )
+{
+&nbsp; <span class="teal">StringBuilder</span> message = <span class="blue">new</span> <span class="teal">StringBuilder</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Selected element's family name is : &quot;</span>
+&nbsp; &nbsp; + family.Name );
+&nbsp;
+&nbsp; <span class="blue">if</span>( family.Symbols.IsEmpty )
+&nbsp; {
+&nbsp; &nbsp; message.AppendLine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Contains no family symbols.&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; message.AppendLine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The family symbols contained&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; in this family are : &quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get family symbols contained in this family</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> sym <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Get family symbol name</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; message.AppendLine( <span class="maroon">&quot;\nName: &quot;</span> + sym.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Material</span> material <span class="blue">in</span> sym.Materials )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message.AppendLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;\tMaterial: &quot;</span> + material.Name );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, message.ToString() );
+}
+</pre>
+
+<p>The problem is, of course, that this loads the entire family and all its symbols up front. Doing this for all the families needed will cause the Revit project to grow and become bigger very fast.
+
+<p>Access to and iteration over all the family symbols without permanently loading the entire family into the project file can be achieved using the power of transactions in the Revit API.
+
+<p>You can load a family within a transaction, read through its symbols, and then roll back the transaction to undo the loading of the family.
+During this process, the names of the symbols contained in the loaded family can be extracted and saved.
+Subsequently, a new transaction can be used to call the LoadFamilySymbol method to load a specific symbol based on the names retrieved in the previous step.
+The following code snippet illustrates this approach and is quite simple and self-explanatory:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> filename = <span class="maroon">@&quot;C:\Documents and Settings&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\All Users\Application Data\Autodesk&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\RAC 2011\Metric Library\Columns&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\M_Round Column.rfa&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; doc, <span class="maroon">&quot;FakeLoading&quot;</span> );
+&nbsp;
+&nbsp; trans.Start();
+&nbsp;
+&nbsp; <span class="teal">Family</span> family = <span class="blue">null</span>;
+&nbsp; <span class="blue">string</span> symbName = <span class="teal">String</span>.Empty;
+&nbsp; <span class="blue">int</span> counter = 0;
+&nbsp; <span class="blue">if</span>( doc.LoadFamily( filename, <span class="blue">out</span> family ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symb <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Symbol names&quot;</span>, symb.Name );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( counter == 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; symbName = symb.Name;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; counter++;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; trans.RollBack();
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> transNew = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; doc, <span class="maroon">&quot;RealLoading&quot;</span> );
+&nbsp;
+&nbsp; transNew.Start();
+&nbsp;
+&nbsp; <span class="blue">if</span>( doc.LoadFamilySymbol( filename, symbName ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Status&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;We managed to load only one desired symbol!&quot;</span> );
+&nbsp; }
+&nbsp; transNew.Commit();
+</pre>
+
+<p><strong>Question:</strong> Of course, loading the whole family, rolling everything back and reloading the required types might considerably slow down the complete loading operation.
+
+<p>If the whole family is already being loaded, it might be faster to only unload or delete the unwanted types.
+
+<p>Is there a way to unload specific types? Within Revit I can just delete the unwanted types by pressing delete or I can purge them out.
+
+Can I do this via the API?
+
+<p><strong>Answer:</strong> As mentioned above, to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/unload-family-type.html">
+unload specific family types</a>,
+
+you can simply delete them from the Revit document object.
+
+<p>If you want to unload more than one type, you can collect all the types that you wish to unload in an ElementSet or create an ICollection of their element ids and use one of the following overloads of the Document.Delete method:
+
+<ul>
+<li>Delete(ElementSet)
+<li>Delete(ICollection(Of ElementId))
+</ul>
+
+<p>While editing this, another thought crossed my mind:
+
+<p>The approach above is based on reading the family into the project in order to determine what types it contains.
+There may be another possible approach, of course, not loading the family into the project but opening the family file as a separate background document via the API and analysing that using its family manager object instead.
+You can iterate the types that way as well.
+I don't know whether there is also any need to handle a possibly associated TXT file, and how that would affect the list of types returned by the family manager, but it might be worth a try.

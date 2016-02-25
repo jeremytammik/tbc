@@ -1,0 +1,62 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>An Introduction to Service-Oriented Architecture (SOA)</h3>
+
+<p>A reader contributed the following introduction to 
+
+<a href="http://en.wikipedia.org/wiki/Service-oriented_architecture">
+Service-Oriented Architecture</a> 
+
+SOA. 
+Even without having dealt with this paradigm previously, the recommendations made are all quickly recognisable as good practice, simply based on experience and striving for reliability and maintainability.
+This contribution is intended as a lead-in to an upcoming article and example code dealing with a specific Revit API issue:</p>
+
+<p>SOA provides an approach to writing code which has many benefits, not the least of which are promoting code reuse and making applying changes or fixes more effective.</p>
+
+<p>It is very intuitive to write a class which has properties on it and then have your functions act on those property values.  
+But how is a developer who is new to writing against the code supposed to know which properties need to be set before a function can be called?  
+What if they miss setting a property?  
+If they set a property to a value for use by a previous method call, but forgot to change it for the next method call, the later call would happily use the old (wrong) data by mistake.</p>
+
+<p>The primary focus of SOA is to write small functions, each of which performs a very specific task, and each of which gets <strong>all</strong> of the data it needs via parameters passed into it.  
+This allows the functions to be stateless.  Web services, which are stateless, generally implement this technique by design.</p>
+
+<p>The stateless approach allows each function to be written in such a manner that it has no idea what code is calling it; it makes <strong>no</strong> assumptions about the environment in which it operates.  
+This ensures the function is as reusable as possible.</p>
+
+<p>Part of this approach includes a lack of trust that the caller is sending valid data, so it requires each function to validate the parameters passed into it and throw an exception if a parameter has an invalid or missing value before attempting to do anything.  
+This can help when debugging because it calls attention to a specific problem as soon as it is detected.</p>
+
+<p>Another part of this approach forbids doing environment-specific things in your reusable code, such as the ever-tempting showing of a System.Windows.Forms.MessageBox, unless your reusable code requires that environment.  
+If your class is itself a Form or Windows User Control, then showing a MessageBox may be acceptable.   
+Otherwise you should throw an exception or return a string that contains the message for processing by the caller.  For example, one caller may choose to show a MessageBox, another may choose to log the string to a file or system event log.</p>
+
+<p>Typically SOA methods are grouped by similar functionality and housed in classes named for that general functionality.  
+This helps promote reuse by providing a logical path for finding methods to do the work for you.  
+This can be seen by some functions in the .NET Framework, such as:</p>
+
+<pre class="code">
+  System.IO.File.Exists
+  System.DateTime.DaysInMonth
+  System.Reflection.Assembly.GetExecutingAssembly
+</pre>
+
+<p>A good 'smoke test' that your function is compatible with an SOA approach is to declare it 'static' (C#) or 'Shared' (VB.NET).  For example:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">decimal</span> CalculateArea(
+&nbsp; &nbsp; <span class="blue">decimal</span> length, 
+&nbsp; &nbsp; <span class="blue">decimal</span> width )
+</pre>
+
+<p>This will not only prevent your method from using any module-level variables, but will allow the caller to call your method without having to create an instance of your class first, as the above Framework examples do.  Incidentally, decimal values are used in this example instead of doubles because decimal types never have rounding errors.  Even a simple addition of double values induces a small rounding error, which can magnify quickly.</p>
+
+<p>You may put a method like this in a class called 'Calculations' which might be housed in an assembly (DLL) called 'MathFunctions' and could readily be used by any number of your applications.  Further, if a bug should be discovered someday, fixing it in the class would allow you to simply provide a new DLL to all of your existing applications, and they would all get the bug fix automatically.</p>
+
+<p>There are environments where SOA doesn’t work very well.  For example, some things that happen inside a Windows Form (or User Control) are much easier to do by maintaining state using module-level variables.  As by definition the Form maintains state anyway, this is appropriate.</p>
+
+<p>But following good SOA (and n-tier) practices, the code inside the Form should be as 'dumb' as possible, and call reusable functions whenever possible.</p>
+
+<p>Writing code following an SOA approach can be a very different mindset, and may require some practice, but once you get into the habit you may be amazed at how much better and more robust your code will become.</p>

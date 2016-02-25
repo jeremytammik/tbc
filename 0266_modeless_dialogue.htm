@@ -1,0 +1,81 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255593 [Modeless dialog in Revit] -->
+
+<h3>Modeless Dialogues in Revit</h3>
+
+<p>Here is an overview and summary of a number of discussions that we have already presented previously on driving Revit from outside and interacting with modeless dialogues, which hopefully will help to further clarify the issues involved.
+
+<p><strong>Question:</strong> How can I use a modeless dialogue in Revit?
+
+<p>I need to display a modeless dialogue in Revit.
+On clicking a button in it, an element should be added to the Revit model. 
+The button can be clicked multiple times and elements should keep on being adding to Revit without closing the dialogue.
+
+<p>How can I programmatically move focus to the Revit application?
+
+<p>Finally, can you please provide some trusted sites for Revit programming tips and examples other than the Autodesk discussion groups?
+
+<p><strong>Answer:</strong> In principle, using a modeless dialogue box within Revit is a non-issue. Any external command can launch a modeless dialogue box, and the dialogue box can make use of the Revit API in any way it chooses &ndash; as long as the external command that launched it has not yet terminated.
+
+<p>From your description, it sounds as if this is the case in your situation, which is good for you and highly recommended.
+
+<p>An example of a modeless dialogue box that remains active only as long as the external command which launched it and makes full use of the Revit API within this context is provided by Joel Karr's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/modeless-pressure-drop-tool.html">
+modeless pressure drop tool</a>.
+
+It also shows how to obtain the Revit window handle, which you can use to set focus to the Revit application.
+
+<p>You should be able to design the command you describe along the same lines as that tool. 
+Just keep the external command running as long as your dialogue is active, and all will be fine.
+
+<p>In some cases, however, one would like to launch a dialogue box which remains active even after the external command that launched it has terminated. 
+This is a completely different issue and may be problematic. 
+Why? Because when Revit invokes an external command, it automatically opens a transaction for it. 
+When you are not within the context of an external command invoked by Revit, you need to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/transactions.html">
+manage your own transaction</a>.
+
+<p>The return code from an external command determines how the automatically generated transaction is terminated, and one effect of this is the setting of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/document-ismodified-property.html">
+IsModified document dirty flag</a>.
+
+<p>To summarise, if you are working in a modeless dialogue box invoked by an external command which is still active, you have full access to Revit and can use the API to its full extent. 
+
+<p>If you are in some other context, i.e. a modeless dialogue that was not invoked by a command, or the command has already terminated, you cannot make full use of the API and there is no guarantee that you can interact with Revit at all. Basically, you are trying to 
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+drive Revit from outside</a>.
+
+<p>Our recent discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/au-and-automated-testing.html">
+automated testing</a>
+
+links to that discussion and additional related posts.
+
+<p>I hope this fully explains the situation.
+
+<p>Regarding the trusted sites, I personally put my trust and effort into 
+
+<a href="http://thebuildingcoder.typepad.com">
+The Building Coder</a>.
+
+We recently presented an overview of additional 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-api-forums.html">
+forums dealing with the Revit API</a>.
+
+I cannot say that any of these except the 
+
+<a href="http://www.autodesk.com/joinadn">
+Autodesk Developer Network</a> ADN 
+
+are especially trusted or specifically endorsed in any way. 
+The others are simply sources of information and places to mutually exchange experience, as always, with no guarantees whatsoever given. 

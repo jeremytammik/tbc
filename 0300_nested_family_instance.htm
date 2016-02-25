@@ -1,0 +1,119 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256760 [how to test whether a family instance in a project file is nested inside another] -->
+
+<h3>Nested Family Instance</h3>
+
+<p>We already discussed a few questions related to nested families, on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+exploring nested instance geometry</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">
+creating a nested family</a> using the family API.
+
+Here is another simple question that may arise in the context of family nesting.
+It also gives me one of the rare opportunities to present at least a few lines of VB code.
+
+<p><strong>Question:</strong> Is there a way of testing whether a family instance in a project file is nested inside another, i.e. does it have a parent family instance?
+
+<p>I have a nested family that consists of two families, a computer and a power outlet.
+
+<p>The following code is returning both the instances:
+
+<pre>
+  Dim FamilyInstanceSet As ElementSet _
+    = oRevApp.App.Create.NewElementSet
+
+  Dim familyInstanceItor As ElementIterator _
+    = m_RevitDoc.Elements(GetType(Elements.FamilyInstance))
+
+  familyInstanceItor.Reset()
+
+  While familyInstanceItor.MoveNext()
+
+    Dim Instance As Elements.FamilyInstance _
+      = DirectCast(familyInstanceItor.Current, _
+        Elements.FamilyInstance)
+
+    FamilyInstanceSet.Insert(Instance)
+
+  End While
+</pre>
+
+<p>In my model I have several power outlets. 
+I need to be able to test the outlets returned, and not count those that are nested within another family. 
+The family parameter of the nested outlet is set to shared, so that they are exposed at project level, and so can be tagged.
+
+<p><strong>Answer:</strong> I verified that the retrieval of the document elements returns both the top level and the nested family instances, just like you say.
+The original version of your test command reports the following three instances:
+
+<pre>
+1 Specialty Equipment-Cupboard-1200x700 
+2 A1 metric 
+3 Electrical Fixture-Gen-Double Socket-Double
+</pre>
+
+<p>Exploring the model with RvtMgdDbg and checking the Revit API documentation, I noticed the two family instance properties SubComponents and SuperComponent which return information about its nesting relationships:
+
+<ul>
+<li>SubComponents: retrieve the sub components of the family instance. If it has no sub components, it returns null.
+<li>SuperComponent: retrieve the super component of the family instance. If it has no super component, it returns null.
+</ul>
+
+<p>I expanded your code very slightly to check the SuperComponent property for a null value, and assume that that means that the family instance is a top level one, like this:
+
+<pre class="code">
+<span class="blue">Dim</span> oRevApp <span class="blue">As</span> Application _
+&nbsp; = commandData.Application
+&nbsp;
+<span class="blue">Dim</span> oRevitDoc <span class="blue">As</span> Document _
+&nbsp; = oRevApp.ActiveDocument
+&nbsp;
+<span class="blue">Dim</span> FamilyInstanceSet <span class="blue">As</span> ElementSet _
+&nbsp; = oRevApp.Create.NewElementSet
+&nbsp;
+<span class="blue">Dim</span> familyInstanceItor <span class="blue">As</span> ElementIterator _
+&nbsp; = oRevitDoc.Elements(<span class="blue">GetType</span>(Elements.FamilyInstance))
+&nbsp;
+<span class="blue">Dim</span> fndFamilies <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;&quot;</span>
+&nbsp;
+<span class="blue">Dim</span> k <span class="blue">As</span> <span class="blue">Integer</span>
+&nbsp;
+familyInstanceItor.Reset()
+&nbsp;
+<span class="blue">While</span> familyInstanceItor.MoveNext()
+&nbsp;
+&nbsp; <span class="blue">Dim</span> instance <span class="blue">As</span> Elements.FamilyInstance _
+&nbsp; &nbsp; = <span class="blue">DirectCast</span>(familyInstanceItor.Current,&nbsp; _
+&nbsp; &nbsp; &nbsp; Elements.FamilyInstance)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> s <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;nested&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">If</span> instance.SuperComponent <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; s = <span class="maroon">&quot;top level&quot;</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; k += 1
+&nbsp;
+&nbsp; fndFamilies &amp;= <span class="blue">CStr</span>(k) &amp; <span class="maroon">&quot; &quot;</span> &amp; instance.Name _
+&nbsp; &nbsp; &amp; <span class="maroon">&quot;: &quot;</span> &amp; s &amp; vbCrLf
+&nbsp;
+<span class="blue">End</span> <span class="blue">While</span>
+&nbsp;
+MsgBox(<span class="maroon">&quot;Found families&quot;</span> &amp; vbCrLf &amp; vbCrLf &amp; fndFamilies)
+</pre>
+
+<p>With this enhancement, the message box now displays:
+
+<pre>
+1 Specialty Equipment-Cupboard-1200x700: top level 
+2 A1 metric: top level 
+3 Electrical Fixture-Gen-Double Socket-Double: nested
+</pre>
+
+<p>So the nested electrical fixtures are correctly identifies as such.

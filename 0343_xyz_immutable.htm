@@ -1,0 +1,59 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>XYZ Immutable</h3>
+
+<p>As mentioned in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-is-coming.html">
+overview of the Revit 2011 changes</a>,
+
+new classes for XYZ, UV, and ElementId were introduced in the Revit 2011 API.
+These ubiquitous objects have been promoted to classes now, some of their methods renamed, and generic .NET collections replace many of the custom Revit collection classes. 
+The Revit API help What's New section describes these changes in some more detail.
+
+<p>One of the changes which may affect existing code is the immutability of the XYZ coordinate value properties.
+The help file suggests that code which previously changed the coordinates of an XYZ instance via setting the values of the X, Y, or Z properties should now construct a new XYZ instance with the desired coordinates instead.
+
+<p>One of the reasons for this change was to better comply with .NET guidelines around exposure of properties.  
+There were several examples of confusion where API users wrote something like this: 
+
+<pre class="code">
+&nbsp; <span class="teal">LocationPoint</span> p = famInstance.Location 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; p.Point.X = 0.0; 
+</pre>
+ 
+The expectation was to modify the curve's location, but actually it would only change the local copy of the XYZ returned, and not the curve that it came from.  
+With the immutable XYZ class, this expectation cannot be made, and you are forced to code something like this: 
+ 
+<pre class="code">
+&nbsp; <span class="teal">LocationPoint</span> p = famInstance.Location 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; p.Point = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, p.Point.Y, p.Point.Z );
+</pre>
+
+<p>Some other examples of changes that this can force you to make are provided by the Revit API introduction lab Lab2_0_CreateLittleHouse.
+For instance, this line of code was used to offset a point by a certain amount in the Y direction in 2010:
+
+<pre class="code">
+&nbsp; p.Y = p.Y + tagOffset;
+</pre>
+
+<p>With the immutable XYZ class in 2011, the Y property can no longer be written to like that.
+One possibility is to create a new point instance as suggested above, e.g.
+
+<pre class="code">
+&nbsp; p = <span class="blue">new</span> <span class="teal">XYZ</span>( p.X, p.Y + tagOffset, p.Z );
+</pre>
+
+<p>A slightly shorter alternative is to simply add a vector representing the appropriate offset:
+
+<pre class="code">
+&nbsp; p += tagOffset * <span class="teal">XYZ</span>.BasisY;
+</pre>
+
+This also better highlights the fact that we are simply offsetting the point from its original position, and that only the Y coordinate is affected.

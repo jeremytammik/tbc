@@ -1,0 +1,532 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266740 [TopographySurface points type] -->
+
+<h3>Toposurface Interior and Boundary Points</h3>
+
+<p>I arrived here in 
+
+<a href="http://en.wikipedia.org/wiki/Jeddah">
+Jeddah</a> last night.
+
+I have not seen anything of it at all yet except through the hotel window, but I will go out exploring today. 
+The Revit API training I am here to give begins on Sunday.
+The weekend here is on Thursday and Friday, so today is the holiest day of the week.
+
+<p>Meanwhile, here is a recent question that gave me a very welcome chance to try my hand at implementing a little algorithm which requires at least a little bit of geometrical and logical analysis, something I love but unfortunately don't get to do as much as I would like.
+
+<p><strong>Question:</strong> I can access the points of the toposurface.
+How can I determine which of them are inner and which are boundary points?
+
+<p>Here is the lower left corner boundary point of a surface:</p>
+
+<center>
+<img src="img/toposurface_boundary_point.png" alt="Toposurface boundary point"/>
+</center>
+ 
+<p>Here is its middle interior point:</p>
+ 
+<center>
+<img src="img/toposurface_interior_point.png" alt="Toposurface interior point"/>
+</center>
+
+<p>I tried to enumerate all the mesh triangles and determine whether a point is interior or boundary depending on how many triangles it belongs to, assuming if it just belongs to one or two it would be exterior and three interior, but that seems to be totally wrong.
+Could you explain why, please?
+
+<p>Here is part of my testing code, but, as said, it does not work at all:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> For each point of the given mesh,</span>
+<span class="gray">///</span><span class="green"> determine how many triangles it belongs to.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> DetermineTriangleCountForPoints( <span class="teal">Mesh</span> mesh )
+{
+&nbsp; <span class="blue">int</span> np = mesh.Vertices.Count;
+&nbsp; <span class="blue">int</span> nt = mesh.NumTriangles;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Mesh has {0} point{1} and {2} triangle{3}.&quot;</span>,
+&nbsp; &nbsp; np, PluralSuffix( np ), nt, PluralSuffix( nt ) );
+&nbsp;
+&nbsp; <span class="teal">MapVertexToTriangleIndices</span> map 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">MapVertexToTriangleIndices</span>();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nt; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MeshTriangle</span> t = mesh.get_Triangle( i );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; 3; ++j )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; map.AddVertex( t.get_Vertex( j ), i );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( map.Keys );
+&nbsp; pts.Sort( Compare );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> pts )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = map[p].Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; vertex {0} belongs to {1} triangle{2}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; PointString( p ), n, PluralSuffix( n ) );
+&nbsp; }
+}
+</pre>
+
+<p>Here is the result of running it on the surface above before I discovered that the interior versus boundary classification is completely wrong:
+
+<pre class="code">
+TopographySurface 128689:
+Mesh has 6 points and 5 triangles.
+  (-35.952648163, -68.290878296, 0.000000000) 
+    belongs to 3 triangles and is therefore interior
+  (-34.969902039, -57.134258270, 0.000000000) 
+    belongs to 1 triangle and is therefore exterior
+  (-24.212404251, -76.898384094, 0.000000000) 
+    belongs to 2 triangles and is therefore exterior
+  (-23.932262421, -60.340045929, 0.000000000) 
+    belongs to 3 triangles and is therefore interior
+  (-23.100381851, -69.003776550, 0.000000000) 
+    belongs to 4 triangles and is therefore exterior
+  (-14.513459206, -65.842926025, 0.000000000) 
+    belongs to 2 triangles and is therefore exterior
+</pre>
+
+<p>Could you please suggest a working method to distinguish boundary and interior toposurface mesh points?
+
+<p>As Revit tells me whether a point is boundary or interior in the user interface, where does it get this info from?
+
+<p>By the way, is there any way to display the mesh triangles and possibly even their indices in the Revit UI?
+
+
+<p><strong>Answer:</strong> There is currently no built-in Revit API functionality that will provide this info. 
+We are aware of a few gaps in the current toposurface API.
+Here is a host of public 
+
+<a href="http://en.wikipedia.org/wiki/Convex_hull_algorithms">
+convex hull algorithms</a> that 
+
+you could try, though.
+
+<p>Remember, Z should be ignorable, if you are only looking for boundaries it's really about XY location 
+
+for a toposurface.
+
+<p>Revit's internal functions to determine the boundary of a mesh are based on the following algorithm idea: 
+
+<p>In order to identify boundary points, one has to first identify boundary edges. 
+
+A boundary edge is an edge belonging to only one triangle. 
+All other (interior) edges are shared by two triangles. 
+Determining if an edge is shared by one or two triangles is a bit tricky. 
+
+<p>I implemented an algorithm based on this idea, and it seems to work fine. 
+I worked on it through several stages. 
+
+<p>In a first step, I determine the triangle count for each mesh vertex just as you did above in the implementation of DetermineTriangleCountForPoints. 
+As you discovered, this information is insufficient to classify the point into boundary or interior. 
+
+<p>In a second step, I determine whether an edge is an interior edge or not, implemented in the method DetermineTriangleCountForEdges. 
+
+<p>This works reliably, and just needs one further step to classify the points. 
+
+<h4>Identifying Points</h4>
+
+<p>At this point, I changed something else as well, though.
+I was initially identifying the points and edges using their coordinate values. 
+Before proceeding to the third stage, I decided to identify them by the vertex indices of the points in the list of mesh vertices instead.
+It is obviously much more reliable and efficient to identify the points by one single integer value rather than a fuzzy comparison of three real values.
+
+<p>For example, DetermineTriangleCountForEdges is based on a helper class to represent the triangle edges 
+
+which stores the complete XYZ start and end point data of each edge:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">MeshTriangleEdge</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> A { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> B { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> MeshTriangleEdge( <span class="teal">XYZ</span> a, <span class="teal">XYZ</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> d = Compare( a, b );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 != d, <span class="maroon">&quot;expected non-equal edge vertices&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; A = ( 0 &lt; d ) ? a : b;
+&nbsp; &nbsp; B = ( 0 &lt; d ) ? b : a;
+&nbsp; }
+}
+</pre>
+
+<p>After deciding that a method storing the edges based on the mesh vertex index of their start and end points instead of the XYZ coordinates is more efficient and reliable, I switched to that representation in the third step using the following class to represent the edges:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Manage a mesh triangle edge by storing the </span>
+<span class="gray">///</span><span class="green"> index of the mesh vertex corresponing to</span>
+<span class="gray">///</span><span class="green"> the edge start and end point.</span>
+<span class="gray">///</span><span class="green"> For reliable comparison purposes, the </span>
+<span class="gray">///</span><span class="green"> lower index is always stored in A and </span>
+<span class="gray">///</span><span class="green"> the higher in B.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">JtEdge</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> A { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> B { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> JtEdge( <span class="blue">int</span> a, <span class="blue">int</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( a != b, <span class="maroon">&quot;expected non-equal edge vertices&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; A = ( a &lt; b ) ? a : b;
+&nbsp; &nbsp; B = ( a &lt; b ) ? b : a;
+&nbsp; }
+}
+</pre>
+
+<h4>Classifying Points</h4>
+
+<p>The third step consists in determining whether a point is interior or boundary, implemented in the method ClassifyPoints. A point is interior if all of the edges it belongs to also are. If one single edge is a boundary, then so is the point.
+
+<p>I make use of a couple of helper classes implementing dictionaries to simplify the mainline of the code. 
+One is MapEdgeToTriangles, which  maps a mesh triangle edge to a list of the indices of all the triangles it belongs to:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Map mesh triangle edges to a list of the </span>
+<span class="gray">///</span><span class="green"> indices of all the triangles they belong to.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">MapEdgeToTriangles</span>
+&nbsp; : <span class="teal">Dictionary</span>&lt;<span class="teal">JtEdge</span>, <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;&gt;
+{
+&nbsp; <span class="blue">public</span> MapEdgeToTriangles()
+&nbsp; &nbsp; : <span class="blue">base</span>( <span class="blue">new</span> <span class="teal">JtEdgeEqualityComparer</span>() )
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add a new edge.</span>
+&nbsp; <span class="gray">///</span><span class="green"> If it is already known, append the triangle </span>
+&nbsp; <span class="gray">///</span><span class="green"> index of the current triangle. Otherwise, </span>
+&nbsp; <span class="gray">///</span><span class="green"> generate a new key for it.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddEdge(
+&nbsp; &nbsp; <span class="teal">JtEdge</span> e,
+&nbsp; &nbsp; <span class="blue">int</span> triangleIndex )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( e ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Add( e, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;( 2 ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; ( <span class="blue">this</span> )[e].Add( triangleIndex );
+&nbsp; }
+}
+</pre>
+
+<p>Another is MapVertexToEdges, mapping a mesh vertex index to a list of the edges the vertex belongs to.
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Map mesh vertex index to a list of the edges </span>
+<span class="gray">///</span><span class="green"> the vertex belongs to.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">MapVertexToEdges</span>
+&nbsp; : <span class="teal">Dictionary</span>&lt;<span class="blue">int</span>, <span class="teal">List</span>&lt;<span class="teal">JtEdge</span>&gt;&gt;
+{
+&nbsp; <span class="blue">public</span> MapVertexToEdges( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Append a new edge for a given vertex.</span>
+&nbsp; <span class="gray">///</span><span class="green"> If the vertex is new, generate a new key for it.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddVertexEdge(
+&nbsp; &nbsp; <span class="blue">int</span> vertexIndex,
+&nbsp; &nbsp; <span class="teal">JtEdge</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( vertexIndex ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Add( vertexIndex, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">JtEdge</span>&gt;( 2 ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; ( <span class="blue">this</span> )[vertexIndex].Add( e );
+&nbsp; }
+}
+</pre>
+
+<p>Both of these basically just provide an enhanced method for adding a new element to the dictionary.
+
+<p>Here is the implementation of the main algorithm:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> For each point of the given mesh,</span>
+<span class="gray">///</span><span class="green"> determine whether it is interior or boundary.</span>
+<span class="gray">///</span><span class="green"> The algorithm goes like this:</span>
+<span class="gray">///</span><span class="green"> Every triangle edge belongs to either one or two triangles,</span>
+<span class="gray">///</span><span class="green"> depending on whether it it boundary or interior.</span>
+<span class="gray">///</span><span class="green"> For each edge, determine whether it is boundary </span>
+<span class="gray">///</span><span class="green"> or interior. A point is interior if all of the edges it </span>
+<span class="gray">///</span><span class="green"> belongs to are interior.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">A dictionary mapping each mesh vertex index </span>
+<span class="gray">///</span><span class="green"> to a Boolean which is true if the corresponding point </span>
+<span class="gray">///</span><span class="green"> is interior and false if it is on the boundary</span><span class="gray">&lt;/returns&gt;</span>
+<span class="teal">Dictionary</span>&lt;<span class="blue">int</span>, <span class="blue">bool</span>&gt; ClassifyPoints( <span class="teal">Mesh</span> mesh )
+{
+&nbsp; <span class="blue">int</span> nv = mesh.Vertices.Count;
+&nbsp; <span class="blue">int</span> nt = mesh.NumTriangles;
+&nbsp; <span class="blue">int</span> i, n;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\nClassifyPoints: mesh has {0} point{1} and {2} triangle{3}:&quot;</span>,
+&nbsp; &nbsp; nv, PluralSuffix( nv ), nt, PluralSuffix( nt ) );
+&nbsp;
+&nbsp; <span class="green">// set up a map to determine the vertex </span>
+&nbsp; <span class="green">// index of a given triangle vertex;</span>
+&nbsp; <span class="green">// this is needed because the </span>
+&nbsp; <span class="green">// MeshTriangle.get_Vertex method</span>
+&nbsp; <span class="green">// returns the XYZ but not the index,</span>
+&nbsp; <span class="green">// and we base our edges on the index:</span>
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; vertexIndex
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt;( nv, <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>() );
+&nbsp;
+&nbsp; <span class="blue">for</span>( i = 0; i &lt; nv; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = mesh.Vertices[i];
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; mesh vertex {0}: {1}&quot;</span>, i, PointString( p ) );
+&nbsp; &nbsp; vertexIndex[p] = i;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// set up a map to determine which </span>
+&nbsp; <span class="green">// edges a given vertex belongs to:</span>
+&nbsp;
+&nbsp; <span class="teal">MapVertexToEdges</span> vertexEdges
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">MapVertexToEdges</span>( nv );
+&nbsp;
+&nbsp; <span class="green">// set up a map to determine which </span>
+&nbsp; <span class="green">// triangles a given edge belongs to;</span>
+&nbsp; <span class="green">// this is used to determine the edge's</span>
+&nbsp; <span class="green">// interior or boundary status:</span>
+&nbsp;
+&nbsp; <span class="teal">MapEdgeToTriangles</span> map
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">MapEdgeToTriangles</span>();
+&nbsp;
+&nbsp; <span class="blue">for</span>( i = 0; i &lt; nt; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MeshTriangle</span> t = mesh.get_Triangle( i );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; 3; ++j )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// get the start and end vertex </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// of the current triangle edge:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> a = vertexIndex[t.get_Vertex( 0 == j ? 2 : j - 1 )];
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> b = vertexIndex[t.get_Vertex( j )];
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">JtEdge</span> e = <span class="blue">new</span> <span class="teal">JtEdge</span>( a, b );
+&nbsp;
+&nbsp; &nbsp; &nbsp; map.AddEdge( e, i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; vertexEdges.AddVertexEdge( a, e );
+&nbsp; &nbsp; &nbsp; vertexEdges.AddVertexEdge( b, e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> nBoundaryEdges;
+&nbsp; <span class="blue">int</span> nInteriorPoints = 0;
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">int</span>, <span class="blue">bool</span>&gt; dict = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">int</span>,<span class="blue">bool</span>&gt;( nv );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Classify the {0} point{1}:&quot;</span>, nv, PluralSuffix( nv ) );
+&nbsp;
+&nbsp; <span class="blue">for</span>( i = 0; i &lt; nv; ++i )
+&nbsp; {
+&nbsp; &nbsp; nBoundaryEdges = 0;
+&nbsp; &nbsp; n = vertexEdges[i].Count;
+&nbsp;
+&nbsp; &nbsp; nBoundaryEdges = vertexEdges[i].Count&lt;<span class="teal">JtEdge</span>&gt;( 
+&nbsp; &nbsp; &nbsp; e =&gt; 1 == map[e].Count );
+&nbsp;
+&nbsp; &nbsp; dict[i] = ( 0 == nBoundaryEdges );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = mesh.Vertices[i];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == nBoundaryEdges )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++nInteriorPoints;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; point {0} {1} belongs to {2} edge{3}, &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{4} interior and {5} boundary and is therefore {6}&quot;</span>,
+&nbsp; &nbsp; &nbsp; i, PointString( p ), n, PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; n - nBoundaryEdges, nBoundaryEdges,
+&nbsp; &nbsp; &nbsp; ( 0 == nBoundaryEdges ? <span class="maroon">&quot;interior&quot;</span> : <span class="maroon">&quot;boundary&quot;</span> ) );
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} boundary and {1} interior points detected.&quot;</span>,
+&nbsp; &nbsp; nv - nInteriorPoints, nInteriorPoints );
+&nbsp;
+&nbsp; <span class="blue">return</span> dict;
+}
+</pre>
+
+<p>I tested this on the following topo surfaces of increasing complexity:
+
+<ul>
+<li>a triangle, 
+<li>a quadrilateral with four boundary points, 
+<li>another quadrilateral with an additional interior point, and
+<li>a larger surface with 26 points
+</ul>
+
+<p>They look like this in Revit:</p>
+
+<center>
+<img src="img/toposurfaces.png" alt="Toposurfaces"/>
+</center>
+
+<p>Here are the results (please copy to a text editor to see the full untruncated lines):
+
+<pre class="code">
+TopographySurface 128701:
+
+ClassifyPoints: mesh has 3 points and 1 triangle:
+  mesh vertex 0: (-14.39,11.53,0)
+  mesh vertex 1: (2.81,12.55,0)
+  mesh vertex 2: (-7.4,22.76,0)
+  triangle 0 vertex 0: (-14.39,11.53,0)
+  triangle 0 vertex 1: (2.81,12.55,0)
+  triangle 0 vertex 2: (-7.4,22.76,0)
+Classify the 3 edges:
+  edge 0->1 belongs to 1 triangle and is therefore boundary
+  edge 0->2 belongs to 1 triangle and is therefore boundary
+  edge 1->2 belongs to 1 triangle and is therefore boundary
+Classify the 3 points:
+  point 0 (-14.39,11.53,0) belongs to 2 edges, 0 interior and 2 boundary and is therefore boundary
+  point 1 (2.81,12.55,0) belongs to 2 edges, 0 interior and 2 boundary and is therefore boundary
+  point 2 (-7.4,22.76,0) belongs to 2 edges, 0 interior and 2 boundary and is therefore boundary
+3 boundary and 0 interior points detected.
+
+TopographySurface 128712:
+
+ClassifyPoints: mesh has 4 points and 2 triangles:
+  mesh vertex 0: (25.45,10.77,0)
+  mesh vertex 1: (25.01,23.65,0)
+  mesh vertex 2: (38.32,11.22,0)
+  mesh vertex 3: (38.77,24.09,0)
+  triangle 0 vertex 0: (25.01,23.65,0)
+  triangle 0 vertex 1: (25.45,10.77,0)
+  triangle 0 vertex 2: (38.32,11.22,0)
+  triangle 1 vertex 0: (38.32,11.22,0)
+  triangle 1 vertex 1: (38.77,24.09,0)
+  triangle 1 vertex 2: (25.01,23.65,0)
+Classify the 5 edges:
+  edge 0->1 belongs to 1 triangle and is therefore boundary
+  edge 0->2 belongs to 1 triangle and is therefore boundary
+  edge 1->2 belongs to 2 triangles and is therefore interior
+  edge 1->3 belongs to 1 triangle and is therefore boundary
+  edge 2->3 belongs to 1 triangle and is therefore boundary
+Classify the 4 points:
+  point 0 (25.45,10.77,0) belongs to 2 edges, 0 interior and 2 boundary and is therefore boundary
+  point 1 (25.01,23.65,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 2 (38.32,11.22,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 3 (38.77,24.09,0) belongs to 2 edges, 0 interior and 2 boundary and is therefore boundary
+4 boundary and 0 interior points detected.
+
+TopographySurface 128718:
+
+ClassifyPoints: mesh has 5 points and 4 triangles:
+  mesh vertex 0: (80.05,28.53,0)
+  mesh vertex 1: (63.18,39.63,0)
+  mesh vertex 2: (84.49,41.85,0)
+  mesh vertex 3: (75.61,52.06,0)
+  mesh vertex 4: (98.7,45.84,0)
+  triangle 0 vertex 0: (75.61,52.06,0)
+  triangle 0 vertex 1: (63.18,39.63,0)
+  triangle 0 vertex 2: (84.49,41.85,0)
+  triangle 1 vertex 0: (80.05,28.53,0)
+  triangle 1 vertex 1: (98.7,45.84,0)
+  triangle 1 vertex 2: (84.49,41.85,0)
+  triangle 2 vertex 0: (84.49,41.85,0)
+  triangle 2 vertex 1: (98.7,45.84,0)
+  triangle 2 vertex 2: (75.61,52.06,0)
+  triangle 3 vertex 0: (80.05,28.53,0)
+  triangle 3 vertex 1: (84.49,41.85,0)
+  triangle 3 vertex 2: (63.18,39.63,0)
+Classify the 8 edges:
+  edge 0->1 belongs to 1 triangle and is therefore boundary
+  edge 0->2 belongs to 2 triangles and is therefore interior
+  edge 0->4 belongs to 1 triangle and is therefore boundary
+  edge 1->2 belongs to 2 triangles and is therefore interior
+  edge 1->3 belongs to 1 triangle and is therefore boundary
+  edge 2->3 belongs to 2 triangles and is therefore interior
+  edge 2->4 belongs to 2 triangles and is therefore interior
+  edge 3->4 belongs to 1 triangle and is therefore boundary
+Classify the 5 points:
+  point 0 (80.05,28.53,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 1 (63.18,39.63,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 2 (84.49,41.85,0) belongs to 8 edges, 8 interior and 0 boundary and is therefore interior
+  point 3 (75.61,52.06,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 4 (98.7,45.84,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+4 boundary and 1 interior points detected.
+
+TopographySurface 128725:
+
+ClassifyPoints: mesh has 26 points and 39 triangles:
+  mesh vertex 0: (-87.01,-44.72,0)
+  mesh vertex 1: (-75.47,-26.96,0)
+  . . .
+  mesh vertex 25: (-83.46,-24.3,0)
+  triangle 0 vertex 0: (-87.01,-44.72,0)
+  triangle 0 vertex 1: (-77.69,-55.82,0)
+  . . .
+  triangle 38 vertex 2: (-75.47,-26.96,0)
+Classify the 64 edges:
+  edge 0->8 belongs to 1 triangle and is therefore boundary
+  edge 0->11 belongs to 1 triangle and is therefore boundary
+  . . .
+  edge 24->25 belongs to 1 triangle and is therefore boundary
+Classify the 26 points:
+  point 0 (-87.01,-44.72,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+ point 1 (-75.47,-26.96,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 2 (-55.49,-19.86,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 3 (-53.71,-33.18,0) belongs to 12 edges, 12 interior and 0 boundary and is therefore interior
+  point 4 (-43.06,-26.96,0) belongs to 8 edges, 6 interior and 2 boundary and is therefore boundary
+  point 5 (-43.06,-42.5,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 6 (-65.26,-35.4,0) belongs to 12 edges, 12 interior and 0 boundary and is therefore interior
+  point 7 (-60.37,-53.15,0) belongs to 12 edges, 12 interior and 0 boundary and is therefore interior
+  point 8 (-77.69,-55.82,0) belongs to 8 edges, 6 interior and 2 boundary and is therefore boundary
+  point 9 (-68.36,-43.83,0) belongs to 14 edges, 14 interior and 0 boundary and is therefore interior
+  point 10 (-41.28,-54.49,0) belongs to 8 edges, 6 interior and 2 boundary and is therefore boundary
+  point 11 (-88.34,-33.62,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 12 (-66.14,-61.14,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+  point 13 (-79.02,-44.28,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 14 (-81.68,-32.73,0) belongs to 14 edges, 14 interior and 0 boundary and is therefore interior
+  point 15 (-63.93,-26.96,0) belongs to 14 edges, 14 interior and 0 boundary and is therefore interior
+  point 16 (-55.05,-43.39,0) belongs to 12 edges, 12 interior and 0 boundary and is therefore interior
+  point 17 (-47.5,-50.93,0) belongs to 8 edges, 8 interior and 0 boundary and is therefore interior
+  point 18 (-74.58,-50.93,0) belongs to 8 edges, 8 interior and 0 boundary and is therefore interior
+  point 19 (-68.81,-54.93,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 20 (-53.71,-26.07,0) belongs to 10 edges, 10 interior and 0 boundary and is therefore interior
+  point 21 (-47.06,-18.97,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+  point 22 (-49.72,-14.98,0) belongs to 4 edges, 2 interior and 2 boundary and is therefore boundary
+  point 23 (-67.03,-17.64,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+  point 24 (-74.58,-19.42,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+  point 25 (-83.46,-24.3,0) belongs to 6 edges, 4 interior and 2 boundary and is therefore boundary
+11 boundary and 15 interior points detected.
+</pre>
+
+<p>As far as I can tell, this works efficiently and reliably.
+
+<p>Please let me know what experiences you have with this and whether it solves the problem for you. Thank you!
+
+<p>Here is 
+
+<a href="zip/TopoSurfacePointClassify.zip">
+TopoSurfacePointClassify.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this add-in.

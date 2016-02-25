@@ -1,0 +1,408 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style>
+h3 {
+  font-size : x-large;
+}
+
+h4 {
+  font-size : larger;
+}
+
+h5 {
+  font-size : medium;
+  font-style : normal;
+  font-weight : normal;
+  text-decoration : underline;
+}
+</style>
+</head>
+
+<h3>The Revit Family API</h3>
+
+<p>Here is a rather lengthy and rich post to start off the week, describing the new family API introduced in Revit 2010 and including both an overview and in-depth information.
+
+<p>These are the main topics covered:</p>
+
+<ul>
+<li><a href="#1">Creating a Family through the User Interface</a>.
+<li><a href="#2">Creating a Family Programmatically</a>.
+<li><a href="#3">Family API Samples in the Revit SDK</a>.
+<li><a href="#4">Family API Labs: Creating an Example Family</a>.
+<li><a href="#5">Family API Webcast and Materials</a>.</li>
+</ul>
+
+<p>The text presented here is also a script for the Revit Family API slide deck which was used for the webcast mentioned at the end of this post.
+If a picture says more than a thousand words to you, then you should download that slide deck, which will provide a couple of thousand words' worth of images to accompany this raw text.</p>
+
+<h5>Background</h5>
+<p>The concept of families is an enormous strength of Revit, but until Revit 2010, no programming access was available in the family context. Therefore, two large and completely disjunct developer communities have evolved around the Revit products, creating either:</p>
+<ul>
+<li>Revit applications using the API.</li>
+<li>Revit content with no API access.</li>
+</ul>
+
+<p>The Family API was the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/api-wish-list-survey-reminder.html">
+top wish list item</a>
+
+and was made available for the first time in Revit 2010. It provides huge potential for synergy uniting the two separate camps. It enables:</p>
+<ul>
+<li>Use of the Revit API in the family editor.</li>
+<li>Extract and modify existing or create new family content.</li>
+<li>Automatic library generation.</li>
+</ul>
+
+<a name="1"></a>
+
+<h4>Creating a Family through the User Interface</h4>
+
+<p>A non-trivial family can have a complex internal structure and many decisions need to be taken. A large body of experience around building families and family libraries has been developed before the introduction of the API. It is useful to gather some experience creating families manually before implementing code to do so automatically. Just like the standard Revit API, almost all the features provided by the family API are available through the user interface as well.</p>
+<h5>What is a Revit Family?</h5>
+<p>Before discussing the family API, it is important to understand the basics of Revit families and their definition.</p>
+<p>A Revit family is a graphic representation of building objects and symbols. It can include geometry in 2D or 3D as well as data that supports the definition and creation of object instances. A family defines one or more types or symbols. A type or symbol can be inserted into the project to create a family instance.</p>
+<p>There are three different classes of families, system, standard and in-place:</p>
+<ul>
+<li>System families are stored in the project template and used for objects such as Walls, Roofs, Floors, Ceilings, Rebar, etc.</li>
+<li>Standard families are defined externally in freestanding ".rfa" files and used for objects such as Windows, Doors, Furniture, Beams, Ductwork, etc.</li>
+<li>In-Place families are used for "one of kind objects".</li>
+</ul>
+
+<p>The new family API provided in Revit 2010 addresses the standard families.</p>
+<h5>Revit Families - Where to Begin</h5>
+<p>A new family is always based on a family template file, if created from scratch, or on an existing family, which is enhanced in some way. Regardless of whether you are using the UI or API, the first thing you will need to decide is which template or family file you want to begin with.</p>
+<ul>
+<li>Create a completely new family starting from a family template.</li>
+<li>Enhance an existing family.</li>
+</ul>
+
+<p>You need to choose which approach to take, as well as which template or family file to start with. There are plenty of templates to choose from. Other decisions that need to be taken and which influence this choice include</p>
+<ul>
+<li>Category?
+<li>Is the family 2D or 3D?
+<li>Model or detail component?
+<li>Hosted or non-hosted: Wall, Ceiling, etc.
+<li>Placement type: Free, two point...
+<li>Specialty: Lighting, RPC...
+</ul>
+
+<h5>Revit Family Flavours</h5>
+<p>Just like the Revit product, Revit families also come in three flavours for architecture, MEP (mechanical, engineering, and plumbing), and structure. Most of the functionality is common to all three. Here are some aspects of the flavours:</p>
+<p>Revit Architecture:</p>
+<ul>
+<li>Basic building components with simplistic interactions in the model.</li>
+<li>Free placement objects - casework, furniture, etc.
+<li>Two point placement objects - detail components, hosted objects.</li>
+<li>Hosted objects: windows, doors, columns ("level to level"), ceiling or "wall based" lighting fixtures.</li>
+</ul>
+
+<p>Revit Structure:</p>
+<ul>
+<li>Additional components with complex interactions with other objects.</li>
+<li>Framing - beams ("beams to beam", "beam to column"), columns.</li>
+<li>Trusses - layout for girder trusses; boundary conditions.</li>
+<li>Span direction symbols; reinforcement symbols - area reinforcement expands to find edges, path reinforcement.</li>
+</ul>
+
+<p>Revit MEP:</p>
+<ul>
+<li>Connectors allowing objects to resize based on connected neighbour elements.</li>
+</ul>
+
+<h5>Revit Family Editor</h5>
+<p>Revit offers six basic family editors:</p>
+<ul>
+<li>3D model, annotation, detail, rebar, truss and new conceptual mass.</li>
+</ul>
+
+<p>Of the six basic family editors, the conceptual mass creation one is new to 2010. Depending on the editor, you will see a different set of available tools and building blocks. For instance, you will see tools to create forms in the model editor, but not in the annotation one. If you are using the truss editor, you will have access to the top and bottom chord, which will be shown in the model editor.</p>
+<p>Each family editor is tied to the chosen family template and provides a specific feature set:</p>
+<ul>
+<li>Geometry - extrusions, blends, sweeps, revolves.</li>
+<li>Lines - model, symbolic, detail.</li>
+<li>Basic tools - copy, mirror, paint, join/unjoin, cut geometry/don't cut.</li>
+<li>References - reference planes, reference lines.</li>
+<li>Annotation tools - labels.</li>
+<li>Advanced tools - formulas, nesting, arrays, type catalogues.</li>
+<li>MEP tools - add connectors.</li>
+</ul>
+
+<h5>Revit Families Best Practice</h5>
+<p>Families are a powerful feature in Revit. Creating a family can be fun, and it can also be complex. When it becomes complex, it requires good planning. Here are some suggestions for a process for building families by the Autodesk Revit content manager Steve Campbell. It describes the manual definition of a family. The same applies to a programmatic approach as well. A key to understanding the family API is to understand the UI.</p>
+<p>It is highly recommended to follow this structured process when building families. It needs to be learned and practiced. Systematically following this process is one of the most important aspects of family creation.</p>
+<p>Process order:</p>
+
+<ol>
+<li>Plan (insertion point, parametric origin).</li>
+<li>Lay out reference planes (the bones).</li>
+<li>Add parameters.</li>
+<li>Add multiple host thickness types.</li>
+<li>Add two or more types.</li>
+<li>Flex types and host (testing procedure).</li>
+<li>Add a single level of geometry.</li>
+<li>Repeat steps 6 and 7 until you are satisfied with the results.</li>
+<li>Test in project environment (create testing project).</li>
+</ol>
+
+<h5>Revit Family Possibilities</h5>
+<p>You can create quite complex objects and behaviour using Revit families. Here are a few of the possibilities:</p>
+<ul>
+<li>Formulas to control behaviour, visibility, arrays.</li>
+<li>Arrays and nesting for repeatable, resizable elements across an array.</li>
+<li>Advanced nesting with subcomponents that can be swapped.</li>
+<li>Reference lines and angular movement.</li>
+</ul>
+
+<p>Formulas can be used to control behaviour, visibility, arrays, e.g. to define arrays of bolts depending on the size of a plate.</p>
+<p>Arraying nested components allows the user to create families with repeatable elements across an array that can resize based on user input or rules. For example, a bookshelf with arrayed shelves, mullion patterns based on rules, and open web joists that adjust based on length and height.</p>
+<p>Advanced nesting can make use of nested families with family type parameters that can provide flexible components with swappable sub-components such as nested door panels, frames, hardware, playground equipment, swappable panels and components.</p>
+<p>Reference lines allow geometry to move about in an angular fashion. They contain two endpoints and two built in work planes that can be parametrically controlled. Some simple examples include a door swing that can change the opening angle, or a light fixture head that moves and points. A more complex example is an excavator arm that can bend and rotate about three or more pivot points.</p>
+
+<a name="2"></a>
+
+<h4>Creating a Family Programmatically</h4>
+
+<p>Now that the basics of Revit families are clear, we can look at the new access to this functionality provided by the new family API.</p>
+<h5>Family API Usage</h5>
+<p>Exposure of the family API is probably the most important enhancement to the Revit API in 2010. The concept of component family is a unique feature and strength of Revit. This was the most wanted feature in the Revit API community and we expect the effect and growth in possibilities with the availability of family API will be dramatic. </p>
+<p>An obvious opportunity provided by the new family API is the automatic generation of content from databases or other library sources. It is also possible to extract a family definition out of a project and store it back into an external family file. The document ‘Revit Platform API Changes and Additions.doc’ in the Revit SDK folder provides an overview of the family API. Family API specific samples are located in the Revit SDK samples FamilyCreation subfolder.</p>
+<p>Here are some of the new supported features:</p>
+<ul>
+<li>Enable use of the Revit API within the family editor context.</li>
+<li>Create and modify family content.</li>
+<li>Automatic library generation from database or other library specification.</li>
+<li>Extract family definitions from existing projects.</li>
+<li>Define references and constraints to drive model geometry parametrically, formulas to drive parameter values, and annotation and dimensioning.</li>
+<li>Control detailed visibility of family types and their elements.</li>
+<li>Control loading behaviour of a family.</li>
+</ul>
+
+<h5>Document and Family Manager Classes</h5>
+<p>The Revit API Document now has some added methods and properties for managing families:</p>
+<ul>
+<li>EditFamily - edit a family loaded in a project document.</li>
+<li>FamilyCreate - return a FamilyItemCreate object to create new instances of elements within a family document, analogous to the Create object in a project.</li>
+<li>FamilyManager - return a FamilyManager object providing access to family types and parameters.</li>
+<li>IsFamilyDocument - identify whether the current document is a family document.</li>
+<li>OwnerFamily - return the owning family of this family document.</li>
+</ul>
+
+<p>Within a family document, the family manager class provides the following new functionality:</p>
+<ul>
+<li>Add, remove and rename types.</li>
+<li>Add and remove parameters.</li>
+<li>Set values and formulas.</li>
+</ul>
+
+<h5>Creating Family Content</h5>
+<p>The FamilyCreate property on the family document returns a FamilyItemFactory instance. This family item factory object is a utility object used to create new instances of elements within the family document. Just like other Revit elements, these are instantiated using dedicated methods instead of the .NET new operator. This ensures that the elements created are correctly added to and hooked up within the family document. A wide range of elements types can be created, including alignments, dimensioning, annotation, curves, levels, and solid forms for conceptual design.</p>
+<p>The family item factory utility object</p>
+<ul>
+<li>Creates new instances of elements within the family document.</li>
+<li>Provides dedicated creation methods instead of the .NET new operator.</li>
+</ul>
+
+<p>Elements types that can be created include:</p>
+<ul>
+<li>Alignment.</li>
+<li>Connector (MEP only).</li>
+<li>Dimensioning.</li>
+<li>Annotation.</li>
+<li>Curves.</li>
+<li>Levels.</li>
+<li>Solids forms.</li>
+</ul>
+
+<h5>Visibility Settings </h5>
+<p>A critical topic when building family content are the visibility settings. They are now accessible for each element in a family through the new FamilyElementVisibility class.</p>
+<p>Each element in a family has its own visibility settings which define which levels of detail and which types of views it appears in. These options are critical to building good content. For example, intricate details of a family should only be visible in the fine detail views. 3D solid content could optionally be suppressed in plan views, where light weight 2D line work could be displayed instead. Such an approach can make a substantial performance difference, especially in large building models.</p>
+<p>Every element in the family has own visibility settings managed by the FamilyElementVisibility class defining:</p>
+<ul>
+<li>Which levels of detail it appears in.</li>
+<li>Which types of views it appears in.</li>
+</ul>
+
+<h5>Loading Control</h5>
+<p>The Document.LoadFamily method has been enhanced and new overloads have been added, which can help to handle situations such as when a family already exists in the project. The following overloads are now provided:</p>
+<ul>
+<li>LoadFamily(Document)  - loads the contents of this family document into another document.</li>
+<li>LoadFamily(String) - loads an entire family and all its types into the document.</li>
+<li>LoadFamily(String, Family) - loads an entire family and all its types into the document and provides a reference to the loaded family.</li>
+<li>LoadFamily(Document, IFamilyLoadOptions) - loads the contents of this family document into another document.</li>
+</ul>
+
+<p>The IFamilyLoadOptions argument to the last overload defines an interface which specifies two call-backs for handling family load situations: OnFamilyFound and OnSharedFamilyFound. These are called when a family or a shared family is already present in the target document.</p>
+
+<a name="3"></a>
+
+<h4>Family API Samples in the Revit SDK</h4>
+
+<p>A number of new samples illustrating the family API have been added to the Revit SDK. They are located in the FamilyCreation subfolder in the SDK Samples directory.</p>
+<h5>AutoJoin</h5>
+<p>AutoJoin automatically joins geometry of multiple generic forms for use in family modelling and massing. It uses the method Document.CombineElements to join geometry between overlapping generic forms. It also includes a utility method to check geometry object overlap, based on the Face.Intersect(Curve) method.</p>
+<h5>AutoParameter</h5>
+<p>AutoParameter implements batch mode automatic addition of shared or non-shared parameters to one or more family documents. It optionally processes either the currently active family document or all families in a specified folder. It uses the FamilyManager class AddParameter methods and reads its input data from parameter text files in a format similar to the Revit shared parameter files.</p>
+<h5>CreateAirHandler - RME</h5>
+<p>CreateAirHandler is a Revit MEP sample to create an air handling unit including MEP pipe and duct connectors. It shows how to check the template family category to verify that a valid starting point is selected. It make use of the FamilyItemFactory class NewExtrusion, NewPipeConnector, and NewDuctConnector methods, sets up the proper connector parameters, and uses Document.CombineElements to join the extrusions to make up the air handler body.</p>
+<h5>CreateTruss - RST</h5>
+<p>CreateTruss is a Revit Structure sample that creates a mono truss in a truss family document. The truss curves are created using NewModelCurve, the truss type is set through the ModelCurve TrussCurveType property, and constraints are added to the truss curves with NewAlignment.</p>
+<h5>DWGFamilyCreation</h5>
+<p>DWGFamilyCreation shows how to import a DWG file into a family document add two type parameters to the imported instance: DWGFileName specifying the DWG file name, and ImportTime storing the data and time when it was imported.</p>
+<h5>GenericModelCreation</h5>
+<p>GenericModelCreation creates a generic model using extrusion, blend, revolution, sweep and swept blend elements. It checks that the open document is indeed a family one or otherwise creates a new family document. It exercises the CreateSketchPlane, NewLineBound, and FamilyItemFactory methods to create profiles and shapes.</p>
+<h5>TypeRegeneration</h5>
+<p>The TypeRegeneration sample uses the FamilyManager Types property to determine all types defined in the current family document, and CurrentType to iterate through them. It reports whether all types regenerated successfully, and logs any errors that occurred to a file.</p>
+<h5>ValidateParameters</h5>
+<p>ValidateParameters checks whether every type in the current family document has valid values for certain parameters and logs the results to a file. This sample can be run in two modes, either as an external application subscribing to DocumentSaving and DocumentSavingAs events to run the check automatically every time a document is opened, or as an external command to be launched manually when required.</p>
+<h5>WindowWizard</h5>
+<p>WindowWizard shows how to create a new window family via a wizard style user interface. It needs to be started in a window family template, e.g. Metric Window.rft. It prompts the user to define input dimensions for various window parameters and materials, and then creates the required geometry, constraints and types using elements including extrusions, alignments, dimensions, reference planes, and family types.</p>
+
+<a name="4"></a>
+
+<h4>Family API Labs: Creating an Example Family</h4>
+
+<p>The Revit Family API Labs is a collection of exercises which introduce you step by step to the creation of a column family. The objective is to learn the basics of the family API. The labs start with the basics and then proceed to more advanced aspects. Full documentation of and instructions for each step are included in separate documents for C# and VB.</p>
+<h5>Family API Labs</h5>
+<ul>
+<li>Lab1 - define a column with rectangular profile.</li>
+<li>Lab2 - define a column with L-shape profile.</li>
+<li>Lab3 - add formula and materials.</li>
+<li>Lab4 - add visibility control.</li>
+</ul>
+
+<h5>Lab 1 - Create Rectangular Column</h5>
+<ul>
+<li>Check the family context.</li>
+<li>Create a simple solid using extrusion.</li>
+<li>Set alignments.</li>
+<li>Add types.</li>
+</ul>
+
+<p>Classes and methods:</p>
+
+<pre>
+doc.IsFamilyDocument()
+doc.OwnerFamily.FamilyCategory.Name
+doc.FamilyCreate.NewExtrusion()
+doc.FamilyCreate.NewAlignment()
+familyMgr = doc.FamilyManager
+familyMgr.NewType()
+familyMgr.Parameter(); familyMgr.Set()
+</pre>
+
+<h5>Lab 2 - Create L-Shaped Column</h5>
+<ul>
+<li>Add reference planes.</li>
+<li>Add parameters.</li>
+<li>Add dimensions.</li>
+</ul>
+
+<p>Classes and methods:</p>
+<pre>
+doc.FamilyCreate.NewReferencePlane()
+familyMgr.AddParameter()
+doc.FamilyCreate.NewDimension()
+</pre>
+
+<h5>Lab 3 - Add Formulas and Materials</h5>
+<ul>
+<li>Add formulae.</li>
+<li>Add materials.</li>
+</ul>
+
+<p>Classes and methods:</p>
+
+<pre>
+familyMgr.SetFormula()
+pSolid.Parameter("Material")
+familyMgr.AddParameter("MyColumnFinish", BuiltInParameterGroup.PG_MATERIALS, ParameterType.Material, True)
+familyMgr.AssociateElementParameterToFamilyParameter()
+</pre>
+
+<h5>Lab 4 - Add Visibility Control</h5>
+<ul>
+<li>Add line representation.</li>
+<li>Add visibility control.</li>
+</ul>
+
+<p>Classes and methods:</p>
+
+<pre>
+doc.FamilyCreate.NewSymbolicCurve()
+doc.FamilyCreate.NewModelCurve()
+FamilyElementVisibility(FamilyElementVisibilityType.ViewSpecific/Model)
+FamilyElementVisibility.IsShownInFine, etc.
+pLine.SetVisibility(pFamilyElementVisibility)
+</pre>
+
+<h5>Learning More</h5>
+<p>Here is an overview of some available resources for further learning:</p>
+<ul>
+<li>Online Help, Developer's Guide and SDK Samples
+
+<li>Families Guide
+<br/><a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=13376394">
+http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=13376394</a></li>
+
+<li>DevTV Introduction to Revit Programming
+<br/><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=2484975">
+http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=2484975</a></li>
+
+<li>Recording of Revit 2010 Programming Introduction Webcast
+<br/><a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+http://www.adskconsulting.com/adn/cs/api_course_sched.php</a> &gt; Revit API</li>
+
+<li>Discussion Group
+<br/><a href="http://discussion.autodesk.com">
+http://discussion.autodesk.com</a> &gt; Revit Architecture &gt; Revit API</li>
+
+<li>API Training Classes
+<br/><a href="http://www.autodesk.com/apitraining">
+http://www.autodesk.com/apitraining</a></li>
+
+<li>The Building Coder, Jeremy Tammik's Revit API Blog
+<br/><a href="http://thebuildingcoder.typepad.com">
+http://thebuildingcoder.typepad.com</a></li>
+
+<li>Autodesk Developer Network
+<br/><a href="http://www.autodesk.com/joinadn">
+http://www.autodesk.com/joinadn</a></li>
+
+<li>DevHelp Online for ADN members
+<br/><a href="http://adn.autodesk.com">
+http://adn.autodesk.com</a></li>
+
+</ul>
+
+<a name="5"></a>
+
+<h4>Family API Webcast and Materials</h4>
+
+<p>We held a successful
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-family-api-webcast.html">
+webcast</a>
+
+on the Revit Family API on Thursday July 23<sup>rd</sup> 2009.
+
+The supporting material and recording from this webcast is now available.
+
+To access the material from any ADN webcast, you can go to the
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+ADN training schedule site</a>
+
+and click on the corresponding download link.
+You can find this specific webcast by filtering for 'Revit Family API'.
+Here is a direct link to
+
+<a href="http://download.autodesk.com/media/adn/Revit_2010_Family_API_Webcast-July2009.zip">
+download the webcast material</a>, which includes the following items:
+
+<ul>
+<li><strong>Presentation:</strong> Revit 2010 Family_API.pptx.
+<li><strong>Source Code for Labs:</strong> Revit Family Labs including Visual Studio solution file, Revit.ini information, C# and VB source code, instructions, and a Revit RFT template file.
+<li><strong>Recording:</strong> Revit Family API Webcast recording.
+<li><strong>Q & A:</strong> Revit 2010 Family API Webcast - Questions and Answers Jul 23 2009.docx.
+</ul>

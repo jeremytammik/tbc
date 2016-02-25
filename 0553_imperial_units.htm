@@ -1,0 +1,53 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Daniël Gijsbers RE: Revit imperial unit -->
+
+<h3>Internal Imperial Units</h3>
+
+<p>To start off this week, here is a pretty useless question that still seems to be of great interest to many people:
+
+<p><strong>Question:</strong> Odd question perhaps, but why does Revit internally work in imperial units? 
+
+<p><strong>Answer:</strong> I do not find your question odd at all; many others wonder that as well, I am sure.
+
+<p>Briefly, I would hazard that the answer is simply that this is a religious question, or a question of taste, or historically evolved.
+
+<p>Does that satisfy your curiosity?
+
+<p>Here is a bit more background information in a little more depth:
+
+<!--
+<p>Revit was originally made in the USA. 
+It simply uses decimal feet internally. 
+This is the same as NASA by the way (and we know how well that turned out).
+
+<p>On a slightly more technical (serious) note:
+Revit was initially written with the US market as its primary customer base, hence the choice of units made logical sense as this was what most US based architects were thinking in. 
+It made it easier to write the code at the time and with any startup, time to market is everything. 
+When acquired by Autodesk the first push was to increase the number of early adopters by going global, i.e. if 1% of the US market were early adopters then it stands to reason that there are 1% in every other country too, so it was a quick way to get return on investment. 
+At that point, Revit obviously had to provide support for metric systems and localisation.
+
+<p>Again, for speed of development, the API, when created, exposed the internal imperial values directly.
+Initially Revit had no API, because we thought we could do it all ourselves.
+When it was realised that we cannot do it ll ourselves, an API was created for a few selected partners, mainly for analysis purposes.
+Finally, when acquired by Autodesk, Revit became a fully open platform, or started evolving into that, at least.
+
+<p>So, as you can see, things are the way things are by necessity, not necessarily by choice.
+
+<p>It might be possible to make the API units more sensible for developers, but there is no real traction on a scalable solution as of now.
+
+-->
+
+<ol>
+<li>Revit was first made in the US, and originally only for the US market. US architects work with imperial units.
+<li>At the time it was simplest to write Revit to use imperial units internally (feet for length) to match customer needs.
+<li>When Revit's market expanded, support was extended for metric units.  But the existing database structures were preserved for backwards compatibility.  
+<li>In addition, Revit started expanding in capability and had to cover additional new areas requiring other units such as force, mass, etc.  For those new capabilities, metric units were chosen as being more universally understood and useful.
+<li>When Revit's API was introduced, the simplest method of introduction was to expose the database values directly.  Thus feet for length, metric for everything else.
+</ol>
+
+<p>I hope this helps, useless as the information may be!
+
+<p>Many thanks to Giles and Scott for contributing to this!

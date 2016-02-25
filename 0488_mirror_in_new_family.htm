@@ -1,0 +1,309 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1264809 [Mirroring family instances in new family document] -->
+
+<h3>Mirroring in a New Family and Changing the Active View</h3>
+
+<p>I spent the past weekend in the desert outside Las Vegas climbing in the daytime and watching the beautiful waning and still powerful half moon and lots of stars at night. 
+I also saw a couple of shooting stars, and surprised some 
+
+<a href="http://en.wikipedia.org/wiki/Donkey">
+wild burros</a> in 
+
+the dark as well.
+
+I was lucky enough to meet a very nice couple, Joachim and Kathleen. 
+We did some climbs together on Oasis, then the multi-pitch 
+
+<a href="http://www.summitpost.org/cat-in-the-hat/157466">
+Cat in a Hat</a> on 
+
+<a href="http://www.summitpost.org/mescalito/151383">
+Mescalito</a> in freezing cold weather, and finally a couple more on the Ultraman wall, before they had to head back home towards the Bay Area.
+I did not realise until later that I had 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/visible-elements.html#redrock">
+been on Ultraman previously</a> already... it did seem slightly familiar  :-)
+
+<p>It was really great to meet so many of my ADN DevTech colleagues for dinner here in the hotel last night!
+
+<p>To celebrate the first day of conferences at Autodesk University, before the scheduled classes begin, here is a tricky and efficient multi-step solution to a simple yet convoluted issue by Joe Offord of the facade system expert
+
+<a href="http://www.enclos.com">
+Enclos</a>.
+
+<p>The original aim is simply to mirror a family instance in a new family document.
+
+We already looked at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/mirror-an-element.html">
+mirroring an element</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html">
+accessing the newly created elements</a>,
+
+but the situation has a twist in the newly created family document.
+
+<p>The first issue that arises is that the mirror command requires a current active view, which is not automatically present in the family document.
+Joe discovers a workaround for that issue using the ShowElements method.
+It generates an unwanted warning message, so a second step is required to deal with eliminating that as well.
+
+<p>As you can see on reading the final solution carefully, you can use the ShowElements method to change the active view and even switch it between the family and project documents.
+The official Revit 2011 API does not provide any method to switch the active view, but using ShowElements can be used to create a workaround for that.
+
+<p>Here is the initial query:
+
+<p><strong>Question:</strong> I am trying to make a new family (Profile-Mullion.rfa), insert some detail components, and then mirror them about the vertical axis.
+When I try and mirror the detail component FamilyInstance it throws an exception saying "Invalid active view!"
+
+<p>The active view of the family document will always be null, because I just created it in the API using Application.NewFamilyDocument(templateFileName).
+I tried changing it manually, but the Document.ActiveView property is read-only.
+Is there a workaround for this?
+I tried using Mirror(Element, Reference) and Mirror(ElementSet, Line), and they both throw the same exception.
+
+<p><strong>First step and next query:</strong> I developed a workaround for the mirroring issue, but I need some help to make it more efficient.
+
+<p>One way to get a document to change its Active View is to use the UIDocument.ShowElements() method.
+For example, in my newly created family I can draw a DetailLine on the Ref. Plan View and then use the ShowElements to change the view.
+This will visually open the FamilyDocument on the Revit screen.
+However, upon calling ShowElements I get a message saying "There is no open view...searching closed views to find a good view could take a long time.  Continue?"</p>
+
+<center>
+<img src="img/ShowElements_message.png" alt="ShowElements message"/>
+</center>
+
+<p>Given that the new family has a small number of views, it doesn't really take much time.
+Here is some example code:
+
+<pre class="code">
+&nbsp; <span class="green">' Mirror element about vertical center line</span>
+&nbsp; <span class="blue">Dim</span> pt <span class="blue">As</span> <span class="blue">New</span> XYZ(0, 1, 0)
+&nbsp; <span class="blue">Dim</span> vertAxis <span class="blue">As</span> Line = app.Create.NewLine( _
+&nbsp; &nbsp; origin, pt, <span class="blue">True</span>)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> elemSet <span class="blue">As</span> <span class="blue">New</span> ElementSet
+&nbsp; elemSet.Insert(famInst)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> detLine <span class="blue">As</span> DetailLine = familyDoc _
+&nbsp; &nbsp; .FamilyCreate.NewDetailCurve( _
+&nbsp; &nbsp; &nbsp; planView, vertAxis)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> <span class="blue">New</span> UIDocument(familyDoc)
+&nbsp;
+&nbsp; uidoc.ShowElements(detLine)
+&nbsp;
+&nbsp; <span class="green">' ACTIVE VIEW = NULL</span>
+&nbsp; familyDoc.Mirror(elemSet, vertAxis)
+&nbsp;
+&nbsp; <span class="green">' Delete the old family instance</span>
+&nbsp; familyDoc.Delete(famInst)
+&nbsp;
+&nbsp; <span class="green">' Delete the detail line</span>
+&nbsp; familyDoc.Delete(detLine)
+</pre>
+
+<p>Is there a way to automatically hit OK on this dialog box?
+If I manually click OK, the mirror command will execute just fine.
+
+<p>I also noticed that the FamilyDocument will remain open even if I execute familyDoc.Close(False).
+I assume this is because the screen is now opened on the family document.
+Do you see a quick way to resolve this and get back to the project document?
+
+<p><strong>Answer:</strong> Regarding how to disable the message, yes, there are two possible approaches. The more powerful and complete
+
+solution is to use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+Failure API</a>, which was later
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/failure-api-take-two.html">
+discussed in more depth</a>  by Joe Ye.
+
+The older and simpler method uses the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+DialogBoxShowing event</a>.
+
+We discussed two examples comparing and making use of both of these, to handle
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html">
+editing elements inside groups</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/suppress-unwanted-dialogue.html">
+suppression of an unwanted dialogue</a>.
+
+<p>Regarding closing the family document, I do not see any officially supported solution.
+You could always try the dangerous
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">
+Windows message workaround</a>.
+
+<p><strong>Second step:</strong> I found a good approach to suppress the dialog box from appearing.
+
+<p>First off, the message box that appears does not trigger the IFailuresPreprocessor, so I had to resort to DialogBoxShowingEvent and a global Boolean that could control it.
+
+<pre class="code">
+&nbsp; <span class="green">' Application Start-Up</span>
+&nbsp; <span class="blue">AddHandler</span> Application.DialogBoxShowing, _
+&nbsp; &nbsp; <span class="blue">AddressOf</span> UIDialogBoxEvent
+
+<span class="green">' . . .</span>
+
+<span class="blue">Private</span> <span class="blue">Sub</span> UIDialogBoxEvent( _
+&nbsp; <span class="blue">ByVal</span> sender <span class="blue">As</span> <span class="blue">Object</span>, _
+&nbsp; <span class="blue">ByVal</span> args <span class="blue">As</span> DialogBoxShowingEventArgs)
+
+&nbsp; <span class="blue">If</span> CGlobal.SuppressDialogBoxes <span class="blue">Then</span>
+&nbsp; &nbsp; args.OverrideResult(DialogResult.OK)
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>Here's what the final code ended up looking like.
+This also switches the active view back to the original document:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Function</span> NewFamilySymbol( _
+&nbsp; <span class="blue">ByVal</span> projectDoc <span class="blue">As</span> Document) _
+&nbsp; <span class="blue">As</span> FamilySymbol
+
+&nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> Autodesk.Revit.ApplicationServices _
+&nbsp; &nbsp; .Application = projectDoc.Application
+
+&nbsp; <span class="blue">Dim</span> templateFileName <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; = <span class="maroon">&quot;C:\Program Files\Autodesk&quot;</span> _
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\Revit Architecture 2011&quot;</span> _
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\Content\Imperial Templates&quot;</span> _
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\Profile-Mullion.rft&quot;</span>
+
+&nbsp; <span class="blue">Dim</span> familyDoc <span class="blue">As</span> Document _
+&nbsp; &nbsp; = app.NewFamilyDocument(templateFileName)
+
+&nbsp; <span class="blue">If</span> familyDoc <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> tdError <span class="blue">As</span> <span class="blue">New</span> TaskDialog(<span class="maroon">&quot;Error&quot;</span>)
+
+&nbsp; &nbsp; tdError.MainInstruction = <span class="maroon">&quot;Could not find&quot;</span> _
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; family template: Profile-Mullion.rft&quot;</span>
+
+&nbsp; &nbsp; tdError.MainContent = <span class="maroon">&quot;Designated path '&quot;</span> _
+&nbsp; &nbsp; &nbsp; + templateFileName + <span class="maroon">&quot;' is invalid.&quot;</span>
+
+&nbsp; &nbsp; tdError.CommonButtons _
+&nbsp; &nbsp; &nbsp; = TaskDialogCommonButtons.Close
+
+&nbsp; &nbsp; tdError.Show()
+
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">Nothing</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+
+&nbsp; <span class="green">' Store some elements in the original project </span>
+&nbsp; <span class="green">' that we can use later (that are in the </span>
+&nbsp; <span class="green">' current ActiveView)</span>
+
+&nbsp; <span class="blue">Dim</span> projDocCollector <span class="blue">As</span> <span class="blue">New</span>&nbsp; _
+&nbsp; &nbsp; FilteredElementCollector( _
+&nbsp; &nbsp; projectDoc, projectDoc.ActiveView.Id)
+
+&nbsp; <span class="blue">Dim</span> projFamInsts <span class="blue">As</span> List(<span class="blue">Of</span> ElementId) _
+&nbsp; &nbsp; = projDocCollector.OfClass( _
+&nbsp; &nbsp; &nbsp; <span class="blue">GetType</span>(FamilyInstance)) _
+&nbsp; &nbsp; &nbsp; .ToElementIds
+
+&nbsp; <span class="blue">Dim</span> famDocCollector <span class="blue">As</span> <span class="blue">New</span>&nbsp; _
+&nbsp; &nbsp; FilteredElementCollector(familyDoc)
+
+&nbsp; <span class="blue">Dim</span> views <span class="blue">As</span> List(<span class="blue">Of</span> Element) _
+&nbsp; &nbsp; = famDocCollector _
+&nbsp; &nbsp; &nbsp; .OfClass(<span class="blue">GetType</span>(View)) _
+&nbsp; &nbsp; &nbsp; .ToElements
+
+&nbsp; <span class="blue">Dim</span> planView <span class="blue">As</span> View = <span class="blue">Nothing</span>
+
+&nbsp; <span class="green">' Find the default view</span>
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> v <span class="blue">As</span> View <span class="blue">In</span> views
+&nbsp; &nbsp; <span class="blue">If</span> v.Name = <span class="maroon">&quot;Ref. Level&quot;</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; planView = v
+&nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span>
+
+&nbsp; <span class="blue">Dim</span> fileName <span class="blue">As</span> <span class="blue">String</span> = <span class="blue">Nothing</span>
+
+&nbsp; <span class="blue">Dim</span> familyDocTrans <span class="blue">As</span> <span class="blue">New</span> Transaction( _
+&nbsp; &nbsp; familyDoc, <span class="maroon">&quot;CreateFamilySymbol&quot;</span>)
+
+&nbsp; familyDocTrans.Start()
+
+&nbsp; <span class="blue">Dim</span> famUIdoc <span class="blue">As</span> <span class="blue">New</span> UIDocument(familyDoc)
+
+&nbsp; <span class="green">' ... Create FamilyInstances in the familyDoc</span>
+
+&nbsp; <span class="green">' Mirror elements about vertical centerline</span>
+&nbsp; <span class="blue">Dim</span> origin <span class="blue">As</span> <span class="blue">New</span> XYZ(0, 0, 0)
+&nbsp; <span class="blue">Dim</span> pt <span class="blue">As</span> <span class="blue">New</span> XYZ(0, 1, 0)
+&nbsp; <span class="blue">Dim</span> vertAxis <span class="blue">As</span> Line = app.Create.NewLine( _
+&nbsp; &nbsp; origin, pt, <span class="blue">True</span>)
+
+&nbsp; <span class="blue">Dim</span> detLine <span class="blue">As</span> DetailLine = familyDoc _
+&nbsp; &nbsp; .FamilyCreate.NewDetailCurve( _
+&nbsp; &nbsp; &nbsp; planView, vertAxis)
+
+&nbsp; <span class="green">' Set up event handler to automatically </span>
+&nbsp; <span class="green">' click &quot;OK&quot; when the ShowElements dialog </span>
+&nbsp; <span class="green">' box appears</span>
+&nbsp; CGlobal.SuppressDialogBoxes = <span class="blue">True</span>
+
+&nbsp; <span class="blue">Try</span>
+
+&nbsp; &nbsp; <span class="green">' Transfer the active view to the </span>
+&nbsp; &nbsp; <span class="green">' Family(Document)</span>
+
+&nbsp; &nbsp; famUIdoc.ShowElements(detLine)
+
+&nbsp; &nbsp; familyDoc.Mirror(detailComps, vertAxis)
+
+&nbsp; &nbsp; <span class="green">' Delete the old family instance</span>
+
+&nbsp; &nbsp; familyDoc.Delete(detailComps)
+
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+
+&nbsp; <span class="green">' Delete the detail line</span>
+
+&nbsp; familyDoc.Delete(detLine)
+
+&nbsp; <span class="green">' Transfer the active view back to the project</span>
+
+&nbsp; <span class="blue">Dim</span> projUIdoc <span class="blue">As</span> <span class="blue">New</span> UIDocument(projectDoc)
+&nbsp; projUIdoc.ShowElements(projFamInsts.Item(0))
+
+&nbsp; <span class="green">' Reset the dialog box event handler</span>
+&nbsp; CGlobal.SuppressDialogBoxes = <span class="blue">False</span>
+
+&nbsp; familyDocTrans.Commit()
+
+&nbsp; <span class="green">' Define a save path for the new family</span>
+
+&nbsp; <span class="blue">If</span> familyDoc.SaveAs(fileSavePath) <span class="blue">Then</span>
+
+&nbsp; &nbsp; <span class="green">' Bring the family into the current project</span>
+&nbsp; &nbsp; projectDoc.LoadFamily( _
+&nbsp; &nbsp; &nbsp; fileSavePath, projectFam)
+
+&nbsp; &nbsp; <span class="green">' Close the family edit, </span>
+&nbsp; &nbsp; <span class="green">' do not save changes</span>
+
+&nbsp; &nbsp; familyDoc.Close(<span class="blue">False</span>)
+
+&nbsp; &nbsp; <span class="green">' Return Family or FamilySymbol</span>
+
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>Kind a long solution to a simple mirror issue but hey it works!
+
+<p>Thank you very much, Joe, for this interesting example of perseverance and cascaded workarounds, for your persistent research and complete and interesting solution!

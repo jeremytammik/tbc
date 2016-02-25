@@ -1,0 +1,304 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Revit Structure Resources</h3>
+
+<p><strong>Question:</strong>
+What resources are available for getting started with the Revit Structure API, especially concerning the implementation of an analysis link, a link between Revit Structure and an external analysis application?</p>
+
+<p><strong>Answer:</strong>
+There are a number of resources available on the Revit Structure or RST API, and we from the Autodesk DevTech team have held several trainings, webcasts and classes at Autodesk University on this topic.
+The Revit Structure training material and samples from these trainings is available, some of it publicly and some on the ADN web site. Here are the main resources that I am aware of:</p>
+
+<ul>
+
+<li>
+<a href="#adn">
+Revit Structure training material, samples and webcast recording</a>
+</li>
+
+<li>
+<a href="#au">
+Autodesk University class material</a>
+</li>
+
+<li>
+<a href="#midaslink">
+MidasLink analysis link sample application</a>
+</li>
+
+</ul>
+
+<p>There are also a number of RST specific samples in the standard Revit SDK.
+Let's look at the contents of each of these packages in more detail.</p>
+
+<a name="adn"></a>
+
+<h4>Revit Structure Training Material and Samples</h4>
+
+<p>The RST training material has focused on two main areas:</p>
+
+<ul>
+<li>Analysis link</li>
+<li>Rebar and detailing</li>
+</ul>
+
+<p>These correspond to and aim to help support and automate the tasks and user focus not addressed very strongly by the base RST product:</p>
+
+<ul>
+<li>Structural analysis by engineers and designers early on in the design phase.</li>
+<li>Creation of fabrication and shop drawings for the contractor and steel detailer in the fabrication phase.</li>
+</ul>
+
+<img src="img/rst_api_focus.gif" alt="RST API focus"/>
+
+<p>The samples provided in the RST training material consist of the following components:</p>
+
+<ul>
+<li>RST labs: a collection of labs demonstrating how to read and write RST elements and data relevant to the analysis link.</li>
+<li>RST link: a sample application simulating an extremely rudimentary link between RST and an external analysis application.</li>
+<li>Rebar and detailing samples: enhancements to add additional RST rebar and detailing oriented functionality to some standard SDK samples.</li>
+</ul>
+
+<p>The RST labs explore the Revit elements and data involved in data exchange between RST and an external analysis application and demonstrate how they are related and can be accessed, modified, and created.
+In a second step, the RST link sample makes use of the labs functionality to implement a simulated analysis link. AutoCAD is used to simulate the external analysis application. The data is exchanged between RST and AutoCAD using a custom XML format. Some RST properties are exposed in AutoCAD and stored in extended entity data. They can be edited manually in the AutoCAD Object Property Manager or OPM, and the updated data is read back in to Revit. Currently, only 'stick' elements are supported, i.e. structural framing elements such as columns, beams and braces. Here is an overview of the different RstLink modules:</p>
+
+<ul>
+<li>RstLink: Helper DLL shared by both AutoCAD and Revit client.</li>
+<li>RSLinkRevitClient: Revit command implementation defining the two commands RSLinkImport and RSLinkExport.</li>
+<li>RSLinkRevitApp: Revit external application defining a user interface for the two commands.</li>
+<li>RSLinkAcadClient: AutoCAD.NET client defining the commands RSImport, RSExport and RSMakeMember.</li>
+<li>RSLinkAcadClientDynProps: Dynamic Revit properties for AutoCAD objects.</li>
+</ul>
+
+<p>The enhanced detailing samples demonstrate:</p>
+
+<ul>
+<li>Generation of a section and drafting view</li>
+<li>Creation of a sheet</li>
+<li>Import and export of external file formats</li>
+<li>Adding text, dimensioning and annotations</li>
+</ul>
+
+<p>The enhanced standard Revit SDK samples are included in some of the the standard Revit SDK distribution samples:</p>
+
+<ul>
+<li>CreateDimensions</li>
+<li>CreateViewSection: CreateDraftingView</li>
+<li>TagBeam: TagRebar, CreateText</li>
+</ul>
+
+<p>Here is a list of the sample commands provided, extracted from my ADN samples text file, which is processed by RvtSamples to define entry points in the Revit 2009 menu:</p>
+
+<h4>Analysis link commands</h4>
+
+<ul>
+<li>1-1 Load Natures, Cases and Combinations: List load grouping objects, i.e. load natures, cases, and combinations</li>
+<li>1-2 Load Objects - List all : demonstrate access to load objects and list point, line and area loads</li>
+<li>1-3 Load Objects - Modify selected: more detailed info and modification of selected loads</li>
+<li>1-4 Load Symbols: list load symbols</li>
+<li>1-5 Create New Point Loads</li>
+<li>2-1 Structural Columns: list structural columns</li>
+<li>2-2 Structural Framing: list structural framing elements</li>
+<li>2-3 Structural Foundations: list structural foundation elements</li>
+<li>2-4 Structural Standard Family Instances: list standard family instances with an analytical model</li>
+<li>2-5 Structural System Family Instances: retrieve structural system family instances: wall, floor, continuous footing</li>
+<li>3 Analytical Model: list analytical model for selected or all structural elements</li>
+<li>RstLink Export: export to RstLink file (from Revit to AutoCAD)</li>
+<li>RstLink Import: import from RstLink result file (from AutoCAD to Revit)</li>
+</ul>
+
+<h4>Standard SDK and enhanced rebar and detailing commands</h4>
+
+<ul>
+<li>Analytical Viewer:
+<br/>Draws analytical model for selected or all elements in the viewer window
+<br/>AnalyticalViewer
+
+<li>Create Beams Columns and Braces
+<br/>Create configurable multi-story Beams Columns and Braces using simple dialog
+<br/>CreateBeamsColumnsBraces
+
+<li>Rebar - Create Reinforcement
+<br/>Create bar set in a selected concrete element (beam or column) that does not have any reinforcement.
+<br/>Reinforcement
+
+<li>Rebar - Edit AreaReinforcement Parameters
+<br/>Show parameters of selected AreaReinforcement and allow user to modify
+<br/>AreaReinParameters
+
+<li>Rebar - List Rebar Parameters
+<br/>Show parameters of selected AreaReinforcement and allow user to modify
+<br/>AreaReinParameters
+
+<li>Rebar - Create Section View
+<br/>Create a section view across the midpoint of the selected wall, floor or beam
+<br/>CreateViewSection
+
+<li>Rebar - Create Drafting View
+<br/>Create a new empty drafting view
+<br/>CreateViewSection, CreateDraftingView
+
+<li>Rebar - Import And Export DWG
+<br/>Export current project to dwg files and import a dwg file into revit
+<br/>ImportExport
+
+<li>Rebar - Create Dimension
+<br/>Add a dimension to a selected structure wall from its start to its end
+<br/>CreateDimensions
+
+<li>Rebar - Tag Beam
+<br/>Tag beam's start and end
+<br/>TagBeam
+
+<li>Rebar - Tag Rebar
+<br/>Tag selected Rebar
+<br/>TagBeam TagRebar
+
+<li>Rebar - Create Text
+<br/>Create a new TextNote instance for selected Rebar
+<br/>TagBeam CreateText
+</ul>
+
+<p>This material was presented in various classroom trainings and webcasts.
+A Revit Structure API webcast was held in May 2008.
+The material and recordings of all ADN webcasts are publicly available from the
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Developer Center training site</a>
+
+listing the course schedule for all our trainings and webcasts.
+
+Here is a
+
+<a href="http://download.autodesk.com/media/adn/RevitStructure2009APIWebcast_13May08.zip">
+direct link</a>
+
+to the
+
+<a href="http://download.autodesk.com/media/adn/RevitStructure2009APIWebcast_13May08.zip">
+materials and recording</a>
+
+for this webcast.
+For your convenience, I am making the presentation and sample code available right here as well:</p>
+
+<ul>
+
+<li>
+<a href="zip/rst_api_ppt_20090401.zip">
+Powerpoint presentation</a>
+</li>
+
+<li>
+<a href="zip/rst_labs_20090401.zip">
+RST labs sample code</a>
+</li>
+
+<li>
+<a href="zip/rst_link_20090401.zip">
+RST link sample code</a>
+</li>
+
+</ul>
+
+<a name="au"></a>
+
+<h4>Autodesk University Class Material</h4>
+
+<p>We held classes on the RST API at Autodesk University in 2007 and 2008.
+In 2007, there were two separate sessions on the analysis link and the rebar and detailing topics:</p>
+
+<ul>
+<li>
+<a href="http://au.autodesk.com/?nd=class&session_id=1048">
+DE201-1 Create Your Own Bidirectional Revit Structure Stress Analysis Integration Link Revit Structure</a>
+</li>
+<li>
+<a href="http://au.autodesk.com/?nd=class&session_id=1132">
+DE205-1 Reinforce Your Design: Revit Structure API for Rebar and Detailing Revit Structure</a>
+</li>
+</ul>
+
+<p>In 2008, they were combined into one single streamlined class held by Mikako Harada:</p>
+
+<ul>
+<li>
+<a href="http://au.autodesk.com/?nd=class&session_id=3136">
+DE215-3 Revit Structure API: From Bi-Directional Link to Rebar Detailing</a>
+</li>
+</ul>
+
+<p>This latter session was also recorded.
+Here is the class description and some highlights:</p>
+
+<p>Two main areas of interest in the Revit Structure (RST) API are the bi-directional link to an external structural
+analysis program and reinforced concrete detailing design. In addition to the physical building information model
+(BIM) defined in Revit Architecture, RST defines an analytical model of the building, composed of geometry,
+loads, connectivity, release/boundary conditions, material properties, and other project parameters. This session
+shows how to implement a bi-directional link to a structural analysis program. We will then look at the
+reinforcement concrete detailing API and show how to automate part of the reinforcement workflow, eliminating
+repetitive manual tasks. This session assumes basic knowledge of Revit programming.</p>
+
+<ul>
+<li>Implement a Revit Structure add-in to export and import between the RST analytical model and an external analysis program.</li>
+<li>Implement an add-in that automates repetitive manual tasks in production of construction documents.</li>
+<li>Analyze, modify and create building model geometry, loads, connectivity, release and boundary conditions.</li>
+<li>Automatically drive the framing modelling, generate rebar, and extract rebar information.</li>
+<li>Programmatically generate section and drafting views and import and export DWG™ files, such as schedules.</li>
+<li>Create RST macros to add text, dimensions, and annotations.</li>
+</ul>
+
+<p>The
+
+<a href="http://au.autodesk.com/?nd=class&session_id=3136">
+class material</a>
+
+is publicly available from the Autodesk University web site and includes:</p>
+
+<ul>
+<li>Handout document</li>
+<li>Powerpoint presentation</li>
+<li>Code samples</li>
+<li>Recording</li>
+</ul>
+
+<a name="midaslink"></a>
+
+<h4>MidasLink Analysis Link Sample Application</h4>
+
+<p>For completeness sake, I also mention MidasLink.
+This is the result of a consulting project linking to a commercial application.
+It is only accessible to ADN members.</p>
+
+<p>MidasLink is a Revit Structure add-in program that exports and imports the Revit model to and from the MIDAS/Gen structural analysis application.
+The source code is provided to help developers integrating analysis programs with Revit Structure.
+The compiled add-in is available to Revit Structure subscription customers in certain countries.
+Source code for the 2008 and 2009 versions are available on the ADN web site.
+To find it, you can simply search for 'MidasLink'.
+Here is a
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=11816840&linkID=4901650">
+direct link</a> to the 2009 version.
+
+The package includes:
+</p>
+
+<ul>
+<li>Analysis application executable</li>
+<li>Documentation</li>
+<li>Source code</li>
+<li>Installer</li>
+</ul>
+
+<p>The installer source code is also included, which is in C++.
+This makes it interesting for any Revit application developer to have a look at.
+Another module of interest to any developer is the unit handling, which I already mentioned in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">
+previous post</a>.</p>
+

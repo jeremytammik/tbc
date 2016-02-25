@@ -1,0 +1,333 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The ADN MEP Sample AdnRme for Revit MEP 2013</h3>
+
+<p>Yesterday I discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html">
+Revit 2013 MEP API and the external services framework</a>.
+
+<p>In preparation for my Revit MEP API presentation at the upcoming 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/aec-devcamp-coming-up-again.html">
+AEC DevCamp</a> in 
+
+Boston in June, I also migrated the ADN MEP API sample AdnRme to Revit MEP 2013.
+
+<p>The initial flat migration was extremely straightforward with zero code changes required.
+
+<p>I obviously had to change the Revit API assembly references, which forces an update of the .NET framework version to 4.0.
+After bumping the framework version, the whole solution immediately compiled with zero errors and warnings.
+I must admit I was a bit surprised.
+
+
+<a name="1"></a>
+
+<h4>New One-box Product Type</h4>
+
+<p>On loading it, though, I was surprised again, because the add-in ribbon panel was simply not displayed.
+
+<p>Debugging the external application OnStartup method revealed that since I was running and testing it in a one-box flavour of Revit, the product type was not 'MEP' but simply 'Revit'.
+To fix this, I had to add support for both of those enumeration values to my product type test:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="green">// only create a new ribbon panel in Revit MEP:</span>
+&nbsp;
+&nbsp; <span class="teal">ProductType</span> pt = a.ControlledApplication.Product;
+&nbsp;
+&nbsp; <span class="green">//if( ProductType.MEP == pt ) // 2012</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">ProductType</span>.MEP == pt 
+&nbsp; &nbsp; || <span class="teal">ProductType</span>.Revit == pt ) <span class="green">// 2013</span>
+&nbsp; {
+&nbsp; &nbsp; AddRibbonPanel( a );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+}
+</pre>
+
+<p>With that little change in place, everything works fine and my ribbon panel shows up as expected:</p>
+
+<center>
+<img src="img/AdnRme_2013_panel.png" alt="AdnRme 2013 ribbon panel"/>
+</center>
+
+<p>Actually, for full-fledged support of the new runtime discipline switching, I could add more flexible enabling and disabling of my buttons, if I wanted to, for instance by dynamically hiding this application when the MEP discipline is not enabled.
+
+<p>Here is the 'About' box, automatically populated with properties harvested from the .NET assembly company, copyright, description, product, title and version and attributes, explaining briefly what this sample is about:</p>
+
+<center>
+<img src="img/AdnRme_2013_about.png" alt="AdnRme 2013 about box"/>
+</center>
+
+
+<a name="2"></a>
+
+<h4>History and Functionality</h4>
+
+<p>By the way, although I have been demonstrating and using this sample for many years now, I have still not described its functionality in detail here in the blog, so maybe that is something I should do right now.
+
+<p>Several descriptions have been made publicly available in the past, though, for instance in the materials for my
+
+<a href="http://au.autodesk.com/?nd=e2011">
+Autodesk University 2011</a> virtual class 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9267&jid=1727895">
+CP4453</a> Everything 
+
+in Place with Autodesk Revit MEP Programming, covering both the Revit MEP 2012 API features and the Revit MEP API in general. 
+
+<p>Before that, I already published the code here on the blog for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/mep-sample-code-for-revit-2012.html">
+Revit MEP 2012</a> and 
+
+previous versions, and at previous Autodesk University and AEC DevCamp events.
+
+<p>The AdnRme sample demonstrates several Revit MEP API aspects, in two separate main areas:
+
+<ul>
+<li>HVAC air terminal analysis and sizing.
+<li>Hierarchical display of an electrical system.
+</ul>
+
+<p>It also demonstrates some Revit and .NET API aspects not directly related to the MEP API, such as:
+
+<ul>
+<li>External application implementation.
+<li>About box, automatically populated using .NET assembly properties.
+<li>Progress bar.
+</ul>
+
+<p>AdnRme implements an external application to define a custom user interface to access the sample commands, as you can see from the ribbon panel shown above.
+The about box is also shown above. 
+
+<p>The progress bar may be useful in a large project, since the processing of a large number of elements may take a noticeable amount of time, and is implemented using a standard .NET modeless form:</p>
+
+<center>
+<img src="img/AdnRme_2013_progress_bar.png" alt="AdnRme 2013 progress bar"/>
+</center>
+
+
+
+<a name="3"></a>
+
+<h4>HVAC Air Terminal Analysis and Sizing Sample</h4>
+
+<p>The HVAC part of the MEP sample was originally implemented based on Revit 2008, before the advent of any MEP-specific API at all, using pure generic Revit element and parameter access to analyse and modify the HVAC duct system. 
+
+<p>It supports a typical HVAC engineering workflow including the following tasks:
+
+<ul>
+<li>Placement and sizing of air distribution ducts and terminals.
+<li>Analysis and verification of results.
+</ul>
+
+<p>In a little more detail, the workflow might look like this:
+
+<ul>
+<li>Manually lay out air terminals.
+<li>Run heating and cooling load analysis.
+<li>Based on load analysis, assign flow to terminals.
+<li>Based on terminal flow, size air terminals.
+<li>Validate design; a common check figure uses air flow per surface area.
+</ul>
+
+<p>The MEP HVAC sample was originally implemented for Revit 2008 and based on room elements, since spaces had not yet been introduced back then. 
+It was modified for RME 2009 to use spaces. 
+
+<p>It implements the following four commands to support the HVAC engineering workflow described above. 
+The first three support the actual workflow itself, the fourth cleans up and resets the data manipulated by them:
+
+<ul>
+<li>Assign flow to terminals.
+<li>Change air terminal size.
+<li>Calculate and display flow density as colour fill to verify design by air flow per surface area.
+<li>Reset demo.
+</ul>
+
+<p>This workflow is exercised in the following simple office building sample model with a place holder duct system in place:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_model.png" alt="HVAC sample model"/>
+</center>
+
+<p>Here it is in plan view:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_plan.png" alt="HVAC sample model plan view"/>
+</center>
+
+<p>The progress of the steps is displayed by four schedules set up in the sample model:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_schedules.png" alt="HVAC sample schedules"/>
+</center>
+
+<p>Initially, all the 51 diffusers are the same:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_initial_quantities.png" alt="HVAC initial quantities"/>
+</center>
+
+<p>The 33 spaces have calculated and specified supply air flows defined, but no actual flow:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_spaces.png" alt="HVAC spaces"/>
+</center>
+
+<p>The CFM per SF parameter in the right-hand column is defined to generate a colour schema at the end to verify the results visually at a glance, and is currently still set to zero.
+
+<p>The air terminals have not yet been properly analysed and sized:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_air_terminal_sizes.png" alt="HVAC air terminal sizes"/>
+</center>
+
+<p>Their flow and actual supply air flow is still zero:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_terminal_flow.png" alt="HVAC terminal flow"/>
+</center>
+
+<p>Executing the commands in the proper sequence fixes all this:
+
+<ul>
+<li>Assign flow to terminals: calculate the required flow per terminal by dividing the required flow for the space by the number of terminals, and assigning the resulting value to each terminal via its Flow parameter.
+<li>Change air terminal size: for each diffuser type, determine its minimum and maximum flow. Select the type that ensures that the actual flow lies between these two.
+<li>Calculate and display flow density as colour fill to verify design by air flow per surface area: calculate the CFM per SF using the built-in parameters ROOM_ACTUAL_SUPPLY_AIRFLOW_PARAM and ROOM_AREA and set the "CFM per SF" parameter accordingly.
+</ul>
+
+<p>The schedules are all updated, and the predefined colour fill displays and enables visual verification of the results:</p>
+
+<center>
+<img src="img/AdnRme_2013_hvac_colour_fill.png" alt="HVAC colour fill"/>
+</center>
+
+
+
+
+<a name="4"></a>
+
+<h4>Electrical Hierarchy Sample</h4>
+
+<p>Later during the lifetime of this sample, the electrical hierarchy functionality was added, initially based on non-MEP-specific analysis of parameter values to determine the system structure, later rewritten and significantly simplified by accessing the MEP connectors for this task instead.
+
+<p>In a way, the electrical hierarchy part is closely related to the TraverseSystem duct system SDK sample, which traverses a duct system by moving through its elements from predecessor to successor element through the connectors and storing the resulting tree data in an HTML file.
+
+<p>The AdnRme electrical sample does the same and displays the result in a tree view form instead:</p>
+
+<center>
+<img src="img/AdnRme_2013_electrical_hierarchy.png" alt="Electrical hierarchy tree view"/>
+</center>
+
+<p>It actually determines and displays the hierarchical structure of the electrical systems in the model in several different ways. 
+Its focus is to:
+
+<ul>
+<li>Traverse the electrical system
+<li>Reproduce the system browser data structure in a tree view
+<li>Determine and display the complete connection hierarchy in a tree view
+</ul>
+
+<p>The standard RME system browser displays electrical components in a three-level flat list, and the complete hierarchical structure of the connection tree is not immediately apparent. 
+This sample inspects the electrical systems and reproduces the structure and information displayed by the system browser as well as the full connection hierarchy. 
+It implements the following commands:
+
+<ul>
+<li>CmdElectricalConnectors
+<li>CmdElectricalSystemBrowser
+<li>CmdUnhostedElements
+</ul>
+
+<p>The first two analyse the electrical system hierarchical structure and present it to the user in a tree view in a modeless dialogue, either in the full hierarchical structure, or in the three-tier structure used by the system browser; the third detects and lists un-hosted elements.
+
+<p>The form displaying the full electrical system hierarchical structure is shown above.
+Besides the hierarchical structure, it also presents a list of panels and devices on the left-hand side and highlights them in bold in the hierarchical tree display.
+
+<p>Clicking on a panel node in the left-hand list redisplays the tree on the right, with all the tree nodes except the selected panel or device collapsed.
+Here we select the panel H-2:</p>
+
+<center>
+<img src="img/AdnRme_2013_electrical_hierarchy_H-2.png" alt="Electrical hierarchy at H-2"/>
+</center>
+
+<p>Here, transformer T1 is selected instead:</p>
+
+<center>
+<img src="img/AdnRme_2013_electrical_hierarchy_T1.png" alt="Electrical hierarchy at T1"/>
+</center>
+
+<p>Being modeless, the form remains visible and can be navigated after the command has terminated. 
+You can leave the form open and switch back and forth between it and Revit to explore the electrical system simultaneously from both points of view. 
+Note, however, that updates to the model will not be reflected in the dialogue until the command is re-executed. A sample model elec_project.rvt is provided.
+Also note that this was originally implemented a long time ago and does not take all of Arno&scaron;t's recent advice on interaction with a modeless dialogue and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/avoid-idling.html">
+avoiding too much use of the Idling event</a> into 
+
+account.
+On the other hand, the modeless form never attempts to make any use whatsoever of the Revit API, so there should be nothing to worry about in this case.
+
+<p>Besides the connection hierarchy tree, the electrical sample also implements these other commands:
+
+<ul>
+<li>Obsolete pre-connector approach
+<li>Three-tier system browser structure
+<li>Find un-hosted elements
+</ul>
+
+<p>The obsolete pre-connector parameter-based approach is still included in the source code, in the C# module CmdElectricalHierarchy2.cs, but has been removed from the user interface.
+
+<p>The system browser three-tier structure is also displayed in a tree structure, like this:</p>
+
+<center>
+<img src="img/AdnRme_2013_system_browser.png" alt="System browser tree"/>
+</center>
+
+<p>The un-hosted element command simply displays a Windows message box listing all elements, which may well overflow the screen in a large untidy model:</p>
+
+<center>
+<img src="img/AdnRme_2013_unhosted.png" alt="Unhosted elements message box"/>
+</center>
+
+<p>As said, I documented some other aspects of this sample in the last few years' Revit MEP API classes at Autodesk University and the AEC DevCamp two years back, so if you really want to know still more, you might be lucky there.
+I think this just about covers it, though, actually more than enough.
+
+<p>Here is 
+
+<a href="file:///C:/a/lib/revit/2013/adn_rme_2013.zip">adn_rme_2013.zip</a> containing
+
+the full Visual Studio solution, source code, add-in manifest and electrical and HVAC sample models to run this and play with.
+Enjoy.
+
+<p>Many thanks once again to Martin Schmid for motivating and helping me set up the HVAC sample back then, many years ago, and many other inspiring impulses since!
+
+
+
+<a name="5"></a>
+
+<h4>US Army Corps of Engineers Revit Templates</h4>
+
+<p>Here is a little piece of news that just happened to come past my way and might be of interest to you as well, even though it is not API related:
+
+<p>The US Army Corps of Engineers ASACE has released version 1 of their 
+
+<a href="https://cadbim.usace.army.mil">
+Revit Architecture, Structure, MEP templates</a>.
+
+<p>These templates were developed to standardize MILCON production documentation and deliverables created by in-house USACE staff to reduce project start-up and configuration lead times, improve the quality and consistency of the contract deliverables and increase the adoption of BIM in general.
+
+<p>If you are interested in this fiscal year's opportunities with USACE, here are some interesting links:
+
+<ul>
+<li><a href="https://www.fbo.gov">Federal Business Opportunities</a>
+<li><a href="http://cbd-net.com/index.php/doc/home">Federal procurement bidding opportunity search</a>
+<li><a href="http://www.usace.army.mil/Portals/2/docs/MILCON/AcquisitionForecastMilitaryConstructionMAR2012.pdf">
+USACE FY12 Acquisition Forecast &ndash; Military Construction</a>
+</ul>

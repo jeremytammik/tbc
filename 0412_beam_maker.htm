@@ -1,0 +1,110 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1261352 [using a void extrusion to cut other one via the API.] -->
+
+<h3>Beam Maker Using a Void Extrusion to Cut</h3>
+
+<p>Here is an interesting and more than average advanced sample application 
+
+<a href="zip/BeamMaker.zip">
+BeamMaker</a> by 
+
+Marcelo Quevedo of 
+
+<a href="http://www.hsb-cad.com">
+hsbSOFT</a> demonstrating 
+
+how to create a void in a beam in a family file.
+
+<p>The family file is created and loaded into the current working project on the fly.
+
+<p>The final result of the application is the following beam family instance created in the currently active document, which in this case was a new project:</p>
+
+<center>
+<img src="img/beammaker.png" alt="Beam with a void extrusion cut out"/>
+</center>
+
+<p>Here is Marcelo's description of his project:
+
+<span style="color:darkblue">
+
+<p>Using the default template that comes with Revit, the sample creates a 'structural framing' family that contains a void extrusion that cuts the solid (existing extrusion in the Revit template). 
+
+<ul>
+<li>The sample looks for the template, opens it, and creates a void extrusion in the position (0,0,0). It means that it is located in the center of the solid. 
+<li>In order that the void extrusion can cut the solid, I am using the brilliant solution that Joe recommended me based on the CombineElements method.
+<li>After that, it loads the new family into an existing Revit project via the LoadFamily method.
+<li>Finally, using this new family, it creates a new instance in the existing project with the NewFamilyInstance method.
+</ul>
+
+</span>
+
+<p>Here are some quick and dirty notes of my own from stepping through the application code in the debugger:
+
+<ul>
+<li>Check if the current document is a family document.
+<li>If not, a new family document based on the 'Structural Framing - Beams and Braces' family template file is created. The template file already contains one extrusion representing the beam element solid body.
+<li>Start a transaction.
+<li>Create a void extrusion by calling the NewExtrusion method with its first argument, bool isSolid, set to false to create a void. This requires the prior creation of the appropriate profile curve array array and sketch plane.
+<li>Collect all extrusions in the family document, e.g. the solid beam element and the void cut-out extrusion.
+<li>Apply the CombineElements method to them to cut the void part out of the solid part.
+<li>Load the newly created family into the current project.
+<li>Commit the transaction.
+<li>Insert a new family instance using the new family definition.
+</ul>
+
+<p>BeamMaker includes a whole bunch of useful utility functions, a real treasure trove of gems is contained in there.
+
+<p>As a very simple example, here is the GetFamilyTemplatePath which determines the full path name of a given family template file and makes use of the FamilyTemplatePath property on the Revit application object to do so. 
+It returns the full path of a default template for a given family template name:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">string</span> GetFamilyTemplatePath( 
+&nbsp; <span class="blue">string</span> strFamilyTemplateName )
+{
+&nbsp; <span class="blue">string</span> strPathForTemplates 
+&nbsp; &nbsp; = _app.FamilyTemplatePath;
+&nbsp;
+&nbsp; <span class="blue">string</span> strTemplateFile 
+&nbsp; &nbsp; = <span class="teal">Path</span>.Combine( strPathForTemplates, 
+&nbsp; &nbsp; &nbsp; strFamilyTemplateName );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( strTemplateFile ) )
+&nbsp; {
+&nbsp; &nbsp; strTemplateFile = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; strPathForTemplates,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Metric &quot;</span> + strFamilyTemplateName );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( strTemplateFile ) )
+&nbsp; {
+&nbsp; &nbsp; strTemplateFile = <span class="maroon">&quot;&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> strTemplateFile;
+}
+</pre>
+
+<p>Please download the 
+
+<a href="zip/BeamMaker.zip">
+BeamMaker project</a> including
+
+the source code, Visual Studio solution and add-in manifest files to look at the complete code.
+
+<p>To wrap this up, here is the original discussion between Marcelo and Joe which prompted Marcelo to develop and provide this sample:
+
+<p><strong>Question:</strong> Using the family API, I am creating a new structural framing family.
+I am using the template that comes with Revit "Metric Structural Framing - Beams and Braces.rft". 
+I am creating a void extrusion to cut the existing extrusion, but it does not cut the existing one. 
+If you manually edit the family, you can see the existing extrusion and the new void extrusion, but the void extrusion does not subtract the geometry from the other one. 
+How can I achieve this? 
+
+<p><strong>Answer:</strong> Simply creating the void solid does not automatically cause it to cut any existing ones. 
+In the Revit user interface, one needs to explicitly invoke the ‘Cut Geometry’ command for this to happen, i.e. to make the void cut the solid. 
+It is accessible through the Modify tab and Geometry panel.
+In a Revit plug-in, one can use the CombineElements method to make the void objects cut the solid objects.
+
+<p>Many thanks to Joe and above all to Marcelo for providing this useful example and code!

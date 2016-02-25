@@ -1,0 +1,157 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Category Comparison and Model Elements Revisited</h3>
+
+<p>This is a follow-up to two previous posts, on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/category-comparison.html">
+category comparison</a>
+
+and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html">
+selection of model elements</a>.
+
+<p>Regarding the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/category-comparison.html">
+category comparison</a>,
+
+we discussed the fact that categories cannot be compared directly, and one should use their element id instead.
+We also underlined that every category comparison should be made language independent by using the built-in category enumeration and not comparing the localised category names.
+
+The analysis of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html">
+model element selection</a>
+
+examined how to eliminate the preview legend components from the selected elements, since they suddenly acquired geometry in Revit 2010 and also fit the other criteria applied in the selection process.</p>
+
+<p>As Miroslav Schonauer pointed out, the model element selection that I suggested in that post will not work, because various model elements exist that do not have a valid level assigned to them.
+He suggests that the previous selection algorithm with an additional check added for the preview legend components probably remains the simplest and most reliable method.</p>
+
+<p>One deplorable aspect of the code presented there with the preview legend component check added is its language dependence.
+It compares the element category name with the preview legend component one, which is "Legend Components".
+I left that in there because I thought I would use the alternative approach anyway, checking for a valid level.</p>
+
+<p>So now the issue is how to compare a given element's category against a built-in one without using the category name.
+In previous similar situations, I achieved this by asking the document for the built-in category object and using its element id.
+The Revit developers guide includes some sample code which demonstrates an extremely effective alternative method.
+It avoids the string comparison and achieves language independence, and it also does not require the effort of querying the document settings for the element id of a built-it category.</p>
+
+<p>For built-in categories, the value of the element id is exactly the same as the integer resulting from casting the built-in category enumeration value.
+The section 5.2.1 Category discusses details of the element category classification and explains:</p>
+
+<span style="color:darkblue">
+
+<p>An element's category is determined by the Category ID.</p>
+
+<ul>
+<li>Category IDs are represented by the ElementId class.
+<li>Imported Category IDs correspond to elements in the document.
+<li>Most categories are built-in and their IDs are constants stored in ElementIds.
+<li>Each built-in category ID has a corresponding value in the BuiltInCategory Enumeration.
+They can be converted to corresponding BuiltInCategory enumerated types.
+<li>If the category is not built-in, the ID is converted to a null value.
+</ul>
+
+</span>
+
+<p>The Code Region 14-1: 'Distinguishing permanent dimensions from constraints' in section 14.1 'Dimensions and Constraints' shows that we can actually use the built-in enum value to compare with an element category id directly, as in the following excerpted lines:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span> ( (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Dimensions
+&nbsp; &nbsp; == dimension.Category.Id.Value )
+&nbsp; {
+&nbsp; &nbsp; message += <span class="maroon">&quot;\nDimension is a permanent dimension.&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>Making use of this for the model element selection, we can implement the following filter which is both language independent and efficient:</p>
+
+<pre class="code">
+<span class="teal">BuiltInCategory</span> _bicPreviewLegendComponent 
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_PreviewLegendComponents;
+&nbsp;
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = doc.Elements;
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp; <span class="blue">int</span> count = 0;
+&nbsp;
+&nbsp; Geo.<span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">int</span> iBic = (<span class="blue">int</span>) _bicPreviewLegendComponent;
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span> ( !(e <span class="blue">is</span> <span class="teal">Symbol</span>)
+&nbsp; &nbsp; &nbsp; &amp;&amp; !(e <span class="blue">is</span> <span class="teal">FamilyBase</span>)
+&nbsp; &nbsp; &nbsp; &amp;&amp; (<span class="blue">null</span> != e.Category)
+&nbsp; &nbsp; &nbsp; &amp;&amp; ( iBic != e.Category.Id.Value )
+&nbsp; &nbsp; &nbsp; &amp;&amp; (<span class="blue">null</span> != e.get_Geometry( opt )) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++count;
+&nbsp; &nbsp; &nbsp; s += <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;\r\n&nbsp; Category={0}; Name={1}; Id={2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; e.Category.Name, e.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; e.Id.Value.ToString() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; s = <span class="maroon">&quot;There are &quot;</span> + count.ToString() 
+&nbsp; &nbsp; + <span class="maroon">&quot; model elements:&quot;</span> + s;
+&nbsp;
+&nbsp; <span class="teal">LabUtils</span>.InfoMsg( s );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>Here is a snapshot of an updated version of the 
+
+<a href="zip/rac_labs_2009-06-19.zip">
+Revit API introduction labs</a>, 
+
+including the updated version of Lab 2-2 to select all model elements using this criterion and other on-going improvements we have made. 
+In particular, it includes two completely new modules, Labs6 dealing with external application and event issues, and Labs7 demonstrating the form creation API.
+We are still continuing the process of updating and enhancing them for the Revit 2010 API and its new features.
+All of the labs are provided in two versions, one each for C# and VB.
+This version also includes a set of HTML instructions for self-learning and AdnSamples.txt, an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+include file</a>
+
+for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+RvtSamples</a>
+
+that I use to load all my external commands, updated to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">
+2010 RvtSamples format</a>.</p>
+
+<h4>Revit Inside</h4>
+
+<p>By the way, if you are interested in seeing who else is using Revit, there is a 
+
+<a href="http://www.revitinside.com">
+Revit Inside</a>
+
+website which tells you just that.
+The people running the list are always interested in new entries as well, so don't hesitate to check it out and sign up if it applies to you.</p>
+

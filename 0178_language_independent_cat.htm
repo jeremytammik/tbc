@@ -1,0 +1,72 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Language Independent Category Access</h3>
+
+<p>I recently discussed 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+category comparison</a>,
+
+and I keep stressing the importance of keeping the application implementation language independent as far as possible.
+
+Jiri Smerak of 
+
+<a href="http://dlubal.de">
+Ing.-Software Dlubal GmbH</a>
+
+now uncovered a situation in which due to a localisation issue the language independent category comparison is in fact the only way to access certain categories in the German version of Revit Structure.</p>
+
+<p>The issue has to do with the following built-in categories:</p>
+
+<ul>
+<li>OST_LoadCasesLive
+<li>OST_LoadCasesRoofLive
+<li>OST_LoadCasesSnow
+<li>OST_LoadCasesWind
+</ul>
+
+<p>When trying to access these from the document settings Categories collection using the get_Item method, the German version of Revit returns null. 
+In the English version, they work fine and return the correct category objects.
+The reason for this is that somewhere internally, a string comparison is taking place.
+In the German version, all four of these categories are represented by the same string in the user interface.</p>
+
+<p>Using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+language independent category comparison</a>,
+
+it is possible to compare the built-in enum value with an element category id directly, bypassing all string comparisons, e.g.:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span> ( (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Dimensions
+&nbsp; &nbsp; == dimension.Category.Id.Value )
+&nbsp; {
+&nbsp; &nbsp; message += <span class="maroon">&quot;\nDimension is a permanent dimension.&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>The same comparison can be used to detect which category belongs to the desired load cases. 
+It works well and it doesn't depend on the language of the application.
+
+<pre class="code">
+&nbsp; <span class="teal">LoadCase</span> lc = element <span class="blue">as</span> <span class="teal">LoadCase</span>;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> param = lc.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.LOAD_CASE_CATEGORY );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> categoryId = param.AsElementId();
+&nbsp;
+&nbsp; <span class="blue">if</span>( categoryId.Value.Equals( 
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_LoadCasesLive ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>Many thanks to Jiri for pointing this out!</p>

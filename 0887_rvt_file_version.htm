@@ -1,0 +1,521 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+
+-->
+
+<h3>Basic File Info and RVT File Version</h3>
+
+<p>I presented an initial solution in Python for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html">
+determining the version of an RVT file on disk</a> from
+
+outside Revit making use of its OLE document Structured Storage format back in 2008.
+David Echols later shared a more full-fledged
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/open-revit-ole-storage.html">
+C# Revit OLE Storage viewer</a> listing
+
+more information and displaying the preview image.
+
+<p>Since then, the Revit API added support for reading basic RVT file info through the BasicFileInfo class.</p>
+
+<p>Victor Chekalin now presents another C# console application showing how some of this data can be accessed independently of the Revit API.</p>
+
+<p>Before looking at that, here are some other topics that also came up in the past day or two:</p>
+
+<ul>
+<li><a href="#2">Building Setout Points</a> used commercially</li>
+<li><a href="#3">Screen recording</a> with Camtasia on the Mac</li>
+<li><a href="#4">Sustainable Autodesk Offices</a></li>
+<li>Reading the <a href="#5">RVT file version</a> without using the Revit API</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Building Setout Points Used in a Commercial Application</h4>
+
+<p>I am glad to say that one of the sample add-ins I am particularly happy with now made its way into a commercial application.</p>
+
+<p>Here is an excerpt from the current Australian
+
+<a href="http://www.arsoftwaresolutions.com.au">
+ARSoftwareSolutions</a>
+
+newsletter:
+
+<p>A recent meander through the TheBuildingCoder website led me to a routine for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">
+marking the corners of structural concrete corners</a>.
+
+Once marked the points could be scheduled and provided to the builder as a file of set out point coordinates.
+These can then be established on site using various surveying tools.
+This seemed like something a lot of companies could benefit from so I set about including it in my software.
+(Please refer to <a href="http://thebuildingcoder.typepad.com/blog/rst">http://thebuildingcoder.typepad.com/blog/rst</a> for more complete details.
+Thank you to both Paul Hellawell of GHD and Jeremy Tammik for the idea and some of the coding.)
+
+<p>Of course I couldn't just leave it the way it was so I expanded on the concept, added extra functionality, and this now forms a part of ARUtils - Leader.
+
+<p>The basic concept is to mark all structural concrete corners with a "SetoutPoint" family.
+Critical setout points can then use a "Major" type of that family to indicate they are a critical point.
+Alternatively other points can be automatically designated as minor, centre points of curves, control points of splines, or just intermediate points along curves.
+Points can be promoted to Major or demoted to Minor as required for construction or changing needs.
+
+<p>When automatically placed at a point, each marker has the X,Y, and Z coordinates assigned to the marker.
+Once this has been done, the families can be scheduled and the points exported for use by the builder.
+The routine also keeps track of the item that generated the points so points can be grouped on a generating object basis.
+
+<center>
+<img src="img/setout_points_ar1.jpeg" alt="Point markers"/>
+
+<p><i>Points marked. Diagram shows Major, Minor, Centre, Control and Curve following points.</i></p>
+
+<img src="img/setout_points_ar2.jpeg" alt="Tagged points"/>
+
+<p><i>Tagged points</i></p>
+
+<img src="img/setout_points_ar3.png" alt="Key setout points"/>
+
+<p><i>Scheduled Keypoints</i></p>
+
+<img src="img/setout_points_ar4.png" alt="Schedule of all points"/>
+
+<p><i>Schedule - All points</i></p>
+
+<img src="img/setout_points_ar5.jpeg" alt="Interface"/>
+
+<p><i>The interface</i></p>
+</center>
+
+<p>Note: You can automatically mark all structural concrete items, or pick specific items of any type to have markers placed.
+
+<p>Note: Should the project location change the coordinates can be automatically synchronised using the "Renumber / Update" option.
+
+<p>I am happy to see my efforts helping people and making their way out into the world  :-)
+
+
+
+<a name="3"></a>
+
+<h4>Screen Recording on the Mac</h4>
+
+<p>On a completely different topic, I have been struggling a bit the past few days to set up a proper screen recording environment for myself to create a canned presentation.</p>
+
+<p>I want to show some Powerpoint slides, record my narration, and also make use of Revit and Visual Studio for add-in demonstrations.</p>
+
+<p>I planned to use Camtasia for this, as I have past experience with it and it does a good job.</p>
+
+<p>The Revit and Visual Studio requirements led me to believe that I had to install Camtasia in my Windows virtual machine.</p>
+
+<p>When I did that, I discovered that the Windows version that I had installed was European and therefore lacked the Windows Media Player, which caused Camtasia to fail. It took a while to find out, though.</p>
+
+<p>I went off and downloaded a US version of Windows, created a new virtual machine, installed Revit, Visual Studio, Camtasia, and some other bits and pieces on it.</p>
+
+<p>After doing all that, I discovered that the Camtasia output quality from this setup is suboptimal, and there are often problems with the audio getting lost completely.</p>
+
+<p>After struggling a bit more with that, a colleague told me that the easiest thing to do is just to use Camtasia in the native Mac system and record the full screen.
+I can display the Powerpoint slides in full screen, record my narration, and switch back and forth to a full-screen virtual Windows machine at any time.
+So I wasted a lot of time there.
+Now I can get going with my recording just as soon as I finish this post.</p>
+
+
+<a name="4"></a>
+
+<h4>Sustainable Autodesk Offices</h4>
+
+<p>Back to the architectural realm, two new case studies on the green office design of the Autodesk offices in Milan and Farnborough are now live on the Autodesk Sustainable Design Center:
+
+<ul>
+<li><a href="http://images.autodesk.com/adsk/files/customer_stories_us_4p_farnborough_r3.pdf">Farnborough</a></li>
+<li><a href="http://images.autodesk.com/adsk/files/customer_stories_us_2p_milan_r3.pdf">Milano</a></li>
+</ul>
+
+<p>These projects were implemented by Morgan Lovell plc and Goring & Straja Architects, respectively.
+The case studies describe the projects, challenges, solutions, results and learning experiences made.</p>
+
+<p>I hope you find this interesting, useful and feel inspired to pursue the same kind of greening efforts in your own company  :-)
+
+
+
+<a name="4"></a>
+
+<h4>Determining the RVT File Version Without Revit</h4>
+
+<p>Back to the main topic that I started discussing above.</p>
+
+<p>This came up again prompted by a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html?cid=6a00e553e168978833017d4061ff1d970c#comment-6a00e553e168978833017d4061ff1d970c">
+comment</a> by
+
+Victor Chekalin, or Виктор Чекалин, on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html">
+original post</a>.</p>
+
+<p>He points to a stackflow discussion thread:
+
+<a href="http://stackoverflow.com/questions/14481652/how-can-i-get-the-revit-file-version-using-the-revit-api/14493458">
+How can I get the Revit file version using the Revit API?</a>
+
+<p><strong>Question:</strong> In the Revit API I know that I can get the version of the Revit instance that is currently running:
+
+<ul>
+<li><code>ControlledApplication.VersionBuild</code></li>
+<li><code>ControlledApplication.VersionName</code></li>
+<li><code>ControlledApplication.VersionNumber</code></li>
+</ul>
+
+<p>However, I would like to get the version of a Revit file itself before I open it.
+This way I could stop the automatic upgrade dialog that shows when a user opens an older Revit file in a newer version of Revit.
+I'm using Revit 2013 and expecting files from 2011, 2012, and 2013.
+
+
+<p><strong>Answer from
+
+<a href="http://stackoverflow.com/users/180529/skeletank">
+skeletank</a>:</strong>
+
+I took a closer look at the
+
+<a href="http://www.revitforum.org/architecture-general-revit-questions/6853-there-tool-determine-what-version-revit.html">
+discussion group posting</a> from
+
+my question and found that the version information is actually human readable among the other gibberish of the file.
+The ".rvt" file is stored in OLE format so you can see the content if you use a tool like
+<a href="http://www.mitec.cz/ssv.html">Structured Storage Viewer</a>.
+It will be located under <em>BasicFileInfo</em>.</p>
+
+<p>If you wanted to then you could probably use an
+<a href="http://stackoverflow.com/questions/2897328/is-there-any-library-to-access-ole-structured-storage-from-c">
+OLE library for .NET</a> to
+
+read the data but I used a <code>StreamReader</code> and a <code>Regex</code> instead.</p>
+
+<p>Here is the regular expression:
+
+<p><code>Revit\sArchitecture\s(?<Year>\d{4})\s(Build:\s(?<Build>\w*)\((?<Processor>\w{3})\)\)</code></p>
+
+<p>Here is the code:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> ControlledApplication_DocumentOpening(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; DocumentOpeningEventArgs e )
+{
+&nbsp; <span class="teal">FileInfo</span> revitFileToUpgrade
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FileInfo</span>( e.PathName );
+&nbsp;
+&nbsp; Regex buildInfoRegex = <span class="blue">new</span> Regex(
+&nbsp; &nbsp; <span class="maroon">@&quot;Revit\sArchitecture\s(?&lt;Year&gt;\d{4})\s&quot;</span>
+&nbsp; &nbsp; +<span class="maroon">@&quot;\(Build:\s(?&lt;Build&gt;\w*)\((&lt;Processor&gt;\w{3})\)\)&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">StreamReader</span> streamReader =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">StreamReader</span>( e.PathName, Encoding.Unicode ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> fileContents = streamReader.ReadToEnd();
+&nbsp;
+&nbsp; &nbsp; Match buildInfo = buildInfoRegex.Match( fileContents );
+&nbsp; &nbsp; <span class="blue">string</span> year = buildInfo.Groups[<span class="maroon">&quot;Year&quot;</span>].Value;
+&nbsp; &nbsp; <span class="blue">string</span> build = buildInfo.Groups[<span class="maroon">&quot;Build&quot;</span>].Value;
+&nbsp; &nbsp; <span class="blue">string</span> processor = buildInfo.Groups[<span class="maroon">&quot;Processor&quot;</span>].Value;
+&nbsp; }
+}
+</pre>
+
+<p>This will allow you to get the year, build number, and the type of processor.
+Notice, however, that my version checks specifically for Architecture so you will need to modify it for MEP or Structural.
+
+
+
+<p><strong>Answer from
+
+<a href="http://stackoverflow.com/users/989259/victor-chekalin">
+Victor Chekalin</a>:</strong>
+
+<p>As you said, Revit file format is a Structured Storage document and information you need is stored in the BasicFileInfo stream.
+
+<p>Within the Revit 2013 API you can use the SavedInVersion method of the BasicFileInfo class.
+
+<p>Here is the
+
+<a href="http://pastebin.com/FUBcmSRx">
+full console application</a> demonstrating
+
+how to extract BasicFileInfo data without the Revit API.
+
+<p>Unfortunately I don't now the format of the BasicFileInfoStream. But if you read it as string you can get version in which file was created.
+
+<p>Reading only the BasicFileInfo is much better than reading the whole file.
+Imagine if the Revit project is over 500 MB.
+You will read the whole file into memory when you call
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> fileContents = streamReader.ReadToEnd();
+</pre>
+
+<p>Also, Regular expression on the huge file works slow.
+
+<p>I think you should use
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> rawString = System.Text.<span class="teal">Encoding</span>.Unicode
+&nbsp; &nbsp; .GetString( rawData );
+</pre>
+
+<p>from my sample and use Regex in the rawString instead the whole file.
+
+<p>For your convenience, here is the full source code of Victor's solution:
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.IO;
+<span class="blue">using</span> System.IO.Packaging;
+<span class="blue">using</span> System.Reflection;
+<span class="blue">using</span> System.Runtime.InteropServices;
+&nbsp;
+<span class="blue">namespace</span> ConsoleApplication1
+{
+&nbsp; <span class="blue">class</span> <span class="teal">Program</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">const</span> <span class="blue">string</span> StreamName = <span class="maroon">&quot;BasicFileInfo&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> pathToRevitFile = ( 1 == args.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; ? args[0]
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">@&quot;pathToRevitFile&quot;</span>;
+&nbsp;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">StructuredStorageUtils</span>.IsFileStucturedStorage(
+&nbsp; &nbsp; &nbsp; &nbsp; pathToRevitFile ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;File is not a structured storage file&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> rawData = GetRawBasicFileInfo( pathToRevitFile );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> rawString = System.Text.<span class="teal">Encoding</span>.Unicode.GetString(
+&nbsp; &nbsp; &nbsp; &nbsp; rawData );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> fileInfoData = rawString.Split(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">string</span>[] { <span class="maroon">&quot;\0&quot;</span>, <span class="maroon">&quot;\r\n&quot;</span> },
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StringSplitOptions</span>.RemoveEmptyEntries );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> info <span class="blue">in</span> fileInfoData )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.WriteLine( info );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">byte</span>[] GetRawBasicFileInfo(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> revitFileName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">StructuredStorageUtils</span>.IsFileStucturedStorage(
+&nbsp; &nbsp; &nbsp; &nbsp; revitFileName ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;File is not a structured storage file&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StructuredStorageRoot</span> ssRoot =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">StructuredStorageRoot</span>( revitFileName ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !ssRoot.BaseRoot.StreamExists( StreamName ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;File doesn't contain {0} stream&quot;</span>, StreamName ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StreamInfo</span> imageStreamInfo =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ssRoot.BaseRoot.GetStreamInfo( StreamName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Stream</span> stream = imageStreamInfo.GetStream(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FileMode</span>.Open, <span class="teal">FileAccess</span>.Read ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">byte</span>[] buffer = <span class="blue">new</span> <span class="blue">byte</span>[stream.Length];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stream.Read( buffer, 0, buffer.Length );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> buffer;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">StructuredStorageUtils</span>
+&nbsp; {
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;ole32.dll&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> StgIsStorageFile(
+&nbsp; &nbsp; &nbsp; [<span class="teal">MarshalAs</span>( <span class="teal">UnmanagedType</span>.LPWStr )]
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> pwcsName );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsFileStucturedStorage(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> fileName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> res = StgIsStorageFile( fileName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( res == 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( res == 1 )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">FileNotFoundException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;File not found&quot;</span>, fileName );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">StructuredStorageException</span> : <span class="teal">Exception</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> StructuredStorageException()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> StructuredStorageException( <span class="blue">string</span> message )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( message )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> StructuredStorageException(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">Exception</span> innerException )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( message, innerException )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">StructuredStorageRoot</span> : <span class="teal">IDisposable</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">StorageInfo</span> _storageRoot;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> StructuredStorageRoot( <span class="teal">Stream</span> stream )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _storageRoot
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">StorageInfo</span>)InvokeStorageRootMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span>, <span class="maroon">&quot;CreateOnStream&quot;</span>, stream );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">StructuredStorageException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot get StructuredStorageRoot&quot;</span>, ex );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> StructuredStorageRoot( <span class="blue">string</span> fileName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _storageRoot
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">StorageInfo</span>)InvokeStorageRootMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span>, <span class="maroon">&quot;Open&quot;</span>, fileName, <span class="teal">FileMode</span>.Open,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FileAccess</span>.Read, <span class="teal">FileShare</span>.Read );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">StructuredStorageException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot get StructuredStorageRoot&quot;</span>, ex );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">object</span> InvokeStorageRootMethod(
+&nbsp; &nbsp; &nbsp; <span class="teal">StorageInfo</span> storageRoot,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> methodName,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="blue">object</span>[] methodArgs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> storageRootType
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">typeof</span>( <span class="teal">StorageInfo</span> ).Assembly.GetType(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;System.IO.Packaging.StorageRoot&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> result = storageRootType.InvokeMember(
+&nbsp; &nbsp; &nbsp; &nbsp; methodName,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BindingFlags</span>.Static | <span class="teal">BindingFlags</span>.Instance
+&nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.Public | <span class="teal">BindingFlags</span>.NonPublic
+&nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.InvokeMethod,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span>, storageRoot, methodArgs );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> CloseStorageRoot()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; InvokeStorageRootMethod( _storageRoot, <span class="maroon">&quot;Close&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of IDisposable
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> Dispose()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CloseStorageRoot();
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">StorageInfo</span> BaseRoot
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _storageRoot; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>For your even greater convenience, I am also providing
+
+<a href="zip/RevitBasicFileInfo.zip">RevitBasicFileInfo.zip</a> containing
+
+the full Visual Studio solution that I created to test it.</p>
+
+<p>Here is the result of running this on a sample model on my system:</p>
+
+<center>
+<img src="img/basic_file_info.png" alt="Basic File Info"/>
+</center>
+
+<p>Many thanks to Victor for his clear explanation and solution!</p>
+
+<p><strong>Addendum:</strong> To get access to the StreamInfo class you need reference the WindowsBase.dll assembly.
+
+<p>The question marks displayed in the result console above are due to the fact that one part of BasicFileInfo is encoded in Unicode and another in BigEndianUnicode.
+
+<p>The second part is rendered legible by accessing it like this instead:
+
+<pre>
+  var rawString = System.Text.Encoding
+    .BigEndianUnicode.GetString( rawData );
+</pre>
+
+<p>Here is the same file information presented twice, once in standard little endian and once in big endian decoding:</p>
+
+<center>
+<img src="img/basic_file_info2.png" alt="Basic File Info in little and big endian decoding"/>
+</center>
+
+<p>This is a summary of the resulting readable text fields:</p>
+
+<ul>
+<li>Little-endian:</li>
+<ul>
+<li>Autodesk Revit 2013 (Build: 20120716_1115)</li>
+<li>C:\j\tmp\rvt\floor_slab.rvt</li>
+</ul>
+<li>Big-endian:</li>
+<ul>
+<li>00000000-0000-0000-0000-000000000000</li>
+<li>Worksharing: Not enabled</li>
+<li>Username:</li>
+<li>Central Model Path:</li>
+<li>Revit Build: Autodesk Revit 2013 (Build: 20120716_1115)</li>
+<li>Last Save Path: C:\j\tmp\rvt\floor_slab.rvt</li>
+<li>Open Workset Default: 3</li>
+<li>Project Spark File: 0</li>
+<li>Central Model Identity: 00000000-0000-0000-0000-000000000000</li>
+<li>Locale when saved: ENU</li>
+</ul>
+</ul>

@@ -1,0 +1,62 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Removing Deprecated API Compilation Warnings</h3>
+
+<p>I completed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/migrating-the-building-coder-samples-to-revit-2014.html">
+The Building Coder sample migration to Revit 2014</a> back
+
+in April, but it was still generating
+
+<a href="zip/bc_migr_2014_d.txt">111 warnings</a> due
+
+to use of obsolete API calls.
+
+<p>After
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+migrating the ADN training lab material</a> last
+
+week, I thought I could now turn my attention back to resolving these warnings.</p>
+
+<p>I replaced 27 calls to the get_EndPoint method, which actually refers to the EndPoint property, by the new GetEndPoint method.</p>
+
+<p>That reduced the count to
+
+<a href="zip/bc_migr_2014_e.txt">84 warnings</a>.
+
+<p></p>Replacing the obsolete creation application NewLineBound and NewLineUnbound calls and adding an element id to the argument to all calls to Document.Delete
+
+reduced the error list to
+
+<a href="zip/bc_migr_2014_f.txt">48 warnings</a>.</p>
+
+<p>Replacing the calls to NewSketchPlane by SketchPlane.Create reduces it to
+
+<a href="zip/bc_migr_2014_g.txt">24 warnings</a>.</p>
+
+<p>Addressing almost all the rest produced the final result for today with just
+
+<a href="zip/bc_migr_2014_h.txt">5 warnings</a>,
+
+three of which are the infamous 'mismatch between the processor architecture of the project being built "MSIL" and the processor architecture' of the referenced Revit API assemblies that I cannot fix myself.</p>
+
+<p>One of the other two refers to a call to the obsolete Document.TitleBlocks, which is intentionally left in to compare with the new approach using the filtered element collector instead.
+
+<p>The second warns about use of the obsolete FindReferencesWithContextByDirection method.
+It should be converted to use the ReferenceIntersector class instead, which we postpone to some other time.</p>
+
+<p>Here is the result,
+
+<a href="zip/bc_14_100_3.zip">
+version 2014.0.100.3</a> of
+
+The Building Coder samples.
+
+<p>Many of the changes have been marked with a trailing comment stating '2013' and '2014', respectively.</p>
+
+<p>Enjoy!</p>

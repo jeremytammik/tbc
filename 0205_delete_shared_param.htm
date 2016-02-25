@@ -1,0 +1,123 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1252336 [Delete Existing Registered Parameters] -->
+
+<h3>Deleting a Shared Parameter</h3>
+
+<p>Here is another question handled by Joe Ye, on removal of shared parameters.</p>
+
+<p><strong>Question:</strong>
+I'm creating a shared parameter and adding it to a parameter group. 
+I then bind it as an instance parameter. 
+I would like to be able to test and remove the binding if a parameter of the same name exists. 
+For instance, I am creating a parameter called XYZ_TEST_PARAMETER. 
+If I run the code twice, I end up with two parameters with the same name. 
+I fully understand that they have different GUIDs, but need a mechanism to remove the existing. 
+
+<p><strong>Answer:</strong>
+Shared parameter can be removed using the method Document.ParameterBindings.Remove( Definition ). 
+The Definition object can be retrieved from the definition file, which can be obtained through the sequence
+Application.OpenSharedParameterFile > DefinitionFile > DefinitionGroup > Definition. 
+You can also get a parameter definition from the parameter itself using the Parameter.Defintion property. 
+
+<p><strong>Question:</strong>
+I would prefer not to require the shared parameter file to be present. 
+I need to be able to delete the bound parameter making no reference to the shared parameter file. 
+
+<p><strong>Answer:</strong>
+I just tested removal of a shared parameter bound to walls.
+The definition is retrieved from the Parameter.Definition, and Revit does not have a definition text file defined.
+This works well in Revit Architecture 2010, so a shared parameter can indeed be removed without the definition text file. 
+Here is the code I used, which assumes that walls have a shared parameter named APIParameter bound to them:
+
+<pre class="code"> 
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; doc.Selection.StatusbarTip 
+&nbsp; &nbsp; = <span class="maroon">&quot;Please select a wall to remove &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;the shared parameter bound to it.&quot;</span>;
+&nbsp;
+&nbsp; doc.Selection.PickOne();
+&nbsp;
+&nbsp; <span class="teal">Element</span> wall = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> doc.Selection.Elements )
+&nbsp; {
+&nbsp; &nbsp; wall = e;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( wall != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> par = wall.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;APIParameter&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Definition</span> def = par.Definition;
+&nbsp;
+&nbsp; &nbsp; doc.ParameterBindings.Remove( def );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+ 
+<p><strong>Question:</strong>
+I think we're getting there. 
+I want to do this with no user interaction. 
+The only thing I know is the parameter name.
+I do not know what element type it's been bound to. 
+
+<p><strong>Answer:</strong>
+Knowing only the shared parameter name is obviously sufficient to remove the parameter binding if the name is unique.
+All the binding information is stored in Document.ParameterBindings collection, and we can access all the binding by iterating over that.
+
+<p>We can get the key and the binding for each item. 
+The key of the binding is the parameter definition. 
+We can compare the definition name with your target parameter name. 
+If they are equal, you have found the parameter you are searching for. 
+Please note that several shared parameters with the same name can live together in a document. 
+If this is the case in your situation, you will have to check for more information such as the category of each binding.
+
+<p>Here is the code for the Execute method of an external command which iterates over all parameter bindings and finds and removes the target shared parameter:
+
+<pre class="code"> 
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">BindingMap</span> bm = doc.ParameterBindings;
+&nbsp;
+&nbsp; <span class="teal">DefinitionBindingMapIterator</span> it 
+&nbsp; &nbsp; = bm.ForwardIterator();
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Definition</span> def = it.Key;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( def.Name.Equals( <span class="maroon">&quot;APIParameter&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; bm.Remove( def );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre> 
+
+<p>There is one important thing to note here:
+For the sake of simplicity, the target parameter is being removed here whilst the iteration is still going on.
+This will not necessarily cause problems in every case, but in general, it should be avoided.
+A better approach might be to perform the iteration first, collect all the entries you want to delete, and then 
+perform the actual deletion after the iteration has terminated.
+
+<p>Thank you very much Joe for these answers!

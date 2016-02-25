@@ -1,0 +1,294 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08231978 [How does ViewSchedule.GroupHeaders work?]
+David Robison, Design Master Software Inc
+
+Toshiaki Isezaki Re: Case 08280363:Change dimension text position with liner leader
+08280363 [Change dimension text position with liner leader]
+SPR #236444 [Wishlist: Change dimension instance of shape via the API.]
+
+-->
+
+<h3>Grouping Schedule Headers and How to Do Something</h3>
+
+<p>Here is my first real Revit 2014 post, sharing some code friendlily provided by David Robison of
+
+<a href="http://www.designmaster.biz">Design Master</a>
+
+showing how to use the ViewSchedule.GroupHeaders method.
+
+
+<a name="2"></a>
+
+<h4>Using the ViewSchedule GroupHeaders Method</h4>
+
+<p><strong>Question:</strong> I am trying to call ViewSchedule.GroupHeaders, and it keeps throwing an unhandled argument exception saying "Headers could not be grouped. Parameter name: right".
+
+<p><strong>Answer:</strong> Yes, this issue has been raised in the past and a few solutions were suggested.
+
+<h5>First case</h5>
+
+<p>The ViewSchedule.GroupHeaders produces the argument exception mentioned above.
+
+<p>After a schedule is created, however, calling it directly with the same parameters succeeds, so the issue is not related to the arguments provided.
+
+<p>I investigated this issue and found 2 workarounds:
+
+<ol>
+<li>Activate the new schedule view and then group the header.</li>
+<li>Refresh the new schedule view and then group the header when the schedule is out of data.</li>
+</ol>
+
+<p>It seems that the second workaround is the right way to 'fix' this issue.
+We have to manually refresh the schedule data if the view is out of data.
+This behaviour is by design.
+
+<h5>Second case</h5>
+
+<p>The API cannot get the updated value in Body section if the schedule view is not opened.
+
+<p>Close the schedule view:
+
+<ol>
+<li>IsCellOverridden returns True;</li>
+<li>ResetCellOverride;</li>
+<li>IsCellOverridden also returns True;</li>
+</ol>
+
+<p>Open the schedule view:
+
+<ol>
+<li>IsCellOverridden returns True;</li>
+<li>ResetCellOverride;</li>
+<li>IsCellOverridden returns False (as expected);</li>
+</ol>
+
+<p>The workaround is to call viewSchedule.GetTableData again.
+
+<p>The API calls will not work in the body section if the schedule view is closed.
+
+<p>The root cause is that the schedule data (especially the body section) will not be updated if the schedule view is closed.
+
+<p>This is no problem for the user interface, and improves performance because the schedule data is not regenerated.
+It does cause a problem in the API, though.
+
+
+<p><strong>Response:</strong> I got this to work using the suggestion in first case #1.
+
+<p>I created the schedule, closed the transaction, set the schedule to the ActiveView and then grouped the headers.
+
+<p>I also discovered that the column indexes ignore hidden columns.
+
+<p>Here is a sample external command demonstrating the ViewSchedule.GroupHeaders function.
+Please note the comments describing some of the steps in more detail:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create the schedule</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> tran = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; tran.Start( <span class="maroon">&quot;Create schedule&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewSchedule</span> sampleSchedule
+&nbsp; &nbsp; &nbsp; = <span class="teal">ViewSchedule</span>.CreateSchedule( doc, <span class="blue">new</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>( <span class="teal">BuiltInCategory</span>.OST_Windows ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSchedule</span>.GetAvailableParameters( doc, <span class="blue">new</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>( <span class="teal">BuiltInCategory</span>.OST_Windows ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sampleSchedule.Definition.AddField(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchedulableField</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ScheduleFieldType</span>.Instance, id ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">ScheduleDefinition</span> sampleDefinition
+&nbsp; &nbsp; &nbsp; = sampleSchedule.Definition;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Hide two columns in the schedule</span>
+&nbsp;
+&nbsp; &nbsp; sampleDefinition.GetField( 0 ).IsHidden = <span class="blue">true</span>;
+&nbsp; &nbsp; sampleDefinition.GetField( 1 ).IsHidden = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Commit the schedule. This is important so </span>
+&nbsp; &nbsp; <span class="green">// you can set the active view.</span>
+&nbsp;
+&nbsp; &nbsp; tran.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Change the active view to the schedule. </span>
+&nbsp; &nbsp; <span class="green">// This is required before the GroupHeaders </span>
+&nbsp; &nbsp; <span class="green">// function will work.</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.ActiveView = sampleSchedule;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Group the last three headers.</span>
+&nbsp; &nbsp; <span class="green">// Hidden fields are not counted in the left </span>
+&nbsp; &nbsp; <span class="green">// and right values, so make sure to account </span>
+&nbsp; &nbsp; <span class="green">// for that.</span>
+&nbsp;
+&nbsp; &nbsp; tran.Start( <span class="maroon">&quot;Group headers&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> iFieldCount = sampleDefinition
+&nbsp; &nbsp; &nbsp; .GetFieldCount();
+&nbsp;
+&nbsp; &nbsp; sampleSchedule.GroupHeaders( 0,
+&nbsp; &nbsp; &nbsp; iFieldCount - 5, 0,
+&nbsp; &nbsp; &nbsp; iFieldCount - 3, <span class="maroon">&quot;Group Header&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; tran.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( ex.ToString(),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Group Headers Sample&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+<p>Here are two important pieces of information I learned:
+
+<ol>
+<li>You have to set the active view to the schedule before the GroupHeaders method will work.</li>
+<li>The left and right indices do not include hidden columns, so you need to make sure to adjust for those.</li>
+</ol>
+
+<p>For completeness' sake, here is
+
+<a href="GroupHeadersSamplerJt2.zip">GroupHeadersSampler.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this command.
+
+<p>Many thanks to David for testing this and sharing the code.
+Hopefully you are able to make good use of this sample.
+
+
+<p>Before closing, here is are some thoughts on how to research automating something using the Revit API in general, the kind of suggestions I regularly provide orally and seldom wind up putting down clearly and separately in writing:</p>
+
+
+<a name="3"></a>
+
+<h4>How to Research Automating Something</h4>
+
+<p><strong>Question:</strong> I would like to create a dimension that differs from the normal linear dimension style within the template.
+
+<p>Here is an example of the normal dimension style and the modified variant I would like, with the dimension text sticking out on the side like this instead:</p>
+
+<center>
+<img src="img/dimension_with_leader.jpeg" alt="Dimension with leader" width="500"/>
+</center>
+
+
+<p>How can I realise this programmatically, please?</p>
+
+<!--
+<p>After some research, </p>
+I can imagine that there are two ways to create it.
+
+1 .Prepare family style for Liner dimension.
+2.Change dimension test position and leader type to liner after drawing dimension instance
+
+I’m not sure which is simplest solution for him. And I tried to create code using my option #2.
+However I cannot find appropriate method or property to realize like below.
+
+  Document doc = revit.Application.ActiveUIDocument.Document;
+
+  using( Transaction tx = new Transaction( doc ) )
+  {
+      tx.Start( "LinerDimension" );
+      XYZ location1 = new XYZ(0.0, 0.0, 0.0);
+      XYZ location2 = new XYZ(0.0, 20.0, 0.0);
+      XYZ location3 = new XYZ(20.0, 0.0, 0.0);
+      XYZ location4 = new XYZ(20.0, 20.0, 0.0);
+
+      Curve curve1 = revit.Application.Application.Create.NewLine(location1, location2, true);
+      Curve curve2 = revit.Application.Application.Create.NewLine(location3, location4, true);
+      DetailCurve dCurve1 = doc.Create.NewDetailCurve(doc.ActiveView, curve1);;
+      DetailCurve dCurve2 = doc.Create.NewDetailCurve(doc.ActiveView, curve2);
+      Line line = revit.Application.Application.Create.NewLine(location2, location4, true);
+
+      ReferenceArray refArray = new ReferenceArray();
+      refArray.Append(dCurve1.GeometryCurve.Reference);
+      refArray.Append(dCurve2.GeometryCurve.Reference);
+
+      Dimension dim = null;
+      dim = doc.Create.NewDimension(doc.ActiveView, line, refArray);
+
+      if (dim != null)
+      {
+          dim.????? = ????;
+      }
+
+      tx.Commit();
+  }
+
+Please let me know which is best. Also I need your input how to realize.
+-->
+
+
+<p><strong>Answer:</strong> There is a simple standard procedure for exploring this kind of issue.</p>
+
+<p>First of all, determine whether what you wish is possible manually in the user interface.</p>
+
+<p>If not, then it is probably not possible programmatically either.
+
+<p>If yes, then the two models before and after can be compared using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">
+RevitLookup</a>,
+
+included with the Revit SDK, to analyse the differences.
+
+<p>That might give a hint how to achieve it programmatically.
+
+<p>If no differences can be found, then it is maybe impossible.
+
+<p>In this case, you can apparently achieve your goal manually, so the first hurdle is already taken.
+
+<p>Looking at the NewDimension method and the Dimension class members, I see no obvious input arguments or properties that might affect the dimension in the desired way.
+
+<p>Therefore, the only remaining things to check are the parameters on the dimension object.
+
+<p>You can list those before and after using RevitLookup or the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/built-in-parameter-enumeration-duplicates-and-bipchecker-update.html">
+built-in parameter BipChecker</a> and
+
+compare.
+
+<p>I hope this helps.
+
+
+<p><strong>Response:</strong> Yes, as you say, I know that it is possible to create this manually.
+
+<p>And yes, the text position and leader information are not shown in the standard UI, nor visible in RevitLookup.
+
+<p>I guess that this specific task cannot be achieved programmatically at this moment, then.
+
+
+<p><strong>Answer:</strong> Sorry about that.
+
+<p>I hope the standard exploration procedure described above will prove useful anyway.

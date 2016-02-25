@@ -1,0 +1,55 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Mirror an Element</h3>
+
+<p>We already discussed 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/transform-an-element.html">
+transformation of elements</a> using Move and Rotate.
+
+Here is a question regarding the related method Mirror that also deserves attention:</p>
+
+<p><strong>Question:</strong>
+I am trying to mirror a family instance element using the X axis as the mirror line. 
+I am creating a new line using the NewLine method and then supplying a reference to that to the Document.Mirror method, but this is causing Revit to crash.
+The Reference property of my line is always null. 
+I am doing it like this because I saw an example showing how to mirror a column element through its analytical model curve reference. 
+How can I successfully mirror my family instance element if I have no such reference?</p>
+
+<p><strong>Answer:</strong>
+What you experience is expected. 
+In your code, you are creating an abstract geometrical line at the application level.
+The resulting object is an abstract geometry entity and not a document element, and therefore no reference is available for this entity. 
+In this case, you should not use the overload of the Mirror method that takes a Reference argument.
+You can simply use the one taking a Geometry.Line argument instead and use the line itself directly.
+If you really wanted to use a reference, you could also create a model line in the document and access its reference using the Line.GeometryCurve.Reference property.
+Normally, one would prefer not to create model elements if it is possible to use only in memory objects.
+Here is the complete code of a minimal but complete external command Execute method which mirrors the currently selected elements around the X axis:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> els = doc.Selection.Elements;
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = app.Create.NewLine( 
+&nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisX, <span class="blue">true</span> );
+&nbsp;
+&nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>Many thanks to Saikat Bhattacharya for handling this case!</p>

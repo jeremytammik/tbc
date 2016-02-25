@@ -1,0 +1,193 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1271155 [Floor creation] -->
+
+<h3>Floor Creation</h3>
+
+<p>I already presented examples on using the NewFloor method to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">
+edit a floor profile</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+perform Boolean operations on two-dimensional polygons</a>.
+
+<p>Now Guming submitted a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/modeless-loose-connector-navigator-update.html?cid=6a00e553e168978833015391044035970b#comment-6a00e553e168978833015391044035970b">
+simpler question</a>, on 
+
+how to use the NewFloor method to create a floor from scratch, 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/modeless-loose-connector-navigator-update.html?cid=6a00e553e168978833015434f762a5970c#comment-6a00e553e168978833015434f762a5970c">
+twice</a> in 
+
+fact, so let's have a look at that: 
+
+<p><strong>Question:</strong> How can I use certain points to create a new floor? 
+The function NewFloor doesn't work for me.
+
+<p><strong>Answer:</strong> You create a new floor using the NewFloor method.
+You need to provide the profile curves and specify whether it is structural or not.
+Other optional arguments can determine the floor type, level and a normal vector in case it is not horizontal.
+According to the help file, the profile curves must always be specified horizontally, regardless of the desired floor slope.
+Here are the argument lists of the three NewFloor overloads:
+
+<ul>
+<li>CurveArray profile, Boolean structural: Creates a floor within the project with the given horizontal profile using the default floor style.
+<li>CurveArray profile, FloorType, Level, Boolean structural: Creates a floor within the project with the given horizontal profile and floor style on the specified level.
+<li>CurveArray profile, FloorType, Level, Boolean structural, XYZ normal: Creates a floor within the project with the given horizontal profile and floor style on the specified level with the specified normal vector.
+</ul>
+
+<p>Further documentation on the use of this method is provided in the developer guide section 11.2 'Floors and Foundations'.
+
+<p>The Building Coder samples include the command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">
+CmdEditFloor</a> which 
+
+exercises the second one of the NewFloor overloads, and so does the Revit SDK sample application GenerateFloor.
+
+<p>CmdEditFloor reads a profile from an existing floor and modifies that, whereas GenerateFloor demonstrates how to generate a floor using the closed outline made by a selection of walls.
+
+<p>Guming, one problem with the input points that you list is that they are not horizontal.
+Some have a Z coordinate of 0, others 10.
+That might be causing the method to fail for you.
+
+<p>Here is another related issue and interesting sample from a case handled by my colleagues Saikat Bhattacharya and Harry Mattison:
+
+<p><strong>Question:</strong> I wish to create a whole set of floors by automatically  generating slabs in every level of a project based on profiles. 
+
+<p>When creating a set of floors using profiles, all the floors seem to be created with a non-zero value for the 'Height Offset from Level' parameter. 
+Why is this parameter value being set to a non-zero value?
+
+<p>In spite of this parameter value being set and the Level property showing the correct information, all the floors are being created on the same level. 
+I can manually set this parameter value to zero to get the expected results, but I am not sure why it is being automatically set in the first place. 
+
+<p><strong>Answer:</strong> The floors are created at the position of the profile curves. 
+The floors are associated with the specified level, but the level does not set the floor's height.
+
+<p>Therefore, all floors are created with the same set of profiles and each floor is associated with a different level. 
+All the profile curves have a Z coordinate equal to zero. 
+So when a floor is associated with a level at 28 feet and its curves are at 0, the offset will be -28.
+
+<p>You have two options: 
+
+<ul>
+<li>Leave the Z value of all curve points at zero, create the floors, and set their FLOOR_HEIGHTABOVELEVEL_PARAM parameter value to zero.
+<li>Modify each and every curve Z coordinate before creating the floors to ensure that the parameter is set to zero to begin with.
+</ul>
+
+<p>Which method to choose depends on how you want your model built. 
+In some cases, you will want to associate with the nearest level and not use the offsets. 
+In other cases, you might not care about what level is related to the floor and position them using offsets only.
+
+<p>Presumably, if you set all the horizontal curve profile Z coordinates to the elevation of the level, the floor height above level parameter value will be automatically set to zero.
+
+<p>I implemented a sample application CreateFloors to demonstrate this.
+It performs the following steps:
+
+<ul>
+<li>Create a list of all the levels in the project.
+<li>Determine the floor type to use, Generic - 12".
+<li>Retrieve the first generic model named WP1 to use as a profile definition element.
+<li>Traverse the profile definition element geometry and collect all its curves.
+<li>Use these curves to generate a floor on each of the levels.
+<li>Set the height above level parameter on each floor to zero, to that it resides on the same height as its associated level.
+</ul>
+
+<p>Here is the source code to achieve these steps:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> levels 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FloorType</span> floorType
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FloorType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Element</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;Generic - 12\&quot;&quot;</span> ) ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FloorType</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> profileElement
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_GenericModel )
+&nbsp; &nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;WP1&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveArray</span> slabCurves = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = profileElement.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryInstance</span> inst <span class="blue">in</span> geo.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> inst.SymbolGeometry.Objects )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">Curve</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; slabCurves.Append( obj <span class="blue">as</span> <span class="teal">Curve</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; trans.Start( <span class="maroon">&quot;Create Floors&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Level</span> level <span class="blue">in</span> levels )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Floor</span> newFloor = doc.Create.NewFloor( slabCurves, 
+&nbsp; &nbsp; &nbsp; &nbsp; floorType, level, <span class="blue">false</span>, normal );
+&nbsp;
+&nbsp; &nbsp; &nbsp; newFloor.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FLOOR_HEIGHTABOVELEVEL_PARAM ).Set( 0 );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>These are some sample levels to use to create floors on:
+
+<center>
+<img src="img/create_floor_levels.png" alt="Floor creation levels"/>
+</center>
+
+<p>This is the generic model that the floor profile is read from:
+
+<center>
+<img src="img/create_floor_generic_model.png" alt="Floor creation generic model"/>
+</center>
+
+<p>Here are the resulting floors:
+
+<center>
+<img src="img/create_floor_floors.png" alt="Floor creation result"/>
+</center>
+
+<p>Finally, here is 
+
+<a href="zip/CreateFloors.zip">CreateFloors.zip</a> containing 
+
+the complete Visual Studio solution, C# source code, and add-in manifest file of the CreateFloors external command.

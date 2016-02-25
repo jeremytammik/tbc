@@ -1,0 +1,134 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Selection Questions</h3>
+
+<p>A whole bunch of questions on selection of elements and points came in during the last day or two. 
+Here are a few of them:</p>
+
+<ul>
+
+<!-- 1248008 [External command waits on user selecting point on drawing] -->
+<li>How can I force the user to select an element when my external command begins?
+<a href="#1248008">Answer...</a></li>
+
+<!-- 1248007 [Mimick user clicking on 'Room' in Basics toolbar from within the API] -->
+<li>How can I invoke an existing Revit command when my external command begins?
+<a href="#1248007">Answer...</a></li>
+
+<!-- 1247912 [Modeless Dialogues and Driving Revit from outside] -->
+<li>In the discussion of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+Revit window handle and modeless dialogues</a>
+
+you list selected elements in a modeless dialogue box. 
+Could the reverse operation be implemented, displaying the selected elements in a list box with check marks next to each, and unselecting them in the Revit user interface if the user removes the check mark?
+<a href="#1247912">Answer...</a></li>
+
+<!-- 1248047 [Get coordinates of mouse click in drawing] -->
+<li>I'd like to be able to click at a point on a drawing and get its coordinates.
+Is this possible without actually selecting an existing element?
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/picking-a-point.html">
+Answer...</a></li>
+
+<!-- 1248049 [PickOne Selection Order] -->
+<li>I call PickOne repeatedly, asking the user to pick elements on the screen. 
+However, when I iterate the selection set, the order is different. 
+How can I retain the selection order when repeatedly calling PickOne?
+<a href="#1248049">Answer...</a></li>
+
+</ul>
+
+
+
+<h4><a name="1248008">Selecting an element</a></h4>
+
+This functionality is supported by the Revit API and its use is pretty straightforward. 
+Two interactive user selection methods can be used while an external command is active, PickOne and WindowSelect. 
+You can call PickOne in a loop until the user selects the specific element that you require.
+The basics of using PickOne are discussed in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/pickone.html">
+this post</a>.
+
+We also provide an example demonstrating how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+pick a specific element type</a>.
+
+Finally, here is a more complex example 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+presenting the current contents of the selection set in a modeless dialogue</a>
+
+and discussing how more complex analysis of the current selection could be added.
+
+
+
+<h4><a name="1248007">Invoking a Revit command</a></h4>
+
+<p>Unfortunately the Revit API does not yet provide access for an external command to invoke any other existing Revit commands.
+Even though the official API does not provide this access to the command, you might be able to use the Revit journaling mechanism or the Win32 API to simulate user input to provide this functionality.
+Please note that both of these approaches are completely unsupported and must be researched, tested and maintained by you completely at your own risk.
+
+<p>The basics of the API access to the journaling mechanism are demonstrated by the Revit SDK Journaling sample.
+
+<p>Using the Win32 API, you can simply send Windows messages simulating user input to either select the corresponding Revit menu entry.
+For example, to invoke the Room command, you could simulate selecting the Revit menu entry Drafting > Room or typing in the keyboard shortcut RM. 
+This is discussed in the post on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+driving Revit from outside</a>.
+
+An alternative method to using Win32 API calls directly yourself to simulate user input is also available:
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/autohotkey.html">
+AutoHotKey</a>.
+
+If you do decide to use the Win32 API, you may also be interested in the discussion on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+Revit window handle and modeless dialogues</a>.
+
+
+
+<h4><a name="1247912">Deselecting elements through a checkmark in a modeless dialogue</a></h4>
+
+<p>Yes, that is perfectly possible. In the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+modeless dialogue</a>
+
+we presented, the selected elements are simply listed in a text label. 
+They could also be displayed in a list box instead, with a check mark for each selected item.
+In that case, you could implement code to unselect the element in the Revit user interface by unchecking its corresponding check box in the modeless dialogue.</p>
+
+<p>This is possible because the Document Selection property is a Selection object which has a property Elements, which is a SelElementSet instance, which provides methods named Erase and Remove. This class is derived from ElementSet and Erase is inherited from that class. I am not sure how Erase affects the current selection in the Revit UI; you might like to test that. 
+Anyway, according to the help file, Remove will "remove the specified from the selected element set, just like de-select it from the UI". 
+Although the formulation is rather strange, I would say that calling the method with a given selected element will unselect it in the document selection set and in the Revit user interface. 
+I am not sure whether Erase will have exactly the same effect as Remove. 
+I might try it out as soon as I have some time.</p>
+
+
+
+<h4><a name="1248047">Picking a Point</a></h4>
+
+<p>This issue and the meagre workarounds I can think of were already discussed in the post on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/picking-a-point.html">
+picking a point</a>.</p>
+
+
+
+<h4><a name="1248049">Retaining the element selection order</a></h4>
+
+<p>The reason that there is no inherent order in the Document Selection collection is that its Elements constitute a set and as such are unordered.
+If you wish to keep track of the original selection order, you would have to do so yourself. You could achieve this by iterating over the entire selection set after each call to PickOne and determining which new element has been added by the last call. You could then keep track of the elements added in an own ordered list, in parallel with the unordered set maintained by Revit.</p>
+
+

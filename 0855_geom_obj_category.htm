@@ -1,0 +1,139 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07776557 [Subcategory of geometryobject]
+
+-->
+
+<h3>Geometry Object Subcategory</h3>
+
+<p>I received and have started installing and learning to use my new laptop, which is a Mac, I'm finishing up my preparations for Autodesk University, and I'm working on preparations for upcoming developer conferences, so you can imagine there is rather a lot to do and 24 hours per day seem very limiting.
+I love the Unix shell!
+Goodbye, DOS box.
+
+<p>Thank goodness my colleague Joe Ye answered a case that I found interesting and would like to share with you, since Joe is busy preparing his own Chinese developer meetings and conferences:
+
+<p><strong>Question:</strong> I am trying to determine the subcategory of each solid element in a family.
+
+<p>Can this be done using the API?
+
+<p>My family that has two different solids and they have different subcategories.
+
+<p>I want to know which solid I am looking at and figured that subcategories would be a good way to go, since they can be applied to solids in a family.
+
+<p>Please note that the family with the subcategories must be nested as a non-shared family and I have to find out what element geometry is what in the supercomponent family.
+
+<p>I know that I can find out what subcategory each solid element belongs to when I open the family, but can I do so when its loaded as well?
+
+<p>Is there any other way of identifying different geometry objects once a family instance has been placed in the project?
+Besides looking at the geometrical aspects such as volume, areas etc.
+
+
+<p><strong>Answer:</strong> Yes, you can retrieve the solid category from the family instance in the model.
+
+<p>The category information is stored in the Solid object's GraphicStyle property.
+
+<p>The following code retrieves all the solid category names from a selected family instance:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a family instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( r );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElem = e.get_Geometry(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = 0;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geoElem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> geoInst
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElem2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = geoInst.GetSymbolGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geoObj2 <span class="blue">in</span> geoElem2 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geoObj2 <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = geoObj2 <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = solid.GraphicsStyleId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GraphicsStyle</span> gStyle = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id ) <span class="blue">as</span> <span class="teal">GraphicsStyle</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( gStyle != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++n;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += gStyle.GraphicsStyleCategory.Name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\r\n&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( n.ToString() + <span class="maroon">&quot; Graphics Styles&quot;</span>,
+&nbsp; &nbsp; &nbsp; s );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is an example of running this and selecting one of the doors in the basic sample project:</p>
+
+<center>
+<img src="img/geom_obj_categories_1.png" alt="Sample project door instance"/>
+</center>
+
+<p>The following materials are listed for this instance:</p>
+
+<center>
+<img src="img/geom_obj_categories_2.png" alt="Solid graphics style categories"/>
+</center>
+
+<p>Many thanks to Joe for this answer!
+
+
+<a name="2"></a>
+
+<h4>Listing all Schedules Placed on a Sheet</h4>
+
+<p>Meanwhile, Saikat discusses yet another use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+temporary transaction and deletion trick</a> to
+
+<a href="http://adndevblog.typepad.com/aec/2012/11/listing-schedules-placed-on-sheets-in-revit.html">
+determine all schedules placed on a given sheet</a>.
+
+<p>In this case, the trick is to temporarily delete the sheet and watch which schedules are wiped out by that operation.
+
+<p>Note that in a comment on that post, Phillip Miller points out a way to achieve the same result using a filtered element collector taking a view id argument.
+
+<p>Who is going to create a benchmark comparing the relative speed of these two approaches?

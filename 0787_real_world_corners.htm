@@ -1,0 +1,379 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Real-World Concrete Corner Coordinates</h3>
+
+<p>I mentioned that I worked together with Paul Hellawell of 
+
+<a href="http://www.ghd.com">
+GHD</a> 
+
+on a full-blown end-user-capable little application for the automatic creation of setout points for on-site location and construction of structural elements at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">
+Melbourne DevLab</a>.
+
+<p>Paul provided a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html#3">
+description</a> of
+
+the task and the initial idea for an implementation approach.
+
+<p>We got the application to a useful working state in the two days during the DevLab, and Paul has provided it to his designers to use in real projects ever since.
+
+<p>Before we look at the full-fledged application, let's explore the core API functionality required: 
+
+<ul>
+<li><a href="#2">Filtering for structural concrete elements</a>.
+<li>Retrieving their corners, i.e. geometry traversal to <a href="#3">retrieve unique vertices</a>.
+<li><a href="#4">Converting from Revit model to real-world coordinates</a>.
+</ul>
+
+<p>Once this is all in place, we can explain how to use the core functionality to implement the real-world end-user application.
+
+
+<a name="2"></a>
+
+<h4>Filtering for Structural Concrete Elements</h4>
+
+<p>We already looked at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">
+retrieving structural elements</a>.
+
+<p>Just like there, we check for certain specific classes like Wall and Floor, and also for generic family instances with categories from our list of interest, including structural columns, framing, foundation, floors and ramps.
+
+<p>In this case, we are only interested in concrete elements, so we apply two structural material type filters as well, for concrete and precast concrete.
+
+<p>This is the method we ended up with to suit our purposes:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all structural elements that we are </span>
+<span class="gray">///</span><span class="green"> interested in using to define setout points.</span>
+<span class="gray">///</span><span class="green"> We are looking at concrete for the moment.</span>
+<span class="gray">///</span><span class="green"> This includes: columns, framing, floors, </span>
+<span class="gray">///</span><span class="green"> foundations, ramps, walls. </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">FilteredElementCollector</span> GetStructuralElements(
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// What categories of family instances</span>
+&nbsp; <span class="green">// are we interested in?</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInCategory</span>[] bics = <span class="blue">new</span> <span class="teal">BuiltInCategory</span>[] {
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFoundation,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Floors,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Ramps
+&nbsp; };
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementFilter</span>&gt; a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( bics.Length );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span> bics )
+&nbsp; {
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( bic ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> categoryFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( a );
+&nbsp;
+&nbsp; <span class="green">// Filter only for structural family </span>
+&nbsp; <span class="green">// instances using concrete or precast </span>
+&nbsp; <span class="green">// concrete structural material:</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt; b
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 2 );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">StructuralMaterialTypeFilter</span>( 
+&nbsp; &nbsp; <span class="teal">StructuralMaterialType</span>.Concrete ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">StructuralMaterialTypeFilter</span>( 
+&nbsp; &nbsp; <span class="teal">StructuralMaterialType</span>.PrecastConcrete ) );
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> structuralMaterialFilter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( b );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt; c
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 3 );
+&nbsp;
+&nbsp; c.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) ) );
+&nbsp;
+&nbsp; c.Add( structuralMaterialFilter );
+&nbsp; c.Add( categoryFilter );
+&nbsp;
+&nbsp; <span class="teal">LogicalAndFilter</span> familyInstanceFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( c );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementFilter</span>&gt; d
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 6 );
+&nbsp;
+&nbsp; d.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) );
+&nbsp;
+&nbsp; d.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ) );
+&nbsp;
+&nbsp; <span class="green">//d.Add( new ElementClassFilter(</span>
+&nbsp; <span class="green">//&nbsp; typeof( ContFooting ) ) );</span>
+&nbsp;
+<span class="blue">#if</span> NEED_LOADS
+<span class="gray">&nbsp; d.Add( new ElementClassFilter(</span>
+<span class="gray">&nbsp; &nbsp; typeof( PointLoad ) ) );</span>
+&nbsp;
+<span class="gray">&nbsp; d.Add( new ElementClassFilter(</span>
+<span class="gray">&nbsp; &nbsp; typeof( LineLoad ) ) );</span>
+&nbsp;
+<span class="gray">&nbsp; d.Add( new ElementClassFilter(</span>
+<span class="gray">&nbsp; &nbsp; typeof( AreaLoad ) ) );</span>
+<span class="blue">#endif</span>
+&nbsp;
+&nbsp; d.Add( familyInstanceFilter );
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> classFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( d );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WherePasses( classFilter );
+&nbsp;
+&nbsp; <span class="blue">return</span> col;
+}
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Geometry Traversal to Retrieve Unique Vertices</h4>
+
+<p>Once the required elements have been retrieved, we analyse their geometry to determine all corners, i.e. geometry vertices.
+
+<p>This goes back to the second day of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html">
+Melbourne Revit API training</a>,
+
+where we looked at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#2">
+retrieving unique geometry vertices</a> from 
+
+a selected element.
+
+<p>This involves comparing XYZ points, i.e. 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/connector-orientation.html#2">
+real number equality testing</a>.
+
+<p>First of all, we need an equality comparer for points:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Define equality for Revit XYZ points.</span>
+<span class="gray">///</span><span class="green"> Very rough tolerance, as used by Revit itself.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">XyzEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">XYZ</span>&gt;
+{
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _sixteenthInchInFeet 
+&nbsp; &nbsp; = 1.0 / ( 16.0 * 12.0 );
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> p.IsAlmostEqualTo( q, 
+&nbsp; &nbsp; &nbsp; _sixteenthInchInFeet );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> PointString( p ).GetHashCode();
+&nbsp; }
+}
+</pre>
+
+<p>With that in hand, we can retrieve all unique vertices of a given solid retrieved from the element geometry:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return all the &quot;corner&quot; vertices of a given solid.</span>
+<span class="gray">///</span><span class="green"> Note that a circle in Revit consists of two arcs</span>
+<span class="gray">///</span><span class="green"> and will return a &quot;corner&quot; at each of the two arc</span>
+<span class="gray">///</span><span class="green"> end points.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>,<span class="blue">int</span>&gt; GetCorners( <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; corners 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt;( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> f.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> ea )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = e.AsCurveFollowingFace( f )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !corners.ContainsKey( p ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; corners[p] = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; ++corners[p];
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> corners;
+}
+</pre>
+
+<p>The solid is retrieved by traversing the element geometry and picking the first non-empty one found.
+
+<p>Special handling is required for family instances, of course, since they have an additional transformation that we have to take account of.
+The family definition defines its own local coordinate system, and we need to transform the solid from that to the Revit model space.
+
+<p>This implementation processes all the cases we have run into so far correctly and elegantly:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve the first non-empty solid found for </span>
+<span class="gray">///</span><span class="green"> the given element. In case the element is a </span>
+<span class="gray">///</span><span class="green"> family instance, it may have its own non-empty</span>
+<span class="gray">///</span><span class="green"> solid, in which case we use that. Otherwise we </span>
+<span class="gray">///</span><span class="green"> search the symbol geometry. If we use the </span>
+<span class="gray">///</span><span class="green"> symbol geometry, we have to keep track of the </span>
+<span class="gray">///</span><span class="green"> instance transform to map it to the actual</span>
+<span class="gray">///</span><span class="green"> instance project location.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Solid</span> GetSolid( <span class="teal">Element</span> e, <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp; <span class="teal">Transform</span> t = <span class="teal">Transform</span>.Identity;
+&nbsp;
+&nbsp; <span class="green">// Some columns have no solids, and we have to </span>
+&nbsp; <span class="green">// retrieve the geometry from the symbol; </span>
+&nbsp; <span class="green">// others do have solids on the instance itself </span>
+&nbsp; <span class="green">// and no contents in the instance geometry </span>
+&nbsp; <span class="green">// (e.g. in rst_basic_sample_project.rvt).</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; {
+&nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid &amp;&amp; <span class="blue">null</span> != inst )
+&nbsp; {
+&nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp; &nbsp; t = inst.Transform;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> solid;
+}
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Transforming Revit Model Coordinates to the Real World</h4>
+
+<p>After the solid vertices have been retrieved in Revit model space, we convert them to real-world coordinates using the project location.
+
+<p>We initially tried to achieve this piecewise by fiddling with the base point offset and manually rotating to project north.
+This was both complicated and returned incorrect results.
+
+<p>The correct solution is very simple and was already discussed a couple of times in the past:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/transformations.html">Transformations</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html">Project location</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/get-transformed-family-instance-geometry.html">Transformed family instance geometry</a>
+</ul>
+
+
+<p>This led us to implement the following GetProjectLocationTransform method:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return the project location transform.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Transform</span> GetProjectLocationTransform( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// Retrieve the active project location position.</span>
+&nbsp;
+&nbsp; <span class="teal">ProjectPosition</span> projectPosition
+&nbsp; &nbsp; = doc.ActiveProjectLocation.get_ProjectPosition(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; <span class="green">// Create a translation vector for the offsets</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> translationVector = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; projectPosition.EastWest,
+&nbsp; &nbsp; projectPosition.NorthSouth,
+&nbsp; &nbsp; projectPosition.Elevation );
+&nbsp;
+&nbsp; <span class="teal">Transform</span> translationTransform
+&nbsp; &nbsp; = <span class="teal">Transform</span>.get_Translation(
+&nbsp; &nbsp; &nbsp; translationVector );
+&nbsp;
+&nbsp; <span class="green">// Create a rotation for the angle about true north</span>
+&nbsp;
+&nbsp; <span class="teal">Transform</span> rotationTransform 
+&nbsp; &nbsp; = <span class="teal">Transform</span>.get_Rotation( <span class="teal">XYZ</span>.Zero, 
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, projectPosition.Angle );
+&nbsp;
+&nbsp; <span class="green">// Combine the transforms </span>
+&nbsp;
+&nbsp; <span class="teal">Transform</span> finalTransform
+&nbsp; &nbsp; = translationTransform.Multiply(
+&nbsp; &nbsp; &nbsp; rotationTransform );
+&nbsp;
+&nbsp; <span class="blue">return</span> finalTransform;
+}
+</pre>
+
+<p>Making use of the resulting transform later is trivial:
+
+<pre class="code">
+&nbsp; <span class="teal">Transform</span> projectLocationTransform 
+&nbsp; &nbsp; = GetProjectLocationTransform( doc );
+&nbsp;
+&nbsp; for each concrete corner point XYZ p:
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Transform insertion point by applying</span>
+&nbsp; &nbsp; <span class="green">// project location transformation.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> r2 = projectLocationTransform.OfPoint( p );
+&nbsp; }
+</pre>
+
+<p>Now I just need to find some more time to discuss how this can all be put together and wrapped into a useful real-world end-user application.

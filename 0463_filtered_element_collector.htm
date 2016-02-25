@@ -1,0 +1,413 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+  C:\a\j\adn\devcamp\2010\kevin\tmp\AecDevCamp2010-RevitPerformanceTipsTricks.pptx
+  C:\a\j\adn\devcamp\2010\kevin\tmp\AecDevCamp2010-RevitPerformanceTipsTricks.docx
+  C:\a\j\adn\devcamp\2010\kevin\kevin.docx
+
+  C:\a\doc\aec\newsletter\2010\2010_2\revit_element_filtering.rtf
+
+-->
+
+<h3>Filtered Element Collectors</h3>
+
+<p>One of the most important enhancements made in the Revit 2011 API which is guaranteed to affect almost every single conceivable Revit add-in is the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+filtered element collector</a> mechanism, and we have already looked at numerous aspects and examples of using it in various ways.
+
+<p>It represents the one and only way to access elements in the Revit database, if you disregard a number of dedicated Document properties providing direct access to specialised collections of various types, which can easily be replaced by filtered element collectors as well.
+
+<!--
+  regex and grep expression to find all htm files with a non-zero count of occurrences of 'collector'
+  grep -i -c collector *htm|grep -v :0
+
+  333_collector_benchmark.htm:45
+  334_anonymous_methods_vb.htm:26
+  344_mirror_new_elements.htm:26
+  345_manual_regeneration.htm:1
+  346_stairs_on_level.htm:20
+  349_migration_steps.htm:1
+  350_failure_api.htm:4
+  355_view_filter.htm:9
+  359_preview_image.htm:5
+  360_p2c.htm:6
+  368_au_voting.htm:2
+  370_revitlookup.htm:6
+  371_sheet_size.htm:8
+  380_revitwebcam.htm:3
+  383_param_filter.htm:35
+  384_elem_name_param_filter.htm:7
+  392_export_xml.htm:2
+  395_set_tag_type.htm:10
+  397_filter_all_elements.htm:5
+  398_retrieve_mep_elements.htm:7
+  423_filter_shared_param.htm
+  426_filter_non_native_class.htm
+  446_filter_view_phase.htm
+  461_measurepanelarea.htm
+
+<ul>
+<li>My first Revit 2011 plug-in, the <a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">pipe to conduit converter</a>.
+<li>A very simple collector to retrieve <a href="http://thebuildingcoder.typepad.com/blog/2010/06/export-data-to-xml.html">view sheets</a>.
+<li>Some utility methods to filter for <a href="http://thebuildingcoder.typepad.com/blog/2010/06/set-tag-type.html">levels and types</a> such as door type and a door tag type symbol</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html">newly added elements</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html">stairs on a level</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/filter-for-views-and-istemplate-predicate.html">views</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/05/get-type-id-and-preview-image.html">family instances and their family</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/05/determine-sheet-size.html">title block symbols and instances</a> to determine the sheet size.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html#3">AVF display styles with a specific name</a>.
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">MEP elements</a>.
+<li>A <a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">collector performance benchmark</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/anonymous-methods-in-vb.html">Using LINQ and anonymous methods in VB</a>.
+<li>A RevitLookup update and <a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">retrieving all database elements</a>.
+<li>Why <a href="http://thebuildingcoder.typepad.com/blog/2010/06/filter-for-all-elements.html"><strong>not</strong> to retrieve all database elements</a>.
+<li>Many examples of <a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html">parameter filters</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">Parameter filter for an element name</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/08/elementparameterfilter-with-a-shared-parameter.html">Parameter filter for a shared parameter</a>.
+<li>Filtering for a <a href="http://thebuildingcoder.typepad.com/blog/2010/08/filtering-for-a-nonnative-class.html">non-native class</a>, i.e. "an element type that exists in the API, but not in Revit's native object model".
+<li>Resolving another non-native class issue, the Panel class in the <a href="http://thebuildingcoder.typepad.com/blog/2010/10/measurepanelarea_update.html">MeasurePanelArea</a> SDK sample.
+<li>Filter for <a href="http://thebuildingcoder.typepad.com/blog/2010/09/filter-for-view-and-phase.html">view and phase</a>.
+</ul>
+-->
+
+<p>In addition to all the results published here so far, I was astounded by the wealth of yet more exciting and useful information and benchmarking results presented by Kevin Vandecar, ex Principal Engineer of the Revit API Team, at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+AEC DevCamp</a> conference
+
+in June 2010 in his presentation on 'Revit Performance Tips and Tricks &ndash; Exploiting 2011 API Features'.
+Kevin has since rejoined the ADN DevTech team, where he specialises on the M & E APIs and is impressed by the powerful and fascinating programming possibilities they offer.
+Here is his session summary:
+
+<p style="color:darkblue">In this class we will cover techniques that can be used to efficiently find elements and information from a Revit model. This new framework was introduced in the 2011 release and includes much more flexibility than before. Along with the flexibility comes some complexity, so we will shed light on the best approaches for common element gathering tasks. We will discuss the various new filters including logical and inverted aspects. We will also show how the iteration framework can be used with the .NET Framework LINQ APIs. We will discuss Regeneration topics including "when" regeneration should be done.  Finally there are a few auto-join performance tips that we will share.
+
+<p>Here are Kevin's complete session materials
+
+<a href="zip/AecDevCamp2010-RevitPerformanceTipsTricks.zip">
+AecDevCamp2010-RevitPerformanceTipsTricks.zip</a>,
+
+which include the presentation, the hand-out document, a C# .NET sample add-in, and a couple of Revit test models.
+
+<p>Unfortunately, Kevin will not be able to present this material himself at Autodesk University.
+It would be a great shame if it were not shown at all, so I have been asked to present it for him instead, which I am very much looking forward to doing.
+It will be part of my class <strong>CP234-2</strong>.
+Here are the complete descriptions of all three of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/autodesk-university-2010-classes.html">
+my AU 2010 classes</a>.
+
+<p>In the best spirit of Autodesk University, Kevin wrote a hand-out document covering the entire session content in some detail. 
+His handout is presented in full below.
+In one of the upcoming posts, I would like to present some details of his benchmarking and example application together with an overview of the other existing samples and results published so far on the blog:
+
+<h3>Performance Tips and Tricks for the Revit 2011 API</h3>
+
+<h4>Introduction</h4>
+
+<p>This course covers tips and techniques to efficiently filter and iterate elements within the Revit model. The system is designed to ensure that you determine what you really need to find before iterating so that there is an implicit performance gain over previous techniques. By combining multiple criteria, the new framework works efficiently internally to find a subset of the model that can then be iterated to perform common tasks. The course also covers regeneration and auto-join aspects of the API.
+
+<p>If you are not already an Autodesk Developer Network ADN member, see this
+
+<a href="http://www.autodesk.com/adn">information about ADN</a>.
+
+<p>We also post periodically SDK updates and other Revit API information to the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+<h4>Sample Code</h4>
+
+<p>The sample code that accompanies this course is meant mainly to illustrate techniques and performance aspects using different techniques. Because of this, there is minimal error checking and exception handling. If reusing any of the sample code in your production code, please remember to add appropriate error handling.
+
+<p>The sample code also uses the .NET framework timing utility class called Stopwatch. This is part of the Microsoft .NET System.Diagnostics namespace and is an easy-to-use facility for timing operations. The Stopwatch class was built by MS using low-level API calls, with less overhead than other .NET methods. If the hardware and Windows version of the computer support a high-resolution performance counter, it will use this counter instead of the standard PC clock.
+
+<h4>Revit 2011 API Filtering Framework</h4>
+
+<p>The 2011 release introduces a new filtering and iteration framework. 
+The internal implementation is done on native side so matching takes place before the managed wrapper is created. 
+This ensures the greatest performance when finding elements with certain criteria. 
+The built-in filters provide this criteria and then you can iterate or filter further using built-in iteration APIs, or with LINQ. In providing the built-in filters, it removes much of the per-element access that would marshal between native internals and the managed API.
+
+<!--
+<p>Tip: The Building Coder blog (Jeremy Tammik) has explored 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+filtering performance</a> as well.
+-->
+
+<p>This removes much of the per-element access that marshals between native internals and managed API.
+
+<h4>Filtering Elements</h4>
+
+<p>The process of finding elements that match your search criteria is easier than ever with Revit 2011. The new filtering framework process can be broken down into three basic steps:
+<ol>
+<li>Filtering is the base step &ndash; first decide what you want
+<ul>
+<li>Find all elements with the model, a given set, or within a view-only
+<li>You can easily combine multiple criteria
+<li>Use shortcuts for common criteria
+<li>Combine with another collector through Intersection/Union
+<li>Add exclusions for things you know should not be included
+</ul>
+
+<li>Choose how to access
+<ul>
+<li>Choose a built-in iterator for Elements or ElementIds
+<li>Get and Element set or ElementId set
+<li>Optionally use the IEnumerable interface, for example with LINQ
+</ul>
+
+<li>Access the found elements
+<ul>
+<li>Use built-in languages features (foreach, while, etc.)
+<li>Use built-in facility to get first element that matches (Element or ElementId)
+<li>Optionally use LINQ
+</ul>
+</ol>
+
+<h4>Example Results</h4>
+
+<p>To demonstrate the enhanced performance of 2011 over 2010, some internal testing provided performance results for some of the filters as follows, listing the execution time of various filters in milliseconds in 2010 and 2011 and the performance gain determined by the relation between the two:</p>
+
+<table>
+<tr><th align="left">Example</th><th>2010 ms</th><th>2011 ms</th><th>Gain</th></tr>
+<tr><td>Filter for each API type</td><td align="right">4828</td><td align="right">618</td><td align="right">7.8</td></tr>
+<tr><td>All elements of ElementType</td><td align="right">7</td><td align="right">5</td><td align="right">1.4</td></tr>
+<tr><td>Elements of Category</td><td align="right">2588</td><td align="right">789</td><td align="right">3.2</td></tr>
+<tr><td>Elements by Parameter filter</td><td align="right">49</td><td align="right">20</td><td align="right">2.4</td></tr>
+<tr><td>Elements of StructuralType</td><td align="right">86</td><td align="right">18</td><td align="right">4.7</td></tr>
+<tr><td>Elements of StructuralUsage</td><td align="right">210</td><td align="right">43</td><td align="right">4.8</td></tr>
+<tr><td>Elements of Structural MaterialTypes</td><td align="right">116</td><td align="right">16</td><td align="right">7.2</td></tr>
+<tr><td>Walls of Structural WallUsages</td><td align="right">70</td><td align="right">13</td><td align="right">5.4</td></tr>
+<tr><td>Enclosures and Tags</td><td align="right">112</td><td align="right">20</td><td align="right">5.6</td></tr>
+<tr><td>Curve-Driven Elements</td><td align="right">53</td><td align="right">3</td><td align="right">17.7</td></tr>
+<tr><td>Elements of Design Options</td><td align="right">51</td><td align="right">35</td><td align="right">1.5</td></tr>
+<tr><td>Elements on Levels</td><td align="right">74</td><td align="right">21</td><td align="right">3.5</td></tr>
+</table>
+
+<h4>FilteredElementCollector</h4>
+
+<p>At the heart of the system is the FilteredElementCollector class. 
+It provides the collection facility based on applied filters and then provides the interfaces to access the found elements. 
+The documentation is provided here for convenience.
+
+<span style="color:darkblue">
+<p>Developers can assign a variety of conditions to filter the elements which are returned. This class requires that at least one condition be set before making the attempt to access the elements.
+
+<p>Revit will attempt to organize the filters in order to minimize expansion of elements regardless of the order in which conditions and filters are applied.
+
+<p>There are three groups of methods which you can use on a given collector once you have applied filter(s) to it. One group provides collections of all passing elements, a second finds the first match of the given filter(s), and a third provides an iterator which is evaluated lazily (each element is tested by the filter only when the iterator reaches it). You should only use one of the methods from these groups at a time; the collector will reset if you call another method to extract elements. Thus, if you have previously obtained an iterator, it will be stopped and traverse no more elements if you call another method to extract elements.
+
+<p>In .NET, this class supports the IEnumerable interface for Elements. You can use this class with LINQ queries and operations to process lists of elements. Note that because the ElementFilters and the shortcut methods offered by this class process elements in native code before their managed wrappers are generated, better performance will be obtained by using as many native filters as possible on the collector before attempting to process the results using LINQ queries.
+
+<p>One special consideration when using this class in .NET: the debugger will attempt to traverse the members of the collector because of its implementation of IEnumerable. You may see strange results if you also attempt to extract the first element or all elements from the collector while the debugger is also looking at the contents of the collector.
+
+</span>
+
+<p>Tip: Do NOT use the debugger to inspect the element list during IEnumerable access (i.e. through LINQ). 
+As the statement above mentions, strange results can occur. 
+In fact during the creation of this material, it was observed a crash in Revit simply due to the debugger trying to inspect the contents of the list.
+
+<h4>Filter Types</h4>
+
+<p>Filters are applied to the collector to define the search criteria. 
+The base class is ElementFilter, and three derived classes provide the different types of filters that can be applied.
+
+<ul>
+<li>ElementLogicalFilter &ndash; Logical filters combine two or more filters logically with specific functionality provided by And and Or logical filters. Note that the component filters may be reordered by Revit to cause the quickest acting filters to be evaluated first.
+<li>ElementQuickFilter &ndash; Quick filters use an internal element record to determine passing state. This allows Revit to find elements which have not been expanded into internal memory yet.
+<li>ElementSlowFilter &ndash; Slow filters will expand the element into memory. Not all information can be obtained by the element record, so these filters must expand to determine passing state.
+</ul>
+
+<p>Tip: It is better to couple slow filters with at least one ElementQuickFilter (e.g. class filter), to minimize the number of elements expanded in order to evaluate against the criteria set by this filter.
+
+<h4>Efficiency Guidelines</h4>
+
+<p>There is no special need to apply quick filters before slow ones, since Revit internally optimizes the order automatically, pushing the quick filters first, regardless of the external order specified. Because the actual iteration takes place only once based on the filter criteria, this optimization can be performed internally.
+
+<p>It is however important to use as many quick filters as possible to reduce the number of elements before any slow filters are applied. Some internal reordering may take place, but this still ensures best performance.
+
+<p>When you apply slow filters, the quick ones will already have eliminated a large number of elements, so the slow filters will not have such a performance impact.
+
+<p>After using the built-in filtering techniques to maximum capacity, you may want to consider using LINQ or explicit coding to narrow the results down further. Be aware that slow filters will normally still be faster than explicit iteration over the results and application of LINQ or custom queries.
+
+<p>Tip: Use the shortcut methods on FilteredElementCollector. Because there are currently no shortcuts for slow filters, you can be sure when using a shortcut you are getting a quick filter. Examples:
+
+<ul>
+<li>OfClass
+<li>OfCategoryId
+</ul>
+
+<h4>Logical Filters</h4>
+
+<p>There are two logical filters representing Boolean AND and OR statements. 
+Both can combine the results of two or more input filters:
+
+<ul>
+<li>LogicalAndFilter: Elements must pass two or more filters; shortcuts: WherePasses adds one additional filter; IntersectWith joins two sets of independent filters.
+<li>LogicalOrFilter: Elements must pass at least one of two or more filters; shortcuts: UnionWith joins two sets of independent filters
+</ul>
+
+<!--
+<table>
+<tr><th align="left">Filter Name</th><th align="left">Passing Criteria</th><th align="left">Shortcut Methods</th></tr>
+<tr><td>LogicalAndFilter</td><td>Elements must pass two or more filters</td><td>WherePasses adds one additional filter; IntersectWith joins two sets of independent filters</td></tr>
+<tr><td>LogicalOrFilter</td><td>Elements must pass at least one of two or more filters</td><td>UnionWith joins two sets of independent filters</td></tr>
+</table>
+-->
+
+<h4>Quick Filters</h4>
+
+<p>Here is a list of all quick filters with their passing criteria and shortcut methods, if available:
+
+<ul>
+<li>ElementCategoryFilter: Elements matching the input category id; shortcut OfCategoryId
+<li>ElementClassFilter: Elements matching the input runtime class; shortcut OfClass
+<li>ElementIsElementTypeFilter: Elements which are "Element types" (symbols); shortcuts WhereElementIsElementType, WhereElementIsNotElementType
+<li>ElementOwnerViewFilter: Elements which are view-specific; shortcuts OwnedByView, WhereElementIsViewIndependent
+<li>ElementDesignOptionFilter: Elements in a particular design option; shortcut ContainedInDesignOption
+<li>ElementIsCurveDrivenFilter: Elements which are curve driven; shortcut WhereElementIsCurveDriven
+<li>ElementStructuralTypeFilter: Elements matching the given structural type ; no shortcut
+<li>FamilySymbolFilter: Symbols of a particular family; no shortcut
+<li>ExclusionFilter: All elements except the element ids input to the filter; shortcut Excluding
+<li>BoundingBoxIntersectsFilter: Elements which have a bounding box which intersects a given outline; no shortcut
+<li>BoundingBoxIsInsideFilter: Elements which have a bounding box inside a given outline; no shortcut
+<li>BoundingBoxContainsPointFilter: Elements which have a bounding box that contain a given point; no shortcut
+</ul>
+
+<!--
+<table>
+<tr><th align="left">Filter Name</th><th align="left">Passing Criteria</th><th align="left">Shortcut Methods</th></tr>
+<tr><td>ElementCategoryFilter</td><td>Elements matching the input category id</td><td>OfCategoryId</td></tr>
+<tr><td>ElementClassFilter</td><td>Elements matching the input runtime class</td><td>OfClass</td></tr>
+<tr><td>ElementIsElementTypeFilter</td><td>Elements which are "Element types" (symbols)</td><td>WhereElementIsElementType</td></tr>
+<tr><td></td><td>WhereElementIsNotElementType</td></tr>
+<tr><td>ElementOwnerViewFilter</td><td>Elements which are view-specific</td><td>OwnedByView</td></tr>
+<tr><td></td><td>WhereElementIsViewIndependent</td></tr>
+<tr><td>ElementDesignOptionFilter</td><td>Elements in a particular design option</td><td>ContainedInDesignOption</td></tr>
+<tr><td>ElementIsCurveDrivenFilter</td><td>Elements which are curve driven</td><td>WhereElementIsCurveDriven</td></tr>
+<tr><td>ElementStructuralTypeFilter</td><td>Elements matching the given structural type </td><td>none</td></tr>
+<tr><td>FamilySymbolFilter</td><td>Symbols of a particular family</td><td>none</td></tr>
+<tr><td>ExclusionFilter</td><td>All elements except the element ids input to the filter</td><td>Excluding</td></tr>
+<tr><td>BoundingBoxIntersectsFilter</td><td>Elements which have a bounding box which intersects a given outline</td><td>none</td></tr>
+<tr><td>BoundingBoxIsInsideFilter</td><td>Elements which have a bounding box inside a given outline</td><td>none</td></tr>
+<tr><td>BoundingBoxContainsPointFilter</td><td>Elements which have a bounding box that contain a given point</td><td>none</td></tr>
+</table>
+-->
+
+<h4>Slow Filters</h4>
+
+<p>Here is a list of all slow filters with their passing criteria. As said, none of these have any shortcut methods defined:
+
+<ul>
+<li>FamilyInstanceFilter: Instances of a particular family symbol
+<li>ElementLevelFilter: Elements associated to a given level id
+<li>ElementParameterFilter: Parameter existence, value matching, range matching, and/or string matching
+<li>PrimaryDesignOptionMemberFilter: Elements owned by any primary design option
+<li>StructuralInstanceUsageFilter: Structural usage parameter for FamilyInstances
+<li>StructuralWallUsageFilter: Structural usage parameter for Walls
+<li>StructuralMaterialTypeFilter: Material type applied to FamilyInstances
+<li>RoomFilter: Finds rooms
+<li>SpaceFilter: Finds spaces
+<li>AreaFilter: Finds areas
+<li>RoomTagFilter: Finds room tags
+<li>SpaceTagFilter: Finds space tags
+<li>AreaTagFilter: Finds area tags
+<li>CurveElementFilter: Finds specific types of curve elements (model curves, symbolic curves, detail curves, etc.)
+</ul>
+
+<!--
+<table>
+<tr><th align="left">Filter Name</th><th align="left">Passing Criteria</th><th align="left">Shortcut Methods</th></tr>
+<tr><td>FamilyInstanceFilter</td><td>Instances of a particular family symbol</td><td>none</td></tr>
+<tr><td>ElementLevelFilter</td><td>Elements associated to a given level id</td><td>none</td></tr>
+<tr><td>ElementParameterFilter</td><td>Parameter existence, value matching, range matching, and/or string matching</td><td>none</td></tr>
+<tr><td>PrimaryDesignOptionMemberFilter</td><td>Elements owned by any primary design option</td><td>none</td></tr>
+<tr><td>StructuralInstanceUsageFilter</td><td>Structural usage parameter for FamilyInstances</td><td>none</td></tr>
+<tr><td>StructuralWallUsageFilter</td><td>Structural usage parameter for Walls</td><td>none</td></tr>
+<tr><td>StructuralMaterialTypeFilter</td><td>Material type applied to FamilyInstances</td><td>none</td></tr>
+<tr><td>RoomFilter</td><td>Finds rooms</td><td>none</td></tr>
+<tr><td>SpaceFilter</td><td>Finds spaces</td><td>none</td></tr>
+<tr><td>AreaFilter</td><td>Finds areas</td><td>none</td></tr>
+<tr><td>RoomTagFilter</td><td>Finds room tags</td><td>none</td></tr>
+<tr><td>SpaceTagFilter</td><td>Finds space tags</td><td>none</td></tr>
+<tr><td>AreaTagFilter</td><td>Finds area tags</td><td>none</td></tr>
+<tr><td>CurveElementFilter</td><td>Finds specific types of curve elements (model curves, symbolic curves, detail curves, etc.)</td><td>none</td></tr>
+</table>
+-->
+
+<h4>Variances of the Filters &ndash; Tips/Tricks</h4>
+
+<p>Remember the filters have many capabilities. The follow functionality may not be obvious, but can be very powerful:
+
+<ul>
+<li>Select the correct collector constructor (i.e. if you already have a set of elements to search, or only care about elements in a specific view)
+<li>Use filters in complex combinations, remembering to place slow filters last.
+<li>Use multiple filters to hone in on something.
+<li>Make use of inverted filters.
+</ul>
+
+<h4>ElementParameterFilter</h4>
+
+<p>The ElementParameterFilter is a unique filter designed for use with parameters. 
+Benchmarking examples show that a parameter filter may be faster by a factor of two than post-processing results using explicit coding or LINQ to find a specific subset of elements. 
+Although it is a slow filter, it is advised to consider depending on the search criteria.
+
+<p>Tip: Use Revit Lookup to find the API name for the desired parameter.
+
+<h4>Using LINQ</h4>
+
+<p>The FilteredElementCollector implements the IEnumerable interface which allows it to work with other .NET framework facilities that can use it. For example, the LINQ APIs are very powerful at allowing you to further find specific data. LINQ is short for the .NET framework Language-INtegrated Query, set, and transform operations. 
+For more information see
+<a href="http://msdn.microsoft.com/en-us/netframework/aa904594.aspx">this link</a>.
+
+<p>LINQ can be used to further filter information using a query, or make use of its other features like XML or SQL.
+
+<h4>Regeneration and Auto-Join</h4>
+
+<p>From the API Developer's Guide:
+<span style="color:darkblue">
+<p>After new elements are created or elements are modified, regeneration and auto-joining of elements is required to propagate the changes throughout the model. Without a regeneration (and auto-join, when relevant), the Geometry property and the AnalyticalModel for Elements are either unobtainable (in the case of creating a new element) or they may be invalid. It is important to understand how and when regeneration occurs before accessing the Geometry or AnalyticalModel of an Element.
+<p>Although regeneration and auto-join are necessary to propagate changes made in the model, it can be time consuming. It is best if these events occur only as often as necessary. When using RegenerationOption.Automatic, regeneration and auto-joining happen automatically after each and every API call that modifies the model. In this case, the Geometry and AnalyticalModel are assigned immediately and no further action is required prior to accessing them. However, due to the slow performance of this option, it is obsolete and will be removed in a future version of Revit.
+<p>In RegenerationOption.Manual, regeneration and auto-joining occur automatically when a transaction that modifies the model is committed successfully, or whenever the Document.Regenerate or Document.AutoJoinElements methods are called. Regenerate and AutoJoinElements may only be called inside an open transaction. It should be noted that the Regeneration method can fail, in which case the RegenerationFailedException will be thrown. If this happens, the changes to the document need to be rolled back by rolling back the current transaction or subtransaction.
+</span>
+
+<h4>Regeneration</h4>
+
+<p>Regeneration access has been improved in 2011, but it means you need to be more aware of its consequences. In prior releases, regeneration was something that you had to control in, sort-of a 'reverse way'. For example there was a suspend mode, or a special batch create mode that were meant to help performance. With the 2011 release, you should now apply the  manual attribute to your Revit API entry point functions and call Document.Regenerate when it is needed. The automatic mode will be removed in the future because it is very inefficient. From the 2011 documentation:
+<span style="color:darkblue">
+<ul>
+<li>RegenerationOption.Automatic &ndash; The API framework will regenerate after every model level change (equivalent behaviour with Revit 2010 and earlier). Regeneration and update can be suspended using SuspendUpdating for some operations, but in general the performance of multiple modifications within the same file will be slower than RegenerationOption.Manual. This mode is provided for behavioural equivalence with Revit 2010 and earlier; it is obsolete and will be removed in a future release.
+<li>RegenerationOption.Manual &ndash; The API framework will not regenerate after every model level change. Instead, you may use the regeneration APIs to force update of the document after a group of changes. SuspendUpdating blocks are unnecessary and should not be used. Performance of multiple modifications of the Revit document should be faster than RegenerationOption.Automatic. Because this mode suspends all updates to the document, your application should not read data from the document after it has been modified until the document has been regenerated, or it runs the risk of accessing stale data. This mode will be only option in a future release.
+</ul>
+</span>
+
+
+<h4>Manual Regeneration Option</h4>
+
+<p>For 2011 and the future you should get into the habit of using the manual option and Document.Regenerate. 
+Consider your performance options as you move over to it. 
+The main point is that you should use regenerate only when needed. 
+This will improve the performance of modification routines and allow you to group or queue modifications until necessary to regenerate. Remember that manual mode will never be slower than the old automatic option. The only problem is the risk of missing a regenerate call and retrieving stale data. Regenerating more often than necessary should not always be considered a problem and does not cause too much overhead. The regeneration algorithm is optimized to minimize the regeneration of only those items that need it. However, remember that it is another operation, and it is advisable to experiment with your particular algorithm and typical data sets to understand the best performance. The performance of regeneration will depend on the magnitude of change and the complexity of the model &ndash; there is no simple and generic answer about how long regeneration will take.
+
+<h4>Tips and Tricks</h4>
+
+<ul>
+<li>Again, regenerating more often than necessary should not always be considered a problem and does not cause too much overhead. The regeneration algorithm is optimized to minimize the regeneration of only those items that need it. Regeneration when nothing needs to be regenerated is rather fast, hence it is not so costly &ndash; still better than Automatic. If in doubt, do it (i.e. when seeing errors pertaining to data access, this is the first thing to try in your code).
+<li>It is another operation, though! It is advisable to experiment with your particular algorithm and typical data sets to understand the best performance.
+<li>Querying data does not require regenerations unless there was a previous change to the part of the model that could affect the data being queried &ndash; that is sometimes hard to estimate, though.
+</ul>
+
+<h4>Auto-Join</h4>
+
+<p>As mentioned above, auto-join is something that needs to be done when creating or modifying elements to ensure the geometry aspects are updated appropriately before accessing those elements. The trick is to know when to call it. Generally, you must call it when elements are related by geometry to other elements. For example, when two walls are added and a corner is formed, those elements are related at the corner and need auto-join.
+
+<p>Tip: With RegenerationOption.Automatic, elements that are meant to be auto-joined should automatically be updated. 
+There was a problem with this in the very first version of 2011 that was fixed in the first user release update.
+
+<h4>Next Instalment</h4>
+
+<p>As said, one of the next topics will be an overview of Kevin's sample code and collector benchmarks, followed by a global  overview of all the filtering samples we have studied so far.

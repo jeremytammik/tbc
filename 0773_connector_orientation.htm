@@ -1,0 +1,127 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Martin Schmid Re: Connector Orientation -->
+
+<h3>Connector Orientation</h3>
+
+<p>Today is the 
+
+<a href="http://en.wikipedia.org/wiki/Pentecost">
+Pentecost</a> or
+
+<a href="http://en.wikipedia.org/wiki/Whit_Monday">
+Whit Monday</a> holiday
+
+in Neuch&acirc;tel, and I am in full tilt preparing for the 
+
+<a href="http://www.cvent.com/events/devcamp-2012/event-summary-56817a3b57614f8eb59ea05fcd59bc32.aspx">
+AEC DevCamp</a> in Waltham next week.
+
+<p>I will be presenting sessions on the new Revit 2013 UI API features, the Revit MEP API, and extensible storage.
+
+<p>I am of course looking forward much more to the many exciting other presentations by my colleagues in the ADN DevTech AEC team and especially by members of the Revit development team, directly from the horse's mouth, so to speak.
+Have a look at the 
+
+<a href="https://custom.cvent.com/FDBB345248B94F40BFFFCEF2FBE054E4/files/645f182b028d480281ebdda12bae6576.pdf">
+session list and descriptions</a> to see them all in their full glory.
+
+<p>Meanwhile, here is yet another MEP related topic to pick up:
+
+<p>Two years ago, I presented a solution for determining the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/connector-orientation.html">
+width and height orientation of a Revit MEP connector</a>.
+
+<p>Now Martin Schmid describes a new useful aspect of this issue which also leads to a very important point on real numbers comparisons.
+
+
+<p><strong>Question:</strong> How do I determine the orientation of a connector in my project?  
+From Revit Lookup, I can find where the information is, but I'm not sure how to interpret this without a 'visual'.
+
+
+<p><strong>Answer:</strong> It was easy enough to determine by exporting a simple Revit model to AutoCAD, and displaying the coordinate entries there.
+
+<p>I thought I would share what I found to save other users from having to go through the same research.
+
+<p>For a FamilyInstance, such as a pipe fitting, the information can be found via
+
+<ul>
+<li>FamilyInstance &gt; MEPModel &gt; ConnectorManager &gt; ConnectorSet &gt; Connector &gt; CoordinateSystem
+</ul>
+
+<p>As the image below shows, the Z coordinate of CoordinateSystem indicates the normal direction of the connector.  The CoordinateSystem.Origin is the actual location in the model:</p>
+
+<center>
+<img src="img/connector_orientation.png" alt="Connector orientation"/>
+</center>
+ 
+<p>For a MEPCurve such as a pipe, the access is slightly different:
+
+<ul>
+<li>MEPCurve &gt; ConnectorManager &gt; ConnectorSet &gt; Connector &gt; CoordinateSystem
+</ul>
+
+<p>So, if you're trying to determine if two connectors are parallel and facing opposite directions, you can test that the Z axis vectors of the two connectors' CoordinateSystem properties pointing in exactly opposite directions, i.e. one equals the negation of the other.
+
+<p>Many thanks to Martin for this explanation!
+
+
+<a name="2"></a>
+
+<h4>Real Number Equality Testing</h4>
+
+<p>Jeremy adds: since the connector CoordinateSystem Z axis vector is an XYZ instance, i.e. a triple of three real numbers, comparing their equality leads back to a floating point number comparison.
+
+<p>In this case, you should actually almost never ever use an exact equality comparison such as Equals, or '=='.
+
+<p>You need to use an appropriate 
+
+<a href="http://wiki.seas.harvard.edu/geos-chem/index.php/Floating_point_math_issues#Testing_for_equality">
+real number equality test</a> instead.
+
+<p>Our guru <a href="http://www.gnu.org/software/gnu-c-manual/gnu-c-manual.html#Real-Number-Types">GNU</a> says:
+
+"we recommend that you consider not comparing real numbers for exact equality with the == operator, but rather check that real numbers are within an acceptable tolerance".
+
+<p>For the Revit API XYZ point and vector instances, this can easily be achieved by using the IsAlmostEqualTo method instead.
+
+<p>The comparison between the two connectors' CoordinateSystem Z axis vectors can therefore be implemented like this, for example:
+
+<pre class="code">
+&nbsp; conn1.CoordinateSystem.BasisZ.IsAlmostEqualTo( 
+&nbsp; &nbsp; -conn2.CoordinateSystem.BasisZ );
+</pre>
+
+<p>I already discussed taking this one step further several times, for instance to implement the XyzEqualityComparer for 
+
+<!--
+
+134_nested_instance_geo.htm:Here is the definition
+259_crop_view_to_room.htm:We did implement some use
+491_point_in_poly.htm:XyzEqualityComparer class</a>
+502_gaps_in_shell.htm:XyzEqualityComparer helper cl
+556_toposurf_points.htm:&nbsp; &nbsp; = <span class
+620_top_faces_of_wall.htm:CmdNestedInstanceGeo.XyzE
+737_melbourne_day_2.htm:
+
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#2">
+retrieving unique geometry vertices</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instance geometry</a>, 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/toposurface-interior-and-boundary-points.html">
+toposurface point classification</a> and
+
+accessing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/top-faces-of-wall.html">
+top faces</a> of
+
+a sloped wall.
+
+

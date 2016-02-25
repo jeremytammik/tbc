@@ -1,0 +1,439 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+C:\a\doc\aec\newsletter\2011\2011_3\Performance Adviser API.docx
+
+C:\a\doc\aec\newsletter\2011\2011_3\ADN - AEC Customization Newsletter - BIM Edition - Fall 2011.htm 
+
+-->
+
+<h3>The Performance Adviser API</h3>
+
+<p>Unbelievable as it may seem, there are still a number of new areas of functionality added in the Revit 2012 API that we have not even got around to covering here yet at all.
+One of these is the performance adviser.
+Here is an article on that by my colleague Saikat Bhattacharya from the ADN AEC newsletter.
+
+<p>The Performance Adviser API added in Revit 2012 allows developers to execute a set of built-in or custom rules against a given model, and to display a warning dialog about the elements that fail to satisfy the rules. You can use this feature to flag the user about possible performance degradations, and to create your own rules that could be run on a model to check for adherence to certain design guidelines. For example, you may want to signal the user where walls may be overlapping.
+
+<p>This article provides an overview and discusses how to 
+
+<a href="#1">access performance adviser rules</a>, 
+<a href="#2">execute rules</a>, and 
+<a href="#3">define custom rules</a>. 
+
+
+<a name="1"></a>
+
+<h4>Accessing Performance Adviser Rules</h4>
+
+<p>The performance adviser rules are a set of application-wide rules. To work with performance adviser rules, we use an application-wide, singleton class called PerformanceAdviser. This class is a registry of all the performance checking rules as well as an engine to execute the rules. You can access the singleton PerformanceAdviser instance using a PerformanceAdviser.GetPerformanceAdviser static method.
+
+<p>Once we have access to the PerformanceAdviser object, we can use the GetAllRuleIds method to obtain a list of rule IDs registered in the application. We can then iterate through each rule ID and get the rule information for the corresponding rule ID, using the methods, such as GetRuleName and GetRuleDescription.
+
+<p>The following command illustrates how to list all the registered performance adviser: 
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> List all registered performance adviser rules</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ListPerformanceAdviserRules</span> 
+&nbsp; : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> Autodesk.Revit.UI.<span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Get access to Performance Adviser object</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PerformanceAdviser</span> adviser 
+&nbsp; &nbsp; &nbsp; = <span class="teal">PerformanceAdviser</span>.GetPerformanceAdviser();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the rules</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">PerformanceAdviserRuleId</span>&gt; ruleIds 
+&nbsp; &nbsp; &nbsp; = adviser.GetAllRuleIds();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> ruleInfo = <span class="teal">String</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Loop through each rule Id and get rule name and description</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PerformanceAdviserRuleId</span> ruleId 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> ruleIds )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ruleInfo += <span class="maroon">&quot;\n&quot;</span> + adviser.GetRuleName( ruleId )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; : &quot;</span> + adviser.GetRuleDescription( ruleId );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Existing Rules Info&quot;</span>, ruleInfo );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="2"></a>
+
+<h4>Executing a Performance Adviser Rule</h4>
+
+<p>Once you know the ids of rules that you are interested in, you can use the PerformanceAdviser.ExecuteRules method to execute the given rules. 
+This method takes a document and a set of rule ids as input arguments. 
+It returns a list of FailureMessages, which we can iterate through and display, for instance, in a standard Revit warning dialog using Document.PostFailure method. 
+
+<p>For an introductory discussion about Failure Posting and Handling, please refer to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+this introduction</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/failure-api-take-two.html">
+its follow-up</a>, 
+
+and the ADN <i>AEC Customization Newsletter &ndash; BIM Edition &ndash; Winter 2011</i>.
+
+<!--
+350_failure_api.htm  484_failure_api.htm  732_failure_idling.htm
+-->
+
+<p>The following command shows a simple example of executing the overlapping walls performance adviser rule: 
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Execute overlapping walls? </span>
+<span class="gray">///</span><span class="green"> performance adviser rule.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ExecutePerformanceRule</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the Performance Adviser object</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PerformanceAdviser</span> adviser 
+&nbsp; &nbsp; &nbsp; = <span class="teal">PerformanceAdviser</span>.GetPerformanceAdviser();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// List all the rules</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">PerformanceAdviserRuleId</span>&gt; ruleIds = adviser.GetAllRuleIds();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create an empty list for </span>
+&nbsp; &nbsp; <span class="green">// the rules to be executed</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">PerformanceAdviserRuleId</span>&gt; rulesIdsToExecute =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">PerformanceAdviserRuleId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Iterate through each</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PerformanceAdviserRuleId</span> ruleId <span class="blue">in</span> ruleIds )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( adviser.GetRuleName( ruleId ).Equals( <span class="maroon">&quot;Overlapping walls&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; rulesIdsToExecute.Add( ruleId );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Now we need to post the results</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessage</span>&gt; failureMessages =
+&nbsp; &nbsp; &nbsp; adviser.ExecuteRules( doc, rulesIdsToExecute );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessage</span> fm <span class="blue">in</span> failureMessages )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;Failure Reporting&quot;</span> );
+&nbsp; &nbsp; &nbsp; doc.PostFailure( fm );
+&nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Defining a Custom Rule</h4>
+
+<p>Now, the most powerful part of this API is that we define custom adviser rules. To create our own, we define a class implementing an interface called IPerformanceAdviserRule. Your custom adviser class then needs to define the following methods:
+
+<ul>
+<li>GetName &ndash; returns the name of this rule.
+
+<li>GetDescription &ndash; provides the description of this custom rule.
+
+<li>InitCheck &ndash; performs the initialization work before running the rule. For example, it could be a task like clearing a collection of elements that we will be storing elements that fail the rule execution test.
+
+<li>WillCheckElements &ndash; sets whether the rule will iterate through elements or not.
+
+<li>GetElementFilter &ndash; provides the element filter which can help narrow down the type or category of elements that a certain rule is expected to work with.
+
+<li>ExecuteElementCheck &ndash; This method contains most of the implementation steps for a given rule. It examines the element passed to it (which is filtered by the GetElementFilter) and checks for all elements that fail the criteria laid by the rule.
+
+<li>FinalizeCheck &ndash; This method gets called by the PerformanceAdviser after all the elements in a document matching the element filter in the GetElementFilter method have been checked by the ExecuteElementCheck method. This method usually will contain the code to check if there are elements which fail the rule test and if there are, the names of the elements are listed along with the standard warning failure message.
+</ul>
+
+<p>The code below shows an example of a custom performance adviser rule, which provides warnings if there are clashes between ducts in a Revit model: 
+
+<pre class="code">
+<span class="green">// A custom performance adviser rule class.</span>
+<span class="green">// This rule provides a warning if the model </span>
+<span class="green">// contains ducts which clash each other.&nbsp; </span>
+&nbsp;
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Text;
+&nbsp;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB.Mechanical;
+<span class="blue">using</span> System.Diagnostics;
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">DuctClashDetection</span> 
+&nbsp; &nbsp; : <span class="teal">IPerformanceAdviserRule</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">FailureDefinition</span> m_warning;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">FailureDefinitionId</span> m_warningId;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; m_ClashingDucts;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> DuctClashDetection Constructor</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> DuctClashDetection()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Create failure message</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; m_warningId = <span class="blue">new</span> <span class="teal">FailureDefinitionId</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;AACC9C09-7956-4B36-9D27-FF8A64544C31&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; m_warning = <span class="teal">FailureDefinition</span>.CreateFailureDefinition(
+&nbsp; &nbsp; &nbsp; &nbsp; m_warningId, <span class="teal">FailureSeverity</span>.Warning,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Some ducts clash with each other&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> This method does most of the work of the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> IPerformanceAdviserRule implementation. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> It is called by PerformanceAdviser and </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> examines the element passed to it </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> (which was previously filtered by the filter </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> returned by GetElementFilter).&nbsp; This method </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> is checking for all elements that intersect </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> with current duct and adds them to the list </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> of elements.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> ExecuteElementCheck(
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> document,
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> element )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// For each of the elements, check if there is </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// any intersection with the specific element </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// being passed on via the method signature</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( document );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Use the Elements Intersection Filter to get elements</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// that intersect with the specified element</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementIntersectsElementFilter</span> elementFilter =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIntersectsElementFilter</span>( element, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; collector.WherePasses( elementFilter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Exclude the element in the intersection</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; excludes = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; excludes.Add( element.Id );
+&nbsp; &nbsp; &nbsp; collector.Excluding( excludes );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Save the intersecting ducts</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> elem <span class="blue">in</span> collector )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_ClashingDucts.Add( elem.Id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// The rule ID for this rule;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">PerformanceAdviserRuleId</span> Id =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PerformanceAdviserRuleId</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;C00CEF6D-2C4B-402C-9AED-160DFA1785BE&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> This method is called by PerformanceAdviser </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> after all elements in document matching the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> ElementFilter from GetElementFilter() are </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> checked by ExecuteElementCheck(). It checks to </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> see if there are any ducts in the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> m_ClashingDucts list. If so, it iterates </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> through that list and reports the failures.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> FinalizeCheck( <span class="teal">Document</span> document )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If no ducts clash</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m_ClashingDucts.Count == 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;No clashing ducts. Test passed.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Pass the element IDs of the clashing ducts to the revit</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// failure reporting APIs.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FailureMessage</span> fm =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FailureMessage</span>( m_warningId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fm.SetFailingElements( m_ClashingDucts );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> failureReportingTransaction =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Transaction</span>( document );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failureReportingTransaction.Start( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Failure reporting&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PerformanceAdviser</span>.GetPerformanceAdviser()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .PostWarning( fm );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failureReportingTransaction.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_ClashingDucts.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Oops!&quot;</span>, ex.Message );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return rule description.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> GetDescription()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;Detects clash between ducts&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Provide the filter to focus on elements </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> that this rule should be focused on.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">ElementFilter</span> GetElementFilter( 
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> document )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return name of rule.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> GetName()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;Duct Clash Detection&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Perform initial/preliminary work </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> before executing the tests.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> InitCheck( <span class="teal">Document</span> document )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m_ClashingDucts == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; m_ClashingDucts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; m_ClashingDucts.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return true if this rule will iterate </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> through elements and check them, </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> else return false.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> WillCheckElements()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<p>Once we have defined a class for our custom rule, our next step is to register the rule. You can do this by calling PerformanceAdvisor.AddRule. 
+This is done at the start-up of Revit using the OnStartup event of IExternalApplication.
+
+<p>Similarly, we can unregister the Performance Adviser rule at the OnShutdown event. The following code shows an example of how the custom rule is registered and unregistered:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">AddPerformanceRule</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">DuctClashDetection</span> ductClashDetect;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Unregister the custom rule.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> application )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PerformanceAdviser</span> adviser 
+&nbsp; &nbsp; &nbsp; = <span class="teal">PerformanceAdviser</span>.GetPerformanceAdviser();
+&nbsp;
+&nbsp; &nbsp; adviser.DeleteRule( ductClashDetect.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Register the custom rule.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> application )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PerformanceAdviser</span> adviser 
+&nbsp; &nbsp; &nbsp; = <span class="teal">PerformanceAdviser</span>.GetPerformanceAdviser();
+&nbsp;
+&nbsp; &nbsp; ductClashDetect = <span class="blue">new</span> <span class="teal">DuctClashDetection</span>();
+&nbsp;
+&nbsp; &nbsp; adviser.AddRule( ductClashDetect.Id, ductClashDetect );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Once the custom rule has been added, we can execute it in the same way as the predefined rules. 
+Using the code used in this article against a given set of clashing ducts, this new API can report the clash results as shown below:</p>
+
+<center>
+<img src="img/performance_adviser_collision_test.jpg" alt="Collision test rule" width="400"/>
+</center>
+
+<p>In this article, we have shown you that the performance adviser API provides the ability to define custom rules, execute them, and report potentially problematic results via the failure message APIs. 
+The Revit SDK PerformanceAdviserControl sample shows more comprehensive examples of this API. 
+It presents a list of rules for the users to select and execute. 
+Please refer to the sample for more details.
+
+<p>Many thanks to Saikat for this helpful overview!
+

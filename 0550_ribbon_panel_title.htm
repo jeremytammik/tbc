@@ -1,0 +1,130 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: Third party ribbon panels -->
+
+<h3>Ribbon Panel Title Conflict</h3>
+
+<p>Here is another exploration into the inner workings of the Revit ribbon by Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a>. 
+
+He says:
+
+<p>If you try to add a new Ribbon panel whose title is already used by another Add-In panel, it will throw an exception.
+You therefore have to ensure that no other third party panel uses the same text as you do.
+
+<p>The Revit API method GetRibbonPanels will not find panels that are not yet loaded, and there is no fixed order in which plug-in will be loaded.
+Therefore, even if a plug-in is installed after yours, it might still be loaded before and could have 'occupied' your 'own' panel title, which would cause your plug-in to fail if the panel title conflict is not handled appropriately, for instance by renaming it on the fly.
+
+<p>Here is an example in which I loaded RevitLookup twice and renamed the displayed text of the second instance:</p>
+
+<center>
+<img src="img/rh_panel_title_conflict_1.png" alt="Ribbon panel naming conflict resolution"/>
+</center>
+
+<p>This may be a real concern, especially if your panel title is something generic such as 'Tools'.
+
+<p>To make sure, you need to iterate through the already loaded panels and adapt your title if necessary before creating it.
+
+<p>This affects the 'Title' property; I'm not sure whether the 'Name' needs to be unique, too.
+
+<p>Here is some sample code to illustrate this;
+in your external application, you can define a global variable:
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="teal">UIControlledApplication</span> m_revit = <span class="blue">null</span>;
+</pre>
+
+<p>It can be initialised when starting the application:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; m_revit = a;
+&nbsp;
+&nbsp; &nbsp; <span class="green">/*</span>
+<span class="green">&nbsp; &nbsp; (do something useful here)</span>
+<span class="green">&nbsp; &nbsp; */</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Then we can implement the following method to check whether a panel title has already been taken:
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">bool</span> IsPanelTitleUsed(
+&nbsp; &nbsp; <span class="blue">string</span> panelTitle )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">RibbonPanel</span>&gt; loadedPluginPanels
+&nbsp; &nbsp; &nbsp; = m_revit.GetRibbonPanels();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">RibbonPanel</span> p <span class="blue">in</span> loadedPluginPanels )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p.Title.Equals( panelTitle ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+</pre>
+
+<p>If we decide to change our panel title, for example by appending an integer counter suffix, we obviously have to continue checking whether it is available until we find a title that has not been taken yet.
+
+<p>The cause of this exception when trying to create RibbonPanels of the same name is visible in the StackTrace:
+
+<ul>
+<li>Autodesk.Revit.UI.UIApplication.verifyPanelNameExclusive(Tab tab, String newPanelName)
+<li>Autodesk.Revit.UI.UIApplication.CreateRibbonPanel(Tab tab, String panelName)
+<li>Autodesk.Revit.UI.UIApplication.CreateRibbonPanel(String panelName)
+<li>Autodesk.Revit.UI.UIControlledApplication.CreateRibbonPanel(String panelName)
+</ul>
+
+<p>After I called the CreateRibbonPanel method, the Title property is not initialized:
+
+<center>
+<img src="img/rh_panel_title_conflict_2.png" alt="Ribbon panel name and null title"/>
+</center>
+
+<p>The title value stays null, even if you think that you see it in the UI.
+
+<p>So <b>the name is your title</b> except you assign a different one:
+
+<pre class="code">
+rvtRibbonPanel.Title = "Dummy";
+</pre>
+
+<center>
+<img src="img/rh_panel_title_conflict_3.png" alt="Ribbon panel name and title differ"/>
+</center>
+
+<center>
+<img src="img/rh_panel_title_conflict_4.png" alt="Ribbon panel name and title differ"/>
+</center>
+
+<p>Having different names, titles <b>can</b> consist of the same string:</p>
+
+<center>
+<img src="img/rh_panel_title_conflict_5.png" alt="Ribbon panels with identical names"/>
+</center>
+
+<p>Using UISpy, by the way, shows that the Revit AutomationElements can be retrieved by name (see AutomationId), not by visible text.
+Here are the properties of the left panel in the image above:</p>
+
+<center>
+<img src="img/rh_panel_title_conflict_6.png" alt="Ribbon panel properties in UISpy" width="400"/>
+</center>
+
+<p>Here are the right-hand panel properties:</p>
+
+<center>
+<img src="img/rh_panel_title_conflict_7.png" alt="Ribbon panel properties in UISpy" width="400"/>
+</center>
+
+<p>For both of these, the Name property is an empty string, while the AutomationId property still distinguishes them as "CustomCtrl_%ADD_INS_TAB%RevitLookup" versus "CustomCtrl_%ADD_INS_TAB%RevitLookup 2".
+
+<p>Many thanks to Rudolf for this important warning and interesting inside-the-ribbon information.

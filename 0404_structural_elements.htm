@@ -1,0 +1,121 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1260792 [Get All Structural Elements]
+  C:\a\j\adn\train\revit\2011\src\rst\link\cs\RstLinkRevitClientCs\CommandsLinkRevit.cs
+  GetStructuralElements
+  test StructuralInstanceUsageFilter and StructuralMaterialTypeFilter
+
+-->
+
+<h3>Retrieve Structural Elements</h3>
+
+<p>I recently discussed the retrieval of all Revit 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+MEP elements and their connectors</a>.
+
+Here is a similar question on retrieving structural elements:
+
+<p><strong>Question:</strong> How can I get all the structural elements like structural walls, slabs, columns, and beams from the model? 
+I have a problem with the columns and beams because they are family instances and I cannot just check only their type. 
+I currently have to go through all the family instances and check whether they are a column or beam to be modified in my model. 
+
+<p><strong>Answer:</strong> Yes, certainly you can efficiently and directly retrieve all structural elements from a Revit model database. 
+The key to doing so is to use the filtered element collectors. 
+All you need to do is identify certain criteria by which to identify all your elements and encode these into filters to apply to the collector.
+
+<p>One approach to achieve this is described for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+retrieval of MEP elements</a>,
+
+which shows how to set up a combined filtered element collector which restricts the categories of the family instances.
+
+<p>In that solution, some elements such as ducts and pipes that can be directly identified by their System.Type. 
+
+<p>Others such as equipment and fittings are represented by family instances and can be further identified by their category. For instance, for the MEP elements, we specified both the System.Type FamilyInstance as well as categories such as duct fitting, duct terminal, and pipe fitting.
+
+<p>To set up a similar filter for your structural elements, you will have to analyse your model to determine exactly which categories your columns and beams have.
+
+<p>Here is an example to retrieve certain structural elements that I make use of for the RST link application:
+
+<pre class="code">
+<span class="teal">FilteredElementCollector</span> GetStructuralElements(
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// what categories of family instances</span>
+&nbsp; <span class="green">// are we interested in?</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInCategory</span>[] bics = <span class="blue">new</span> <span class="teal">BuiltInCategory</span>[] {
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFoundation
+&nbsp; };
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementFilter</span>&gt; a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( bics.Count() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span> bics )
+&nbsp; {
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( bic ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> categoryFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( a );
+&nbsp;
+&nbsp; <span class="teal">LogicalAndFilter</span> familyInstanceFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( categoryFilter,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) ) );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementFilter</span>&gt; b
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 6 );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ContFooting</span> ) ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">PointLoad</span> ) ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">LineLoad</span> ) ) );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">AreaLoad</span> ) ) );
+&nbsp;
+&nbsp; b.Add( familyInstanceFilter );
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> classFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( b );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.WherePasses( classFilter );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector;
+}
+</pre>
+
+<p>You will have to analyse your model and see whether this filtering really suits your needs and whether all elements you are interested in are covered.
+
+<p>In addition to the explicit filtering demonstrated here, which gives you full and detailed control over what exactly is retrieved, the StructuralInstanceUsageFilter might fit your needs more exactly with less effort. 
+You might also find the StructuralMaterialTypeFilter useful.
+In any case, you will have to test them in your specific models.
+
+<p>Please refer to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+MEP element retrieval</a> for
+
+links to further discussions and examples of filtered element collectors.

@@ -1,0 +1,65 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256697 [How to select an item in a particular area] -->
+
+<h3>Find an Element in an Area</h3>
+
+<p>Another last interlude before concluding the series on the Revit API geometry library based on Scott Conover's Autodesk University presentation on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+also dealing with geometrical analysis of Revit elements:
+
+<p><strong>Question:</strong> How can I select a Revit element within a particular area, for instance the rectangle defined by the points (0,0) and (500,500) in the XY plane?
+
+<p><strong>Answer:</strong> There are several different approaches to this, and you will obviously have to decide for yourself which one best suits your needs. 
+Basically, you need to determine the location of your Revit element in some way, and then test whether this location lies within the specified area. 
+You can use different approaches to determine the element location. 
+Some properties and data that might be useful for this include:
+
+<ul>
+<li>The BoundingBox property.
+<li>The Location property.
+<li>The element geometry.
+</ul>
+
+<p>In previous posts, I presented the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+GetVertices</a> method
+
+as an example of retrieving a list of vertices from the element geometry, and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/unrotate-north.html">
+GetElementLocation</a> method
+
+determining a single point from the element location.
+These will probably both provide useful starting points and still need to be adapted for your specific needs.
+
+<p>Once you have determined the element location in some way, you need to decide what exactly it means that the element lies within the area. 
+For instance, do you want to just determine one specific point for an element, and check whether that lies within the area, or use the entire location curve for elements having one, or require the entire solid or even the bounding box to be contained?
+
+<p>Once you have defined both how to define the element location and its containment within the area, you can start to implement the selection process.
+
+<p>Whatever approach you choose, you should definitely also apply additional filtering to your algorithm, so that it will ignore all the objects you are not interested in, for instance by checking the element category, level, type and other properties.
+
+<p>Making use of the Revit API filters, you can retrieve the subset of all elements that may possibly be of interest to you.
+Looking at those elements one by one, determine their location and check whether it is contained in your area of interest, for instance according to the following pseudo code algorithm:
+
+<pre>
+List&lt;Element&gt; a = get candidate 
+  elements from Revit database;
+
+foreach( Element e in a )
+{
+  get location L of e;
+
+  if( L is in area )
+  {
+    process e;
+  }
+}
+</pre>

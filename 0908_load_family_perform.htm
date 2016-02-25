@@ -1,0 +1,193 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08064425 [Perfomance Question]
+
+-->
+
+<h3>LoadFamily and Collector Iteration Performance</h3>
+
+<p>Since we are into the topic of family loading performance anyway, after yesterdays discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sweep-family-performance-enhancement.html">
+efficient sweep creation</a>,
+
+here is another interesting discussion with some useful family loading and symbol filtering benchmarking results and observations by Thomas Jarzyna and an in-depth analysis of the effects of converting a filtered element collector to a .NET collection by Scott Conover:</p>
+
+
+<p><strong>Question:</strong> I need to load some family symbols into my project.
+I have a lot of different families and even more symbols, so to keep the projects small and clean I would prefer to load family symbols on demand only.
+
+<p>Therefore, whenever an instance of a family is to be created, I need to check first whether the family symbol is already loaded.
+
+<p>I can see two possible approaches to achieve this:
+
+<ul>
+<li>Check whether the family symbol already exist by iterating through the database using a filtered element collector searching for family name and family symbol name.</li>
+<li>Not checking anything, and just always calling LoadFamilySymbol. It runs fine even if the family symbol is already loaded. One negative side effect of this approach is the "one time conversion" dialogue popping up for older families every time.</li>
+</ul>
+
+<p>Which approach is better from a performance centred point of view, please?
+
+<p>Is there any other possible approach?
+
+
+<p><strong>Answer:</strong> Both of your two approaches sound feasible.
+
+<p>I also find the "one time conversion" dialogue rather irritating and would not want my users to see it, especially not repeatedly.
+
+<p>If that is a serious problem for you, you could implement a system to ensure that it never occurs more than once. For instance, you could create different sub-directories for the different Revit versions of the same family, and check whether an updated version has already been generated before loading an older one.
+
+<p>However, I would expect the use of the filtered element collector to be much (very much!) more efficient.
+
+<p>However^2, it really depends on so many factors that it is impossible to say for sure.
+
+<p>The only way to really answer this with certainty   for your particular system, workflow needs, and installation situation is to benchmark the different options.
+
+<p>I described a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/timer-code-for-benchmarking.html">
+simple benchmarking system</a> that
+
+I would use in a Revit add-in in lack of anything more sophisticated.
+
+<p>I cannot think of any other approach offhand.
+
+<p>The thought of calling LoadFamily without even checking beforehand actually never occurred to me  :-)
+
+<p>Here are two different implementation examples checking whether a family has already been loaded, and loading it otherwise, for
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/creating-and-inserting-an-extrusion-family.html#3">
+Creating and inserting an extrusion family</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html#6">
+Structural concrete setout points</a></li>
+</ul>
+
+<p>I hope they fulfil your needs.</p>
+
+
+<p><strong>Response:</strong> Thank you for the answer.
+
+<p>I was hoping for a simple standard best practice, but I see it's not as easy as that.
+
+<p>In the meantime, I've done a little bit of benchmarking myself.
+Just basic, using a stopwatch:</p>
+
+<center>
+<img src="img/RevitInsertion.png" alt="Filter for and load family benchmarks" width="600"/>
+</center>
+
+<p>And you are right, depending on the quantity of different Types (FamilySymbols) these approaches differ significantly.
+
+<p>For a scenario of creating 2000 family instances from one family (see attached sheet), this is my conclusion:
+
+<ul>
+<li>If you expect less than a dozen different family symbols to load, just load them once via "LoadFamilySymbol" and
+don't care about iterating the element collection for the already loaded family symbols.
+<li>Otherwise, iterating and finding the loaded family symbols first is better.
+<li>Of course, this depends on the complexity of the family types and the environment (hardware & current load).
+<li>A large number of different families is not considered yet.
+</ul>
+
+<p>I also noted the following interesting fact while iterating for "known" family symbols:
+
+<pre class="code">
+  var collector = new FilteredElementCollector( doc );
+
+  IEnumerable&lt;FamilySymbol&gt; familySymbols = collector
+    .OfClass( typeof( FamilySymbol ) )
+    .ToElements()
+    .OfType&lt;FamilySymbol&gt;();
+</pre>
+
+<p>The additional call to the ToElements method makes the search using the collector slightly less effective (some milliseconds slower) compared to:
+
+<pre class="code">
+  IEnumerable&lt;FamilySymbol&gt; familySymbols = collector
+    .OfClass( typeof( FamilySymbol ) )
+    .OfType&lt;FamilySymbol&gt;();
+</pre>
+
+<p>But in the long term, iterating over the family symbols is much faster when ToElements is called first.
+
+<p>For the 2000 instances it takes 14 seconds without ToElements vs. 9 seconds with.
+
+<p>I guess this has to do with the caching provided by
+
+<a href="http://confluence.jetbrains.com/display/ReSharper/Possible+multiple+enumeration+of+IEnumerable">
+possible multiple enumerations of IEnumerable</a>.
+
+<p>What do you think?</p>
+
+<p>Thank you, till next time.
+
+
+<p><strong>Answer:</strong> Thank you for your very interesting results and observations, and congratulations on your first benchmarking results!
+They are already very interesting.
+
+<p>A call to ToElements definitely costs some performance, since it allocates an entirely new generic .NET collection and copies all the elements across from the Revit filtered element collector, as I mentioned discussing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+FindElement and collector optimisation</a>.
+
+<p>I am surprised and interested (and was initially a little disappointed) to hear that the subsequent iteration over the .NET collection is measurably faster than the Revit collector, though.
+
+<p>Yes, the speed improvement is probably indeed related to the explanation you point to.
+In this case, the Revit element collector may be storing the elements in 'Revit memory' and eating cycles when marshalling them across to '.NET memory'.
+This marshalling effort may need to be performed anew on each repetition of the iteration.
+
+<p>Ah yes, with that explanation, I am perfectly happy with this observation, and not disappointed at all.</p>
+
+<p>Thank you for these illuminating results.</p>
+
+
+<p><strong>Scott adds:</strong> I would expect the total time spent in FilteredElementCollector.ToElements and subsequent iteration to be longer than direct iteration of FilteredElementCollector, regardless of the number of elements that pass the filter.
+
+<p>Of course, once ToElements has run and you store the managed handles, iteration of this collection should be fast &ndash; you are not going back to the document to find the elements again or filter them or wrap them in managed handles.
+
+<p>If you are doing more than one iteration of a given filter criteria, the first one will always be faster than the second &ndash; because of the extra time taken to create the Elements collection.  The other activities &ndash; traversing the database, applying and evaluating the filter, wrapping the elements that pass into managed code &ndash; happen on both.
+
+<p>If you know you need to have the same filtered set of elements more than once, saving them in the collection should be faster for the second and subsequent iterations.  This assumes that you know the document hasn’t changed where there are new elements that pass the filter (or some of them are deleted).  The second iteration over the managed collection should be faster than re-traversing the document.  This is a pretty specialized approach.  The other reasons for converting FilteredElementCollector to a collection (you want to store a list of elements or ids for later, you need such a list as input to another method, you want to delete anything you find, etc.) still apply.
+
+<p>If you are running multiple loops on the collector with no changes in between, the second will be consistently faster.
+Optimally, you might want to unroll the loop to just do everything in one shot.
+
+<p>The first might be faster than the second if the collector is returning a really large number of elements.
+
+<p>Mostly, you want to get a set of things once and just do things to it once.
+Normally, only certain specialized applications such as multiple data extractions or multiple permutations for design studies might require retrieval of the exact same data and then doing things to it repeatedly in the same code sequence.
+
+<p>Let’s use made up concrete numbers.
+
+<ul>
+<li>It takes 100 ms to process the model and find elements that pass the filters, and to wrap each element into the API object.
+<li>It takes 5 ms to build the .NET collection returned by ToElements.
+<li>It takes 1 ms to traverse a .NET IEnumerable&lt;Element&gt;, which could be either the Revit collector or the .NET collection.
+</ul>
+
+<p>So with one group of elements processed once:
+
+<ul>
+<li>With collection: 100 + 5 + 1 = 106 ms.
+<li>Without collection: 100 + 1 = 101 ms.
+</ul>
+
+<p>With the same exact group of elements processed 10 times in the same code (where we know there is no chance new elements were added or elements deleted that we care about):
+
+<ul>
+<li>With collection obtained once: 100 + 5 + 10 * 1 = 116 ms.
+<li>Without collection:  100 * 10 + 10 * 1 = 1010 ms.
+</ul>
+
+<p>Make sense?
+
+<p>The key thing to understand is that FilteredElementCollector caches nothing (except the filters applied to it, of course).
+Caching data needed for multiple things will be better &ndash; always &ndash; but premature if there’s no need to have such a cache at all.
+
+<p>Note that the built-in collections on Document (.WallTypes, etc.) &ndash; which are becoming obsolete in future versions &ndash; use FilteredElementCollector as their base; there is no caching done there either, and no real advantage to them other than saving the coding effort of building the collector and filters.

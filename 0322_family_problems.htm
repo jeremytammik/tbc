@@ -1,0 +1,45 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Family problems... by Greg Wesner -->
+
+<h3>Family Problems Missing Components</h3>
+
+<p>The title of this question from my colleague Greg Wesner of Autodesk is so nice, I just had to add it to the blog, even though we have actually already provided the explanation a long time ago.
+
+<p><strong>Question: Family problems...</strong> ... no, not that kind – Revit Family problems :-)
+
+<p>This seems so simple, yet I'm way too tired to try to figure this out. 
+I'm porting some code that I didn't write from Revit 2009 to 2010. 
+I'm getting an error because of this line:
+
+<pre class="code">
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> m_family.Components )
+{
+&nbsp; <span class="green">// do something to element e</span>
+}
+</pre>
+
+<p>I looked it up in the Revit Platform API Changes document and found the following:
+
+<p style="color:darkblue">New document methods &ndash; Document.LoadFamily and Document.EditFamily &ndash; are introduced ... as a result, the properties of Family which access the contents have been removed (Family.SolidForms, Family.VoidForms, Family.Components, Family.LoadedSymbols, Family.Others).
+
+<p>I've been looking around for a while now, and I don't see any obvious way to get to the equivalent of 'Components' in the 2010 Family API. 
+
+<p>The Revit 2009 SDK included the FamilyExplorer sample, but it seems it was dropped for 2010. Pity. 
+I searched your blog and haven't found anything obvious for this one. 
+
+<p>Any ideas? Even just pointing me to a sample would be great.
+
+<p><strong>Answer:</strong> Yes, that property was removed. 
+In Revit 2010, you can just open the family document instead and iterate over its elements in the normal fashion. 
+I actually did provide an explanation and explicit replacement code in the post describing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">
+porting The Building Coder samples</a> from 
+
+2009 to 2010.
+
+
+

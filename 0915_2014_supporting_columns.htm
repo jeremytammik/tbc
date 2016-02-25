@@ -1,0 +1,598 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07727891 [Bounding Box] -->
+
+<h3>Revit 2014 and Supporting Columns</h3>
+
+<h4>Revit 2014 Announced</h4>
+
+<p>As you probably noticed by now, Revit 2014 has been announced.
+Here are the
+
+<a href="http://www.autodesk.com/products/autodesk-revit-family/features">
+main product features</a>:
+
+<ul>
+<li>Design
+<ul>
+<li>Enhanced Autodesk Exchange
+<li>Dockable window framework
+<li>New stairs and railings
+<li>Temporary view templates to change view properties temporarily
+<li>Point cloud improvements improve appearance and controls of point clouds
+<li>Parameter variance for groups to vary the value of parameters assigned to groups
+<li>New air terminal on duct enables placement of air terminal device on duct face
+<li>New angle constraints to restrict angles for pipe, duct, and cable tray
+<li>Cap open ends of pipe or duct content quickly
+<li>CSV file removal project, embedding the data into families
+<li>New plumbing template
+<li>New rebar placement constraints customization
+<li>Reinforcement enhancements with more rebar options
+</ul>
+
+<li>Documentation
+<ul>
+<li>Non-rectangular crop regions
+<li>Split elevations
+<li>Alternate dimensions
+<li>Improved rebar tagging to annotate multiple elements with a single tag
+<li>Improved positioning of beams and braces
+<li>Enhanced schedules providing greater control of schedule formatting
+</ul>
+
+<li>Visualization
+<ul>
+<li>Displaced views enable creation of displaced or exploded building design views
+<li>Enhanced visualization
+<li>New rendering to reduce project costs with cloud-based rendering
+</ul>
+
+<li>Analysis
+<ul>
+<li>New building element energy analysis
+<li>Enhanced structural analytical model
+<li>New duct and pipe calculations to API
+</ul>
+</ul>
+
+
+<!-- Here is one of many overviews of
+
+<a href="http://autodesk-revit.blogspot.ch/2013/03/whats-new-in-revit-2014.html">what's new</a>. -->
+
+<p>Each and every one of these is really exciting in itself, and almost all include or are even based on enhanced API support.
+Some of the ones that seem most exciting to me are the non-rectangular crop regions, parameter variance for groups, enhanced schedules, displaced views... well, as said, they are really all very exciting.</p>
+
+<p>And this is not even mentioning some of the new API features, such as the possibility to launch a Revit command and control copy and paste operations.
+I will get to all that real soon now.</p>
+
+<p>As Harry puts it, the Revit 2014 API is going to
+
+<a href="http://boostyourbim.wordpress.com/2013/03/26/revit-2014-api-is-going-to-blow-your-faces-out">
+blow your faces out</a>  :-)</p>
+
+<a name="2"></a>
+
+<h4>Determining the Columns Supporting a Beam</h4>
+
+<p>Still, ignoring all that busy-ness for the moment, I chug along and return to a topic similar to my discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/filter-for-touching-beams-using-solid-intersection.html">
+retrieving all touching beams</a>.
+
+<p>In that post, I showed how to recursively traverse a collection of beams and detect the neighbouring ones at each end using an ElementIntersectsSolidFilter with a sphere.</p>
+
+<p>Today I explore the task of determining the columns supporting a selected beam using various different filtering and intersection methods.</p>
+
+<ul>
+<li><a href="#2">Columns supporting a selected beam</a></li>
+<li><a href="#3">Solid and element intersection</a></li>
+<li><a href="#4">Bounding box filter tolerance</a></li>
+<li><a href="#5">Moving the beam downwards in a temporary transaction</a></li>
+<li><a href="#6">GetGeneratingElementIds</a></li>
+<li><a href="#7">Cylinder Along Location Line Offset Downwards</a></li>
+<li><a href="#8">Find references via ray casting</a></li>
+<li><a href="#9">Sweep Along Location Curve Offset Downwards</a></li>
+<li><a href="#10">Conclusion and source code</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Columns Supporting a Selected Beam</h4>
+
+<p>Here is a view of a simple sample model:</p>
+
+<center>
+<img src="img/supporting_columns.png" alt="Beam supported by two columns" width="200"/>
+</center>
+
+<p>The task at hand is to pick the indicated beam and report the columns supporting it:</p>
+
+<center>
+<img src="img/supporting_columns_msg.png" alt="Reporting the columns supporting the selected beam" width="400"/>
+</center>
+
+<p>Simple, ain't it?</p>
+
+
+<a name="3"></a>
+
+<h4>Solid and Element Intersection</h4>
+
+<p>Initially, I made some further attempts and experiments using the ElementIntersectsSolidFilter and ElementIntersectsElementFilter functionality.
+
+<p>The sample provided includes code exercising these tests and also the original bounding box implementation.
+It is enclosed in 'if' statements checking the setting of the following Boolean variables:
+
+<pre class="code">
+  bool useBoundingBox = false;
+  bool useSolid = false;
+  bool useElement = false;
+</pre>
+
+<p>That enables them to be switched on and off interactively in the debugger, if the need arises.
+
+<p>Unfortunately, as it turns out, they both do not work.
+
+<p>The beam solid is not quite big enough to intersect the columns, because the beam is cut back so that it does not actually intersect them.
+
+<p>The same problem also prevents use the element intersection filter.
+
+<p>It would be great if there was a possibility to grow the solid just slightly, e.g. offset all its faces outwards by an inch or two or define a tolerance before executing the intersection check, like for the bounding box.
+Unfortunately, growing or shrinking an arbitrary solid is much harder than a bounding box and therefore not implemented.
+
+
+<a name="4"></a>
+
+<h4>Bounding Box Filter Tolerance</h4>
+
+<p>The BoundingBoxIsInsideFilter can be instantiated with an optional double tolerance value that allows control over the match criteria by using the given tolerance in the geometry comparison.
+
+<p>By default, the tolerance is set to zero.
+If the tolerance is positive, the iterated element outline may extend the tolerance distance outside of the given outline in each coordinate to be a match.
+If the tolerance is negative, the iterated element outline must lie at least the tolerance distance inside the given outline in each coordinate to be a match.
+
+<p>This is exactly what I would need here for the solid and element intersection filters as well.
+Unfortunately, as said, such a tolerance is not supported by the solid or element intersection filters.
+
+
+<a name="5"></a>
+
+<h4>Moving the Beam Downwards in a Temporary Transaction</h4>
+
+<p>Lacking the tolerance option, I thought that maybe it would help to move the beam down a bit, and that it would intersect the supporting columns then.
+Unfortunately, that does not help either.
+
+<p>The problem is not only that the bottom face of the beam solid may be located above the end of the supporting columns, but also that the ends of the beam are cut back to avoid intersecting the columns, so their solids do not intersect even when the beam is moved slightly downwards.
+
+<p>This temporary movement forces a switch from read-only to manual transaction mode, of course, even though the model is not actually modify in any way in the end.
+
+<p>To make sure that the movement really is executed and the model updated before checking for an intersection, I followed the advice given by Arno&scaron;t L&ouml;bel on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+enhancing the temporary transaction trick</a> and
+
+encapsulated the whole operation in a transaction group.
+The group is rolled rolled back at the end, but, before doing so, the encapsulated temporary transaction around the movement of the beam can be committed and the updated geometry evaluated.
+
+<p>By the way, these changes temporarily caused an error saying "Attempted to read or write protected memory. This is often an indication that other memory is corrupt."
+This was probably due to accessing the list of elements generated within the temporary transaction after the transaction group is rolled back.
+I handled that problem by storing the element ids instead of the live elements themselves inside the transaction, and then opening the elements via their id after rolling back the changes.
+
+<p>As said, the temporary downward translation still did not produce any intersections.</p>
+
+<p>Time for another idea.
+
+
+<a name="6"></a>
+
+<h4>GetGeneratingElementIds</h4>
+
+<p>A colleague suggested that if the beam is cut back by the columns, you can iterate over the beam geometry faces and call the Element GetGeneratingElementIds method on each one, which might return the column element ids.
+In this example, you might also get faces generated by joins with other beams.
+
+<p>I tried this, encapsulating the code in the section if( useGeneratingIds ).
+Unfortunately, all the generating ids belong to the structural framing or floors categories, so that does not help to determine the columns either.
+No columns at all are returned by this method.
+
+
+<a name="7"></a>
+
+<h4>Cylinder Along Location Line Offset Downwards</h4>
+
+<p>I then realised that I could create a much simpler independent solid shape to intersect the columns by extruding a cylinder along the beam location line, offset downwards to just below the bottom face of the beam.
+It might require extending a little at each end.
+All supporting columns should be intersected by it.
+
+<p>I can use code similar to the sample presented to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">
+find 3D elements by intersection</a>.
+
+<p>Yay!
+This works!
+
+
+<a name="8"></a>
+
+<h4>Find References via Ray Casting</h4>
+
+<p>A similar approach as the solid intersection with an offset cylinder could obviously also be implemented using the ray casting functionality provided by the FindReferencesByDirection and FindReferencesWithContextByDirection methods and the ReferenceIntersector wrapper class.</p>
+
+<p>I did not implement any sample code demonstrating this, because I wanted to generalise the straight beam cylinder solution to a more general arbitrary curve case.</p>
+
+
+<a name="9"></a>
+
+<h4>Sweep Along Location Curve Offset Downwards</h4>
+
+<p>Once I had the working solution using a cylinder defined by the straight beam location line offset downwards, I realised that it might be nice to use more generic sweep along curve functionality instead.
+<!-- of restricting the use to straight beams and an extruded cylinder. -->
+After all, the beam location curve might not be straight, and a non-linear location curve can quite simply be used to generate a non-linear solid using the CreateSweptGeometry method instead of CreateExtrusionGeometry.
+
+<p>My first attempt caused the CreateSweptGeometry method to throw an exception saying that "The given attachment point don't lie in the plane of the Curve Loop. Parameter name: pathAttachmentCrvIdx & pathAttachmentParam".
+That was my fault, though, because I was providing zero for the parameter value, which is probably the <i>normalised</i> curve start point parameter.
+When providing the <i>raw</i> parameter value returned by curve.get_EndParameter( 0 ) instead, all works fine.</p>
+
+<p>Here is a rather unrealistic sample spline beam that I used for testing:</p>
+
+<center>
+<img src="img/supporting_columns_spline_beam.png" alt="A spline beam supported by multiple columns" width="200"/>
+</center>
+
+<p>The algorithm reports the following supporting columns for the spline beam:</p>
+
+<center>
+<img src="img/supporting_columns_spline_beam_msg.png" alt="Reporting the columns supporting the selected spline beam" width="400"/>
+</center>
+
+<p>All is well.</p>
+
+
+<a name="10"></a>
+
+<h4>Conclusion and Source Code</h4>
+
+<p>Here is the complete source code of this command, including the test branches that are disabled by default.
+As said, they can be enabled and tested by modifying the Boolean switches interactively in the debugger.
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _eps = 0.1e-9;
+&nbsp;
+&nbsp; <span class="blue">double</span> SignedDistanceTo( <span class="teal">Plane</span> plane, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = plane.Normal;
+&nbsp; &nbsp; <span class="blue">return</span> v.DotProduct( p )
+&nbsp; &nbsp; &nbsp; - v.DotProduct( plane.Origin );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">class</span> <span class="teal">BeamPickFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Element</span> beam = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">BeamPickFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select a beam&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; beam = doc.GetElement( r );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; columnIds = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Optionally switch between different tests</span>
+&nbsp; &nbsp; <span class="green">// by modifying these values in the debugger</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> useBoundingBox = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> useSolid = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> useElement = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> useGeneratingIds = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> useLocation = <span class="blue">true</span>;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Obsolete previous attempts
+&nbsp; &nbsp; <span class="blue">if</span>( useBoundingBox )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> box = beam.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Outline</span> outline = <span class="blue">new</span> <span class="teal">Outline</span>( box.Min, box.Max );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> bbfilter = <span class="blue">new</span> <span class="teal">BoundingBoxIntersectsFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; outline, 0.1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> columns
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_StructuralColumns )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( bbfilter );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( useSolid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = beam.get_Geometry( opt );
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> beamIntersectFilter
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>( solid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> columns
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_StructuralColumns )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( beamIntersectFilter );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( useElement )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Initially, no columns are found to </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// intersect the beam. Maybe it will help to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// move the beam down a bit?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> txg = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; txg.Start( <span class="maroon">&quot;Find Columns Intersecting Beam&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Temporarily Move Beam Down a Little&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, beam.Id, -0.1 * <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> beamIntersectFilter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsElementFilter</span>( beam );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> columns
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_StructuralColumns )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( beamIntersectFilter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; columnIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; columns.ToElementIds() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// We do not commit the transaction group, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// because no modifications should be saved.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The transaction group is only created and </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// started to encapsulate the transactions </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// required by the IsolateElementTemporary </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// method. Since the transaction group is not </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// committed, the changes are automatically </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// discarded.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//txg.Commit();</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( useGeneratingIds )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = beam.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = beam.GetGeneratingElementIds( f );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralColumns ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; columnIds.Add( id );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Obsolete previous attempts</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( useLocation )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine beam location curve for </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// extrusion direction and length</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = beam.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = lc.Curve;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Handle generic curve parameters.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// See below for simplified linear case.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> param = curve.get_EndParameter( 0 );
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> transform = curve.ComputeDerivatives( param, <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( p.IsAlmostEqualTo( transform.Origin ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected derivative origin to equal evaluation curve point&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> tangent = transform.BasisX;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Use bounding box to determine elevation of</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// bottom of beam and how far downwards to </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// offset location line -- one inch below </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// beam bottom.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = beam.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( .001 &gt; bb.Min.Z - bb.Max.Z,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected horizontal beam&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> inch = 1.0 / 12.0;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> beamBottom = bb.Min.Z;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> arcCenter = <span class="blue">new</span> <span class="teal">XYZ</span>( p.X, p.Y,
+&nbsp; &nbsp; &nbsp; &nbsp; beamBottom - inch );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( tangent, arcCenter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveLoop</span> profileLoop = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; &nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Arc</span> arc1 = creapp.NewArc(
+&nbsp; &nbsp; &nbsp; &nbsp; plane, inch, 0, <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Arc</span> arc2 = creapp.NewArc(
+&nbsp; &nbsp; &nbsp; &nbsp; plane, inch, <span class="teal">Math</span>.PI, 2 * <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; &nbsp; &nbsp; profileLoop.Append( arc1 );
+&nbsp; &nbsp; &nbsp; profileLoop.Append( arc2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; loops.Add( profileLoop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Switch this on to handle a straight beam as </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// a separate simplified case using </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// CreateExtrusionGeometry instead of the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// generic CreateSweptGeometry solution.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> checkForLine = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( checkForLine &amp;&amp; curve <span class="blue">is</span> <span class="teal">Line</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0.01 &gt; v.Z,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected horizontal beam&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( v.IsAlmostEqualTo( tangent ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected straight beam vector to equal start tangent&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; solid = <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CreateExtrusionGeometry( loops, v, v.GetLength() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Offset location curve downward </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// one inch&nbsp; below beam bottom face</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> offset = arcCenter - p;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; transform = <span class="teal">Transform</span>.get_Translation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; offset );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CurveLoop</span> sweepPath = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; sweepPath.Append( curve.get_Transformed(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; transform ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; solid = <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CreateSweptGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sweepPath, 0, param, loops );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> beamIntersectFilter
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>( solid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; columnIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_StructuralColumns )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( beamIntersectFilter )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToElementIds() );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = (<span class="blue">null</span> == columnIds)
+&nbsp; &nbsp; &nbsp; ? 0
+&nbsp; &nbsp; &nbsp; : columnIds.Count&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s1 = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Selected beam is supported by {0} column{1}{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n,
+&nbsp; &nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ),
+&nbsp; &nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;:&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s2 = <span class="maroon">&quot;&lt;None&gt;&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uidoc.Selection.Elements.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> columnIds )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp; &nbsp; &nbsp; &nbsp; uidoc.Selection.Elements.Add( e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; s2 = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; columnIds.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id =&gt; id.IntegerValue.ToString() ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( s1, s2 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>For your convenience, here is
+
+<a href="zip/GetBeamColumns06.zip">GetBeamColumns06.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the GetBeamColumns external command.
+
+<p>I hope you find this both interesting and useful as a basis for your own variants.

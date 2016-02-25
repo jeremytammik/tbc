@@ -1,0 +1,181 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!-- 1250726 [Find instance at specific location] -->
+
+<h3>Language Integrated Query Linq</h3>
+
+<p>The 
+
+<a href="http://en.wikipedia.org/wiki/Language_Integrated_Query">
+Language Integrated Query</a>
+
+or 
+
+<a href="http://en.wikipedia.org/wiki/Language_Integrated_Query">
+Linq</a>
+
+is a .NET Framework component that adds powerful native data querying capabilities to .NET languages.</p>
+
+<p>Here is a contribution by Joel Karr of
+
+<a href="http://www.esdesign.com">
+Environmental Systems Design, Inc</a>
+
+on this exciting topic, demonstrating how it can be used to achieve huge performance improvements when analysing large Revit models.</p>
+
+<h3>Using LINQ to Query</h3>
+
+<p>Here at Environmental Systems Design, www.esdesign.com, we have seen that a simple task in Revit, such as changing a single parameter of an object, can take an immense amount of time when multiplied over thousands of elements in a model.  
+Through the use of LINQ, we have found that we have a wide range of powerful query tools that can help us avoid the costly time associated with constant calls to the Revit API.  
+We can store the information we need once, and then efficiently query that data in a similar way to the familiar SQL database queries.</p>
+
+<p>LINQ was introduced with the .NET Framework 3.5.
+The main benefit is an advanced native data query capability.
+For example, if we wanted to find all diffusers in a model that had a CFM of over 500, we could use a LINQ query to find them:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> results 
+&nbsp; &nbsp; = <span class="blue">from</span> d <span class="blue">in</span> allDiffusers
+&nbsp; &nbsp; &nbsp; <span class="blue">let</span> x = 500
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> d.CFM &lt; x
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> d;
+</pre>
+
+<p>Although LINQ takes a little more time to set up initially, repeated queries will perform much faster.  We had an instance where we wanted to place nearly 15,000 connectors in our model to correspond with an architectural model.</p>
+
+<p>LINQ queries have a running time of O(n), but when used with Revit we find that we can greatly reduce our search time if we store information in an object that we will reuse.  Our initial method kept a list of elements and then checked each element.Location for a match.  This caused us to use the Revit API thousands of times unnecessarily.  By storing the location in an object and then using LINQ to find a match, our process time went from over 14 hours down to under 10 minutes.</p>
+
+<p>We created an object that stored the information about each lighting fixture in the architect's model and also the information we needed about our connectors.  Through the use of a LINQ query, we were able to search to see if a connector existed at the same location as the architect's lighting fixture.</p>
+
+<p>It became as simple as the following code to find out if a connector existed in the same location as the lighting fixture we were checking:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> found 
+&nbsp; &nbsp; = <span class="blue">from</span> con <span class="blue">in</span> Connectors
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> con.ConLocation.Equals( location )
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> con;
+</pre>
+
+<p>LINQ can work with a ton of different type of data sources.  Some of the most popular are SQL, XML, ADO.NET datasets, .NET objects and several other third party sources which even include an ongoing project for the creation of LINQ to Google.  In order to keep our code self contained and as simple as possible, we create a custom object to use with our LINQ queries.</p>
+
+<p>To start with, we need to create a new class to store the information that we would like to query:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">InstanceData</span>
+{
+<span class="blue">&nbsp; #region</span> Field Data
+&nbsp; <span class="blue">private</span> <span class="teal">Element</span> _instance;
+&nbsp; <span class="blue">private</span> <span class="teal">String</span> _param1;
+&nbsp; <span class="blue">private</span> <span class="blue">bool</span> _param2;
+&nbsp; <span class="blue">private</span> <span class="blue">int</span> _param3;
+<span class="blue">&nbsp; #endregion</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Properties
+&nbsp; <span class="blue">public</span> <span class="teal">Element</span> Instance
+&nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _instance; }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _instance = <span class="blue">value</span>; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="teal">String</span> Param1
+&nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _param1; }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _param1 = <span class="blue">value</span>; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Param2
+&nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _param2; }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _param2 = <span class="blue">value</span>; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Param3
+&nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _param3; }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _param3 = <span class="blue">value</span>; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Constructors
+&nbsp; <span class="blue">public</span> InstanceData( <span class="teal">Element</span> instance )
+&nbsp; {
+&nbsp; &nbsp; Instance = instance;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> param <span class="blue">in</span> Instance.Parameters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Param1 returns string value</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( param.Definition.Name == <span class="maroon">&quot;Param1&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; Param1 = param.AsString();
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Param2 is a checkbox returning 0 or 1</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( param.Definition.Name == <span class="maroon">&quot;Param2&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; Param2 = (0 != param.AsInteger());
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Param3 returns an integer value</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( param.Definition.Name == <span class="maroon">&quot;Param3&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; Param3 = param.AsInteger();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span>
+}
+</pre>
+
+<p>Now that we have our custom class created, we just need to populate it with the data we would like to query.  
+This can be done many ways.
+For this example we will simply retrieve all the family instances in the model:</p>
+
+<pre class="code">
+<span class="teal">CreationFilter</span> cf = app.Create.Filter;
+<span class="teal">Filter</span> f1 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+doc.get_Elements( f1, a );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">InstanceData</span>&gt; instanceDataList 
+&nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">InstanceData</span>&gt;();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+{
+&nbsp; instanceDataList.Add( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">InstanceData</span>( e ) );
+}
+&nbsp;
+<span class="blue">string</span> s = <span class="maroon">&quot;value1&quot;</span>;
+<span class="blue">bool</span> b = <span class="blue">true</span>;
+<span class="blue">int</span> i = 42;
+&nbsp;
+<span class="blue">var</span> found = <span class="blue">from</span> instance <span class="blue">in</span> instanceDataList <span class="blue">where</span> 
+&nbsp; (instance.Param1.Equals( s )
+&nbsp; &amp;&amp; b == instance.Param2
+&nbsp; &amp;&amp; i &lt; instance.Param3)
+<span class="blue">select</span> instance;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">InstanceData</span> instance <span class="blue">in</span> found )
+{&nbsp; 
+&nbsp; <span class="green">// Do whatever you would like</span>
+}
+</pre>
+
+
+<p>So that was it from Joel, and back to Jeremy again. 
+Thank you ever so much, Joel, for this fantastic introduction and example!</p>
+
+<p>While preparing this article, I was a bit stumped to compile the sample code as part of The Building Coder samples until I noticed that I have to switch to the .NET Framework 3.5 before I can use Linq in C#. Watch out for this if you are trying to add Linq functionality to existing older projects.</p>
+
+<p>Two things to note here, which make this information ever more globally usable:</p>
+
+<ul>
+<li>This is a very powerful optimisation technology in any environment, whether inside of Revit or elsewhere.
+<li>Possibly the same kind of performance enhancement could be achieved by using some other caching mechanism independent of Linq. The main factor here is possibly the local storage of the data to be processed, avoiding repeated expensive calls to query it from Revit.
+</ul>
+
+<p>One extremely powerful advantage of Linq is its extremely readable query syntax.</p>

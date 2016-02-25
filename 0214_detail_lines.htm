@@ -1,0 +1,118 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1252850 [Drawing Detail lines on a drafting view.] -->
+
+<h3>Detail Lines</h3>
+
+<p>We previously discussed various aspects of model lines, such as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/model-line-creation.html">
+model line creation</a>,
+
+the 
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/model-line-sketch-plane.html">
+model line sketch plane</a>,
+
+and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">
+minimal length of a model line</a>.
+
+Here is a question on the related topic of detail lines handled by my colleague Saikat Bhattacharya:
+
+<p><strong>Question:</strong>
+How can I create a detail line on a drafting view? 
+I tried to use the following statement:
+
+<pre>
+doc.Create.NewDetailCurve( View, curve, y );
+</pre>
+
+It is unclear to me what the "curve" and the "sketchPlane" stand for and how to use them.
+Please could you provide me with a small sample.
+
+<p><strong>Answer:</strong>
+Detail curves are created for drawings such as a detail or drafting view. 
+They are annotation elements and are visible only in the view in which they are drawn.
+They can currently only be created in plan views.
+
+<p>Except for this, detail curves are similar to model curves. 
+ModelLine and DetailLine both belong to the Lines category.
+Thus, for a sample on creating detail curves, you can refer to and slightly adapt the Revit SDK sample ModelLines,
+which shows how to work with the sketch plane and geometry curve to create a new model line. 
+
+<p>For more details on sketch planes and model curves, you can also refer to the developer guide "Revit 2010 API Developer Guide.pdf", especially chapter 14, Annotation Elements, and section 14.2, Detail Curve.
+Another helpful section is 15.3.1 on Creating a ModelCurve and the Code Region 15-2: Creating a new model curve, which illustrates how to create new geometry curves, a sketch plane, and model curves, a ModelLine and a ModelArc.
+You can use the same approach to create detail curves as well.
+
+<p>I implemented a new external command CmdDetailCurves in The Building Coder sample application by slightly modifying the sample code provided in the developer guide. 
+Here is the code of the new command's Execute method:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; <span class="green">// Create a geometry line</span>
+&nbsp; <span class="teal">XYZ</span> startPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> endPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp;
+&nbsp; <span class="teal">Line</span> geomLine = app.Create.NewLine(
+&nbsp; &nbsp; startPoint, endPoint, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="green">// Create a geometry arc</span>
+&nbsp; <span class="teal">XYZ</span> end0 = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> end1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 10 );
+&nbsp; <span class="teal">XYZ</span> pointOnCurve = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 0, 0 );
+&nbsp;
+&nbsp; <span class="teal">Arc</span> geomArc = app.Create.NewArc(
+&nbsp; &nbsp; end0, end1, pointOnCurve );
+&nbsp;
+&nbsp; <span class="green">// Create a geometry plane</span>
+&nbsp; <span class="teal">XYZ</span> origin = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> normal = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 1, 0 );
+&nbsp;
+&nbsp; <span class="teal">Plane</span> geomPlane = app.Create.NewPlane(
+&nbsp; &nbsp; normal, origin );
+&nbsp;
+&nbsp; <span class="green">// Create a sketch plane in current document</span>
+&nbsp; <span class="teal">SketchPlane</span> sketch = doc.Create.NewSketchPlane(
+&nbsp; &nbsp; geomPlane );
+&nbsp;
+&nbsp; <span class="green">// Create a DetailLine element using the </span>
+&nbsp; <span class="green">// created geometry line and sketch plane</span>
+&nbsp; <span class="teal">DetailLine</span> line = doc.Create.NewDetailCurve(
+&nbsp; &nbsp; view, geomLine ) <span class="blue">as</span> <span class="teal">DetailLine</span>;
+&nbsp;
+&nbsp; <span class="green">// Create a DetailArc element using the </span>
+&nbsp; <span class="green">// created geometry arc and sketch plane</span>
+&nbsp; <span class="teal">DetailArc</span> arc = doc.Create.NewDetailCurve(
+&nbsp; &nbsp; view, geomArc ) <span class="blue">as</span> <span class="teal">DetailArc</span>;
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre> 
+
+<p>As you see, the curve parameter above can be any geometric curve entity like Line, Arc, Ellipse or NurbSpline. 
+All of these types are derived from the Curve class and can be used as parameters to create a detail curve.
+
+<p>Here are the resulting detail curves after running this command in a new project document:
+
+<center>
+<img src="img/detail_curves.png" alt="Detail curves"/>
+</center>
+
+<p>Here is
+
+<a href="zip/bc11046.zip">
+version 1.1.0.46</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>Thank you Saikat for this helpful explanation!
+
+<p><strong>Addendum:</strong> Please make sure you do not overlook the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/detail-curve-must-indeed-lie-in-plane.html">
+update to this post</a>.

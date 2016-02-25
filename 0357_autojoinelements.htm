@@ -1,0 +1,109 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>AutoJoinElements</h3>
+
+<p>I just heard that there is an issue with the Document.AutoJoinElements method.
+This gave rise to a discussion which raises some interesting points and is worth sharing.
+
+<p>For those of you not familiar with this method, here is the brief description from the Revit API help file:
+
+<p style="color:darkblue">AutoJoinElements forces the elements in the Revit document to automatically join to their neighbours where appropriate.
+Use this method to force elements in the document to automatically join to their neighbours.
+Note that when a transaction is committed there is an automatic call to automatically join elements.</p>
+
+<p>That sounds pretty clear, doesn't it?
+Unfortunately, it doesn't quite work that way, at least not at the moment.
+
+
+<h4>Automatic AutoJoinElements Broken</h4>
+
+<p>As stated in the help file, all elements requiring joining are automatically joined every time a transaction is committed.
+This obviously includes the transaction that is automatically managed by the Revit API framework for a command using the automatic transaction mode.
+
+<p>You may want to call auto-join manually at some point as well, though only in manual regeneration mode, for instance if you need to query the auto-joined geometry for something else. 
+For example, if you create two walls that will eventually be auto-joined, and want to examine the corner formed by them right away because you want to create something else there. 
+In order to get the updated and joined geometry and the final resulting corner point, you will need to regenerate and auto-join. 
+
+<p>The Regeneration.Automatic mode applies to auto-joining as well. 
+In any mode though, you should not need to call auto-join (nor regenerate) manually if you do not need to read updated geometry. 
+The end of the transaction will always perform both no matter what the regeneration mode is. 
+
+<p>Unfortunately, right now, you <strong>do</strong> need to make the explicit call to AutoJoinElements, because the automatic mechanism is not kicking in. 
+Furthermore, calling AutoJoinElements in automatic regeneration mode will throw an exception, so you cannot do that. 
+An application that needs this functionality currently has to use manual regeneration. 
+
+<p>If I run the Revit API introduction external command Lab2_0_CreateLittleHouse, which creates a little house consisting of four walls with a door and some windows, a floor, a roof, and a room, the end result after the command terminates looks like this:</p>
+
+<center>
+<img src="img/little_house_unjoined.png" alt="Little house with unjoined walls"/>
+</center>
+
+<p>The walls have not been joined at the corners, so somehow the automatic call to AutoJoinElements has not been performed.
+
+<p>This command is using automatic transaction mode and the manual regeneration option.
+
+<p>Adding a call to doc.AutoJoinElements immediately before returning Result.Succeeded fixes the problem:</p>
+
+<center>
+<img src="img/little_house_joined.png" alt="Little house with joined walls"/>
+</center>
+
+
+<h4>Questions and Answers on AutoJoinElements</h4>
+
+<p>As mentioned above, we had an interesting and fruitful internal discussion in the course of clarifying the intended behaviour of this mechanism:
+
+<p><strong>[Q]</strong> I would like some usage tips or comments that help me understand the behaviour of AutoJoinElemens.
+Here is what I am doing:
+I draw four rectangular walls.
+I notice that the wall corners are not automatically shrink wrapped.
+If I add an explicit call to AutoJoinElements, they are.
+When is the right timing for this?
+Right before or after a new element is added?
+Does AutoJoinElements only affect one element at a time?
+
+<p><strong>[A]</strong> It can be used to affect one single element at a time, and it is also effective for multiple elements.
+That's what I would do here: draw all the new walls, call AutoJoinElements once at the end, and then you should be able to do things like creating rooms for the circuits formed by these walls.
+
+<p>You may also need to regenerate first by calling doc.Regenerate, and then auto-join.
+Sometimes, you may even need to regenerate again afterwards as well.
+
+<p><strong>[Q]</strong> Thank you, it works now.
+So it looks like auto-join is also updating the graphics in this case.
+I thought the regeneration would do that.
+Your comment about calling the regeneration twice makes more sense now.
+
+<p><strong>[A]</strong> Generally, you should not need to regenerate twice, but sometimes it is needed.
+
+<p>Yes, auto-join updates the model.
+It updates it in a different way than regeneration.
+Technically, auto-join could actually be part of regeneration, but there are performance reasons for them to be two separate methods.
+
+<p>Obviously, you need a transaction to be able to regenerate and auto-join.
+The end of the transaction (commit) will do call these for you too, but you can do it yourself (in manual mode) if you need to.
+
+<p><strong>[Q]</strong> Another question: how can I partially auto-join, e.g. join certain specific walls but not others?
+
+<p><strong>[A]</strong> Auto joining is not for joining walls on demand &ndash; it is a step that will eventually be always performed and it will join everything that needs to be joined, according to certain rules.
+So it does not matter if you only auto-join two walls in your loop.
+At the end you will have to commit your transaction, and during the committing procedure all walls that should be joined will be joined automatically.
+
+<p><strong>[Q]</strong> Aha, thank you for the clarification.
+I thought this feature is to control join and disjoin behaviour, and that is not the case.
+
+<p>So this means that we only need to call auto-join once when the shrink wrap information is needed.
+
+<p>Regarding the automatically joining, I am using TransactionMode.Automatic and RegenerationOption.Automatic, and the walls are not joined after my command has terminated.
+I need to add the call to AutoJoinElements for them to be joined.
+
+<p><strong>[A]</strong> As explained above, that is a temporary situation.
+The Regeneration.Automatic mode normally applies to auto-joining as well.
+You should not need to call auto-join manually in any mode if you do not need to query the updated geometry.
+The end of the transaction will always perform both no matter what the regeneration mode is.
+
+<p>Right now you do need to make the explicit call to AutoJoinElements, because the automatic mechanism is not kicking in.
+Furthermore, you cannot make that call in automatic regeneration mode due to it throwing an exception, so an application that needs this functionality currently has to use manual regeneration.
+
+<p>Very many thanks to Mikako Harada, Scott Conover and Arno&scaron;t L&ouml;bel for this useful information, and sorry for the temporary bad news for application developers relying on the automatic mechanism.

@@ -1,0 +1,95 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1273427 [How to check if an element is inside/outside cropbox of view] -->
+
+<h3>Element in View Crop Box Predicate</h3>
+
+<p>We had a look at one aspect of the interaction between element geometry and the view crop box last week when noting that
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/section-view-geometry-not-cropped.html">
+section view geometry is not cropped</a>.
+
+<p>Here is another aspect: a useful little predicate function developer by Frode T&oslash;rresdal of 
+
+<a href="http://www.nois.no">
+Norconsult Informasjonssystemer AS</a> to
+
+determine whether an element is contained in the crop box of a view.
+
+<p><strong>Question:</strong> Using the API I'm trying to determine if a detail item element is inside or outside the cropbox of a view. 
+
+<p>This code works fine in a plan view, but not in a elevation view:
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> IsElementOutsideCropBox( <span class="teal">Element</span> e, <span class="teal">View</span> v )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = v.CropBoxActive;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> vBox = v.CropBox;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> eBox = e.get_BoundingBox( v );
+
+&nbsp; &nbsp; &nbsp; rc = ( eBox.Min.X &gt; vBox.Max.X )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Max.X &lt; vBox.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Min.Y &gt; vBox.Max.Y )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Max.Y &lt; vBox.Min.Y )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Min.Z &gt; vBox.Max.Z )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Max.Z &lt; vBox.Min.Z );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+</pre>
+
+<p>What might I be doing wrong, please?
+
+
+
+<p><strong>Answer:</strong> In what way does it not work in an elevation view? 
+Are some (or all) of the six logical checks incorrect, or what?
+
+<p>In any case, comparing the bounding box min and max will never be precise, because the element's rectangular bounding box will not match the geometry of any non-rectangular element. 
+
+<p>Instead, how about creating a FilteredElementCollector with the view so that it returns only the elements visible in the view, and then check to see if the element of interest is found by the collector?
+
+
+<p><strong>Response:</strong> I tried to create the FilteredElementCollector with the view as an input parameter, but that collector also collects the elements outside the crop box.
+
+<p>I think I found the solution to the problem, however:
+The transforms of the view and the element are different. 
+On all the cases I've tested, it seems to work OK if I use the inverse transform of the crop box of the view on the element.
+
+<p>I now use the following code to transform the bounding box:
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> IsElementOutsideCropBox( <span class="teal">Element</span> e, <span class="teal">View</span> v )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = v.CropBoxActive;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> vBox = v.CropBox;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> eBox = e.get_BoundingBox( v );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> tInv = v.CropBox.Transform.Inverse;
+&nbsp; &nbsp; &nbsp; eBox.Max = tInv.OfPoint( eBox.Max );
+&nbsp; &nbsp; &nbsp; eBox.Min = tInv.OfPoint( eBox.Min );
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = ( eBox.Min.X &gt; vBox.Max.X )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Max.X &lt; vBox.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Min.Y &gt; vBox.Max.Y )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( eBox.Max.Y &lt; vBox.Min.Y );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+</pre>
+
+<p>I left out the Z coordinate in this version, because the transform is not 100% accurate. 
+Therefore, if the element box is on the edge of the view box, the comparison might be slightly off and not return the desired result. 
+I should probably include a tolerance in the test, but in my case the Z test is not important anyway.
+
+<p>As said, the new system resolves my issue and I will use that in the future.
+
+<p>Many thanks to Frode for this useful hint!

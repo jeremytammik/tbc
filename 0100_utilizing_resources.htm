@@ -1,0 +1,160 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Utilizing Revit API Resources</h3>
+
+<h4>Happy Birthday to The Building Coder</h4>
+
+<img src="img/100_birthday.gif" alt="Happy Birthday to The Building Coder"/>
+
+<p>
+Hooray!
+This is the hundredth posting to The Building Coder.
+I am celebrating by having a wonderful cup of chai and a muesli with my dear friend 
+
+<a href="http://www.tanzdichganz.ch">
+Andreas</a>
+
+in the middle of a snowstorm way out in the Swiss countryside.
+I hope you are happy as well.
+I am looking forward to feedback, suggestions, and questions to fuel future topics.
+Please be aware that I do not want to do any of your work for you, but I love supporting you in doing it yourself.
+Here is a prime example of such a process coming to full fruition.
+</p>
+
+<p>A couple of weeks ago,
+
+<a href="mailto:dan.levesque@stantec.com">Dan Levesque</a>
+
+of
+
+<a href="http://www.stantec.com">Stantec</a>
+
+approached me asking for support in rapidly implementing a complex process for managing elements in a large structural Revit project.
+We decide to handle this step by step and on a do-it-yourself basis, and the end result is really pretty spectacular.
+Dan made extremely effective use of a number of pre-existing Revit SDK and ADN samples that address similar issues, asking brief questions on how to adapt them for his own use and with minimal further guidance.</p>
+
+<p>For this special issue, I asked Dan to describe his project as a perfect example of making use of the large base of existing sample code to create a complex and professional customer solution. Here is Dan's project description:</p>
+
+<h4>Company</h4>
+
+<p><a href="http://www.stantec.com">Stantec</a>
+provides professional consulting services in planning, engineering, architecture, interior design, landscape architecture, surveying, environmental sciences, project management, and project economics for infrastructure and facilities projects.  Stantec supports public and private sector clients in a diverse range of markets, at every stage, from initial concept and financial feasibility to project completion and beyond. There services are offered through over 10,000 employees operating out of more than 150 locations in North America.</p>
+
+<h4>Contact</h4>
+
+<p><a href="mailto:dan.levesque@stantec.com">Dan Levesque</a>
+is a Senior Structural Technologist at Stantec in Scarborough, Maine. He has over 13 years of experience in the use of 3D modelling software, programming, network administration and web development. At Stantec Scarborough office, Mr. Levesque is responsible for Revit Structure integration, file exchange, training, programming and software evaluation.</p>
+
+<h4>Software</h4>
+
+<p>Revit Structure 2009 SP2, Add-in Manager, Visual Studio 2008 Express, Navisworks.</p>
+
+<h4>Main Project</h4>
+
+<p>This is an overview of the project requiring additional Revit customization:</p>
+
+<ul>
+<li>Industrial power steel structure, new & existing phased.</li>
+<li>Composed of 14,000 tons of structural steel.</li>
+<li>Created in Revit Structure 2009.</li>
+<li>Divided into 4 projects.</li>
+<li>Analytical analysis performed with 3rd party software.</li>
+<li>Visualization, collision, and construction sequencing performed with Navisworks.</li>
+</ul>
+
+<h4>Revit Customization</h4>
+
+<p>These are the goals and requirements of the project specific Revit extension through coding and customization:</p>
+
+<ul>
+<li>Create and apply new shared parameters to specified structural category elements automatically.</li>
+<li>Export new shared parameters and required predefined parameters to a database based on Revit Element ID.</li>
+<li>Export XYZ analytical coordinates from all structural elements to a database.</li>
+<li>Quickly and accurately number all Revit structural elements utilizing the Mark parameter based on z elevation and category.</li>
+<li>Import and return new parameter data values to respective Revit project elements.</li>
+</ul>
+
+<h4>Process Overview</h4>
+
+<p>Here is an overview of the general process steps and some comments:</p>
+
+<p>Our real-time Revit project consists of a total 14,000 elements divided in 4 projects. With the expertise, help and guidance of Jeremy Tammik and SDK examples, I was able to create a Structural_ID program based on the SDK FireRating example and a Revit_XYZ_Export program based upon the RstLinkRevitClient sample.</p>
+
+<p><strong>1a.</strong>
+Structural_ID Module 1: Apply Parameters &ndash; derived from FireRating:</p>
+
+<ul>
+<li>Create and apply new shared parameter data per category to Framing & Columns: Structural_ID_Frame, Structural_ID_Column, and Sequence Number. Defined as user entry text fields.</li>
+<li>Revit designer isolates all structural framing per project and enters 'Projno.F'. All framing elements are assigned.</li>
+<li>Revit designer isolates all structural Columns per project and enters 'Projno.C'. All columns elements are assigned.</li>
+<li>Revit designer isolates all structural framing and columns per project and enters 'Sequence no.' per PM assignment. All selected structural elements are assigned.</li>
+</ul>
+
+<p><strong>1b.</strong>
+Structural_ID Module 2: Export Parameters &ndash; derived from FireRating:
+</p>
+
+<ul>
+<li>Export Structural_ID_Frame and Structural_ID_Column shared parameters. As noted before, these parameters hold a value to define the project category identification such as 'Proj-1F' or 'Proj-1C'. From this we can tell its project origin. You could have duplication of the Revit Element ID amongst the 4 separate projects, so using Structural_ID’s and Element ID as dual validation will effectively provide data integrity.</li>
+<li>Export Sequence Number shared parameter. This user entered value is utilized for establishing a grouping of structural elements for construction sequence which is later interpreted in Navisworks and used for sorting purposes.</li>
+<li>Export predefined parameters Element ID, Mark, and Level.</li>
+<li>End result is Database1, a tabulated spreadsheet defining each row by Revit Element ID, Level, Mark, and Structural ID.</li>
+</ul>
+
+<p><strong>2.</strong> The Revit projects are then analytically checked and the vertical projection property of the horizontal elements are assigned to the correct T.O.S. level to ensure accuracy on Z. Columns are set to Top and Bottom analytically.</p>
+
+<p><strong>3.</strong> RST_XYZ_Export &ndash; derived from RstLinkRevitClient:</p>
+
+<ul>
+<li>RST_XYZ_Export, a second individual program exports all the XYZ, Type, Element ID and other various parameters. The resulting xml data is opened, converted and saved as Database2. </li>
+<li>The Structural ID Database1 and RST_XYZ_Export Database2 are then combined and transferred per project through Revit Element ID validation to a Master Database. </li>
+</ul>
+
+<p><strong>4.</strong> A separate analytical model that has been manually kept in sync is exported to Database3 with its beam numbers and XYZ coordinates.</p>
+
+<p><strong>5.</strong> A VBA Excel program designed by our structural engineers compares analytical Database3 XYZ values and the Master Database XYZ Revit values and determines the match. This results in the analytical beam numbers placed in a row along with the Revit Element ID and related parameters. Engineering Team coordinates loads and connection data as well in Master Database.</p>
+
+<p><strong>6.</strong> All data in the Master Database is complete with the exception of the Mark field. Project Supervisor will assign a number sequence to the Mark field that is incremented based upon the Z coordinate of the members. This results in lower levels having smaller values and higher levels high numbers. This is a quick way to number 3,600 plus elements per project. Due to the fact that the Mark parameter is utilized, we can also detect duplicates when importing data brought back into Revit or if the Designer enters a number twice.</p>
+
+<p><strong>7.</strong> From the Master Database file the Revit Element ID and Mark values are validated and transferred back to the first Database1 file.</p>
+
+<p><strong>8.</strong> Structural_ID Module 3: Import Parameters &ndash; derived from FireRating:</p>
+
+<ul>
+<li>The Import application is executed to return the Mark number values to each Revit project from each per project updated Database1 file.</li>
+</ul>
+
+<p><strong>9.</strong> Revit project tags are modified to depict Mark values and represent element numbering in each project.</p>
+
+<p><strong>10.</strong> The remainder and continuation of the project is a manual input for number coordination. All numbers forward are incremented higher and previous numbers are not to be re-used. Schedules are created based on ascending mark number listing to ensure next number used.</p>
+
+<h4>Summary</h4>
+
+<p>There is obviously a lot going on here, but if kept regimented it works well. Time as always, will dictate how much effort is put in making a program practical, clean, accurate, and deliver the scope intended. Within one weeks time (We stopped counting the hours) we were able to complete this overall team effort. As I look in hind sight, I am grateful that I had the required information and support by Autodesk and its professional staff. Without it, it would have been a grave disappointment. I am now aware of my available resources to further our development and utilization of the Revit API. It’s amazing how much you can learn from the various samples provided in the SDK with supported documentation. Just imagine the possibilities for the upcoming future. I intend to bring this program example to a more consolidated level and transform it to an internal Revit Auto Mark Numbering validation program with various user select export options ranging from shared parameters, predefined parameters, and XYZ coordinates.</p>
+
+<p>Thanks to Jeremy Tammik
+
+of
+
+<a href="http://www.autodesk.com">
+Autodesk</a>
+
+and
+
+Elizabeth Shulok of
+
+<a href="http://www.structuralintegrators.com">
+Structural Integrators</a>
+
+for all your help and sharing the knowledge.</p>
+
+<h4>Back to Jeremy</h4>
+
+<p>Thank you very much Dan, for this contribution.
+I would like to express my appreciation and respect for your hard work and enthusiasm, and gratitude for documenting and sharing the end result, hopefully as an inspiration for others as well.
+It was an honour and a pleasure to work with Dan and see with him make such efficient use of every little snippet of information provided.</p>

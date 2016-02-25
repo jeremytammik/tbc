@@ -1,0 +1,371 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07367840 [Stacked Walls Built-in Category]
+SPR #192556 [document Categories.get_Item(BuiltInCategory.OST_SWallRectOpening) returns null]
+SPR #224991 [Categories.get_Item returns null for DivisionProfile etc. and SplitterProfile throws exception]
+SPR #225851 [Categories.get_Item returns null for BuiltInCategory.OST_StackedWalls]
+
+07606516 [NullReferenceException in doc.ParameterBindings.Insert]
+SPR #228699 [ParameterBindings.Insert() throws exception when used with OST_IOSRebarSystemSpanSymbolCtrl category]
+
+-->
+
+<h3>Categories Collection Item Accessor Fails</h3>
+
+<p>The document settings categories collection Item property returns null for certain built-in categories, and even throws an exception for certain others.
+You should be aware of this.
+
+<p>I mentioned a related issue back in the Revit 2011 timeframe, describing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/categories.html">
+The Building Coder CmdCategories sample command</a>.
+
+<p>Still, this is a bit unexpected and has caused issues for several developers.
+
+<p>Here are some examples:
+
+<p><strong>Question 1:</strong> For some reason I cannot obtain the category for stacked walls, e.g. using
+
+<pre class="code">
+  Dim cat As Category = Doc.Settings.Categories
+    .Item(BuiltInCategory.OST_StackedWalls)
+</pre>
+
+<p>This call returns nothing even though I have stacked walls in my document. 
+I can also find the BuiltinCategory.OST_StackedWalls using RevitLookup. 
+
+<p>Should I be looking somewhere else?
+
+<p><strong>Question 2:</strong> I am adding several parameters through
+
+<pre class="code">
+  doc.ParameterBindings.Insert(
+    information, caseTying, bipgroup );
+</pre>
+
+<p>Sometimes I get an error, even though the parameters all seem OK.
+
+<p>The stack trace says NullReferenceException in BindingMap.Insert.
+
+<p>What is causing this?
+
+<p>Here is a code snippet demonstrating the problem:
+
+<pre class="code">
+&nbsp; <span class="teal">DefinitionFile</span> sharedParametersFile
+&nbsp; &nbsp; = app.OpenSharedParameterFile();
+&nbsp;
+&nbsp; <span class="teal">DefinitionGroup</span> group = sharedParametersFile
+&nbsp; &nbsp; .Groups.Create( <span class="maroon">&quot;Reinforcement&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Definition</span> def = group.Definitions.Create(
+&nbsp; &nbsp; <span class="maroon">&quot;ReinforcementParameter&quot;</span>, <span class="teal">ParameterType</span>.Text );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; bics
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">//bics.Add(BuiltInCategory.OST_AreaRein);</span>
+&nbsp; <span class="green">//bics.Add(BuiltInCategory.OST_FabricAreas);</span>
+&nbsp; <span class="green">//bics.Add(BuiltInCategory.OST_FabricReinforcement);</span>
+&nbsp; <span class="green">//bics.Add(BuiltInCategory.OST_PathRein);</span>
+&nbsp; <span class="green">//bics.Add(BuiltInCategory.OST_Rebar);</span>
+&nbsp;
+&nbsp; bics.Add( <span class="teal">BuiltInCategory</span>
+&nbsp; &nbsp; .OST_IOSRebarSystemSpanSymbolCtrl );
+&nbsp;
+&nbsp; <span class="teal">CategorySet</span> catset = <span class="blue">new</span> <span class="teal">CategorySet</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span> bics )
+&nbsp; {
+&nbsp; &nbsp; catset.Insert(
+&nbsp; &nbsp; &nbsp; doc.Settings.Categories.get_Item( bic ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">InstanceBinding</span> binding
+&nbsp; &nbsp; = app.Create.NewInstanceBinding( catset );
+&nbsp;
+&nbsp; doc.ParameterBindings.Insert( def, binding,
+&nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_CONSTRUCTION );
+</pre>
+
+<p><strong>Answer:</strong> The first issue is due to OST_StackedWalls being marked 'Hidden to User', causing certain internal methods to return false.
+As a final result, the Categories Item accessor returns null. 
+
+<p>'Hidden to User' means that the user interface to Object Styles, Visibility/Graphics, and Export Layers will not include these categories.
+
+<p>It does not mean that the categories are hidden everywhere in the product. 
+Some features get a specific category from an element and display its name. 
+For example, the status prompt displays the category of the element that the mouse is hovering over, and the Selection Filter dialog displays the categories of selected elements. 
+This works because other methods return all categories regardless of the 'Hidden to User' flag. 
+
+<p>Aside from OST_StackedWalls, here are some other categories that may correspond to real elements that users can see, select, and whose category name may appear:
+
+<ul>
+<li>OST_Reveals
+<li>OST_ArcWallRectOpening
+<li>OST_SWallRectOpening
+<li>OST_SitePropertyLineSegment
+<li>OST_RvtLinks
+<li>OST_LegendComponents
+<li>OST_ConnectorElem
+</ul>
+
+<p>Some features also display lists of categories that don't come from the CategoryTableInterface methods. 
+Schedules, project parameters, the Family Category and Parameters dialog are examples. 
+Typically those can also include 'Hidden to User' categories. 
+For example, OST_SitePropertyLineSegment is a schedulable category despite being 'Hidden to User'.
+
+<p>In some cases it may be incorrect for the API to prevent people from working with 'Hidden to User' categories. 
+Of course any APIs for category-related features should have proper validation so that people can only use appropriate categories. For example, APIs for category visibility, project parameters, and schedules should restrict which categories can be used for those features, just like the UI does. We have to be careful about exposing 'Hidden to User' categories without checking other APIs for proper validation. For example, the project parameters API may allow more categories that it should. 
+
+<!--
+<p>In any case, all document categories are accessible using filtered element collectors, including the specific hidden categories mentioned above, which is why you see them in RevitLookup.
+
+<p>Since you have the RevitLookup source, you can debug it and see how they are found.
+
+C:\a\j\adn\case\sfdc\07367840\snoop.jpg
+
+<p>This obviously applies to everything you see there.
+-->
+
+<p>I expanded The Building Coder samples CmdCategories external command to determine and display a list of all the built-in categories causing the Categories.Item property to either return null or throw an exception.
+Here is the code that demonstrates that:
+
+<pre class="code">
+&nbsp; <span class="teal">Array</span> bics = <span class="teal">Enum</span>.GetValues(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">BuiltInCategory</span> ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> nBics = bics.Length;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} built-in categories and the &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;corresponding document ones:&quot;</span>, nBics );
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat;
+&nbsp; <span class="blue">string</span> s;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; bics_null
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; bics_exception
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span> bics )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; cat = categories.get_Item( bic );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == cat )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; bics_null.Add( bic );
+&nbsp; &nbsp; &nbsp; &nbsp; s = <span class="maroon">&quot;&lt;null&gt;&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} ({1})&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cat.Name, cat.Id.IntegerValue );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; bics_exception.Add( bic );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = ex.GetType().Name + <span class="maroon">&quot; &quot;</span> + ex.Message;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0} --&gt; {1}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; bic.ToString(), s );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> nBicsNull = bics_null.Count;
+&nbsp; <span class="blue">int</span> nBicsException = bics_exception.Count;
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span> dlg = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Hidden Built-in Categories&quot;</span> );
+&nbsp;
+&nbsp; s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} categories obtained from the Categories collection;\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{1} built-in categories;\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} built-in categories retrieve null result;\r\n&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{3} built-in categories throw an exception:\r\n&quot;</span>,
+&nbsp; &nbsp; nCategories, nBics, nBicsNull, nBicsException );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( s );
+&nbsp;
+&nbsp; dlg.MainInstruction = s;
+&nbsp;
+&nbsp; s = bics_exception
+&nbsp; &nbsp; .Aggregate&lt;<span class="teal">BuiltInCategory</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Empty,
+&nbsp; &nbsp; &nbsp; ( a, bic ) =&gt; a + <span class="maroon">&quot;\n&quot;</span> + bic.ToString() );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( s );
+&nbsp;
+&nbsp; dlg.MainContent = s;
+&nbsp;
+&nbsp; dlg.Show();
+</pre>
+
+<!-- 
+<p>It now also demonstrates how to retrieve all document categories through a filtered element collector.
+
+<p>Trying to use OfClass with the Category class throws an Autodesk.Revit.Exceptions.ArgumentException exception saying "Input type Autodesk.Revit.DB.Category is not a recognized Revit API type".
+
+<p>Instead, we have to retrieve generic Element, like this:
+
+<pre class="code">
+</pre>
+-->
+
+<p>This is the resulting output in an empty architectural project reporting the count of document categories, built-in categories, and built-in categories for which a document category cannot be retrieved, either because the call the Categories.Item returns null or throws an exception:</p>
+
+<center>
+<img src="img/bic_hidden.png" alt="Document and built-in category counts"/>
+</center>
+
+<p>To spell it out in full text:
+
+<ul>
+<li>259 categories obtained from the Categories collection;
+<li>897 built-in categories;
+<li>358 built-in categories retrieve null result;
+<li>12 built-in categories throw an exception:
+<ul>
+<li>OST_FurnitureHiddenLines
+<li>OST_SplitterProfile
+<li>OST_HostTemplate
+<li>OST_MassFaceSplitter
+<li>OST_MassCutter
+<li>OST_ZoningEnvelope
+<li>OST_StairsSupports
+<li>OST_InstanceDrivenLineStyle
+<li>OST_CurtainGridsSystem
+<li>OST_StairsStringerCarriage
+<li>OST_IOSNotSilhouette
+<li>OST_InvisibleLines
+</ul>
+</ul>
+
+<p>The complete lists of built-in categories for which no corresponding document category can be retrieved are logged to the Visual Studio debug output window.
+They obviously depend on the document that you run this command in.
+
+<p>You should probably run it yourself in the documents you are working with to be aware of what is going on.
+In any case, all code accessing the Categories.Item property with untested built-in categories needs to implement appropriate handling of these conditions.
+
+<p>Here is the updated 
+
+<a href="zip/bc_13_99_1.zip">version 2013.0.99.1</a> of 
+
+The Building Coder samples including the expanded version of the CmdCategories external command displaying the list of hidden built-in categories.
+
+<p><strong>Addendum:</strong> Saikat presented another example of an inaccessible category, the 
+
+<!-- Accessing Profiles Category while OmniClass Code and Description access -->
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/accessing-profiles-category-while-omniclass-code-and-description-access.html">
+Profiles category OST_ProfileFamilies</a>.
+
+<a name="2"></a>
+
+<h4>Brute Force Computing</h4>
+
+<p>I stumbled across this interesting article on 
+
+<a href="http://bits.blogs.nytimes.com/2012/09/11/the-brute-force-computing-revolution">
+brute force computing</a> explaining
+
+one interesting aspect of cloud based computing and access to huge amounts of computing power.
+
+<p>One fact I was totally unaware of, and that had me a bit surprised in the past year or two, is that "brute force computing is behind Google's successful language translation. 
+By comparing thousands of Web pages in different languages to find patterns, in one year Google was able to discern and refine translation better than linguistic theorists had been able to do with their fancy programs for years."
+
+<p>As you of course know, Autodesk offers the 
+
+<a href="https://360.autodesk.com">
+Autodesk 360</a> cloud-based 
+
+platform providing access to storage, a collaboration workspace, and a fast-growing number of cloud services to help improve design, visualisation, simulation, and work sharing.
+
+
+<a name="3"></a>
+
+<h4>Blending Profiles with Different Vertex Counts</h4>
+
+<p>Arjen de Pater raised a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/newblend-sample.html?cid=6a00e553e168978833017744a73173970d#comment-6a00e553e168978833017744a73173970d">
+question</a> on 
+
+using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/newblend-sample.html">
+NewBlend method</a> that
+
+Mikako Harada just addressed:
+
+<p><strong>Question:</strong> I want to create a blend with 8 curves in the BottomProfile and 4 curves in the TopProfile.
+
+<p>When I try this the Document.FamilyCreate.NewBlend method throws an ApplicationException saying "Unexpected internal error: code 1. at Autodesk.Revit.Creation.FamilyItemFactory.NewBlend(Boolean isSolid, CurveArray topProfile, CurveArray baseProfile, SketchPlane sketchPlane)".
+
+<p>How can I create such a blend?
+
+<p><strong>Answer:</strong> There are some points you need to pay attention to. 
+These points are documented in the page explaining the NewBlend method in Revit API help file RevitAPI.chm file. 
+It also includes sample code to create a blend form:
+
+<ol>
+<li>The two profiles should be parallel.
+<li>Each of the profiles must be planar.
+<li>If the profile shape is circle or ellipse, it must be split into at least two segments, so that Revit can find vertices to use for mapping the blend.
+</ol>
+
+<p>Once that is clear, you should definitely ensure that you can create the same shape through the user interface, as recommended for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging form creation</a>.
+
+If that fails, then it will fail through the API as well.
+It may provide you with a more informative error message, though.
+
+<p><strong>Response:</strong> Yes, I can create the blend in the UI.
+
+<p>The problem is the different number of curves in the BottomProfile and TopProfile because the NewBlend method lacks a parameter for the VertexConnectionMap.
+
+<p><strong>Answer:</strong> Ah.
+Well, here are two 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/newsweptblend.html">
+NewSweptBlend</a>
+
+<a href="http://adndevblog.typepad.com/aec/2012/08/newsweptblend-code-sample.html">
+samples</a>, which may or may not prove useful. 
+
+<p>However, Mikako hopefully provided the ultimate solution by demonstrating
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/blending-two-profiles-with-different-topbottom-vertex-counts-.html">
+blending two profiles with different top and bottom vertex counts</a>.
+
+
+<a name="4"></a>
+
+<h4>Creating a ViewPlan in a Family Document</h4>
+
+<p>On the topic of Revit API blog posts by my colleagues on the 
+
+<a href="http://adndevblog.typepad.com/aec">
+AEC DevBlog</a>,
+
+here is another interesting topic brought up by Saikat Bhattacharya: 
+
+<p>You can 
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/creating-a-new-viewplan-in-a-family-document-using-the-revit-api.html">
+create a new ViewPlan in a family document </a> using
+
+the View.Duplicate method taking a ViewDuplicateOption, something that I was not previously aware of.
+
+<p>You cannot use the NewViewPlan method to achieve this in a family document, because it throws an InvalidOperationException,
+as Saikat explains very clearly.

@@ -1,0 +1,477 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Desktop to Cloud via DreamSeat CouchDB Client</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I now started looking at storing the plan view room and furniture boundary loop data in the cloud.
+
+<p>I wound up the main Revit add-in functionality using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+ExtrusionAnalyzer</a>
+
+to create a plan view boundary profile for the furniture and equipment family instances,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+sort and orient its output curves</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/curve-following-face-and-bounding-box-implementation.html">
+determine their bounding box</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html">
+visualise the results</a> in
+
+a dynamically generated GeoSnoop .NET form for verification.
+The plan view boundary loop data is handily managed in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#2">
+integer-based 2D points</a> packaged
+
+by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#4">
+JtLoops</a> class.</p>
+
+<p>That wraps up the initial add-in implementation.
+We will certainly return to it and add more functionality when the time comes to update the model with the edits applied on the mobile device.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Moving to the Cloud</h4>
+
+<p>The next step is to implement a cloud-based data repository to make this information ubiquitously available for consumption on mobile devices and elsewhere.</p>
+
+<p>I mentioned looking at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html#4">
+CouchDB</a> database
+
+and the free
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html#5">
+IrisCouch</a> hosting
+
+service as a candidate repository implementation.</p>
+
+<p>My colleague
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a>
+
+took that same thought and very quickly and easily implemented a
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/03/experimenting-couchdb-a-simple-and-efficient-restful-database.html">
+simple and efficient restful database</a> using
+
+those components to host and consume images of CAD model data.
+
+<p>Philippe used the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html#6">
+DreamSeat</a> .NET
+
+CouchDB wrapper library to easily access the functionality from within a .NET add-in.
+
+<p>He added his own asynchronous support, in addition to the asynchronous support already provided by DreamSeat itself, and attached the complete implementation of a .NET client and console allowing for upload and viewing of pictures.</p>
+</p>
+
+<p>I added DreamSeat support to feed a CouchDB database with my plan view room and equipment boundary loop data in just a very few simple steps:</p>
+
+<ul>
+<li><a href="#3">Implement SVG path properties</a></li>
+<li><a href="#4">Add references to the DreamSeat libraries</a></li>
+<li><a href="#5">Implement couch document wrappers</a></li>
+<li><a href="#6">Instantiate, populate and save to cloud</a></li>
+<li><a href="#7">Looking at the cloud-based data repository</a></li>
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>Implement SVG Path Properties</h4>
+
+<p>First of all, I need to decide how to store the boundary loops in my data repository.</p>
+
+<p>I initially thought I would save the integer values, and may still do so.</p>
+
+<p>For the moment, though, I implemented a much simpler placeholder by adding methods to the point and loop classes to serialise the data to a single complete
+
+<a href="http://www.w3.org/TR/SVG/paths.html#PathData">
+SVG path</a> string
+
+representation.
+
+<p>A single string is easy to add to the database and can be reused directly for the SVG visualisation.
+I am not planning to modify the boundary loops in any way, so I might as well manage them in static strings.
+The only disadvantage would be if I wanted to scale the coordinates differently.
+If that need arises, I may switch to uploading the structured integer-based point and loop data instead.
+We'll cross that bridge when we come to it.
+
+<p>An SVG path element contains a path data attribute that can include moveto, line, curve, arc and closepath instructions.
+
+<p>For an individual point, I simply output its two coordinate values.
+For the first loop vertex, I prepend an 'M' for moveto.
+For the second one, I prepend an 'L' for line-to.
+For all following vertices, the 'L' can be omitted.
+At the end, a 'Z' is appended to close the path.
+
+<p>For an individual point,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#2">Point2dInt</a>,
+
+the SvgPath property is therefore implemented like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a string suitable for use in an SVG </span>
+&nbsp; <span class="gray">///</span><span class="green"> path. For index i == 0, prefix with 'M', for</span>
+&nbsp; <span class="gray">///</span><span class="green"> i == 1 with 'L', and otherwise with nothing.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SvgPath( <span class="blue">int</span> i )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}{1} {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; ( 0 == i ? <span class="maroon">&quot;M&quot;</span> : ( 1 == i ? <span class="maroon">&quot;L&quot;</span> : <span class="maroon">&quot;&quot;</span> ) ),
+&nbsp; &nbsp; &nbsp; X, Y );
+&nbsp; }
+</pre>
+
+<p>For an individual boundary loop,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#3">JtLoop</a>,
+
+the member vertices are converted to their SVG string representation using LINQ and concatenated using the string Join method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return an SVG path specification, c.f.</span>
+&nbsp; <span class="gray">///</span><span class="green"> http://www.w3.org/TR/SVG/paths.html</span>
+&nbsp; <span class="gray">///</span><span class="green"> M [0] L [1] [2] ... [n-1] Z</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SvgPath
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot; &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span>.Select&lt;<span class="teal">Point2dInt</span>,<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (p,i) =&gt; p.SvgPath( i ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Z&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>For a collection of loops,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#4">JtLoops</a>,
+
+concatenate the individual loop paths:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the concatenated SVG path </span>
+&nbsp; <span class="gray">///</span><span class="green"> specifications for all the loops.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SvgPath
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot; &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span>.Select&lt;<span class="teal">JtLoop</span>,<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a =&gt; a.SvgPath ) );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>With these properties in place, I can finally set about uploading the data to the cloud.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Add References to the DreamSeat Libraries</h4>
+
+<p>Just like Philippe, I use the DreamSeat wrapper to access the CouchDB functionality from my .NET Revit add-in.</p>
+
+<p>I simply added this functionality to the existing GetLoops external command.</p>
+
+<p>First, I need to reference the DreamSeat .NET assemblies to access it classes and methods.</p>
+
+<p>I grabbed these from the
+
+<a href="https://github.com/vdaron/DreamSeat">
+DreamSeat sample solution</a> on
+
+<a href="https://github.com">github</a>.</p>
+
+<p>For my initial minimal upload usage, all I need are DreamSeat.dll and mindtouch.dream.dll:</p>
+
+<center>
+<img src="img/dreamseat_references.png" alt="DreamSeat library .NET assembly references" width="200"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Implement Couch Document Wrappers for my Data</h4>
+
+<p>Data in CouchDB is stored in documents.</p>
+
+<p>DreamSeat provides a CouchDocument base class for deriving your own document wrappers.</p>
+
+<p>I implemented derived classes to store some minimal model, level, room and furniture data as follows:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">DbObj</span> : <span class="teal">CouchDocument</span>
+{
+&nbsp; <span class="blue">protected</span> DbObj()
+&nbsp; {
+&nbsp; &nbsp; Type = <span class="maroon">&quot;obj&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Type { <span class="blue">get</span>; <span class="blue">protected</span> <span class="blue">set</span>; }
+&nbsp; <span class="green">//public string UniqueId { get; set; }</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Description { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+}
+&nbsp;
+<span class="blue">class</span> <span class="teal">DbModel</span> : <span class="teal">DbObj</span>
+{
+&nbsp; <span class="blue">public</span> DbModel()
+&nbsp; {
+&nbsp; &nbsp; Type = <span class="maroon">&quot;model&quot;</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="blue">class</span> <span class="teal">DbLevel</span> : <span class="teal">DbObj</span>
+{
+&nbsp; <span class="blue">public</span> DbLevel()
+&nbsp; {
+&nbsp; &nbsp; Type = <span class="maroon">&quot;level&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> ModelId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+}
+&nbsp;
+<span class="blue">class</span> <span class="teal">DbRoom</span> : <span class="teal">DbObj</span>
+{
+&nbsp; <span class="blue">public</span> DbRoom()
+&nbsp; {
+&nbsp; &nbsp; Type = <span class="maroon">&quot;room&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> LevelId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Loops { <span class="blue">get</span>; <span class="blue">set</span>; }
+}
+&nbsp;
+<span class="blue">class</span> <span class="teal">DbFurniture</span> : <span class="teal">DbObj</span>
+{
+&nbsp; <span class="blue">public</span> DbFurniture()
+&nbsp; {
+&nbsp; &nbsp; Type = <span class="maroon">&quot;furniture&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> RoomId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Loop { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Transform { <span class="blue">get</span>; <span class="blue">set</span>; }
+}
+</pre>
+
+<p>I initially thought of identifying documents with the auto-generated CouchDB identifiers, but then chose to use the UniqueId already provided by Revit to identify the objects in CouchDB as well.</p>
+
+<p>Type, description and name are fields added to all my objects.</p>
+
+<p>Type identifies the object type and can be one of model, level, room or furniture.</p>
+
+<p>The only information of interest to me is:
+
+<ul>
+<li>Mutual relationships, i.e. which room belongs to what level, where does the furniture go, etc., handled by the ModelId, LevelId and RoomId properties.</li>
+<li>Boundary loop data for display purposes, currently stored as strings representing the SVG path information produced by the properties described above.</li>
+<li>The transform applied to the furniture, which can be moved and rotated in the mobile device room editor and then needs to be updated back to the model again.</li>
+</ul>
+
+<p>Pretty minimal and readable, isn't it?</p>
+
+
+
+<a name="6"></a>
+
+<h4>Instantiate, Populate and Save to Cloud</h4>
+
+<p>Here is the entire code to connect to the cloud database host, open the 'rooms' database, and populate the room and furniture data for a given room, either creating new records or updating existing ones:</p>
+
+<pre class="code">
+<span class="blue">void</span> UploadRoom(
+&nbsp; <span class="teal">Room</span> room,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; furniture,
+&nbsp; <span class="teal">JtLoops</span> roomLoops,
+&nbsp; <span class="teal">JtLoops</span> furnitureLoops )
+{
+&nbsp; <span class="teal">CouchClient</span> client = <span class="blue">new</span> <span class="teal">CouchClient</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;jt.iriscouch.com&quot;</span>, 5984 );
+&nbsp;
+&nbsp; <span class="teal">CouchDatabase</span> db = client.GetDatabase(
+&nbsp; &nbsp; <span class="maroon">&quot;rooms&quot;</span>, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="blue">string</span> uid = room.UniqueId;
+&nbsp;
+&nbsp; <span class="teal">DbRoom</span> dbRoom;
+&nbsp;
+&nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; {
+&nbsp; &nbsp; dbRoom = db.GetDocument&lt;<span class="teal">DbRoom</span>&gt;( uid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; dbRoom.Id.Equals( room.UniqueId ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal ids&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; room );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Name = room.Name;
+&nbsp; &nbsp; dbRoom.LevelId = room.Level.UniqueId;
+&nbsp; &nbsp; dbRoom.Loops = roomLoops.SvgPath;
+&nbsp;
+&nbsp; &nbsp; dbRoom = db.UpdateDocument&lt;<span class="teal">DbRoom</span>&gt;( dbRoom );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; dbRoom = <span class="blue">new</span> <span class="teal">DbRoom</span>();
+&nbsp;
+&nbsp; &nbsp; dbRoom.Id = uid;
+&nbsp; &nbsp; dbRoom.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; room );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Name = room.Name;
+&nbsp; &nbsp; dbRoom.LevelId = room.Level.UniqueId;
+&nbsp; &nbsp; dbRoom.Loops = roomLoops.SvgPath;
+&nbsp; &nbsp; dbRoom = db.CreateDocument&lt;<span class="teal">DbRoom</span>&gt;( dbRoom );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> f <span class="blue">in</span> furniture )
+&nbsp; {
+&nbsp; &nbsp; uid = f.UniqueId;
+&nbsp; &nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbFurniture</span> dbf = db.GetDocument&lt;<span class="teal">DbFurniture</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; dbf.Description = <span class="teal">Util</span>.ElementDescription( f );
+&nbsp; &nbsp; &nbsp; dbf.Name = f.Name;
+&nbsp; &nbsp; &nbsp; dbf.RoomId = room.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.Loop = furnitureLoops[i++].SvgPath;
+&nbsp; &nbsp; &nbsp; dbf = db.UpdateDocument&lt;<span class="teal">DbFurniture</span>&gt;( dbf );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbFurniture</span> dbf = <span class="blue">new</span> <span class="teal">DbFurniture</span>();
+&nbsp; &nbsp; &nbsp; dbf.Id = f.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.Description = <span class="teal">Util</span>.ElementDescription( f );
+&nbsp; &nbsp; &nbsp; dbf.Name = f.Name;
+&nbsp; &nbsp; &nbsp; dbf.RoomId = room.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.Loop = furnitureLoops[i++].SvgPath;
+&nbsp; &nbsp; &nbsp; dbf = db.CreateDocument&lt;<span class="teal">DbFurniture</span>&gt;( dbf );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>As you can see, I am storing the data in my IrisCouch hosted database in the cloud.</p>
+
+
+
+
+<a name="7"></a>
+
+<h4>Looking at the Cloud-based Data Repository</h4>
+
+<p>After running this command, I can retrieve the top-level database information in JSON format:
+
+<!--
+from the URL
+
+<a href="https://jt.iriscouch.com/rooms">jt.iriscouch.com/rooms</a>: -->
+
+<pre>
+{"db_name":"rooms", "doc_count":10, "doc_del_count":11,
+"update_seq":54, "purge_seq":0, "compact_running":false,
+"disk_size":102511, "data_size":6921,
+"instance_start_time":"1365674085202773",
+"disk_format_version":6, "committed_update_seq":54}
+</pre>
+
+<p>This is what an individual room looks like in futon, the CouchDB management console:</p>
+
+<center>
+<img src="img/room_in_futon.png" alt="View of a room in futon"/>
+</center>
+
+<p>Here is the raw JSON representation of the same data:</p>
+
+<pre>
+{
+  "_id": "4d2e6fd6-eb44-4e2a-98c5-271decaa9225-00033e9f",
+  "_rev": "2-a863fbc7b2294ef4d8630bc961221b24",
+  "levelId": "e3e052f9-0156-11d5-9301-0000863f27ad-00000137",
+  "loops": "M2753 3087 L-4446 3087 -4446 587 -746 587 -746 -1212 2753 -1212Z M298 -112 L298 587 1698 587 1698 -112Z",
+  "type": "room",
+  "description": "Room Rooms &lt;212639 Room 1&gt;",
+  "name": "Room 1"
+}
+</pre>
+
+<p>So far, so good.</p>
+
+<p>Once I got to here, I wanted to start working on the visualisation in SVG and had a very nasty surprise: the strict
+
+<a href="http://www.w3.org/Security/wiki/Same_Origin_Policy">
+same origin policy</a> prevents
+
+my simple JavaScript application from accessing my IrisCouch domain, so I cannot easily read the data.
+
+<p>The discovery robbed me of a full night's sleep, but I think I have found a good way out of that dilemma as well.</p>
+
+<p>Wish me luck!</p>
+
+
+<hr>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Desktop to Cloud via DreamSeat CouchDB Client</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</i></p>
+
+<p>I mentioned the idea of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html">
+using CouchDB and IrisCouch as a simple cloud-based data repository</a> option,
+
+and Philippe picked up that idea to demonstrate a
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/03/experimenting-couchdb-a-simple-and-efficient-restful-database.html">
+simple and efficient restful database</a> using
+
+those components to host and consume images of CAD model data.
+
+<p>Now I presented my own example of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/desktop-to-cloud-via-dreamseat-couchdb-client.html">
+pushing desktop data to the cloud via a DreamSeat CouchDB client</a> to
+
+store 2D plan view room and furniture boundaries in a cloud-hosted data repository.</p>
+
+<p>Check it out, and please let us know what you think of it!</p>

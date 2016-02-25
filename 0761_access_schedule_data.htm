@@ -1,0 +1,309 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07207257 [Schedules]
+07217303 [Revit Schedule Data] 
+
+-->
+
+<h3>Schedule API and Access to Schedule Data</h3>
+
+<p>Somehow I seem to be spending the vast majority of my time just shovelling information back and forth, preparing for conferences and trainings and answering questions.
+It is always a great pleasure for me to actually get in a teeny weenie bit of programming in between, so I am happy that I managed to find time to create the new little sample application described below.
+
+<p>One of the many exciting enhancements in the Revit 2013 API is the new Schedule API.
+Here is the description from the Revit API help file RevitAPI.chm What's New section:
+
+
+<a name="1"></a>
+
+<h4>Schedule API</h4>
+
+<p>Several new classes have been added to allow schedule views to be created, modified, and added to drawing sheets. Major new classes include:
+
+<ul>
+<li>The ViewSchedule class that represents the schedule view. Its create methods are used to create new schedules.
+<li>The ScheduleField class for the individual fields in a schedule.
+<li>The ScheduleSheetInstance class represents schedules placed on sheets. The create method creates an instance of a schedule on a sheet. 
+<li>The ScheduleDefinition class defines the contents of a schedule view, including: 
+<ol>
+<li>Basic properties that determine the kind of schedule, such as the schedule's category. 
+<li>A set of fields that become the columns of the schedule. 
+<li>Filters that restrict the set of elements visible in the schedule. 
+<li>Sorting and grouping criteria. 
+</ol>
+</ul>
+
+<h4>Running API commands in Schedule Views</h4>
+
+<p>API commands may now be active when a Schedule is active in the current document.
+
+<h4>Schedule export</h4>
+
+<p>The ViewSchedule class has been added to the API and the method ViewSchedule.Export method exports an existing schedule to a text file.
+
+<p>As I already mentioned, the ability to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+create a schedule</a> is 
+
+demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/developer-center-and-sdk-update.html#22">
+ScheduleCreation SDK sample</a>.
+
+<p>Before even dreaming of creating new schedules, however, many people are interested in simply accessing the data in existing ones.
+
+
+<a name="2"></a>
+
+<h4>Accessing Schedule Data</h4>
+
+<p>Fitting in nicely with this, a couple of queries recently came in on accessing schedule data.
+
+<p>The Revit API currently does not provide a method to access and cycle through the schedule data directly.
+
+<p>The new Revit 2013 schedule export functionality described above provides for a very simple workaround, however:
+you can use the ViewSchedule.Export method to export the schedule data to a text file, and then parse the resulting file to access the data. 
+
+<p>The ViewSchedule.Export method takes a ViewScheduleExportOptions argument which provides the following properties to enable specification of various text file output settings:
+
+<ul>
+<li>ColumnHeaders: how to export column headers. Default is MultipleRows.
+<li>FieldDelimiter: how to delimit fields. Default is Tab.
+<li>HeadersFootersBlanks: whether to export group headers, footers, and blank lines. Default is true.
+<li>TextQualifier: how to qualify text fields. Default is DoubleQuote.
+</ul>
+
+
+<a name="3"></a>
+
+<h4>ScheduleData Sample Add-in</h4>
+
+<p>I created a sample application to demonstrate accessing the schedule data, and not just that. It also  implements the following interesting additional features:
+
+<ul>
+<li>Access and read back the schedule data from the exported text file into your application.
+<li>Separately determine the schedule name, the column header names, and the schedule row data.
+<li>Populate a DataTable instance with the retrieved schedule data.
+<li>Create a new Windows form with a docked DataGridView in it programmatically, avoiding the need to define a hard-coded form in your add-in.
+<li>Attach the form to the Revit main window, so that it is minimised and restored together with Revit.
+<li>Populate the DataGridView from the DataTable and display the results.
+</ul>
+
+<p>I use the undocumented AdWindows assembly to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#5">
+determine the Revit parent window</a>.
+
+<p>It returns the main window Revit handle in the static property ApplicationWindow of the ComponentManager class in the Autodesk.Windows namespace. 
+
+<p>Here is the JtWindowHandle class that I use to convert the IntPtr returned by that property to the IWin32Window required by the Form.Show method:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Wrapper class for converting </span>
+&nbsp; <span class="gray">///</span><span class="green"> IntPtr to IWin32Window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">JtWindowHandle</span> : <span class="teal">IWin32Window</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> _hwnd;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> JtWindowHandle( <span class="teal">IntPtr</span> h )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">IntPtr</span>.Zero != h,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected non-null window handle&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _hwnd = h;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">IntPtr</span> Handle
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> _hwnd;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Exporting the schedule data from Revit is really simple. 
+Here is the implementation to export all schedule data in the entire model to separate text files with the filename extension TXT, defined by _ext, in a hard-coded folder, defined by _export_folder_name:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewSchedule</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ViewScheduleExportOptions</span> opt 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ViewScheduleExportOptions</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSchedule</span> vs <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Directory</span>.CreateDirectory( 
+&nbsp; &nbsp; &nbsp; _export_folder_name );
+&nbsp;
+&nbsp; &nbsp; vs.Export( _export_folder_name, 
+&nbsp; &nbsp; &nbsp; vs.Name + _ext, opt );
+&nbsp; }
+</pre>
+
+<p>The application then asks the user to select any one of the resulting text output files at a time to display its data in the data grid view. When the user cancels the file selection, the command is terminated:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; <span class="blue">while</span>( FileSelect( _export_folder_name, 
+&nbsp; &nbsp; <span class="blue">out</span> filename ) )
+&nbsp; {
+&nbsp; &nbsp; DisplayScheduleData( filename, 
+&nbsp; &nbsp; &nbsp; revit_window );
+&nbsp; }
+</pre>
+
+<p>Here is the DisplayScheduleData method that programmatically sets up a new Windows form, populates it with a docked DataGridView instance, and populates that with the schedule data retrieved from the output text files by the ScheduleDataParser class:
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> DisplayScheduleData( 
+&nbsp; &nbsp; <span class="blue">string</span> filename, 
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> owner )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ScheduleDataParser</span> parser 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ScheduleDataParser</span>( filename );
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">Form</span> form 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>();
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 400, 400 );
+&nbsp; &nbsp; form.Text = _caption_prefix + parser.Name;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DataGridView</span> dg = <span class="blue">new</span> <span class="teal">DataGridView</span>();
+&nbsp; &nbsp; dg.AllowUserToAddRows = <span class="blue">false</span>;
+&nbsp; &nbsp; dg.AllowUserToDeleteRows = <span class="blue">false</span>;
+&nbsp; &nbsp; dg.AllowUserToOrderColumns = <span class="blue">true</span>;
+&nbsp; &nbsp; dg.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; dg.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; dg.ReadOnly = <span class="blue">true</span>;
+&nbsp; &nbsp; dg.TabIndex = 0;
+&nbsp; &nbsp; dg.DataSource = parser.Table;
+&nbsp; &nbsp; dg.Parent = form;
+&nbsp;
+&nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; }
+</pre>
+
+<p>You could obviously make the form modeless instead of modal by calling Show instead of ShowDialog here. Since we are not accessing the Revit API from the form, there is no danger in leaving it open after the external command terminates. That would enable navigation and exploration of the schedule data in a modeless form in parallel with continued work in the Revit model.
+
+<p>Finally, here is the main point, the ScheduleDataParser class that I implemented to extract the schedule name, column headers, and schedule data from the text file and populate a DataTable instance with it:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">ScheduleDataParser</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Default schedule data file field delimiter.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">char</span>[] _tabs = <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">'\t'</span> };
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Strip the quotes around text strings </span>
+&nbsp; <span class="gray">///</span><span class="green"> in the schedule data file.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">char</span>[] _quotes = <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">'&quot;'</span> };
+&nbsp;
+&nbsp; <span class="blue">string</span> _name = <span class="blue">null</span>;
+&nbsp; <span class="teal">DataTable</span> _table = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Schedule name</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Name 
+&nbsp; { 
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _name; } 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Schedule columns and row data</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">DataTable</span> Table 
+&nbsp; { 
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _table; } 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> ScheduleDataParser( <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">StreamReader</span> stream = <span class="teal">File</span>.OpenText( filename );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> line;
+&nbsp; &nbsp; <span class="blue">string</span>[] a;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">null</span> != ( line = stream.ReadLine() ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a = line
+&nbsp; &nbsp; &nbsp; &nbsp; .Split( _tabs )
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;( s =&gt; s.Trim( _quotes ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToArray();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// First line of text file contains </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// schedule name</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _name )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _name = a[0];
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Second line of text file contains </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// schedule column names</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _table )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _table = <span class="blue">new</span> <span class="teal">DataTable</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> column_name <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DataColumn</span> column = <span class="blue">new</span> <span class="teal">DataColumn</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; column.DataType = <span class="blue">typeof</span>( <span class="blue">string</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; column.ColumnName = column_name;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _table.Columns.Add( column );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _table.BeginLoadData();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Remaining lines define schedula data</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DataRow</span> dr = _table.LoadDataRow( a, <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; _table.EndLoadData();
+&nbsp; }
+}
+</pre>
+
+<p>Here is a sample schedule in Revit to test this on:</p>
+
+<center>
+<img src="img/schedule_data_rvt_view.png" alt="Schedule data in Revit view" width="400"/>
+</center>
+
+<p>This is the resulting data grid view representation:</p>
+
+<center>
+<img src="img/schedule_data_grid_view.png" alt="Schedule data in data grid view" width="400"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/ScheduleData.zip">ScheduleData.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this add-in.
+
+<p>On a closely related note, here is another question that just came in:
+
+<p><strong>Question:</strong> Can calculated values in schedules be transferred to a shared parameter with some API code?
+
+<p><strong>Answer:</strong> Sure.
+Just access the schedule data as demonstrated above, and then write the relevant value to the shared parameter.

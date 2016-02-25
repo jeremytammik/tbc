@@ -1,0 +1,632 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Family API Add-in &ndash; Load Family and Place Instances</h3>
+
+<p>The day before yesterday, I presented the contents of Steven Campbell's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3">
+key family concepts</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3b">
+parametric family</a> classes
+
+from the
+
+<a href="http://www.autodesk.ru/adsk/servlet/pc/index?id=21516340&siteID=871736">
+Revit API DevCamp in Moscow</a>, and
+
+an overview of the related
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">
+family API topics</a> representing
+
+my humble contribution to the latter.</p>
+
+<p>If you read that post immediately after it was first published, I suggest you go back and have a quick look again now, since I revisited it and added a significant chunk of information after the initial publication.</p>
+
+<p>Now I would like to delve deeper into the detailed API aspects.</p>
+
+<p>Before proceeding with that, let me mention two other good bits of news:</p>
+
+<ul>
+<li><a href="#02">Trillions &ndash; thriving in the emerging information technology</a></li>
+<li><a href="#03">Visual Studio 2013 supports 64 bit edit and continue</a></li>
+</ul>
+
+
+<a name="02"></a>
+
+<h4>Trillions &ndash; Thriving in the Emerging Information Technology</h4>
+
+<p>I just finished reading
+
+<a href="http://eu.wiley.com/WileyCDA/WileyTitle/productCd-1118176073.html">
+Trillions &ndash; Thriving in the Emerging Information Technology</a> by
+
+Peter Lucas, Joe Ballay, Mickey McManus of
+
+<a href="http://en.wikipedia.org/wiki/MAYA_Design">MAYA Design</a>.</p>
+
+<p>This is the first pure technology related book I have read all the way through in ages, and I am very enthused.
+It was distributed to all participants of the internal Autodesk Tech Summit in Boston and discusses design and technology for pervasive computing.</p>
+
+<p>It provides numerous shockingly obvious and often quite old insights, a very critical view of our current use of Internet and so-called cloud technologies, and an inspiring and thrilling read.</p>
+
+<p>The topic is how to harness and live <b>in</b> &ndash; as opposed to 'with' &ndash; the unbounded complexity of the trillion-node network of connected devices that we are inevitable heading towards, and will lead to catastrophe unless we radically change some fundamental aspects of the ways we handle and share information.</p>
+
+<p>I highly recommend reading this book.</p>
+
+<p>I highly recommend abstaining from all use of the word 'cloud computing' until you have completed it  :-)</p>
+
+
+<a name="03"></a>
+
+<h4>Visual Studio 2013 Supports 64 Bit Edit and Continue</h4>
+
+<p>Visual Studio 2013 and the CLR 4.5.1 now support 64-bit Edit and Continue when debugging C# and VB applications.
+
+<a href="http://adndevblog.typepad.com/autocad/2013/06/coming-soon-x64-edit-and-continue.html">
+Stephen Preston is happy</a> about that.</p>
+
+<p>You can download the
+
+<a href="http://www.microsoft.com/visualstudio/eng/2013-downloads">
+preview version of Visual Studio 2013</a> to
+
+test it right away.
+
+<p>64-bit Edit and Continue for C++ is not yet supported.
+
+Please
+
+<a href="http://visualstudio.uservoice.com/forums/121579-visual-studio/suggestions/4126415-x64-edit-and-continue-for-c-">
+vote for 64-bit Edit and Continue for C++ to be implemented</a> as well.
+
+<p>You have three votes, and you can apply them all to this one wish, if you like.</p>
+
+
+<a name="04"></a>
+
+<h4>Family API Add-in</h4>
+
+<p>Getting back to the Revit API and programmatic work with families in particular:</p>
+
+<p>As I pointed out, Steve's presentation covers key family editor concepts from a user point of view.
+From a programming point of view, there are two main family related areas to consider:</p>
+
+<ol>
+<li>Creation of a family, i.e. working in the context of family document.</li>
+<li>Use of a family, mostly in the context of project document.</li>
+</ol>
+
+<p>Since a family instance can also be inserted into a family document to create a nested family structure, the second point is actually relevant both in the family and project context.
+It includes tasks such as loading a family, placing instances, manipulating types and existing instances.</p>
+
+<p>Both of these aspects represent large important topics that have been frequently discussed here in the past.</p>
+
+<p>Before Revit 2010, only the second area was covered by the API.
+Programmatic creation of families and the entire use of the API in the family context was impossible before the introduction of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">Family API</a>.
+
+<p>The basic steps to programmatically create a family from scratch are demonstrated in detail in section 3, Revit Family API, of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+ADN Revit API training material</a>.
+
+<p>The programmatic
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/creating-and-inserting-an-extrusion-family.html">
+creation and insertion of an extrusion family</a> provides
+
+a more recent and simplified example of defining and loading a family and placing an instance without exploring the more complex and interesting aspects of the definition such as setting alignments and adding types.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">
+family API topics</a> concluding
+
+the preceding post list the programming concepts that Steve and I decided to revisit:</p>
+
+<ol>
+<li>Load family and place instances</li>
+<li>Pick interaction and modify instances</li>
+<li>Instance and symbol retrieval, nested type modification</li>
+</ol>
+
+<p>It also provides a full snapshot of the source code and Visual Studio solution implementing the three external commands implementing these concepts and an external application wrapper defining a nice compact user interface to access and launch them:</p>
+
+<ol>
+<li>CmdTableLoadPlace</li>
+<li>CmdTableNewTypeModify</li>
+<li>CmdKitchenUpdate</li>
+</ol>
+
+<p>Here is the list of topics to explain their implementation and functionality in full detail:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#10">
+Scenario 1 &ndash; load family and place instances</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#11">
+Checking whether a family is loaded</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#12">
+Find a database element by type and name</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#13">
+Loading a family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#14">
+Placing family instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#15">
+Accessing the newly placed instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#16">
+Complete source code of CmdTableLoadPlace</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html#20">
+Scenario 2 &ndash; select and modify instances</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html#21">
+Creating a new family type</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html#22">
+Selecting instances with pre- and post-selection</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html#23">
+Modifying a family instance symbol</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#30">
+API scenario 3 &ndash; instance and symbol retrieval, nested type modification</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#31">
+Retrieve specific family symbols</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#32">
+Retrieve specific family instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#33">
+Display available door panel types</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#34">
+Modify a nested family type</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#40">
+External application</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#50">
+Conclusion and download</a></li>
+</ul>
+
+<p>I'll discuss scenario 1 right here and now, and return to the rest in the next few days.</p>
+
+
+<a name="10"></a>
+
+<h4>Scenario 1 &ndash; Load Family and Place Instances</h4>
+
+<p>The external command CmdTableLoadPlace demonstrates loading a family and placing family instances.</p>
+
+<p>The loading requires a prior check whether the family is already present in the project.</p>
+
+<p>Placing the instances can be done either completely automatically or by prompting the user for their locations.
+
+<p>The former makes use of one of the many
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/newfamilyinstance-overloads.html">
+overloads of the NewFamilyInstance method</a> (how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-site-component.html#2">
+test all NewFamilyInstance overloads</a>) and
+
+is not discussed here.</p>
+
+<p>The latter can be implemented using PromptForFamilyInstancePlacement, in which case the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+retrieval of the newly placed instances</a> requires
+
+an interesting additional little twist.</p>
+
+
+<a name="11"></a>
+
+<h4>Checking Whether a Family is Loaded</h4>
+
+<p>Before we can start placing any family instances, we need to load our family definition.</p>
+
+<p>Loading it into the project will cause an error if it is already present beforehand, so we need to check for its prior existence before attempting.</p>
+
+<p>All retrieval of database elements is performed using filtered element collectors.
+Effective element filtering requires application of as many filters as possible to limit the number of elements retrieved.
+
+<p>Of these, the quick filters are highly preferred, since they enable filtering of elements without loading the entire element information into memory.
+Slow filters are also effective, since they enable checking of element properties inside the Revit memory space before the element information is marshalled and transferred out into the .NET universe.
+The slowest filtering is achieved by post-processing the element data in .NET after extracting it from Revit.</p>
+
+<p>Assuming that we do not have a terribly large number of families loaded in the project, we can get by in this case by looking at all the families and applying a .NET post-processing step filtering for the desired family name, e.g. using a language integrated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/language-integrated-query-linq.html">LINQ</a>
+
+query and the generic FirstOrDefault method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Family</span> family = a.FirstOrDefault&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; e =&gt; e.Name.Equals( FamilyName ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Family</span>;
+</pre>
+
+
+
+<a name="12"></a>
+
+<h4>Find a Database Element by Type and Name</h4>
+
+<p>We check whether the family is already loaded by retrieving all element by filtering of a specific class, also known as .NET type, in this case the Family class, and then post-processing the results looking for a given target name.</p>
+
+<p>This functionality is useful for many different kinds of searches, which led to us already discussing a helper function implementing it, as well as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+possible optimisations</a> to it.</p>
+
+<p>In this add-in, for the same of simplicity, I implement it like this without any further attempts at optimisation:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve a database element </span>
+&nbsp; <span class="gray">///</span><span class="green"> of the given type and name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> FindElementByName(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Type</span> targetType,
+&nbsp; &nbsp; <span class="blue">string</span> targetName )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( targetType )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( targetName ) );
+&nbsp; }
+</pre>
+
+<p>This add-in makes use of this helper method for three different purposes:</p>
+
+<ul>
+<li>Retrieve a specific family to check whether it has been loaded into the project</li>
+<li>Retrieve a specific family symbol to check whether it has been defined in the project</li>
+<li>Retrieve a specific material to apply it to a family symbol</li>
+</ul>
+
+
+<a name="13"></a>
+
+<h4>Loading a Family</h4>
+
+<p>Once we have determined that the required family is not yet present in the project, loading it is a trivial task:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == family )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// It is not present, so check for </span>
+&nbsp; &nbsp; <span class="green">// the file to load it from:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( FamilyPath ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please ensure that the sample table &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;family file '{0}' exists in '{1}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; FamilyName, _family_folder ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Load family from file:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Load Family&quot;</span> );
+&nbsp; &nbsp; &nbsp; doc.LoadFamily( FamilyPath, <span class="blue">out</span> family );
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I added a check to ensure that the family definition file is available in the expected location.</p>
+
+<p>Loading the family modifies the database, so a transaction is required.</p>
+
+<p>If you only need a few symbols (also known as types) from a large family, you can load them more effectively one by one by using LoadFamilySymbol instead of loading them all at once through the single call to LoadFamily.</p>
+
+<p>Here is a detailed discussion and implementation of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/loading-only-selected-family-types.html">
+loading only selected family types</a>.</p>
+
+
+
+<a name="14"></a>
+
+<h4>Placing Family Instances</h4>
+
+<p>As said, we decided to manually place the table instances in this particular sample application, which is easily implemented using PromptForFamilyInstancePlacement.</p>
+
+<p>The only input required is the symbol to be placed:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Determine the family symbol</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> symbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; {
+&nbsp; &nbsp; symbol = s;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Our family only contains one</span>
+&nbsp; &nbsp; <span class="green">// symbol, so pick it and leave</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Place the family symbol:</span>
+&nbsp;
+&nbsp; <span class="green">// PromptForFamilyInstancePlacement cannot </span>
+&nbsp; <span class="green">// be called inside transaction.</span>
+&nbsp;
+&nbsp; uidoc.PromptForFamilyInstancePlacement( symbol );
+</pre>
+
+<p>Note that this method call requires that no transactions be open, presumably because Revit prefers taking care of that internally instead.</p>
+
+
+
+<a name="15"></a>
+
+<h4>Accessing the Newly Placed Instances</h4>
+
+<p>As already noted, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+retrieval of the instances placed</a> by
+
+the call to PromptForFamilyInstancePlacement requires an interesting additional little twist.</p>
+
+<p>Theoretically, this method could return a list of the instance element ids.
+Lacking that, we can find out for ourselves by temporarily registering to the DocumentChanged event before the call, unregistering immediately afterwards, and making a note of all element ids added in between.</p>
+
+<p>Here is the OnDocumentChanged event handler and the element id container I use for that:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Collection of newly added family instances</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _added_element_ids
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+
+&nbsp; <span class="blue">void</span> OnDocumentChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; _added_element_ids.AddRange(
+&nbsp; &nbsp; &nbsp; e.GetAddedElementIds() );
+&nbsp; }
+</pre>
+
+<p>Here is the full source code showing the event registration details to activate this.</p>
+
+
+<a name="16"></a>
+
+<h4>Complete Source Code of CmdTableLoadPlace</h4>
+
+<p>For completeness sake, here is the full source code of the CmdTableLoadPlace external command showing the  steps described above in their complete glorious, elegant and cooperative context:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Load table family if not already present and</span>
+<span class="gray">///</span><span class="green"> place table family instances.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdTableLoadPlace</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> FamilyName = <span class="maroon">&quot;family_api_table&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family file path.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Normally, you would either search the&nbsp; library</span>
+&nbsp; <span class="gray">///</span><span class="green"> paths provided by Application.GetLibraryPaths </span>
+&nbsp; <span class="gray">///</span><span class="green"> method. In this case, we store the sample </span>
+&nbsp; <span class="gray">///</span><span class="green"> family in the same location as the add-in.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="green">//const string _family_folder = &quot;Z:/a/rvt&quot;;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _family_folder
+&nbsp; &nbsp; = <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">CmdTableLoadPlace</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; .Assembly.Location );
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family filename extension RFA.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _family_ext = <span class="maroon">&quot;rfa&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family file path</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _family_path = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return complete family file path</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> FamilyPath
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _family_path )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _family_path = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _family_folder, FamilyName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _family_path = <span class="teal">Path</span>.ChangeExtension(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _family_path, _family_ext );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _family_path;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Collection of newly added family instances</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _added_element_ids
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> External command mainline</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve the family if it is already present:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Family</span> family = <span class="teal">Util</span>.FindElementByName(
+&nbsp; &nbsp; &nbsp; doc, <span class="blue">typeof</span>( <span class="teal">Family</span> ), FamilyName ) <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == family )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// It is not present, so check for </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the file to load it from:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( FamilyPath ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please ensure that the sample table &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;family file '{0}' exists in '{1}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FamilyName, _family_folder ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Load family from file:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Load Family&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; doc.LoadFamily( FamilyPath, <span class="blue">out</span> family );
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine the family symbol</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; symbol = s;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Our family only contains one</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// symbol, so pick it and leave</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Place the family symbol:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Subscribe to document changed event to</span>
+&nbsp; &nbsp; <span class="green">// retrieve family instance elements added by the </span>
+&nbsp; &nbsp; <span class="green">// PromptForFamilyInstancePlacement operation:</span>
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; _added_element_ids.Clear();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// PromptForFamilyInstancePlacement cannot </span>
+&nbsp; &nbsp; <span class="green">// be called inside transaction.</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.PromptForFamilyInstancePlacement( symbol );
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the newly placed family instances:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = _added_element_ids.Count();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Placed {0} {1} family instance{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, family.Name,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> ids = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; _added_element_ids.Select&lt;<span class="teal">ElementId</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; id =&gt; id.IntegerValue.ToString() ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg2( msg, ids );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDocumentChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; _added_element_ids.AddRange(
+&nbsp; &nbsp; &nbsp; e.GetAddedElementIds() );
+&nbsp; }
+}
+</pre>
+
+<p>As said, the detailed description of the other two commands will follow soon, and the complete Visual Studio solution is available from the overview of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">
+family API topics</a> concluding
+
+the preceding post.</p>
+
+<p>I wish you a wonderful weekend.</p>
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Trillions &ndash; Thriving in the Emerging Information Technology</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</p>
+
+<p>I just finished reading
+
+<a href="http://eu.wiley.com/WileyCDA/WileyTitle/productCd-1118176073.html">
+Trillions &ndash; Thriving in the Emerging Information Technology</a> by
+
+Peter Lucas, Joe Ballay, Mickey McManus of
+
+<a href="http://en.wikipedia.org/wiki/MAYA_Design">MAYA Design</a>,
+
+distributed to all Tech Summit presenters.
+
+<p>It discusses design and technology for pervasive computing, provides numerous shockingly obvious and often quite old insights, a very critical view of our current use of Internet and so-called cloud technologies, and an inspiring and thrilling read.</p>
+
+<p>The topic is how to harness and live <b>in</b> &ndash; as opposed to 'with' &ndash; the unbounded complexity of the trillion-node network of connected devices that we are inevitable heading towards, and will lead to catastrophe unless we radically change some fundamental aspects of the ways we handle and share information.</p>
+
+<p>I highly recommend reading this book.</p>
+
+<p>I highly recommend abstaining from all use of the word 'cloud computing' until you have completed it :-)</p>

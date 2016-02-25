@@ -1,0 +1,33 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2011 Web Update 1</h3>
+
+<p>Rather belatedly, I note that the first web update of Revit 2011 was released in the beginning of this month and can be downloaded from the public Revit product pages:
+
+<ul>
+<li><a href="http://www.autodesk.com/revitarchitecture">Revit Architecture</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262001">Product Download</a></li>
+<li><a href="http://www.autodesk.com/revitmep">Revit MEP</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=14973660">Product Download</a></li>
+<li><a href="http://www.autodesk.com/revitstructure">Revit Structure</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262026">Product Download</a></li>
+</ul>
+
+<p>Here is the list of the API enhancements, which is the same across all three flavours:
+
+<ul>
+<li>Elements will now be properly joined when the ExternalCommand concludes when using automatic regeneration and automatic transaction.
+<li>ExportImage(ImageExportOptions) no longer throws an exception when given a set of views.
+<li>ElementParameterFilters now operate properly against ElementType elements.
+<li>Improves stability when saving a family and there are event subscribers for Save or Save As.
+<li>Closes the Family editor environment after loading a family via the API.
+<li>Improves stability when using selection APIs to pick grid elements.
+<li>Dynamic Model Update: GetChangeTypeGeometry() now triggers properly when active type is changed.
+<li>Improves stability for Dynamic Model Update: when registering updaters and more than one application is registered.
+<li>The new API SunAndShadowSettings.CalculateTimeZone() uses Revit’s mechanism to calculate the time zone value for a given latitude and longitude. This calculation is more accurate than the results obtained from City.TimeZone.
+<li>Improves performance of display of Analysis Visualization framework when Hardware Acceleration is on.
+<li>VSTA is now allowed for multiple concurrent sessions of Revit; editing the same module by two sessions is prohibited.
+<li>VSTA: Document-level macros no longer become corrupted when the document is workshared and the macro is edited by more than one concurrent session.
+<li>Improves stability when calls to NewFamilyDocument() and PickObjects() are used in sequence.
+<li>VSTA: Revit no longer prematurely exits when opening a project containing corrupted macros.
+<li>The Idling event no longer generates a journal comment for each invocation.
+</ul>

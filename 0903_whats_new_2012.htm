@@ -1,0 +1,2672 @@
+﻿<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+<body>
+
+<h1>What's New in the Revit 2012 API</h1>
+
+<p>This is the third instalment of a series publishing the information provided in the 'What's New' sections of the past few Revit API releases help file RevitAPI.chm.</p>
+
+<p>The first instalment covering
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">
+What's New in the Revit 2010 API</a> explains
+
+my motivation for this and provides an overview of the other releases.</p>
+
+<p>We now move on to the Revit 2012 API, looking at:</p>
+
+<ul>
+<li><a href="#2">Major renovations</a></li>
+<li><a href="#3">Major enhancements</a></li>
+<li><a href="#4">Small enhancements and changes</a></li>
+</ul>
+
+<p>First, however, another update on my vacation.</p>
+
+
+
+<a name="1"></a>
+
+<h3 style="font-weight:bold; font-size:medium">Unexpected Places, and Warmer</h3>
+
+<p>I am still on holiday in Italy, so please do not expect any immediate responses to comments for a while.</p>
+
+<p>I love adventures, and finding myself in unexpected places, and I am getting my fill of that here and now.</p>
+
+<p>I found better weather further south, and a beautiful empty beach north of Bari.</p>
+
+<p>Acting on a recommendation by a cyclist whom I asked about his unintelligible dialect in a bar, I also ended up enjoying the unique
+
+<a href="http://en.wikipedia.org/wiki/Trullo">
+trulli</a> of
+
+<a href="http://en.wikipedia.org/wiki/Alberobello">
+Alberobello</a>.</p>
+
+<img src="img/Trulli_Alberobello.jpg" alt="Trulli in Alberobello"/>
+
+<p>From there we continued to
+
+<a href="http://en.wikipedia.org/wiki/Lecce">
+Lecce</a> and
+
+started exploring the sweet and efficient little local train system connecting many of the communities on the peninsula of
+
+<a href="http://en.wikipedia.org/wiki/Salento">
+Salento</a>.</p>
+
+<p>We visited Galatina, continued to Nardo, and walked a long way on foot towards Santa Caterina to reach the protected natural park and beach of
+
+<a href="http://it.wikipedia.org/wiki/Parco_naturale_regionale_Porto_Selvaggio_e_Palude_del_Capitano">
+Porto Selvaggio</a>.</p>
+
+<img src="img/Portoselvaggio.jpg" alt="Portoselvaggio"/>
+
+<p>In spite of some rain and cold, with some warm sunshine in between, we spent a day or two in pure uninterrupted nature.</p>
+
+<p>On the way out towards Nardo again, a passing car picked us up and took us to Galipoli, another surprise visit, with a direct train connection back to Lecce.</p>
+
+<p>Now, to continue the promised series of 'What's New' documentation from the past few Revit API releases.</p>
+
+
+
+<a name="2"></a>
+
+<h1 style="font-weight:bold; font-size:large">Major renovations to the Revit 2012 API</h1>
+
+<h2>.NET 4.0 now used by the Revit API</h2>
+
+<p>The Revit API has been enhanced to run with the .NET 4.0 runtime. As a result, Visual Studio 2010 with a framework target of .NET 3.5 or 4.0 must be used to debug your addins. Addins compiled with Visual Studio 2008 will run normally outside the debugging environment.
+<p>All samples in the Revit API SDK have been upgraded to Visual Studio 2010.
+<p>Microsoft has not yet announced when Visual Studio Tools for Applications (VSTA) for .NET 4.0 will be available. VSTA is the technology used for Revit macros.  The Microsoft VSTA debugger is not compatible with the default Revit 2012 .NET 4.0 environment.  VSTA macros can run successfully in the .NET 4.0 environment, but a special Revit configuration is required for debugging.  In order to use VSTA debugging, you must:
+
+<ol>
+<li>Ensure you have user permissions sufficient to modify files in the Revit installation folder.
+<li>Exit Revit.
+<li>Run '[Revit.exe directory]\RevitVSTAConfig.exe'
+<li>Click the 'Prepare Revit for VSTA' button.
+<li>Restart Revit.
+</ol>
+
+<p>Note: Revit's native components continue to be compiled with the VS 2008 C++ compiler.  Therefore Revit 2012 does not include the VS2010 redistributable. Third-party applications which include natively compiled C++ components should use the VS 2008 C++ compiler or must include the VS 2010 C++ redistributables with the installation.
+<h2>RegenerationMode</h2>
+<p>Automatic regeneration mode has been removed. You no longer have to include the RegenerationMode attribute on your add-ins. All APIs expect that add-in code is written using manual regeneration when necessary.
+<h2>Add-In registration &ndash; new required property VendorId</h2>
+
+<p>Two new registration properties have been added:
+
+<ul>
+<li>VendorId &ndash; a mandatory string conforming to the Autodesk vendor ID standard. Register your vendor id string with Autodesk at http://www.autodesk.com/symbreg. An error will be shown if the add-in manifest file does not contain this required node for add-in entry.
+<li>VendorDescription &ndash; optional string containing vendor's legal name and/or other pertaining information.
+</ul>
+
+
+<p>Here is an example of the new entries:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-16</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>Command.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>d7e30025-97d4-4012-a581-5f8ed8d18808<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Command<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>ADSK<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>Autodesk, www.autodesk.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+
+<h2>CompoundStructure and WallSweeps</h2>
+
+<p>The CompoundStructure class has been replaced. The old CompoundStructure class in the API was read-only and supported only the nominal layers list without support for the settings related to vertical regions, sweeps, and reveals. The new CompoundStructure class supports read and modification of all of the structure information include vertical regions, sweeps and reveals.
+
+<p>The CompoundStructure.Layers property has been replaced by CompoundStructure.GetLayers() and CompoundStructure.SetLayers().
+
+<p>The CompoundStructureLayer class has also been replaced for the same reasons as CompoundStructure.
+
+<p>The following table maps properties from the old CompoundStructureLayer to the new version of the class:
+
+<ul>
+<li>DeckProfile &ndash; DeckProfileId: Is now an ElementId.
+<li>DeckUsage &ndash; DeckEmbeddingType: Uses a different enum.
+<li>Function &ndash; Function: Uses a different enum.
+<li>Material &ndash; MaterialId: Is now an ElementId.
+<li>Thickness &ndash; Width.
+<li>Variable &ndash; N/A: Not a part of the layer class, use CompoundStructure.VariableLayerIndex instead.
+</ul>
+
+<p>The property HostObjAttributes.CompoundStructure has been replaced by two methods:
+
+<ul>
+<li>HostObjAttributes.GetCompoundStructure()
+<li>HostObjAttributes.SetCompoundStructure()
+</ul>
+
+
+<p>Remember that you must set the CompoundStructure back to the HostObjAttributes instance in order for any change to be stored in the element.
+
+<p>In addition to the information on wall sweeps found in the CompoundStructure class, there is a new API representing a wall sweep or reveal. The WallSweep class is an element that represents either a standalone wall sweep/reveal, or one added by the settings in a given wall's compound structure. Standalone wall sweeps and reveals may be constructed using the static method Create().
+<h2>LinePattern</h2>
+
+<p>The LinePattern class has been replaced. The old LinePattern class in the API represented both the line pattern itself and the element that contains it, and offered no details on the contents of the pattern beyond its name. The new classes available are:
+
+<ul>
+<li>LinePatternElement &ndash; an element that contains a line pattern
+<li>LinePattern &ndash; the line pattern. This class provides access to the pattern name and the list of segments that make up the pattern. The line segments define a repeating pattern of dashes and dots for the line pattern.
+</ul>
+
+
+<p>The method
+
+<ul>
+<li>LinePatternElement.Create()
+</ul>
+
+
+<p>offers the ability to add new LinePattern elements to the Revit database.
+
+
+<p>The property of the Settings class:
+
+<ul>
+<li>Settings.LinePatterns
+</ul>
+
+
+<p>has been removed. LinePatterns may be found by the following approaches:
+
+<ol>
+<li>Use of a FilteredElementCollector filtering on class LinePatternElement
+<li>Use of the static methods of LinePatternElement:
+<ul>
+<li>LinePatternElement.GetLinePattern(Document, ElementId)
+<li>LinePatternElement.GetLinePatternByName(Document, string)
+</ul>
+</ol>
+
+
+<h2>FillPattern</h2>
+
+<p>The FillPattern class has been replaced. The old FillPattern class in the API represented both the fill pattern itself and the element that contains it, and offered no details on the contents of the pattern beyond its name. The new classes available are:
+
+<ul>
+<li>FillPatternElement &ndash; an element that contains a fill pattern
+<li>FillPattern &ndash; the fill pattern. This class provides access to the pattern name and the set of grids that make up the pattern.
+<li>FillGrid &ndash; a single fill pattern grid, described in the two dimensions of a face.
+</ul>
+
+
+<p>The method
+
+<ul>
+<li>FillPatternElement.Create()
+</ul>
+
+<p>offers the ability to add new FillPattern elements to the Revit database.
+
+
+<p>The property of the Settings class:
+
+<ul>
+<li>Settings.FillPatterns
+</ul>
+
+
+<p>has been removed. FillPatterns may be found by the following approaches:
+
+<ol>
+<li>Use of a FilteredElementCollector filtering on class FillPatternElement
+<li>Use of the static methods of FillPatternElement:
+<ul>
+<li>FillPatternElement.GetFillPattern(Document, ElementId)
+<li>FillPatternElement.GetFillPatternByName (Document, string)
+</ul>
+</ol>
+
+
+
+<h2>IndependentTag</h2>
+
+<p>A good portion of the IndependentTag class and related classes have been renovated.
+
+<ul>
+<li>Leader has been renamed HasLeader.
+<li>LeaderMode has been renamed LeaderEndCondition, and the members of the LeaderEndCondition enum have been renamed.
+<li>A new method CanLeaderEndConditionBeAssigned() determines if the LeaderEndCondition can be set.
+<li>TagMode has been replaced by multiple properties: IsMaterialTag, IsMulticategoryTag.
+<li>Members of the TagOrientation enum have been renamed.
+</ul>
+
+
+<p>Some new members were added to determine the elements referenced by the tag:
+
+<ul>
+<li>New property TaggedElementId &ndash; provides the id of the element referenced by the tag.
+<li>New property TaggedLocalElementId &ndash; provides the id of a linked element reference by the tag.
+<li>New method GetTaggedLocalElement() &ndash; returns the handle of the element reference by the tag.
+<li>New property IsOrphaned &ndash; Orphans are those tags that are associated with an instance of a linked Revit file but have no host element. Tags become orphaned when the element they were tagging was deleted from the link.
+</ul>
+
+<h2>Import and Export APIs changes</h2>
+
+<p>The import and export APIs no longer have special argument combinations which permit use of the "active view".
+If you wish to export from or import to the active view, you must obtain it directly and pass it as input to the method.
+
+<ul>
+<li>For the following APIs, a non-empty ViewSet must be provided:
+<ul>
+<li>bool Export (string folder, string name, ViewSet views, DGNExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, DWGExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, DXFExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, SATExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, DWFExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, DWFXExportOptions options);
+<li>bool Export (string folder, string name, ViewSet views, FBXExportOptions options);
+</ul>
+</ul>
+
+
+<ul>
+<li>For the following API, a 3D view must be provided:
+<ul>
+<li>bool Export(string folder, string name, View3D view, ViewPlan grossAreaPlan, BuildingSiteExportOptions options);
+</ul>
+</ul>
+
+
+<ul>
+<li>For import APIs, the 'View' property has been removed from the DWGImportOptions and ImageImportOptions. Instead, a new required argument has been added for the following APIs:
+<ul>
+<li>bool Import (string file, DWGImportOptions options, View view, out Element element);
+<li>bool Import (string file, ImageImportOptions options, View view, out Element element);
+<li>bool Link (string file, DWGImportOptions options, View view, out Element element);
+</ul>
+</ul>
+
+<p>The methods
+
+<ul>
+<li>ACADExportOptions.GetPredefinedSetupNames()
+<li>DWGExportOptions.GetPredefinedOptions()
+<li>DXFExportOptions.GetPredefinedOptions()
+</ul>
+
+<p>provide access to predefined setups and settings from a given document for DWG and DFX export.
+
+<p>The method
+
+<ul>
+<li>Document.Import(String, InventorImportOptions)
+</ul>
+
+<p>has been replaced by
+
+<ul>
+<li>Application.OpenBuildingComponentDocument(String)
+</ul>
+
+
+<h2>Save and Close API changes</h2>
+
+<ul>
+<li>Document.Close()
+<li>Document.Close(bool saveModified)
+</ul>
+
+<p>The behaviour of these methods has been changed. Previously, they would prompt the interactive user to pick a target path name if the document's path name was not already set, or if the target file was read-only. Now they will throw an exception if the document's path name is not yet set, or if the saving target file is read-only.
+
+<ul>
+<li>Document.Save()
+</ul>
+
+<p>The behaviour of this method has been changed. Previously, it would prompt the interactive user to pick a target path name if the document's path name was not already set, or if the target file was read-only. Now it will throw an exception if the document's path name is not set yet. In this case, it needs to be first saved using the SaveAs method instead, or when the target file is read-only.
+
+<ul>
+<li>Document.Save(SaveOptions)
+</ul>
+
+<p>This new method behaves identically to Document.Save(), but allows you to specify a temporary id to use to generate the file preview.
+
+<ul>
+<li>Document.SaveAs(string fileName)
+<li>Document.SaveAs(string fileName, bool changeDocumentFilename)
+</ul>
+
+<p>The behaviour of these methods has been changed. Previously, they would prompt the user before overwriting another file. Now an exception will be thrown in that situation.
+
+<ul>
+<li>Document.SaveAs(string fileName, SaveAsOptions options)
+</ul>
+
+
+<p>This new method allows you to save a document, and encapsulates the options to rename the document in session, overwrite an existing file (if it exists), and temporarily assign a view id to use to generate the file preview.
+
+<ul>
+<li>UIDocument.SaveAndClose()
+</ul>
+
+<p>This new method closes the document after saving it. If the document's path name has not been set the "Save As" dialog will be shown to the Revit user to set its name and location.
+
+<ul>
+<li>UIDocument.SaveAs()
+</ul>
+
+<p>This new method saves the document to a file name and path obtained from the Revit user (via the "Save As" dialog).
+
+
+<h2>Reference properties</h2>
+
+<p>The Reference class is being renovated to be more closely aligned with the native Revit class it wraps.
+Because of this change, References will no longer carry information on the document, element, or geometry object it was obtained from.
+The following table lists the replacement API calls for the obsolete Reference properties:
+
+<ul>
+<li>Element &ndash; ElementId or Document.GetElement(Reference)
+<li>GeometryObject &ndash; Element.GetGeometryObjectFromReference(Reference)
+<li>Transform &ndash; ReferenceWithContext.GetInstanceTransform() (see below)
+<li>ProximityParameter &ndash; ReferenceWithContext.ProximityParameter (see below)
+<li>ElementReferenceType &ndash; Unchanged
+<li>GlobalPoint &ndash; Unchanged
+<li>UVPoint &ndash; Unchanged
+</ul>
+
+<p>The method
+
+<ul>
+<li>Document.FindReferencesByDirection()
+</ul>
+
+<p>is affected most by this change. The method was the only method to populate the Transform and ProximityParameter properties of Reference. You should switch to the replacement method:
+
+<ul>
+<li>Document.FindReferencesWithContextByDirection()
+</ul>
+
+<p>This replacement method returns a list of ReferenceWithContext objects, containing the Reference plus additional members:
+
+<ul>
+<li>ReferenceWithContext.ProximityParameter
+<li>ReferenceWithContext.GetInstanceTransform()
+</ul>
+
+<p>Note that methods which existed in Revit 2011 and earlier will continue in this release to return a fully populated Reference object (it is not necessary to change code dealing with these methods). However, methods added in Revit 2012 may not return a fully populated Reference handle and will need to be parsed using the replacement methods above. Also, affected members have been marked obsolete and planned to be removed in a future release.
+
+
+<h2>Event argument changes</h2>
+
+<p>A few changes have been made to event argument classes as we align frameworks to generate code for events.
+
+<p>Note: some of these classes and methods may change again in future.
+
+<p>The following table of changes lists the affected property, the classes providing it, and the new member with optional notes:
+
+<ul>
+<li>Cancel &ndash; Many event argument classes &ndash; Methods Cancel(), IsCancelled() &ndash; Now available only in argument classes for pre-events that derive from RevitAPIPreEventArgs.
+<li>ImportedInstance &ndash; FileImportedEventArgs &ndash; Property ImportedInstanceId &ndash; Now an ElementId.
+<li>PrintedViews &ndash; DocumentPrintedEventArgs &ndash; Method GetPrintedViewElementIds().
+<li>FailedViews &ndash; DocumentPrintedEventArgs &ndash; Method GetFailedViewElementIds().
+<li>Views &ndash; DocumentPrintingEventArgs &ndash; Method GetViewElementIds().
+</ul>
+
+
+<h2>Event sender changed for UI events</h2>
+
+<p>For some UI events on UIApplication and UIControlledApplication, the type of the "sender" object has been changed.
+
+<ul>
+<li>For the ApplicationClosing event, the sender object is now a UIControlledApplication object (it was previously a ControlledApplication);
+<li>For all other UI events, the sender object is now a UIApplication (it was previously an Application).
+</ul>
+
+<h2>Move/Mirror/Rotate/Array changes</h2>
+<h3>Move method replacements</h3>
+
+<p>The new static methods
+
+<ul>
+<li>ElementTransformUtils.MoveElements(Document, ICollection&lt;ElementId&gt;, XYZ)
+<li>ElementTransformUtils.MoveElement(Document, ElementId, XYZ)
+</ul>
+
+
+<p>replace the Document.Move() overloads.
+<h3>Mirror method replacements</h3>
+
+<p>The new static methods
+
+<ul>
+<li>ElementTransformUtils.MirrorElements(Document, ICollection&lt;ElementId&gt;, Plane)
+<li>ElementTransformUtils.MirrorElement(Document, ElementId, Plane)
+</ul>
+
+
+<p>replace the Document.Mirror() methods. These new methods allow you to mirror one or more elements directly about a geometric plane which you may construct directly. Previously the Document.Mirror() methods required you to obtain a reference to an actual plane, or implicitly used the active view to calculate the mirror plane.
+<h3>Rotate method replacements</h3>
+
+<p>The new static methods
+
+<ul>
+<li>ElementTransformUtils.RotateElements(Document, ICollection&lt;ElementId&gt;, Line, double)
+<li>ElementTransformUtils.RotateElement(Document, ElementId, Line, double)
+</ul>
+
+
+<p>replace the Document.Rotate() methods.
+<h3>New Copy methods</h3>
+
+<p>The new static methods
+
+<ul>
+<li>ElementTransformUtils.CopyElements(Document, ICollection&lt;ElementId&gt;, XYZ)
+<li>ElementTransformUtils.CopyElement(Document, ElementId, XYZ)
+</ul>
+
+
+<p>allow you to copy and translate one or more physical elements and place the newly copied elements by applying the given translation vector.
+<h3>LinearArray creation replacement methods</h3>
+
+<p>The new methods
+
+<ul>
+<li>LinearArray.Create(Document, View, ICollection&lt;ElementId&gt;, int, XYZ, ArrayAnchorMember)
+<li>LinearArray.Create(Document, View, ElementId, int, XYZ, ArrayAnchorMember)
+</ul>
+
+
+<p>replace the Document.Array() overloads that return LinearArray.
+
+<p>The new methods
+
+<ul>
+<li>LinearArray.ArrayElementsWithoutAssociation(Document, View, ICollection&lt;ElementId&gt;, int, XYZ, ArrayAnchorMember)
+<li>LinearArray.ArrayElementWithoutAssociation(Document, View, ElementId, int, XYZ, ArrayAnchorMember)
+</ul>
+
+
+<p>replace the Document.ArrayWithoutAssociate() methods that create sets of elements based on linear translation.
+<h3>RadialArray creation replacement methods</h3>
+
+<p>The new methods
+
+<ul>
+<li>RadialArray.Create(Document, View, ICollection&lt;ElementId&gt;, int Line, double, ArrayAnchorMember)
+<li>RadialArray.Create(Document, View, ElementId, int Line, double, ArrayAnchorMember)
+</ul>
+
+
+<p>replace the Document.Array() overloads that return RadialArray. The new methods require a view input (where previously the old overloads would use the active view implicitly, which could lead to unexpected failure in some conditions).
+
+<p>The new methods
+
+<ul>
+<li>RadialArray.ArrayElementsWithoutAssociation(Document, View, ICollection&lt;ElementId&gt;, int, Line, double, ArrayAnchorMember)
+<li>RadialArray.ArrayElementWithoutAssociation(Document, View, ElementId, int, Line, double, ArrayAnchorMember)
+</ul>
+
+
+<p>replace the Document.ArrayWithoutAssociate() methods that create sets of elements based on rotation.
+<h2>Structural AnalyticalModel changes</h2>
+<h3>AnalyticalModel now an Element</h3>
+
+<p>The AnalyticalModel class is now a subclass of Element.
+
+<p>One consequence of this change: the AnalyticalModel of a newly created structural element can no longer be obtained without regeneration (as the AnalyticalModel element must be generated).
+<h3>AnalyticalModelSelector</h3>
+
+<p>The following two constructors were removed from AnalyticalModelSelector:
+
+<ul>
+<li>AnalyticalModelSelector(IList&lt;Curve&gt;, int index)
+<li>AnalyticalModelSelector(IList&lt;Curve&gt;, int index, AnalyticalCurveSelector)
+</ul>
+
+
+<p>The following method was also removed:
+
+<ul>
+<li>bool IsValidIndex(IList&lt;Curve&gt;, int index)
+</ul>
+
+
+<p>Instead of passing the array of curves and the index to create the selector, you should use the constructor that accepts the Curve directly (obtain the curve from the collection prior to input).
+
+<h3>SlabFoundationType</h3>
+
+<p>The enumerated value SlabFoundationType.Slab is now SlabFoundationType.SlabOneWay. A new option, SlabTwoWay, is also available. Existing floors assigned the value Slab will report SlabOneWay.
+
+
+<a name="3"></a>
+
+<h1>Major enhancements to the Revit API</h1>
+
+<h2>Extensible Storage</h2>
+
+<p>The Revit API now allows you to create your own class-like Schema data structures and attach instances of them to any Element in a Revit model. This functionality can be used to replace the technique of storing data in hidden shared parameters. Schema-based data is saved with the Revit model and allows for higher-level, metadata-enhanced, object-oriented data structures. Schema data can be configured to be readable and/or writable to all users, just a specific application vendor, or just a specific application from a vendor.
+
+<p>The extensible storage classes are all found in Autodesk.Revit.DB.ExtensibleStorage
+
+<ul>
+<li>Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder -- Used to create Schemas definitions
+<li>Autodesk.Revit.DB.ExtensibleStorage.Schema --Contains a unique schema identifier, read/write permissions, and a collection of data Field objects.
+<li>Autodesk.Revit.DB.ExtensibleStorage.Field  -- Contains data name, type, and unit information and is used as the key to access corresponding data in an Element
+<li>Autodesk.Revit.DB.ExtensibleStorage.FieldBuilder -- A helper class used with SchemaBuilder used when creating a new field.
+<li>Autodesk.Revit.DB.ExtensibleStorage.Entity -- An object containing data corresponding to a Schema that can then be inserted into an Element.
+</ul>
+
+
+<p>The following data types are currently supported:
+
+<ul>
+<li>int
+<li>short
+<li>double
+<li>float
+<li>bool
+<li>string
+<li>Guid
+<li>ElementId
+<li>Autodesk.Revit.DB.XYZ
+<li>Autodesk.Revit.DB.UV
+<li>Autodesk.Revit.DB.ExtensibleStorage.Entity (An instance of another Schema, also known as a SubSchema)
+<li>Array (as a System.Collections.Generic.IList&lt;T&gt;)
+<li>Map (as a System.Collections.Generic.IDictionary&lt;TKey, TValue&gt;)
+<li>All types supported for simple types, including Entity, are supported for the &lt;TValue&gt; parameter.
+<li>All types supported for simple types *except* double, float, XYZ, UV, and Entity are supported for the &lt;TKey&gt; parameter.
+</ul>
+
+
+<h4>Simple usage of ExtensibleStorage</h4>
+
+<pre class="code">
+<span class="green">// Create a data structure, attach it to a wall, </span>
+<span class="green">// populate it with data, and retrieve the data </span>
+<span class="green">// back from the wall</span>
+<span class="blue">public</span> <span class="blue">void</span> StoreDataInWall(
+&nbsp; <span class="teal">Wall</span> wall,
+&nbsp; <span class="teal">XYZ</span> dataToStore )
+{
+&nbsp; <span class="teal">Transaction</span> createSchemaAndStoreData
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>(wall.Document, <span class="maroon">&quot;tCreateAndStore&quot;</span>);
+&nbsp; createSchemaAndStoreData.Start();
+&nbsp; SchemaBuilder schemaBuilder = <span class="blue">new</span> SchemaBuilder(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>(<span class="maroon">&quot;720080CB-DA99-40DC-9415-E53F280AA1F0&quot;</span>));
+&nbsp; <span class="green">// allow anyone to read the object</span>
+&nbsp; schemaBuilder.SetReadAccessLevel(AccessLevel.Public);
+&nbsp; <span class="green">// restrict writing to this vendor only</span>
+&nbsp; schemaBuilder.SetWriteAccessLevel(AccessLevel.Vendor);
+&nbsp; <span class="green">// required because of restricted write-access</span>
+&nbsp; schemaBuilder.SetVendorId(<span class="maroon">&quot;ADSK&quot;</span>);
+&nbsp; <span class="green">// create a field to store an XYZ</span>
+&nbsp; FieldBuilder fieldBuilder = schemaBuilder
+&nbsp; &nbsp; .AddSimpleField(<span class="maroon">&quot;WireSpliceLocation&quot;</span>, <span class="blue">typeof</span>(<span class="teal">XYZ</span>));
+&nbsp; fieldBuilder.SetUnitType(<span class="teal">UnitType</span>.UT_Length);
+&nbsp; fieldBuilder.SetDocumentation(
+&nbsp; &nbsp; <span class="maroon">&quot;A stored location value representing a wiring splice in a wall.&quot;</span>);
+&nbsp; schemaBuilder.SetSchemaName(<span class="maroon">&quot;WireSpliceLocation&quot;</span>);
+&nbsp; <span class="green">// register the Schema object</span>
+&nbsp; Schema schema = schemaBuilder.Finish();
+&nbsp; <span class="green">// create an entity (object) for this schema (class)</span>
+&nbsp; Entity entity = <span class="blue">new</span> Entity(schema);
+&nbsp; <span class="green">// get the field from the schema</span>
+&nbsp; Field fieldSpliceLocation
+&nbsp; &nbsp; = schema.GetField(<span class="maroon">&quot;WireSpliceLocation&quot;</span>);
+&nbsp; <span class="green">// set the value for this entity</span>
+&nbsp; entity.Set&lt;<span class="teal">XYZ</span>&gt;(fieldSpliceLocation,
+&nbsp; &nbsp; dataToStore, <span class="teal">DisplayUnitType</span>.DUT_METERS);
+&nbsp; <span class="green">// store the entity in the element</span>
+&nbsp; wall.SetEntity(entity);
+&nbsp; <span class="green">// get the data back from the wall</span>
+&nbsp; Entity retrievedEntity = wall.GetEntity(schema);
+&nbsp; <span class="teal">XYZ</span> retrievedData = retrievedEntity.Get&lt;<span class="teal">XYZ</span>&gt;(
+&nbsp; &nbsp; schema.GetField(<span class="maroon">&quot;WireSpliceLocation&quot;</span>),
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span>.DUT_METERS);
+&nbsp; createSchemaAndStoreData.Commit();
+}
+</pre>
+
+<h2>Worksharing API</h2>
+
+<p>Several new classes were added to provide access to worksharing information in the document:
+
+<ul>
+<li>Workset &ndash; Represents a workset in the document. Worksets are a way to divide a set of elements in the Revit document into subsets for worksharing.
+<li>WorksetId &ndash; Identifies a workset within a single document.
+<li>WorksetKind &ndash; An enumerated type that indicates one of the standard kinds of workset (as available in the UI).
+<li>WorksetTable &ndash; A table containing references to all the worksets contained in a document.
+<li>WorksetVisibility &ndash; An enumerated type that indicates the visibility settings of a workset in a particular view.
+<li>WorksetDefaultVisibilitySettings &ndash; An object that manages default visibility of worksets in a document.
+<li>FilteredWorksetCollector &ndash; This class is used to search, filter and iterate through a set of worksets. Developers can assign a condition to filter the worksets that are returned. If no condition is applied, it attempts to access all the worksets in the document.
+<li>FilteredWorksetIdIterator &ndash; An iterator to a set of workset ids filtered by the settings of a FilteredWorksetCollector.
+<li>FilteredWorksetIterator &ndash; An iterator to a set of worksets filtered by the settings of a FilteredWorksetCollector.
+<li>WorksetFilter &ndash; A base class for a type of filter that accepts or rejects worksets based upon criteria.
+<li>WorksetKindFilter &ndash; A filter used to match worksets of the given WorksetKind.
+<li>ElementWorksetFilter &ndash; A filter used to match elements which reside in a given workset (use this filter with FilteredElementCollector).
+<li>WorksharingUtils &ndash; access to information about a work-shared document.
+<li>WorksharingTooltipInfo &ndash; basic read-only information about a work-shared document, such as owner, creator, etc.
+</ul>
+
+
+<p>Some related additions were made to existing classes:
+
+<ul>
+<li>Document.GetWorksetTable() &ndash; Gets the WorksetTable of this document. There is one WorksetTable for each document.
+<li>Document.GetWorksetId(ElementId id) &ndash; Gets the id of the Workset which owns the element.
+<li>Element.WorksetId &ndash; Gets the id of the workset which owns the element.
+<li>View.GetWorksetVisibility(WorksetId worksetId) &ndash; Returns the visibility settings of a workset for this particular view.
+<li>View.SetWorksetVisibility(WorksetId worksetId, WorksetVisibility visible) &ndash; Sets visibility for a workset in this view. This setting overrules implicit visibility of the workset for this particular view.
+<li>View.IsWorksetVisible(WorksetId worksetId) &ndash; Indicates whether the workset is visible in this view.
+</ul>
+
+
+<p>In addition, there is API support for the new 2012 worksharing visualization functionality:
+
+<ul>
+<li>View.SetWorksharingDisplayMode and View.GetWorksharingDisplayMode allow the API to control which worksharing display mode is enabled in the view.
+<li>WorksharingDisplaySettings allows getting and setting the specific graphic overrides that will be applied in the various worksharing display modes.
+</ul>
+
+<h2>Setting the Active View</h2>
+
+<p>The new property
+
+<ul>
+<li>UIDocument.ActiveView
+</ul>
+
+
+<p>has both a getter and setter, so it allows you to query the currently active view of the currently active document, and also allows you to set it similarly to what an end user can do by changing a view in the Project Browser in Revit.
+
+<p>The setter has a number of limitations:
+
+<ul>
+<li>It can only be used in an active document, which must not be in read-only state and must not be inside a transaction.
+<li>The setter also cannot be used during ViewActivating and ViewActivated events, or during any pre-action event, such as DocumentSaving, DocumentExporting, or other similar events.
+</ul>
+
+<h2>Opening and activating a document</h2>
+
+<p>A new method:
+
+<ul>
+<li>UIApplication.OpenAndActivateDocument(String)
+</ul>
+
+
+<p>was added to the UI API. It opens a Revit document and makes it the active one. The document is opened with its default view displayed.
+
+<p>There are limitations preventing this method to be called at certain situations:
+
+<ul>
+<li>when there is a transaction open in the currently active document (if there is an active document)
+<li>during execution of any event handler
+</ul>
+
+<h2>Adding a custom Ribbon tab</h2>
+
+<p>The new methods
+
+<ul>
+<li>UIApplication.CreateRibbonTab()
+<li>UIApplication.CreateRibbonPanel(string, string)
+<li>UIApplication.GetRibbonPanels(string)
+</ul>
+
+<p>(and the corresponding methods in UIControlledApplication) provide the ability to add a new ribbon tab to Revit, at the end of the list of static tabs (to the right of the Add-Ins tab, if shown). If multiple tabs are added, they will be shown in the order added.
+
+<p>There is a limit to the number of custom tabs supported in a given session of Revit (20). This limit is provided to ensure that the standard tabs remain visible and usable. Because of this, your application should only add a custom tab if it's really needed.
+
+<h2>Construction modeling API</h2>
+
+<p>New functionality in Revit 2012 allows elements to be divided into sub-parts, collected into assemblies, and displayed in special assembly views. The API for dividing parts is still under development and likely to change.
+
+<p>Read, write and create access to assemblies in the Revit environment is provided through the classes:
+
+<ul>
+<li>Autodesk.Revit.DB.Assembly.AssemblyInstance
+<li>Autodesk.Revit.DB.Assembly.AssemblyType
+</ul>
+
+
+<p>A new assembly containing the selected elements can be created as follows:
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> categoryId = doc.get_Element(
+&nbsp; &nbsp; uidoc.Selection.GetElementIds().
+&nbsp; FirstOrDefault() ).Category.Id;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> titleblockId
+&nbsp; &nbsp; = doc.TitleBlocks.Cast&lt;<span class="teal">FamilySymbol</span>&gt;()
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">FamilySymbol</span>&gt;().Id;
+&nbsp;
+&nbsp; <span class="teal">AssemblyInstance</span> instance = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">AssemblyInstance</span>.IsValidNamingCategory( doc,
+&nbsp; &nbsp; categoryId, uidoc.Selection.GetElementIds() ) )
+&nbsp; {
+&nbsp; &nbsp; t.SetName( <span class="maroon">&quot;Create Assembly Instance&quot;</span> );
+&nbsp; &nbsp; t.Start();
+&nbsp; &nbsp; instance = <span class="teal">AssemblyInstance</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; uidoc.Selection.GetElementIds(), categoryId );
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; t.SetName( <span class="maroon">&quot;Set Assembly Name&quot;</span> );
+&nbsp; &nbsp; t.Start();
+&nbsp; &nbsp; <span class="blue">string</span> assemblyName = <span class="maroon">&quot;Assembly #1&quot;</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">AssemblyInstance</span>.IsValidAssemblyName( doc,
+&nbsp; &nbsp; &nbsp; assemblyName, categoryId ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; instance.AssemblyTypeName = assemblyName;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+<p>Other important methods include AssemblyInstance.GetMemberIds(), AssemblyInstance.SetMemberIds(), and AssemblyInstance.Disassemble().
+
+<p>Assembly views, that display only the elements in the assembly, are created with the AssemblyViewUtils class such as:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( instance.AllowsAssemblyViewCreation() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ViewSheet</span> viewSheet = <span class="teal">AssemblyViewUtils</span>
+&nbsp; &nbsp; &nbsp; .CreateSheet( doc, instance.Id, titleblockId );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view3d = <span class="teal">AssemblyViewUtils</span>
+&nbsp; &nbsp; &nbsp; .Create3DOrthographic( doc, instance.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewSection</span> detailSectionA = <span class="teal">AssemblyViewUtils</span>
+&nbsp; &nbsp; &nbsp; .CreateDetailSection( doc, instance.Id,
+&nbsp; &nbsp; &nbsp; <span class="teal">AssemblyDetailViewOrientation</span>.DetailSectionA );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> materialTakeoff = <span class="teal">AssemblyViewUtils</span>
+&nbsp; &nbsp; &nbsp; .CreateMaterialTakeoff( doc, instance.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> partList = <span class="teal">AssemblyViewUtils</span>
+&nbsp; &nbsp; &nbsp; .CreatePartList( doc, instance.Id );
+&nbsp; }
+</pre>
+
+<p>The PartUtils class provides methods to identify Part elements that are created by sub-dividing model elements. These methods describe the relationship between Parts and the elements (such as walls, floors, etc) that are divided to create the Parts.
+
+
+<h2>DB-level applications</h2>
+
+<p>The add-in framework has been extended to support database-level add-ins. These add-ins should be used when the purpose of your application is to assign events and/or updaters to the Revit session, but not to add anything to the Revit user interface or use APIs from RevitAPIUI.dll.
+
+<p>To implement a DB-level application, implement the methods in the Autodesk.Revit.DB.IExternalDBApplication interface:
+
+<ul>
+<li>public Result OnStartup(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+<li>public Result OnShutdown(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+</ul>
+
+
+<p>Within the OnStartup() method you should register events and updaters which your application will respond to during the session.
+
+<p>To register the DB-level application with Revit, add the appropriate registry entry to a manifest file in the Addins folder.
+A DB-level application has a similar structure as for a UI external application:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">DBApplication</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>MyDBLevelApplication.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>DA3D570A-1AB3-4a4b-B09F-8C15DFEC6BF0<span class="blue">&lt;/</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>MyCompany.MyDBLevelAddIn<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>My DB-Level AddIn<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+
+<h2>Geometry API enhancements</h2>
+
+<h3>Get original geometry of a FamilyInstance</h3>
+
+<p>The new method
+
+<ul>
+<li>FamilyInstance.GetOriginalGeometry()
+</ul>
+
+
+<p>returns the original geometry of the instance, before the instance is modified by joins, cuts, coping, extensions, or other post-processing.
+
+<h3>Extrusion analysis of a solid</h3>
+
+<p>The utility class
+
+<ul>
+<li>ExtrusionAnalyzer
+</ul>
+
+
+<p>allows you to attempt to “fit” a given piece of geometry into the shape of an extrusion. An instance of this class is a single-time use class which should be supplied a solid geometry, a plane, and a direction. The utility will calculate a base boundary parallel to the input plane which is the outer boundary of the shadow cast by the solid onto the input plane and along the extrusion direction.
+
+<p>After the extrusion has been calculated, the class permits a second step analysis to identify all faces from the original geometry which do not align with the faces of the calculated extrusion.
+
+<p>This utility works best for geometry which are at least somewhat “extrusion-like”, for example, the geometry of a wall which may or may not be affected by end joins, floor joins, roof joins, openings cut by windows and doors, or other modifications.
+<h3>GeometryCreationUtilities</h3>
+
+<p>The new utility class GeometryCreationUtilities offers the ability to create solid geometry from input curves:
+
+<ul>
+<li>GeometryCreationUtilities.CreateBlendGeometry()
+<li>GeometryCreationUtilities.CreateExtrusionGeometry()
+<li>GeometryCreationUtilities.CreateRevolvedGeometry()
+<li>GeometryCreationUtilities.CreateSweptGeometry()
+<li>GeometryCreationUtilities.CreateSweptBlendGeometry()
+</ul>
+
+
+<p>The resulting geometry is not added to the document as a part of any element. However, you may use the created Solid, and its constituent faces and edges, in several ways:
+
+<ul>
+<li>As the input face(s) to the methods in the Analysis Visualization framework (SpatialFieldManager.AddSpatialFieldPrimitive())
+<li>As the input solid to finding 3D elements by intersection
+<li>As one or more of the inputs to a Boolean operation
+<li>As a part of a geometric calculation (using, for example, Face.Project(), Face.Intersect(), or other Face, Solid, and Edge geometry methods)
+</ul>
+
+<h3>Find 3D elements by intersection</h3>
+
+<p>The new element filters:
+
+<ul>
+<li>ElementIntersectsElementFilter
+<li>ElementIntersectsSolidFilter
+</ul>
+
+
+<p>pass elements whose actual 3D geometry intersects the 3D geometry of the target object. With ElementIntersectsElementFilter, the target object is another element. The intersection is determined with the same routine used to determine if an interference exists during generation of an InterferenceReport. With ElementIntersectsSolidFilter, the target object is any solid, including one created from scratch using GeometryCreationUtilities.
+
+<p>This example uses a created cylinder centered on the end of a wall to find other walls in close proximity (whether or not they are actually joined):
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt;
+&nbsp; FindWallJoinsAtEndUsingProximity(
+&nbsp; &nbsp; <span class="teal">Wall</span> wall, <span class="blue">int</span> end )
+{
+&nbsp; <span class="green">// Get properties of wall at the end point </span>
+&nbsp; <span class="teal">LocationCurve</span> wallCurve = wall.Location
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; <span class="teal">XYZ</span> endPoint = wallCurve.Curve.get_EndPoint( end );
+&nbsp; <span class="blue">double</span> height = wall.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.WALL_USER_HEIGHT_PARAM ).AsDouble();
+&nbsp; <span class="blue">double</span> elevation = wall.Level.Elevation;
+&nbsp; <span class="green">// Build cylinder centered at wall end point, </span>
+&nbsp; <span class="green">// extending 3' in diameter </span>
+&nbsp; <span class="teal">CurveLoop</span> cylinderLoop = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp; <span class="teal">XYZ</span> arcCenter = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; endPoint.X, endPoint.Y, elevation );
+&nbsp; <span class="teal">Application</span> application = wall.Document.Application;
+&nbsp; <span class="teal">Arc</span> firstArc = application.Create.NewArc( arcCenter,
+&nbsp; &nbsp; 1.5, 0, <span class="teal">Math</span>.PI, <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY );
+&nbsp; <span class="teal">Arc</span> secondArc = application.Create.NewArc( arcCenter,
+&nbsp; &nbsp; 1.5, <span class="teal">Math</span>.PI, 2 * <span class="teal">Math</span>.PI, <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY );
+&nbsp; cylinderLoop.Append( firstArc );
+&nbsp; cylinderLoop.Append( secondArc );
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; singleLoop = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;();
+&nbsp; singleLoop.Add( cylinderLoop );
+&nbsp; <span class="teal">Solid</span> proximityCylinder = <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; .CreateExtrusionGeometry( singleLoop,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, height );
+&nbsp; <span class="green">// Filter walls </span>
+&nbsp; <span class="teal">FilteredElementCollector</span> proximityCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( wall.Document );
+&nbsp; proximityCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp; <span class="green">// Exclude the wall itself </span>
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; toExclude = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; toExclude.Add( wall.Id );
+&nbsp; proximityCollector.Excluding( toExclude );
+&nbsp; <span class="green">// Filter only elements intersecting our target cylinder </span>
+&nbsp; proximityCollector.WherePasses(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>(
+&nbsp; &nbsp; &nbsp; proximityCylinder ) );
+&nbsp; <span class="green">// Return matches </span>
+&nbsp; <span class="blue">return</span> proximityCollector.ToElementIds();
+}
+</pre>
+
+
+<h3>Boolean operations</h3>
+
+
+<p>The new methods
+
+<ul>
+<li>BooleanOperationsUtils.ExecuteBooleanOperation()
+<li>BooleanOperationsUtils.ExecuteBooleanOperationModifyingOriginalSolid()
+</ul>
+
+
+<p>execute a boolean operation combining a pair of solid geometry objects. Options to the method include the operations type: Union, Difference, or Intersect.
+
+<p>The first method takes a copy of the input solids and produces a new solid as a result. Its first argument can be any solid, either obtained directly from a
+
+<p>Revit element or created via another operation like GeometryCreationUtils.
+
+<p>The second method performs the boolean operation directly on the first input solid. The first input must be a solid which is not obtained directly from a Revit
+
+<p>element. The property
+
+<ul>
+<li>GeometryObject.IsElementGeometry
+</ul>
+
+
+<p>can identify whether the solid is appropriate as input for this method.
+
+<p>In this example, the geometry of intersecting columns and walls is obtained by a Boolean intersection operation. The intersection volume and number of boundary faces is shown in the resulting dialog.
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> A data structure containing the details </span>
+<span class="gray">///</span><span class="green"> of each intersecting wall/column pair. </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span><span class="green"> </span>
+<span class="blue">struct</span> <span class="teal">Intersection</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Element</span> Wall;
+&nbsp; <span class="blue">public</span> <span class="teal">Element</span> Column;
+&nbsp; <span class="blue">public</span> <span class="teal">Solid</span> Solid;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> A collection of all intersections. </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span><span class="green"> </span>
+<span class="blue">private</span> <span class="teal">List</span>&lt;<span class="teal">Intersection</span>&gt; m_allIntersections;
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> Finds and posts information on wall/column intersections. </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;</span><span class="green">The document.</span><span class="gray">&lt;/param&gt;</span><span class="green"> </span>
+<span class="blue">public</span> <span class="blue">void</span> FindIntersectionVolumes( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// Find all Wall elements. </span>
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp; m_allIntersections = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Intersection</span>&gt;();
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> collector.OfType&lt;<span class="teal">Wall</span>&gt;() )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Find all intersecting columns </span>
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> columnIntersectionCollector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; &nbsp; <span class="green">// Columns may be one of two different categories </span>
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; categories
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;();
+&nbsp; &nbsp; categories.Add( <span class="teal">BuiltInCategory</span>.OST_Columns );
+&nbsp; &nbsp; categories.Add( <span class="teal">BuiltInCategory</span>.OST_StructuralColumns );
+&nbsp; &nbsp; <span class="teal">ElementMulticategoryFilter</span> categoryFilter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementMulticategoryFilter</span>( categories );
+&nbsp; &nbsp; <span class="green">// Apply intersection filter to find matches </span>
+&nbsp; &nbsp; <span class="teal">ElementIntersectsElementFilter</span> intersectsFilter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsElementFilter</span>( wall );
+&nbsp; &nbsp; columnIntersectionCollector
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WherePasses( categoryFilter )
+&nbsp; &nbsp; &nbsp; .WherePasses( intersectsFilter );
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; columnIntersectionCollector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Store information on intersection </span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Intersection</span> intersection;
+&nbsp; &nbsp; &nbsp; intersection.Wall = wall;
+&nbsp; &nbsp; &nbsp; intersection.Column = element;
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> wallSolid = GetGeometry( wall );
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> columnSolid = GetGeometry( element );
+&nbsp; &nbsp; &nbsp; <span class="green">// Intersect the solid geometry of the two elements </span>
+&nbsp; &nbsp; &nbsp; intersection.Solid = <span class="teal">BooleanOperationsUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .ExecuteBooleanOperation( wallSolid,
+&nbsp; &nbsp; &nbsp; &nbsp; columnSolid, <span class="teal">BooleanOperationsType</span>.Intersect );
+&nbsp; &nbsp; &nbsp; m_allIntersections.Add( intersection );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">TaskDialog</span> td = <span class="blue">new</span> <span class="teal">TaskDialog</span>( <span class="maroon">&quot;Intersection info&quot;</span> );
+&nbsp; td.MainInstruction = <span class="maroon">&quot;Intersections found: &quot;</span>
+&nbsp; &nbsp; + m_allIntersections.Count;
+&nbsp; <span class="teal">StringBuilder</span> builder = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Intersection</span> intersection <span class="blue">in</span>
+&nbsp; &nbsp; m_allIntersections )
+&nbsp; {
+&nbsp; &nbsp; builder.AppendLine( <span class="teal">String</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} x {1}: volume {2} faces {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; intersection.Wall.Name,
+&nbsp; &nbsp; &nbsp; intersection.Column.Name,
+&nbsp; &nbsp; &nbsp; intersection.Solid.Volume,
+&nbsp; &nbsp; &nbsp; intersection.Solid.Faces.Size ) );
+&nbsp; }
+&nbsp; td.MainContent = builder.ToString();
+&nbsp; td.Show();
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green">&nbsp; Gets the solid geometry of an element. </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;remarks&gt;</span><span class="green">Makes an assumption that each element </span>
+<span class="gray">///</span><span class="green"> consists of only one postive-volume solid, and </span>
+<span class="gray">///</span><span class="green"> returns the first one it finds.</span><span class="gray">&lt;/remarks&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;e&quot;&gt;&lt;/param&gt;</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span><span class="green"> </span>
+<span class="blue">private</span> <span class="teal">Solid</span> GetGeometry( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">GeometryElement</span> geomElem = e.get_Geometry(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj <span class="blue">in</span>
+&nbsp; &nbsp; geomElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Walls and some columns will have a </span>
+&nbsp; &nbsp; <span class="green">// solid directly in its geometry </span>
+&nbsp; &nbsp; <span class="blue">if</span>( geomObj <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = (<span class="teal">Solid</span>)geomObj;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid.Volume &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> solid;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="green">// Some columns will have a instance </span>
+&nbsp; &nbsp; <span class="green">// pointing to symbol geometry </span>
+&nbsp; &nbsp; <span class="blue">if</span>( geomObj <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> geomInst
+&nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">GeometryInstance</span>) geomObj;
+&nbsp; &nbsp; &nbsp; <span class="green">// Instance geometry is obtained so that the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// intersection works as expected without </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// requiring transformation </span>
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> instElem
+&nbsp; &nbsp; &nbsp; &nbsp; = geomInst.GetInstanceGeometry();
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> instObj <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; instElem.Objects )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( instObj <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = (<span class="teal">Solid</span>)instObj;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid.Volume &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> solid;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+
+<h3>HostObject &ndash; top, bottom, side faces</h3>
+
+
+<p>The new methods
+
+<ul>
+<li>HostObjectUtils.GetTopFaces()
+<li>HostObjectUtils.GetBottomFaces()
+<li>HostObjectUtils.GetSideFaces()
+</ul>
+
+
+<p>provide a shortcut to locate the faces of a given roof, floor, or wall which act as the exterior or interior boundary of the object's CompoundStructure. Top and bottom faces are applicable to roofs and floors. Side faces are applicable to walls.
+
+<h3>Get host face of a FamilyInstance</h3>
+
+<p>The property
+
+<ul>
+<li>FamilyInstance.HostFace
+</ul>
+
+
+<p>gets the reference to the host face of family instance, or if the instance is placed on a work plane, the reference to the geometry face underlying the work plane.
+
+<h3>Element.Geometry</h3>
+
+<p>This property has been modified to throw an exception when attempting to read the geometry of a newly added or modified element, if the element has not yet been regenerated. Call Document.Regenerate() to regenerate the affected element and to be able to obtain the geometry.
+
+<p>This property now returns results for ElementType subclasses which own geometry.
+<h3>GeometryObject.GraphicsStyleId</h3>
+
+<p>This new property allows access to the GraphicsStyle and Category of individual family primitives to be determined while working in the project environment.
+
+<h3>Curve representation of an Edge</h3>
+
+<p>The methods
+
+<ul>
+<li>Edge.AsCurve()
+<li>Edge.AsCurveFollowingFace(Face faceForDir)
+</ul>
+
+
+<p>provide a curve that corresponds to the edge (either oriented along the edge's parametric direction, or oriented in the edge's topological direction on the specified face).
+
+<h3>Centroid of a Solid</h3>
+
+<p>The method
+
+<ul>
+<li>Solid.ComputeCentroid
+</ul>
+
+
+<p>calculates the centroid of the solid using an approximation, with an accuracy suitable for architectural purposes. This will correspond only with the center of gravity if the solid represents a homogeneous structure of a single material.
+
+<h3>Transforming geometry</h3>
+
+<p>The new method
+
+<ul>
+<li>GeometryElement.GetTransformed()
+</ul>
+
+
+<p>returns a copy of the geometry in the original element, transformed by the input coordinate transformation.
+
+<h3>Instance.GetTransform() and Instance.GetTotalTransform()</h3>
+
+<p>These new methods provide the transform for a given Instance (which is the parent class for elements like family instances, link instances, and imported CAD content). GetTransform() obtains the basic transform for the instance based on how the instance is placed. GetTotalTransform() provides the transform modified with the true north transform, for instances like import instances.
+
+<h3>Serialization/deserialization of References</h3>
+
+<p>The new methods
+
+<ul>
+<li>Reference.ConvertToStableRepresentation()
+<li>Reference.ParseFromStableRepresentation()
+</ul>
+
+
+<p>allow you to save a reference to a geometry object, for example a face, edge, or curve, as a string, and to obtain an identical Reference later using the String as input.
+<h3>Face.HasRegions & Face.GetRegions()</h3>
+
+<p>This property and method provide information about the faces created by the Split Face command. HasRegions returns a boolean indicating if the face has any Split Face regions. GetRegions returns a list of faces. As the material of these faces can be independently modified through the UI with the Paint tool, the material of each face can be found from its MaterialElementId property.
+
+<h3>Face.MaterialElementId replaces Face.MaterialElement</h3>
+
+<p>Face.MaterialElement has been obsoleted. Face.MaterialElementId should be used instead.
+
+<p>In some cases the return face will not have access to its Document, so the MaterialElement cannot be returned, but the id can.
+<h3>NewHermiteSpline tangency control</h3>
+
+<p>A new overload takes optional XYZ inputs for the tangency at the start and end of the spline.
+<h3>New NewNurbSpline overload</h3>
+
+<p>The new overload
+
+<ul>
+<li>Autodesk.Revit.Creation.Application.NewNurbSpline(IList&lt;XYZ&gt; controlPoints, IList&lt;double&gt; weights)
+</ul>
+
+
+<p>creates a NurbSpline in an identical manner to how the spline sketching tool creates such a curve in the Revit UI. Remaining fields in the curve definition (Knots, Degree) are automatically assigned from the calculation.
+
+<h3>PolyLine returned from Element.Geometry</h3>
+
+<p>A new geometry object called a PolyLine is exposed through the API. The PolyLine represents a set of coordinate points forming contiguous line segments. Typically this type of geometry would be seen in geometry imported from other formats (such as DWG). Previous Element.Geometry[] would skip extraction of these geometry object completely.
+
+<h2>Analysis of Room and Space 3D geometry</h2>
+
+<p>The new method:
+
+<ul>
+<li>SpatialElementGeometryCalculator.CalculateSpatialElementGeometry()
+</ul>
+
+
+<p>computes the 3D geometry of the input spatial element (room or space) and returns it, along with information about the elements which form the boundary of the element.
+
+<p>The new classes:
+
+<ul>
+<li>SpatialElementGeometryResults
+<li>SpatialElementBoundarySubface
+</ul>
+
+
+<p>encapsulate the results of the geometric calculation.
+
+<p>The class:
+
+<ul>
+<li>SpatialElementBoundaryOptions
+</ul>
+
+
+<p>provides the available options for the calculation (currently limited to an option to calculate the boundaries at the finish face or at the boundary object's centerlines and whether to include the free boundary faces in the calculation result).
+
+<h2>Detailed Energy Analysis Model API</h2>
+
+<p>A new API is provided to obtain and analyze the contents of a project's detailed energy analysis model, as seen in the Export to gbXML and the Heating and Cooling Loads features:
+
+<center>
+<img src="img/whats_new_2012_1.png" alt="Detailed energy analysis model"/>
+</center>
+
+<p>This analysis produces an analytical thermal model from the physical model of a building. The analytical thermal model is composed of spaces, zones and planar surfaces that represent the actual volumetric elements of the building.
+
+<p>The new classes in Autodesk.Revit.DB.Analysis namespace:
+
+<ul>
+<li>EnergyAnalysisDetailModel
+<li>EnergyAnalysisDetailModelOptions
+<li>EnergyAnalysisOpening
+<li>EnergyAnalysisSpace
+<li>EnergyAnalysisSurface
+<li>Polyloop
+</ul>
+
+
+<p>can be used to generate and analyze the contents of the detailed energy analysis model. Use
+
+<ul>
+<li>EnergyAnalysisDetailModel.Create()
+</ul>
+
+
+<p>to create and populate the model (while setting up appropriate options); use
+
+<ul>
+<li>EnergyAnalysisDetailModel.GetAnalyticalSpace()
+<li>EnergyAnalysisDetailModel.GetAnalyticalSurfaces()
+<li>EnergyAnalysisDetailModel.GetAnalyticalOpenings()
+<li>EnergyAnalysisDetailModel.GetAnalyticalShadingSurfaces()
+</ul>
+
+
+<p>to extract the entities from the analysis; and use
+
+<ul>
+<li>EnergyAnalysisDetailModel.Destroy()
+</ul>
+
+
+<p>to clean up the Revit database after finishing with the analysis results.
+
+<h2>Conceptual energy analysis API</h2>
+
+<p>The new classes in the Autodesk.Revit.DB.Analysis namespace:
+
+<ul>
+<li>ConceptualConstructionType
+<li>ConceptualSurfaceType
+<li>MassEnergyAnalyticalModel
+<li>MassLevelData
+<li>MassSurfaceData
+<li>MassZone
+</ul>
+
+
+<p>provide access to the elements and objects created by Revit to perform energy analyses on conceptual design models.
+
+<p>The method
+
+<ul>
+<li>Document.Export(string,string,MassGBXMLExportOptions)
+</ul>
+
+
+<p>supports export of a gBXML file containing conceptual energy analysis elements (mass elements) only.
+<h2>Analysis visualization framework</h2>
+
+<p>The analysis visualization framework was improved to support multiple analysis results shown in the same view at the same time.
+
+<p>The new class
+
+<ul>
+<li>AnalysisResultSchema
+</ul>
+
+
+<p>was added to store meta-data for each analysis result. The Results Visibilty view frame control in the user interface and the API's SpatialFieldManager.ResultsEnabledInView and AnalysisResultSchema.IsVisible properties control which results (if any) are displayed.
+
+<p>The class SpatialFieldManager now has new methods:
+
+<ul>
+<li>RegisterResult()
+<li>GetResultSchema()
+<li>SetResultSchema()
+<li>GetRegisteredResults()
+</ul>
+
+
+<p>to register and access results meta-data. Corresponding methods and properties of SpatialFieldManager:
+
+<ul>
+<li>SetUnits()
+<li>CurrentUnits
+<li>GetDescription()
+<li>SetDescription()
+</ul>
+
+
+<p>are deprecated. They can be used if SpatialFieldManager contains only one analysis result, but they throw an exception if multiple results are registered.
+
+<p>The method
+
+<ul>
+<li>UpdateSpatialFieldPrimitive()
+</ul>
+
+
+<p>is changed to take a result index as an additional argument; the old version is deprecated and can be used if SpatialFieldManager contains only one analysis result.
+
+<p>New classes allow for different types of analysis data and different appearance of results:
+
+<ul>
+<li>AnalysisDisplayDiagramSettings
+<li>AnalysisDisplayVectorSettings
+</ul>
+
+
+<pre class="code">
+&nbsp; <span class="green">// Create a SpatialFieldManager for the active view </span>
+&nbsp; SpatialFieldManager sfm = SpatialFieldManager
+&nbsp; &nbsp; .CreateSpatialFieldManager(doc.ActiveView, 1);
+&nbsp; <span class="blue">int</span> primitiveIndex = sfm.AddSpatialFieldPrimitive();
+&nbsp;
+&nbsp; <span class="green">// This example creates two result schema. </span>
+&nbsp; <span class="green">// Each schema contains a single value at the origin. </span>
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp; pts.Add(<span class="teal">XYZ</span>.Zero);
+&nbsp;
+&nbsp; FieldDomainPointsByXYZ pnts = <span class="blue">new</span> FieldDomainPointsByXYZ(pts);
+&nbsp;
+&nbsp; <span class="green">// Create the schema </span>
+&nbsp;
+&nbsp; AnalysisResultSchema resultSchemaA = <span class="blue">new</span> AnalysisResultSchema(
+&nbsp; &nbsp; <span class="maroon">&quot;Schema A&quot;</span>, <span class="maroon">&quot;Time&quot;</span>);
+&nbsp;
+&nbsp; AnalysisResultSchema resultSchemaB = <span class="blue">new</span> AnalysisResultSchema(
+&nbsp; &nbsp; <span class="maroon">&quot;Schema B&quot;</span>, <span class="maroon">&quot;Distance&quot;</span>);
+&nbsp;
+&nbsp; <span class="green">// Data in Schema A measures time and can be </span>
+&nbsp; <span class="green">// displayed using Hours or Minutes for units </span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; unitsList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp; unitsList.Add(<span class="maroon">&quot;Hours&quot;</span>);
+&nbsp; unitsList.Add(<span class="maroon">&quot;Minutes&quot;</span>);
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; unitsMultipliers = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; unitsMultipliers.Add(1);
+&nbsp; unitsMultipliers.Add(60);
+&nbsp; resultSchemaA.SetUnits(unitsList, unitsMultipliers);
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; doubleList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// The data value in Schema A is 3.5 hours </span>
+&nbsp;
+&nbsp; doubleList.Add(3.5);
+&nbsp; <span class="teal">IList</span>&lt;ValueAtPoint&gt; valueList
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;ValueAtPoint&gt;();
+&nbsp; valueList.Add(<span class="blue">new</span> ValueAtPoint(doubleList));
+&nbsp; FieldValues fieldValuesA
+&nbsp; &nbsp; = <span class="blue">new</span> FieldValues(valueList);
+&nbsp;
+&nbsp; <span class="green">// Data in Schema B measures distance and can be </span>
+&nbsp; <span class="green">// displayed using Feet or Inches for units </span>
+&nbsp; unitsList.Clear();
+&nbsp; unitsMultipliers.Clear();
+&nbsp; unitsList.Add(<span class="maroon">&quot;Feet&quot;</span>);
+&nbsp; unitsList.Add(<span class="maroon">&quot;Inches&quot;</span>);
+&nbsp; unitsMultipliers.Add(1);
+&nbsp; unitsMultipliers.Add(12);
+&nbsp; resultSchemaB.SetUnits(unitsList, unitsMultipliers);
+&nbsp;
+&nbsp; doubleList.Clear();
+&nbsp; valueList.Clear();
+&nbsp; <span class="green">// The data value in Schema B is 5 feet </span>
+&nbsp; doubleList.Add(5);
+&nbsp; valueList.Add(<span class="blue">new</span> ValueAtPoint(doubleList));
+&nbsp; FieldValues fieldValuesB = <span class="blue">new</span> FieldValues(valueList);
+&nbsp;
+&nbsp; <span class="green">// Update the view's spatial field primitive with the schema </span>
+&nbsp; sfm.UpdateSpatialFieldPrimitive(primitiveIndex,
+&nbsp; &nbsp; pnts, fieldValuesA, sfm.RegisterResult(resultSchemaA));
+&nbsp; sfm.UpdateSpatialFieldPrimitive(primitiveIndex,
+&nbsp; &nbsp; pnts, fieldValuesB, sfm.RegisterResult(resultSchemaB));
+</pre>
+
+
+<h2>Point Cloud API</h2>
+
+
+<p>Revit offers two sets of APIs related to Point Clouds.
+
+<p>The client API is capable of working with point cloud instances within Revit (creating them, manipulating their properties, and reading the points found matching a given volumetric filter).
+
+<p>The major classes of the client API are:
+
+<ul>
+<li>PointCloudType &ndash; a type of a point cloud, representing the points obtained from a single file or engine's identifier.
+<li>PointCloudInstance &ndash; an instance of a point cloud in a location in the Revit project.
+<li>PointCloudFilter &ndash; a filter determining the volume of interest when extracting points.
+<li>PointCollection &ndash; a collection of points obtained from an instance and a filter.
+<li>PointIterator &ndash; an iterator for the points in a PointCollection.
+<li>CloudPoint &ndash; an individual point cloud point, representing an X, Y, Z location in the coordinates of the cloud, and a color.
+</ul>
+
+
+<p>There are two methods to access the points as a client:
+
+<ol>
+<li>In the traditional IEnumerable interface, you can iterate the resulting points directly from the PointCollection.
+<li>In an unsafe interface usable only from C# and C++/CLI, you can get a pointer to the point storage of the collection and access the points directly in memory. Although you must deal with pointers directly, there may be performance improvements when traversing large buffers of points.
+</ol>
+
+
+<p>The following snippets show how to iterate part of a point cloud using both methods. The same point cloud filter is applied for both routines:
+
+<h4>Reading point cloud points by iteration</h4>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">int</span> ReadPointCloud_Iteration(
+&nbsp; <span class="teal">PointCloudInstance</span> pcInstance )
+{
+&nbsp; <span class="teal">PointCloudFilter</span> filter = CreatePointCloudFilter(
+&nbsp; &nbsp; pcInstance.Document.Application, pcInstance );
+&nbsp;
+&nbsp; <span class="green">// Get points.&nbsp; Number of points is </span>
+&nbsp; <span class="green">// determined by the needs of the client</span>
+&nbsp;
+&nbsp; <span class="teal">PointCollection</span> points = pcInstance.GetPoints(
+&nbsp; &nbsp; filter, 10000 );
+&nbsp;
+&nbsp; <span class="blue">int</span> numberOfPoints = 0;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">CloudPoint</span> point <span class="blue">in</span> points )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Process each point</span>
+&nbsp; &nbsp; System.Drawing.<span class="teal">Color</span> color
+&nbsp; &nbsp; &nbsp; = System.Drawing.<span class="teal">ColorTranslator</span>.FromWin32(
+&nbsp; &nbsp; &nbsp; &nbsp; point.Color );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> pointDescription = <span class="teal">String</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;({0}, {1}, {2}, {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; point.X, point.Y, point.Z, color.ToString() );
+&nbsp;
+&nbsp; &nbsp; numberOfPoints++;
+&nbsp; }
+&nbsp; <span class="blue">return</span> numberOfPoints;
+}
+</pre>
+
+
+<h4>Reading point cloud points by pointer</h4>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">unsafe</span> <span class="blue">int</span> ReadPointCloud_Pointer(
+&nbsp; <span class="teal">PointCloudInstance</span> pcInstance )
+{
+&nbsp; <span class="teal">PointCloudFilter</span> filter = CreatePointCloudFilter(
+&nbsp; &nbsp; pcInstance.Document.Application, pcInstance );
+&nbsp;
+&nbsp; <span class="green">// Get points.&nbsp; Number of points is </span>
+&nbsp; <span class="green">// determined by the needs of the client</span>
+&nbsp;
+&nbsp; <span class="teal">PointCollection</span> points = pcInstance.GetPoints(
+&nbsp; &nbsp; filter, 10000 );
+&nbsp;
+&nbsp; <span class="blue">int</span> totalCount = points.Count;
+&nbsp; <span class="teal">CloudPoint</span>* pointBuffer = (<span class="teal">CloudPoint</span>*) points
+&nbsp; &nbsp; .GetPointBufferPointer().ToPointer();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> numberOfPoints = 0;
+&nbsp; &nbsp; numberOfPoints &lt; totalCount; numberOfPoints++ )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CloudPoint</span> point = *( pointBuffer + numberOfPoints );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Process each point</span>
+&nbsp;
+&nbsp; &nbsp; System.Drawing.<span class="teal">Color</span> color
+&nbsp; &nbsp; &nbsp; = System.Drawing.<span class="teal">ColorTranslator</span>.FromWin32(
+&nbsp; &nbsp; &nbsp; &nbsp; point.Color );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> pointDescription = <span class="teal">String</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;({0}, {1}, {2}, {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; point.X, point.Y, point.Z, color.ToString() );
+&nbsp; }
+&nbsp; <span class="blue">return</span> totalCount;
+}
+</pre>
+
+
+<h4>Point cloud filter creation</h4>
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">PointCloudFilter</span> CreatePointCloudFilter(
+&nbsp; <span class="teal">Application</span> app, <span class="teal">PointCloudInstance</span> pcInstance )
+{
+&nbsp; <span class="green">// Filter will match 1/8 of the overall point cloud</span>
+&nbsp; <span class="green">// Use the bounding box (filter coordinates </span>
+&nbsp; <span class="green">// are in the coordinates of the model)</span>
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> boundingBox
+&nbsp; &nbsp; = pcInstance.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Plane</span>&gt; planes = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Plane</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> midpoint
+&nbsp; &nbsp; = ( boundingBox.Min + boundingBox.Max ) / 2.0;
+&nbsp;
+&nbsp; <span class="green">// X boundaries</span>
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.BasisX, boundingBox.Min ) );
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; -<span class="teal">XYZ</span>.BasisX, midpoint ) );
+&nbsp;
+&nbsp; <span class="green">// Y boundaries</span>
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, boundingBox.Min ) );
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; -<span class="teal">XYZ</span>.BasisY, midpoint ) );
+&nbsp;
+&nbsp; <span class="green">// Z boundaries</span>
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, boundingBox.Min ) );
+&nbsp; planes.Add( app.Create.NewPlane(
+&nbsp; &nbsp; -<span class="teal">XYZ</span>.BasisZ, midpoint ) );
+&nbsp;
+&nbsp; <span class="green">// Create filter</span>
+&nbsp;
+&nbsp; <span class="teal">PointCloudFilter</span> filter = <span class="teal">PointCloudFilterFactory</span>
+&nbsp; &nbsp; .CreateMultiPlaneFilter( planes );
+&nbsp;
+&nbsp; <span class="blue">return</span> filter;
+}
+</pre>
+
+<p>There are two special API-only tools intended to help your client application interact with the user:
+
+<ol>
+<li>The SetSelectionFilter() method and FilterAction property of PointCloudInstance allow you to specify a volumetric filter to be applied to the cloud. The parts of the cloud that pass this filter will be rendered differently in the user interface than the rest of the cloud. If the FilterAction is Highlight, the selected part of the cloud will show in highlight color (blue). If the action is Isolate, only the selected part of the cloud will be visible.
+<li>The overloaded method Selection.PickBox() invokes a general purpose two-click editor that lets the user to specify a rectagular area on the screen. While this editor makes no changes in Revit as a result of the selections, you can use the returned box to generate a filter and apply a highlight or isolate action to the point cloud.
+</ol>
+
+<p>This example prompts the user to select a portion of the cloud, and creates a highlight filter for it.
+
+
+<h4>Prompt for cloud selection and highlight</h4>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> PromptForPointCloudSelection(
+&nbsp; <span class="teal">UIDocument</span> uiDoc, <span class="teal">PointCloudInstance</span> pcInstance )
+{
+&nbsp; <span class="teal">Application</span> app = uiDoc.Application.Application;
+&nbsp; <span class="teal">Selection</span> currentSel = uiDoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">PickedBox</span> pickedBox = currentSel.PickBox(
+&nbsp; &nbsp; <span class="teal">PickBoxStyle</span>.Enclosing,
+&nbsp; &nbsp; <span class="maroon">&quot;Select region of cloud for highlighting&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> min = pickedBox.Min;
+&nbsp; <span class="teal">XYZ</span> max = pickedBox.Max;
+&nbsp;
+&nbsp; <span class="green">//Transform points into filter</span>
+&nbsp; <span class="teal">View</span> view = uiDoc.ActiveView;
+&nbsp; <span class="teal">XYZ</span> right = view.RightDirection;
+&nbsp; <span class="teal">XYZ</span> up = view.UpDirection;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Plane</span>&gt; planes = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Plane</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// X boundaries</span>
+&nbsp; <span class="blue">bool</span> directionCorrect = IsPointAbovePlane(
+&nbsp; &nbsp; right, min, max );
+&nbsp; planes.Add( app.Create.NewPlane( right,
+&nbsp; &nbsp; directionCorrect ? min : max ) );
+&nbsp; planes.Add( app.Create.NewPlane( -right,
+&nbsp; &nbsp; directionCorrect ? max : min ) );
+&nbsp;
+&nbsp; <span class="green">// Y boundaries</span>
+&nbsp; directionCorrect = IsPointAbovePlane(
+&nbsp; &nbsp; up, min, max );
+&nbsp; planes.Add( app.Create.NewPlane( up,
+&nbsp; &nbsp; directionCorrect ? min : max ) );
+&nbsp; planes.Add( app.Create.NewPlane( -up,
+&nbsp; &nbsp; directionCorrect ? max : min ) );
+&nbsp;
+&nbsp; <span class="green">// Create filter</span>
+&nbsp; <span class="teal">PointCloudFilter</span> filter = <span class="teal">PointCloudFilterFactory</span>
+&nbsp; &nbsp; .CreateMultiPlaneFilter( planes );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; uiDoc.Document, <span class="maroon">&quot;Highlight&quot;</span> );
+&nbsp; t.Start();
+&nbsp;
+&nbsp; pcInstance.SetSelectionFilter( filter );
+&nbsp; pcInstance.FilterAction
+&nbsp; &nbsp; = <span class="teal">SelectionFilterAction</span>.Highlight;
+&nbsp;
+&nbsp; t.Commit();
+}
+&nbsp;
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">bool</span> IsPointAbovePlane(
+&nbsp; <span class="teal">XYZ</span> normal, <span class="teal">XYZ</span> planePoint, <span class="teal">XYZ</span> point )
+{
+&nbsp; <span class="teal">XYZ</span> difference = point - planePoint;
+&nbsp; difference = difference.Normalize();
+&nbsp; <span class="blue">double</span> dotProduct = difference.DotProduct( normal );
+&nbsp; <span class="blue">return</span> dotProduct &gt; 0;
+}
+</pre>
+
+<p>The engine API is capable of supplying points in a point cloud to Revit. A custom engine implementation consists of the following:
+
+<ul>
+<li>An implementation of IPointCloudEngine registered to Revit via the PointCloudEngineRegistry.
+<li>An implementation of IPointCloudAccess coded to respond to inquiries from Revit regarding the properties of a single point cloud.
+<li>An implementation of IPointSetIterator code to return sets of points to Revit when requested.
+</ul>
+
+<p>Engine implementations may be file-based or non-file-based:
+
+<ul>
+<li>File-based implementations require that each point cloud be mapped to a single file on disk. Revit will allow users to create new point cloud instances in a document directly by selecting point cloud files whose extension matches the engine identifier. These files are treated as external links in Revit and may be reloaded and remapped when necessary from the Manage Links dialog.
+<li>Non-file-based engine implementations may obtain point clouds from anywhere (e.g. from a database, from a server, or from one part of a larger aggregate file). Because there is no file that the user may select, Revit's user interface will not allow a user to create a point cloud of this type. The engine provider should supply a custom command using PointCloudType.Create() and PointCloudInstance.Create() to create and place point clouds of this type. The Manage Links dialog will show the point clouds of this type, but since there is no file associated to the point cloud, the user cannot manage, reload or remap point clouds of this type.
+</ul>
+
+<p>Regardless of the type of engine used, the implementation must supply enough information to Revit to display the contents of the point cloud. There are two ReadPoints methods which must be implemented:
+
+<ul>
+<li>IPointCloudAccess.ReadPoints() &ndash; this provides a single set of points in a one-time call from Revit. Revit uses this during some display activities including selection prehighlighting. It is also possible for API clients to call this method directly (via PointCloudInstance.GetPoints()).
+<li>IPointSetIterator.ReadPoints() &ndash; this provides a subset of points as a part of a larger iteration of points in the cloud. Revit uses this method during normal display of the point cloud; quantities of points will be requested repeatedly until it obtains enough points or until something in the display changes. The engine implementation must keep track of which points have been returned to Revit during any given point set iteration.
+</ul>
+
+
+
+<h2>Material API changes and PropertySets</h2>
+
+<p>The Revit Materials API is largely renovated to allow for a representation of materials that is both more compact and more extensible.
+
+<p>The following classes are now obsolete:
+
+<ul>
+<li>MaterialWood
+<li>MaterialConcrete
+<li>MaterialSteel
+<li>MaterialGeneric
+<li>MaterialOther
+</ul>
+
+
+<p>The properties on these classes are now accessible from PropertySets or the Material class itself.
+
+<p>All named properties on Material specific to appearance or structure (e.g. Shininess) are also obsolete.
+
+<p>In their place, a material will have one or more aspects pertaining to rendering appearance, structure, or other major material category. Each aspect is represented by a PropertySet or PropertySetElement. Each material can own its properties of an aspect via a PropertySet or share them with other materials as a reference to a PropertySetElement.
+
+<p>New enumerated types:
+
+<ul>
+<li>MaterialAspect &ndash; An enumeration of material aspects. Currently, we support rendering and structural aspects.
+</ul>
+
+
+<p>New classes:
+
+<ul>
+<li>PropertySetElement &ndash; an Element containing a PropertySet &ndash; used for sharing PropertySets among materials.
+</ul>
+
+
+
+<p>New methods:
+
+<ul>
+<li>Material.Create()
+<li>PropertySetElement.Create()
+<li>Material.SetMaterialAspectByPropertySet()
+<li>Material.SetMaterialAspectIndependent()
+<li>Material.GetMaterialAspectPropertySet()
+</ul>
+
+<h2>Performance Adviser</h2>
+
+<p>The new Revit feature Performance adviser is designed to analyze the document and flag for the user any elements and/or settings that may cause performance degradation. The Performance Adviser command executes set of rules and displays their result in a standard review warnings dialog.
+
+<p>The API for performance adviser consists of 2 classes (PerformanceAdviser and IPerformanceAdviserRule). PerformanceAdviser is an application-wide singleton that has a dual role: it is a registry of performance checking rules and an engine to execute them. The methods of PerformanceAdviser:
+
+<ul>
+<li>AddRule()
+<li>DeleteRule()
+<li>GetNumberOfRules()
+<li>GetRuleIDs()
+<li>GetRuleName()
+<li>GetRuleDescription()
+<li>ExecuteRules()
+<li>ExecuteAllRules()
+</ul>
+
+
+<p>allow you to manipulate what rules are checked. Applications that create new rules are expected to use AddRule() to register the new rule during application startup and DeleteRule() to deregister it during application shutdown.
+
+<p>Methods of PerformanceAdviser
+
+<ul>
+<li>SetRuleEnabled
+<li>IsRuleEnabled
+<li>ExecuteRules
+</ul>
+
+
+<p>allow UI or API application to mark rules for execution and run them on a given document, getting report as a list of FailureMessage objects.
+
+<p>The new interface IPerformanceAdviserRule allows you to define new rules for the Performance Adviser. Your application should create a class implementing this interface, instantiate an object of the derived class and register it using PerformanceAdviser.AddRule(). Methods of IPerformanceAdviserRule available for override include:
+
+<ul>
+<li>GetName()
+<li>GetDescription()
+</ul>
+
+
+<p>which provide rule identification information;
+
+<ul>
+<li>InitCheck()
+<li>FinalizeCheck()
+</ul>
+
+
+<p>which are executed once per check and can be used to perform checks of the document "as a whole";
+
+<ul>
+<li>WillCheckElements()
+<li>GetElementFilter()
+<li>ExecuteElementCheck()
+</ul>
+
+
+<p>which allow the rule to identify a subset of elements in the document to be checked and run the check on the individual elements.
+
+<p>Potentially problematic results found during rule execution are reported by returning FailureMessage(s).
+<h2>External File References (Linked Files)</h2>
+
+<p>The API can now tell what elements in Revit are references to external files, and can make some modifications to where Revit loads external files from.
+
+<p>An Element which contains an ExternalFileReference is an element which refers to some external file (ie. a file other than the main .rvt file of the project.) Two new Element methods, IsExternalFileReference() and GetExternalFileReference(), let you get the ExternalFileReference for a given Element.
+
+<p>ExternalFileReference contains methods for getting the path of the external file, the type of the external file, and whether the file was loaded, unloaded, not found, etc. the last time the main .rvt file was opened.
+
+<p>The classes RevitLinkType and CADLinkType can have IsExternalFileReference() return true. RevitLinkTypes refer to Revit files linked into another Revit project. CADLinkTypes refer to DWG files. Note that CADLinkTypes can also refer to DWG imports, which are not external file references, as imports are brought completely into Revit. A property IsImport exists to let users distinguish between these two types.
+
+<p>Additionally, the element which contains the location of the keynote file is an external file reference, although it has not been exposed as a separate class.
+
+<p>There is also a class ExternalFileUtils, which provides a method for getting all Elements in a document which are references to external files.
+
+<p>Additionally, the classes ModelPath and ModelPathUtils have been exposed. ModelPaths can store paths to a location on disk, a network drive, or a Revit Server location. ModelPathUtils provides methods for converting between modelPath and String.
+
+<p>Finally, the class TransmissionData allows users to examine the external file data in a closed Revit document, and to modify path and load-state information for that data. Two methods, ReadTransmissionData, and WriteTransmissionData, are provided. With WriteTransmissionData, users can change the path from which to load a given link, and can change links from loaded to unloaded and vice versa. (WriteTransmissionData cannot be used to add links to or remove links from a document, however.)
+
+<p>Newly exposed classes:
+
+<ul>
+<li>ExternalFileReference &ndash; A non-Element class which contains path and type information for a single external file which a Revit project references. ExternalFileReference also contains information about whether the external file was loaded or unloaded the last time the associated Revit project was opened.
+<li>ExternalFileUtils &ndash; A utility class which allows the user to find all external file references, get the external file reference from an element, or tell whether an element is an external file reference.
+<li>RevitLinkType &ndash; An element representing a Revit file linked into a Revit project.
+<li>CADLinkType &ndash; An element representing a DWG drawing. CADLinkTypes may be links, which maintain a relationship with the file they originally came from, or imports, which do not maintain a relationship. The property IsImport will distinguish between the two kinds.
+<li>LinkType &ndash; The base class of RevitLinkType and CADLinkType.
+<li>ModelPath &ndash; A non-Element class which contains path information for a file (not necessarily a .rvt file.) Paths can be to a location on a local or network drive, or to a Revit Server location.
+<li>ModelPathUtils &ndash; A utility class which provides methods for converting between strings and ModelPaths.
+<li>TransmissionData &ndash; A class which stores information about all of the external file references in a document. The TransmissionData for a Revit project can be read without opening the document.
+</ul>
+
+<h2>Customizing IFC export </h2>
+
+<p>The classes
+
+<ul>
+<li>ExporterIFCRegistry
+<li>IExporterIFC
+</ul>
+
+
+<p>allow your custom application to override the default implementation for the IFC export process.
+
+<p>The interface is passed an ExporterIFC object. The ExporterIFC object is the starting point for all IFC export activities and offers access to the options selected for the given export operation. It also contains access to information cached by Revit during the export process; this information is cached to provide easy access to it later, and sometimes to write it to the file at the end of the export process.
+
+<p>There are several auxiliary objects provided to support implementation of an IFC export client. These are the most important:
+
+<ul>
+<li>IFCFile &ndash; a representation of the IFC file being written. This class contains methods which directly generate handles to IFC entries and write them to the file.
+<li>IFCAnyHandle &ndash; a wrapper around any sort of IFC element, product, or other data.
+<li>IFCLabel &ndash; a string in an IFC file.
+<li>IFCMeasureValue &ndash; a parameterized value in an IFC file.
+<li>ExporterIFCUtils &ndash; a collection of utilities to support the Revit IFC export client.
+</ul>
+
+
+<p>The IFC export client for Revit 2012 represents a transitional state between the version implemented internally in Revit 2011 and the final state which should be written 100% using the Revit API. Temporary APIs are exposed to bridge the gaps between the API client code and portions of the previous implementation. As Autodesk continues to evolve this export client, temporary APIs will be changed, deprecated and/or removed in future versions of Revit.
+<h2>MEP API major enhancements</h2>
+<h3>Pipe settings and sizes</h3>
+
+<p>The following new classes provide read/write access to MEP pipe settings:
+
+<ul>
+<li>PipeSettings &ndash; The pipe settings. There is one object of this type in a document accessible through the static method GetPipeSettings().
+<li>PipeSizeSettings &ndash; The main class to access pipe sizes. There is one object of this type in a document accessible through the static method GetPipeSizeSettings(). Stores PipeConnections per each pipe material, using the id of the pipe material element as key to access.
+<li>PipeSizeSettingIterator &ndash; An iterator to a set of items from PipeSizeSettings. Each item is a KeyValuePair<ElementId, PipeConnections>.
+<li>PipeConnections &ndash; Represents a set of pipe connection types. Stores PipeSchedules per each pipe connection type, using the id of the pipe connection type as key to access.
+<li>PipeConnectionIterator &ndash; An iterator to a set of items from PipeConnections. Each item is a KeyValuePair<ElementId, PipeSchedules>.
+<li>PipeSchedules &ndash; Represents a set of pipe schedules. Stores PipeSizes per each pipe schedule type, using the id of the pipe schedule type as key to access.
+<li>PipeScheduleIterator &ndash; An iterator to a set of items from PipeSchedules. Each item is a KeyValuePair<ElementId, PipeSizes>.
+<li>PipeSizes &ndash; Stores a set of pipe sizes, with the ability to add and remove from the set as needed.
+<li>PipeSizeIterator &ndash; An iterator to a set of MEP pipe sizes from PipeSizes.
+<li>MEPSize &ndash; Stores the basic size information for an MEP duct, pipe, cable tray, or conduit.
+</ul>
+
+<h3>Placeholder ducts and pipes</h3>
+
+<p>The following new properties identify placeholder ducts and pipes:
+
+<ul>
+<li>Duct.IsPlaceholder
+<li>Pipe.IsPlaceholder
+</ul>
+
+<p>These new static methods allows creation of placeholder ducts and pipes:
+
+<ul>
+<li>Duct.CreatePlaceholder
+<li>Pipe.CreatePlaceholder
+</ul>
+
+<p>New utility methods are exposed to convert a set of placeholder ducts and pipes to real 3D entities:
+
+<ul>
+<li>MechanicalUtils.ConvertDuctPlaceholders()
+<li>PlumbingUtils.ConvertPipePlaceholders()
+</ul>
+
+<h3>Duct & pipe insulation & lining</h3>
+
+<p>The new classes
+
+<ul>
+<li>DuctInsulation
+<li>PipeInsulation
+<li>DuctLining
+</ul>
+
+<p>and related types support read/write and create access to duct & pipe insulation and lining. In Revit 2012, these objects are now accessible as standalone elements related to their parent duct, pipe, or fitting.
+
+
+
+<a name="4"></a>
+
+<h1>Small enhancements & API interface changes</h1>
+
+<h2>SiteLocation and City TimeZone</h2>
+
+<p>The properties
+
+<ul>
+<li>SiteLocation.Latitude
+<li>SiteLocation.Longitude
+</ul>
+
+
+<p>now use Revit's TimeZone calculation engine to assign an appropriate time zone for the coordinates. (Previously the time zone was not modified when these values were changed).
+
+<p>SiteLocation retains the ability to set the TimeZone manually as the calculation is may not be accurate for locations near the boundaries.
+
+<p>The City class has been adjusted to return the more accurate TimeZone values.
+
+<p>The new static method
+
+<ul>
+<li>SunAndShadowSettings.CalculateTimeZone()
+</ul>
+
+
+<p>provides direct access to the results of a time zone calculation.
+
+<h2>FamilyParameter.GUID property</h2>
+
+<p>Returns the GUID of a particular family parameter. Allows you to determine if family parameters are shared or not.
+
+<h2>InternalDefintion.Visible property</h2>
+
+<p>Identifies if a parameter definition represents a visible or hidden parameter (hidden applies to shared parameters only).
+
+<h2>Selection.GetElementIds() method</h2>
+
+<p>Returns a collection containing the ids of the selected elements. This collection can be used directly with FilteredElementCollector.
+
+<h2>API to prompt for rubber band box</h2>
+
+<ul>
+<li>PickBoxStyle- A new enum that controls the style of the pick box.
+<li>PickedBox-A new class that contains two XYZ points representing the pick box on the screen.
+<li>The following two new methods are added to Selection class that invoke a general purpose two-click editor that lets the user to specify a rectangular area on the screen:
+</ul>
+
+<pre>
+PickedBox Selection.PickBox(PickBoxStyle style);
+PickedBox Selection.PickBox(PickBoxStyle style, String statusPrompt)
+</pre>
+
+<h2>Save and SaveAs APIs permitted in most event handlers</h2>
+
+<p>The limitation against calling Save/SaveAs has been removed for most events.
+
+<p>The restriction against calling Save/SaveAs remains only in the following special events:
+
+<ul>
+<li>DocumentSaving
+<li>DocumentSaved
+<li>DocumentSavingAs
+<li>DocumentSavedAs
+<li>DocumentSynchronizingWithCentral
+<li>DocumentSynchronizedWithCentral
+<li>FileExporting
+<li>FileImporting
+<li>DocumentPrinting
+<li>ViewPrinting
+<li>DocumentClosing
+</ul>
+
+<p>Please note that other restrictions may still prevent a successful save (e.g. save cannot be performed if a transaction group or transaction is still opened by the API client or via Revit's UI when the event handler is invoked)
+
+<h2>Opening IFC Documents</h2>
+
+<p>A new method allows opening an IFC Document. This method is similar in behaviour to OpenDocumentFile rather than to standard Import methods. It opens the specified file as a newly created document rather than importing it into an existing one. The new document is retuned by the method if opening was successful.
+
+<ul>
+<li>Application.OpenIFCDocument(String fileName)
+</ul>
+
+
+<h2>RevitUIFamilyLoadOptions</h2>
+
+<p>The class RevitUIFamilyLoadOptions is no longer available for direct construction in the API. If you want to trigger the Revit UI to respond to situations when a loaded family is already found in the target project, obtain a special IFamilyLoadOptions instance from the new static method UIDocument.GetRevitUIFamilyLoadOptions() (in RevitAPIUI.dll) instead.
+
+
+<h2>Reference documentation for BuiltInParameter members</h2>
+
+<p>The members of the BuiltInParameter enum (which are parameter "ids" for Revit use) now have automatically generated documentation. The documentation for each id includes the parameter name, as found in the Element Properties dialog in the English version of Autodesk Revit. Note that multiple distinct parameter ids may map to the same English name; in those case you must examine the parameters associated with a specific element to determine which parameter id to use.
+<h2>SolidSolidCutUtils.CanTwoElemsHaveSolidSolidCut() method</h2>
+
+<p>This method has been removed and replaced by
+
+<ul>
+<li>SolidSolidCutUtils.CanElementCutElement()
+</ul>
+
+
+<p>The new method provides a reason why the cutting element cannot cut the other element.
+
+<h2>Adaptive component API</h2>
+
+<p>The methods in the new classes
+
+<ul>
+<li>AdaptiveComponentFamilyUtils
+<li>AdaptiveComponentInstanceUtils
+</ul>
+
+
+<p>provide access to data related to adaptive component families and instances.
+
+<h2>ViewSheet.ConvertToRealSheet()</h2>
+
+<p>This new method converts a placeholder sheet to a real view sheet, optionally applying a titleblock at the same time.
+
+<h2>Initial View Settings</h2>
+
+<p>A new class
+
+<ul>
+<li>IntitialViewSettings
+</ul>
+
+
+<p>allows access to the initial view settings for a document that controls which view should initially be shown when the model is opened.
+
+<p>It has the following public methods/properties:
+
+<ul>
+<li>GetInitialViewSettings &ndash; Returns the initial view settings for the specified document.
+<li>ViewId &ndash; Returns (if set) or sets the Id of an initial view
+<li>IsAcceptableInitialView &ndash; Checks whether the given view is acceptable as an initial view.
+</ul>
+
+
+
+<h2>Document preview</h2>
+
+<p>The new method
+
+<ul>
+<li>Document.GetDocumentPreviewSettings()
+</ul>
+
+
+<p>gets the settings related to the stored document preview image for a given document. It returns a DocumentPreviewSettings object, whose members include:
+
+<ul>
+<li>DocumentPreviewSettings.PreviewViewId &ndash; the id of the view to use for the preview. This value is stored in the document and used in subsequent save operations.
+<li>DocumentPreviewSettings.ForceViewUpdate() &ndash; sets the document to update the view before saving (useful when the document is never displayed)
+</ul>
+
+
+<p>Note that it is also possible to temporarily assign a preview view id for one save operation through the SaveOptions and SaveAsOptions classes. The id set to these classes is not stored in the saved documented.
+<h2>Document identification</h2>
+
+<p>An override for
+
+<ul>
+<li>Document.Equals()
+</ul>
+
+
+<p>was added to determine if two Documents represent the same document currently opened in the Revit session.
+
+<p>An override for
+
+<ul>
+<li>Document.GetHashCode()
+</ul>
+
+
+<p>was added to return the same hashcode for document instances that represent the same document currently opened in the Revit session.
+
+<h2>Dynamic Update Framework API changes</h2>
+
+<p>There are new settings to flag an updater as optional. Optional updaters will not cause prompting the end user when they are opening a document which was modified by that updater but the updater is not currently registered. red). Optional updaters should be used only when necessary. By default, updaters are non-optional. New methods introduced to support this change are:
+
+<ul>
+<li>UpdaterRegistry.SetIsUpdaterOptional(UpdaterId id, bool isOptional)
+<li>UpdaterRegistry.RegisterUpdater(UpdaterId id, bool isOptional)
+<li>UpdaterRegistry.RegisterUpdater(UpdaterId id, Document doc, bool isOptional)
+</ul>
+
+
+<p>New methods were added to access information about currently registered updaters:
+
+<ul>
+<li>UpdaterRegistry.GetRegisteredUpdaterInfos(Document doc)
+<li>UpdaterRegistry.GetRegisteredUpdaterInfos()
+</ul>
+
+
+<p>Revit now disallows any calls to UpdaterRegistry from within the Execute() method of an updater. That means any calls to RegistryUpdater(), AddTrigger(), etc. will now throw an exception. The only method of UpdaterRegistry allowed to be called during execution of an updater is UnregisterUpdater(,) but the updater to be unregistered must be not the one currently being executed.
+<h2>Enclosure class renamed</h2>
+
+<p>The Enclosure class, introduced in Revit 2011 as the parent class for Rooms, Spaces and Areas, was renamed to SpatialElement.
+
+<h2>Room, Area and Space boundary segments</h2>
+
+<p>The individual BoundarySegment properties for the Room, Space and Area classes have been marked obsolete.
+
+<p>The SpatialElement class contains a new method:
+
+<ul>
+<li>SpatialElement.GetBoundarySegments()
+</ul>
+
+
+<p>which works for all subclass types.
+
+<h2>Line origin and direction</h2>
+
+<p>Two new properties added to Line class to get the origin and direction of a line:
+
+<ul>
+<li>Line.Origin
+<li>Line.Direction
+</ul>
+
+
+<h2>TextElement properties</h2>
+
+<p>Five new read-only properties have been added to the TextElement class:
+
+<ul>
+<li>TextElement.UpDirection &ndash; The direction towards the top of the text.
+<li>TextElement.BaseDirection &ndash; The base direction for the text.
+<li>TextElement.LineWidth &ndash; The TextElement line width.
+<li>TextElement.Height &ndash; The TextElement height.
+<li>TextElement.Align &ndash; The TextAlignFlags of the TextElement.
+</ul>
+
+
+<h2>FaceSplitter class</h2>
+
+
+<p>The FaceSplitter class, representing the element produced by a Split Face operation, has been exposed to the API.
+
+<p>Use this class to identify the element whose face was split by the element (SplitElementId property).
+
+<pre class="code">
+&nbsp; Autodesk.Revit.DB.<span class="teal">Options</span> opt
+&nbsp; &nbsp; = app.Create.NewGeometryOptions();
+&nbsp; opt.ComputeReferences = <span class="blue">true</span>;
+&nbsp; opt.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">FaceSplitter</span>&gt; splitElements
+&nbsp; &nbsp; = collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FaceSplitter</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FaceSplitter</span>&gt;().ToList();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FaceSplitter</span> faceSplitter <span class="blue">in</span>
+&nbsp; &nbsp; splitElements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> splitElement = doc.get_Element(
+&nbsp; &nbsp; &nbsp; faceSplitter.SplitElementId );
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">GeometryElement</span> geomElem
+&nbsp; &nbsp; &nbsp; = faceSplitter.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; geomElem.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = geomObj <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( line != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> end1 = line.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> end2 = line.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> length = line.ApproximateLength;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<p>To find the faces created by the split, use the new Face.GetFaceRegions() method on the face of the host element for the split.
+
+<h2>ColumnAttachment</h2>
+
+<p>The newly exposed ColumnAttachment class represents an attachment of the top or bottom of a column to a roof, floor, ceiling, or beam. Static methods:
+
+<ul>
+<li>ColumnAttachment.GetColumnAttachment()
+<li>ColumnAttachment.AddColumnAttachment()
+<li>ColumnAttachment.RemoveColumnAttachment()
+</ul>
+
+
+<p>provide access to the settings in this class for a given element.
+<h2>Color class</h2>
+
+<p>The API color class may represent an invalid or uninitialized color when an instance of it is obtained from Revit. Invalid colors cannot be read; a new exception will throw from the Red, Green, and Blue properties if you attempt to read them. Setting the color properties is permitted and makes the color no longer invalid.
+
+<p>The property
+
+<ul>
+<li>Color.IsValid
+</ul>
+
+
+<p>identifies if the color is valid.
+
+<h2>FamilyInstance: flip work plane</h2>
+
+<p>The new property
+
+<ul>
+<li>FamilyInstance.IsWorkPlaneFlipped
+</ul>
+
+
+<p>is a settable property capable of changing if the work plane for a particular family instance is flipped.
+
+<p>The new property
+
+<ul>
+<li>FamilyInstance.CanFlipWorkPlane
+</ul>
+
+
+<p>identifies if the family instance allows flipping of the work plane.
+
+<h2>New NewFamilyInstance() overloads</h2>
+
+<p>Two new overloads are provided for creating family instances from References:
+
+<ul>
+<li>Autodesk.Revit.Creation.ItemFactoryBase.NewFamilyInstance(Reference, Line, FamilySymbol)
+<li>Autodesk.Revit.Creation.ItemFactoryBase.NewFamilyInstance(Reference, XYZ, XYZ, FamilySymbol)
+</ul>
+
+
+<p>These are identical to their counterparts that accept Faces as input. Because the Reference member will not always be populated in all Face handles, these overloads allow an alternate means of creating the target family instance attached to the right face.
+
+
+<p>The new overload
+
+<ul>
+<li>Autodesk.Revit.Creation.ItemFactoryBase.NewFamilyInstance(Line, FamilySymbol, View)
+</ul>
+
+
+<p>provides the ability to create a line-based detail component.
+
+<h2>Allow and disallow wall end joins</h2>
+
+<p>The new methods
+
+<ul>
+<li>WallUtils.DisallowWallJoinAtEnd()
+<li>WallUtils.AllowWallJoinAtEnd()
+<li>WallUtils.IsWallJoinAllowedAtEnd()
+</ul>
+
+
+<p>provide access to the setting for whether or not joining is allowed at a particular end of the wall. If joins exist at the end of a wall and joins are disallowed, the walls will become disjoint. If joins are disallowed for the end of the wall, and then the setting is toggled to allow the joins, the wall will automatically join to its neighbors if there are any.
+
+<h2>Element.Pinned property</h2>
+
+<p>The Element.Pinned property is no longer read-only. It now allows you to set an element to be pinned or unpinned.
+
+<h2>ElementFilter.PassesElement</h2>
+
+<p>Two new overloads allow you to evaluate the result of an ElementFilter:
+
+<ul>
+<li>bool ElementFilter.PassesElement(Element)
+<li>bool ElementFilter.PassesElement(Document, ElementId)
+</ul>
+
+
+<h2>ElementMulticategoryFilter</h2>
+
+<p>This new ElementFilter subtype allows you to easily find elements whose category matches any of a given set of categories.
+<h2>ElementMulticlassFilter</h2>
+
+<p>This new ElementFilter subtype allows you to easily find elements whose class type matches any of a given set of classes.
+
+<h2>ElementPhaseStatus</h2>
+
+<p>The new method
+
+<ul>
+<li>Element.GetPhaseStatus()
+</ul>
+
+
+<p>returns the status of a given element in the input phase. Options include none (elements unaffected by phasing), new, demolished, past, future, existing and temporary.
+
+<p>The new element filter allows you to filter for elements which have a status matching one of the set of input statuses.
+
+<h2>Temporary view mode information</h2>
+
+<p>The new method:
+
+<ul>
+<li>View.IsInTemporaryViewMode()
+</ul>
+
+
+<p>identifies if a particular temporary view mode is active for a view.
+
+<p>The new method:
+
+<ul>
+<li>View.IsElementVisibleInTemporaryViewMode()
+</ul>
+
+
+<p>identifies if an element should be visible in the indicated view mode. This applies only to the TemporaryHideIsolate and AnalyticalModel view modes.
+
+<h2>Generalized Array, Set, Map classes removed</h2>
+
+<p>The Revit API classes in Autodesk.Revit.Collections:
+
+<ul>
+<li>Array
+<li>Set
+<li>Map
+</ul>
+
+
+<p>have been removed. More flexible alternatives exist in the .NET framework System.Collections and System.Collections.Generic namespaces.
+
+<h2>Replacement for ExternalCommandData.Data</h2>
+
+<p>The property
+
+<ul>
+<li>ExternalCommandData.Data
+</ul>
+
+
+<p>has been replaced by
+
+<ul>
+<li>ExternalCommandData.JournalData
+</ul>
+
+
+<p>The data type is now an IDictionary&lt;String, String&gt;.
+
+<p>The previous Data property has been marked Obsolete.
+
+<h2>Replacement for Application.LibraryPaths</h2>
+
+<p>The property
+
+<ul>
+<li>Application.LibraryPaths
+</ul>
+
+
+<p>has been replaced by two methods
+
+<ul>
+<li>Application.GetLibraryPaths()
+<li>Application.SetLibraryPaths()
+</ul>
+
+
+<p>The data type is now an IDictionary&lt;String, String&gt;.
+
+<p>The previous LibraryPaths property has been marked Obsolete.
+
+<h2>LinkElementId property changes</h2>
+
+<p>The members of the LinkElementId class have changed in order to clarify what element is represented by an instance of this object. The new properties are:
+
+<ul>
+<li>LinkElementId.LinkInstanceId &ndash; The id of the link, or invalidElementId if no link.
+<li>LinkElementId.LinkedElementId &ndash; The id of the element in the link, or invalidElementId if no link.
+<li>LinkElementId.HostElementId &ndash; The id of the element in the host, or invalidElementId if there is a link.
+</ul>
+
+
+<h2>Application properties</h2>
+
+<p>The new properties:
+
+<ul>
+<li>Application.Username
+<li>Application.CentralServerName
+<li>Application.LocalServerName
+</ul>
+
+
+<p>provide read access to information in the current Revit session.
+<h2>RevitAddInUtility.dll</h2>
+
+<p>This DLL is now compiled as a compatible binary capable of execution on 32-bit or 64-bit systems.
+
+<h2>VSTA changes</h2>
+<h3>VSTA enabled for multiple Revit sessions</h3>
+
+<p>Macros can now be used in multiple Revit sessions launched from a single installation. Revit will no longer warn you about VSTA being disabled when the second and subsequent sessions are launched.
+
+<p>There are a few restrictions regarding what you can do from the second and subsequent sessions:
+
+<ol>
+<li>Application level macros in the second session may be run, but not edited, until the first session is closed.
+<li>Document level macros in the second session can be run and edited freely. However, edits to macro projects from a document opened in both sessions can't be saved until the document is closed by the first session.
+</ol>
+
+<h2>Structure API</h2>
+<h3>Track Changes UI</h3>
+
+<p>The track changes UI previously offered by Revit Structure has been removed. In previous releases, this offered the ability to highlight elements changed by API commands, and a limited ability to revert some or all of the changes.
+
+<p>Unfortunately, the functionality was limited in certain ways:
+
+<ul>
+<li>It only watched and highlighted some types of changes that the API could make.
+<li>It expected that only one transaction would be committed during a given API command.
+<li>It did not respect changes made by applications during updaters and events.
+<li>Some application developers did not want the changes they made to be undone partially.
+</ul>
+
+
+<p>If you wish to offer some ability for your users to see what changes were made by a given transaction, you can implement something similar or more sophisticated using the DocumentChanged event. End users are best served using the Undo mechanism to revert all changes made during a given transaction, if that is their desire. The Undo mechanism is consistent and compatible with multiple API transactions, events and updaters as well as individual commands.
+<h3>LineLoad.UniformLoad</h3>
+
+<p>This property has been corrected to be Boolean instead of integer.
+
+<h3>NewBeamSystem() changes</h3>
+
+<p>The family of NewBeamSystem() methods has changed. Previously curves could be input without a sketch plane or level as input, and the orientation of the active view would determine the orientation of the resultant beam system. Now, there are overloads accepting either the sketch plane or the level and those inputs are required.
+
+<p>The overloads of NewBeamSystem() now check that the input profile curves lie properly in the sketch plane or level. They also check to ensure that the profile forms a closed loop.
+<h3>NewTruss() change</h3>
+
+<p>The SketchPlane input for this method is now required. Previously null could be input, and the orientation of the active view would determine the orientation of the resultant truss.
+
+<h3>Rebar changes</h3>
+
+<h4>RebarShape creation and modification</h4>
+
+<p>RebarShape elements are no longer modifiable (except for Allowed Bar Types).
+Instead of changing a RebarShape, create a new one based on the old one.
+This change results in a simplified API that works in the same way as the UI.
+
+<p>Also, the syntax for RebarShape creation has been changed.
+In 2011, the steps were:
+
+<ol>
+<li>Create a RebarShape inside the Document.
+<li>Create a RebarShapeDefinition inside the RebarShape.
+<li>Add data to the RebarShapeDefinition.
+<li>Commit the RebarShape.
+</ol>
+
+
+<p>In 2012, the steps are:
+
+<ol>
+<li>Create a RebarShapeDefinition. (It refers to the Document, but is not inside the document.)
+<li>Add data to the RebarShapeDefinition.
+<li>Create a RebarShape inside the Document based on the RebarShapeDefinition. (Only now is the document modified.)
+</ol>
+
+
+<p>Specifically, the following methods are removed:
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewRebarShape()
+<li>RebarShape.NewDefinitionBySegments()
+<li>RebarShape.NewDefinitionByArc()
+</ul>
+
+
+<p>and replaced by:
+
+<ul>
+<li>RebarShape.Create(Document, RebarShapeDefinition, ... )
+<li>The RebarShapeDefinitionBySegments constructor.
+<li>The RebarShapeDefinitionByArc constructors.
+</ul>
+
+
+<p>The ability to modify hook angle, hook orientation, and style has been removed. These can only be set at creation.
+
+<ul>
+<li>There is no SetHookAngle(int) method.
+<li>There is no SetHookOrientation(int) method.
+<li>The SetRebarStyle(RebarStyle) method has been removed.
+</ul>
+
+<h4>Rebar Shape Parameters</h4>
+
+<p>The interface for Rebar Shape Parameters has changed.
+Throughout the Rebar API, all methods now use ElementId to stand for a shared parameter, instead of ExternalDefinition.
+Methods are provided in the new RebarShapeParameters class to convert between ElementId and ExternalDefinition:
+
+<ul>
+<li>RebarShapeParameters.GetAllRebarShapeParameters(Document), which returns an array of ElementIds.
+<li>RebarShapeParameters.GetElementIdForExternalDefinition(Document, ExternalDefinition), which retrieves or adds the parameter to the document.
+<li>RebarShapeParameters.GetExternalDefinitionForElementId(Document, ElementId, DefinitionFile), which retrieves a shared parameter corresponding to an id.
+<li>The class RebarShapeMultiplanarDefinition and the RebarShape method getMultiplanarDefinition() have been added to support 3D rebar shape definitions.
+<li>Families of category "Structural Connection" support the Structural Material Type parameter. Structural Connection families of type Concrete or Precast Concrete are considered corbels. Corbels support the following features:
+
+<ul>
+<li>Hosting rebar.
+<li>Autojoining to columns and walls.
+<li>Manual joining to other concrete elements.
+</ul>
+
+<li>Families of category "Generic Model" support the "Can Host Rebar" parameter. Turning on this yes/no parameter allows instances to host rebar. Instances also now support the "Volume" parameter. (Join behaviour does not change.)
+</ul>
+
+<p>The following RebarShape properties were replaced with get methods:
+
+<ul>
+<li>Property int HookAngle[int] -&gt; GetHookAngle(int)
+<li>Property RebarHookOrientation HookOrientation[int] -&gt; GetHookOrientation(int)
+<li>Property bool SameShapeIgnoringHooks[RebarShape] -&gt; IsSameShapeIgnoringHooks(RebarShape)
+</ul>
+
+
+<p>The ability to modify hook angle, hook orientation, and style has been removed.
+
+<ul>
+<li>There is no SetHookAngle(int) method.
+<li>There is no SetHookOrientation(int) method.
+<li>The SetRebarStyle(RebarStyle) method has been removed.
+</ul>
+
+
+<p>The return type of RebarShape.GetCurvesForBrowser() was changed from CurveArray to IList&lt;Curve&gt;.
+<h4>RebarHookType</h4>
+
+<p>The method
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewRebarHookType(double angle, double multiplier)
+</ul>
+
+
+<p>was replaced by
+
+<ul>
+<li>RebarHookType.Create(int angleDegrees, double multiplier)
+</ul>
+
+
+<p>New members were added to the RebarHookType class are new (its properties were only available through the Parameters interface before).
+<h4>RebarHostData class</h4>
+
+<p>The RebarHostData class has the following changes:
+
+<ul>
+<li>Method getRebarHostData(Element) renamed to GetRebarHostData(Element).
+<li>Property CoverType[Reference] replaced with GetCoverType(Reference) and SetCoverType(Reference, CoverType).
+<li>Property Valid deprecated; use IsValidHost() instead.
+<li>Method HasCoverTypeForReference(Reference) deprecated; use IsFaceExposed(Reference) instead.
+<li>New methods pertaining to cover: GetExposedFaces(), GetCommonCoverType(), SetCommonCoverType(CoverType).
+<li>Other new methods: GetRebarsInHost(), GetAreaReinforcementsInHost(), GetPathReinforcementsInHost().
+</ul>
+
+<h4>Rebar class</h4>
+
+<p>The two methods Creation.Document.NewRebar() were replaced by:
+
+<ul>
+<li>Rebar.CreateFromCurves()
+<li>Rebar.CreateFromRebarShape()
+</ul>
+
+
+<p>The new methods are similar to the old ones, except that they no longer return null for invalid arguments, and they no longer regenerate the document.
+
+<p>The new class RebarBendData is to support functionality that is not part of Alpha 3.
+
+
+<h2>MEP API small enhancements and changes</h2>
+
+<h3>Spare and space circuits</h3>
+
+<p>The new property
+
+<ul>
+<li>ElectricalSystem.CircuitType
+</ul>
+
+
+<p>identifies the type of an electrical circuit (circuit, spare or space).
+
+<p>The method ElectricalSystem.AddToCircuit now throws an exception when the system is a spare or space circuit.
+
+<h3>Cable tray and conduit domain</h3>
+
+<p>The enum class
+
+<ul>
+<li>Autodesk.Revit.DB.Domain
+</ul>
+
+
+<p>adds a new enum value to represent cable tray & conduit.
+<h3>Connector</h3>
+
+<p>New read-only properties have been added:
+
+<ul>
+<li>Connector.JointType
+<li>Connector.GenderType
+<li>Connector.EngagementLength
+</ul>
+
+<h3>MEPSystem</h3>
+
+<p>The new property
+
+<ul>
+<li>MEPSystem.IsEmpty
+</ul>
+
+
+<p>identifies if the system currently contains no components.
+<h3>Graphical warnings for disconnects</h3>
+
+<p>The new properties:
+
+<ul>
+<li>Application.ShowGraphicalWarningCableTrayConduitDisconnects
+<li>Application.ShowGraphicalWarningDuctDisconnects
+<li>Application.ShowGraphicalWarningElectricalDisconnects
+<li>Application.ShowGraphicalWarningPipeDisconnects
+</ul>
+
+
+<p>and the matching setters control whether Revit MEP will highlight disconnects in systems graphically.
+<h3>Space properties</h3>
+
+<p>The new property
+
+<ul>
+<li>Space.BaseHeatLoadOn
+</ul>
+
+<p>indicates if the value of Space.LatentHeatGainperPerson and Space.SensibleHeatGainperPerson properties is the default value or if it is user-defined.
+
+<p>To accomodate this property, the namespace of enum BaseLoadOn has changed from Autodesk.Revit.DB.Electrical to Autodesk.Revit.DB.
+
+
+<h3>Fitting methods</h3>
+
+<p>The following methods no longer remove unused or dangling curve connectors:
+
+<ul>
+<li>Document.NewTeeFitting
+<li>Document.NewCrossFitting
+<li>Document.NewElbowFitting
+<li>Document.NewUnionFitting
+<li>Document.NewTransitionFitting
+<li>Document.NewTakeoffFitting
+</ul>
+
+<p>Please use ConnectorManager.UnusedConnectors.Erase to remove unused connectors after creating a new fitting.
+
+<hr>
+<p style="text-align:center">End of document</p>
+<hr>
+
+<p>That was the news in the Revit 2012 API back in the year 2011.</p>
+
+<p>Please be aware that some of the changes mentioned above have been updated yet again since.</p>
+
+<p>Stay tuned for the next installment, coming soon, leading up towards the current day.</p>
+
+</body>
+</html>

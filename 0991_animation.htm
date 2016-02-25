@@ -1,0 +1,131 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Toshiaki Isezaki, 08641392 [moving an instance like animation in Revit] -->
+
+<h3>Animation and the DisplacementElement Class</h3>
+
+<p>A recent developer query asks about animating elements in the Revit model and updating the display within a loop in the external command to show the step-by-step displacements.</p>
+
+<p>This provides a welcome opportunity to highlight another one of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html">
+Revit 2014 SDK Samples</a>:</p>
+
+
+<a name="2"></a>
+
+<h4>The DisplacementElementAnimation SDK Sample</h4>
+
+<p>One of the very visually impressive Revit 2014 API samples is the DisplacementElementAnimation application.</p>
+
+<p>It automatically animates groups of structural building members in any Revit BIM, proceeding sequentially from bottom level to top.</p>
+
+<p>It creates and executes an animation of the model by disassembling and then reassembling it from the ground up.
+The members are sorted into groups based on category and level and displaced from their actual position.
+Each group is then animated using the Idling event until the model is reassembled.</p>
+
+<p>It is an external application, so it is not automatically made available by installing RvtSamples, which just provides access to the external command SDK samples.</p>
+
+<p>It makes use of the new DisplacementElement to visually create a view-specific temporary displacement of the elements.
+The DisplacementElement class is a view-specific element that causes other elements to appear to be displaced from their actual locations.</p>
+
+<p>The DisplacementElement does not actually change the location of any model elements; it merely causes them to be displayed in a different location.</p>
+
+<p>The add-in subscribes to the Idling event to implement the step-by-step changes to the displacement offsets required to animate the entire model.</p>
+
+<p>The project files include:</p>
+
+<ul>
+<li>Application.cs &ndash; implements the Revit add-in interface IExternalApplication to add the ribbon panel.</li>
+<li>DisplacementStructureModelAnimatorCommand.cs &ndash; the external command that initializes and starts the model animation.</li>
+<li>DisplacementStructureModelAnimator.cs &ndash; a class that executes an animation of structural model elements using DisplacementElements.</li>
+</ul>
+
+<p>The displacement elements enable a visual animation to be presented without physically moving the elements, which would distort the model due to joins and geometric relationships between the elements.</p>
+
+<p>An element may only be displaced by a single DisplacementElement in any view.
+Assigning an element to more than one DisplacementElement is an error condition.</p>
+
+<p>A DisplacementElement can declare another DisplacementElement as its parent.
+In that case, its transform will be concatenated with that of the parent, and the displacement of its associated elements will be relative to the parent DisplacementElement.</p>
+
+<p>The elements are grouped using parent and child displacements, which enables the elements to inherit a displacement in Z while varying in X and Y.</p>
+
+<p>This sample is geared towards a structural model.
+It is independent of the actual model it is run in, but only foundations, structural columns, walls, floors, and structural framing will be displaced and animated.</p>
+
+<p>To run it, install the external application and open the sample model provided or any other structural model.
+Select the Add-ins &gt; Displacement &gt; Displacement animation command.
+The animation will begin and run automatically.</p>
+
+<p>For a video showing a sample run, please refer to the recording included with the Revit 2014
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#2">
+DevDays online material</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Animating Movement of a Revit Family Instance or Other Element</h4>
+
+<p>With the overview of the DisplacementElementAnimation sample in hand, let's return to the developer query:</p>
+
+<p><strong>Question:</strong> I would like to implement an animated movement of a family instance in the model.
+
+Here is my current code attempting this.
+
+I tried to execute it using both manual and automatic transactions, but Revit does not refresh the view per transform although I included a call to Document.Regenerate in the loop:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;Pick element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( r );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 50; i++ )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//tx.Start(&quot;modify&quot;);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> dt = 10;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, dt, 0.0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Document, e.Id, v );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//tx.Commit();</span>
+&nbsp; &nbsp; &nbsp; &nbsp; System.Threading.<span class="teal">Thread</span>.Sleep( 1000 );
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Is it possible to achieve this kind of simulation and animation in Revit?</p>
+
+<p>Please let me know if I need to approach this differently or if you have other ideas.</p>
+
+
+<p><strong>Answer:</strong> While in an external command that has not yet been completed, it is not always enough to close a transaction, although closing a transaction is necessary for propagating all changes correctly throughout the mode.</p>
+
+<p>In order for changes to appear correctly in the current view, an additional call to the UIDocument.RefreshActiveView method may also be needed.
+Please keep in mind that it should not be called during the Idling event.</p>
+
+<p>You can simply refer to the abovementioned DisplacementElementAnimation SDK sample to see how to implement a complete animation.</p>

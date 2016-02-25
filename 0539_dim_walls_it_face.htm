@@ -1,0 +1,491 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1263071 [Revit 2011 Dimension Wall]
+1263303 [Case Number 1263071 [Revit 2011 Dimension Wall]]
+1266872 [Create Dimensions]
+
+-->
+
+<h3>Dimension Walls by Iterating Faces</h3>
+
+<p>I have not seen many published examples of creating dimensioning elements using the Revit API.
+
+<p>The one sample that is provided by the Revit SDK, CreateDimensions, shows how to add dimensioning between the start and end points of selected structural wall, but is limited to exactly that, dimensioning a structural wall, and only in Revit Structure.
+
+<p>To create a dimensioning element, one has to provide an array of stable references to some geometrical features of the building geometry.
+CreateDimensions simplifies the process of providing the references by using the wall's analytical model, which is only accessible in Revit Structure.
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-family-creation-api-labs.html">
+Family API labs</a> provide 
+
+another example of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-family-creation-api-labs.html#1">
+setting up a reference array</a> in 
+
+order to create some dimensioning and alignment elements.
+
+<p>So how about creating some dimensioning elements with no additional support from the analytical model, that runs in all flavours of Revit?
+
+<p>Well, there are several ways to obtain references through the Revit API, two of which are:
+
+<ul>
+
+<li>Query the element geometry and ask it to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/geometry-options.html">
+compute references</a>.
+
+<li>Use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">
+FindReferencesByDirection</a> method.
+
+</ul>
+
+<p>Let's explore the usage of these two approaches to create a dimensioning element between two walls, prompted by the following question:
+
+<p><strong>Question:</strong> Could you please provide the simplest possible code that shows dimensioning between two inside surfaces of two walls in plan view?
+For example, I have a shaft and I want to dimension its inside width and height. 
+
+<p><strong>Answer:</strong> Before getting into the nuts and bolts of determining references on existing walls, let's discuss some basics:
+
+<a name="1"></a>
+
+<h4>Creating Linear Dimensioning</h4>
+
+<p>Linear dimensioning such as you describe is created using the NewDimension method provided by the Creation.Document class. 
+The Revit SDK developer guide "Revit 2011 API Developer Guide.pdf" includes a snippet of sample code demonstrating how use this method in Code Region 16-3: Duplicating a dimension with NewDimension:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> DuplicateDimension(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Dimension</span> dimension )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Line</span> line = dimension.Curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != line )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">View</span> view = dimension.View;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ReferenceArray</span> references = dimension.References;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Dimension</span> newDimension = doc.Create.NewDimension(
+&nbsp; &nbsp; &nbsp; &nbsp; view, line, references );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Another sample of interest in this context is Code Region 13-9: Labelling a dimension, since it shows in more detail how the view, reference array, and line arguments can be determined and populated. 
+It works in the context of a family document, however:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Dimension</span> CreateLinearDimension(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// first create two lines</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pt1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 5, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> pt2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 10, 0 );
+&nbsp; &nbsp; <span class="teal">Line</span> line = app.Create.NewLine( pt1, pt2, <span class="blue">true</span> );
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = app.Create.NewPlane( 
+&nbsp; &nbsp; &nbsp; pt1.CrossProduct( pt2 ), pt2 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> skplane = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; .NewSketchPlane( plane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> modelcurve1 = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; .NewModelCurve( line, skplane );
+&nbsp;
+&nbsp; &nbsp; pt1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 5, 0 );
+&nbsp; &nbsp; pt2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp; &nbsp; line = app.Create.NewLine( pt1, pt2, <span class="blue">true</span> );
+&nbsp; &nbsp; plane = app.Create.NewPlane( 
+&nbsp; &nbsp; &nbsp; pt1.CrossProduct( pt2 ), pt2 );
+&nbsp;
+&nbsp; &nbsp; skplane = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; .NewSketchPlane( plane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> modelcurve2 = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; .NewModelCurve( line, skplane );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// now create a linear dimension between them</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceArray</span> ra = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp; &nbsp; ra.Append( modelcurve1.GeometryCurve.Reference );
+&nbsp; &nbsp; ra.Append( modelcurve2.GeometryCurve.Reference );
+&nbsp;
+&nbsp; &nbsp; pt1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 10, 0 );
+&nbsp; &nbsp; pt2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp; &nbsp; line = app.Create.NewLine( pt1, pt2, <span class="blue">true</span> );
+&nbsp; &nbsp; <span class="teal">Dimension</span> dim = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; .NewLinearDimension( doc.ActiveView, line, ra );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create a label for the dimension called &quot;width&quot;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyParameter</span> param = doc.FamilyManager
+&nbsp; &nbsp; &nbsp; .AddParameter( <span class="maroon">&quot;width&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_CONSTRAINTS,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Length, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; dim.Label = param;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> dim;
+&nbsp; }
+</pre>
+
+<p>In this sample code, two new model lines are created and the dimension element is generated between them.
+
+<a name="2"></a>
+
+<h4>Determining References to Wall Faces</h4>
+
+<p>Returning to your question: to dimension two existing walls instead, you need to obtain references to their respective inside surfaces and pass them in to the NewLinearDimension method.
+
+<p>I discussed various methods to determine specific surfaces on the solids of walls and other elements, e.g.
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">Slab boundary</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/slab-side-faces.html">Slab side faces</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">Wall elevation profile</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygon areas and outer loop</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">3D polygon areas</a>.</li>
+</ul>
+
+<p>For the case you describe, one possibility would be to determine the two closest parallel vertical faces of two respective selected opposing walls.
+
+<p>When querying the wall geometry for their solids and faces, one needs to explicitly specify that references be computed, since these are required for the dimensioning creation.
+
+<p>Since I was unable to find a simple ready-made sample that demonstrates this, and your query is a very valid one, I implemented a new Building Coder sample command CmdDimensionWallsIterateFaces to show the exact steps required.
+
+<p>It is as short and simple as I was able to make it, but still rather complex for a Revit API beginner. 
+
+<p>First of all, it makes use of a couple of trivial geometrical comparison and helper methods:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _eps = 1.0e-9;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Check whether two real numbers are equal</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> IsEqual( <span class="blue">double</span> a, <span class="blue">double</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Abs( a - b ) &lt; _eps;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Check whether two vectors are parallel</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> IsParallel( <span class="teal">XYZ</span> a, <span class="teal">XYZ</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> angle = a.AngleTo( b );
+&nbsp; &nbsp; <span class="blue">return</span> _eps &gt; angle || IsEqual( angle, <span class="teal">Math</span>.PI );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the midpoint between two points.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">XYZ</span> Midpoint( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> p + 0.5 * ( q - p );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the midpoint of a Line.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">XYZ</span> Midpoint( <span class="teal">Line</span> line )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> Midpoint( line.get_EndPoint( 0 ),
+&nbsp; &nbsp; &nbsp; line.get_EndPoint( 1 ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the normal of a Line in the XY plane.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">XYZ</span> Normal( <span class="teal">Line</span> line )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = line.get_EndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = line.get_EndPoint( 1 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Debug.Assert( IsZero( v.Z ), </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; &quot;expected horizontal line&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> v.CrossProduct( <span class="teal">XYZ</span>.BasisZ ).Normalize();
+&nbsp; }
+</pre>
+
+<p>Using these, we can implement a helper method GetClosestFace which returns the closest planar face with a given normal vector to a given point p on the element e:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Face</span> GetClosestFace(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="teal">XYZ</span> p,
+&nbsp; <span class="teal">XYZ</span> normal,
+&nbsp; <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="teal">Face</span> face = <span class="blue">null</span>;
+&nbsp; <span class="blue">double</span> min_distance = <span class="blue">double</span>.MaxValue;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FaceArray</span> fa = solid.Faces;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> fa )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != pf,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected planar wall faces&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Util</span>.IsParallel( normal, pf.Normal ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = p - pf.Origin;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> d = v.DotProduct( -pf.Normal );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; min_distance )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face = f;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; min_distance = d;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> face;
+}
+</pre>
+
+<p>Once the references on the closest opposing wall faces have been determined and collected into an array, the following helper method creates the dimensioning.
+
+<p>It creates a new dimension element using the given references and dimension line end points.
+It also opens and commits its own transaction, assuming that no transaction is open yet and manual transaction mode is being used.
+
+<p>Note that I only tested this so far using references to surfaces on planar walls in a plan view:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> CreateDimensionElement(
+&nbsp; <span class="teal">View</span> view,
+&nbsp; <span class="teal">XYZ</span> p1,
+&nbsp; <span class="teal">Reference</span> r1,
+&nbsp; <span class="teal">XYZ</span> p2,
+&nbsp; <span class="teal">Reference</span> r2 )
+{
+&nbsp; <span class="teal">Document</span> doc = view.Document;
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; <span class="green">// creation objects, or factories, for database</span>
+&nbsp; <span class="green">// and non-database resident instances:</span>
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creApp 
+&nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> creDoc 
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="teal">ReferenceArray</span> ra = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; ra.Append( r1 );
+&nbsp; ra.Append( r2 );
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = creApp.NewLineBound( p1, p2 );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; <span class="maroon">&quot;Dimension Two Walls&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="teal">Dimension</span> dim = creDoc.NewDimension(
+&nbsp; &nbsp; doc.ActiveView, line, ra );
+&nbsp;
+&nbsp; t.Commit();
+}
+</pre>
+
+<p>Finally, here is the code of the external command and its Execute method putting all of this to use:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Dimension two opposing parallel walls.</span>
+<span class="gray">///</span><span class="green"> For simplicity, the dimension is defined from </span>
+<span class="gray">///</span><span class="green"> wall midpoint to midpoint, so the walls have </span>
+<span class="gray">///</span><span class="green"> to be exactly opposite each other for it to work.</span>
+<span class="gray">///</span><span class="green"> Iterate the wall solid faces to find the two</span>
+<span class="gray">///</span><span class="green"> closest opposing faces and use references to </span>
+<span class="gray">///</span><span class="green"> them to define the dimension element.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdDimensionWallsIterateFaces</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; &nbsp; = <span class="maroon">&quot;Please select two parallel opposing straight walls.&quot;</span>;
+
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// obtain the current selection and pick </span>
+&nbsp; &nbsp; <span class="green">// out all walls from it:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Wall</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Wall</span>&gt;( 2 );
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Wall</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; walls.Add( e <span class="blue">as</span> <span class="teal">Wall</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 != walls.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// ensure the two selected walls are straight and </span>
+&nbsp; &nbsp; <span class="green">// parallel; determine their mutual normal vector </span>
+&nbsp; &nbsp; <span class="green">// and a point on each wall for distance </span>
+&nbsp; &nbsp; <span class="green">// calculations:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Line</span>&gt; lines = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Line</span>&gt;( 2 );
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; midpoints = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = lc.Curve;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( curve <span class="blue">is</span> <span class="teal">Line</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> l = curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; &nbsp; lines.Add( l );
+&nbsp; &nbsp; &nbsp; midpoints.Add( <span class="teal">Util</span>.Midpoint( l ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == normal )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = <span class="teal">Util</span>.Normal( l );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsParallel( normal, <span class="teal">Util</span>.Normal( l ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// find the two closest facing faces on the walls;</span>
+&nbsp; &nbsp; <span class="green">// they are vertical faces that are parallel to the </span>
+&nbsp; &nbsp; <span class="green">// wall curve and closest to the other wall.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; opt.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt; faces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt;( 2 );
+&nbsp; &nbsp; faces.Add( GetClosestFace( walls[0], midpoints[1], normal, opt ) );
+&nbsp; &nbsp; faces.Add( GetClosestFace( walls[1], midpoints[0], normal, opt ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create the dimensioning:</span>
+&nbsp;
+&nbsp; &nbsp; CreateDimensionElement( doc.ActiveView,
+&nbsp; &nbsp; &nbsp; midpoints[0], faces[0].Reference,
+&nbsp; &nbsp; &nbsp; midpoints[1], faces[1].Reference );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>For simplicity, the dimension is defined from wall midpoint to midpoint, so the walls have to be exactly opposite for it to work.
+
+<p>Here is a pretty horrible example of some dimensioning elements created by this command, by repeatedly selecting two opposing parallel walls and then launching it:
+
+<center>
+<img src="img/DimensionTwoWalls.png" alt="Dimensioning two opposing walls"/>
+</center>
+
+<p>This sample has the following limitations: 
+
+<ul>
+<li>The dimension line is defined from wall midpoint to wall midpoint. 
+Since the dimension line must be perpendicular to the wall faces, this means that the two opposing wall midpoints must be exactly opposite to each other, i.e. the walls must both be centred respective to the other. 
+This fits your requirements for a lift shaft, I assume, but is a rather special case. 
+A more general approach would allow the user to pick a point on one of the walls to define where the dimension line should be placed.
+<li>The creation of the dimension element requires an array of references to the wall solid faces being dimensioned. 
+The solution presented iterates over all the wall solid faces to determine the two required faces and their references. 
+A completely different approach to obtain these references which may even be simpler than the explicit iteration presented is to use the high-level FindReferencesByDirection Revit API method. 
+It shoots a ray through the Revit model and reports the elements and their faces and the points on the faces intersected by the ray. 
+This is exactly what we need to decide where the dimension line should be located and which two walls and faces are closest to each other from a given point along a given line. 
+This provides an idea for an obvious second sample implementation demonstrating that approach.
+</ul>
+
+<a name="3"></a>
+
+<h4>Determine Normal Vector Using Cross Product</h4>
+
+<p><strong>Response:</strong> Although I have success in getting this part of my dimensioning correct,
+I'm not exactly sure how your function 'static XYZ Normal' is working, with the call to v.CrossProduct( XYZ.BasisZ ).Normalize();
+I must admit I'm real fuzzy on what is happening here. 
+Is there any way that I can get some type of good and simple explanation on this line of code is doing? 
+I'm sure this would help me with my next step of dimensioning.
+
+<p><strong>Answer:</strong> You ask about the meaning of the cross product
+
+<pre class="code">
+&nbsp; v.CrossProduct( <span class="teal">XYZ</span>.BasisZ ).Normalize()
+</pre>
+
+<p>That calculates the cross product between two vectors. 
+Here is an explanation of the term 
+
+<a href="http://en.wikipedia.org/wiki/Euclidean_vector">
+Euclidian vector<a>, and its 
+
+<a href="http://en.wikipedia.org/wiki/Euclidean_vector">
+length and normalisation</a>.
+
+The calculation of the 
+
+<a href="http://en.wikipedia.org/wiki/Cross_product">
+cross product</a> of 
+
+two vectors produces a third vector perpendicular to both of the input vectors.
+The code snippet above does just that and then normalises the result, i.e. scales it so that its length equals one.
+
+<p>I will continue with this dimensioning topic and address the next step, using FindReferencesByDirection, in a follow-up post.
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_86.zip -->
+
+<a href="zip/bc_11_86.zip">
+version 2011.0.86.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution of the new command.
+Actually, to tell the truth, it includes the next yet-to-be-discussed command as well... psst!

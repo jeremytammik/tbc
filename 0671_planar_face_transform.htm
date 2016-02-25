@@ -1,0 +1,223 @@
+<!-- 
+
+1272598 [planar face transform]
+
+374_curtain_wall_geometry.htm
+441_speed_up_selection.htm
+488_mirror_in_new_family.htm
+
+-->
+
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Planar Face Transform</h3>
+
+<p>Here is another contribution by Joe Offord of 
+
+<a href="http://www.enclos.com">
+Enclos</a>,
+
+who already shared valuable insights on accessing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">
+curtain wall geometry</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/speed-up-selection.html">
+speeding up the interactive selection process</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/mirroring-in-a-new-family-and-changing-active-view.html">
+mirroring in a new family and changing the active view</a>.
+
+<p>Above all, he implements all his stuff in VB, so this is also something for you VB aficionados.
+
+<p>This time, Joe looks at a command that redraws a planar face's edges in a drafting view.  
+The issue is somewhat related to the discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+polygon transformations</a>.
+
+<p>However, instead of using rotations and translations, which can be difficult to determine in 3D, Joe wrote a utility function that re-maps the global coordinate system to the planar face's coordinate system using vectors and origins.
+
+<p>The command prompts the user to select a planar face on an elements, creates a new drafting view, retrieves the edges of the selected face, and transforms them from the 3D space to the drafting view.
+
+<p>To test this, I selected the following slightly lopsided wall in 3D:</p>
+
+<center>
+<img src="img/planar_face_transform_wall_in_3d.png" alt="Wall in 3D"/>
+</center>
+
+<p>The command generated a new drafting view showing the wall profile edges like this:</p>
+
+<center>
+<img src="img/planar_face_transform_wall_profile.png" alt="Transformed wall profile in drafting view"/>
+</center>
+
+<p>Here is the Execute method implementation for the mainline of the command:
+
+<pre class="code">
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>, _
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> uiapp <span class="blue">As</span> <span class="teal">UIApplication</span> = commandData.Application
+&nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> <span class="teal">Application</span> = uiapp.Application
+&nbsp; &nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> <span class="teal">UIDocument</span> = uiapp.ActiveUIDocument
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> <span class="teal">Document</span> = uidoc.Document
+&nbsp; &nbsp; <span class="blue">Dim</span> sel <span class="blue">As</span> <span class="teal">Selection</span> = uidoc.Selection
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> ref <span class="blue">As</span> <span class="teal">Reference</span> = sel.PickObject( _
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Select a face&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> elem <span class="blue">As</span> <span class="teal">Element</span> = doc.GetElement(ref)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> gObj <span class="blue">As</span> <span class="teal">GeometryObject</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = elem.GetGeometryObjectFromReference(ref)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> face <span class="blue">As</span> <span class="teal">PlanarFace</span> = <span class="blue">TryCast</span>(gObj, <span class="teal">PlanarFace</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> face <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; MsgBox(<span class="maroon">&quot;Not a planar face&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> v <span class="blue">As</span> <span class="teal">ViewDrafting</span> = <span class="blue">Nothing</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> tr <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc, <span class="maroon">&quot;Draw Face&quot;</span>)
+&nbsp; &nbsp; &nbsp; tr.Start()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; v = doc.Create.NewViewDrafting <span class="green">'create a new view</span>
+&nbsp; &nbsp; &nbsp; &nbsp; v.Scale = 48 <span class="green">'1/4&quot; = 1'-0&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'this transform re-orients the global </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'coordinate system to the face's coordinate system</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> trans <span class="blue">As</span> <span class="teal">Transform</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Util</span>.PlanarFaceTransform(face)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> eArr <span class="blue">As</span> <span class="teal">EdgeArray</span> <span class="blue">In</span> face.EdgeLoops
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> e <span class="blue">As</span> <span class="teal">Edge</span> <span class="blue">In</span> eArr
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> c <span class="blue">As</span> <span class="teal">Curve</span> = e.AsCurveFollowingFace(face)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c = c.Transformed(trans) <span class="green">'orient the curve on the XY plane</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewDetailCurve(v, c) <span class="green">'draw the curve</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; tr.Commit()
+&nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp; &nbsp; &nbsp; &nbsp; tr.RollBack()
+&nbsp; &nbsp; &nbsp; &nbsp; MsgBox(<span class="maroon">&quot;Error: &quot;</span> + ex.Message)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> tr.GetStatus = <span class="teal">TransactionStatus</span>.Committed <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; uidoc.ActiveView = v
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp; &nbsp; &nbsp; MsgBox(<span class="maroon">&quot;Error: &quot;</span> + ex.Message)
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>The transformation from the planar face coordinate system is created by the following two utility methods:
+
+<pre class="code">
+&nbsp; <span class="green">''' </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="green">''' Return a transform that changes a x,y,z </span>
+&nbsp; <span class="green">''' coordinate system to a new x',y',z' system</span>
+&nbsp; <span class="green">''' </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Function</span> TransformByVectors( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> oldX <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> oldY <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> oldZ <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> oldOrigin <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> newX <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> newY <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> newZ <span class="blue">As</span> <span class="teal">XYZ</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> newOrigin <span class="blue">As</span> <span class="teal">XYZ</span>) <span class="blue">As</span> <span class="teal">Transform</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">' [new vector] = [transform]*[old vector]</span>
+&nbsp; &nbsp; <span class="green">' [3x1] = [3x4] * [4x1]</span>
+&nbsp; &nbsp; <span class="green">'</span>
+&nbsp; &nbsp; <span class="green">' [v'x]&nbsp;&nbsp; [ i*i'&nbsp; j*i'&nbsp; k*i'&nbsp; translationX' ]&nbsp;&nbsp; [vx]</span>
+&nbsp; &nbsp; <span class="green">' [v'y] = [ i*j'&nbsp; j*j'&nbsp; k*j'&nbsp; translationY' ] * [vy]</span>
+&nbsp; &nbsp; <span class="green">' [v'z]&nbsp;&nbsp; [ i*k'&nbsp; j*k'&nbsp; k*k'&nbsp; translationZ' ]&nbsp;&nbsp; [vz]</span>
+&nbsp; &nbsp; <span class="green">'&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; [1 ]</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> t <span class="blue">As</span> <span class="teal">Transform</span> = <span class="teal">Transform</span>.Identity
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> xx <span class="blue">As</span> <span class="blue">Double</span> = oldX.DotProduct(newX)
+&nbsp; &nbsp; <span class="blue">Dim</span> xy <span class="blue">As</span> <span class="blue">Double</span> = oldX.DotProduct(newY)
+&nbsp; &nbsp; <span class="blue">Dim</span> xz <span class="blue">As</span> <span class="blue">Double</span> = oldX.DotProduct(newZ)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> yx <span class="blue">As</span> <span class="blue">Double</span> = oldY.DotProduct(newX)
+&nbsp; &nbsp; <span class="blue">Dim</span> yy <span class="blue">As</span> <span class="blue">Double</span> = oldY.DotProduct(newY)
+&nbsp; &nbsp; <span class="blue">Dim</span> yz <span class="blue">As</span> <span class="blue">Double</span> = oldY.DotProduct(newZ)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> zx <span class="blue">As</span> <span class="blue">Double</span> = oldZ.DotProduct(newX)
+&nbsp; &nbsp; <span class="blue">Dim</span> zy <span class="blue">As</span> <span class="blue">Double</span> = oldZ.DotProduct(newY)
+&nbsp; &nbsp; <span class="blue">Dim</span> zz <span class="blue">As</span> <span class="blue">Double</span> = oldZ.DotProduct(newZ)
+&nbsp;
+&nbsp; &nbsp; t.BasisX = <span class="blue">New</span> <span class="teal">XYZ</span>(xx, xy, xz)
+&nbsp; &nbsp; t.BasisY = <span class="blue">New</span> <span class="teal">XYZ</span>(yx, yy, yz)
+&nbsp; &nbsp; t.BasisZ = <span class="blue">New</span> <span class="teal">XYZ</span>(zx, zy, zz)
+&nbsp;
+&nbsp; &nbsp; <span class="green">' The movement of the origin point </span>
+&nbsp; &nbsp; <span class="green">' in the old coordinate system</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> translation <span class="blue">As</span> <span class="teal">XYZ</span> = newOrigin - oldOrigin
+&nbsp;
+&nbsp; &nbsp; <span class="green">' Convert the translation into coordinates </span>
+&nbsp; &nbsp; <span class="green">' in the new coordinate system</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> translationNewX <span class="blue">As</span> <span class="blue">Double</span> _
+&nbsp; &nbsp; &nbsp; = xx * translation.X _
+&nbsp; &nbsp; &nbsp; &nbsp; + yx * translation.Y _
+&nbsp; &nbsp; &nbsp; &nbsp; + zx * translation.Z
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> translationNewY <span class="blue">As</span> <span class="blue">Double</span> _
+&nbsp; &nbsp; &nbsp; = xy * translation.X _
+&nbsp; &nbsp; &nbsp; &nbsp; + yy * translation.Y _
+&nbsp; &nbsp; &nbsp; &nbsp; + zy * translation.Z
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> translationNewZ <span class="blue">As</span> <span class="blue">Double</span> _
+&nbsp; &nbsp; &nbsp; = xz * translation.X _
+&nbsp; &nbsp; &nbsp; &nbsp; + yz * translation.Y _
+&nbsp; &nbsp; &nbsp; &nbsp; + zz * translation.Z
+&nbsp;
+&nbsp; &nbsp; t.Origin = <span class="blue">New</span> <span class="teal">XYZ</span>( _
+&nbsp; &nbsp; &nbsp; -translationNewX, _
+&nbsp; &nbsp; &nbsp; -translationNewY, _
+&nbsp; &nbsp; &nbsp; -translationNewZ)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> t
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Function</span> PlanarFaceTransform( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> face <span class="blue">As</span> <span class="teal">PlanarFace</span>) <span class="blue">As</span> <span class="teal">Transform</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Util</span>.TransformByVectors( _
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisX, _
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, _
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, _
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, _
+&nbsp; &nbsp; &nbsp; face.Vector(0), _
+&nbsp; &nbsp; &nbsp; face.Vector(1), _
+&nbsp; &nbsp; &nbsp; face.Normal, _
+&nbsp; &nbsp; &nbsp; face.Origin)
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>Here is 
+
+<a href="zip/PlanarFaceTransform.zip">
+PlanarFaceTransform.zip</a> including 
+
+the complete source code and Visual Studio solution of this command.
+
+<p>Many thanks to Joe for sharing this!

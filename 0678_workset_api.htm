@@ -1,0 +1,81 @@
+<!-- 1272872 [Name associated with integer ELEM_PARTITION_PARAM] -->
+
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Read-only Workset API</h3>
+
+<p>Another one of the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+Revit 2012 API features</a> that
+
+we still never had a detailed look at is the worksharing API, a comprehensive read-only API to worksharing features, access the list of worksets, find out what elements are in a workset, who borrowed what, whether an element went out of date with central, etc.
+
+Here is a quick Q &amp; A on some basic aspects of that API:
+
+<p><strong>Question:</strong> I know that the built-in parameter ELEM_PARTITION_PARAM identifies the workset of an element in some manner.
+Its value is an integer.
+How can I retrieve the workset name from this value?
+
+
+<p><strong>Answer:</strong> The integer value stored in the parameter is actually the workset id, which is used as a key in the workset table.
+
+<p>To access the workset, you therefore first have to 
+obtain the document workset table, for instance via the GetWorksetTable method:
+
+<pre class="code">
+&nbsp; <span class="teal">WorksetTable</span> worksetTable
+&nbsp; &nbsp; = doc.GetWorksetTable();
+</pre>
+
+<p>You can then create a workset id from the parameter value and access the workset of a given element 'e' using that:
+
+<pre class="code">
+&nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ELEM_PARTITION_PARAM );
+&nbsp;
+&nbsp; <span class="blue">int</span> paramValue = param.AsInteger();
+&nbsp;
+&nbsp; <span class="teal">WorksetId</span> wid = <span class="blue">new</span> <span class="teal">WorksetId</span>( paramValue );
+&nbsp;
+&nbsp; <span class="teal">Workset</span> workset = <span class="teal">WorksetId</span>.InvalidWorksetId == wid
+&nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; : worksetTable.GetWorkset( wid );
+</pre>
+
+<p>Just like a standard Revit database element, the workset provides a property returning its name.
+
+<p>There is also a simpler direct way to access the workset of an element, however, using the document method GetWorksetId, which returns the workset id for a given element id:
+
+<pre class="code">
+&nbsp; <span class="teal">WorksetId</span> wid = doc.GetWorksetId( e.Id );
+</pre>
+
+<p><strong>Question:</strong> How can I iterate the workset table to obtain a list of all the worksets defined in the project? 
+
+<p><strong>Answer:</strong> There are dedicated FilteredWorksetCollector and WorksetFilter classes for that purpose.
+Here is some sample code demonstrating their use:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredWorksetCollector</span> coll
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredWorksetCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="green">// You may want to filter them...</span>
+&nbsp;
+&nbsp; <span class="green">//coll.OfKind(WorksetKind.UserWorkset);</span>
+&nbsp;
+&nbsp; StringBuilder worksetNames = <span class="blue">new</span> StringBuilder();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Workset</span> workset <span class="blue">in</span> coll )
+&nbsp; {
+&nbsp; &nbsp; worksetNames.AppendFormat( <span class="maroon">&quot;{0}: {1}\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; workset.Name, workset.Kind );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Worksets&quot;</span>,
+&nbsp; &nbsp; worksetNames.ToString() );
+</pre>
+
+<p>As mentioned in the comment, please note that the FilteredWorksetCollector class provides an OfKind method which can be used to limit the filters returned to a given workset kind, e.g. to UserWorkset only, i.e. worksets defined by users, including the two default Revit ones.

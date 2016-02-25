@@ -1,0 +1,41 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255535 [Filter.NewParameterFilter Method (BuiltInParameter, CriteriaFilterType, Double)] -->
+
+<h3>Parameter Filter Units</h3>
+
+<p>The Western European DevDays conference tour has begun, and I will be presenting and travelling all week, leaving very little time to spend blogging or responding to comments.
+I visited relatives in London the preceding weekend, and took some time to write and post this before the real crunch began.
+
+<p>We have several old posts dealing with various aspects of unit handling in the Revit API:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">Units</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/formatting-units-strings.html">Formatting unit strings</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/unit-types-and-format-options.html">Unit types and format options</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">Unit conversion</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/unit-suffix-and-the-projectunit-sdk-sample.html">Unit Suffix and the ProjectUnit SDK sample</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/dut-versus-ust.html">DisplayUnitType and UnitSymbolType</a>.</li>
+</ul>
+
+<p>Here is a new related information nugget, a surprising little quirk when defining Revit API filters that just came to my attention last week.
+In brief, a Revit API parameter filter specifying a length or area will be evaluated using the current user interface units, and not the database units, as one would expect.
+This is an inconsistency that we expect to change in future releases.
+This means that to make proper use of filters for selecting elements depending on some unit-based parameter, an add-in using the 2010 API will have to convert the target value to the current user interface unit.
+This is unexpected.
+I would expect that when working purely within the API, all units should remain in the internal database units, with no exceptions, not for filters nor for anything else.
+In future, this conversion will hopefully be removed, so that add-ins can work consistently and exclusively in Revit database units.
+
+<p>Specifically, the Filter.NewParameterFilter method taking the three arguments <span class="teal">BuiltInParameter</span>, <span class="teal">CriteriaFilterType</span>, and <span class="blue">double</span> returns the selected elements based on the units displayed in the user interface instead of the internal database units. 
+
+<p><strong>Example:</strong> This can be reproduced using the ElementsFilter SDK sample. 
+I tested it by running the ElementsFilter in a minimal model with two rooms:
+
+<pre>
+ROOM_AREA  Area  double   6.840 m<sup>2</sup>   73.63 sqf
+ROOM_AREA  Area  double  14.440 m<sup>2</sup>  155.43 sqf
+</pre>
+
+<p>Specifying a filter to select all rooms with a value of ROOM_AREA exceeding 14 returns only the second, larger room, i.e. it is evaluating the parameter in the user interface area unit 'square meters' rather than the database area unit 'square feet'.

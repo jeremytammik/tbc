@@ -1,0 +1,148 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Categories</h3>
+
+<p>We have looked at many aspects of categories in the past, such as 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+category comparison</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/get-and-set-family-category-and-parameters.html">
+family categories</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/adding-a-category-to-a-parameter-binding.html">
+categories and parameter bindings</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/system-versus-user-family-category.html">
+system versus user defined categories</a>.
+
+<p>Here is very basic question that just came in and may be of general interest:
+
+<p><strong>Question:</strong> Is it possible to obtain a complete list of Revit family categories?
+
+<p><strong>Answer:</strong> Yes, sure it is. 
+You can create it yourself. 
+There are two sets of categories in a Revit project document: the ones defined in the document itself, and the pre-defined built-in ones.
+
+<p>The top-level document ones are available from the document settings categories property, and the built-in ones from the BuiltInCategory enumeration.
+
+<p>I implemented a new Building Coder sample command CmdCategories to list the contents of these two collections.
+
+<p>This is the code to read the document categories.
+The Categories object is a map that contains all the top-level Category objects within the Document:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp; <span class="teal">Categories</span> categories = doc.Settings.Categories;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = categories.Size;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} categories and their parents:&quot;</span>, n );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Category</span> c <span class="blue">in</span> categories )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Category</span> p = c.Parent;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0} ({1}), parent {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; c.Name, c.Id.IntegerValue, 
+&nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == p ? <span class="maroon">&quot;&lt;none&gt;&quot;</span> : p.Name) );
+&nbsp; }
+</pre>
+
+<p>This lists 219 categories in the sample project I tested it in, starting like this:
+
+<pre>
+219 categories and their parents:
+  Plumbing Fixture Tags (-2005010), parent &lt;none&gt;
+  Switch System (-2008101), parent &lt;none&gt;
+  Structural Framing Tags (-2005015), parent &lt;none&gt;
+  Room Tags (-2000480), parent &lt;none&gt;
+  Raster Images (-2000560), parent &lt;none&gt;
+  Security Devices (-2008079), parent &lt;none&gt;
+  Structural Beam System Tags (-2005130), parent &lt;none&gt;
+</pre>
+
+<p>Since all of these are top-level categories, the Parent property is always null.
+You can still ask the map for a sub-category by name or id and it should return it to you.  
+You can also extract the sub-categories of each parent category you iterate.
+
+<p>Here is the code iterating over the built-in categories listed in the BuiltInCategory enumeration:
+
+<pre class="code">
+&nbsp; <span class="teal">Array</span> bics = <span class="teal">Enum</span>.GetValues( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">BuiltInCategory</span> ) );
+&nbsp;
+&nbsp; n = bics.Length;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} built-in categories and the &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;corresponding document ones:&quot;</span>, n );
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat;
+&nbsp; <span class="blue">string</span> s;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span> bics )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; cat = categories.get_Item( bic );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = (<span class="blue">null</span> == cat)
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;&lt;none&gt;&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Format( <span class="maroon">&quot;--&gt; {0} ({1}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cat.Name, cat.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = ex.GetType().Name + <span class="maroon">&quot; &quot;</span> + ex.Message;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0} {1}&quot;</span>, bic.ToString(), s );
+&nbsp; }
+</pre>
+
+<p>This lists 747 built-in categories and their corresponding document ones, if found.
+
+<p>I had to add an exception handler around the call to the Categories collection Item property taking a BuiltInCategory argument, since I discovered that it throws exceptions when called with certain built-in categories:
+
+<ul>
+<li>A InvalidOperationException with an empty message on the built-in categories 
+<ul>
+<li>OST_FurnitureHiddenLines 
+<li>OST_HostTemplate InvalidOperationException 
+<li>OST_MassFaceSplitter InvalidOperationException 
+<li>OST_MassCutter InvalidOperationException 
+<li>OST_ZoningEnvelope InvalidOperationException 
+</ul>
+<li>A NullReferenceException with a message saying "Object reference not set to an instance of an object" on
+<ul>
+<li>OST_InstanceDrivenLineStyle 
+<li>OST_CurtainGridsSystem
+<li>OST_IOSNotSilhouette
+<li>OST_InvisibleLines 
+</ul>
+</ul>
+
+<p>This is due to the fact that a few categories can't be stored in the map correctly because their names are the same as other categories, and the name is used as a key.
+A workaround might be: obtain the category from a new Categories object (from Settings.Categories), get the category directly by BuiltInCategory from that object.
+
+<p>Here is a 
+
+<a href="zip/367_categories.txt">
+text file</a> including 
+the output of running this command in my simple sample project.
+
+<p>Here is
+
+<a href="zip/bc_11_67.zip">
+version 2011.0.67.0</a>
+
+of The Building Coder sample source code and Visual Studio solution including the new command.
+
+<p>The Revit 2010 version of the Revit API introduction labs also included a command Lab2_5_Categories which performed some further analysis on the document and built-in categories and their relationships with each other.
+The last version we published was in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+selecting model elements
+</a>.

@@ -1,0 +1,843 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>UIView, Windows Coordinates, ReferenceIntersector and My Own Tooltip</h3>
+
+<p>Here is my well-meant contribution to making this the most exciting Wednesday of your entire week.
+
+<p>For the first time in history, the Revit 2013 UIView class provides a possibility to convert back and forth between Revit model coordinates and Windows device screen points.
+
+<p>I imagined making use of that right away when I read about the UIView class, and mentioned it when discussing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/uiview-and-windows-device-coordinates.html">
+UIView and Windows device coordinates</a>.
+
+<p>I am still a bit surprised that I have not yet received any questions about these exciting possibilities.
+Well, anyway, that gives me a chance to finally dive into this exploration free of preconceptions.
+
+<p>Another Revit 2013 topic that I wanted to talk about for a long time is the new ReferenceIntersector class.
+My previous attempts at publishing anything on it were thwarted by running into some unintended features which have meanwhile been attended to.
+
+<p>Now I can combine both of these topics into a single nice example, presenting my very own tooltips displaying any information I like based on the cursor location in the Revit BIM.
+
+<p>Does that sound cool, or what?
+
+<p>To give you an idea of what I am talking about, here is a 
+
+<a href="http://youtu.be/-5cx_I9OzFM">
+two-minute video</a> depicting 
+
+a sample run demonstrating the final result, with the normal Revit tooltips and my own specialised ones displayed side by side.
+
+<p>To run the demo, I open up the basic architectural sample project, switch away from the perspective view, since add-ins are disabled there, select Level 2, turn on my own tooltips, hover around different elements to compare the Revit tooltip with my own one, and turn off my tooltips again:</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/-5cx_I9OzFM?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<a name="1"></a>
+
+<h4>Table of Contents</h4>
+
+<p>To display a useful tooltip, the user needs to be free to play around in the model.
+
+<p>Simultaneously, my add-in needs to be able to access the Windows cursor location, determine the corresponding Revit model coordinates from it, and query the Revit BIM to determine the information I would like to display.
+
+<p>This calls for an Idling event handler, adding a third topic to the two already mentioned above.
+
+<p>We thus end up with the following list, including hints on the respective approaches, solutions, and helper  methods:
+
+<ul>
+<li><a href="#2">Top-level form and Idling event management</a>: ModelessForm_IdlingEvent.
+<li><a href="#3">Helper methods</a>: GetActiveUiView, GetView3d, ElementDescription.
+<li><a href="#4">Idling event handler</a>:
+<ul>
+<li>Access <a href="#5">Windows cursor location</a>: System.Windows.Forms.<span class="teal">Cursor</span>.Position.
+<li>Determine <a href="#6">Revit model coordinates</a>: <span class="teal">UIView</span>.
+<li><a href="#7">Query Revit BIM for information</a>: <span class="teal">ReferenceIntersector</span>.
+<li><a href="#8">Display tooltip</a>: <span class="teal">JtTooltipForm</span>.
+<li><a href="#9">Entire implementation</a>.
+</ul>
+<li>Toggle tooltip <a href="#10">on and off commands</a>.
+<li><a href="#11">Conclusion and download</a>.
+</ul>
+
+<p>Before closing, I also mention Saikat's new posts on 
+
+<a href="#21">multi-image naming conventions</a> and
+<a href="#22">text file TaskDialog command links</a>,
+<a href="#23">DesignScript</a> availability on Autodesk Labs, and a nice video of my friend 
+<a href="#24">Falk on the Schafberg</a>.
+
+
+<a name="2"></a>
+
+<h4>Top-level Form and Idling Event Management</h4>
+
+<p>As you hopefully know by now, the implementation to handle the Idling event needs to be really clean and clear and is a little bit tricky.
+
+<p>I strongly suggest basing anything you do on the ModelessForm_IdlingEvent SDK sample.
+
+<p>If you implemented your Idling event handler in any other way in the past, it might be a good idea revisiting it now and comparing notes with that sample.
+
+<p>I based my WinTooltip external application on it, anyway.
+
+<p>It handles all the modeless form interaction in the external application implementation.
+
+<p>In my case, the modeless form is either a Visual Studio designer generated JtTooltipForm or a hand-built JtTooltipForm2.
+
+<p>The external application is instantiated as a singleton instance, and provides public access to that instance so that external commands can access it and use its functionality to show and hide the modeless form.
+
+<p>It implements an internal CloseForm method, public methods ShowForm and HideForm, called by the external commands, and the standard interface methods OnStartup and OnShutdown, like this:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Singleton external application class instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">internal</span> <span class="blue">static</span> <span class="teal">App</span> _app = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Provide access to singleton class instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">App</span> Instance
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _app; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The tooltip form to display.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">internal</span> <span class="blue">static</span> <span class="teal">JtTooltipForm2</span> _form = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Dispose and null out form.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if it was previously not disposed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> CloseForm()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = _form != <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !_form.IsDisposed )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _form.Dispose();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; _form = <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and show the form, </span>
+&nbsp; <span class="gray">///</span><span class="green"> unless it already exists.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;remarks&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The external command invokes </span>
+&nbsp; <span class="gray">///</span><span class="green"> this on end-user request.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/remarks&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ShowForm( <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// If we do not have a form yet, create and show it</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( _form == <span class="blue">null</span> || _form.IsDisposed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Instantiate JtTooltipForm to use </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the designer generated form.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; _form = <span class="blue">new</span> <span class="teal">JtTooltipForm2</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; _form.Show();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If we have a form, we need Idling too</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uiapp.Idling += IdlingHandler;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Hide the form.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;remarks&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The external command invokes </span>
+&nbsp; <span class="gray">///</span><span class="green"> this on end-user request.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/remarks&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> HideForm( <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( CloseForm() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// If the form was showing, we had subscribed</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uiapp.Idling -= IdlingHandler;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _app = <span class="blue">this</span>;
+&nbsp; &nbsp; _form = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( CloseForm() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.Idling -= IdlingHandler;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Helper Methods</h4>
+
+<p>Apart from the top-level management, the Idling event handler does all the rest of the work.
+
+<p>Before we get to the event handler itself, I'll present the three helper methods it uses:
+
+<ul>
+<li>GetActiveUiView: retrieve the active UIView.
+<li>GetView3d: retrieve the 3D view named "{3D}".
+<li>ElementDescription: return a descriptive text for a given Revit element.
+</ul>
+
+<p>We can get the active document view directly, but need some additional coding to determine the associated UIView, for example like this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return currently active UIView or null.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="teal">UIView</span> GetActiveUiView( 
+&nbsp; <span class="teal">UIDocument</span> uidoc )
+{
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">UIView</span>&gt; uiviews = uidoc.GetOpenUIViews();
+&nbsp; <span class="teal">UIView</span> uiview = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">UIView</span> uv <span class="blue">in</span> uiviews )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( uv.ViewId.Equals( view.Id ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uiview = uv;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> uiview;
+}
+</pre>
+
+<p>The ReferenceIntersector constructor requires a 3D view argument in which the ray tracing takes place.
+In this sample, I assume that a suitable 3D view named "{3D}" is available and retrieve that using one single line of filtered element and LINQ driven code:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return the 3D view named &quot;{3D}&quot;.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">View3D</span> GetView3d( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) )
+&nbsp; &nbsp; .Cast&lt;<span class="teal">View3D</span>&gt;()
+&nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">View3D</span>&gt;( 
+&nbsp; &nbsp; &nbsp; v =&gt; v.Name.Equals( <span class="maroon">&quot;{3D}&quot;</span> ) );
+}
+</pre>
+
+<p>You can obviously modify this in any way you like and set up a suitable 3D view to suit your specific view setting, sectioning and filtering needs.
+
+<p>The location dependent BIM information displayed in the tooltip can be determined completely freely.
+In my case, I simply detect what element the cursor is hovering over and use the ElementDescription method to put together a descriptive text for it:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return a string describing the given element:</span>
+<span class="gray">///</span><span class="green"> .NET type name,</span>
+<span class="gray">///</span><span class="green"> category name,</span>
+<span class="gray">///</span><span class="green"> family and symbol name for a family instance,</span>
+<span class="gray">///</span><span class="green"> element id and element name.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">string</span> ElementDescription(
+&nbsp; <span class="teal">Element</span> e )
+{
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;&lt;null&gt;&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// For a wall, the element name equals the</span>
+&nbsp; <span class="green">// wall type name, which is equivalent to the</span>
+&nbsp; <span class="green">// family name ...</span>
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> typeName = e.GetType().Name;
+&nbsp;
+&nbsp; <span class="blue">string</span> categoryName = ( <span class="blue">null</span> == e.Category )
+&nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; : e.Category.Name + <span class="maroon">&quot; &quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> familyName = ( <span class="blue">null</span> == fi )
+&nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; : fi.Symbol.Family.Name + <span class="maroon">&quot; &quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> symbolName = ( <span class="blue">null</span> == fi
+&nbsp; &nbsp; || e.Name.Equals( fi.Symbol.Name ) )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; &nbsp; : fi.Symbol.Name + <span class="maroon">&quot; &quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} {1}{2}{3}&lt;{4} {5}&gt;&quot;</span>,
+&nbsp; &nbsp; typeName, categoryName, familyName,
+&nbsp; &nbsp; symbolName, e.Id.IntegerValue, e.Name );
+}
+</pre>
+
+<p>This is somewhat similar to and yet does not exactly match the information displayed by the standard Revit tooltip and other parts of the user interface, as you might have noticed in the 
+
+<a href="http://youtu.be/-5cx_I9OzFM">
+video recording</a>.
+
+
+<a name="4"></a>
+
+<h4>Idling Event Handler</h4>
+
+<p>The Idling event handler implements the following steps, which we first discuss one by one before presenting the entire code in context:
+
+<ul>
+<li>Access <a href="#5">Windows cursor location</a>: System.Windows.Forms.<span class="teal">Cursor</span>.Position.
+<li>Determine <a href="#6">Revit model coordinates</a>: <span class="teal">UIView</span>.
+<li><a href="#7">Query Revit BIM for information</a>: <span class="teal">ReferenceIntersector</span>.
+<li><a href="#8">Display tooltip</a>: <span class="teal">JtTooltipForm</span>.
+<li><a href="#9">Entire implementation</a>.
+</ul>
+
+<a name="5"></a>
+
+<h4>Access Windows Cursor Location</h4>
+
+<p>Converting from the cursor position retrieved in Windows device coordinates to Revit model coordinates is possible by calculating the relative position in the UIView.
+
+<p>Here is an illustration assuming a screen resolution of 1600 x 1200 with a Revit view located at the rectangle 800,150 to 1500,650, displaying a plan view of part of the Revit model, with model coordinates ranging from 10,40,0 to 220,120,0.
+The current cursor location is represented by the green spot:</p>
+
+<center>
+<img src="img/wincoords_mapping.png" alt="Windows device coordinate to Revit model coordinate mapping"/>
+</center>
+
+<p>The Windows device coordinate origin 0,0 is at the upper left, and Y values increase downwards, whereas the Revit model coordinate Y values increase upwards.
+
+<p>You can easily query the cursor position in device coordinates on the Windows screen from .NET framework at any time using the System.Windows.Forms.<span class="teal">Cursor</span>.Position property:
+
+<pre class="code">
+&nbsp; <span class="teal">Point</span> p = System.Windows.Forms.<span class="teal">Cursor</span>.Position;
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Determine Revit Model Coordinates</h4>
+
+<p>The cursor location is obviously returned in Windows device coordinates, stored in the point (or vector) variable 'p'.
+
+<p>The aim is to determine the location indicated by this point in Revit model coordinates, for example by determining the vector v from the lower left corner of the Revit view to that location.
+
+<p>We can easily determine the relative position of p between the two corners of the UIView in Windows device coordinates by subtracting the lower left hand corner and dividing by the total width and height to obtain the relative width and height location values dx and dy like this:
+
+<pre class="code">
+&nbsp; <span class="teal">UIView</span> uiview = GetActiveUiView( uidoc );
+&nbsp;
+&nbsp; <span class="teal">Rectangle</span> rect = uiview.GetWindowRectangle();
+&nbsp;
+&nbsp; <span class="teal">Point</span> p = System.Windows.Forms.<span class="teal">Cursor</span>.Position;
+&nbsp;
+&nbsp; <span class="blue">double</span> dx = (<span class="blue">double</span>) ( p.X - rect.Left )
+&nbsp; &nbsp; / ( rect.Right - rect.Left );
+&nbsp;
+&nbsp; <span class="blue">double</span> dy = (<span class="blue">double</span>) ( p.Y - rect.Bottom )
+&nbsp; &nbsp; / ( rect.Top - rect.Bottom );
+</pre>
+
+<!--
+<p>For instance, if p is at 900,300, then its relative location is a bit more than 0.5 in the X and 0.25 in the Y direction.
+These two relative values are calculated and stored in dx and dy.
+-->
+
+<p>From the UIView, we can also determine model coordinates of the view corners.
+They are stored in a and b, respectively.
+
+<p>Now it is easy to calculate the cursor point 'q' in model coordinates from the two relative values like this:
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; corners = uiview.GetZoomCorners();
+&nbsp; <span class="teal">XYZ</span> a = corners[0];
+&nbsp; <span class="teal">XYZ</span> b = corners[1];
+&nbsp; <span class="teal">XYZ</span> v = b - a;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> q = a
+&nbsp; &nbsp; + dx * v.X * <span class="teal">XYZ</span>.BasisX
+&nbsp; &nbsp; + dy * v.Y * <span class="teal">XYZ</span>.BasisY;
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Query Revit BIM for Information using ReferenceIntersector Ray Casting</h4>
+
+<p>Once we have the model space cursor location 'q', we can calculate a point beyond the model extents (hopefully) from which one can picture the user looking into the model.
+
+<p>The first element intersected by a ray cast from that point in the view direction should be the one we are interested in displaying information about.
+
+<p>Initially, the sample run was a bit boring, because the only element encountered when looking from straight above was always the roof.
+
+<p>I tweaked that to make the example more interesting, not by modifying the model itself &ndash; I use the standard architectural basic sample project rac_basic_sample_project.rvt &ndash; but by adding a filter to remove all roof category elements from the reference intersector results instead.
+The exact elements of interest and information to display are entirely up to you and your needs to determine, of course.
+
+<p>The ray casting requires a 3D view to operate in. 
+In this case, I simply pick the one named "{3D}" returned by the GetView3d helper method.
+You can set up your own view with specific graphics properties, section cuts, and only certain elements visible, if that better suits your requirements.
+
+<p>Here is the code determining the view, view direction and ray origin, setting up the intersector, determining the target element, and defining the tooltip text to display in the variable 's':
+
+<pre class="code">
+&nbsp; <span class="teal">View3D</span> view3d = GetView3d( doc );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> viewdir = view.ViewDirection;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> origin = q + 1000 * viewdir;
+&nbsp;
+&nbsp; <span class="green">// Find all elements:</span>
+&nbsp;
+&nbsp; <span class="green">//ReferenceIntersector ri</span>
+&nbsp; <span class="green">//&nbsp; = new ReferenceIntersector( view3d );</span>
+&nbsp;
+&nbsp; <span class="green">// Find all elements except roofs:</span>
+&nbsp;
+&nbsp; <span class="teal">ElementFilter</span> f = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Roofs, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">ReferenceIntersector</span> ri 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( f, 
+&nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Element, view3d );
+&nbsp;
+&nbsp; <span class="teal">ReferenceWithContext</span> rc
+&nbsp; &nbsp; = ri.FindNearest( origin, -viewdir );
+&nbsp;
+&nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Element not found&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != rc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Reference</span> r = rc.GetReference();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( r );
+&nbsp;
+&nbsp; &nbsp; s = ElementDescription( e );
+&nbsp; }
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Display Tooltip and the JtTooltipForm class</h4>
+
+<p>I originally used the Visual Studio designer to create a simple tooltip form named JtTooltipForm for me, then tweaked that auto-generated code to create one named JtTooltipForm2 myself programmatically from scratch.
+
+<p>Besides the constructor setting up the form and the Label object to display the tooltip text, it also manages an offset from the cursor position at which to display itself, provides a method to set the tooltip text, and overrides the OnShown and OnVisibleChanged methods to react appropriately to position changes:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A tooltip window designed to move </span>
+<span class="gray">///</span><span class="green"> around with the cursor position.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtTooltipForm2</span> : <span class="teal">Form</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The offset from the mouse pointer </span>
+&nbsp; <span class="gray">///</span><span class="green"> at which to show the form.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point</span> Offset { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Tooltip text.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Label</span> _label;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set the tooltip text.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> SetText( <span class="blue">string</span> s )
+&nbsp; {
+&nbsp; &nbsp; _label.Text = s;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Move the window to an offset of mouse pointer.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">protected</span> <span class="blue">override</span> <span class="blue">void</span> OnShown( <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">base</span>.OnShown( e );
+&nbsp;
+&nbsp; &nbsp; Location = <span class="blue">new</span> <span class="teal">Point</span>(
+&nbsp; &nbsp; &nbsp; MousePosition.X + Offset.X,
+&nbsp; &nbsp; &nbsp; MousePosition.Y + Offset.Y );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Move the window to an offset of mouse pointer.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">protected</span> <span class="blue">override</span> <span class="blue">void</span> OnVisibleChanged(
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">base</span>.OnVisibleChanged( e );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( Visible )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Location = <span class="blue">new</span> <span class="teal">Point</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; MousePosition.X + Offset.X,
+&nbsp; &nbsp; &nbsp; &nbsp; MousePosition.Y + Offset.Y );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> JtTooltipForm2()
+&nbsp; {
+&nbsp; &nbsp; Size = <span class="blue">new</span> <span class="teal">Size</span>( 200, 20 );
+&nbsp;
+&nbsp; &nbsp; _label = <span class="blue">new</span> <span class="teal">Label</span>();
+&nbsp;
+&nbsp; &nbsp; SuspendLayout();
+&nbsp;
+&nbsp; &nbsp; _label.AutoSize = <span class="blue">false</span>; <span class="green">// the label will not change its height automatically, only width, so switch off AutoSize to wrap text</span>
+&nbsp; &nbsp; _label.CausesValidation = <span class="blue">false</span>;
+&nbsp; &nbsp; _label.Dock = <span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; _label.Location = <span class="blue">new</span> <span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; _label.Size = <span class="blue">new</span> <span class="teal">Size</span>( 35, 13 );
+&nbsp; &nbsp; _label.Parent = <span class="blue">this</span>;
+&nbsp;
+&nbsp; &nbsp; AutoScaleDimensions = <span class="blue">new</span> <span class="teal">SizeF</span>( 6F, 13F );
+&nbsp; &nbsp; AutoScaleMode = <span class="teal">AutoScaleMode</span>.Font;
+&nbsp; &nbsp; BackColor = <span class="teal">SystemColors</span>.Info;
+&nbsp; &nbsp; ClientSize = <span class="blue">new</span> <span class="teal">Size</span>( 200, 12 );
+&nbsp; &nbsp; Controls.Add( _label );
+&nbsp; &nbsp; FormBorderStyle = <span class="teal">FormBorderStyle</span>.None;
+&nbsp; &nbsp; Name = <span class="maroon">&quot;JtTooltipForm&quot;</span>;
+&nbsp; &nbsp; Opacity = 0.8D;
+&nbsp; &nbsp; ShowInTaskbar = <span class="blue">false</span>;
+&nbsp; &nbsp; TopMost = <span class="blue">true</span>;
+&nbsp; &nbsp; TransparencyKey = <span class="teal">Color</span>.White;
+&nbsp;
+&nbsp; &nbsp; ResumeLayout( <span class="blue">false</span> );
+&nbsp; &nbsp; PerformLayout();
+&nbsp;
+&nbsp; &nbsp; Offset = <span class="blue">new</span> <span class="teal">Point</span>( 10, 0 );
+&nbsp; }
+}
+</pre>
+
+<!--
+<a name="?"></a>
+
+<h4>Wrapping Text in Windows Forms Label Control</h4>
+-->
+
+<p>You may note that I switched off the AutoSize property. 
+Setting it to true enables the label to automatically expand, and that just means getting wider to fit the text length.
+The label will not change its height automatically, only width.
+
+<p>A neat trick to wrap text before putting it into the label that I spotted and did not make use of employs a regular expression to do the job:
+
+<pre>
+  WrappedMessage := RegExReplace( 
+    LongMessage, "(.{50}\s)", "$1`n" );
+</pre>
+
+<p>Controlling the text and position from the Idling event handler is a trivial two-liner:
+
+<pre class="code">
+&nbsp; <span class="green">// Move tooltip to current cursor </span>
+&nbsp; <span class="green">// location and set tooltip text.</span>
+&nbsp;
+&nbsp; _form.Location = p + <span class="blue">new</span> <span class="teal">Size</span>( _form.Offset );
+&nbsp; _form.SetText( s );
+</pre>
+
+
+<a name="9"></a>
+
+<h4>Entire Idling Event Handler Implementation</h4>
+
+<p>For better readability, here is the entire Idling event handler implementation in all its glory.
+
+<p>It even includes one slight improvement that is not demonstrated by the ModelessForm_IdlingEvent SDK sample implementation:
+
+<p>If the Revit project is closed while the Idling event is still subscribed to, the UI document may be null.
+One needs to add a check for that situation as well in the Idling handler, in case the hander relies on an open document.
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Idling event handler.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;remarks&gt;</span>
+<span class="gray">///</span><span class="green"> We keep the handler very simple. First check</span>
+<span class="gray">///</span><span class="green"> if we still have the form. If not, unsubscribe </span>
+<span class="gray">///</span><span class="green"> from Idling, for we no longer need it and it </span>
+<span class="gray">///</span><span class="green"> makes Revit speedier. If the form is around, </span>
+<span class="gray">///</span><span class="green"> check if it has a request ready and process </span>
+<span class="gray">///</span><span class="green"> it accordingly.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/remarks&gt;</span>
+<span class="blue">public</span> <span class="blue">void</span> IdlingHandler( 
+&nbsp; <span class="blue">object</span> sender, 
+&nbsp; <span class="teal">IdlingEventArgs</span> args )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = sender <span class="blue">as</span> <span class="teal">UIApplication</span>;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == uidoc || _form.IsDisposed )
+&nbsp; {
+&nbsp; &nbsp; uiapp.Idling -= IdlingHandler;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="green">// form still exists</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIView</span> uiview = GetActiveUiView( uidoc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Rectangle</span> rect = uiview.GetWindowRectangle();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Point</span> p = System.Windows.Forms.<span class="teal">Cursor</span>.Position;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dx = (<span class="blue">double</span>) ( p.X - rect.Left )
+&nbsp; &nbsp; &nbsp; / ( rect.Right - rect.Left );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dy = (<span class="blue">double</span>) ( p.Y - rect.Bottom )
+&nbsp; &nbsp; &nbsp; / ( rect.Top - rect.Bottom );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; corners = uiview.GetZoomCorners();
+&nbsp; &nbsp; <span class="teal">XYZ</span> a = corners[0];
+&nbsp; &nbsp; <span class="teal">XYZ</span> b = corners[1];
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = b - a;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = a
+&nbsp; &nbsp; &nbsp; + dx * v.X * <span class="teal">XYZ</span>.BasisX
+&nbsp; &nbsp; &nbsp; + dy * v.Y * <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If the current view happens to be a 3D view, </span>
+&nbsp; &nbsp; <span class="green">// we could simply use it right away. In </span>
+&nbsp; &nbsp; <span class="green">// general we have to find a different one to </span>
+&nbsp; &nbsp; <span class="green">// run the ReferenceIntersector in.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view3d = GetView3d( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> viewdir = view.ViewDirection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> origin = q + 1000 * viewdir;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find all elements:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//ReferenceIntersector ri</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; = new ReferenceIntersector( view3d );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find all elements except roofs:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementFilter</span> f = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Roofs, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceIntersector</span> ri 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( f, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Element, view3d );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceWithContext</span> rc
+&nbsp; &nbsp; &nbsp; = ri.FindNearest( origin, -viewdir );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Element not found&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = rc.GetReference();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( r );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = ElementDescription( e );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Move tooltip to current cursor </span>
+&nbsp; &nbsp; <span class="green">// location and set tooltip text.</span>
+&nbsp;
+&nbsp; &nbsp; _form.Location = p + <span class="blue">new</span> <span class="teal">Size</span>( _form.Offset );
+&nbsp; &nbsp; _form.SetText( s );
+&nbsp; }
+}
+</pre>
+
+<a name="10"></a>
+
+<h4>Toggle Tooltip On and Off Commands</h4>
+
+<p>To simplify the usage and cooperation with other add-ins, I implemented two trivial read-only external commands calling the external application ShowForm and HideForm methods to toggle my personal tooltips on and off:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdTooltipOn</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">App</span>.Instance.ShowForm( 
+&nbsp; &nbsp; &nbsp; commandData.Application );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+&nbsp;
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdTooltipOff</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">App</span>.Instance.HideForm(
+&nbsp; &nbsp; &nbsp; commandData.Application );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+
+<a name="11"></a>
+
+<h4>Conclusion and Download</h4>
+
+<p>I hope you find this as useful as I imagine it might become, and look forward to your feedback.
+
+<p>By the way, I will be talking about this sample and the possibilities it demonstrates along with many other topics in my Autodesk University presentation
+
+<a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4107">
+CP4107</a> on 
+
+the new Revit 2013 UI API functionality, probably making this the most exciting one of my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/au-registration-and-adn-open.html">three AU sessions</a>.
+
+
+<p>Here is a 
+
+<a href="zip/CP4107_2012-10-09.zip">
+current snapshot</a> of 
+
+the entire source code, Visual Studio solution and add-in manifest of the WinTooltip sample application, together the rest of my CP4107 sample material.
+The latter is based on my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#2">
+DevCamp Revit 2013 UI API</a> samples.
+
+<p>Here are a couple of other items of interest before I wrap up, related to the Revit API, technology and purely human interst.
+
+
+<a name="21"></a>
+
+<h4>DWG and Image Export Naming Convention</h4>
+
+<p>Saikat Bhattacharya points out that the 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/naming-rules-and-prefixes-for-multiple-image-exports-in-revit.html">
+naming convention for exporting multiple images</a> follows 
+
+the one used for DWG export:
+
+[FileName]-[ViewType]-[ViewName].[image format].
+
+
+<a name="22"></a>
+
+<h4>Displaying a Text File from a TaskDialog Command Link</h4>
+
+<p>I recently mentioned the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/detach-workset-and-taskdialog-command-link-order.html">
+order of TaskDialog command links</a>.
+
+<p>Now Saikat Bhattacharya picked up a related issue, on how to define a TaskDialog command link to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/linking-local-file-to-taskdialog.html">
+open up a text file in the local system</a>.
+
+<p>URLs and local system HTML links work fine out of the box.
+A text file, however, needs special processing.
+One way to launch it is by using the Process.Start method in the .NET System.Diagnostics namespace.
+Saikat provides the source.
+
+
+<a name="23"></a>
+
+<h4>DesignScript</h4>
+
+<p>A very exciting new technology is now publicly available on Autodesk Labs: 
+
+<a href="http://labs.autodesk.com/utilities/designscript">
+DesignScript</a>:
+
+<ul>
+<li>A powerful scripting language for exploratory programming.
+<li>Managing and distinguishing between a generative description of a design (as a script) and the resulting generated model.
+<li>A language to help designers build and analyze complex geometric models that would be difficult to model with interactive techniques.
+<li>Integrated into a host geometry application (currently AutoCAD).
+</ul>
+
+<p>The designer no longer directly models the resulting design: instead she develops a script whose execution generates the model. 
+This enables a completely different kind of design model to be created. 
+The design process is also different. 
+An apparently minor edit to the script can have a profound effect on the generated model, enabling the exploration of a vast array of alternatives, with much less effort than manual interactive modeling.
+Here is a five-minute video explanation of 
+
+<a href="http://www.youtube.com/watch?v=_mPag-y_SG0">
+Design Computation</a> by Robert Aish for Autodesk University last year:</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/_mPag-y_SG0" frameborder="0" allowfullscreen></iframe>
+
+<p>Kean Walmsley provides a very nice explanation and 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/10/designscript-now-available-for-download-from-autodesk-labs.html">
+description of the DesignScript sample</a> he 
+
+implemented for it together with Robert in 2008 for the Design Computation Symposium and AU mainstage presentation.
+
+<p>Now you can try it for yourself.
+Unfortunately, DesignScript is not yet available for Revit...
+
+
+<a name="24"></a>
+
+<h4>Falk on Schafberg</h4>
+
+<!-- C:\j\photo\jeremy\2012\2012-09-08_wildhaus\mvi_1006.avi -->
+
+<p>For something completely unrelated to any technology at all, here is a nice little 
+
+<a href="http://youtu.be/_kXMtG2RRGs">
+video</a> of
+
+my friend 
+
+<a href="http://www.falkstein.de">
+Falk</a> recently 
+
+when we hiked over the 
+
+<a href="http://de.wikipedia.org/wiki/Schafberg_%28Wildhaus%29">
+Wildhauser Schafberg</a> (sheep 
+
+mountain) together, clearly illustrating some basic and sympathetic human and 
+
+<a href="http://uk.answers.yahoo.com/question/index?qid=20080323175133AAFCTeb">
+ovine</a> commonalities  :-)</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/_kXMtG2RRGs" frameborder="0" allowfullscreen></iframe>

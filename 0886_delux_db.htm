@@ -1,0 +1,170 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Steven Rowland 
+
+-->
+
+<h3>Delux Database Enabled Loading and Updating</h3>
+
+<p>This paper by Steven Rowland, Interior BIM Manager in a hospital in Stockholm, Sweden, describes a novel method to extend database functionality for a "smart" loading and updating process in very large Revit projects.
+
+<p>The method is designed solve a somewhat unique problem, but the resulting solution has interesting possibilities for other projects of all sizes.
+Here it is:</p>
+
+
+<h4>Database Enabled Loading & Updating eXperiment &ndash; DELUX Copy/Paste</h4>
+
+<p style="text-align: right"><i>By Steven Rowland and Fredrik Sjödén.</i></p>
+
+<p>This short paper describes a novel method to extend database functionality for a "smart" loading and updating process in a very large Revit project.
+It builds upon the white paper on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/database-integration.html">
+database integration</a> by
+
+Miroslav Schonauer of Autodesk.
+
+
+<h4>Summary Description</h4>
+
+The DELUX copy/paste method uses an external database definition to duplicate floor plans, in whole or in part, to multiple Revit models or floor plans, with the ability to update changes as required. This includes walls, doors, windows, generic models, detail groups, etc., as well as associated annotation. The resulting duplicated floor plans can be updated or refreshed from the database definition as changes occur in the source file. All Revit content in the copied floor plans is live, i.e. nothing is grouped or in links.
+
+
+
+<h4>Project Description</h4>
+
+<p>It is important to understand the kind of project that this was developed for, because we had special circumstances that pushed us towards finding the kind of crazy solution that we developed. We have a very large hospital project, with over 300,000 sq. meters of new construction. The project was divided into 17 main Revit model files, and several more supporting model files. Each of the main Revit files hover between 300-800 megabytes.
+
+<p>In addition, the project is a "fully loaded" project, meaning that all equipment, furnishings, and building elements are loaded into every room (11,000+ rooms). In addition, various other data types are fully implemented into the BIM model. We are required by contract to not use typical floor plans, even where floor plans are repetitive. Also, it is good to understand that this is a live model, which is actively being used for construction and coordination during the design process over several years of continuous design and construction. Eventually the fully loaded BIM model will be handed off to facilities management.
+
+
+
+<h4>The Problem</h4>
+
+<p>The problem we had was this: we have numerous (14) floor plans that are identical or nearly identical with minor differences. These repetitive floor plans are spread across multiple Revit models (4 models). Because of the "fully load" requirements I described above, we were required to fully document each plan completely. On normal projects, this would be accomplished by using Revit Groups or Links. However, both of those methods were unavailable to us, because we have extensive database connections and collaboration methods (IFC, Navis) that do not cooperate with the limitations of Revit Groups or Links. We needed a method that would allow us to have "live" Revit content on multiple plans (no groups or links), and manage the repetitive floor plans in a time efficient way. We wanted to quickly and accurately duplicate entire floor plans and manage change during the design process in an efficient BIM way. We don't like to do the same thing more than twice, and 14 times over is simply too inefficient.
+
+
+
+<h4>DELUX Copy/Paste</h4>
+
+<p>Step one &ndash; Mark elements for the database definition &ndash; On a Source Plan, we marked each model element with a DELUX parameter to identify that it was a member of the database definition. We included all doors, windows, walls, openings, generic models, furniture, casework, equipment, etc. (Note: ceilings were not included because of API limitations. Also note that room objects are not included.)
+
+
+
+<p>Step two &ndash; Create a relative coordinate system &ndash; We added a simple annotation object to mark a base point that we would measure x,y coordinates from. We could have used the project basepoint, however we felt that a relative coordinate system would offer more flexibility.
+
+
+
+<p>Step three &ndash; Export to a database &ndash;We programmed an add-in that would identify all the members of the DELUX group, and use the relative base point to measure x,y coordinates. The add-in exports all information associated with the model elements, including x,y coordinates, all parameter values, sizes, shapes, rotations, checkboxes, worksets, and everything else we could find through the API. The exported information is formatted as binary code. We had a database available that we use for other purposes, so we put the DELUX information there also. The add-in also adds another parameter to all of the source model elements &ndash; UniqueID. We will use this UniqueID parameter later for the updating process. (Note that all annotation for any given model element is exported from all views, and not just the active view. Also note that we are not exporting dimensions yet, but we are looking to explore those possibilities also.)
+
+
+
+<p>Step four &ndash; Target Plan &ndash; We prepare the target plan by placing a target annotation family to mark the relative coordinate. In our project we used a stairwell as the common base point. Any model elements that we wish to replace with the database definition are then marked with the same DELUX parameter that was used in the source file.
+
+
+
+<p>Step five &ndash; Initialize and precheck &ndash; The DELUX add-in does two things when it starts. First it checks for and then adds any missing shared parameters to the target Revit file. Second it performs a precheck to ensure that all required families are present in the target file. We have systems that can automatically load most types of families, however the precheck generates a pop-up and text file that lists the missing families, if any. At this point the user can either proceed with insertion or cancel out of the function and manually load the missing families into the target Revit file.
+
+
+
+<p>Step six &ndash; Press the shiny button &ndash; Now we can tell the add-in to begin inserting the database definition. We begin with the walls, and the function uses the API to insert them according to the relative coordinates we provided. Then it proceeds with doors, windows, and openings. After that all other Revit families are added. All content is inserted in the correct location, orientation, workset, etc., with all parameters and options preserved from the source file. (Note: walls are inserted relatively slowly on the first insertion. This can depend upon the size and complexity of the model, and is constrained by Revit calculating room bounding. We have tried to find various ways around this constraint, and, while there are possibilities, the walls are the slowest to populate from the database definition. In our experience on large model files (500+mb) the insertion rate is about 20 walls per minute. This is accelerated substantially when updating, as I will discuss later.)
+
+
+
+<p>Step seven &ndash; Annotate &ndash; We have a second add-in for inserting annotation. Upon initializing, the user chooses the DELUX group, and the interface shows which annotation views are available from the source file. The user then chooses an active view to receive annotation and presses the shiny button. All annotation from the selected source view is inserted in the correct position and orientation. This can be repeated multiple times for as many source/target pairs as are required.
+
+
+
+<p>Step eight &ndash; Update &ndash; As previously noted, each source model element receives a UniqueID parameter. The same UniqueID parameter from the source is written to each model element in the target plans. By using this parameter we are able to evaluate and match the source and target elements. The update process is similar to the insertion process. If we make changes to the source plans, we export the DELUX group again to the database. In the target file, we run the insertion function same as before; however this time the function uses the UniqueID parameter to compare each element to the new database definition. If the element has not changed, then it is ignored for updating. If the element has changed then it is removed and a new element is inserted in its place. It continues until the floor plan is refreshed. This process is much faster than the initial insertion process.
+
+
+
+<h4>Implications</h4>
+
+<p>That is the entire function, with a few more features that I have not described here. It is still under development, so we have hope for expanding and refining it in various ways. The beauty of this system is that it allows us to manage multiple identical target plans from one source plan, and be certain that any changes are reproduced accurately across multiple Revit files without using Revit Groups or Links. Extending this to annotation opens the possibility of substantially reducing the time required to prepare documentation. This can all be updated over time, and doesn't interfere with our collaboration methods, or other database linkages; in fact we have found ways of using it to reduce work in other areas by leveraging the matched-up UniqueID of source/target. All of this is accomplished through the use of external database connections, and some very clever coding ;)
+
+
+
+<p>So what do you think?
+In some ways we are reinventing the wheel &ndash; however we had special needs that led us to this solution.
+I'd love to hear your opinion, if you have time.
+
+
+<p><strong>Addendum:</strong> I continue to imagine more ways of extending the method.
+There are, of course, some limitations with our current approach.
+The biggest one is that the update process is currently a “remove-and-replace” approach, meaning that the new updated content has a new GUID, which can cause problems.
+The source GUID is written to a parameter on each target element, thus providing the source/target pairing.
+In the future I would like to provide the option to update parameters or x,y location only, without removing and replacing the content.
+This will require us to make some changes in how we store information in the database, but could work.</p>
+
+<p>Now, let's return to a couple of other interesting items...</p>
+
+<a name="2"></a>
+
+<h4>Autodesk University 2012 Classes Now Available</h4>
+
+<p>The Autodesk University 2012 classes are now available, both from the live Las Vegas and the AU Virtual conferences.</p>
+
+<p>They are provided at no cost via the
+
+<a href="http://au.autodesk.com/?nd=classes">
+class catalogue</a>
+
+on the AU website, available to anyone with an AU account.
+
+<p>If you don't have an account, you can
+
+<a href="http://au.autodesk.com/?nd=new_registration">
+sign up for free</a> at
+
+any time.
+
+<p>Here are
+
+<a href="http://au.autodesk.com/?nd=au_blaug&rss_data_id=47818">
+all the details</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Setting a Structural Framing Tag Leader Arrowhead</h4>
+
+<p>In a recent AEC DevBlog article, Saikat Bhattacharya demonstrates how to
+
+<a href="http://adndevblog.typepad.com/aec/2013/01/setting-the-leader-arrowhead-for-a-structural-framing-tag-using-revit-api.html">
+set the leader arrowhead for a structural framing tag</a>.
+
+<p>His sample code first retrieves all arrowhead definitions, which are ElementType instances whose family name is "Arrowhead".
+They are obtained using a filtered element collector and a parameter filter testing the built-in parameter ALL_MODEL_FAMILY_NAME for that value.
+Once the desired arrowhead is found, the IndependentTag built-in parameter LEADER_ARROWHEAD is set to its element id.
+
+
+<a name="4"></a>
+
+<h4>Using DMU to Track Changes to a Custom Project Parameter</h4>
+
+<p>Another of Saikat's articles discusses the implementation of a
+
+<a href="http://adndevblog.typepad.com/aec/2013/01/dynamic-model-updater-with-project-parameters.html">
+dynamic model updater for project parameters</a>.
+
+It checks whether a specific shared parameter has been attached to the door category.
+If so, a dynamic model updater is created and set up to be triggered by changes to that specific parameter on door instances.
+
+<p>Thank you for these two nice posts, Saikat!</p>
+
+
+<a name="5"></a>
+
+<h4>The Useful Log4Net Logging Tool</h4>
+
+<p>Sometimes you need to obtain information about what you add-in is actually doing, possibly even from a customer, e.g. if something unexpected happens.</p>
+
+<p>For this purpose, Rudolf Honke recommends using <a href="http://logging.apache.org/log4net/">log4net</a>.
+It comes equipped with a very helpful <a href="http://www.codeproject.com/Articles/140911/log4net-Tutorial">tutorial</a> as well.

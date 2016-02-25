@@ -1,0 +1,46 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Parameter Binding Performance</h3>
+
+<p>Here is a short but important question that has come up repeatedly concerning the performance of parameter bindings.<p>
+
+<p><strong>Question:</strong>
+There is a big problem in the early versions of Revit 2009 with the performance of the Document ParameterBindings property, for example in the last line of the following code:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">BindingMap</span> bindingMap = doc.ParameterBindings;
+</pre>
+
+<p>The last statement takes a huge amount of time to execute, in the order of minutes.
+Are there any known solutions for this?</p>
+
+<p><strong>Answer:</strong>
+Good news: this performance delay was analysed and reported by Saikat Bhattacharya and fixed in the 
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=11017599">
+Revit 2009 Web Update 3</a>.
+
+The issue is mentioned in the associated PDF file containing the 
+
+<a href="http://revit.downloads.autodesk.com/download/2009/RAC2009_WU3_List.pdf">
+list of enhancements</a>:</p>
+
+<h4>API Enhancements</h4>
+
+<ul>
+<li>Parameter binding performance has been improved.</li>
+<li>The JoinType method has been implemented for the LocationCurve of structural members.</li>
+<li>Mullion LocationCurves are now accessible through the API.</li>
+<li>External programs may now suppress VSTA startup warning messages.</li>
+<li>The built-in parameter MATERIAL_PARAM_TRANSPARENCY now returns the correct set value.</li>
+</ul>
+
+<p>So all you need to do is install the updated version of Revit 2009 and the problem disappears.
+Many thanks to Saikat for pointing this out.</p>

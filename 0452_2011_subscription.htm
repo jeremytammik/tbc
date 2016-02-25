@@ -1,0 +1,196 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Subscription Release and Updated SDK</h3>
+
+<p>Lots of really important news coming in right now, both because the mid-year updates of the Revit family products are now available and because we just released the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/revit-2011-web-update-2.html">
+Revit 2011 DevTV</a> recordings that we are so excited about.
+
+<p>Similar to last year, Autodesk provides two types of mid-year updates to Revit:
+
+<ul>
+<li>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/revit-2011-web-update-2.html">
+Web Update 2 (WU2)</a> that I recently discussed.
+
+<li>The Subscription Release.
+</ul>
+
+<p>Unlike the public web updates, the Revit 2011 subscription releases are available only for 
+
+<a href="http://www.autodesk.com/subscriptionlogin">
+subscription customers</a>.
+
+<h4>Updated SDK</h4>
+
+<p>Both the web update and the subscription releases include a number of API enhancements.  
+Last year, there were separate sets of updated SDKs for the WU2 and subscription release.
+This year, Autodesk provides one single updated SDK.
+Certain features are available only in the subscription release.  
+They are clearly marked in the API reference documentation. 
+
+<p>The updated SDK has been posted to the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+Here is a direct link as well, for your convenience:
+
+<ul>
+<li><a href="http://images.autodesk.com/adsk/files/revit2011sdk0.exe">Revit 2011 SDK (Update Sept. 2010)</a> (exe - 108143Kb) 
+<li><a href="http://images.autodesk.com/adsk/files/readme_-_revit_2011_sdk_(update__sept_22__2010)_devcenter.docx">Readme - Revit SDK 2011 SDK (Update Sept. 2010)</a> (docx - 19Kb) 
+</ul>
+
+<p>The product updates themselves do not include the updated SDK, so you have to download it separately.
+
+<p>In addition to the API enhancements, the SDK samples and the Revit Lookup tool have been updated.  
+
+<p>Here is a summary of API changes and enhancements made in these releases:
+
+<ul>
+<li><a href="#2">Issues addressed</a>
+<li><a href="#3">New Features</a>
+<ul>
+<li><a href="#4">Conceptual Energy Analysis API</a>
+<li><a href="#5">City Time Zone</a>
+<li><a href="#6">Document Preview</a>
+</ul>
+<li><a href="#7">Changes to the 2011 SDK</a>
+</ul>
+
+<a name="2"></a>
+
+<h4>Issues addressed</h4>
+
+<ul>
+<li>Attributes of Revit API DLLs need to be updated (190870) 
+<li>Autodesk.Revit.DB.Domain is missing enum items for Conduit, CableTray (190981) 
+<li>Accessing grids using selection through the API causes stability problem after closing Revit (190867)
+<li>ElectricalSystem.AddToCircuit returns true for a Spare circuit, but doesn't actually connect (191518)
+<li>RaytraceBounce sample: model curves along rays not created because curve is not in sketchplane (192058) 
+<li>Stability problem when select to save a family (191578) 
+<li>SDK sample MaterialQuantities does not successfully calculate Gross material quantities (192331) 
+<li>DetailLine/AnnotationSymbol cannot be created in ViewSheet programmatically (No sketch plane) (192072) 
+<li>API issue: Save /SaveAs lose the preview image of family file (192545) 
+<li>Detail curve cannot be create in a plan view via NewDetailCurve in a specific plan view (192115) 
+<li>Setting formula for Manufacturer/Type Comments as string using the API throws exception (192866)
+<li>New electrical shared parameter types are missing (192832)
+<li>CableTray Connector Angle property throws exception (190873)
+<li>Family Type count using the API is inconsistent with UI (192889) 
+</ul>      
+
+<a name="3"></a>
+
+<h4>New Features</h4>
+
+In addition to the enhancements listed above, it includes the following new API features: 
+
+<ul>
+<li>Conceptual Energy Analysis API (Subscription only) 
+<li>City Time Zone 
+<li>Document Preview 
+</ul>      
+
+<a name="4"></a>
+
+<h4>Conceptual Energy Analysis API</h4>
+
+Conceptual Energy Analysis API is a major enhancement to the Revit API. This feature will be functional only in sessions with licensed access to the Revit 2011 Subscription Advantage Pack. The following classes are added in the Autodesk.Revit.DB.Analysis namespace and provide access to the elements and objects created by Revit to perform energy analyses on conceptual design models: 
+
+<ul>
+<li>ConceptualConstructionType 
+<li>ConceptualSurfaceType 
+<li>MassEnergyAnalyticalModel 
+<li>MassLevelData 
+<li>MassSurfaceData 
+<li>MassZone 
+</ul>      
+
+The following method supports the export of a gbXML file containing conceptual energy analysis elements (mass elements) only.
+
+<ul>
+<li>Document.Export(string,string,MassGBXMLExportOptions) 
+</ul>      
+
+<a name="5"></a>
+
+<h4>City Time Zone</h4>
+
+The following new static method provides direct access to the results of a time zone calculation for a given longitude and latitude: 
+
+<ul>
+<li>SunAndShadowSettings.CalculateTimeZone() 
+</ul>      
+
+The City class has been adjusted to return more accurate TimeZone values than in the previous implementation.
+Note that the properties, SiteLocation.Latitude and SiteLocation.Longitude, do not adjust the time zone of the site location according to these calculations. But you can make this change directly by setting the TimeZone property.
+
+<a name="6"></a>
+
+<h4>Document Preview</h4>
+
+The following new methods are added to allow you to access the settings related to the stored document preview image for a given document: 
+
+<ul>
+<li>Document.GetDocumentPreviewSettings – this returns a DocumentPreviewSettings object 
+<li>DocumentPreviewSettings.PreviewViewId - the id of the view to use for the preview 
+<li>DocumentPreviewSettings.ForceViewUpdate() - sets the document to update the view before saving (useful when the document is never displayed)
+</ul>      
+
+The following code snippet shows a sample use of the enhancement described above:  
+
+<pre class="code">
+&nbsp; <span class="green">// ... </span>
+&nbsp; <span class="teal">View3D</span> view3d 
+&nbsp; &nbsp; = d.FamilyCreate.NewView3D(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>(1, 2, 0).Normalize() );
+&nbsp;
+&nbsp; <span class="green">// Assign permanent preview id</span>
+&nbsp;
+&nbsp; <span class="teal">DocumentPreviewSettings</span> dps 
+&nbsp; &nbsp; = d.GetDocumentPreviewSettings();
+&nbsp;
+&nbsp; dps.PreviewViewId = view3d.Id;
+&nbsp; dps.ForceViewUpdate( <span class="blue">true</span> );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp; d.SaveAs( <span class="maroon">@&quot;C:\Door-Automated.rfa&quot;</span> ); 
+&nbsp; <span class="green">// ... </span>
+</pre>
+
+<a name="7"></a>
+
+<h4>Changes to the 2011 SDK</h4>
+
+<ul>
+<li>RevitAPI.chm
+<li>SDK sample ArchSample is updated: due to category length beyond the limitation of excel sheet name length. - Samples/ArchSample/VB.NET/Command.vb
+<li>SDK sample MaterialQuantities – did not calculate Gross material quantities correctly - Samples/MaterialQuantities/CS/MaterialQuantities.cs
+<li>SDK sample RaytraceBounce – updated to generate curves properly. - Samples/FindReferencesByDirection/RaytraceBounce/CS/RayTraceBounceForm.cs
+<li>Fixed sample bugs and correct typos, formats
+<ul>
+<li>Samples/DirectionCalculation/CS/DirectionCalculation.addin#2 integrate
+<li>Samples/GenerateFloor/CS/GenerateFloor.addin#2 integrate
+<li>Samples/ImportExport/CS/Import/ImportDWGData.cs#4 integrate
+<li>Samples/ImportExport/CS/Import/ImportGBXMLData.cs#3 integrate
+<li>Samples/Massing/ParameterValuesFromImage/CS/ParameterValuesFromImage.csproj#2 edit
+<li>Samples/Massing/ParameterValuesFromImage/ParameterValuesFromImage.suo#2 delete
+<li>Samples/Massing/ParameterValuesFromImage/ParamValueFromImage.suo#2 delete
+<li>Samples/Revit 2011 New Samples.doc#5 integrate
+<li>Samples/RvtSamples/CS/RvtSamples.txt#4 edit
+<li>Samples/SamplesContent.htm#4 edit
+<li>Samples/SDKSamples2011.sln#4 integrate
+<li>Samples/Selections/CS/Command.cs#4 integrate
+<li>Samples/Selections/CS/SelectionFilters.cs#3 integrate
+<li>Samples/Selections/CS/SelectionForm.cs#3 integrate
+<li>Samples/Selections/CS/SelectionForm.Designer.cs#2 integrate
+<li>Samples/Selections/CS/SelectionManager.cs#3 integrate
+<li>Samples/Selections/CS/Selections.addin#2 integrate
+</ul>      
+<li>190662: RevitLookup snoop DB lacks the ElementType node:
+<li>Add sfm.Clear() and GetChangeTypeElementDeletion trigger
+Samples/AnalysisVisualizationFramework/DistanceToSurfaces/CS/Command.cs
+</ul>      

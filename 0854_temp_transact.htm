@@ -1,0 +1,90 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Arnost Lobel Re: The Temporary Transaction Trick for Gross Slab Data
+
+-->
+
+<h3>Temporary Transaction Trick Touchup</h3>
+
+<p>I mentioned a number of uses of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+temporary transaction trick</a> a
+
+few days back.
+
+<p>Autodesk's own Revit API transaction expert Arno&scaron;t L&ouml;bel has a very important point to add to that discussion:
+
+<p>The procedure as described is not always going to work. 
+
+<p>First of all, you need to regenerate manually before retrieving any modified geometry; even that is not always guaranteed to give you the accurate and proper geometry. 
+
+<p>Many times you will need to actually commit the 'temporary' transaction, since that is the only way to guarantee that all changes propagate though the model. 
+
+<p>In order to undo the temporary transaction, you need to enclose it within a transaction group and roll back that group at the end. 
+It goes as follows:
+
+<ol>
+<li>Start a transaction group.
+<li>Start a transaction
+<li>Make changes.
+<li>Commit the transaction
+<li>Retrieve changed geometry
+<li>Roll back the transaction group
+</ol>
+
+<p>Unfortunately, all too many are unaware of the fact that it is safe to read a model only after regeneration, and sometimes only after committing the open transaction. 
+This is not only related to the 'temporary transaction' trick, it is simply a matter of fact: one should query model geometry only between transactions, or at least after regeneration (and auto-joining, if appropriate).
+
+<p>Many thanks to Arno&scaron;t for this important enhancement!
+
+
+<a name="2"></a>
+
+<h4>Cloud Based Team Foundation Service</h4>
+
+<p>We have seen how 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/divideparts-in-f.html#4">
+Git and Github</a> can
+
+simplify global source code management and sharing, and Victor demonstrates one aspect of this by regularly providing his samples such as the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">
+Revit external access demo</a> via 
+
+that platform.
+
+<p>As you obviously know, Autodesk is also driving hard and moving fast towards providing innovative and empowering cloud-based solutions, e.g.
+
+<a href="https://360.autodesk.com">
+Autodesk 360</a>,
+
+<a href="http://www.autodeskplm360.com">
+PLM 360</a> and
+
+<a href="https://bim360.autodesk.com">
+BIM 360 Glue</a>.
+
+<p>Now Microsoft joined the club, announcing its own cloud-based software project management platform, e.g. for Visual Studio, the 
+
+<a href="http://tfs.visualstudio.com">
+Team Foundation Service</a>.
+
+<p>You can sign up for a free preview account right away, if you are interested.
+
+
+<a name="3"></a>
+
+<h4>Rotating Annotation Symbol</h4>
+
+<p>Saikat Bhattacharya discusses using the AnnotationSymbol.Location.Rotate and ElementTransformUtils.RotateElement methods to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/11/rotating-annotationsymbols-using-the-revit-api.html">
+rotate an annotation symbol</a>, 
+
+and presents a sample code snippet implementing it.

@@ -1,0 +1,100 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08241318 [Ramp material information]
+Ning Zhou, ONG & ONG PTE LTD
+
+-->
+
+<h3>Accesssing and Filtering by Ramp Material</h3>
+
+<p>I had a chat with Ning Zhou, who was away from the Revit API for a while and is now happily back in the fold.
+
+<p>He explored how to access the material of a ramp element.</p>
+
+<a name="2"></a>
+
+<h4>Access to Ramp Material</h4>
+
+<p><strong>Question:</strong> Is there a way to get the ramp material information using API?
+
+I tried lots of paths and could not find anything.
+
+<p><strong>Answer (by Ning himself):</strong> I searched again using RevitLookup snoop.
+
+<p>It turns out that basic material info is accessible after all.
+I found it us under 'Object type' instead of 'Parameters'.
+Apparently only the material name is stored there, in the built-in parameter 'RAMP_ATTR_MATERIAL':</p>
+
+<center>
+<img src="img/snoop_ramp_material.jpg" alt="Snoop ramp material" width="400"/>
+</center>
+
+<p>I have not seen anything providing the material volume, so I guess I'll have to use the geometry access and calculate that myself instead.
+
+<p>At least I can now implement a filter selection using the material name!
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> concreteRamps
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Ramps )
+&nbsp; &nbsp; &nbsp; .Where( e =&gt;
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = e.GetValidTypes().First(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id2 =&gt; id2.Equals( e.GetTypeId() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> m = doc.GetElement( doc.GetElement( id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RAMP_ATTR_MATERIAL )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId() ) <span class="blue">as</span> <span class="teal">Material</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m.Name.Contains( <span class="maroon">&quot;Concrete&quot;</span> );
+&nbsp; &nbsp; &nbsp; } );
+</pre>
+
+<p>Many thanks to Ning for his research and sharing this helpful result.
+
+<a name="2.2"></a>
+
+<p><strong>Addendum:</strong> Simpler:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> concreteRamps
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Ramps )
+&nbsp; &nbsp; &nbsp; .Where( e =&gt;
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = e.GetTypeId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> m = doc.GetElement( doc.GetElement( id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RAMP_ATTR_MATERIAL )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId() ) <span class="blue">as</span> <span class="teal">Material</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m.Name.Contains( <span class="maroon">&quot;Concrete&quot;</span> );
+&nbsp; &nbsp; &nbsp; } );
+</pre>
+
+<p>Thank you again, Ning, for you your additional comment below.
+
+
+<p>Before closing, here is another useful pointer on family instance placement and rotation:
+
+
+<a name="3"></a>
+
+<h4>Rotate a Family in Three Different Axes</h4>
+
+<p>Here is a pretty neat article on family instance placement strategies from a user point of view, describing how to
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/Community/Tips_and_Tricks/Families,_Parameters,_Formulas/Rotate_a_Family_in_3_Different_Axes">
+rotate a family in three different axes</a>,
+
+which is certainly useful for developers as well.
+
+<p>As always in the Revit API, knowing the best practice from a user and product point of view is of paramount importance before putting any thoughts or efforts at all into API development issues.</p></p>

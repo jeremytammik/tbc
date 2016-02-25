@@ -1,0 +1,109 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07594050 [Revit Addin commands grouping] 
+
+- read-only parameter via formula
+  07499462 [Slow call to create read-only family parameters]
+  Adam Nagy RE: Making family parameter read-only faster?
+
+-->
+
+<h3>Group My Own Commands in the Ribbon</h3>
+
+<p>Here is an issue that has been presented numerous times in the past, and apparently needs to be highlighted again for newbies.
+
+<p><strong>Question:</strong> I have implemented a Revit add-in which implements several commands.
+
+<p>Currently, I have added all my commands to the add-in manifest file, as recommended by various examples I found on the Internet. 
+It works and they do indeed appear in the Add-Ins ribbon tab under the 'External Tools' pull-down menu. 
+
+<p>The problem with this is that other commands from other companies' add-ins appear in the same place and are mixed up with mine.
+
+<p>Is there some possibility to group my own commands somehow?
+
+<p>I would like to have my commands separated from the other companies' ones.
+
+<p>For example, is it possible to add a parent category for my commands in the 'External Tools' category, or to group them in some other way, for instance by creating a special ribbon category other than 'External Tools'?
+
+<p><strong>Answer:</strong> Yes, there are several simple ways to group your commands separately.
+
+<p>You can define your own panel in the Add-Ins tab using the CreateRibbonPanel method. 
+This is the recommended approach. 
+
+<p>If you really want, you can also define your own ribbon tab. 
+However, this is not recommended.
+
+<p>The former approach is demonstrated by many examples. 
+For instance, I implemented an absolutely minimal separate add-in tab providing one single button to demonstrate 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">
+enabling ribbon items in zero document state</a>.
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html#3">
+structural concrete setout point add-in</a> is
+
+very slightly more complex, providing two buttons  :-)
+
+<p>The ADN training material on the Revit UI includes an entire class on the topic of ribbon customisation which covers almost every possibility provided for creating your own ribbon items. 
+You can either look at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/xtra-adn-revit-2013-api-training-labs.html">
+Xtra version</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2012/08/validate-roof-type-and-view-obj-on-android.html#3">recently updated</a>)
+
+or the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/validate-roof-type-and-view-obj-on-android.html#4">
+standard material</a> from the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+<p>Read the documentation explaining the ribbon UI exercise, "Revit Ui Lab1 - Ribbon.doc", provided separately for C# and VB in the subdirectories DocsCS and DocsVB of the 2_Revit_UI_API folder.
+
+<p>Sample source code is also provided separately for both C# and VB, respectively:
+
+<ul>
+<li>2_Revit_UI_API/SourceCS/1_Ribbon.cs
+<li>2_Revit_UI_API/SourceVB/1_Ribbon.vb
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Read-Only Parameter Workaround</h4>
+
+<p>To add a little hint for more advanced Revit API users, another frequently asked question has to do with read-only parameters.
+
+<p>Developers would often like to add parameters that cannot be modified to a family definition.
+However, the Revit API currently does not provide any support for creating read-only parameters, unfortunately.
+
+<p>One way to make a parameter a little bit harder to modify anyway is to define its value via a formula instead of setting the value directly:
+
+<pre>
+  FamilyParameter p 
+    = famMgr.get_Parameter( name );
+
+  if( null == p )
+  {
+    p = famMgr.AddParameter( name, 
+      BuiltInParameterGroup.PG_GENERAL, 
+      ParameterType.Text, false );
+  }
+ 
+  if( p.StorageType 
+    == StorageType.String )
+  {
+    if( '\"' != val[0] )
+    {
+      val = "\"" + val + "\"";
+    }
+    famMgr.SetFormula( p, val );
+  }
+</pre>

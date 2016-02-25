@@ -1,0 +1,170 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Filter for Views and the IsTemplate Predicate</h3>
+
+<p>Several people encountered issues when retrieving views in Revit 2011.
+The reason is that the most direct approach to filtering for view elements using the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+element filtering</a> also 
+
+returns view templates, which were not accessible in the Revit 2010 API.
+Here is the initial issue:
+
+<p><strong>Question:</strong> I tried to extract all PlanView elements from the model and found something weird: besides the expected and obvious plan views such as Level 1, Level 2 and Site, some other unexpected ones also showed up in the collector results, such as Architectural Plan, Structural Framing Plan, Architectural Reflected Ceiling Plan, and Site Plan. I verified that this behaviour is not model specific, and that even an empty project returns all these unexpected plan views.
+
+<p>Why is this happening? What can I do to recognise and eliminate these unexpected and invisible plan views?
+
+<p><strong>Answer:</strong> The unexpected plan view elements that you are seeing are the View Templates.  
+They used to be excluded from the API iteration, for a reason that is lost to antiquity.  
+The new iteration didn’t know about this.
+It also turns out that it does not really make sense to exclude them.
+
+<p>We have added a new predicate to the API, the View.IsTemplate property, which allows you to filter them out.
+
+<p>Here is a related question with some sample code:
+
+<p><strong>Question:</strong> I am having difficulties with the new API in relation to retrieving unfiltered elements in a view. 
+From a preselected list of elements I am trying to find out in which views these elements occur. 
+
+<p>In 2010 I used to get the elements in a view by 
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; ViewElements
+&nbsp; = view.Elements.OfType&lt;<span class="teal">Element</span>&gt;().ToList(); 
+</pre>
+
+<p>It could not be simpler than this :-) 
+
+<p>However, the Elements collection is no longer available, and the only way to access elements is by creating a FilteredElementCollector. 
+
+<p>I apply the WhereElementIsNotElementType filter and then use the following code to get a list of views in which a list of elements are applicable:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">View</span>&gt; GetElementViews( 
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a, 
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">View</span>&gt; views )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">View</span>&gt; returnViews = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">View</span>&gt;();
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> view <span class="blue">in</span> views )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> coll 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; view.Document, view.Id );
+&nbsp;
+&nbsp; &nbsp; coll = coll.WhereElementIsNotElementType();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elementList = coll.ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e1 <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e2 = elementList.Where( 
+&nbsp; &nbsp; &nbsp; &nbsp; x =&gt; x.Id == e1.Id )
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e2 != <span class="blue">null</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> == returnViews.Where( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x =&gt; x.Id == view.Id ).FirstOrDefault() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; returnViews.Add( view );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> returnViews;
+} 
+</pre>
+
+<p>This seems to work for quite a few views, but at a certain moment it causes an exception.
+
+<p><strong>Answer:</strong> The reason is that the following element collection returns some additional view elements than what are not visible in the user interface:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> coll 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; coll.OfClass( <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+</pre>
+
+<p>The LINQ query that you apply above fails on these additional views, causing an error message:</p>
+
+<center>
+<img src="img/invalid_view_id.png" alt="Invalid view id"/>
+</center>
+
+<p>Some of these additional views are template views.
+In theory, one way to recognise them would be to check for their crop box property like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> GetViewsAndDrawingSheets( 
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">View</span>&gt; views, 
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewSheet</span>&gt; viewSheets )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> coll
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; coll.OfClass( <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> coll )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">View</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = e <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != view.CropBox )
+&nbsp; &nbsp; &nbsp; &nbsp; views.Add( view );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">ViewSheet</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; viewSheets.Add( e <span class="blue">as</span> <span class="teal">ViewSheet</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>However, a more direct and efficient way to filter them out is by using the new Revit 2011 View.IsTemplate predicate that we mentioned above:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> coll )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">View</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = e <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !view.IsTemplate )
+&nbsp; &nbsp; &nbsp; &nbsp; views.Add( view );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">ViewSheet</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; viewSheets.Add( e <span class="blue">as</span> <span class="teal">ViewSheet</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>And now for something slightly off-topic which may be of interest to some of you:
+
+<h4>UK PhD Bursaries</h4>
+
+<p>Claudio Benghi of the 
+
+<a href="http://www.northumbria.ac.uk">
+Northumbria University</a> in 
+
+Newcastle UK sent me a note on two PhD posts for construction-aware coders.
+They come with paid fees and 13.000 GBP yearly tax-free salaries. 
+The deadline is next Monday, May 3<sup>rd</sup>.
+The two topics are:
+
+<ul>
+<li>SEEmail: Spatially Enhanced Email for the Construction Industry
+<li>XPIDITE: eXchange Protocols In DesIgn Teams Environments
+</ul> 
+
+<p>For further information, please contact Claudio or Stephen Lockley, Professor in Building Modelling, at the 
+School of the Built Environment,
+
+<a href="http://www.northumbria.ac.uk">
+Northumbria University</a>, 
+
+tel. +44 (0)191 227 4819.
+

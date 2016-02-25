@@ -1,0 +1,168 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">
+table.jtb
+{
+  border-color: #600;
+  border-width: 0 0 1px 1px;
+  border-style: solid;
+}
+
+td.jtb, th.jtb
+{
+  border-color: #600;
+  border-width: 1px 1px 0 0;
+  border-style: solid;
+  margin: 0;
+  padding: 4px;
+  background-color: #FFC;
+}
+</style>
+
+</head>
+
+<h3>UK Electrical Schedule Sample</h3>
+
+<p>Here is my final Christmas present and last post of the year.
+Over the next few days, I will do my best not to answer any email or comments &nbsp;:-)&nbsp;&nbsp;
+
+<p>This final gift before I leave is from Simon Jones, Technical Sales Manager of Autodesk UK.
+Simon has been strongly and enthusiastically involved in all things AEC related for several decades now and was maybe the main early driving force of the use of AutoCAD in the architectural realm in the UK.
+Even though his job is mainly management nowadays, he still likes to keep up with the API side of things.
+
+<p>The automatic numbering system and schedules for electrical panels built into Revit MEP are designed according the conventions used in the USA, and do not fit some other countries conventions at all.
+Simon now presents an almost complete application for generating a UK style panel schedule from Revit MEP.
+It defines the following two commands:
+
+<ul>
+<li>Add Circuit References to assign UK style circuit references to an existing model as described by Simon below.
+<li>Panel Schedule Export to export the circuits to an Excel spreadsheet.
+</ul>
+
+<p>To demonstrate the functionality, we start off with a sample model with two panels:</p>
+
+<center>
+<img src="img/uk_panels_1.png" alt="Sample model"/>
+</center>
+
+<p>Running the first command prompts us to select which panel to process.
+Selecting Panel 1 updates the model:</p>
+
+<center>
+<img src="img/uk_panels_2.png" alt="Circuit references added"/>
+</center>
+
+<p>Running the second command prompts us to select a panel again, and a spreadsheet template file to populate.
+Here is the resulting output spreadsheet for Panel 1 in this model using the sample template file provided with Simon's code:</p>
+
+<center>
+<img src="img/uk_panels_3.png" alt="Panel schedule spreadsheet"/>
+</center>
+
+<p>Here is Simon's description of the application:
+
+<h4>Revit MEP UK DB Schedule Sample</h4>
+
+<p><i>By Simon Jones, Autodesk UK – December 2009</i></p>
+
+<p>This is a far as I got for generating a UK Style Panel Schedule from Revit MEP.
+
+<p>The first problem to get over is to match the RME circuit numbers with the conventions. Consider the simple panel below that has 18 slots. In Revit MEP the odd number circuits (1,3,5,…) are listed on the left side of the panel, whilst the even number circuits (2,4,6,…) are listed on the right. In the UK the convention is to use circuit codes that group in three’s the match the phasing, and are typically named: 1L1, 1L2, 1L3, 2L1, 2L2, 2L3, 3L1... and a 3 phase circuit example would be 6L123 for circuits 14, 16 & 18, as illustrated below:</p>
+
+<!--
+<table border="thin" cellpadding="5px" cellspacing="0px">
+<th cellpadding="100px">
+style="margin-left:"100px"
+id="ukborder"
+-->
+
+<center>
+<table class="jtb">
+<tr><th class="jtb" colspan="2">Left</th><th class="jtb" colspan="2">Right</th></tr>
+<tr><th class="jtb" style="border-width: 0 0 0 0">Num</th><th class="jtb" style="border-width: 0 1px 0 0">Code</th><th class="jtb" style="border-width: 0 0 0 0">Num</th><th class="jtb" style="border-width: 0 1 0 0">Code</th></tr>
+<tr><td class="jtb">1</td><td class="jtb">1L1</td><td class="jtb">2</td><td class="jtb">4L1</td></tr>
+<tr><td class="jtb">3</td><td class="jtb">1L2</td><td class="jtb">4</td><td class="jtb">4L2</td></tr>
+<tr><td class="jtb">5</td><td class="jtb">1L3</td><td class="jtb">6</td><td class="jtb">4L3</td></tr>
+<tr><td class="jtb">7</td><td class="jtb">2L1</td><td class="jtb">8</td><td class="jtb">5L1</td></tr>
+<tr><td class="jtb">9</td><td class="jtb">2L2</td><td class="jtb">10</td><td class="jtb">5L2</td></tr>
+<tr><td class="jtb">11</td><td class="jtb">2L3</td><td class="jtb">12</td><td class="jtb">5L3</td></tr>
+<tr><td class="jtb">13</td><td class="jtb">3L1</td><td class="jtb">14</td><td class="jtb" rowspan="3">6L123</td></tr>
+<tr><td class="jtb">15</td><td class="jtb">3L2</td><td class="jtb">16</td></tr> <!-- <td class="jtb">6L123</td> -->
+<tr><td class="jtb">17</td><td class="jtb">3L3</td><td class="jtb">18</td></tr> <!-- <td class="jtb"></td> -->
+</table>
+</center>
+
+<h4>Commands</h4>
+
+<p>The C#.NET sample comes with two commands:
+
+<ul>
+<li>Add Circuit References &ndash; assigns UK style circuit references.
+<li>Panel Schedule Export &ndash; exports the circuits to an Excel spreadsheet.
+</ul>
+
+<h4>Add Circuit References</h4>
+
+<p>To provide the circuit number to code mapping, this sample sets the value of the 'Circuit Ref' shared parameter that has been added to circuits and light fittings. Ideally, the 'Circuit Ref' parameter should be added to all objects with an electrical connector as well as wires, so that you can tag what circuit they are on.
+
+<p>After running the command you will simply be asked to select the appropriate panel.
+
+<p>If you’re using the supplied dataset, this shared parameter has already been added to circuits and light fittings through the Project Parameters, but if you use an alternative Revit project, you’ll have to add this parameter manually.
+
+<p>For this to work, the panel needs to have an even number of circuits that is also divisible by 3, for example 6, 12, 18, 24, 48 etc.
+
+<p>If any changes are made to the number of circuits or their position in the panel, this command will need to be re-run to re-assign the codes.
+
+<h4>Panel Schedule Export</h4>
+
+<p>Once the circuit references have been set-up, you can then use the ‘Panel Schedule Export’ command to extract the data to an Excel spreadsheet. As with the ‘Add Circuit References’ command, you will be prompted to select the appropriate panel.
+
+<p>After picking the panel, you will then be prompted to select an Excel spreadsheet.
+This sample is hard coded to use the cell positions in the PanelSchedule.xls that is included with the sample. For example, the following cell positions are used:
+
+<ul>
+<li>O3 &ndash; Panel Name
+<li>H5 &ndash; Number of ways (slots)
+<li>A12, A13, A14 etc. &ndash; Circuit Reference
+<li>B12, B13, B14 etc. &ndash; Circuit description
+<li>J12, J13, J14 etc. &ndash; Number of points (devices)
+<li>K12, K13, K14 etc. &ndash; Cable Size PH (saved as shared parameter 'CableSize_PH')
+<li>L12, L13, L14 etc. &ndash; Cable Size CPC (saved as shared parameter 'CableSize_CPC')
+<li>Q12, Q13, Q14 etc. &ndash; Circuit rating
+</ul>
+
+<p>This could be improved by adding tags that are searched for and replaced, but if you want to change the current hardcoded method, look for calls to exportToExcel in CreateDbSchedule.cs, for example:
+
+<pre>
+exportToExcel(ws, "O", 3, panelName);
+</pre>
+
+<p>Here is the complete
+
+<a href="zip/UK_DB_Schedule.zip">
+UK_DB_Schedule</a> source code, Visual Studio solution, spreadsheet template, shared parameter file, and documentation.</p>
+
+<p>Very many thanks to Simon for this great and useful real-world example!
+
+<h4>Merry Christmas and Happy New Year!</h4>
+
+<p>So, finally, I wish you all a Very Merry Christmas and a Happy New Year!
+
+<p>I am celebrating with myself and my kids for a couple of days and then heading off for a total break, the most exciting part of my upcoming holidays, a long and deep voyage to an exotic place in exotic company: into my own self with my own self.
+
+<a name="vipassana"></a>
+
+<p>Straight after Christmas I am participating in a
+
+<a href="http://en.wikipedia.org/wiki/Vipassan%C4%81">
+Vipassana</a> meditation retreat, cf.
+
+<a href="http://www.dhamma.org">
+www.dhamma.org</a>.
+
+<p>Apparently, this will mean not speaking with and not even looking at another person, getting up at four in the morning, not eating anything at all after midday, for ten days.
+It has nothing at all to do with religion or esoteric beliefs, it is a purely practical matter of getting into a state of calm and peace which allows me to really observe myself and what is going on in me, explore the interrelationship between my thoughts and emotions and body in unprecedented depth.
+
+<p>And forget about the Revit API blogging for a while  &nbsp;:-)&nbsp;&nbsp;
+I will be back in the second week of January.
+I wish you all the best until then.

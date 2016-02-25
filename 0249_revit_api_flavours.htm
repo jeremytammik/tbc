@@ -1,0 +1,77 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit API Flavours</h3>
+
+<p>Maher raised an interesting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html#comment-6a00e553e1689788330120a6a0e650970b">
+question</a> regarding the different flavours of the Revit API:
+
+<p><strong>Question:</strong> I have a few questions on Revit MEP, Arch, and Structure in general. 
+What are the major highlights of each API? 
+I downloaded the SDK and tried to read through. 
+But could not get my head around it as it is very overwhelming. 
+It would be great if you could post something in the difference between these three flavours both in terms of API and in general use. 
+They seem to do the same thing in many cases. 
+I am confused.
+
+<p><strong>Answer:</strong> By far the major part of the Revit API is identical for the three flavours, and to get started with it you need not worry about the differences. All the basic functionality and most objects that I have ever had occasion to use are provided in all three flavours.
+
+<p>If you try to access a property that is not available in the particular flavour of Revit that your application is running in, the property will generally simply return a null value or sometimes throw an exception, as Shifali is currently painfully discovering, being
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html#comments">
+unable to access the gbXML settings in Revit Architecture</a>.
+
+<p>You can check what flavour you are running in by querying the application object as demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/files/rac_labs_2009-07-30.zip">
+Revit API introduction labs</a> sample command Lab1_2_CommandArguments:
+
+<pre class="code">
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">View</span> view = commandData.View;
+&nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Application = &quot;</span> + app.VersionName;
+&nbsp; s += <span class="maroon">&quot;\r\nVersion = &quot;</span> + app.VersionNumber;
+&nbsp; s += <span class="maroon">&quot;\r\nDocument path = &quot;</span> + doc.PathName;
+&nbsp; s += <span class="maroon">&quot;\r\nDocument title = &quot;</span> + doc.Title;
+&nbsp; s += <span class="maroon">&quot;\r\nView name = &quot;</span> + view.Name;
+&nbsp; <span class="teal">LabUtils</span>.InfoMsg( s );
+</pre>
+
+<p>In the Revit 2010 API, new LanguageType and ProductType enumerations and corresponding properties on the application object were introduced to enable an add-in to query and analyse the underlying product and user interface language without resorting to any string comparisons:
+
+<pre class="code">
+&nbsp; <span class="teal">LanguageType</span> lt = app.Language;
+&nbsp; <span class="teal">ProductType</span> pt = app.Product;
+</pre>
+
+<p>We have previously taken a deeper look at the Revit 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-structure-resources.html">
+Structure</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html">
+MEP</a> APIs and mentioned some of the specific features of each.
+
+<p>The easiest way that I can think of to see the exact differences between the three flavours of the Revit API is to look at the class diagram in the Revit SDK provided in "Revit API Class Diagram.png".
+It shows all of the namespaces and classes defined in the Revit API and colour codes them into various groups, including separate groups for the three product flavours.
+
+<p>The developer guide in the document "Revit 2010 API Developer Guide.pdf" also includes the three separate chapters dealing with the API specifics of each flavour:
+
+<ol start="23">
+<li><b>Revit Architecture</b>
+<br>23.1 &nbsp; Rooms
+<br>23.2 &nbsp;  Energy Data
+<li><b>Revit Structure</b>
+<br>24.1 &nbsp; Structural Model Elements
+<br>24.2 &nbsp; AnalyticalModel
+<br>24.3 &nbsp; Loads
+<br>24.4 &nbsp; Analysis Link
+<li><b>Revit MEP</b>
+<br>25.1 &nbsp; MEP Element Creation
+<br>25.2 &nbsp; Connectors
+<br>25.3 &nbsp; Family Creation
+</ol>

@@ -1,0 +1,305 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Melbourne Day One</h3>
+
+<p>These days right now represent a unique time in our life history. 
+Venus and Jupiter are in a 
+
+<a href="http://earthsky.org/astronomy-essentials/visible-planets-tonight-mars-jupiter-venus-saturn-mercury">
+stunning conjunction</a>,
+
+closer together right now than they will ever be again for the next two hundred years. 
+If you have a chance, don't forget to look up at the sky in the evenings!</p>
+
+<center>
+<img src="img/venus_jupiter.jpg" alt="Venus Jupiter conjunction"/>
+</center>
+
+<p>In another unique and far-away event, at least from my normal habitat, we completed the first day of the Revit API Training here in Melbourne.
+
+<p>Talking about being far away from my everyday habitat, I went for a walk with my hosts Kim, Rob, Erika and Lewis and their friends Geoff, Vivienne and Alice up the Anakie Gorge in the
+
+<a href="http://en.wikipedia.org/wiki/Brisbane_Ranges_National_Park">
+Brisbane Ranges National Park</a>
+
+last Saturday, enjoying the wonderful Australian flora:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-03-17_anakie_gorge_melbourne/dsc03406.jpg" alt="Anakie Gorge" width="400"/>
+</center>
+
+<p>Back in the city and the Autodesk training room in 
+
+<a href="http://en.wikipedia.org/wiki/Queen_Street,_Melbourne">
+Queen's Road</a> we 
+
+are a nice mix of participants, many with significant Revit product and some Revit API experience, others with zero of both, but decades of professional application development behind them and a wish to make use of it within the Revit API.
+
+<p>On the first day we went through the basics of the Revit API, all of which are also covered by the 
+
+materials provided by the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> and 
+
+described in more detail in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+hands-on training preparation</a> suggestions.
+
+<h4>Command Instantiation and Element Picking</h4>
+
+<p>One little sample command that we ended up developing together simply demonstrates interactive element selection and changing the name of an element type. 
+In the case of a wall, the attempt to change the name of the wall itself throws an exception, because the wall instance is actually just reflecting its type name. 
+For other instances it throws no exception but has no effect either.
+Changing the code to modify the name of the element type instead of the instance works in both these cases.
+
+<p>While playing around with this, one interesting and previously unanswered question that we stumbled across was on the instantiation of the external command implementation class. 
+
+<p>In AutoCAD.NET, a separate instance of a command implementation class is created for each document, and then reused for future command invocations in that document.
+How is this handled in Revit?
+
+<p>The code required to explore and answer this question is very simple: just implement a public constructor for the class which counts and prints out the number of invocations.
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">int</span> _instance_count = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> Command()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} instances.&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; ++_instance_count );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>As it turns out, a new instance of the command class is created every time the command is launched.
+
+<p>Oops. 
+Looking in a bit more depth, we discovered that this is in fact clearly stated in the developer guide, which says: "When a command is selected, a command object is created and its Execute() method is called. Once this method returns back to Revit, the command object is destroyed."
+
+<p>This confirms what every careful programmer would do subconsciously anyway: keep your command class implementation as light as possible, since it will be re-instantiated for each call of your command.
+
+<p>If you need to store any large amounts of data, then do so either in static variables, or, more cleanly, in separate singleton classes elsewhere.
+
+<p>The code we ended up with to select an element and rename its type looks like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject( 
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; e = doc.get_Element( r.ElementId );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Rename Element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = e.GetTypeId();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> type = doc.get_Element( id );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != type )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; type.Name = <span class="maroon">&quot;Melbourne &quot;</span> + type.Name;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>We used this to discuss a number of basic aspects of add-in creation:
+
+<ul>
+<li>Referencing the Revit API assemblies and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/set-copy-local-to-false.html">
+setting the copy local flag</a>.
+
+<li>Implementing the basic application skeleton code.
+
+<li>Using attributes to define the journaling, regeneration and transaction options. 
+Journaling we might return to tomorrow, regeneration is trivial, since there is only one single option nowadays, and transaction is important to understand: automatic, manual or read-only, of which I generally recommend using only the latter two.
+
+<li>Creating the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+add-in manifest and GUID</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/network-access-to-add-in-manifest-and-icons.html">
+other add-in manifest features</a>.
+
+<li>Using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html">
+Revit add-in wizard</a> to
+
+handle all that automatically.
+
+<li>Selecting an element using PickObject and handling the exception thrown by user cancellation.
+<li>Transaction management and element modification.
+<li>Instances versus types.
+</ul>
+
+
+<h4>Filtered Element Collector and Using Parameter Filter for Non-Empty String</h4>
+
+<p>In a second step, we had a look at a filtered element collector to access the Revit database contents.
+
+<p>We decided that parameter filters are of special interest, and explored how to filter for an empty and a non-empty string value.
+
+<p>Here is the code that we ended up with:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip 
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="green">// Filter for an empty string:</span>
+&nbsp;
+&nbsp; <span class="green">//FilterStringRuleEvaluator evaluator </span>
+&nbsp; <span class="green">//&nbsp; = new FilterStringEquals();</span>
+&nbsp;
+&nbsp; <span class="green">// Filter for an non-empty string:</span>
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringGreater</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterStringRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>( 
+&nbsp; &nbsp; provider, evaluator, <span class="maroon">&quot;&quot;</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="blue">bool</span> inverted = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule, inverted );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( bip );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;'{0}': '{1}'&quot;</span>, 
+&nbsp; &nbsp; &nbsp; e.Name, 
+&nbsp; &nbsp; &nbsp; (<span class="blue">null</span>==p? <span class="maroon">&quot;null&quot;</span> : p.AsString() ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>In its current, final state, it uses a parameter string filter to retrieve and list all elements with a non-empty Mark parameter value.
+
+<p>To do so, we search for any string values greater than the empty string "".
+
+<p>We also tried using a null value instead of the empty string, but that throws a rather inelegant exception in the FilterStringRule constructor saying
+
+<ul>
+<li>ArgumentNullException: 
+"The input argument \"ruleString\" of function 
+`anonymous-namespace'::FilterStringRule_constructor 
+or one item in the collection is null at line 1193 
+of file n:\\build\\2012_ship_inst_20110916_2132
+\\source\\api\\revitapi\\gensrc\\APIFilterRule.cpp.
+\r\nParameter name: ruleString"
+</ul>
+
+<p>We also tested searching for all empty string values using a FilterStringEquals evaluator, and that worked fine as well.
+
+
+<h4>Evernote and a Revit Product and Family Tutorial</h4>
+
+<p>During our explorations, we underlined the importance of families and the family API.
+I mentioned the Autodesk 
+
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=13080413&linkID=9243097">
+Revit 2010 Families Guide</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">
+several</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">
+times</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/families-guide.html">
+in the</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/bim-versus-free-geometry-and-product-training.html">
+past</a>.
+
+It is free and covers the basics well together with Google, especially some important Revit MEP content best practices.
+
+<!--
+The Seek Family Guidelines
+and am sorry to say that it is not highly regarded and advises several non-optimal practices in this complex area.
+I think one of the terms used was 'absolute rubbish'.
+
+199_family_api.htm:<li>Families Guide
+600_instance_void_cut.htm:Families Guide</a>  (still the
+664_families_guide.htm:<h3>Families Guide</h3>
+664_families_guide.htm:Revit Families Guide</a>.
+723_spark_learning.htm:Revit Families Guide</a> is
+-->
+
+<p>For more background, especially on Revit MEP, the 
+
+<a href="http://cad-notes.com/2011/12/learning-autodesk-revit-mep-2012-training-video-is-available">
+Learning Autodesk Revit MEP 2012</a> video 
+
+training by Simon Whitbread, 
+
+<!-- of <a href="http://www.karelcad.com.au/">KarelCAD</a> --> 
+
+Don Bokmiller and Joel Londenberg is recommended.
+
+<!-- 4 disks worth of stuff plus working files, family section, the Autodesk Revit Family guide is rubbish and includes bad practice -->
+
+<p>One neat little non-Revit-API topic that popped up was the handy and free little 
+
+<a href="http://www.evernote.com">
+Evernote</a> utility 
+
+for storing and sharing notes across the cloud and various mobile devices.

@@ -1,0 +1,84 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253169 [Presentation Strings/Values for internal parameters -> example:WallFunction] -->
+
+<h3>Display Strings and Enumerations</h3>
+
+<p><strong>Question:</strong> I need to get the string value displayed in the Revit user interface for some parameters whose values only contain an integer value, such as:
+
+<ul>
+<li>Wall Function: the API returns an integer value, whereas the UI displays "Exterior".
+<li>Wrapping at Inserts: again, the API returns an integer value, whereas the UI displays "Both".
+</ul>
+
+<p>Is there a general way to get a mapping between the integer values and the display strings for all such items in Revit?
+
+<p><strong>Answer:</strong> For a parameter containing a double value representing a length or an area, you can retrieve the raw internal database value using the Parameter.AsDouble method, and the AsValueString method will return the string representation as displayed in the Revit user interface, honouring the current unit settings.
+
+<p>Unfortunately, for the enumerated parameter values you are interested in, the parameter value is just a normal integer value, and AsValueString can do nothing to convert it to the user interface display string.
+Please note that these display strings are localised, i.e. language dependent, so they cannot simply be hard-wired into the API.
+Revit does not provide any API method to retrieve the mapping from the internal integer values to the display strings programmatically.
+
+The mapping can be created manually by setting every option of the parameter in the user interface and then checking its integer value using RvtMgdDbg, which is obviously tedious and inefficient.
+
+<p>In the case of the wall function, this results in the following value mapping:
+
+<ul>
+<li>0 Interior
+<li>1 Exterior
+<li>2 Foundation
+<li>3 Retaining
+<li>4 Soffit
+<li>5 Core-shaft
+</ul>
+
+<p>The wall function is also represented by the WallFunction Enumeration in the API, which has the following values:
+
+<ul>
+<li>Soffit
+<li>Retaining  
+<li>Foundation  
+<li>Exterior  
+<li>Interior
+</ul>
+
+<p>Converting these enumeration values to integers does return the same numbers as those listed above.
+However, in this case, the Core-shaft entry is missing in the enumeration.
+
+<p>Whenever you run into an integer-valued parameter like this, it is worth while checking the Revit API help file to see whether a corresponding enumeration type is available.
+You may of course run into parameters for which this is not the case, or where some of the values displayed in the user interface are missing in the API, but in many cases this can save at least some of the manual effort described above.
+
+<p>My colleague Augusto Goncalves points out that this is an apt place to mention that you can use the .NET Enum class to get some information about the enumeration values, for example like this:
+
+<pre class="code">
+<span class="green">// list enum values:</span>
+&nbsp;
+<span class="blue">string</span>[] enumValues = <span class="teal">Enum</span>.GetNames( 
+&nbsp; <span class="blue">typeof</span>( Autodesk.Revit.Enums.<span class="teal">WallFunction</span> ) );
+&nbsp;
+<span class="teal">StringBuilder</span> values 
+&nbsp; = <span class="blue">new</span> <span class="teal">StringBuilder</span>( <span class="maroon">&quot;Values are: &quot;</span> );
+&nbsp;
+<span class="blue">foreach</span>( <span class="blue">string</span> s <span class="blue">in</span> enumValues )
+{
+&nbsp; values.AppendFormat( <span class="maroon">&quot;\n{0}&quot;</span>, s );
+}
+&nbsp;
+System.Windows.Forms.<span class="teal">MessageBox</span>.Show( 
+&nbsp; values.ToString() );
+&nbsp;
+<span class="green">// convert an enum value to string:</span>
+&nbsp;
+Autodesk.Revit.Enums.<span class="teal">WallFunction</span> aValue 
+&nbsp; = Autodesk.Revit.Enums.<span class="teal">WallFunction</span>.Interior;
+&nbsp;
+<span class="blue">string</span> aValueName = <span class="teal">Enum</span>.GetName( 
+&nbsp; aValue.GetType(), aValue );
+&nbsp;
+System.Windows.Forms.<span class="teal">MessageBox</span>.Show( 
+&nbsp; <span class="teal">String</span>.Format( <span class="maroon">&quot;The value is: {0}&quot;</span>, aValueName ) );
+</pre>
+
+<p>By the way, conversion to a string can also be achieved even more simply and directly by using aValue.ToString().

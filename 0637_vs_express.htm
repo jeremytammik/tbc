@@ -1,0 +1,92 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Visual Studio, C# and VB Express</h3>
+
+<p>Yesterday Kean mentioned that
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/08/debugging-autocad-net-projects-using-express-editions.html">
+debugging AutoCAD.NET projects using the Visual C# and VB Express editions</a> is
+
+now directly supported by the
+
+<a href="http://images.autodesk.com/adsk/files/AutoCAD_2010-2012_dotNET_Wizards.zip">
+latest version of the AutoCAD .NET Wizard</a>.
+
+<p>That prompted me to have a look and see what the current situation is with Revit add-ins.
+
+<p>Obviously, we poor Revit developers do not have such a sophisticated wizard available ... or so I thought!
+
+<p>I installed
+
+<a href="http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-csharp-express">
+Visual C# Express</a> and started my experiment:
+
+<p>I launched the new installation and selected New Project &gt; Visual C#.
+
+<p>My intention was to select 'Class Library' next and manually set up the Revit API references and all that stuff, then move on to explore how to define appropriate debug settings.
+
+<p>However, guess my surprise to see the Revit Add-in option already listed:</p>
+
+<center>
+<img src="img/vcs_exp_new_project.png" alt="Visual C# Express 2010 New Project dialogue"/>
+</center>
+
+<p>Apparently, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Visual Studio Add-In Wizards for Revit 2012</a> that
+
+I have installed for the full version of Visual Studio are also picked up by Visual C# Express.
+
+<p>Well, that simplifies matters a lot, doesn't it?
+
+<p>There is actually nothing else whatsoever to do.
+
+<p>Debugging is already set up by the add-in wizard, and Revit has been specified as the start-up project, although it is not displayed in the Visual C# Express debug properties:</p>
+
+<center>
+<img src="img/vcs_exp_properties_debug.png" alt="Visual C# Express debug properties"/>
+</center>
+
+<p>Simply hitting F5 to start debugging launches Revit, and on opening a project and looking at the Add-Ins tab external tools, I see my new Visual C# Express add-in loaded and raring to go:</p>
+
+<center>
+<img src="img/vcs_exp_add-in_loaded.png" alt="Visual C# Express add-in loaded"/>
+</center>
+
+<p>After setting a breakpoint using F9 in Visual C# Express and picking the external command in Revit, the breakpoint is hit and full debugging functionality is available in Visual C#:</p>
+
+<center>
+<img src="img/vcs_exp_debugging.png" alt="Visual C# Express debugging the Revit add-in"/>
+</center>
+
+<p>Wow.
+I expected this exploration and blog post to take an hour or two, but I was done after fifteen minutes.
+
+<p>I am assuming that all of the above remains valid analogously for 
+
+<a href="http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-basic-express">
+Visual Basic 2010 Express</a> as well.
+
+Please let me know if you can verify this, or have any problems with either that or the C# version.
+
+<p>So the short and sweet message is: all you need to do is install Visual C# or Visual VB Express and the appropriate
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Visual Studio add-in wizard for Revit</a>,
+
+and you will be all set to create stand-alone add-ins and develop and debug them using the Express tools.
+I hope you have fun!
+
+<p><strong>Addendum:</strong> Here are some additonal notes on this by Augusto Gon&ccedil;alves of Autodesk Brazil, the original implementer of the Revit add-in wizards:
+
+<ul>
+<li>One issue with Express is that the project is initially created under \Temp\, and therefore the add-in manifest file is also configured to use this path. 
+Usually on my trainings (with Express), I recommend immediately saving the project after creating it by clicking on 'Save All', selecting a folder, and then updating the path in the add-in manifest file &lt;Assembly&gt; tag.
+
+<li>Also, keep in mind that Express builds the Debug version when you press F5 (or Star Debugging), and the Release version when you select the command in the Build menu.
+</ul>
+
+<p>Thank you, Augusto, for pointing this out!

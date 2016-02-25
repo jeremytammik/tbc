@@ -1,0 +1,1810 @@
+﻿<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+<body>
+
+<h1 style="font-weight:bold; font-size:large">What's New in the Revit 2011 API</h1>
+
+
+<p>This is the second instalment of a series publishing the information provided in the 'What's New' sections of the past few Revit API releases help file RevitAPI.chm.</p>
+
+<p>The first instalment covering
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">
+What's New in the Revit 2010 API</a> explains
+
+my motivation for this and provides an overview of the other releases.</p>
+
+<p>We now move on to Revit 2011, looking at:</p>
+
+<ul>
+<li><a href="#2">Major renovations</a></li>
+<li><a href="#3">Major enhancements</a></li>
+<li><a href="#4">Small enhancements and changes</a></li>
+</ul>
+
+<p>First, however, an update on my vacation so far.</p>
+
+
+
+<a name="1"></a>
+
+<h3 style="font-weight:bold; font-size:medium">Snowstorm in Italy</h3>
+
+<p>I am still on holiday in Italy, so please do not expect any immediate repsonses to any comments for a while.</p>
+
+<p>&nbsp; &nbsp; My first cappuccino in Domodossola was slightly disappointing.
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/0_domodossola_coffee.jpeg" alt="First Italian coffee" width="400"/>
+</center>
+
+<p>&nbsp; &nbsp; It improved later, though.</p>
+
+<p/>
+<p/>
+<p/>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/1_cappuccino.jpeg" alt="I love cappuccino" width="400"/>
+</center>
+
+<p>Searching for sun and warmth, we found cold and snow, and started heading southward to flee it.</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/2_jeremy_poirone_clock_tower.jpeg" alt="Poirone clock tower with snow" width="400"/>
+</center>
+
+<p>Instead of getting better, it got worse, causing huge trees to crash down or lose their branches under loads of snow never previously experienced.</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/3_jeremy_cesenatico_broken_branch.jpeg" alt="Cesenatico branch broken by snow" width="400"/>
+</center>
+
+<p>We did what we could to improve the situation.</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/4_jeremy_cesenatico_rolling_snowball.jpeg" alt="Rolling a snowball on the beach" width="400"/>
+</center>
+
+<p>The result is anti-art.</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-02-22_cesenatico/5_cesenatico_snowman_and_woman.jpeg" alt="Snowman and woman" width="400"/>
+</center>
+
+<p>Still hoping for better weather further south...</p>
+
+<p>Now, to continue the promised series of 'What's New' documentation from the past few Revit API releases.</p>
+
+
+
+<a name="2"></a>
+
+<h1 style="font-weight:bold; font-size:large">Major renovations to the Revit 2011 API</h1>
+
+<p>Autodesk is using the 2011 Release to position the Revit API for significant future growth. In order to ensure that as the API grows, the interfaces created during this expansion can remain stable for a significant period of time, there are some quite significant up-front changes being made to the existing API.
+
+
+<h3 style="font-weight:bold; font-size:medium">Changes to the Revit API namespaces</h3>
+<p>The Revit API namespaces have been changed to be more consistent and more suitable to expansion. In previous releases, API classes were split along the lines of functionality and Revit vertical product, which led to confusion about where classes which were Elements or Symbols belonged if they were specific to one vertical. In the new namespace structure, there is a primary division into three sets of namespaces:
+
+<ul>
+<li>Autodesk.Revit.ApplicationServices &ndash; contains classes accessing settings and options for the main Revit application
+<li>Autodesk.Revit.DB &ndash; contains classes accessing data from the Revit file
+<li>Autodesk.Revit.UI &ndash; contains classes accessing or customizing the Revit user interface
+</ul>
+
+<p>Within these main namespaces there are subdivisions based on discipline, e.g.:
+
+<ul>
+<li>Autodesk.Revit.DB.Architecture
+<li>Autodesk.Revit.DB.Structure
+<li>Autodesk.Revit.DB.Mechanical
+<li>Autodesk.Revit.DB.Electrical
+<li>Autodesk.Revit.DB.Plumbing
+</ul>
+
+<p>Classes which are useful in more than one discipline are placed in the Autodesk.Revit.DB main namespace.
+<p>Less commonly used classes, like event arguments, are also placed in subordinate namespaces, e.g.:
+
+<ul>
+<li>Autodesk.Revit.DB.Events
+<li>Autodesk.Revit.UI.Events
+</ul>
+
+<p>As a result of the rearrangement of the namespaces, a few classes have been modified more drastically than simply being moved to new namespaces:
+
+<ul>
+<li>Autodesk.Revit.Geometry.Element has been renamed to Autodesk.Revit.DB.GeometryElement to avoid a naming conflict.
+<li>Autodesk.Revit.Geometry.Instance has been renamed to Autodesk.Revit.DB.GeometryInstance to avoid a naming conflict.
+<li>Autodesk.Revit.Structural.Enums.Material has been renamed to Autodesk.Revit.DB.MaterialType to avoid a naming conflict.
+<li>Autodesk.Revit.Options.Application has been removed. The properties accessible from this class have been moved into Autodesk.Revit.ApplicationServices.Application.
+</ul>
+
+<p>To obtain a full list mapping the changes from the Revit 2010 API, see the document Revit 2011 API Namespace Remapping.xlsx in the Software Development Kit install.
+
+
+<h3 style="font-weight:bold; font-size:medium">Split of Revit API DLL</h3>
+<p>The Revit API has been split into two DLLs. The new DLLs are:
+
+<ul>
+<li>RevitAPI.dll &ndash; which now contains only methods used to access Revit's application, documents, elements, and parameters at the database level.
+<li>RevitAPIUI.dll &ndash; which contains all API interfaces related to manipulation and customization of the Revit user interface, including:
+<ul>
+<li>IExternalCommand and External Command related interfaces
+<li>IExternalApplication and related interfaces
+<li>Selection
+<li>RibbonPanel, RibbonItem and subclasses
+<li>TaskDialogs
+</ul>
+</ul>
+
+
+<p>In order to facilitate access to application and document level interfaces from both DLLs, the Application and Document classes have also split into two:
+
+<ul>
+<li>Autodesk.Revit.UI.UIApplication &ndash; provides access to UI-level interfaces for the application, including the ability to add RibbonPanels to the user interface, and the ability to obtain the active document in the user interface.
+<li>Autodesk.Revit.ApplicationServices.Application &ndash; provides access to all other application level properties.
+<li>Autodesk.Revit.UI.UIDocument &ndash; provides access to UI-level interfaces for the document, such as the contents of the selection and the ability to prompt the user to make selections and pick points
+<li>Autodesk.Revit.DB.Document &ndash; provides access to all other document level properties
+</ul>
+
+<p>The ExternalCommandData interface now provides access to the UIApplication object as well as the active view. From the active UIApplication object you can obtain the active UI document. You can also construct the UIApplication from the Application object, and the UIDocument from the DB level document at any time.
+
+
+<h3 style="font-weight:bold; font-size:medium">New classes for XYZ, UV, and ElementId</h3>
+<p>New classes have been introduced for the basic XYZ, UV and ElementId classes used in the API. These classes are:
+
+<ul>
+<li>Autodesk.Revit.DB.XYZ
+<li>Autodesk.Revit.DB.UV
+<li>Autodesk.Revit.DB.ElementId
+</ul>
+
+<p>These new classes provide a more consistent and complete interface, operate more quickly by having their implementation be entirely in managed code, and are immutable thus making them more suitable for use as properties.  The following table summarizes the old and new methods for the XYZ and UV classes listing the old XYZ/UV member, the new member, and optional notes:
+
+<ul>
+<li>AlmostEqual() &ndash; IsAlmostEqualTo()
+<li>Angle() &ndash; AngleTo()
+<li>AngleAround() &ndash; AngleOnPlaneTo()
+<li>Cross() &ndash; CrossProduct()
+<li>Distance() &ndash; DistanceTo()
+<li>Dot() &ndash; DotProduct()
+<li>Basis &ndash; N/A: Use BasisX, BasisY, BasisZ as required
+<li>IsNormalized &ndash; IsUnitLength()
+<li>IsZero &ndash; IsZeroLength()
+<li>Item &ndash; Item: Property is now read-only
+<li>Length &ndash; GetLength()
+<li>Normalized &ndash; Normalize()
+<li>X &ndash; X: Property is now read-only
+<li>Y &ndash; Y: Property is now read-only
+<li>Z &ndash; Z: Property is now read-only
+</ul>
+
+<p>All Revit API methods accepting or returning these types have been converted to the new classes.
+<p>In addition, the collections for these types have been removed.
+<p>Methods which used to take dedicated Revit collections now take equivalent .NET collection interfaces containing these types:
+
+<ul>
+<li>Autodesk.Revit.ElementIdSet &ndash; ICollection&lt;Autodesk.Revit.DB.ElementId&gt;
+<li>Autodesk.Revit.Geometry.XYZArray &ndash; IList&lt;Autodesk.Revit.DB.XYZ&gt;
+<li>Autodesk.Revit.Geometry.UVArray &ndash; IList&lt;Autodesk.Revit.DB.UV&gt;
+</ul>
+
+<p>The major impact to existing code is the replacement of the collections, and the changes to the classes designed to make them immutable. Code which previously change the coordinates of an XYZ via setting XYZ.X, XYZ.Y, and/or XYZ.Z, now should construct a new XYZ with the desired coordinates.
+<p>One further impact is the fact that ElementId is now a class, instead of a struct, and should not be passed with "ref" in C# or "ByRef" in VB.NET.
+
+
+<h3 style="font-weight:bold; font-size:medium">Replacement for Symbol and properties that access types</h3>
+<p>The Symbol class has been renamed to ElementType.
+<p>The Element ObjectType and SimilarObjectTypes properties that access types from elements have been replaced:
+
+<ul>
+<li>ObjectType &ndash; Element.GetTypeId(), Element.ChangeTypeId(): ChangeTypeId() returns the id of a new element; in rare cases, changing the element type will result in deletion of the current element. Static versions which operate on sets of elements are also supplied.</li>
+<li>Element.SimilarObjectTypes &ndash; Element.GetValidTypes()</li>
+</ul>
+
+<h3 style="font-weight:bold; font-size:medium">New transaction interfaces</h3>
+<p>New interfaces have been added to the API related to Transactions. These interfaces will provide a more comprehensive set of options for managing changes being made to the Revit document.
+<p>At this time, the new transaction interfaces are not compatible with the automatically-opened transactions created around ExternalCommand callbacks and VSTA macros. So, Autodesk recommends that you not use these interfaces until compatible changes have been made to those frameworks. In order to experiment with the new interfaces, a document needs to be opened or created while in an external command. In the new document, either the old transaction interfaces or the new ones can be used, as long as they are not used together in the same document.
+<p>There are three main classes among the new interfaces plus a few supporting classes. The main classes represent three different (but related) transaction contexts.
+<p><b>Transaction</b> &ndash; a context required in order to make any changes to a Revit model. Only one transaction can be open at a time; nesting is not allowed. Each transaction must have a name, which will be listed on the Undo menu in Revit once a transaction is successfully submitted.
+
+<p><b>SubTransaction</b> &ndash; can be used to enclose a set of model modifying commands. Sub-transactions are optional. They are not required in order to modify the model. They are a convenience tool to allow logical splitting of larger tasks into smaller ones. Sub-transaction can only be created within an already opened transaction and must be closed (either committed or rolled back) before the transaction is closed (committed or rolled back). Unlike transactions, sub-transaction may be nested, but any nested sub-transaction must be closed before the enclosing sub-transaction is closed. Sub-transactions do not have name, for they do not appear on the Undo menu in Revit.
+
+<p><b>Transaction group</b> &ndash; allows grouping together several independent transactions, which gives the owner of a group an opportunity to treat many transactions at once. When a transaction group is to be closed, it can be rolled back, which means that all already submitted transactions will be rolled back at once. If not rolled back, a group can be either submitted or assimilated. In the former case, all submitted transactions (within the group) will be left as they were. In the later case, transactions within the group will be merged together into one single transaction that will bear the group's name. A transaction group can only be started when there is no transaction open yet, and must be closed only after all enclosed transactions are closed (rolled back or committed). Transaction groups can be nested, but any nested group must be closed before the enclosing group is closed. Transaction groups are optional. They are not required in order to make modifications to a model.
+<p>All three transaction objects share some common methods:
+
+<ul>
+<li>Start &ndash; Will start the context.
+<li>Commit &ndash; Ends the context and commits all changes to the document.
+<li>RollBack &ndash; Ends the context and discards all changes to the document.
+<li>GetStatus &ndash; Returns the current status of a transaction object
+</ul>
+
+<p>Besides having the GetStatus returning the current status, both Commit and RollBack methods also return a status indicating whether or not the method was successful. Available status values include:
+
+<ul>
+<li>Uninitialized &ndash; The initial value after object is instantiated; the context has not started yet
+<li>Started &ndash; Set after a transaction object successfully started (Start method was called)
+<li>Committed &ndash; Set after a transaction object successfully committed (Commit method was called)
+<li>RolledBack &ndash; Set after a transaction object successfully rolled back (RollBack method was called)
+<li>Pending &ndash; Set after transaction object was attempted to be either submitted or rolled back, but due to failures that process could not be finished yet and is waiting for the end-user's response (in a modeless dialog). Once the failure processing is finished, the status will be automatically updated (to either Committed or RolledBack status).
+</ul>
+
+<p>The new Transaction interfaces replace the old APIs:
+
+<ul>
+<li>Document.BeginTransaction()
+<li>Document.EndTransaction()
+<li>Document.AbortTransaction()
+</ul>
+
+<p>which have been removed from the API.
+
+
+
+<h4 style="font-weight:bold; font-size:large">Refactored Document properties related to transactions</h4>
+<p>Two existing properties have been re-implemented to better complement the changes in the transaction framework:
+
+<ul>
+<li>Document.IsReadOny
+</ul>
+
+<p>Indicates that a document is &ndash; either temporarily or permanently &ndash; in read-only state. If it is read-only, it would mean that new transactions may not be started in that document, thus no modification could be made to the model.
+
+<ul>
+<li>Document.IsModifiabe
+</ul>
+
+<p>Indicates whether a document is or is not currently modifiable. A document is not modifiable if either there is no transaction currently open or when some temporary state lock modification for a certain operation. Taken from another perspective, a transaction may be started only when document is not yet modifiable, but is also not read-only.
+
+
+
+<h4 style="font-weight:bold; font-size:large">Transactions in events</h4>
+<p>All events have been changed to no longer automatically open transactions like they originally did in earlier releases. As a result of this new policy, the document will not be modified during an event unless one of the event’s handlers modifies it by making changes inside a transaction. A transaction may be opened by either the event handler if there is no transaction already opened (sometimes when the event is invoked, there is already a trasnaction open). If an event handler opens a transaction it is required that it will also close it (commit it or roll it back), otherwise all eventual changes will be discarded.
+<p>Please be aware that modifying the active document is not permitted during some events (e.g. the DocumentClosing event). If an event handler attempts to make modifications during such an event, an exception will be thrown. The event documentation indicates whether or not the event is read-only.
+
+
+<h3 style="font-weight:bold; font-size:medium">New ExternalCommand and ExternalApplication registration mechanism</h3>
+<p>The Revit API now offers the ability to register API applications via a .addin manifest file.
+<p>Manifest files will be read automatically by Revit when they are places in one of two locations on a user's system:
+
+<ul>
+<li>In a non-user specific location in "application data"
+<ul>
+<li>For Windows XP &ndash; C:\Documents and Settings\All Users\Application Data\Autodesk\Revit\Addins\2011\
+<li>For Vista/Windows 7 &ndash; C:\ProgramData\Autodesk\Revit\Addins\2011\
+</ul>
+
+<li>In a user specific location in "application data"
+<ul>
+<li>For Windows XP &ndash; C:\Documents and Settings\[user]\Application Data\Autodesk\Revit\Addins\2011\
+<li>For Vista/Windows 7 &ndash; C:\Users\[user]\AppData\Roaming\Autodesk\Revit\Addins\2011\
+</ul>
+</ul>
+
+<p>All files named .addin in these locations will be read and processed by Revit during startup.
+<p>A basic file adding one ExternalCommand looks like this:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>c:\MyProgram\MyProgram.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>76eb700a-2c85-4888-a78d-31429ecae9ed<span class="blue">&lt;/</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.Samples.SampleCommand<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Sample command<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInFamily<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInMEP<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AvailabilityClassName</span><span class="blue">&gt;</span>Revit.Samples.SampleAccessibilityCheck<span class="blue">&lt;/</span><span class="maroon">AvailabilityClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LongDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">p</span><span class="blue">&gt;</span>This is the long description for my command.<span class="blue">&lt;/</span><span class="maroon">p</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">p</span><span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">p</span><span class="blue">&gt;</span>This is another descriptive paragraph, with notes about how to use the command properly.<span class="blue">&lt;/</span><span class="maroon">p</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">LongDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">TooltipImage</span><span class="blue">&gt;</span>c:\MyProgram\Autodesk.jpg<span class="blue">&lt;/</span><span class="maroon">TooltipImage</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LargeImage</span><span class="blue">&gt;</span>c:\MyProgram\MyProgramIcon.png<span class="blue">&lt;/</span><span class="maroon">LargeImage</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>A basic file adding one ExternalApplication looks like this:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>SampleApplication<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>c:\MyProgram\MyProgram.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>604B1052-F742-4951-8576-C261D1993107<span class="blue">&lt;/</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.Samples.SampleApplication<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>Multiple AddIn elements may be provided in a single manifest file.
+
+<p>The new mechanism currently offers the following XML tags:
+
+<ul>
+<li>Assembly &ndash; The full path to the add-in assembly file. Required for all ExternalCommands and ExternalApplications.
+<li>FullClassName &ndash; The full name of the class in the assembly file which implements IExternalCommand or IExternalApplication. Required for all ExternalCommands and ExternalApplications.
+<li>ClientId &ndash; A GUID which represents the id of this particular application. ClientIds must be unique for a given session of Revit. Autodesk recommends you generate a unique GUID for each registered application or command. Required for all ExternalCommands and ExternalApplications.  The property UIApplication.ActiveAddInId provides programmatic access to this value, if required.
+<li>Name &ndash; The name of application. Required; for ExternalApplications only.
+<li>Text &ndash; The name of the button. Optional; use this tag for ExternalCommands only. The default is "External Tool".
+<li>Description &ndash; Short description of the command, will be used as the button tooltip. Optional; use this tag for ExternalCommands only. The default is a tooltip with just the command text.
+<li>VisibilityMode &ndash; Provides the ability to specify if the command is visible in project documents, family documents, or no document at all. Also provides the ability to specify the discipline(s) where the command should be visible. Multiple values may be set for this option. Optional; use this tag for ExternalCommands only. The default is to display the command in all modes and disciplines, including when there is no active document. Previously written external commands which need to run against the active document should either be modified to ensure that the code deals with invocation of the command when there is no active document, or apply the NotVisibleWhenNoActiveDocument mode.
+<li>AvailabilityClassName &ndash; The full name of the class in the assembly file which implemented IExternalCommandAvailability. This class allows the command button to be selectively grayed out depending on context. Optional; use this tag for ExternalCommands only. The default is a command that is available whenever it is visible.
+<li>LargeImage &ndash; The path to the icon to use for the button in the External Tools pulldown menu. The icon should be 32 x 32 pixels for best results. Optional; use this tag for ExternalCommands only. The default is to show a button without an icon.
+<li>LongDescription &ndash; Long description of the command, will be used as part of the button's extended tooltip. This tooltip is shown when the mouse hovers over the command for a long amount of time. You can split the text of this option into multiple paragraphs by placing &lt;p&gt; tags around each paragraph. Optional; use this tag for ExternalCommands only. If neither of this property and TooltipImage are supplied, the button will not have an extended tooltip.
+<li>TooltipImage &ndash; The path to an image file to show as a part of the button extended tooltip, shown when the mouse hovers over the command for a longer amount of time. Optional; use this tag for ExternalCommands only. If neither of this property and TooltipImage are supplied, the button will not have an extended tooltip.
+<li>LanguageType &ndash; Localization setting for Text, Description, LargeImage, LongDescription, and TooltipImage of external tools buttons. Revit will load the resource values from the specified language resource dll. The value can be one of the eleven languages supported by Revit. If no LanguageType is specified, the language resource which the current session of Revit is using will be automatically loaded. For more details see the section on Localization.
+</ul>
+
+<p>The Revit.ini registration mechanism remains in place for the 2011 release but will be removed in the future. The Revit.ini mechanism does not offer any of the new capabilities listed above. In addition, because Dynamic Model Update registration requires a valid AddInId, updaters may not be registered from applications declared in Revit.ini.</p>
+
+<h4 style="font-weight:bold; font-size:large">Localization</h4>
+
+<p>You can let Revit localize the user-visible resources of an external command button (including Text, large icon image, long and short descriptions and tooltip image). You will need to create a .NET Satellite DLL which contains the strings, images, and icons for the button. Then change the values of the tags in the .addin file to correspond to the names of resources in the Satellite dll, but prepended with the 'at' character '@'. So the tag:
+
+<pre class="code">
+ <span class="blue">&lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Extension Manager<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+</pre>
+
+<p>Becomes
+
+<pre class="code">
+  <span class="blue">&lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>@ExtensionText<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+</pre>
+
+<p>where ExtensionText is the name of the resource found in the Satellite DLL.
+
+<p>The Satellite DLLs are expected to be in a directory with the name of the language of the language-culture, such as en or en-US. The directory should be located in the directory that contains the add-in assembly.
+Please refer to
+
+<a href="http://msdn.microsoft.com/en-us/library/sb6a8618.aspx">
+how to create managed Satellite DLLs</a>.
+
+<p>You can force Revit to use a particular language resource DLL, regardless of the language of the Revit session, by specifying the language and culture explicitly with a LanguageType tag. For example:
+
+<pre class="code">
+  <span class="blue">&lt;</span><span class="maroon">LanguageType</span><span class="blue">&gt;</span>English_USA<span class="blue">&lt;/</span><span class="maroon">LanguageType</span><span class="blue">&gt;</span>
+</pre>
+
+<p>would force Revit to always load the values from the en-US Satellite DLL and to ignore the current Revit language and culture settings when considering the localizable members of the external command manifest file.
+
+<p>Revit supports the 11 languages defined in the Autodesk.Revit.ApplicationServices.LanguageType enumerated type: English_USA, German, Spanish, French, Italian, Dutch, Chinese_Simplified, Chinese_Traditional, Japanese, Korean, and Russian.
+
+
+<h4 style="font-weight:bold; font-size:large">External Command Accessibility</h4>
+<p>The interface
+
+<ul>
+<li>IExternalCommandAvailability
+</ul>
+
+<p>allows you control over whether or not an external command button may be pressed. The IsCommandAvailable interface method passes the application and a set of categories matching the categories of selected items in Revit to your implementation. The typical use would be to check the selected categories to see if they meet the criteria for your command to be run.
+<p>In this example accessibility check allows a button to be clicked when there is no active selection, or when at least one wall is selected:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">SampleAccessibilityCheck</span> : IExternalCommandAvailability
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsCommandAvailable(
+&nbsp; &nbsp; Autodesk.Revit.ApplicationServices.Application data,
+&nbsp; &nbsp; CategorySet selectedCategories )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Allow button click if there is no active selection</span>
+&nbsp; &nbsp; <span class="blue">if</span>( selectedCategories.IsEmpty )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Allow button click if there is at least one wall selected</span>
+&nbsp; &nbsp; <span class="blue">foreach</span>( Category c <span class="blue">in</span> selectedCategories )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( c.Id.IntegerValue == (<span class="blue">int</span>)BuiltInCategory.OST_Walls )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+}
+</pre>
+
+<h3 style="font-weight:bold; font-size:medium">External Command and External Application registration utility</h3>
+
+<p>The .NET utility DLL RevitAddInUtility.dll offers a dedicated API capable of reading, writing and modifying Revit Add-In manifest files. It is intended for use from product installers and scripts. Consult the API documentation in the RevitAddInUtility.chm help file in the SDK installation folder.
+
+<p>Here are some code snippets showing use of the RevitAddInUtility API.
+<p>First, creating a new .addin manifest file which contains one external command and one external application:
+
+<pre class="code">
+&nbsp; <span class="green">//create a new addin manifest</span>
+&nbsp; RevitAddInManifest Manifest = <span class="blue">new</span> RevitAddInManifest();
+&nbsp; <span class="green">//create an external command</span>
+&nbsp; RevitAddInCommand command1 = <span class="blue">new</span> RevitAddInCommand(
+&nbsp; &nbsp; <span class="maroon">&quot;full path\\assemblyName.dll&quot;</span>, <span class="teal">Guid</span>.NewGuid(),
+&nbsp; &nbsp; <span class="maroon">&quot;namespace.className&quot;</span> );
+&nbsp; command1.Description = <span class="maroon">&quot;description&quot;</span>;
+&nbsp; command1.Text = <span class="maroon">&quot;display text&quot;</span>;
+&nbsp; <span class="green">//this command only visible in Revit MEP, Structure, </span>
+&nbsp; <span class="green">// and only visible in Project document or when no </span>
+&nbsp; <span class="green">// document at all</span>
+&nbsp; command1.VisibilityMode = VisibilityMode.NotVisibleInArchitecture
+&nbsp; &nbsp; | VisibilityMode.NotVisibleInFamily;
+&nbsp; <span class="green">//create an external application</span>
+&nbsp; RevitAddInApplication application1
+&nbsp; &nbsp; = <span class="blue">new</span> RevitAddInApplication( <span class="maroon">&quot;appName&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;full path\\assemblyName.dll&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span>.NewGuid(), <span class="maroon">&quot;namespace.className&quot;</span> );
+&nbsp; <span class="green">//add both command(s) and application(s) into manifest</span>
+&nbsp; Manifest.AddInCommands.Add( command1 );
+&nbsp; Manifest.AddInApplications.Add( application1 );
+&nbsp; <span class="green">//save manifest to a file</span>
+&nbsp; RevitProduct revitProduct1 = RevitProductUtility
+&nbsp; &nbsp; .GetAllInstalledRevitProducts()[0];
+&nbsp; Manifest.SaveAs( revitProduct1.AllUsersAddInFolder
+&nbsp; &nbsp; + <span class="maroon">&quot;\\RevitAddInUtilitySample.addin&quot;</span> );
+</pre>
+
+<p>Second, reading from an existing addin file:
+
+<pre class="code">
+&nbsp; RevitProduct revitProduct1 = RevitProductUtility
+&nbsp; &nbsp; .GetAllInstalledRevitProducts()[0];
+&nbsp;
+&nbsp; RevitAddInManifest revitAddInManifest
+&nbsp; &nbsp; = Autodesk.RevitAddIns.AddInManifestUtility
+&nbsp; &nbsp; &nbsp; .GetRevitAddInManifest(
+&nbsp; &nbsp; &nbsp; &nbsp; revitProduct1.AllUsersAddInFolder
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\\RevitAddInUtilitySample.addin&quot;</span> );
+</pre>
+
+
+<h3 style="font-weight:bold; font-size:medium">Attributes for configuring ExternalCommand and ExternalApplication behavior</h3>
+
+
+<h4 style="font-weight:bold; font-size:large">Transaction mode</h4>
+<p>The custom attribute Autodesk.Revit.Attributes.TransactionMode should be applied to your implementation class of the IExternalCommand interface to control transaction behavior for external command. There is no default for this option. You must apply it to legacy application classes to allow your application to function in Revit 2011.
+<p>This mode controls how the API framework expects transactions to be used when the command is invoked. There are three supported values:
+
+<ol>
+<li>TransactionMode.Automatic &ndash; The API framework will create a transaction on the active document before the external command is executed and the transaction will be committed or rolled back after the command is completed (based upon the return value of the ExternalCommand callback). This means that command code cannot create and start its own Transactions, but it can create SubTransactions as required during the implementation of the command. The command must report its success or failure status via the Result return value.
+<li>TransactionMode.Manual &ndash; The API framework will not create a transaction (but it will create an outer group to roll back all changes if the external command returns a failure status). Instead, you may use combinations of Transactions, SubTransactions, and TransactionGroups as you please. You will have to follow all rules regarding use of transactions and related classes. You will have to give your transaction(s) names, which will then appear in the Undo menu. Revit will check that all transactions (also groups and sub-transactions) are properly closed upon return from an external command. If not, it will discard all changes made to the model.
+<li>TransactionMode.ReadOnly &ndash; No transaction (nor group) will be created, and no transaction may be created for the lifetime of the command. The External command may use methods that only read from the model, but not methods that write anything to it. Exceptions will be thrown if the command either tries to start a transaction (or group) or attempts to write to the model.
+</ol>
+
+<p>In all three modes, the TransactionMode applies only to the active document. You may open other documents during the course of the command, and you may have complete control over the creation and use of Transactions, SubTransactions, and TransactionGroups on those other documents (even in ReadOnly mode).
+<p>For example, to set an external command to use automatic transaction mode:
+
+<pre class="code">
+&nbsp; [<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> Autodesk.Revit.IExternalCommand.Result
+&nbsp; &nbsp; &nbsp; Execute(
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.ExternalCommandData commandData,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.ElementSet elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Command implementation, which modifies the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// active document directly and no need to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// start/commit any transactions.</span>
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<h4 style="font-weight:bold; font-size:large">Regeneration option</h4>
+
+<p>The custom attribute Autodesk.Revit.Attributes.RegenerationAttribute should be applied to your implementation class of the IExternalCommand interface and IExternalApplication interface to control the regeneration behavior for the external command and external application. There is no default for this option. You must apply it to legacy application classes to allow your application to function in Revit 2011.
+<p>This mode controls whether or not the API framework automatically regenerates after every model modification. There are two supported values:
+
+<ol>
+<li>RegenerationOption.Automatic &ndash; The API framework will regenerate after every model level change (equivalent behavior with Revit 2010 and earlier). Regeneration and update can be suspended using SuspendUpdating for some operations, but in general the performance of multiple modifications within the same file will be slower than RegenerationOption.Manual. This mode is provided for behavioral equivalence with Revit 2010 and earlier; it is obsolete and will be removed in a future release.
+<li>RegenerationOption.Manual &ndash; The API framework will not regenerate after every model level change. Instead, you may use the regeneration APIs to force update of the document after a group of changes. SuspendUpdating blocks are unnecessary and should not be used. Performance of multiple modifications of the Revit document should be faster than RegenerationOption.Automatic. Because this mode suspends all updates to the document, your application should not read data from the document after it has been modified until the document has been regenerated, or it runs the risk of accessing stale data. This mode will be only option in a future release.
+</ol>
+
+<p>For example, to set an external command to use manual regeneration mode:
+
+<pre class="code">
+&nbsp; [<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> Autodesk.Revit.IExternalCommand.Result
+&nbsp; &nbsp; &nbsp; Execute(
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.ExternalCommandData commandData,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.ElementSet elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Command implementation, which modifies the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// document and calls regeneration APIs when</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// needed.</span>
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>To set an external application to use automatic mode
+
+<pre class="code">
+&nbsp; [<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Automatic )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Application</span> : <span class="teal">IExternalApplication</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> Autodesk.Revit.UI.<span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; &nbsp; <span class="teal">ControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// OnStartup implementation</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> Autodesk.Revit.UI.<span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; &nbsp; <span class="teal">ControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// OnShutdown implementation</span>
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The regeneration mode used for code executed during events and updater callbacks will be the same mode applied to the ExternalApplication or ExternalCommand during which the event or updater was registered.
+
+
+<h4 style="font-weight:bold; font-size:large">Manual regeneration and update</h4>
+
+<ul>
+<li>Document.Regenerate
+<li>Document.AutoJoinElements
+</ul>
+
+<p>These new methods have been added to allow an application running in manual regeneration mode to update the elements in the Revit document at any time.
+
+
+<h4 style="font-weight:bold; font-size:large">Journaling mode</h4>
+<p>The custom attribute Autodesk.Revit.Attributes.JournalingAttribute can optionally be applied to your implementation class of the IExternalCommand interface to control the journaling behavior during the external command execution session.
+
+<ul>
+<li>JournalMode.UsingCommandData
+</ul>
+
+<p>Uses the “StringStringMap” supplied in the command data. Hides all Revit journal entries in between the external command invocation and the StringStringMap entry. Commands which invoke the Revit UI for selection or for responses to task dialogs may not replay correctly.
+
+<ul>
+<li>JournalMode.NoCommandData
+</ul>
+
+<p>Does not write contents of the ExternalCommandData.Data map to the Revit journal. But does allow Revit API calls to write to the journal as needed. This option should allow commands which invoke the Revit UI for selection or for responses to task dialogs to replay correctly.
+
+
+<h3 style="font-weight:bold; font-size:medium">New element iteration interfaces</h3>
+<p>New interfaces have been added to the API to permit iteration of elements and element ids. These new interfaces have been designed to provide a more flexible and usable interface for a variety of applications, while being completely implemented in native Revit code to provide the best possible performance.
+<p>Existing element iteration routines have been replaced, including:
+
+<ul>
+<li>Document.Elements (all versions of this property)
+<li>ElementIterator
+<li>Filter and all subclasses of it
+<li>Application.Create.Filter
+<li>Classes and properties related to the ParameterFilter:
+<ul>
+<li>CriteriaFilterType
+<li>Document.FilterTypeSupported
+<li>FilterCriterion
+<li>ParameterStorage
+</ul>
+</ul>
+
+<p>The new element iteration interfaces offer several enhanced capabilities from their predecessors:
+
+<ul>
+<li>The ability to iterate and filter elements from a document, or only elements from an arbitrary list of element ids, or elements visible in a view (replacing View.Elements)
+<li>The ability to clearly identify filters which are designed for best performance ("Quick Filters"), which do not expand the element in memory when evaluating whether the element passes the filter
+<li>The ability to use chained shortcuts which automatically apply commonly used filters, e.g.
+</ul>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( document );
+&nbsp;
+&nbsp; <span class="green">// Finds all walls in a certain design option</span>
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; walls = collector
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; .ContainedInDesignOption( myDesignOptionId )
+&nbsp; &nbsp; .ToElementIds();
+</pre>
+
+<ul>
+<li>The ability to logically group more than two filters.
+<li>The ability to match derived types automatically when using the type filter and type filter shortcut.
+<li>The ability to iterate elements from all design options or from any specific design option.
+<li>The ability to use foreach on the collector element, and to use the class with LINQ queries. This is due to the connection between the collector class and System.Collections.Generic.IEnumerable<Element>. Note that because the ElementFilters and the shortcut methods offered by this class process elements in native code before their managed wrappers are generated, better performance will be obtained by using as many native filters as possible on the collector before attempting to process the results using LINQ queries.
+</ul>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="green">// First apply a built-in filter to minimize</span>
+&nbsp; <span class="green">// the number of elements processed by LINQ</span>
+&nbsp;
+&nbsp; collector.WherePasses( <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Levels ) );
+&nbsp;
+&nbsp; <span class="green">// LINQ query to find level with name == &quot;Level 1&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> levelElements = <span class="blue">from</span> element <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name == <span class="maroon">&quot;Level 1&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> element;&nbsp;
+&nbsp;
+&nbsp; <span class="teal">Level</span> level1 = levelElements.Cast&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; .ElementAt&lt;<span class="teal">Level</span>&gt;( 0 );
+</pre>
+
+<p>Detailed information on the new element iteration interfaces can be found in the document "Element iteration APIs" in the SDK.
+<p>Note that there are a few behavioral changes in the new iteration mechanism when compared to the old:
+
+<ul>
+<li>View templates were previously returned as Element. They are now returned as the correct View subclass (ViewPlan, View3d, etc). You can identify these using the new View.IsTemplate property.
+<li>Previous element iteration methods only returned elements of the main model, the active design option, and primary design options of each option set. Elements of design options which were not active and not primary were excluded. In the new iteration API, by default, design option membership is no longer considered when iterating elements. In order to find the same elements which were iterated in the 2010 API, you should use the following filters combined using 'OR':
+<ul>
+<li>An ElementDesignOptionFilter with id = InvalidElementId, to match all elements not associated to a design option.
+<li>An ElementDesignOptionFilter with id = DesignOption.GetActiveDesignOptionId(), to match elements in the active design option.
+<li>A PrimaryDesignOptionMemberFilter, to match all elements in primary design options.
+</ul>
+</ul>
+
+
+
+<h3 style="font-weight:bold; font-size:medium">Replacement for View.Elements</h3>
+<p>The property View.Elements has been removed and replaced with a constructor for FilteredElementCollector taking a document and view id. This allows you to use filtering and LINQ queries against the elements visible in a given view.
+
+
+<h3 style="font-weight:bold; font-size:medium">Replacement for 3 structural enums</h3>
+<p>The enumerated types
+
+<ul>
+<li>Autodesk.Revit.Structural.Enums.InstanceUsage
+<li>Autodesk.Revit.Structural.Enums.Material
+<li>Autodesk.Revit.Structural.Enums.WallUsage
+</ul>
+
+<p>have been replaced with new enums:
+
+<ul>
+<li>Autodesk.Revit.DB.Structure.StructuralInstanceUsage
+<li>Autodesk.Revit.DB.Structure.StructuralMaterialType
+<li>Autodesk.Revit.DB.Structure.StructuralWallUsage
+</ul>
+
+<p>Some of the names of the members have changed.
+
+
+<h3 style="font-weight:bold; font-size:medium">Replacement for AnalyticalModel</h3>
+<p>The class hierarchy for accessing the structural analytical model has been replaced. The new class hierarchy offers a more streamlined interface and more capabilities to read data and modify analytical model settings.
+<p>The following AnalyticalModel subclasses have been removed:
+
+<ul>
+<li>AnalyticalModel3D
+<li>AnalyticalModelFloor
+<li>AnalyticalModelFrame
+<li>AnalyticalModelLocation
+<li>AnalyticalModelWall
+</ul>
+
+
+<p>Access the data you used to find on those subclasses on the base AnalyticalModel class, as indicated by the following list of classes, old properties, and new methods:
+
+<ul>
+<li>AnalyticalModelFrame &ndash; Curve &ndash; GetCurves(): If analytical model was approximated, .Curve would have previously returned non-approximated analytical model. Now GetCurves() will return approximated analytical model when analytical model is approximated. GetCurve() is a shortcut method returning the single curve.
+<li>AnalyticalModel3D, AnalyticalModelFloor, AnalyticalModelFrame, AnalyticalModelLocation, AnalyticalModelWall &ndash; Curves &ndash; GetCurves(): AnalyticalCurveType.ActiveCurves will return the analytical model displayed by Revit. Most of the time, this is what is desired.
+<li>AnalyticalModelLocation &ndash; Point &ndash; GetPoint(): GetCurves() can also be called, the return will be a single curve of almost 0-length containing the point.
+<li>AnalyticalModelFrame &ndash; Profile &ndash; GetSweptProfile()
+<li>AnalyticalModelFrame &ndash; RigidLink &ndash; GetCurves(AnalyticalCurveType.RigidLinkHead) or GetCurves(AnalyticalCurveType.RigidLinkTail): AnalyticalCurveType.RigidLinkHead retrieves the Rigid Link at the end, and AnalyticalCurveType.RigidLinkTail retrieves the Rigid Link at the start.
+<li>AnalyticalModel3D, AnalyticalModelFloor,: AnalyticalModelFrame, AnalyticalModelLocation, AnalyticalModelWall &ndash; SupportData &ndash; GetAnalyticalModelSupports()
+</ul>
+
+<p>Note that the curves returned from these new methods will not have their Reference properties set, and cannot be used for the properties like Curve.EndPointReference. Instead, you can obtain References to the curves and their endpoints through construction of an AnalyticalModelSelector object containing the necessary information.
+<p>The AnalyticalModel class offers new methods to access other Analytical Model properties, such as:
+
+<ul>
+<li>Adjustment information, both manual and automatic
+<li>Parameter information, including projection, hard points, approximation, and rigid links
+<li>Analytical offset
+</ul>
+
+<p>The AnalyticalModelProfile class has been replaced by the AnalyticalModelSweptProfile class, which offers similar contents to the original class.
+<p>The AnalyticalSupportData and AnalyticalSupportInfo classes have been replaced by collections of AnalyticalModelSupport objects. This new class offers the same information offered by AnalyticalSupportInfo, plus:
+
+<ul>
+<li>The support priority
+<li>The curve, point, and face providing support
+</ul>
+
+<p>The new AnalyticalSupportChecking interface offers the ability to run the check for unsupported structural elements. The new AnalyticalConsistencyChecking interface offers the ability to run a consistency check for the Analytical Model.
+<p>The results of both checks are added to the document as warnings.
+<p>Access the AnalyticalModel through the method GetAnalyticalModel() on Element. This replaces the AnalyticalModel property of Wall, Floor, ContFooting and FamilyInstance.
+<p>The integer values of the enumerated type AnalyticalSupportType have changed.  They no longer match the values returned for the built-in parameter BOUNDARY_CONDITIONS_TYPE, use the members of the enum BoundaryConditionsType instead.
+
+
+
+<h3 style="font-weight:bold; font-size:medium">Replacement for gbXMLParamElem</h3>
+<p>The new class EnergyDataSettings replaces the gbXMLParamElem class. The members of the old class, the gbXMLParamElem properties, can be accessed via the new EnergyDataSettings properties as follows:
+
+<ul>
+<li>BuildingConstruction &ndash; ConstructionSetElementId
+<li>BuildingService &ndash; ServiceType
+<li>BuildingType &ndash; BuildingType
+<li>ExportComplexity &ndash; ExportComplexity
+<li>GroundPlane &ndash; GroundPlane
+<li>PostalCode &ndash; This is not supported in the new interface as the property has been removed from the element stored within Revit. It was removed because the data often conflicted with other settings provided during gbXML export.
+<li>ProjectLocation &ndash; This data is not supplied; it was always the same as Document.ActiveProjectLocation.
+<li>ProjectPhase &ndash; ProjectPhase
+</ul>
+
+<h3 style="font-weight:bold; font-size:medium">Revit exceptions</h3>
+<p>All Revit API methods have been changed to throw subclasses of Autodesk.Revit.Exceptions.ApplicationException. Some Revit exceptions, such as
+
+<ul>
+<li>ArgumentException
+<li>InvalidOperationException
+<li>FileNotFoundException
+</ul>
+
+<p>closely mirror the corresponding .NET System exception types. However, some of them have subclasses which are unique to Revit, e.g.
+
+<ul>
+<li>AutoJoinFailedException
+<li>RegenerationFailedException
+<li>ModificationOutsideTransactionException
+</ul>
+
+<p>In addition, there is a special exception type called InternalException, which represents a failure path which was not anticipated. Exceptions of this type carry extra diagnostic information which can be passed back to Autodesk for diagnosis.
+
+
+<h3 style="font-weight:bold; font-size:medium">Removed deprecated events</h3>
+<p>The pre-Revit 2010 events:
+
+<ul>
+<li>Application.OnDocumentSaved
+<li>Application.OnDocumentSavedAs
+<li>Application.OnDocumentOpened
+<li>Application.OnDocumentClosed
+<li>Application.OnDocumentNewed
+<li>Application.OnDialogBox
+<li>Document.OnSaveAs
+<li>Document.OnSave
+<li>Document.OnClose
+</ul>
+
+<p>have been removed from the API. To replace these, use the replacement events in both Revit External Applications and VSTA macros.
+
+
+<h3 style="font-weight:bold; font-size:medium">Changes to VSTA</h3>
+<p>There are many changes to the VSTA framework:
+
+<ol>
+<li>Revit VSTA no longer depends on the proxy DLL. Macros are now written referencing RevitAPI.dll and RevitAPIUI.dll directly. This allows macros access to the full features of the Revit API, including generic methods, all events and other methods missing from the proxy previously.  Module templates have been updated accordingly, and the references will be added automatically when upgrading macros from previous releases.
+<li>The entry point classes ThisApplication and ThisDocument have been adjusted to the direct reference of the API classes.  They also now represent UIApplication and UIDocument (instead of Application and Document).
+<li>The Transaction and Regeneration attributes must be applied to the ThisApplication and ThisDocument class. Their meanings for VSTA are same as for external commands.  Module templates have been updated with default assignments, but upgraded modules must have these added manually.
+<ul>
+<li>A special AddInId attribute can be added to modules.  This allows VSTA macros to work with updaters.  When new modules are created this attribute is automatically generated with a random Guid.
+<li>The Module_Startup methods are now executed at the time when the module is first loaded (as the Revit application starts for Application-level macros, and as the document is loaded for document-level macros).
+</ul>
+<li>No transactions may be opended in the Module_Startup and Module_Shutdown methods.
+</ol>
+
+<p>New modules created in Revit 2011 should be "ready to code" &ndash; all framework changes have been incorporated into the templates.
+<p>Upgraded macros and modules will need to be adjusted to the framework changes mentioned above, as well as all of the API changes (namespace changes, modified APIs).
+
+
+
+<a name="3"></a>
+
+<h1 style="font-weight:bold; font-size:large">Major enhancements to the Revit API</h1>
+
+
+<h3 style="font-weight:bold; font-size:medium">Dynamic Model Update</h3>
+<p>Dynamic model update offers the ability for a Revit API application to modify the Revit model as a reaction to changes happening in the model. This facility is offered through implementation of updaters. The updater interface offers the ability to implement a method that is informed of the scope of changes that triggered the update.
+<p>In order to "subscribe" an updater to the right set of changes, the updater should be assigned one or more update triggers. Update triggers are combinations of "Change Scope" and "Change Type". Change Scope may be either an explicit list of element ids in a document, or an implicit list of elements communicated via an ElementFilter. Change Type represents one of an available list of possible changes, including element addition, deletion, and modification of geometry, parameters, or any property of the element.
+<p>For a more detailed introduction to the Dynamic Model Update capabilities, consult the "Introduction to Dynamic Model Update" document in the SDK.
+
+
+<h3 style="font-weight:bold; font-size:medium">Elements changed event</h3>
+<p>The new event
+
+<ul>
+<li>Application.DocumentChanged
+</ul>
+
+<p>is raised after every transaction gets committed, undone, or redone. This is a read-only event, designed to allow you to keep external data in synch with the state of the Revit database. To update the Revit database in response to changes in elements, use the Dynamic Model Update framework.
+
+
+<h3 style="font-weight:bold; font-size:medium">Failure API</h3>
+<p>There are two capabilities offered by the new failure API:
+
+<ol>
+<li>The ability to define and post failures from within API code when a user-visible problem has occurred.
+<li>The ability to respond to failures posted by Revit and by API code through code in your application.
+</ol>
+
+<p>This section offers a high level overview of both capabilities; more detail about the failures API is provided in the "Failure API" document in the Revit API help file.
+<p>As a part of exposing these new capabilities, all overloads accepting "PostedErrors" have been removed from the API.
+
+
+<h4 style="font-weight:bold; font-size:large">Failure posting</h4>
+
+<p>If you are using the failure posting mechanism to report your problem, all you need to do is:
+
+<ol>
+<li>If you are creating a new failure not already existing in Revit, define the new failure and register it in the FailureDefinitionRegistry during the OnStartup() call of your ExternalApplication (new failures must be registered at Revit startup).
+<li>Find the failure definition id, either from the BuiltInFailures classes or from your pre-registered custom failure using the class related to FailureDefinition.
+<li>Post a failure to a document that has a problem &ndash; using the classes related to FailureMessage to set options and details related to the failure.
+</ol>
+
+<h4 style="font-weight:bold; font-size:large">Failure handling</h4>
+
+<p>Normally posted failures are processed by Revit's standard failure resolution UI at the end of transaction. The user is presented information and options in the UI to deal with the failures.
+<p>However, if your operation (or set of operations) on the document requires some special treatment for certain errors (or even all possible errors), you can customize failure resolution. Custom failure resolution can be supplied:
+
+<ul>
+<li>For a given transaction using the interface IFailuresPreprocessor.
+<li>For all possible errors using the FailuresProcessing event.
+</ul>
+
+<p>Finally, the API offers the ability to completely replace the standard failure processing user interface using the interface IFailuresProcessor.
+
+<h3 style="font-weight:bold; font-size:medium">Select element(s), point(s) on element(s), face(s) or edge(s)</h3>
+
+<ul>
+<li>Selection.PickObject
+<li>Selection.PickObjects
+</ul>
+
+<p>New methods have been added to prompt the user to select items from the Revit model. When using the new selection methods from your application you can:
+
+<ul>
+<li>Allow users to make one or multiple selections
+<li>Allow users to make multiple selections via box select
+<li>Provide a custom status prompt to direct the user what to select
+<li>Provide a custom selection filter (Autodesk.Revit.UI.ISelectionFilter) to accept only those items which your application supports
+<li>Provide a list of preselected items which will be selected and highlighted when the selection activity starts
+<li>Reference(Element) &ndash; This new constructor allows you to obtain a Reference for an Element; it can be useful when adding preselected elements to the PickObjects() call.
+</ul>
+
+
+<h3 style="font-weight:bold; font-size:medium">Pick point on the view active workplane</h3>
+
+<ul>
+<li>Selection.PickPoint()
+</ul>
+
+<p>New methods have been added to prompt the user to pick a point on the view active workplane. When using these methods you have the option of overriding the user's default snap settings and providing a custom status prompt to direct the user what to pick. The method returns an XYZ location corresponding to the user's pick.
+<p>For 2D and 3D views, you can set the active workplane via the new setter property for View.SketchPlane. This allows you to control the plane used for calls to the PickPoint() method.
+<p>For 2D views where the active workplane cannot be changed, such as drafting and sheet views, the method picks a point in the default coordinate system of the view.
+
+<h3 style="font-weight:bold; font-size:medium">Additional options for Ribbon customization</h3>
+<p>There are new Ribbon components supported via the Ribbon API:
+
+<ul>
+<li>SplitButton &ndash; a pulldown button with a default pushbutton attached
+<li>RadioGroup &ndash; a set of ToggleButtons, where only one of the set can be active at a time
+<li>ComboBox &ndash; a pulldown containing a set of selectable items, which can be grouped optionally
+<li>TextBox &ndash; an input field for users to enter text
+<li>SlideOut panel &ndash; an extra panel can optionally slide down from a Ribbon panel; this panel can contain any of the standard Ribbon components
+</ul>
+
+<p>For ComboBox and TextBox, events are included; these events call your API code when the component is changed by the user.
+<p>The new property:
+
+<ul>
+<li>RibbonItem.Visible
+</ul>
+
+<p>provides control over whether a particular item is visible.
+<p>The new properties:
+
+<ul>
+<li>RibbonItem.LongDescription
+<li>RibbonItem.ToolTipImage
+</ul>
+
+<p>allow you to set up an extended tooltip for the Ribbon item.  This tooltip can display a longer set of text, and/or a single image.
+<p>The new property:
+
+<ul>
+<li>PushButton.AvailabilityClassName
+</ul>
+
+<p>allows assignment of an availability class to controlled whether or not the button is available, similar to the option provided for ExternalCommands registered by manifest.
+<p>There is also a new option supported for PulldownButton &ndash; a separator can now be added between buttons this component.
+<p>There is also a new option to add custom panels to the Analyze tab in Revit as well as the Add-Ins tab, via a new overload of Application.CreateRibbonPanel().
+<p>As a result of these enhancements, some pre-existing APIs have changed:
+
+<ul>
+<li>RibbonPanel.AddButton() has been replaced with RibbonPanel.AddItem()
+<li>RibbonPanel.AddStackedButtons() overloads have been replaced with RibbonPanel.AddStackedItems() overloads
+<li>Property RibbonPanel.Items has been replaced with method RibbonPanel.GetItems()
+<li>Property PulldownButton.Items has been replaced with method PulldownButton.GetItems()
+<li>Methods RibbonPanel.AddPushButton() and RibbonPanel.AddPulldownButton() have been removed. Use RibbonPanel.AddItem() for this operation.
+<li>RibbonPanel.AddToPulldown() has been removed. Use PulldownButton.AddItem() for this operation.
+<li>PulldownButton.AddPushButton() has been removed. Use PulldownButton.AddItem() for this operation.
+</ul>
+
+
+<h3 style="font-weight:bold; font-size:medium">Create and display Revit-style Task Dialogs</h3>
+<p>The API now offers the ability to create and display Revit-style Task Dialogs. It is intended to provide capabilities similar to System.Windows.Forms.MessageBox with a Revit look-and-feel such as:</p>
+
+
+<center>
+<img src="img/whats_new_2011_1.png" alt="Task dialogue"/>
+</center>
+
+<p>Construct an instance of the class:
+
+<ul>
+<li>Autodesk.Revit.UI.TaskDialog
+</ul>
+
+<p>and use the members of that class to set the instructions, detailed text, icons, buttons and command links to be displayed in the task dialog. Then display the dialog using the Show() method. After the user responds to the dialog by clicking one of the buttons or links, the Show() method returns an identifier indicating the user's preferred choice.
+<p>There are also shortcut static Show() methods on this class providing a quick way to show simple task dialogs.
+
+<h3 style="font-weight:bold; font-size:medium">Idling event</h3>
+<p>The new event
+
+<ul>
+<li>UIApplication.Idling
+</ul>
+
+<p>is raised when it is safe for the API application to access the active document between user interactions. The event is raised only when the Revit UI is in a state where the user could successfully click on an API command button. The event allows changes to a document if a new transaction is opened.
+<p>Because this event is invoked between user actions in the Revit UI, if the handler for this event requires a significant amount of processing time, users will perceive a slowdown in the responsiveness of Revit. If the execution for updates can be safely split across multiple calls to this event, the user perception of Revit responsiveness will be improved.
+
+<h3 style="font-weight:bold; font-size:medium">Sun and shadows settings element</h3>
+<p>The SunAndShadowSettings class represents the settings applied to a project or view regarding the position, dates, time intervals and other options for the sun control and solar studies. Obtain the SunAndShadowSettings for a particular view from the View.SunAndShadowSettings property. Obtain the SunAndShadowSettings for the project from SunAndShadowSettings.GetActiveSunAndShadowSettingsId().
+
+<h3 style="font-weight:bold; font-size:medium">MEP Electrical API</h3>
+
+<h4 style="font-weight:bold; font-size:large">Demand factor and load classifications</h4>
+<p>The property
+
+<ul>
+<li>ElectricalSystem.LoadClassification
+</ul>
+
+<p>has been replaced with a new property
+
+<ul>
+<li>ElectricalSystem.LoadClassifications
+</ul>
+
+<p>The new property returns a semicolon-delimited string listing the load classifications assigned to the system.  Load classifications are now an element and can be found through regular element iteration.
+<p>The class
+
+<ul>
+<li>DemandFactor
+</ul>
+
+<p>was replaced by
+
+<ul>
+<li>ElectricalDemandFactorDefinition.
+</ul>
+
+<p>The method
+
+<ul>
+<li>ElectricalSetting.GetDemandFactor()
+</ul>
+
+<p>has been replaced by
+
+<ul>
+<li>ElectricalLoadClassification.DemandFactorId
+</ul>
+
+<p>which returns the id of the ElectricalDemandFactorDefinition element assigned to the load classification.
+
+<h4 style="font-weight:bold; font-size:large">Panel schedules</h4>
+<p>A new comprehensive API has been introduced to support access to Panel Schedules and their contents.
+The major classes exposed by this API are:
+
+<ul>
+<li>TableView &ndash; represents a view that shows a table.
+<li>TableData &ndash; holds most of the data that describe the style of the rows, columns, and cells in a table.
+<li>TableSectionData &ndash; holds row, column and cell data for a TableData instance.
+<li>PanelScheduleView &ndash; represents a view that shows a panel schedule.
+<li>PanelScheduleData &ndash; holds most of the data that describe the layout, appearance, and style of the rows, columns, and cells of a panel schedule.
+<li>PanelScheduleTemplate &ndash; represents a branch panel, a switchboard or a data panel template.
+<li>PanelScheduleSheetInstance &ndash; represents an instance of a panel schedule placed on sheet.
+</ul>
+
+
+<h4 style="font-weight:bold; font-size:large">Cable tray and conduit</h4>
+<p>New classes and elements have been added to the API related to Cable Tray and Conduit elements.  The major classes introduced by this API are:
+
+<ul>
+<li>CableTrayConduitBase &ndash; the base class for cable trays and conduits.
+<li>CableTrayConduitRunBase &ndash; the base class for cable tray and conduit runs.
+<li>CableTray &ndash; a cable tray instance.
+<li>CableTrayType &ndash; a cable tray type.
+<li>CableTrayRun &ndash; a cable tray run.
+<li>Conduit &ndash; a conduit instance.
+<li>ConduitType &ndash; a conduit type.
+<li>ConduitRun &ndash; a conduit run.
+</ul>
+
+<p>The previously existing API classes
+
+<ul>
+<li>ConduitType
+<li>ConduitTypeSet
+</ul>
+
+<p>have been renamed to
+
+<ul>
+<li>WireConduitType
+<li>WireConduitTypeSet
+</ul>
+
+<p>as a result of the introduction of the new conduit elements.
+
+<h3 style="font-weight:bold; font-size:medium">Analysis Visualization Framework</h3>
+<p>This new functionality creates a mechanism for external analysis applications to easily display the results of their computation as 3D data in the Revit model. Note that the results data is transient; it is stored only in the model for the duration of the current Revit session.
+<p>The SpatialFieldManager class is used to create, delete, and modify the "containers" in which the analysis results are stored.
+<p>The FieldDomainPoints sub-classes indicate the points where analysis results are computed.
+<p>The FieldValues class contains the values for each domain point. Each domain point can have multiple values, each for a separate "measurement" at this point. For example, if a solar calculation is being done for every day of the year, each point would have 365 corresponding values.
+
+<p>The code below assigns results for two data points on a surface:
+
+<pre class="code">
+&nbsp; SpatialFieldManager sfm = SpatialFieldManager
+&nbsp; &nbsp; .CreateSpatialFieldManager( view, 1 );
+&nbsp;
+&nbsp; <span class="teal">Reference</span> reference = doc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Select a face&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">int</span> idx = sfm.AddSpatialFieldPrimitive( reference );
+&nbsp;
+&nbsp; <span class="teal">Face</span> face = reference.GeometryObject <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">UV</span>&gt; uvPts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">UV</span>&gt;();
+&nbsp; uvPts.Add( <span class="blue">new</span> <span class="teal">UV</span>( 0, 0 ) );
+&nbsp; uvPts.Add( <span class="blue">new</span> <span class="teal">UV</span>( 0.1, 0.1 ) );
+&nbsp; FieldDomainPointsByUV pnts = <span class="blue">new</span> FieldDomainPointsByUV(
+&nbsp; &nbsp; uvPts );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; doubleList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; <span class="teal">IList</span>&lt;ValueAtPoint&gt; valList = <span class="blue">new</span> <span class="teal">List</span>&lt;ValueAtPoint&gt;();
+&nbsp; doubleList.Add( 0 );
+&nbsp; valList.Add( <span class="blue">new</span> ValueAtPoint( doubleList ) );
+&nbsp; doubleList.Clear();
+&nbsp; doubleList.Add( 10 );
+&nbsp; valList.Add( <span class="blue">new</span> ValueAtPoint( doubleList ) );
+&nbsp; FieldValues vals = <span class="blue">new</span> FieldValues( valList );
+&nbsp;
+&nbsp; sfm.UpdateSpatialFieldPrimitive( idx, pnts, vals );
+</pre>
+
+<a name="4"></a>
+
+<h1 style="font-weight:bold; font-size:large">Small enhancements &amp; API interface changes</h1>
+
+<h3 style="font-weight:bold; font-size:medium">Family &amp; massing API enhancements</h3>
+
+<h4 style="font-weight:bold; font-size:large">Rehost a form</h4>
+<p>The overloaded methods
+
+<ul>
+<li>Form.Rehost()
+</ul>
+
+<p>rehost a form to a new edge, face, curve, or sketch plane.
+
+<h4 style="font-weight:bold; font-size:large">Obtain the location of point placement references from a family</h4>
+<p>The methods
+
+<ul>
+<li>FamilySymbol.GetFamilyPointPlacementReferences()
+<li>FamilyInstance.GetFamilyPointPlacementReferences()
+</ul>
+
+<p>provide information about the location and geometry of point placement references in the loaded family symbol or placed family instance. These points are found in Panel families and flexible components.
+
+<h4 style="font-weight:bold; font-size:large">Associate array dimension to label in families</h4>
+<p>The property
+
+<ul>
+<li>BaseArray.Label
+</ul>
+
+<p>associates the number of members of the array with a family parameter.
+<p>A BaseArray only can be labelled in a family document and only can be labelled to an integer FamilyParameter.
+The property can also unbind a labelled family parameter.
+
+<h4 style="font-weight:bold; font-size:large">Dissociate label from dimension in families</h4>
+<p>The property
+
+<ul>
+<li>Dimension.Label
+</ul>
+
+<p>can be set to null to dissociate a dimension from a label parameter.
+
+<h4 style="font-weight:bold; font-size:large">Rename and replace a family parameter</h4>
+<p>The method
+
+<ul>
+<li>FamilyManager.RenameParameter()
+</ul>
+
+<p>allows you to rename a Family parameter.
+<p>The overloaded methods
+
+<ul>
+<li>FamilyManager.ReplaceParameter()
+</ul>
+
+<p>allow you to replace a Family parameter with a new shared parameter, or a shared parameter with a new Family parameter.
+
+<h4 style="font-weight:bold; font-size:large">Reporting parameters</h4>
+<p>The property
+
+<ul>
+<li>FamilyParameter.IsReporting
+</ul>
+
+<p>identifies if the parameter is a reporting parameter. If true, the parameter is associated to a dimension value and cannot be modified. If false, the parameter is a driving parameter and if associated to a dimension, can modify the dimension it labels.
+<p>The methods
+
+<ul>
+<li>FamilyManager.MakeReporting()
+<li>FamilyManager.MakeNonReporting()
+</ul>
+
+<p>change a family parameter to be reporting or non-reporting.
+
+<h4 style="font-weight:bold; font-size:large">Place 2D family types on views</h4>
+<p>A new overload
+
+<ul>
+<li>ItemFactoryBase.NewFamilyInstance(XYZ, FamilySymbol, View)
+</ul>
+
+<p>has been added to support placement of 2D families in target views.  This can be used for placement of detail components, annotation symbols, and titleblocks into their target views.
+
+<h4 style="font-weight:bold; font-size:large">Prompt user to interactively place a family type</h4>
+<p>The method
+
+<ul>
+<li>UIDocument.PromptForFamilyInstancePlacement()
+</ul>
+
+<p>prompts the user to place one or more instances of a particular FamilySymbol.
+
+<h4 style="font-weight:bold; font-size:large">Use IFamilyLoadOptions to override behavior when loading family or family symbol from disk</h4>
+<p>New overloads for
+
+<ul>
+<li>Document.LoadFamily()
+<li>Document.LoadFamilySymbol()
+</ul>
+
+<p>have been added. These overloads accept IFamilyLoadOptions as an argument, allowing your application to automatically respond to the prompts Revit typically shows the user when reloading a family which already exists in a document. These new overloads apply when loading a family or a family symbol from a file on disk.
+
+<h4 style="font-weight:bold; font-size:large">Extract PartAtom from loaded family</h4>
+<p>The method
+
+<ul>
+<li>Family.ExtractPartAtom()
+</ul>
+
+<p>writes a PartAtom file describing the loaded family to a specified file on disk.
+
+<h4 style="font-weight:bold; font-size:large">FamilyHostingBehavior</h4>
+<p>The enum FamilyHostingBehavior represents the type of host a family expects.  The value for a particular family can be obtained from the family's BuiltInParameter.FAMILY_HOSTING_BEHAVIOR parameter.
+
+<h4 style="font-weight:bold; font-size:large">FamilyInstance.Host property improved</h4>
+<p>The property
+
+<ul>
+<li>FamilyInstance.Host
+</ul>
+
+<p>will now return the host element of face-hosted family instances. Previously it returned null.
+
+<h4 style="font-weight:bold; font-size:large">Convert family to be face host based</h4>
+<p>The method
+
+<ul>
+<li>FamilyUtils.ConvertFamilyToFaceHostBased()
+</ul>
+
+<p>converts a family to be face host based.
+
+<h4 style="font-weight:bold; font-size:large">Extract id of a family parameter</h4>
+<p>The new property
+
+<ul>
+<li>FamilyParameter.Id
+</ul>
+
+<p>extracts the id of a FamilyParameter as an ElementId. When you have a shared or family parameter, this Id is needed in order to use the parameter from an ElementParameterFilter during element iteration and as a ParameterChange for an updater. When you have a built-in parameter, the integer value of the id is the same as the integer value of the BuiltInParameter enumeration.
+
+<h4 style="font-weight:bold; font-size:large">API for solid/solid cut</h4>
+<p>The static methods in the class
+
+<ul>
+<li>SolidSolidCutUtils
+</ul>
+
+<p>expose the ability to add and remove new solid/solid cuts, and to inquire if an element is used in solid/solid cut in a family.
+
+<h4 style="font-weight:bold; font-size:large">Additional DividedSurface API</h4>
+<p>Some additional methods have been added to the DividedSurface class and provide access to intersection references:
+
+<ul>
+<li>DividedSurface.GetAllIntersectionElements()
+<li>DividedSurface.AddIntersectionElement()
+<li>DividedSurface.RemoveIntersectionElement()
+<li>DividedSurface.RemoveAllIntersectionElements()
+<li>DividedSurface.CanBeIntersectionElement()
+</ul>
+
+
+<h3 style="font-weight:bold; font-size:medium">View API changes</h3>
+
+<h4 style="font-weight:bold; font-size:large">NewViewPlan input change</h4>
+<p>The method
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewViewPlan()
+</ul>
+
+<p>now accepts a ViewPlanType enum, which contains only those view types which can be created by the method.
+
+<h4 style="font-weight:bold; font-size:large">Refresh active view</h4>
+<p>The method
+
+<ul>
+<li>Document.RefreshActiveView()
+</ul>
+
+<p>refreshes the display of the active view during the execution of your command so users can see incremental updates to their model. As in the past, Revit will automatically redraw the view after the command completes.
+
+<h4 style="font-weight:bold; font-size:large">View.IsTemplate</h4>
+<p>This property identifies if an instance of the View class represents an instance view (which users see in the project browser and graphics window) or a template view.
+
+<h4 style="font-weight:bold; font-size:large">Save image to new view</h4>
+<p>The new method
+
+<ul>
+<li>Document.SaveToProjectAsImage()
+</ul>
+
+<p>saves the graphics shown in the current view to a rendering view in the document.
+
+<h4 style="font-weight:bold; font-size:large">API for placeholder sheets</h4>
+<p>The method
+
+<ul>
+<li>ViewSheet.CreatePlaceholder()
+</ul>
+
+<p>creates a placeholder sheet in the document. Placeholder sheets represent sheets stored outside of the Revit model, but which should be organized along with the Revit sheets.
+
+<p>The property
+
+<ul>
+<li>ViewSheet.IsPlaceholder
+</ul>
+
+<p>identifies if a sheet is a placeholder sheet or not.
+
+<h3 style="font-weight:bold; font-size:medium">Import, export and print changes</h3>
+
+<h4 style="font-weight:bold; font-size:large">Import DWG as link</h4>
+<p>The method
+
+<ul>
+<li>Document.Link()
+</ul>
+
+<p>imports a DWG into the document as a link.
+
+<h4 style="font-weight:bold; font-size:large">Identify if import instance is linked</h4>
+<p>The property
+
+<ul>
+<li>ImportInstance.IsLinked
+</ul>
+
+<p>identifies if an import instance element is a link to an external file.
+
+<h4 style="font-weight:bold; font-size:large">Print API changes</h4>
+<p>The property
+
+<ul>
+<li>PrintSetup.CurrentPrintSetting
+</ul>
+
+<p>has been changed to an IPrintSetting. This interface may represent a PrintSetting element, or an InSessionPrintSetting object representing the In-session print settings for Revit printing.
+<p>The property
+
+<ul>
+<li>PrintSetup.InSessionPrintSetting
+</ul>
+
+<p>has been added to return the In-session print settings object. The in-session print settings will no longer returned in the collection of elements from the property
+
+<ul>
+<li>Document.PrintSettings
+</ul>
+
+<p>The event arguments for the event
+
+<ul>
+<li>Document.DocumentPrinting
+</ul>
+
+<p>has been changed to return an IPrintSetting object as well.
+<p>The property
+
+<ul>
+<li>ViewSheetSetting.CurrentViewSheetSet
+</ul>
+
+<p>has been changed to an IViewSheetSet. This interface may represent a ViewSheetSet element, or an InSessionViewSheetSet object representing the In-session view sheet set for Revit printing.
+<p>The property
+
+<ul>
+<li>ViewSheetSetting.InSessionViewSheetSet
+</ul>
+
+<p>has been added to return the In-session view sheet set object. The in-session view sheet set will no longer returned in the collection of elements from the property
+
+<ul>
+<li>Document.ViewSheetSets
+</ul>
+
+
+<h4 style="font-weight:bold; font-size:large">Export option for colour mode</h4>
+<p>The new property
+
+<ul>
+<li>ACADExportOptions.Colors
+</ul>
+
+<p>allows the option of exporting colours matching the AutoCAD Color Index colours, or as 24-bit true colour RGB values.
+
+<h4 style="font-weight:bold; font-size:large">Export model to IFC</h4>
+<p>The new method
+
+<ul>
+<li>Document.Export(string, string, IFCExportOptions)
+</ul>
+
+<p>exports the document to the Industry Standard Classes (IFC) format.
+
+<h4 style="font-weight:bold; font-size:large">Export model to DXF</h4>
+<p>The new method
+
+<ul>
+<li>Document.Export(string, string, ViewSet, DXFExportOptions)
+</ul>
+
+<p>exports the document or set of selected views to the DXF format.
+
+<h4 style="font-weight:bold; font-size:large">Export model to SAT</h4>
+<p>The new method
+
+<ul>
+<li>Document.Export(string, string, ViewSet, DXFExportOptions)
+</ul>
+
+<p>exports the document or set of selected views to the SAT format.
+
+<h4 style="font-weight:bold; font-size:large">Export image</h4>
+<p>The new method
+
+<ul>
+<li>Document.ExportImage()
+</ul>
+
+<p>exports the graphics shown in one or more views to image file(s).
+
+<h4 style="font-weight:bold; font-size:large">Extract image of an ElementType</h4>
+<p>The new method
+
+<ul>
+<li>ElementType.GetPreviewImage()
+</ul>
+
+<p>extracts the preview image of an Element Type. This image is similar to what is seen in the Revit UI when selecting the type of an element. You can specify the size of the image in pixels.
+
+<h4 style="font-weight:bold; font-size:large">Updated DWF and DWFX export methods</h4>
+<p>The four 2010 Document.Export methods for exporting of DWF-2D, DWF-3D, DWFX-2D and DWFX-3D files were consolidated into just two methods, one for exporting to DWF format, another to DWFX format. The corresponding export options classes are:
+
+<ul>
+<li>DWFExportOptions
+<li>DWFXExportOptions
+</ul>
+
+<p>Both methods can export both 2D views as well as 3D views in one call.
+
+<h4 style="font-weight:bold; font-size:large">Export id</h4>
+<p>The static method
+
+<ul>
+<li>ExportUtils.GetExportId()
+</ul>
+
+<p>retrieves the GUID representing an element in DWF and IFC export.  This id is used in the contents of DWF export and IFC export and it should be used only when cross-referencing to the contents of these export formats.  When storing Ids that will need to be mapped back to elements in future sessions, UniqueId must be used instead.
+
+<h3 style="font-weight:bold; font-size:medium">Parameter API changes</h3>
+
+<h4 style="font-weight:bold; font-size:large">ParameterFilterElement</h4>
+<p>Provides access to filter elements associated to views. You can access and modify the categories associated to a filter and the rules associated to a filter. You can also create new filters using an input list of categories and rules.
+<p>Rules are organized in a hierarchy based on parameter value type:
+
+<ul>
+<li>FilterIntegerRule &ndash; applies to integer and enumerated type parameters.
+<li>FilterDoubleRule &ndash; applies to double type parameters.
+<li>FilterElementIdRule &ndash; applies to ElementId type parameters.
+<li>FilterStringRule &ndash; applies to String type parameters.
+</ul>
+
+<p>Rules are associated to evaluators and value providers.
+<p>Evaluators are classes which determine how to evaluate the rule based on the value of the parameter and the value set in the rule. There are two hierarchies of evaluators:
+
+<ul>
+<li>FilterStringRuleEvaluator &ndash; applies to FilterStringRule rules, offers options for equality, begins with, ends with, contains, greater than, and less than evaluations.
+<li>FilterNumericRuleEvaluator &ndash; applies to other rule types, offers options for equality, greater than, and less than.
+</ul>
+
+<p>At this time, the hierarchy of evaluators is not extendable in the API.
+<p>Value providers determine how the value is obtained for the evaluation. In this release, there is only one value provider available: ParameterValueProvider.
+
+<h4 style="font-weight:bold; font-size:large">Extract GUID from a Parameter</h4>
+<p>The new properties
+
+<ul>
+<li>Parameter.IsShared
+<li>Parameter.GUID
+</ul>
+
+<p>identify if a given parameter is a shared parameter, and if it is, extract its GUID.
+
+<h4 style="font-weight:bold; font-size:large">Extract id of a parameter</h4>
+<p>The new property
+
+<ul>
+<li>Parameter.Id
+</ul>
+
+<p>extracts the id of a parameter as an ElementId. When you have a shared or family parameter, this Id is needed in order to use the parameter from an ElementParameterFilter during element iteration and as a ParameterChange for an updater. When you have a built-in parameter, the integer value of the id is the same as the integer value of the BuiltInParameter enumeration.
+
+<h4 style="font-weight:bold; font-size:large">SuspendUpdating applies to Parameter.Set</h4>
+<p>SuspendUpdating performance improvements now apply to Parameter.Set by default. By using the new constructor for SuspendUpdating which takes a boolean suspendForParameterSet, you can turn off this option.
+<p>The performance benefits of this can be extremely significant (95-99% improvement in speed) if you are setting instance parameters on family instances (where the instance parameters are defined in the family itself, and not added to the instances via shared parameters). For most other applications of Parameter.Set this will likely have no visible performance benefit.
+<p>Note that SuspendUpdating applies only to RegenerationMode.Manual.
+
+<h3 style="font-weight:bold; font-size:medium">Alignment and ItemFactoryBase.NewAlignment() method</h3>
+<p>The Alignment element subclass has been removed.  NewAlignment() and element iteration will now return alignments as Dimension elements.
+
+<h3 style="font-weight:bold; font-size:medium">DimensionType &ndash; access to the dimension style</h3>
+<p>The property
+
+<ul>
+<li>DimensionType.StyleType
+</ul>
+
+<p>identifies the style to which the dimension type can be applied, e.g. linear, angular, radial, etc.
+
+
+<h3 style="font-weight:bold; font-size:medium">Create sloped wall on mass face</h3>
+<p>The method
+
+<ul>
+<li>FaceWall.Create()
+</ul>
+
+<p>creates a new instance of a face wall on the sloped face of a mass.
+
+<h3 style="font-weight:bold; font-size:medium">Face.GetBoundingBox() method</h3>
+<p>This new method returns a BoundingBoxUV with the extents of the parameterization of the face.
+
+<h3 style="font-weight:bold; font-size:medium">NewFootPrintRoof() input</h3>
+<p>The method
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewFootPrintRoof()
+</ul>
+
+<p>has been changed. It now outputs an array of Model Curves corresponding to the set of Curves input in the footPrint. By knowing which Model Curve was created by each footPrint curve, you can set properties like SlopeAngle for each curve.
+
+<h3 style="font-weight:bold; font-size:medium">Floor slope and elevation</h3>
+<p>The slope and elevation at a point on floor's surface can be found using the methods:
+
+<ul>
+<li>Floor.GetVerticalProjectionPoint()
+<li>Floor.GetNormalAtVerticalProjectionPoint()
+</ul>
+
+
+<h3 style="font-weight:bold; font-size:medium">Converting between Model Curves and Detail/Symbolic Curves</h3>
+<p>The Revit API offers new utilities to convert model curves to and from detail curves or symbolic curves.
+
+<ul>
+<li>Document.ConvertModelToDetailCurves()
+<li>Document.ConvertDetailToModelCurves()
+<li>Document.ConvertModelToSymbolicCurves()
+<li>Document.ConvertSymbolicToModelCurves()
+</ul>
+
+<p>In all these methods, the original curves are deleted. If the curves do not lie in the appropriate plane for their target curve type, they will be projected to the target plane.
+
+<h3 style="font-weight:bold; font-size:medium">CurveElement type</h3>
+<p>The new property
+
+<ul>
+<li>CurveElement.CurveElementType
+</ul>
+
+<p>identifies if a particular curve is a model curve, detail curve, symbolic curve, reference line, room, area or space separation line, insulation detail curve, repeating detail profile line, or revision cloud line.
+
+<h3 style="font-weight:bold; font-size:medium">Shared base classes for Room, Space, Area and their tags</h3>
+
+<p>The new classes Enclosure and EnclosureTag act as shared base classes for rooms, spaces, and areas, and room tags, space tags, and area tags, respectively. Some shared functionality from the derived classes has been moved into the base classes. There are some minor impacts to the previous API interfaces:
+
+<ol>
+<li>The RoomTag, SpaceTag, AreaTag property Leader has been renamed to HasLeader.
+<li>The Room and Space properties Area and Perimeter have been moved to the base class, thus granting access to these properties for the Area class as well.
+</ol>
+
+<h3 style="font-weight:bold; font-size:medium">View-specific elements</h3>
+<p>The new properties
+
+<ul>
+<li>Element.ViewSpecific
+<li>Element.OwnerViewId
+</ul>
+
+<p>identify if the element is owned by a particular view (for example, a Detail Curve is owned by the drafting view in which it is drawn), and which view is the owner. These properties align with the ElementOwnerViewFilter which can be used in Element iteration.
+
+<h3 style="font-weight:bold; font-size:medium">Monitoring elements</h3>
+<p>The new functions
+
+<ul>
+<li>Element.IsMonitoringLinkElement()
+<li>Element.IsMonitoringLocalElement()
+<li>Element.GetMonitoredLinkElementIds()
+<li>Element.GetMonitoredLocalElementIds()
+</ul>
+
+<p>indicate whether an element is monitoring any elements in the local document or in linked files.
+
+<h3 style="font-weight:bold; font-size:medium">Design Options</h3>
+<p>The new static function
+
+<ul>
+<li>DesignOption.GetActiveDesignOptionId()
+</ul>
+
+<p>returns the id of the active design option within the document.
+<p>The new property
+
+<ul>
+<li>DesignOption.IsPrimary
+</ul>
+
+<p>identifies if the design option is the primary option within its owning design option set.
+
+<h3 style="font-weight:bold; font-size:medium">Family template path</h3>
+<p>The property
+
+<ul>
+<li>Application.FamilyTemplatePath
+</ul>
+
+<p>provides the default path for family template files.
+
+<h3 style="font-weight:bold; font-size:medium">Write comments to the Revit Journal File</h3>
+<p>The method
+
+<ul>
+<li>Application.WriteJournalComment()
+</ul>
+
+<p>allows the API application to write comments to the Revit Journal file for diagnostic, testing, and other purposes.
+
+<h3 style="font-weight:bold; font-size:medium">Window extents</h3>
+<p>The properties
+
+<ul>
+<li>UIApplication.MainWindowExtents
+<li>UIApplication.DrawingAreaExtents
+</ul>
+
+<p>provide access to the outer coordinates of the Revit window and drawing area, in pixels. An application can use these value to correctly locate its own UI relative to the Revit UI.
+
+<h3 style="font-weight:bold; font-size:medium">City.WeatherStation</h3>
+<p>The new property
+
+<ul>
+<li>City.WeatherStation
+</ul>
+
+<p>provides an identifier for the nearest weather station.
+
+<h3 style="font-weight:bold; font-size:medium">Labels matching commonly used enumerated type values</h3>
+<p>The new class LabelUtils provides methods to obtain the user-visible label corresponding to certain enum values.  These routines obtain the label corresponding to the name in the current Revit language.  Support is offered for:
+
+<ul>
+<li>BuiltInParameter
+<li>BuiltInParameterGroup
+<li>ParameterType
+<li>UnitType
+<li>DisplayUnitType
+<li>gbXMLBuildingType
+</ul>
+
+
+<h3 style="font-weight:bold; font-size:medium">Keyboard shortcut support for API buttons</h3>
+<p>API buttons found on the Ribbon can be assigned a keyboard shortcut.  Buttons created by applications registered using manifest files now use an id based on their application id and button name to provide a unique identifier for the button.  The keyboard shortcut will be maintained even if the order of registration of API applications changes.
+
+<h3 style="font-weight:bold; font-size:medium">MEP API</h3>
+
+<h4 style="font-weight:bold; font-size:large">Validation in ElectricalSystem properties</h4>
+<p>The properties
+
+<ul>
+<li>ElectricalSystem.Length
+<li>ElectricalSystem.VoltageDrop
+</ul>
+
+<p>now throw an InvalidOperationException when the value cannot be computed (instead of returning 0).
+
+<h4 style="font-weight:bold; font-size:large">WireMaterialType, InsulationType, TemperatureRatingType</h4>
+<p>These methods now inherit from ElementType.
+
+<h4 style="font-weight:bold; font-size:large">DuctConnector, PipeConnector, ElectricalConnector</h4>
+<p>The methods now inherit from a new common base class, ConnectorElement.
+
+<h3 style="font-weight:bold; font-size:medium">Structural API</h3>
+
+<h4 style="font-weight:bold; font-size:large">NewTruss() in Revit Architecture</h4>
+<p>The Autodesk.Revit.Creation.Document.NewTruss method, which was previously only enabled in Revit Structure, is now also enabled in Revit Architecture.
+
+<h4 style="font-weight:bold; font-size:large">Truss &ndash; attach and detach chord</h4>
+<p>The methods
+
+<ul>
+<li>Truss.AttachTopChord
+<li>Truss.DetachTopChord
+</ul>
+
+<p>have been replaced by methods
+
+<ul>
+<li>Truss.AttachChord
+<li>Truss.DetachChord
+</ul>
+
+<p>supporting both top and bottom chords as inputs.
+
+<h4 style="font-weight:bold; font-size:large">Drop truss and beam systems</h4>
+<p>The new methods
+
+<ul>
+<li>Truss.DropTruss()
+<li>BeamSystem.DropBeamSystem()
+</ul>
+
+<p>delete the parent collection elements after disassociating their constituent members.
+
+<h4 style="font-weight:bold; font-size:large">Rebar API changes</h4>
+<p>The new methods
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewRebarBarType()
+<li>Autodesk.Revit.Creation.Document.NewRebarHookType()
+<li>Autodesk.Revit.Creation.Document.NewRebarCoverType()
+</ul>
+
+<p>allow creation of new instances of these elements.
+<p>The RebarBarType class has a new interface. (Formerly some properties were available through parameters only.)
+
+<ul>
+<li>BarDiameter
+<li>StandardBendDiameter
+<li>StandardHookBendDiameter (new property for 2011)
+<li>StirrupTieBendDiameter
+<li>MaximumBendRadius
+<li>GetHookPermission() / SetHookPermission()
+<li>GetAutoCalcHookLengths() / SetAutoCalcHookLengths()
+<li>GetHookLength() / SetHookLength()
+<li>GetHookOffsetLength() / SetHookOffsetLength()
+</ul>
+
+<p>The Rebar class has two new properties, includeFirstBar and includeLastBar, which allow suppression of the end bars in a rebar array.
+<p>Rebar also has a new interface to its Array functionality. (Formerly these properties were available through parameters only.)
+
+<ul>
+<li>LayoutRule: (read-only) Array layout rule.
+<li>SetLayoutAsSingle() / SetLayoutAsFixedNumber() / SetLayoutAsMaximumSpacing() / SetLayoutAsNumberWithSpacing() / SetLayoutAsMinimumClearSpacing(): Change the array layout rule. Note that the layout rule interacts with several other properties; to avoid confusion, the SetLayout methods require you to specify values for these other properties.
+<li>ArrayLength: Array length.
+<li>NumberOfBarPositions: Number of bar positions in the array. The actual number may be 1 or 2 fewer and is given by getQuantity().
+<li>MaxSpacing: maxium spacing.
+<li>Quantity: (read-only) Number of bars in the array, equal to getNumberOfBarPositions() minus the number of end bars suppressed with includeFirstBar / includeLastBar.
+<li>BarsOnNormalSide: flip the array with respect to the start plane.
+</ul>
+
+<p>The method SetLayoutRuleWithoutExaminingHost() has been removed in favour of the new setLayoutRuleAs...() methods.
+<p>The methods:
+
+<ul>
+<li>Rebar.IsUnobscuredInView()
+<li>Rebar.SetUnobscuredInView()
+<li>Rebar.IsSolidInView()
+<li>Rebar.SetSolidInView()
+</ul>
+
+<p>control the visibility of the Rebar in the indicated view.
+<p>New Rebar properties and methods have been introduced to work with spiral rebar:
+
+<ul>
+<li>Rebar.Height
+<li>Rebar.Pitch
+<li>Rebar.BaseFinishingTurns
+<li>Rebar.TopFinishingTurns
+<li>Rebar.ScaleToBoxForSpiral()
+<li>RebarShapeDefinitionByArc.SetArcTypeSpiral()
+</ul>
+
+<p>Finally, HostedSweep elements are now valid for the Rebar.Host property.
+
+<h4 style="font-weight:bold; font-size:large">Structural Settings</h4>
+<p>The class StructuralSettings provides access to many of the values shown in the Revit Structural Settings dialog box:
+
+<ul>
+<li>Symbolic Cutback distances
+<li>Brace symbols
+<li>Analytical model settings
+<li>Boundary conditions settings
+</ul>
+
+<p>To obtain the StructuralSettings for a given document, use the static method:
+
+<ul>
+<li>StructuralSettings.GetStructuralSettings(Document)
+</ul>
+
+<p>Some items in the Revit Structural Settings dialog box are not accessed through StructuralSettings in the API:
+
+<ul>
+<li>Connection Types are individual elements of type StructuralConnectionType that are part of the document.
+<li>Load cases are individual elements of type LoadCase that are part of the document.
+</ul>
+
+
+<h4 style="font-weight:bold; font-size:large">Rigid link built-in parameter change</h4>
+
+<p>The built-in parameter id STRUCTURAL_ANALYTICAL_RIGID_LINK has been replaced with STRUCTURAL_ANALYTICAL_COLUMN_RIGID_LINK and STRUCTURAL_ANALYTICAL_BEAM_RIGID_LINK.
+
+<p>You can also access the value of this parameter for a given element via the AnalyticalModel.RigidLinksOption property.
+
+<h4 style="font-weight:bold; font-size:large">BoundaryConditions type</h4>
+
+<p>A new enum BoundaryConditionsType has been introduced.
+The values of this enum match the values of the built-in parameter id BOUNDARY_CONDITIONS_TYPE.
+
+<hr>
+<p style="text-align:center">End of document</p>
+<hr>
+
+<p>So that was the news in the Revit 2011 API way back in the year 2010.</p>
+
+<p>Please be aware that some of the changes listed above obviously have changed yet again since.</p>
+
+<p>Stay tuned for the next installment, coming soon, leading up towards the current day.</p>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- SPR #191551 [VisibilityMode documentation in developer guide and help file] -->
+
+<h3>Add-In Visibility Mode</h3>
+
+<p>This Monday is the 
+
+<a href="http://en.wikipedia.org/wiki/Pentecost">
+Pentecost holiday</a>
+
+in Neuch&acirc;tel.
+I  used it to make my first experiments using the add-in manifest visibility mode tag.
+The developer guide has the following to say about it:
+
+<span style="color:darkblue">
+
+<p>Provides the ability to specify if the command is visible in project documents, family documents, or no document at all.
+
+<p>Also provides the ability to specify the discipline(s) where the command should be visible. 
+Multiple values may be set for this option. 
+Optional; use this tag for ExternalCommands only. 
+The default is to display the command in all modes and disciplines, including when there is no active document. Previously written external commands which need to run against the active document should either be modified to ensure that the code deals with invocation of the command when there is no active document, or apply the NotVisibleWhenNoActiveDocument mode.
+
+</span>
+
+<p>It does not actually specify how to define multiple values for this tag, though.
+Luckily, the Code Region 3-9: 'Manifest .addin ExternalCommand' also provides an example of using it:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>c:\MyProgram\MyProgram.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>76eb700a-2c85-4888-a78d-31429ecae9ed<span class="blue">&lt;/</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.Samples.SampleCommand<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Sample command<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInFamily<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInMEP<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AvailabilityClassName</span><span class="blue">&gt;</span>Revit.Samples.SampleAccessibilityCheck<span class="blue">&lt;/</span><span class="maroon">AvailabilityClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LongDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">p</span><span class="blue">&gt;</span>This is the long description for my command.<span class="blue">&lt;/</span><span class="maroon">p</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">p</span><span class="blue">&gt;</span>This is another descriptive paragraph, with notes about how to use the command properly.<span class="blue">&lt;/</span><span class="maroon">p</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">LongDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">TooltipImage</span><span class="blue">&gt;</span>c:\MyProgram\Autodesk.jpg<span class="blue">&lt;/</span><span class="maroon">TooltipImage</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LargeImage</span><span class="blue">&gt;</span>c:\MyProgram\MyProgramIcon.png<span class="blue">&lt;/</span><span class="maroon">LargeImage</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>If the lines are truncated, please copy them to an editor to see them in full.
+
+<h4>VisibilityMode Enumeration</h4>
+
+<p>The list of all the possible values to use in this tag is currently not provided explicit in the API documentation, but we will be adding that information anon.
+The values to use are simply the string representations of the VisibilityMode enumeration values, some of which are used in Code Region 3-11: 'Creating and editing a manifest file' in the developer guide:
+
+<pre class="code">
+&nbsp; <span class="green">// this command only visible in Revit MEP, </span>
+&nbsp; <span class="green">// Structure, and only visible in Project </span>
+&nbsp; <span class="green">// document or when no document at all:</span>
+&nbsp; command1.VisibilityMode 
+&nbsp; &nbsp; = VisibilityMode.NotVisibleInArchitecture 
+&nbsp; &nbsp; | VisibilityMode.NotVisibleInFamily;
+</pre>
+
+<p>The VisibilityMode enumeration is documented in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">
+RevitAddInUtility</a> help file 
+
+RevitAddInUtility.chm located in the SDK folder, so the full list can be found there:
+
+<span style="color:darkblue">
+
+<p>Describes the conditions under which a particular external command will be visible in the Revit UI. 
+
+<h5>Members</h5>
+
+<ul>
+<li>AlwaysVisible: The command is available in all possible modes supported by the Revit API.
+<li>NotVisibleInProject: The command is invisible when there is a project document active.
+<li>NotVisibleInFamily: The command is invisible when there is a family document active.
+<li>NotVisibleWhenNoActiveDocument: The command is invisible when there is no active document.
+<li>NotVisibleInArchitecture: The command is invisible in Autodesk Revit Architecture.
+<li>NotVisibleInStructure: The command is invisible in Autodesk Revit Structure.
+<li>NotVisibleInMechanical: The command is invisible when the Mechanical discipline editing tools are available, e.g. in Autodesk Revit MEP.
+<li>NotVisibleInElectrical: The command is invisible when the Electrical discipline editing tools are available, e.g. in Autodesk Revit MEP.
+<li>NotVisibleInPlumbing: The command is invisible when the Plumbing discipline editing tools are available, e.g. in Autodesk Revit MEP.
+<li>NotVisibleInMEP: The command is invisible in Autodesk Revit MEP.
+</ul>
+
+<h5>Remarks</h5>
+
+<p>Note that there are a few conditions where the Revit API framework prevents commands from being available always:
+
+<ol>
+<li>When the user has another Revit command active, e.g. creating Windows, Doors, or editing sketches.
+<li>When the active view is in perspective mode, or when the view is a Legend, Schedule, Walkthrough, Material Takeoffs, Drawings Lists, View Lists, Note Blocks, View Lists, etc.
+<li>When the user is editing an in-place family.
+</ol>
+
+</span>
+
+<h4>Loose Connector Utility</h4>
+
+<p>Now I implemented a little utility to check for unconnected MEP connectors.
+Since my list of add-ins is continuously growing, I thought it might be about time to start hiding as many as possible of them when they are not needed.
+In this case, I only want access to this utility in the Revit MEP project context, i.e. I wanted to hide it in all other modes:
+
+<ul>
+<li>Architecture
+<li>Family editor
+<li>Structure
+<li>No active document
+</ul>
+
+<p>Using the couple of values mentioned in the developer guide and simply guessing what the missing ones might be, I ended up with the following manifest file:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Loose Connectors<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>List all unconnected Revit MEP connectors<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInArchitecture<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInFamily<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInStructure<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleWhenNoActiveDocument<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\bin\LooseConnectors.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>LooseConnectors.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>fc508f72-84b2-4e82-942c-ad9ec07cbe4a<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIn</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I tested it in the contexts mentioned above, and lo and behold, my external command is not displayed, just as desired.

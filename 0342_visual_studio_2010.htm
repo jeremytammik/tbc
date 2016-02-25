@@ -1,0 +1,66 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Debugging with Visual Studio 2010 and RvtSamples.txt Update</h3>
+
+<p>Rod Howarth just published a description of a problem 
+
+<a href="http://blog.rodhowarth.com/2010/04/revit-api-visual-studio-2010-and-revit.html">
+debugging a Revit 2011 add-in with Visual Studio 2010</a>.
+
+He found a related thread on the Microsoft Connect Visual Studio discussion forum describing the
+
+<a href="http://connect.microsoft.com/VisualStudio/feedback/details/487949/debugging-external-application">
+same issue with Revit 2010</a>  and 
+
+presenting a solution for it:
+
+<span style="color:darkblue">
+
+<p>The issue that you are encountering is that Visual Studio 2010 is launching Revit under the default debugger (v4.0) but since you are building a project against the 2.0 framework (3.5 runs on the CLR 2.0) in order to correctly debug your Revit plugin, Visual Studio must launch Revit under the 2.0 debugger, not the 4.0. 
+
+<p>You can either launch Revit and manually attach to the Revit process with your Revit plugin open (the debugger will automatically attach with the correct engine once the process has already started), or you can add a &lt;supportedRuntime&gt; attribute to the &lt;startup&gt; section of the Revit.exe.config file that will allow Visual Studio to determine which debugger should be attached:
+
+</span>
+
+<p>As Rod says, the workaround is to edit your Revit.exe.config file which is located in the same directory as Revit.exe and add the following just before the &lt;/configuration&gt; part of it:
+
+<pre>
+&lt;startup&gt;
+&lt;supportedRuntime version="v2.0.50727" /&gt;
+&lt;/startup&gt;
+</pre>
+
+<p>For more details, please refer to 
+
+<a href="http://blog.rodhowarth.com/2010/04/revit-api-visual-studio-2010-and-revit.html">
+Rod's post</a>.
+
+
+<h4>RvtSamples.txt Update</h4>
+
+<p>In a separate thread, Rod also mentioned a problem loading the version of RvtSamples.txt included with the Revit 2011 SDK. 
+
+This is the text file read by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+RvtSamples</a>
+
+SDK sample application 
+
+(for <a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">2010</a>)
+
+to load all the other Revit SDK sample commands as well as potentially process 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+include files</a> to 
+
+load an additional set of own personal commands.
+
+I ran into the same issues Rod describes, so I thought it worthwhile to publish 
+
+<span class="asset  asset-generic at-xid-6a00e553e1689788330133ecb2e5b7970b"><a href="http://thebuildingcoder.typepad.com/files/rvtsamples.txt">my current version of RvtSamples.txt</a></span>
+
+for Revit 2011 to save others the bother of having to explore what fixes need to be made.
+

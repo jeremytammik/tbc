@@ -1,0 +1,176 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1252286 [Edges for RoofSlab] 
+  devnote 13703588 JT2009-08-05 [Setting Roof Slab Edge Plumb Cut Property]
+
+-->
+
+<h3>Roof Eave Cut in Revit and ACA</h3>
+
+<p>Here is a case that is interesting in its own right, or rather two separate cases and a comparison between the two.
+The issue is the programmatic setting of the roof eave cut property in AutoCAD Architecture and Revit, respectively.
+One interesting aspect is the similarity and differences between the two solutions.
+
+<p>First of all, here is the original question, addressed at ACA:</p>
+
+<p><strong>Question:</strong>
+I am having difficulty accessing the edges of a RoofSlab entity. 
+I am programming in C#.  
+I need to change the EdgeCut to a Plumb Cut and I don't know how to access the edges so that I can change the property from Square Cut to Plumb Cut.</p>
+
+<h4>Setting the SlabEdge.IsPlumbCut Property in AutoCAD Architecture</h4>
+
+<p>In ACA, this issue can also be formulated like this:
+
+<p><strong>Question:</strong> How can I define the roof slab edge plumb cut property and set it to plumb or square cut in AutoCAD Architecture?
+The ACA.NET API SlabEdge.IsPlumbCut property is read-only, so some other method is needed.
+
+<p><strong>Answer:</strong> As said, the required property is represented by the SlabEdge.IsPlumbCut property, which is read-only in the API. 
+So you are searching for write access to this property?
+
+<p>This property can be controlled by the roof slab style. 
+One way to change it is to set up an appropriate edge style. 
+You can define an edge style that uses the plumb orientation by default and then define a slab style using that edge style. 
+When you convert to slab, use that slab style, and the plumb edge will come with it.
+
+<p>You can also directly access and write to this property on each edge individually, independently of the edge style, by using the SlabEdge.SetCutOption method. 
+The setting of this property is displayed when you select the 'Edges' entry in the roof slab property palette:
+
+<center>
+<img src="img/aca_slab_edges.png" alt="ACA Slab Edges"/>
+</center>
+
+<p>I implemented a sample ACA.NET application PlumbCut which toggles the state of this setting on each edge of a selected roof slab every time it is called. 
+Here is the relevant code snippet from the command method implementation:
+
+<pre class="code">
+&nbsp; <span class="teal">RoofSlab</span> roofSlab = t.GetObject( 
+&nbsp; &nbsp; entId, <span class="teal">OpenMode</span>.ForWrite ) <span class="blue">as</span> <span class="teal">RoofSlab</span>;
+&nbsp;
+&nbsp; <span class="teal">SlabFace</span> face = roofSlab.Face;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">SlabLoop</span> loop <span class="blue">in</span> face.Loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SlabEdge</span> edge <span class="blue">in</span> loop.Edges )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> isPlumb = edge.IsPlumbCut;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// SlabEdge.IsPlumbCut cannot be assigned </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to -- it is read only:</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//edge.IsPlumbCut = !edge.IsPlumbCut; </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; edge.SetCutOption( isPlumb );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Here is the complete 
+
+<a href="zip/PlumbCut.zip">
+PlumbCut</a>
+
+ACA.NET command source code and the complete Visual Studio solution to build it.
+
+<p>So much for AutoCAD Architecture.
+Here is an answer to the analogue question in the context of Revit:</p>
+
+<h4>Setting the Roof Eave Cut Property in Revit</h4>
+
+<p><strong>Question:</strong> How can I define the roof eave cut property and set it to plumb or square cut in Revit?
+
+<p><strong>Answer:</strong> I created a very simple sample model consisting of four walls supporting a footprint roof to explore your query and see the property you are looking for, the roof element Rafter Cut property, which can take the following values:</p>
+
+<ul>
+<li>Plumb Cut
+<li>Two Cut - Plumb
+<li>Two Cut - Square
+</ul>
+
+<center>
+<img src="img/roof_rafter_cut.png" alt="Roof Rafter Cut Property"/>
+</center>
+
+<p>These values correspond to the following EaveCutterType enumeration values in the API:</p>
+
+<ul>
+<li>PlumbCut
+<li>TwoCutPlumb
+<li>TwoCutSquare
+</ul>
+
+<p>Exploring the roof element parameters using RvtMgdDbg, I can see that these values are stored in the integer-valued built-in parameter ROOF_EAVE_CUT_PARAM.</p>
+
+<p>To ensure that this parameter can be accessed and its integer value read and written using the EaveCutterType enumeration values, I implemented an external command and a sample application RoofEaveCut. 
+To run it, you need to pre-select a foot print roof in the model. 
+Then, each time you call the external command, the value of the Rafter Cut property is cycled through the three values listed above. 
+This demonstrates that you can both read and write the built-in ROOF_EAVE_CUT_PARAM parameter value as an integer and cast it to the EaveCutterType enumeration values. 
+Here is the relevant code snippet:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _prompt 
+&nbsp; = <span class="maroon">&quot;Please select a single foot print roof element.&quot;</span>;
+&nbsp;
+<span class="blue">const</span> <span class="teal">BuiltInParameter</span> _bip 
+&nbsp; = <span class="teal">BuiltInParameter</span>.ROOF_EAVE_CUT_PARAM;
+&nbsp;
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">ElementSet</span> els = doc.Selection.Elements;
+
+&nbsp; <span class="blue">if</span>( 1 != els.Size )
+&nbsp; {
+&nbsp; &nbsp; message = _prompt;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FootPrintRoof</span> roof = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> els )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; roof = e <span class="blue">as</span> <span class="teal">FootPrintRoof</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == roof )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = roof.get_Parameter( _bip );
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = p.AsInteger();
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> (<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.PlumbCut: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i =(<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.TwoCutPlumb; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> (<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.TwoCutPlumb: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i =(<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.TwoCutSquare; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> (<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.TwoCutSquare: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i =(<span class="blue">int</span>) <span class="teal">EaveCutterType</span>.PlumbCut; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; p.Set( i );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> 0 == message.Length
+&nbsp; &nbsp; ? <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+}
+</pre>
+
+<p>Here is the complete 
+
+<a href="zip/RoofEaveCut.zip">
+RoofEaveCut</a>
+
+Revit external command source code and the complete Visual Studio solution to build it.

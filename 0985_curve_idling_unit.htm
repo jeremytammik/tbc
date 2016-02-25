@@ -1,0 +1,148 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+2. 08559345 [Curve.ApproximateLength vs Curve.Length] -- Ning Zhou, Ong & Ong Pte Ltd
+
+3. http://adndevblog.typepad.com/aec/2013/07/tricks-to-force-trigger-idling-event.html -- Joe Ye,  trick to force trigger Idling event
+   08542825 [force inmediate idle event] -- Jose Fandos, Andekan LLC
+
+4. 08248896 [ADN Support - Possible bug in Revit 2014 API Discovered] -- CoderBoy
+
+-->
+
+<h3>Curve Length, Idling, Units and RevitPythonShell</h3>
+
+<p>Here are a couple of recent interesting questions that came up:</p>
+
+<ul>
+<li><a href="#2">Curve Length versus ApproximateLength</a></li>
+<li><a href="#3">Potential SetRaiseWithoutDelay workaround</a></li>
+<li><a href="#4">Unit handling improvements</a></li>
+<li><a href="#5">Self-contained RevitPythonShell deployment</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Curve Length versus ApproximateLength</h4>
+
+<p><strong>Question:</strong> What is the difference between the Curve Length and ApproximateLength properties, please?</p>
+
+<p>I am using them to obtain an arc wall length.
+As far as I can tell, the result is exactly the same, so which one should I normally use?</p>
+
+
+<p><strong>Answer:</strong> All Revit geometry
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curve-parameterisation.html">
+curves are parameterised</a>.
+
+<p>A curve is a mapping from a simple one-dimensional parameter range, e.g. the interval [0,1] or [0,2&pi;], to a set of contiguous points in 2D or 3D space.</p>
+
+<p>Whereas the parameter range is normally very simple, the resulting curve points in space are a different matter.</p>
+
+<p>For a complex curve, the range spanned by the points and the resulting curve length may be difficult to determine exactly.
+The Length property may calculate it using numeric integration, which provides a pretty good approximation and may be expensive to compute.</p>
+
+<p>The ApproximateLength property uses a simpler, faster, more efficient algorithm to determine an approximate length without integration.</p>
+
+<p>However, as stated in the documentation, the results may be off by a significant amount.</p>
+
+<p>For arcs and lines there is no difference, as you noted.
+In those simple cases, the result and performance for both will always be identical.</p>
+
+<p>Therefore, for walls, under normal circumstances, it will make no difference which one of the two methods you use.</p>
+
+<p>The only difference will occur for complex curves, in which case you need to decide for yourself whether speed or precision is of greater importance for you.</p>
+
+<p>If you have a plan requiring a wall that returns different results for these two properties, your architect is probably mad.  :-)</p>
+
+
+<a name="3"></a>
+
+<h4>Potential SetRaiseWithoutDelay Workaround</h4>
+
+<p>Revit 2014 introduced a new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/idling-enhancements-and-external-events.html#2">
+default Idling behaviour</a>,
+
+raising the event one single time each time Revit enters an idle session, and the SetRaiseWithoutDelay method to restore the non-default mode, calling the event handler repeatedly.
+
+<p>Calling SetRaiseWithoutDelay may cause more calls than needed and degrade system performance.</p>
+
+<p>However, not calling it means that your Idling event handler will be called once only when Revit enters the idle state, and never again unless the user moves the mouse or takes some other action.</p>
+
+<p>Joe Ye presented a
+
+<a href="http://adndevblog.typepad.com/aec/2013/07/tricks-to-force-trigger-idling-event.html">
+trick to force trigger Idling event</a> that
+
+can be used to achieve something in between the two extremes by simulating a mouse move, triggering a new Idling call without calling SetRaiseWithoutDelay.
+
+<p>It may or may not be possible to combine this trick with a timer to achieve any desired delay between the calls.</p>
+
+
+<a name="4"></a>
+
+<h4>Unit Handling Improvements</h4>
+
+<p><strong>Question:</strong> My add-in needs to create a list of all DisplayUnitTypes (e.g. DUT_DECIMAL_INCHES, DUT_FEET_FRACTIONAL_INCHES) that are valid for a given UnitType (e.g. UT_Length) in a family document.
+
+<p>The only way I could find to do this previously was to try applying every DisplayUnitType enum value to the FormatOptions.Units object for the given UnitType.
+The invalid ones throw an exception, so the rest are presumably valid.</p>
+
+<p>Since this is a time-consuming process, I cache the results for all UnitTypes.</p>
+
+<p>The Revit 2014 API introduced the FormatOptions.DisplayUnits property.
+The Visual Studio IntelliSense says it can throw three exceptions: ArgumentException, ArgumentOutOfRangeException and InvalidOperationException.</p>
+
+<p>However, in all my tests so far, the method <b>never</b> throws an exception.
+My add-in therefore concludes that every possible DisplayUnitType is valid for the FormatOptions for every UnitType.</p>
+
+<p>I know that significant changes were made to the Units engine.</p>
+
+<p>Is there any better built-in way to generate the list of DisplayUnitTypes that are valid for a UnitType?</p>
+
+
+<p><strong>Answer:</strong> This is working as designed:
+
+<p>FormatOptions.DisplayUnits rejects only "invalid display units".
+The documentation refers to UnitUtils.GetValidDisplayUnits, which says, "A display unit is considered valid if it is an actual unit like meters or feet. Obsolete values and the special values DUT_CUSTOM and DUT_UNDEFINED are not considered valid."</p>
+
+<p>So no attempt is made to coordinate display units with the unit type that generated the FormatOptions.</p>
+
+<p>Note that SetFormatOptions does throw an exception for invalid combinations of UnitType and DisplayUnitType if you add this code to the check:</p>
+
+<pre class="code">
+  oFormatOption.DisplayUnits = eDisplayUnitType;
+
+  using (Transaction t = new Transaction(doc))
+  {
+    t.Start("Set options");
+    units.SetFormatOptions(unitType, oFormatOption);
+    t.Commit();
+  }
+</pre>
+
+<p>On the other hand, there really is an easier way to achieve this:</p>
+
+<p>Call UnitUtils.GetValidDisplayUnits(UnitType), which directly returns valid types without any further complications.</p>
+
+
+<a name="5"></a>
+
+<h4>Self-contained RevitPythonShell Deployment</h4>
+
+<p>Daren Thomas points out the
+
+<a href="http://darenatwork.blogspot.ch/2013/05/deploying-rps-scripts-with.html">
+new RevitPythonShell deployment functionality</a> that
+
+enables the creation of a self-contained set of DLLs for deploying RevitPythonShell scripts without requiring the user to install RevitPythonShell.
+You still need to create an installer, and a HelloWorld example with a sample InnoSetup installer is provided.</p>

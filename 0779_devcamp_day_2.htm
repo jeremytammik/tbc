@@ -1,0 +1,561 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>DevCamp Day Two</h3>
+
+<p>This morning I presented my second session, on some of the Revit 2013 UI API enhancements, in the Revit API beginner track.
+After that, I returned back to the Revit API expert one to attend the presentations on modeless interaction and IFC before presenting my final session on the Revit MEP API.
+Here then are my sessions of today, in chronological order:
+
+<ul>
+<li><a href="#2">1-4 Revit 2013 UI API enhancements</a>
+<li><a href="#3">2-3 Asynchronous interactions</a>
+<li><a href="#4">2-2 IFC export open source</a>
+<li><a href="#5">2-7 Revit MEP API</a>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Revit 2013 UI API Enhancements</h4>
+
+<p><a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+Enhanced add-in integration</a> is
+
+an important topic in the Revit 2013 API.
+This session discusses four of the add-in integration topics in more depth, building on a preceding presentation by Saikat Bhattacharya presenting a snapshot of the entire Revit UI API functionality:
+
+<ul>
+<li><a href="#21">Revit progress bar notifications</a>
+<li><a href="#22">Options dialogue WPF custom extensions</a>
+<li><a href="#23">Embed and control a Revit view</a>
+<li><a href="#24">Drag and drop</a>
+</ul>
+
+<p>All four of these are covered by existing SDK samples, the first by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#2">ProgressNotifier</a> (Events), 
+
+the others by the comprehensive 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">UIAPI</a> sample.
+
+<p>For someone like me, feeling a strong affinity to 
+
+<a href="http://en.wikipedia.org/wiki/Winnie-the-Pooh">
+Winnie the Pooh</a>, the 
+
+"<a href="http://www.winnie-pooh.org/winnie-the-pooh-quotes.htm">bear of very little brain</a>",
+
+the existing SDK samples are way beyond simple comprehension and reuse, so I ended up creating four own extremely simple and minimal ones exercising these features in just a few lines of code each instead, to reduce the code and required audience comprehension power to an absolute minimum.
+
+
+<a name="21"></a>
+
+<h4>Revit progress bar notifications</h4>
+
+<p>To receive information about the current Revit progress bar status, you can subscribe to the ProgressChanged event.
+
+<p>The event handler will receive a ProgressChangedEventArgs instance providing the following properties:
+
+<ul>
+<li>Caption &ndash; progress bar caption describing operation in progress
+<li>Stage &ndash; current stage of the progress bar, one of Started, CaptionChanged, RangeChanged, PositionChanged, UserCancelled, Finished
+<li>LowerRange &ndash; lower limit of range, always zero
+<li>UpperRange &ndash; upper limit of range, any non-zero number
+<li>Position &ndash; Value between zero and UpperRange incremented with "PositionChanged" stage
+</ul>
+
+<p>The ProgressNotifier SDK sample displays a WPF-based dialogue box.
+It provides a button to open and load a Revit model.
+Loading the selected file will cause a number of progress bar actions to execute.
+These actions are monitored and presented in a stack structure, since occasionally more than one progress bar event may be active simultaneously:</p>
+
+<center>
+<img src="img/ProgressNotifier.png" alt="ProgressNotifier SDK sample"/>
+</center>
+
+<p>My new ProgressWatcher sample in much simpler and tracks all progress bar events by just printing the event argument data to the Visual Studio debug output window.
+This can be achieved in a very few lines of code, basically only one each to subscribe to the event and to access and print the progress bar event data:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; &nbsp; app.ProgressChanged 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">ProgressChangedEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; OnProgressChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnProgressChanged( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">ProgressChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> percent = 100.0 * e.Position / e.UpperRange;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;'{0}' stage {1} position {2} [{3}, {4}] ({5}%)&quot;</span>,
+&nbsp; &nbsp; &nbsp; e.Caption, e.Stage, e.Position, e.LowerRange, 
+&nbsp; &nbsp; &nbsp; e.UpperRange, percent.ToString( <span class="maroon">&quot;0.##&quot;</span> ) );
+&nbsp; }
+}
+</pre>
+
+<p>Saving the output to a text file will allow you to analyse in detail the progress bar event sequence and nesting.
+
+<a name="22"></a>
+
+<h4>Options dialogue WPF custom extensions</h4>
+
+<p>In Revit 2013, an add-in can add its own custom tabs to the standard Revit Options dialogue.
+
+<p>This is achieved by defining a WPF control to display and subscribing to the UIApplication DisplayingOptionsDialog event.
+
+<p>The event handler receives an DisplayingOptionsDialogEventArgs instance.
+It has a PagesCount property providing the number of Options dialogue tabs including default Revit ones.
+It also sports the AddTab method that can be used to add a tab, providing a name and a handler for it.
+The handler information is encapsulated in the TabbedDialogExtension class.
+
+<p>The TabbedDialogExtension class provides a constructor taking two arguments, a WPF user control instance and an OK handler.
+These cannot be changed later.
+It provides methods to get and set contextual help, and properties to read the WPF control and OK handler.
+It also provides properties to both get and set the cancel and 'restore defaults' handlers:
+
+<ul>
+<li>Control &ndash; the control
+<li>OnOKAction &ndash; the ok handler
+<li>OnCancelAction &ndash; the cancel handler
+<li>OnRestoreDefaultsAction &ndash; the restore defaults handler
+</ul>
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">UIAPI</a> SDK 
+
+sample adds several custom tabs demonstrating most available features.
+
+<p>I created a minimal sample named AddOptionsTab which defines the simplest possible WPF control with one single button to click:</p>
+
+<center>
+<img src="img/AddOptionsTab.png" alt="AddOptionsTab custom Options tab"/>
+</center>
+
+<p>If you click the button, the corresponding event handler on the form is called, which simply displays a task dialog:</p>
+
+<center>
+<img src="img/AddOptionsTab_clicked.png" alt="AddOptionsTab button clicked"/>
+</center>
+
+<p>If this tab has ever been activated after the Options dialogue was opened, its OK, cancel and 'restore defaults' handlers are called, depending on the user actions.
+
+<p>Here is the entire user control source code defining its handlers:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">UserControl1</span> : <span class="teal">UserControl</span>
+{
+&nbsp; <span class="blue">string</span> _name;
+&nbsp;
+&nbsp; <span class="blue">public</span> UserControl1( <span class="blue">string</span> name )
+&nbsp; {
+&nbsp; &nbsp; _name = name;
+&nbsp;
+&nbsp; &nbsp; InitializeComponent();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> button1_Click( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _name, <span class="maroon">&quot;I was clicked...&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnOK()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _name, <span class="maroon">&quot;OK&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnCancel()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _name, <span class="maroon">&quot;OnCancel&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnRestoreDefaults()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _name, <span class="maroon">&quot;OnRestoreDefaults&quot;</span> );
+&nbsp; }
+}
+</pre>
+
+<p>The event handler code reacting to the Options dialogue displaying simply instantiates the user control, calls the TabbedDialogExtension constructor with it, and feeds that to the event handler arguments AddTab method:
+
+<pre class="code">
+<span class="blue">void</span> OnDisplayingOptionsDialog( 
+&nbsp; <span class="blue">object</span> sender, 
+&nbsp; <span class="teal">DisplayingOptionsDialogEventArgs</span> e )
+{
+&nbsp; <span class="teal">UserControl1</span> c = <span class="blue">new</span> <span class="teal">UserControl1</span>( 
+&nbsp; &nbsp; <span class="maroon">&quot;DevCamp User Control&quot;</span> );
+&nbsp;
+&nbsp; e.AddTab( <span class="maroon">&quot;DevCamp Custom Tab&quot;</span>, 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">TabbedDialogExtension</span>( 
+&nbsp; &nbsp; &nbsp; c, c.OnOK ) );
+}
+</pre>
+
+<p>The event handler is called each time the Options dialogue is invoked once the event has been subscribed to, which is achieved in a single line of code like this in the AddOptionsTab external command:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp;
+&nbsp; uiapp.DisplayingOptionsDialog 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DisplayingOptionsDialogEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; OnDisplayingOptionsDialog );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="23"></a>
+
+<h4>Embed and control a Revit view</h4>
+
+<p>Another of the add-in integration enhancements enables you to embed and control a Revit view in your own form, dialogue or window.
+
+<p>The new PreviewControl class presents a preview control to browse the Revit model.
+It takes two input arguments, a document and a view id.
+The hosting form or window must be modal.
+The View can be any graphical view, i.e. must be printable.
+Perspective views are also supported, and all 3D Views can be manipulated by view cube.
+The visibility and graphical settings of the view are effective and respected by the control.
+<!-- User interaction requires an open transaction (in Quasar RP only?) -->
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">UIAPI</a> SDK 
+
+sample proves a demonstration of this as well, which allows you to interactively select any of the open documents to view, or even open a new one, and secondly presents a list of all the documents views for you to switch between.
+Each time you change any of these two selections, the current preview control is discarded and a new one is instantiated with the updated input arguments.
+These input arguments are the only way in which the add-in affects the view, all further interaction happens between the control and the user.
+
+<p>To use a Revit preview control, you simply create a standard .NET form and insert a WPF host in it.
+A suitable host is the System.Windows.Forms.Integration.ElementHost.
+You populate this with a new Revit preview control instance, e.g. like this
+
+<pre class="code">
+&nbsp; elementHost.Child = <span class="blue">new</span> <span class="teal">PreviewControl</span>( 
+&nbsp; &nbsp; doc, view.Id );
+</pre>
+
+<p>The PreviewControl instance needs to be disposed of after use:
+
+<pre class="code">
+  PreviewControl vc = elementHost.Child
+    as PreviewControl;
+
+  if( vc != null ) { vc.Dispose(); }
+</pre>
+
+<p>Here is a code snippet showing how all the printable views can be retrieved using a filtered element collector:
+
+<pre class="code">
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt; views
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">View</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">View</span>&gt;( v =&gt; v.CanBePrinted );
+</pre>
+
+<p>I created a minimal sample application PreviewControlSimple for this DevCamp class with much less code (and functionality than the UIAPI one, since it just displays the current view of a document with no further ado.
+
+<p>It does add one interesting twist, though: to show exactly how the hosting form is set up, I implemented that twice over, first using the Visual Studio designer as usual, and then converting the form to be completely programmatically generated.
+Here is the DisplayRevitView method taking the document and view input arguments for the preview control.
+It also takes a third argument for the main Revit window, so that the generated control can be hooked up to that as a parent window.
+This defines an appropriate relationship between the two as far as the Windows OS is concerned, ensuring correct minimisation and restoration behaviour:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _caption_prefix
+&nbsp; = <span class="maroon">&quot;Simple Revit Preview - &quot;</span>;
+&nbsp;
+<span class="blue">void</span> DisplayRevitView( 
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">View</span> view,
+&nbsp; <span class="teal">IWin32Window</span> owner )
+{
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">PreviewControl</span> pc
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PreviewControl</span>( doc, view.Id ) )
+&nbsp; {
+&nbsp;
+<span class="blue">#if</span> CREATE_FORM_BY_CODE
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( System.Windows.Forms.<span class="teal">Form</span> form
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementHost</span> elementHost = <span class="blue">new</span> <span class="teal">ElementHost</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; elementHost.Location
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; elementHost.Dock = <span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; &nbsp; elementHost.TabIndex = 0;
+&nbsp; &nbsp; &nbsp; elementHost.Parent = form;
+&nbsp; &nbsp; &nbsp; elementHost.Child = pc;
+&nbsp;
+&nbsp; &nbsp; &nbsp; form.Text = _caption_prefix + view.Name;
+&nbsp; &nbsp; &nbsp; form.Controls.Add( elementHost );
+&nbsp; &nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 400, 400 );
+&nbsp; &nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">#else</span> <span class="green">// if not CREATE_FORM_BY_CODE</span>
+&nbsp;
+<span class="gray">&nbsp; &nbsp; Form1 form = new Form1( pc );</span>
+<span class="gray">&nbsp; &nbsp; form.ShowDialog( owner );</span>
+&nbsp;
+<span class="blue">#endif</span> <span class="green">// CREATE_FORM_BY_CODE</span>
+&nbsp;
+&nbsp; }
+}
+</pre>
+
+<p>Please note that correct disposal of the preview control is ensured by the 'using' statement.
+This is similar to Arno&scaron;t's strong recommendation to always 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+encapsulate Revit Transactions in a 'using' statement</a>.
+
+<p>Calling this method from the external command mainline with the current document view is trivial.
+I add one line of code to access the Revit main window:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; DisplayRevitView( doc, view, revit_window );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="24"></a>
+
+<h4>Drag and Drop API</h4>
+
+<p>I recently discussed the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/drag-and-drop-api.html">
+drag and drop functionality</a> and 
+
+the UIAPI sample command demonstrating it.
+
+<p>The UIApplication provides the new static DoDragDrop method, with two overloads:
+
+<ul>
+<li>DoDragDrop( ICollection&lt;string&gt; ) &ndash;
+initiate a standard built-in Revit drag and drop operation taking a collection of file names.
+
+<li>DoDragDrop( object, IDropHandler ) &ndash;
+initiate a drag and drop operation with a custom drop implementation.
+</ul>
+
+<p>This method is designed for use in a modeless form.
+
+<p>Please note that this is currently the one and only Revit API method not requiring a valid Revit API context.
+
+<p>This method can be called from your modeless form at any time, even without Revit giving you explicit permission to interact with the API via some form of callback or notification, as required for all other Revit API calls.
+
+<p>The behaviour of drag and drop given a list of filenames depends on the type of files, as I already recently pointed out:
+
+<ul>
+<li>One AutoCAD format or image file dragged onto Revit
+&ndash; A new import placement editor is started to import the file.
+
+<li>More than one AutoCAD format or image files dragged
+&ndash; A new import placement editor is started for the first file.
+
+<li>One family file dragged onto Revit
+&ndash; The family is loaded, and an editor started to place an instance.
+
+<li>More than one family file dragged onto Revit
+&ndash; All the families are loaded.
+
+<li>More than one family file including other format files dragged 
+&ndash; Revit tries to open all the files.
+
+<li>Valid file or list of files is passed
+&ndash; Revit does its best to use them appropriately.
+
+<li>Any files are not usable
+&ndash; Failure is signalled to user, no exception is thrown, add-in is not notified.
+</ul>
+
+<p>Here again, I implemented a new DevCamp sample add-in DragDropApi to be able to show the necessary steps in a simpler context than the corresponding UIAPI example.
+
+<p>Here are my four new Revit 2013 UI API samples 
+
+<a href="file:///C:/a/j/adn/devcamp/2012/doc/1-4_revit_2013_ui_api.zip">
+AddOptionsTab, DragDropApi, PreviewControlSimple, ProgressWatcher</a> and 
+
+the 
+
+<a href="file:///C:/a/j/adn/devcamp/2012/doc/1-4_revit_2013_ui_api.pptx">
+slides</a> I 
+
+used.
+
+
+
+<a name="3"></a>
+
+<h4>Asynchronous Interactions</h4>
+
+<p>Arno&scaron;t L&ouml;bel already presented on this topic at Autodesk University 2011 in his class
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9879&jid=1725932">CP5381</a> 'Asynchronous Interactions and Managing Modeless UI with the Autodesk Revit API', as mentioned in the overview of the AU 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-and-aec-api-classes-at-autodesk-university.html">
+Revit and AEC API sessions</a>.
+
+<p>In this class, Arno&scaron;t also covered the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/idling-enhancements-and-external-events.html">
+external events</a> and
+
+demonstrated his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#1">
+ModelessForm_ExternalEvent, ModelessForm_IdlingEvent</a> (ModelessDialog)
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#5">
+WorkThread</a> (MultiThreading)
+
+SDK samples.
+
+<p>The conclusion of the presentation is the following pledge that we are all strongly recommended to take:
+
+<ul>
+<li>I shall not call the API unless invoked by it
+<li>I shall not call the API from anywhere but the main thread
+<li>I shall call the API only, not directly the Revits UI
+<li>I shall use the Idling event cautiously and considerably
+</ul>
+
+<p>Here is a snapshot of the 
+
+<a href="zip/devcamp_2012_2-3_Asynchronous_Interactions.pdf">
+entire slide deck</a>.
+
+This is not the final version, which will be posted soon after the end of DevCamp.
+
+
+
+<a name="4"></a>
+
+<h4>IFC Export Open Source</h4>
+
+<p>Angel Velez is senior principal engineer in the Revit development team and presented on the IFC exporter open source project, covering the following main topics:
+
+<ul>
+<li>Introduction
+<ul>
+<li>History of IFC in Revit
+<li>Why open source?
+</ul>
+<li>How the code Works
+<ul>
+<li>Overall structure of code
+<li>Key points of interest, e.g. element traversal, property sets
+<li>Look at alternate UI
+</ul>
+</ul>
+
+<p>Here is the snapshot of his 
+
+<a href="zip/devcamp_2012_2-2_IFC_Open_Source.pptx">
+slides</a>.
+
+
+<a name="5"></a>
+
+<h4>Revit MEP API</h4>
+
+<p>The Revit MEP API is a recurring topic of mine at Autodesk University, and I presented on this once again last year in my session
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9267&jid=1727895">
+CP4453</a> 'Everything 
+
+in Place with Autodesk Revit MEP Programming', as mentioned in the overview of the AU 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-and-aec-api-classes-at-autodesk-university.html">
+Revit and AEC API sessions</a>.
+
+The AU materials and the sample code that I use there was already 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/mep-sample-code-for-revit-2012.html">
+published and discussed</a>.
+
+<p>In preparation for the sessions here in Waltham, I also discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html">
+Revit 2013 MEP API</a> and completed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+migration of the ADN MEP sample code</a> to Revit 2013.
+
+<p>Here is the 
+
+<a href="file:///C:/a/j/adn/devcamp/2012/doc/2-8_estorage.pptx">
+slide deck</a> I
+
+used today, based on the AU one and updated for Revit MEP 2013.
+
+<p>Please note again that all the materials provided above are just snapshots.
+Soon after the conference completes, the complete and final materials will be published.
+
+
+
+<h4>Winding Down and Winding Up Again</h4>
+
+<p>In the evening we went out for a DevTech dinner, Japanese and Chinese cuisine.
+It was great to hang out with the guys for a while and wind down a bit.
+
+<p>Next stop is the DevLab tomorrow with a record number of almost fifty registered participants, so we will be way busy!
+Time to wind up again.
+No rest for the wicked!
+These events are always great, and I'm looking forward to it a lot.
+
+<pre class="code">
+</pre>

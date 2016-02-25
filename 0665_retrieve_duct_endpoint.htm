@@ -1,0 +1,102 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1272304 [Trying to get duct coords in plan view] -->
+
+<h3>Retrieving Duct and Pipe Endpoints</h3>
+
+<p>Here is a very basic question that may still stump a newcomer to the Revit MEP API:
+
+<p><strong>Question:</strong> I have just started to learn the MEP API and I am struggling with a problem, which I thought would be fairly easy, but after a day and a half I guess not.  
+I need to iterate through ducts (done that bit), then decide if it's a round duct (done that too).  
+Then I want to get the plan view coordinates in order to draw a centre line.  
+ 
+<p>What I really need are x1, y1, x2, y2 for each end Duct so I can bisect to find the centre point.  
+I am guessing I should be looking within the duct geometry, returned by the Element.get_Geometry method in C#.
+I am not sure how to get at the coordinates, though.
+
+<p>I have also looked at the analytical model, but the ducts I have drawn (rect and round) do not seem to contain one, or at least it isn't returned by the Element.GetAnalyticalModel method, which always returns null.
+
+
+<p><strong>Answer:</strong> Congratulations on getting started with the Revit MEP API and solving your first few issues. Sorry to hear that this current problem has you stumped.
+
+<p>Getting the start and end points of a duct element is actually very easy. 
+A duct is derived from the MEPCurve class, which has a Location property, which contains a LocationCurve, which contains a geometrical Curve, which provides this information via the EndPoint property, which is accessed in C# through the get_EndPoint method, taking an argument 0 to return the start and 1 for the end point.
+
+<p>So you do not even have to retrieve and analyse the duct geometry.
+
+<p>The AnalyticalModel is used by Revit Structure, and trying to access it in Revit MEP will not work at all and simply return null, just as you discovered.
+
+<p>Here is a sample application which retrieves all duct elements and lists their start and end point coordinates to the Visual Studio debug output window:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> nDucts = 0;
+&nbsp; <span class="blue">int</span> nCurves = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Duct</span> d <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; ++nDucts;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = d.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != lc, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected duct to have valid location curve&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != lc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++nCurves;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> c = lc.Curve;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Duct {0} from {1} to {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; d.Id.IntegerValue, 
+&nbsp; &nbsp; &nbsp; &nbsp; PointString( c.get_EndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; PointString( c.get_EndPoint( 1 ) ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} duct{1} analysed, and {2} curve{3} listed.&quot;</span>,
+&nbsp; &nbsp; nDucts, PluralSuffix( nDucts ),
+&nbsp; &nbsp; nCurves, PluralSuffix( nCurves ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Since this command does not need to write to the Revit database, its Transaction attribute can be set to read-only.
+
+<p>Here is the result of running this command in the sample project rme_basic_sample_project.rvt provided in the Program/Samples subdirectory of the Revit MEP root installation folder:
+
+<pre>
+Duct 392168 from (60.53,121.53,10.32) to (60.53,110.24,10.32)
+Duct 392170 from (28.59,119.19,10.32) to (28.59,110.24,10.32)
+Duct 392174 from (39.29,113.74,10.32) to (39.29,110.57,10.32)
+
+. . .
+
+Duct 686628 from (-39.04,21.2,16.84) to (-39.04,21.2,49.52)
+Duct 712063 from (115.66,-11.57,10.38) to (115.66,-15,10.38)
+727 ducts analysed, and 727 curves listed.
+</pre>
+
+<p>Just like ducts, pipes are also derived from the MEPCurve class, so the exact same approach applies to them as well.
+
+<p>Here is 
+
+<a href="zip/DuctEndPoints.zip">
+DuctEndPoints.zip</a> including the complete source code and Visual Studio solution of this command.
+

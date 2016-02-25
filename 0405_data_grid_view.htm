@@ -1,0 +1,491 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Populating a Data Grid View</h3>
+
+<p>By the time you read this, I will be gone on the first of a series of holidays this summer.
+By the way, for that reason, don't expect any answers to comments for a while.
+I left the computer at home this time!
+I posted this in advance to ensure you have something worthwhile to chew on during my absence.
+
+<p>This is another stepping stone towards implementing Martin Schmid's proposal to display and navigate through all unconnected MEP connectors in the model that I mentioned in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+retrieving MEP elements and connectors</a>.
+
+<p>Another one of the steps is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+determining the Revit parent window</a> and
+
+attaching a form to it.
+The latter enables us to set Revit as the parent window of the modeless form, ensuring that it stays on top of Revit when Revit is visible, and also that it is minimised when the user minimises Revit.
+
+<p>After we have determined the unconnected connectors, we populate a modeless form with their pertinent information, display it, and enable the user to double click on an element to zoom to it in Revit.
+The double click handling and zooming interaction still needs to be documented.
+For the moment, we will focus on implementing, populating and displaying the modeless form.
+
+<h4>Modeless Form with Data Grid View</h4>
+
+<p>I implemented a modeless form named LooseConnectorNavigator.
+It is derived from a Form base class from the System.Windows.Forms namespace.
+It has one single DataGridView control added to it which is anchored to all four sides.
+Here is what it looks like with its properties in the Visual Studio form designer:</p>
+
+<center>
+<img src="img/modeless_loose_connector_navigator_form.png" alt="Modeless loose connector navigator form"/>
+</center>
+
+<p>A data grid view is extremely easy to populate with an absolute minimum of coding, as we have already seen in Joel Karr's sample showing how to
+
+<!-- 106 -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">
+list linked elements</a>.
+
+If you set up an appropriate data container whose elements expose certain public member properties, all you need to do is to specify the container as the data source of the data grid view, and it will not only automatically populate the rows of data, but even create the columns according to the available properties!</p>
+
+<p>What's more, by using
+
+<!-- 164 -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/three-coding-and-performance-hints.html">
+auto-implemented properties</a>,
+
+the definition of the properties on the data item classes is reduced to just specifying their name and type and almost nothing else.</p>
+
+<h4>Data Container Classes</h4>
+
+<p>In this case, we wish to display the unconnected connectors.
+Each connector belongs to a specific Revit element, and in some circumstances we wish to present the element data independently of its connectors, so I implemented two separate data containers for each, a base ElementData class and a derived ConnectorData one.
+Both of them have a list of public properties whose main purpose is to define exactly what ultimately gets displayed in the data grid view.
+They also each have a constructor which populates their public properties, and a ToString method to stream them to a text file for logging purposes:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ElementData</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Class { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Category { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Family { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Symbol { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Id { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> ElementData(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; Class = e.GetType().Name;
+&nbsp;
+&nbsp; &nbsp; Category = ( <span class="blue">null</span> == e.Category )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; &nbsp; : e.Category.Name;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> typeId = e.GetTypeId();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementType</span> elementType = ( <span class="blue">null</span> == typeId )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : doc.get_Element( typeId ) <span class="blue">as</span> <span class="teal">ElementType</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = e <span class="blue">as</span> <span class="teal">Duct</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != duct )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = duct.DuctType.Name;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; Family = ( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; &nbsp; ? fi.Symbol.Family.Name
+&nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; Symbol = ( <span class="blue">null</span> != fi ) ? fi.Symbol.Name
+&nbsp; &nbsp; &nbsp; : ( ( <span class="blue">null</span> != elementType ) ? elementType.Name
+&nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Empty );
+&nbsp;
+&nbsp; &nbsp; Name = e.Name;
+&nbsp;
+&nbsp; &nbsp; Id = e.Id.IntegerValue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> c = (0 == Category.Length)
+&nbsp; &nbsp; &nbsp; ? Class
+&nbsp; &nbsp; &nbsp; : Category;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> fam = (0 == Family.Length)
+&nbsp; &nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;'&quot;</span> + Family + <span class="maroon">&quot;' &quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} {1}&lt;{2} '{3}'&gt;&quot;</span>,
+&nbsp; &nbsp; &nbsp; c, fam, Id, Name );
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ConnectorData</span> : <span class="teal">ElementData</span>
+{
+&nbsp; <span class="teal">XYZ</span> _p;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> ConnectorType { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> X { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Y { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Z { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> ConnectorData(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">ConnectorType</span> ct,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; : <span class="blue">base</span>( e, doc )
+&nbsp; {
+&nbsp; &nbsp; ConnectorType = ct.ToString();
+&nbsp; &nbsp; _p = p;
+&nbsp; &nbsp; X = <span class="teal">Util</span>.RealString( p.X );
+&nbsp; &nbsp; Y = <span class="teal">Util</span>.RealString( p.Y );
+&nbsp; &nbsp; Z = <span class="teal">Util</span>.RealString( p.Z );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} connector at ({1},{2},{3}) on {4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; ConnectorType, X, Y, Z, <span class="blue">base</span>.ToString() );
+&nbsp; }
+}
+</pre>
+
+<p>There are a few details here worth mentioning.
+For instance, I split the connector point into separate X, Y and Z coordinate values, because then I can later sort them based on these values, which gives me more sorting options and flexibility than if they were all lumped together into one single point data item.
+Furthermore, I save the coordinates as string values instead of double numbers, because later on I do not want to see reams of useless, confusing and unintelligible post-comma digits in my user interface.</p>
+
+<p>Talking about sorting, by the way:</p>
+
+<h4>Sortable Binding List</h4>
+
+<p>In the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">
+linked elements</a> example
+
+mentioned above, we simply used a generic .NET List&lt;&gt; as a data container.
+That works fine, but does not automatically provide support for one additional neat feature available from the data grid view, which is the ability to sort the columns.</p>
+
+<p>If we use a
+
+<a href="http://www.timvw.be/presenting-the-sortablebindinglistt-take-two">
+sortable binding list</a> instead,
+
+all of our columns will automatically be sortable.
+So we do just that.</p>
+
+<h4>Log File</h4>
+
+<p>Since most MEP models will initially contain a large number of parts, and many of them may have unconnected connectors, it makes sense to log the data to a text file in addition to presenting it in the modeless dialogue box.
+The text file is easier than a form to manually search or automatically post-process for specific purposes.
+Here is my log file implementation:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">JtLogFile</span> : <span class="teal">IDisposable</span>
+{
+&nbsp; <span class="blue">string</span> _path;
+&nbsp; <span class="teal">StreamWriter</span> _sw;
+&nbsp;
+&nbsp; <span class="blue">public</span> JtLogFile( <span class="blue">string</span> basename )
+&nbsp; {
+&nbsp; &nbsp; _path = System.IO.<span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; System.IO.<span class="teal">Path</span>.GetTempPath(),
+&nbsp; &nbsp; &nbsp; basename + <span class="maroon">&quot;.log&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _sw = <span class="blue">new</span> <span class="teal">StreamWriter</span>( _path, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; _sw.WriteLine( <span class="maroon">&quot;\n\rStart analysis {0}\n\r&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;u&quot;</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Dispose()
+&nbsp; {
+&nbsp; &nbsp; _sw.Close();
+&nbsp; &nbsp; _sw.Dispose();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Log( <span class="blue">string</span> s )
+&nbsp; {
+&nbsp; &nbsp; _sw.WriteLine( s );
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( s );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Path
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _path;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<h4>Collecting and Displaying Information</h4>
+
+<p>We now have all the components ready to collect and display the unconnected connector information, both in the log file and the modeless form.
+Enter the external command mainline Execute method, which performs the following steps:
+
+<ul>
+<li>Determine Revit application window handle.
+<li>Retrieve all MEP elements that have connectors.
+<li>Loop over all elements and retrieve loose connectors.
+<li>List these in a log file and a data container.
+<li>Display the log file.
+<li>Start a modeless dialogue with entries for all loose connectors and set up the appropriate interaction with Revit.
+I'll postpone the discussion of this last step to a later post, so that we can give it the full attention that it deserves.
+</ul>
+
+<p>There is whole bunch of additional category tracking going on for logging and validation purposes.
+At the end of the log file, we display information on the number of elements and connectors processed and what categories they belong to.
+Don't let that confuse or distract you from the main points.</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="teal">String</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="green">// set up IWin32Window instance encapsulating </span>
+&nbsp; <span class="green">// main Revit application window handle:</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _hWndRevit )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Process</span> process = <span class="teal">Process</span>.GetCurrentProcess();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntPtr</span> h = process.MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>( h );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp; <span class="blue">bool</span> include_wires = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">SortableBindingList</span>&lt;<span class="teal">ConnectorData</span>&gt; data
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SortableBindingList</span>&lt;<span class="teal">ConnectorData</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">string</span> path;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">JtLogFile</span> log
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtLogFile</span>( <span class="maroon">&quot;LooseConnectors&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = GetConnectorElements( doc, include_wires );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;&gt; categories
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nErrors = 0;
+&nbsp; &nbsp; <span class="blue">int</span> nUnconnected = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = e.Category;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != cat,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a valid category on all elements&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> key = cat.Name;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !categories.ContainsKey( key ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; categories[key] = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; categories[key].Add( e );
+&nbsp;
+&nbsp; &nbsp; &nbsp; connectors = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; connectors = GetConnectors( e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ++nErrors;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; log.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error {0} retrieving connectors &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;from {1}: {2} '{3}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nErrors,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementData</span>( e, doc ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ex.GetType().Name,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ex.Message ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != connectors )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>(
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// this is too restrictive:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ConnectorType.PhysicalConn </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; == c.ConnectorType </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// i had to add some strange checks to avoid </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// IsConnected throwing an exception:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ConnectorType</span>.LogicalConn != c.ConnectorType
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 32 != ((<span class="blue">int</span>)c.ConnectorType)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !c.IsConnected )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nUnconnected;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ConnectorData</span> cd = <span class="blue">new</span> <span class="teal">ConnectorData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e, doc, c.ConnectorType, c.Origin );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; log.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unconnected {0}: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nUnconnected, cd ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Add( cd );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> total = categories.Values
+&nbsp; &nbsp; &nbsp; &nbsp; .Aggregate&lt;<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;, <span class="blue">int</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, ( n, a ) =&gt; n + a.Count );
+&nbsp;
+&nbsp; &nbsp; log.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Examined {0} elements of {1} categories:&quot;</span>,
+&nbsp; &nbsp; &nbsp; total, categories.Count ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; categories.Keys );
+&nbsp;
+&nbsp; &nbsp; keys.Sort();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> key <span class="blue">in</span> keys )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = categories[key][0];
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic = ( <span class="teal">BuiltInCategory</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; e.Category.Id.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; log.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0,8} '{1}' {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; categories[key].Count,
+&nbsp; &nbsp; &nbsp; &nbsp; key,
+&nbsp; &nbsp; &nbsp; &nbsp; bic ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; log.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error retrieving connectors on {0} elements,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; {1} unconnected connectors found.&quot;</span>,
+&nbsp; &nbsp; &nbsp; nErrors, nUnconnected ) );
+&nbsp;
+&nbsp; &nbsp; path = log.Path;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// display log file:</span>
+&nbsp;
+&nbsp; <span class="teal">Process</span>.Start( path );
+&nbsp;
+&nbsp; <span class="green">// display data in modeless form and ensure</span>
+&nbsp; <span class="green">// that the form remains on tp of Revit:</span>
+&nbsp;
+&nbsp; <span class="teal">LooseConnectorNavigator</span> navigator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LooseConnectorNavigator</span>(
+&nbsp; &nbsp; &nbsp; data,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SetElementId</span>( SetPendingElementId )&nbsp; );
+&nbsp;
+&nbsp; navigator.Show( _hWndRevit );
+&nbsp;
+&nbsp; <span class="green">// subscribe to Idling event:</span>
+&nbsp;
+&nbsp; app.Idling += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; OnIdling );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Notes:</p>
+
+<ul>
+<li>I had to add some checks to work around an exception being thrown by the IsConnected predicate.</li>
+<li>I can use Process.Start to display the log file.</li>
+</ul>
+
+<p>Here are a couple of sample lines from the generated log file listing the unconnected connector information in the rme_basic_sample_project.rvt included in the Revit MEP distribution:</p>
+
+<pre class="code">
+Unconnected 48: EndConn connector at (77.22,-12.31,10.38)
+  on Ducts <411599 'Mitered Elbows / Taps'>
+
+Unconnected 49: EndConn connector at (106.09,-12.31,10.38)
+  on Ducts <411618 'Mitered Elbows / Taps'>
+
+Unconnected 50: EndConn connector at (136.28,-9.69,10.38)
+  on Ducts <411724 'Mitered Elbows / Taps'>
+</pre>
+
+<p>This is the summary information listed at the end of the log file: </p>
+
+<pre class="code">
+Examined 3927 elements of 15 categories:
+ 309 'Air Terminals' OST_DuctTerminal
+  14 'Conduit Fittings' OST_ConduitFitting
+  20 'Conduits' OST_Conduit
+ 933 'Duct Fittings' OST_DuctFitting
+ 727 'Ducts' OST_DuctCurves
+  29 'Electrical Equipment' OST_ElectricalEquipment
+ 424 'Electrical Fixtures' OST_ElectricalFixtures
+  63 'Lighting Devices' OST_LightingDevices
+ 410 'Lighting Fixtures' OST_LightingFixtures
+  47 'Mechanical Equipment' OST_MechanicalEquipment
+ 464 'Pipe Fittings' OST_PipeFitting
+ 467 'Pipes' OST_PipeCurves
+  11 'Plumbing Fixtures' OST_PlumbingFixtures
+   3 'Specialty Equipment' OST_SpecialityEquipment
+   6 'Sprinklers' OST_Sprinklers
+Error retrieving connectors on 3 elements,
+381 unconnected connectors found.
+</pre>
+
+<p>The modeless form populated and displayed by the command looks like this:</p>
+
+<center>
+<img src="img/modeless_loose_connector_form.png" alt="Modeless loose connector form"/>
+</center>
+
+<h4>Next</h4>
+
+<p>The next and final instalment of this discussion will present the details of the interaction of the modeless dialogue box with Revit.
+The modeless form does not have access to the Revit API, since it is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+not asynchronously accessible</a>.
+
+Happily, we can use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a>
+
+to create a reliable and seamless solution for that.</p>
+
+<p>In spite of not having completed the entire discussion yet, there is nothing to stop me from sharing the Visual Studio solution and source code with you already now, so here it is in
+
+<!-- C:\a\doc\revit\blog\zip\loose_connectors_5.zip -->
+
+<a href="zip/loose_connectors_5.zip">
+loose_connectors_5.zip</a>.
+
+This is actually almost the same sample that I already shared in the discussion of hooking up a modeless dialogue with the
+
+<a href="zip/http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+Revit parent window</a>.
+
+<p>Enjoy, and I look forward to hearing back from you after my holidays!</p>
+

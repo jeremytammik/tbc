@@ -1,0 +1,317 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253563 [Is a Point inside an Area] -->
+
+<h3>Point in Polygon Containment Algorithm</h3>
+
+<p>I have been travelling for two nights and a day now and arrived in Tel Aviv this morning, via snowy London yesterday, ready to prepare for the next conference.
+
+<p>I just had a wonderful cappuccino with an almond croissant and some chocolate truffles for breakfast, a swim in the Mediterranean, and a run along the beach.
+Now I am ready to post again  :-)
+
+<p>One thing that cropped up repeatedly at Autodesk University was the question of determining point containment and 2D polygon intersections independently of Revit.
+In fact, the request is not independent of Revit, but...
+Some of the geometrical analysis methods provided by the Revit API are not as generic as they might be.
+
+<ul>
+<li>It provides methods to determine whether a given point is located inside a room or space, but not within an area.
+<li>Many of the interesting geometrical methods like Intersect and FindReferencesByDirection do not work on geometry located in linked files.
+<li>It lacks a generic 2D polygon intersection method.
+</ul>
+
+<p>Besides, I have this unhealthy tendency to always strive for exaggerated independence. 
+It doesn't always make life easier, but it certainly does make it more interesting at times.
+It also causes occasional fuss and worry.
+
+<p>Anyway, determining whether a 2D point is located within a given 2D polygon is actually very simple, and this is an important instrument to have available in every CAD programmer's toolbox, so why depend on the Revit API implementation when you can roll it yourself?
+In conjunction with the Revit independent 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+Boolean operations on 2D polygons</a>, 
+
+a lot of powerful analysis can be performed on pure geometry both within Revit and exported into some other external container such as a database.
+
+<p>Actually, one discussion we had dealt with a number of linked files representing the architectural, furniture, MEP, and medical equipment in large hospital projects.
+The relevant geometrical properties of these elements can be systematically encoded in such a way that they can be used as keys in an external database, e.g. using encodings produced similarly to my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+XYZ Compare method</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+XyzEqualityComparer class</a>.
+
+<p>This can enable us to manage the equipment and other Revit family instances and maintain their relationship with the appropriate rooms, storing their locations, line segments, and boundary polygons in the database so that they can also be used as keys for identification, searching and sorting.
+
+<p>Here is a typical variant of the point containment question:
+
+<p><strong>Question:</strong> How can I find out whether a particular point lies inside a given area element?
+
+<p>I need to retrieve a list of rooms bounded by an area, and figure that the only way to do so is to see if all the vertices of the room in the plan are inside the shape made by the area element.
+
+<p>You could make this more of a generic mathematical question &ndash; in a 2D environment, how do I know when a point in space is inside a given polygon?
+
+<p>I attempted to work this out using FindReferencesByDirection.
+It allows me to cast a ray out and look at intersections, but it only works in a 3D view. 
+An Area Plan is a 2D view.
+
+<p>How would I cast a ray from a Room origin point and analyze intersections with a containing Area?
+
+<p><strong>Answer:</strong> I am sure that you are aware of the fact that you can query whether a given point lies within a room or space. Here is a snippet of the What's New section in the Revit 2011 API help file covering this:
+
+<span style="color:darkblue">
+
+<h4>Rooms and Spaces</h4>
+
+<p>The new method Autodesk.Revit.Elements.Room.IsPointInRoom determines if a 3D point is in the volume of a room. 
+
+<p>The new method Autodesk.Revit.Elements.Space.IsPointInSpace determines if a 3D point is in the volume of a space. 
+
+<p>The new methods Autodesk.Revit.Document. GetRoomAtPoint and GetSpaceAtPoint find the Room or Space that encloses a given 3D point within the project.
+
+<p>The new property Autodesk.Revit.Elements.FamilyInstance.Space allows an API application to determine what in which Space an air terminal or other family instance exists in Revit MEP.
+
+</span>
+
+<p>However, you wish to determine which area a given room resides in, so this does not address your need.
+
+<p>As you say, for abstract 2D geometry, this is a pretty standard basic question. I did once implement an algorithm for this, years ago, in C++.
+Funnily enough, the algorithm is attributed to Kevin Weiler of Autodesk, although I got it from one of the Graphic Gems books.
+My implementation looks like this.
+To see the truncated lines in full, please copy and paste to an editor:
+
+<pre class="code">
+<span class="green">//</span>
+<span class="green">// ptinpoly.cpp - check whether point is inside polygon</span>
+<span class="green">//</span>
+<span class="green">// Copyright (C) 1996 by Jeremy Tammik. All rights reserved.</span>
+<span class="green">//</span>
+<span class="green">// Based on C code from the article</span>
+<span class="green">// &quot;An Incremental Angle Point in Polygon Test&quot;</span>
+<span class="green">// by Kevin Weiler, kjw@autodesk.com</span>
+<span class="green">// in &quot;Graphics Gems IV&quot;, Academic Press, 1994</span>
+<span class="green">//</span>
+<span class="green">// 97-11-28:</span>
+<span class="green">//</span>
+<span class="green">// Added code to handle (hopefully) boundaries including</span>
+<span class="green">// circular arc segments. That is based on code from</span>
+<span class="green">// the article &quot;Point in polygon strategies&quot; by Eric Haines</span>
+<span class="green">// also in &quot;Graphics Gems IV&quot;, Academic Press, 1994.</span>
+<span class="green">//</span>
+&nbsp;
+<span class="blue">typedef</span> <span class="blue">int</span> quadrant_type;
+&nbsp;
+<span class="green">//</span>
+<span class="green">// determine the quadrant of a polygon point relative to the test point:</span>
+<span class="green">//</span>
+<span class="blue">inline</span> quadrant_type quadrant( <span class="blue">const</span> RoPoint2d &amp; vertex, <span class="blue">const</span> RoPoint2d &amp; p )
+{
+&nbsp; <span class="blue">return</span> (vertex.x &gt; p.x)
+&nbsp; &nbsp; ? ((vertex.y &gt; p.y) ? 0 : 3)
+&nbsp; &nbsp; : ( (vertex.y &gt; p.y) ? 1 : 2);
+}
+&nbsp;
+<span class="green">//</span>
+<span class="green">// determine x intercept of a polygon edge</span>
+<span class="green">// with a horizontal line at the y value of the test point:</span>
+<span class="green">//</span>
+<span class="blue">inline</span> <span class="blue">double</span> x_intercept( <span class="blue">const</span> RoPoint2d &amp; pt1, <span class="blue">const</span> RoPoint2d &amp; pt2, <span class="blue">double</span> y )
+{
+&nbsp; <span class="green">//roassert( 0 != (pt1.y - pt2.y) );</span>
+&nbsp; <span class="blue">return</span> pt2.x - ( (pt2.y - y) * ((pt1.x - pt2.x) / (pt1.y - pt2.y)) );
+}
+&nbsp;
+<span class="blue">static</span> <span class="blue">void</span> adjust_delta(
+&nbsp; <span class="blue">int</span> &amp; delta,
+&nbsp; <span class="blue">const</span> RoPoint2d &amp; vertex,
+&nbsp; <span class="blue">const</span> RoPoint2d &amp; next_vertex,
+&nbsp; <span class="blue">const</span> RoPoint2d &amp; p )
+{
+&nbsp; <span class="blue">switch</span>( delta ) {
+&nbsp; &nbsp; &nbsp; <span class="green">/* make quadrant deltas wrap around */</span>
+&nbsp; &nbsp; <span class="blue">case</span>&nbsp; 3:&nbsp; delta = -1; <span class="blue">break</span>;
+&nbsp; &nbsp; <span class="blue">case</span> -3:&nbsp; delta =&nbsp; 1; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="green">/* check if went around point cw or ccw */</span>
+&nbsp; &nbsp; <span class="blue">case</span>&nbsp; 2:
+&nbsp; &nbsp; <span class="blue">case</span> -2:
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> (x_intercept(vertex, next_vertex, p.y) &gt; p.x)
+&nbsp; &nbsp; &nbsp; &nbsp; delta =&nbsp; - (delta);
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="blue">bool</span> polygonContains(
+&nbsp; <span class="blue">int</span> nPoints, 
+&nbsp; <span class="blue">const</span> RoPoint2d * polygon, 
+&nbsp; <span class="blue">const</span> RoPoint2d &amp; p )
+{
+&nbsp; quadrant_type quad, next_quad, delta, angle;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">/* initialize */</span>
+&nbsp; <span class="blue">const</span> RoPoint2d &amp; vertex = *polygon;
+&nbsp; quad = quadrant( *polygon, p );
+&nbsp; angle = 0;
+&nbsp; &nbsp; &nbsp; <span class="green">/* loop on all vertices of polygon */</span>
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nPoints; ++i ) {
+&nbsp; &nbsp; <span class="blue">const</span> RoPoint2d &amp; vertex = polygon[i];
+&nbsp; &nbsp; <span class="blue">const</span> RoPoint2d &amp; next_vertex = polygon[ (i+1 &lt; nPoints) ? i+1 : 0];
+&nbsp; &nbsp; <span class="green">/* calculate quadrant and delta from last quadrant */</span>
+&nbsp; &nbsp; next_quad = quadrant( next_vertex, p );
+&nbsp; &nbsp; delta = next_quad - quad;
+&nbsp; &nbsp; adjust_delta( delta, vertex, next_vertex, p );
+&nbsp; &nbsp; <span class="green">/* add delta to total angle sum */</span>
+&nbsp; &nbsp; angle = angle + delta;
+&nbsp; &nbsp; <span class="green">/* increment for next step */</span>
+&nbsp; &nbsp; quad = next_quad;
+&nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="green">/* complete 360 degrees (angle of + 4 or -4 ) means inside */</span>
+&nbsp; <span class="blue">return</span> (angle == +4) || (angle == -4);
+&nbsp; &nbsp; &nbsp; <span class="green">/* odd number of windings rule */</span>
+&nbsp; <span class="green">/* if (angle &amp; 4) return INSIDE; else return OUTSIDE; */</span>
+&nbsp; &nbsp; &nbsp; <span class="green">/* non-zero winding rule */</span>
+&nbsp; <span class="green">/* if (angle != 0) return INSIDE; else return OUTSIDE; */</span>
+}
+</pre>
+
+<p>This code does not show the definition of the 2D point class, but I think all it needs is a simple container for the X and Y coordinates.
+
+<p>For your convenience and out of personal interest, I ported this code to C#, .NET and the Revit UV class.
+The result looks like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">PointInPoly</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine the quadrant of a polygon vertex </span>
+&nbsp; <span class="gray">///</span><span class="green"> relative to the test point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Quadrant</span> GetQuadrant( <span class="teal">UV</span> vertex, <span class="teal">UV</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ( vertex.U &gt; p.U )
+&nbsp; &nbsp; &nbsp; ? ( ( vertex.V &gt; p.V ) ? 0 : 3 )
+&nbsp; &nbsp; &nbsp; : ( ( vertex.V &gt; p.V ) ? 1 : 2 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine the X intercept of a polygon edge </span>
+&nbsp; <span class="gray">///</span><span class="green"> with a horizontal line at the Y value of the </span>
+&nbsp; <span class="gray">///</span><span class="green"> test point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">double</span> X_intercept( <span class="teal">UV</span> p, <span class="teal">UV</span> q, <span class="blue">double</span> y )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 != ( p.V - q.V ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;unexpected horizontal segment&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> q.U
+&nbsp; &nbsp; &nbsp; - ( ( q.V - y )
+&nbsp; &nbsp; &nbsp; &nbsp; * ( ( p.U - q.U ) / ( p.V - q.V ) ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> AdjustDelta(
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">int</span> delta,
+&nbsp; &nbsp; <span class="teal">UV</span> vertex,
+&nbsp; &nbsp; <span class="teal">UV</span> next_vertex,
+&nbsp; &nbsp; <span class="teal">UV</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">switch</span>( delta )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// make quadrant deltas wrap around:</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 3: delta = -1; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> -3: delta = 1; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="green">// check if went around point cw or ccw:</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 2:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> -2:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( X_intercept( vertex, next_vertex, p.V )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; p.U )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; delta = -delta;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine whether given 2D point lies within </span>
+&nbsp; <span class="gray">///</span><span class="green"> the polygon.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> Written by Jeremy Tammik, Autodesk, 2009-09-23, </span>
+&nbsp; <span class="gray">///</span><span class="green"> based on code that I wrote back in 1996 in C++, </span>
+&nbsp; <span class="gray">///</span><span class="green"> which in turn was based on C code from the </span>
+&nbsp; <span class="gray">///</span><span class="green"> article &quot;An Incremental Angle Point in Polygon </span>
+&nbsp; <span class="gray">///</span><span class="green"> Test&quot; by Kevin Weiler, Autodesk, in &quot;Graphics </span>
+&nbsp; <span class="gray">///</span><span class="green"> Gems IV&quot;, Academic Press, 1994.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> Copyright (C) 2009 by Jeremy Tammik. All </span>
+&nbsp; <span class="gray">///</span><span class="green"> rights reserved.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> This code may be freely used. Please preserve </span>
+&nbsp; <span class="gray">///</span><span class="green"> this comment.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">bool</span> PolygonContains(
+&nbsp; &nbsp; <span class="teal">UVArray</span> polygon,
+&nbsp; &nbsp; <span class="teal">UV</span> point )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// initialize</span>
+&nbsp; &nbsp; <span class="teal">Quadrant</span> quad = GetQuadrant(
+&nbsp; &nbsp; &nbsp; polygon.get_Item( 0 ), point );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Quadrant</span> angle = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// loop on all vertices of polygon</span>
+&nbsp; &nbsp; <span class="teal">Quadrant</span> next_quad, delta;
+&nbsp; &nbsp; <span class="blue">int</span> n = polygon.Size;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UV</span> vertex = polygon.get_Item( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UV</span> next_vertex = polygon.get_Item(
+&nbsp; &nbsp; &nbsp; &nbsp; ( i + 1 &lt; n ) ? i + 1 : 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// calculate quadrant and delta from last quadrant</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; next_quad = GetQuadrant( next_vertex, point );
+&nbsp; &nbsp; &nbsp; delta = next_quad - quad;
+&nbsp;
+&nbsp; &nbsp; &nbsp; AdjustDelta(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> delta, vertex, next_vertex, point );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// add delta to total angle sum</span>
+&nbsp; &nbsp; &nbsp; angle = angle + delta;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// increment for next step</span>
+&nbsp; &nbsp; &nbsp; quad = next_quad;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// complete 360 degrees (angle of + 4 or -4 ) </span>
+&nbsp; &nbsp; <span class="green">// means inside</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> ( angle == +4 ) || ( angle == -4 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// odd number of windings rule:</span>
+&nbsp; &nbsp; <span class="green">// if (angle &amp; 4) return INSIDE; else return OUTSIDE;</span>
+&nbsp; &nbsp; <span class="green">// non-zero winding rule:</span>
+&nbsp; &nbsp; <span class="green">// if (angle != 0) return INSIDE; else return OUTSIDE;</span>
+&nbsp; }
+}
+</pre>
+
+<p>This compiles all right, but I have not tested it yet. I would appreciate if you would set up a sample project, test it, and let me know whether it satisfies your needs. You will need to implement code to extract the boundary polygon of an area, convert it to an abstract geometrical 2D polygon represented by an UVArray, and call PolygonContains with that and a point to test for containment inside the room. I already discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+transformation of arrays of points between 2D and 3D</a>.
+
+<p>A nice little exercise based on this would be to implement a Revit command that retrieves room, space or area boundaries, feeds them into this algorithm, and verifies that it really does correctly determine the containment of a number of given points in the resulting boundary polygon, as a sort of simplistic
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/unit-testing-in-revit.html">
+unit test</a>.
+
+I would love to implement this myself.
+If anybody else if faster, please be my guest.
+
+<p>Here is 
+
+<a href="zip/PointInPoly.zip">
+PointInPoly.zip</a>
+
+containing the entire Visual Studio project implementing the methods listed above.

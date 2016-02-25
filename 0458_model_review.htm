@@ -1,0 +1,59 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Model Review for Standards Compliance</h3>
+
+<p>We discussed Autodesk Revit 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/model-review.html">
+Model Review</a> when 
+
+it was originally introduced as a subscription pack add-in for Revit 2010.
+
+In the last moments before leaving Cairo and my host Mohamed Yamani of
+
+<a href="http://www.kemet.com.eg">
+Kemet Corporation</a> yesterday,
+
+we discussed some of their further Revit application development ideas and customisation needs.
+One important item they mentioned was automated checking of building standards compliance.
+
+<p>This can obviously be implemented using the Revit API, but of course we wish to avoid reinventing the wheel where possible.
+
+<p>I am absolutely not a product or implementation expert, but I did remember that old post, largely because of frequent contact with its principal implementer 
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a>,
+
+also a regular Autodesk University presenter.
+
+<p>We verified that Kemet already have the model review module installed and were simply not aware of its possible uses, especially its customisation facilities
+ which allow a .NET programmer to plug in her own custom checks into the system.
+
+<p>So, surprisingly, in the very last minutes of my visit, yet another issue was resolved.
+
+<p>This is just to point out once again that this extremely useful functionality is available, in case you have similar needs.
+
+<p>By the way, I asked Matt what new functionality has been added to the Model Review application for Revit 2011, to which he replies:
+
+<p>Yes &ndash; the Model Review application was updated for 2011 (with some help from Avatech). It is downloadable from the subscription site.
+
+<p>As before, the principal uses of the tool are to check Revit projects or Revit families to determine if they meet with firm-specific or broad standards.
+
+<p>The primary enhancements in 2011 are:
+
+<ul>
+<li>Localized in all Revit languages
+<li>Family support &ndash; while the 2010 version could run on families standalone or in a folder, the 2011 version can run on all families embedded within a project (doing the equivalent of an 'Edit Family' to test each family individually).
+<li>Check Conditions &ndash; dynamic test to determine if a particular check is appropriate or not. For example, only run a particular check if a family is in the Furniture category, or only run a particular project check if the project is a 'Healthcare facility' type building.
+<li>Document Event-based Running (automatically running on document saves, etc.).
+<li>New Checks in 2011: 
+<ul>
+<li>Model Type
+<li>Building Type
+<li>Family Category
+</ul>
+</ul>
+
+<p>Many thanks to Matt for the quick overview!

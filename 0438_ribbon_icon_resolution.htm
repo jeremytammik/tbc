@@ -1,0 +1,138 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Ribbon Icon Resolution</h3>
+
+<p>We are still on the 
+
+<a href="http://www.classicsailing.de">
+Pantagruel</a>, currently 
+
+sailing from Norway to the west coast of Sweden. 
+Here is a view from Preikestolen down into Lysefjord, where we went for a hike before leaving the Stavanger area:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-09-06_norway/andreas/dsc06491.jpg" alt="The view from Preikestolen down into Lysefjord" width="400"/>
+</center>
+
+Here are some of us on deck the first day:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-09-06_norway/andreas/dsc06507.jpg" alt="First hours on deck" width="400"/>
+</center>
+
+<p>That was before getting out onto the open sea and into higher winds, causing us to feel a lot less chirpy:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-09-06_norway/andreas/dsc06512.jpg" alt="Slightly stronger winds and waves" width="400"/>
+</center>
+
+<p>The weather has been pleasant all the time, but the wind is very weak now.
+Yesterday we caught a few mackerel which we had for dinner.
+For some reason I ended up playing butcher for the fish, in spite of being the only vegetarian on board.
+I did eat some of them, as well, anyway.
+We had a nice sunset last night:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-09-06_norway/andreas/dsc06524.jpg" alt="Sunset" width="400"/>
+</center>
+
+<p>The view towards the east was like a 
+
+<a href="http://en.wikipedia.org/wiki/Mark_Rothko">
+Rothko</a> painting, a study in blue:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-09-06_norway/andreas/dsc06527.jpg" alt="Study in blue" width="400"/>
+</center>
+
+<p>It was sunny all the time in Norway.
+Now, outside the northern coast of Denmark, we have a light cloud cover, but it is still dry.
+We had the motor on all through the night from Saturday to Sunday, then sailed all day long Sunday, and turned on the motor again Sunday evening when we passed the southern tip of Norway and headed across more open water towards Skagen on the northern tip of Denmark.
+We are almost there by now.
+
+<p>Later... almost there was a big exaggeration.
+The wind came up a bit on Monday, but from the east, which is the direction we were heading.
+We switched off the motor and sailed but had to cross against the wind, and it took us all day to cross the Skagerrak and arrive close to Skagen.
+Our skipper Micha dropped off us off on the west side of the Skagen peninsula for a beautiful walk along the beach up northwards on the west side beach of Skagen up to the point where the North Sea and the Baltic Sea meet.
+It is pretty fascinating.
+He headed out with a reduced crew to cross around the point and get into Skagen harbour from the east side.
+We did not arrive in Skagen harbour until nine o'clock at night, so the showers and shops were already shut.
+
+<p>Tuesday morning our aim was to leave as early as possible and get over to the islands north of Gothenburg in Sweden, but due to a pure easterly wind we ended up further south on the Danish island of 
+
+<a href="http://en.wikipedia.org/wiki/L%C3%A6s%C3%B8">
+L&aelig;s&oslash;</a>, 
+
+where I am sitting watching the sunset right now.
+
+<p>You can follow our exact route on the 
+
+<a href="http://share.findmespot.com/shared/faces/viewspots.jsp?glId=0fQEu0hRkYX5FQpeMDEj8hms84EuXOsRl">
+Pantagruel tracker</a>.
+
+<p>Returning once again to Revit programming, we talked about the Ribbon API and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/simulating-a-ribbon-textbox-label.html">
+simulating a textbox label</a> the other day.
+
+<p>Here is another interesting issue concerning the Revit ribbon and the icons used in it that took some research to figure out.
+
+<p><strong>Question:</strong> I have been having problems correctly displaying icons and images in my Revit add-in.  
+It was difficult to reproduce, but I can finally describe the differences that cause the problem.
+
+<p>It seems as if Revit is influenced by the resolution or DPI (dot per inch) information in the image file. 
+
+<p>You can easily see this difference using the Ribbon SDK sample:
+
+<ol>
+<li>Copy the original Ribbon sample project with all its support files. 
+<li>Rename Reset.png to something else, and replace it with <a href="zip/__icon_16x16_org.png">__icon_16x16_org.png</a>.
+<li>Rename RectangleWall.png to some other name, and replace it with <a href="zip/__icon_16x16_resaved.png">__icon_16x16_resaved.png</a>.
+<li>Start Revit and check icons. 
+</ol>
+
+<p>The first image is the one causing a problem.  
+The second one was reopened in Paint and simply resaved.  
+Both images look like this, normally:</p>
+
+<center>
+<img src="img/ribbon_icon_resolution_1.png" alt="Original icon"/>
+</center>
+
+<p>But in Revit, the resulting panel looks like this:</p>
+
+<center>
+<img src="img/ribbon_icon_resolution_2.png" alt="Different icons in Revit ribbon"/>
+</center>
+
+<p>As you can see, the top image above is not showing correctly, while the lower one looks as expected.  
+
+<p>Looking at the image attributes using Paint &gt; Image &gt; Attributes..., you can see that the resolution or DPI (dot per inch) settings differ.  
+The one that does not work shows up like this:</p>
+
+<center>
+<img src="img/ribbon_icon_resolution_3.png" alt="Problematic icon resolution setting"/>
+</center>
+ 
+<p>If the file is resaved, it works fine, and the image attributes then look like this:</p>
+
+<center>
+<img src="img/ribbon_icon_resolution_4.png" alt="Unproblematic icon resolution setting"/>
+</center>
+ 
+<p>Apparently, once the image is saved in Paint, the DPI information is stripped out. 
+The file becomes slightly smaller and the resolution changes from 72 to 96 dpi. 
+
+<p>Is this an expected behaviour of the image specification?  
+Do I need to take the DPI image attributes into consideration when creating my Revit add-in user interface?
+What settings do I have to use?
+
+<p><strong>Answer:</strong> From the technical point of view, the underlying Windows Presentation Foundation technology WPF used in the ribbon postulates 96 dpi as the default resolution setting.
+If an image has a different resolution such as 72 dots per inch, it will be displayed bigger under 96 dpi. 
+I would say that this is expected behaviour. 
+
+<p>To have the ribbon display icons the same way you originally see them, you have to use 96 dpi resolution images.
+
+<p>Many thanks to Matt Mason for raising and pursuing this issue and to Mikako Harada and Dominic Zhang for researching and nailing it down so clearly!

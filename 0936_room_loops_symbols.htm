@@ -1,0 +1,1047 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Room and Furniture Loops Using Symbols</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I now implemented the first of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#7">
+next steps</a> mentioned
+
+at the end:
+
+<ul>
+<li>Separation of symbol and instance data in my add-in and database structure: currently, the furniture loops are placed absolutely, and multiple instances of a symbol duplicate the same loop over and over again at different locations.
+I will rewrite this to separate the furniture loop definition, defined by the family symbol, and its placement, defined by the instance.
+This needs to be done anyway to enable editing the placement data through the editor interaction on the mobile device.</li>
+</ul>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/desktop-to-cloud-via-dreamseat-couchdb-client.html">
+first implementation</a> just
+
+uploaded the room and furniture instance 2D boundary polygon loops, absolutely placed.</p>
+
+<p>Besides converting that to defining and reusing symbols, I also added support for exporting the model and level data to the cloud.</p>
+
+<p>I discuss the implementation of that here now:</p>
+
+<ul>
+<li><a href="#2">Database structure</a></li>
+<li><a href="#3">Database upload</a></li>
+<li><a href="#4">Integer based 2D placement</a></li>
+<li><a href="#5">Populating symbols and instances</a></li>
+<li><a href="#6">Retrieving the boundary loops</a></li>
+<li><a href="#7">GeoSnoop loop display</a></li>
+<li><a href="#8">Caveats</a></li>
+<li><a href="#9">Download</a></li>
+<li><a href="#10">Next steps</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Database Structure</h4>
+
+<p>I enhanced the database classes to include a new class DbSymbol.
+It defines the family symbol loop, which is reused by the family instances.
+
+<p>The DbFurniture class no longer has its own individual loop data.
+Instead, it has a reference to a symbol and placement data defining its 2D translation and rotation.</p>
+
+<p>All the database classes are derived from the DbObj base class:</p>
+
+<ul>
+<li>DbObj</li>
+<ul>
+<li>Type</li>
+<li>Description</li>
+<li>Name</li>
+</ul>
+</ul>
+
+<p>Some of the derived classes have no additional properties of their own at all.
+The data structure is this as simple as this:</p>
+
+<ul>
+
+<li>DbModel</li>
+
+<li>DbLevel</li>
+<ul>
+<li>ModelId</li>
+</ul>
+
+<li>DbRoom</li>
+<ul>
+<li>LevelId</li>
+<li>Loops</li>
+<li>ViewBox</li>
+</ul>
+
+<li>DbSymbol</li>
+<ul>
+<li>Loop</li>
+</ul>
+
+<li>DbFurniture</li>
+<ul>
+<li>RoomId</li>
+<li>SymbolId</li>
+<li>Transform</li>
+</ul>
+
+</ul>
+
+<p>The source code does nothing but exactly reproduce this structure.
+Here is the complete implementation of these classes:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Base class for all Jeremy Room Editor classes.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbObj</span> : <span class="teal">CouchDocument</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">protected</span> DbObj()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;obj&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Type { <span class="blue">get</span>; <span class="blue">protected</span> <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Description { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Current model, i.e. Revit project.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbModel</span> : <span class="teal">DbObj</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> DbModel()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;model&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Level.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbLevel</span> : <span class="teal">DbObj</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> DbLevel()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;level&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> ModelId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Room</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbRoom</span> : <span class="teal">DbObj</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> DbRoom()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;room&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> LevelId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Loops { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> ViewBox { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family symbol, i.e. element type defining </span>
+&nbsp; <span class="gray">///</span><span class="green"> the geometry, i.e. the 2D boundary loop.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbSymbol</span> : <span class="teal">DbObj</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> DbSymbol()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;symbol&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Loop { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Family instance, defining placement, i.e.</span>
+&nbsp; <span class="gray">///</span><span class="green"> transform, i.e. translation and rotation,</span>
+&nbsp; <span class="gray">///</span><span class="green"> and referring to the symbol geometry.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">DbFurniture</span> : <span class="teal">DbObj</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> DbFurniture()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Type = <span class="maroon">&quot;furniture&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> RoomId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> SymbolId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Transform { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Database Upload</h4>
+
+<p>The database upload has not changed very much from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/desktop-to-cloud-via-dreamseat-couchdb-client.html#6">
+previous version</a>,
+
+except that the model, level and symbol data is now added, and the furniture and equipment instances store their symbol reference and transformation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Upload model, level, room and furniture data </span>
+<span class="gray">///</span><span class="green"> to an IrisCouch hosted CouchDB data repository.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">public</span> <span class="blue">void</span> DbUploadRoom(
+&nbsp; <span class="teal">Room</span> room,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; furniture,
+&nbsp; <span class="teal">JtLoops</span> roomLoops,
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt; furnitureLoops,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt; furnitureInstances )
+{
+&nbsp; <span class="teal">CouchClient</span> client = <span class="blue">new</span> <span class="teal">CouchClient</span>(
+&nbsp; &nbsp; _web_url,
+&nbsp; &nbsp; 5984 );
+&nbsp;
+&nbsp; <span class="teal">CouchDatabase</span> db = client.GetDatabase(
+&nbsp; &nbsp; _database_name, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = room.Document;
+&nbsp;
+&nbsp; <span class="teal">Element</span> projectInfo
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ProjectInfo</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstElement();
+&nbsp;
+&nbsp; <span class="blue">string</span> uid = projectInfo.UniqueId;
+&nbsp;
+&nbsp; <span class="teal">DbModel</span> dbModel;
+&nbsp;
+&nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; {
+&nbsp; &nbsp; dbModel = db.GetDocument&lt;<span class="teal">DbModel</span>&gt;( uid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; dbModel.Id.Equals( projectInfo.UniqueId ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal ids&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; dbModel.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; projectInfo );
+&nbsp;
+&nbsp; &nbsp; dbModel.Name = projectInfo.Document.Title;
+&nbsp;
+&nbsp; &nbsp; dbModel = db.UpdateDocument&lt;<span class="teal">DbModel</span>&gt;(
+&nbsp; &nbsp; &nbsp; dbModel );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; dbModel = <span class="blue">new</span> <span class="teal">DbModel</span>();
+&nbsp;
+&nbsp; &nbsp; dbModel.Id = uid;
+&nbsp; &nbsp; dbModel.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; projectInfo );
+&nbsp;
+&nbsp; &nbsp; dbModel.Name = projectInfo.Name;
+&nbsp; &nbsp; dbModel = db.CreateDocument&lt;<span class="teal">DbModel</span>&gt;( dbModel );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Level</span> level = room.Level;
+&nbsp;
+&nbsp; uid = level.UniqueId;
+&nbsp;
+&nbsp; <span class="teal">DbLevel</span> dbLevel;
+&nbsp;
+&nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; {
+&nbsp; &nbsp; dbLevel = db.GetDocument&lt;<span class="teal">DbLevel</span>&gt;( uid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; dbLevel.Id.Equals( level.UniqueId ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal ids&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; dbLevel.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; level );
+&nbsp;
+&nbsp; &nbsp; dbLevel.Name = level.Name;
+&nbsp; &nbsp; dbLevel.ModelId = projectInfo.UniqueId;
+&nbsp;
+&nbsp; &nbsp; dbLevel = db.UpdateDocument&lt;<span class="teal">DbLevel</span>&gt;(
+&nbsp; &nbsp; &nbsp; dbLevel );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; dbLevel = <span class="blue">new</span> <span class="teal">DbLevel</span>();
+&nbsp;
+&nbsp; &nbsp; dbLevel.Id = uid;
+&nbsp; &nbsp; dbLevel.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; level );
+&nbsp;
+&nbsp; &nbsp; dbLevel.Name = level.Name;
+&nbsp; &nbsp; dbLevel.ModelId = projectInfo.UniqueId;
+&nbsp;
+&nbsp; &nbsp; dbLevel = db.CreateDocument&lt;<span class="teal">DbLevel</span>&gt;(
+&nbsp; &nbsp; &nbsp; dbLevel );
+&nbsp; }
+&nbsp;
+&nbsp; uid = room.UniqueId;
+&nbsp;
+&nbsp; <span class="teal">DbRoom</span> dbRoom;
+&nbsp;
+&nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; {
+&nbsp; &nbsp; dbRoom = db.GetDocument&lt;<span class="teal">DbRoom</span>&gt;( uid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; dbRoom.Id.Equals( room.UniqueId ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal ids&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; room );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Name = room.Name;
+&nbsp; &nbsp; dbRoom.LevelId = level.UniqueId;
+&nbsp; &nbsp; dbRoom.Loops = roomLoops.SvgPath;
+&nbsp; &nbsp; dbRoom.ViewBox = roomLoops.BoundingBox.SvgViewBox;
+&nbsp;
+&nbsp; &nbsp; dbRoom = db.UpdateDocument&lt;<span class="teal">DbRoom</span>&gt;( dbRoom );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; dbRoom = <span class="blue">new</span> <span class="teal">DbRoom</span>();
+&nbsp;
+&nbsp; &nbsp; dbRoom.Id = uid;
+&nbsp; &nbsp; dbRoom.Description = <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; room );
+&nbsp;
+&nbsp; &nbsp; dbRoom.Name = room.Name;
+&nbsp; &nbsp; dbRoom.LevelId = level.UniqueId;
+&nbsp; &nbsp; dbRoom.Loops = roomLoops.SvgPath;
+&nbsp; &nbsp; dbRoom.ViewBox = roomLoops.BoundingBox.SvgViewBox;
+&nbsp;
+&nbsp; &nbsp; dbRoom = db.CreateDocument&lt;<span class="teal">DbRoom</span>&gt;( dbRoom );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">KeyValuePair</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt; p <span class="blue">in</span> furnitureLoops )
+&nbsp; {
+&nbsp; &nbsp; uid = p.Key;
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( uid );
+&nbsp; &nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbSymbol</span> symbol = db.GetDocument&lt;<span class="teal">DbSymbol</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; symbol.Description = <span class="teal">Util</span>.ElementDescription( e );
+&nbsp; &nbsp; &nbsp; symbol.Name = e.Name;
+&nbsp; &nbsp; &nbsp; symbol.Loop = p.Value.SvgPath;
+&nbsp;
+&nbsp; &nbsp; &nbsp; symbol = db.UpdateDocument&lt;<span class="teal">DbSymbol</span>&gt;( symbol );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbSymbol</span> symbol = <span class="blue">new</span> <span class="teal">DbSymbol</span>();
+&nbsp; &nbsp; &nbsp; symbol.Id = uid;
+&nbsp; &nbsp; &nbsp; symbol.Description = <span class="teal">Util</span>.ElementDescription( e );
+&nbsp; &nbsp; &nbsp; symbol.Name = e.Name;
+&nbsp; &nbsp; &nbsp; symbol.Loop = p.Value.SvgPath;
+&nbsp;
+&nbsp; &nbsp; &nbsp; symbol = db.CreateDocument&lt;<span class="teal">DbSymbol</span>&gt;( symbol );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> f <span class="blue">in</span> furniture )
+&nbsp; {
+&nbsp; &nbsp; uid = f.UniqueId;
+&nbsp; &nbsp; <span class="blue">if</span>( db.DocumentExists( uid ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbFurniture</span> dbf = db.GetDocument&lt;<span class="teal">DbFurniture</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; dbf.Description = <span class="teal">Util</span>.ElementDescription( f );
+&nbsp; &nbsp; &nbsp; dbf.Name = f.Name;
+&nbsp; &nbsp; &nbsp; dbf.RoomId = room.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.SymbolId = f.Symbol.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.Transform = <span class="blue">new</span> <span class="teal">JtPlacement2dInt</span>( f )
+&nbsp; &nbsp; &nbsp; &nbsp; .SvgTransform;
+&nbsp;
+&nbsp; &nbsp; &nbsp; dbf = db.UpdateDocument&lt;<span class="teal">DbFurniture</span>&gt;( dbf );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbFurniture</span> dbf = <span class="blue">new</span> <span class="teal">DbFurniture</span>();
+&nbsp; &nbsp; &nbsp; dbf.Id = uid;
+&nbsp; &nbsp; &nbsp; dbf.Description = <span class="teal">Util</span>.ElementDescription( f );
+&nbsp; &nbsp; &nbsp; dbf.Name = f.Name;
+&nbsp; &nbsp; &nbsp; dbf.RoomId = room.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.SymbolId = f.Symbol.UniqueId;
+&nbsp; &nbsp; &nbsp; dbf.Transform = <span class="blue">new</span> <span class="teal">JtPlacement2dInt</span>( f )
+&nbsp; &nbsp; &nbsp; &nbsp; .SvgTransform;
+&nbsp;
+&nbsp; &nbsp; &nbsp; dbf = db.CreateDocument&lt;<span class="teal">DbFurniture</span>&gt;( dbf );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Integer Based 2D Placement</h4>
+
+<p>I implemented the following simple class to manage the 2D placement.</p>
+
+<p>It is based on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html#2">
+2D point class</a>,
+
+storing the coordinate data in integers, for various reasons:</p>
+
+<ul>
+<li>Revit precision is no smaller than one sixteenth of an inch, ca. 1.2 mm.</li>
+<li>The data is stored in the cloud and rendered on a mobile device: the use of integers</li>
+<ul>
+<li>eliminates rounding issues,</li>
+<li>lowers the data volume,</li>
+<li>enhances performance,</li>
+<li>simplifies storage,</li>
+<li>improves human reading and understanding.</li>
+</ul>
+</ul>
+
+<p>Since I am already using millimetres for the length measurement, I find it fitting to store the rotation in degrees.
+The SVG rendering expects degrees as input, anyway.</p>
+
+<p>Here is the class implementation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A 2D integer-based transformation, </span>
+<span class="gray">///</span><span class="green"> i.e. translation and rotation.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtPlacement2dInt</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Translation.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> Translation { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Rotation in degrees.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Rotation { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The family symbol UniqueId.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SymbolId { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> JtPlacement2dInt( <span class="teal">FamilyInstance</span> fi )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = fi.Location <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != lp,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid family instanace location point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; Translation = <span class="blue">new</span> <span class="teal">Point2dInt</span>( lp.Point );
+&nbsp;
+&nbsp; &nbsp; Rotation = (<span class="blue">int</span>) (
+&nbsp; &nbsp; &nbsp; ( ( 180 * lp.Rotation ) + 0.5 ) / <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; &nbsp; SymbolId = fi.Symbol.UniqueId;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return an SVG transform,</span>
+&nbsp; <span class="gray">///</span><span class="green"> either for native SVG or Raphael.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SvgTransform
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;R{2}T{0},{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&quot;translate({0},{1}) rotate({2})&quot;,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; Translation.X, Translation.Y, Rotation );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The placement is instantiated from a family instance, and returns a suitably formatted SVG transformation string, either for native SVG or the
+
+<a href="http://raphaeljs.com">Raphaël</a> JavaScript SVG library.</p>
+
+
+<a name="5"></a>
+
+<h4>Populating Symbols and Instances</h4>
+
+<p>To populate the symbol and instance data, I loop over all the instances exactly like I did previously.</p>
+
+<p>Now, instead of exporting the family instance boundary loop in situ, I transform it back to the symbol definition coordinate system instead, and save that in a dictionary mapping the family symbol UniqueId to its boundary loop.</p>
+
+<p>The family instance exports a reference to that symbol and its placement data:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; furniture
+&nbsp; &nbsp; = GetFurniture( room );
+&nbsp;
+&nbsp; <span class="green">// Map symbol UniqueId to symbol loop</span>
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt; furnitureLoops
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// List of instances referring to symbols</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt; furnitureInstances
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt;(
+&nbsp; &nbsp; &nbsp; furniture.Count );
+&nbsp;
+&nbsp; <span class="blue">int</span> nFailures;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> f <span class="blue">in</span> furniture )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> s = f.Symbol;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> uid = s.UniqueId;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !furnitureLoops.ContainsKey( uid ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; nFailures = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">JtLoops</span> loops = GetPlanViewBoundaryLoops(
+&nbsp; &nbsp; &nbsp; &nbsp; f, <span class="blue">ref</span> nFailures );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; nFailures )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0}: {1} extrusion analyser failure{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( f ), nFailures,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( nFailures ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; ListLoops( f, loops );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; loops.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Assume first loop is outer one</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; furnitureLoops.Add( uid, loops[0] );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; furnitureInstances.Add(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">JtPlacement2dInt</span>( f ) );
+&nbsp; }
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Retrieving the Boundary Loops</h4>
+
+<p>The boundary loop retrieval has not changed very much, although the following significant enhancements were made:</p>
+
+<ul>
+<li>Store the symbol loop in the original symbol definition coordinate system.</li>
+<li>Store the instance transformation data.</li>
+<li>Manage the dictionary of symbols and the instances referencing them.</li>
+<li>Save intermediate tessellated curve points, not just start and end point. This functionality can be toggled on and off by setting the Boolean _tessellate_curves switch.</li>
+</ul>
+
+<p>The implementation is separated into two methods:</p>
+
+<ul>
+<li>AddLoops: add the plan view boundary loops from a given solid to the list of loops.</li>
+<li>GetPlanViewBoundaryLoops: Retrieve the plan view boundary loops from all solids of given element united together.
+If the element is a family instance, transform its loops from the instance placement coordinate system back to the symbol definition one.</li>
+</ul>
+
+<p>Here is the implementation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Add all plan view boundary loops from </span>
+<span class="gray">///</span><span class="green"> given solid to the list of loops.</span>
+<span class="gray">///</span><span class="green"> The creation application argument is used to</span>
+<span class="gray">///</span><span class="green"> reverse the extrusion analyser output curves</span>
+<span class="gray">///</span><span class="green"> in case they are badly oriented.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Number of loops added</span><span class="gray">&lt;/returns&gt;</span>
+<span class="blue">int</span> AddLoops(
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp,
+&nbsp; <span class="teal">JtLoops</span> loops,
+&nbsp; <span class="teal">GeometryObject</span> obj,
+&nbsp; <span class="blue">ref</span> <span class="blue">int</span> nExtrusionAnalysisFailures )
+{
+&nbsp; <span class="blue">int</span> nAdded = 0;
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; extrusionAnalyzer = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++nExtrusionAnalysisFailures;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> nAdded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = extrusionAnalyzer
+&nbsp; &nbsp; &nbsp; .GetExtrusionBase();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> a <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nEdges = a.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; curves
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;( nEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="blue">null</span>; <span class="green">// loop start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p; <span class="green">// edge start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="blue">null</span>; <span class="green">// edge end point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This returns the curves already</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// correctly oriented:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; curve = e.AsCurveFollowingFace(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1} following face&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; curves.Add( curve );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; q = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">JtLoop</span> loop = <span class="blue">new</span> <span class="teal">JtLoop</span>( nEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curves )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == q
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || q.IsAlmostEqualTo( p, 1e-05 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == q ? 0 : p.DistanceTo( q ))&nbsp; ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p0 = p; <span class="green">// save loop start point</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = -1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _tessellate_curves
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; _min_tessellation_curve_length_in_feet
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt; q.DistanceTo( p ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = curve.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = pts.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 &lt; n, <span class="maroon">&quot;expected at least two points&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( p.IsAlmostEqualTo( pts[0] ), <span class="maroon">&quot;expected tessellation start equal curve start point&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( pts[n-1] ), <span class="maroon">&quot;expected tessellation end equal curve end point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 == n )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = -1; <span class="green">// this is a straight line</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; --n; <span class="green">// skip last point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; loop.Add( <span class="blue">new</span> <span class="teal">Point2dInt</span>( pts[i] ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If tessellation is disabled,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// or curve is too short to tessellate,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// or has only two tessellation points,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// just add the start point:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( -1 == n )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; loop.Add( <span class="blue">new</span> <span class="teal">Point2dInt</span>( p ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( p0, 1e-05 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p0.DistanceTo( q ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; loops.Add( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++nAdded;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> nAdded;
+}
+
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all plan view boundary loops from </span>
+<span class="gray">///</span><span class="green"> all solids of given element united together.</span>
+<span class="gray">///</span><span class="green"> If the element is a family instance, transform</span>
+<span class="gray">///</span><span class="green"> its loops from the instance placement </span>
+<span class="gray">///</span><span class="green"> coordinate system back to the symbol </span>
+<span class="gray">///</span><span class="green"> definition one.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">JtLoops</span> GetPlanViewBoundaryLoops(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="blue">ref</span> <span class="blue">int</span> nFailures )
+{
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; = e.Document.Application.Create;
+&nbsp;
+&nbsp; <span class="teal">JtLoops</span> loops = <span class="blue">new</span> <span class="teal">JtLoops</span>( 1 );
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve family instance geometry </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// transformed back to symbol definition</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// coordinate space by inverting the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// family instance placement transformation</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = e.Location
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> t = <span class="teal">Transform</span>.get_Translation(
+&nbsp; &nbsp; &nbsp; &nbsp; -lp.Point );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> r = <span class="teal">Transform</span>.get_Rotation(
+&nbsp; &nbsp; &nbsp; &nbsp; lp.Point, <span class="teal">XYZ</span>.BasisZ, -lp.Rotation );
+&nbsp;
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed( t * r );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> union = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Some solids, e.g. in the standard </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// content 'Furniture Chair - Office' </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// cause an extrusion analyser failure,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// so skip adding those.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solid = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nFailures;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == union )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; union = solid;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; union = <span class="teal">BooleanOperationsUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ExecuteBooleanOperation( union, solid,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BooleanOperationsType</span>.Union );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; AddLoops( creapp, loops, union, <span class="blue">ref</span> nFailures );
+&nbsp; }
+&nbsp; <span class="blue">return</span> loops;
+}
+</pre>
+
+
+
+<a name="7"></a>
+
+<h4>GeoSnoop Loop Display</h4>
+
+<p>I obviously had to update my GeoSnoop display to take the symbol loop dictionary lookup into account.</p>
+
+<p>I invoke it passing in the room loops, symbol loops, and instance placements:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">GeoSnoop</span>.DisplayLoops( revit_window,
+&nbsp; &nbsp; <span class="maroon">&quot;Room and furniture&quot;</span>, roomLoops,
+&nbsp; &nbsp; furnitureLoops, furnitureInstances );
+</pre>
+
+
+<p>The new implementation displays the instances at their respective location by transforming the referenced symbol geometry accordingly.</p>
+
+<p>I make use of two transformations:</p>
+
+<ul>
+<li>Matrix transform: Transform from native loop coordinate system to target display coordinates.</li>
+<li>Matrix placement: Additional transformation from symbol definition to instance location for placing an individual instance.</li>
+</ul>
+
+<p>It also takes the aspect ratio of the room to display into account and adjusts the window height to fit, based on the room bounding box aspect ratio:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Display a collection of loops in a .NET form.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">GeoSnoop</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Pen size.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _pen_size = 1;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Pen colour.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Color</span> _pen_color = <span class="teal">Color</span>.Black;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Margin around graphics.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _margin = 10;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Draw loops on graphics with the specified</span>
+&nbsp; <span class="gray">///</span><span class="green"> transform and graphics attributes.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> DrawLoopsOnGraphics(
+&nbsp; &nbsp; <span class="teal">Graphics</span> graphics,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt; loops,
+&nbsp; &nbsp; <span class="teal">Matrix</span> transform )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Pen</span> pen = <span class="blue">new</span> <span class="teal">Pen</span>( _pen_color, _pen_size );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point</span>[] loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GraphicsPath</span> path = <span class="blue">new</span> <span class="teal">GraphicsPath</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; transform.TransformPoints( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; path.AddLines( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; graphics.DrawPath( pen, path );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Display loops in a temporary form generated</span>
+&nbsp; <span class="gray">///</span><span class="green"> on the fly.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;owner&quot;&gt;</span><span class="green">Owner window</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;caption&quot;&gt;</span><span class="green">Form caption</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;loops&quot;&gt;</span><span class="green">Boundary loops</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> DisplayLoops(
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> owner,
+&nbsp; &nbsp; <span class="blue">string</span> caption,
+&nbsp; &nbsp; <span class="teal">JtLoops</span> roomLoops,
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt; furnitureLoops,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt; furnitureInstances )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">JtBoundingBox2dInt</span> bb = roomLoops.BoundingBox;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Adjust target rectangle height to the </span>
+&nbsp; &nbsp; <span class="green">// displayee loop height.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> width = 400;
+&nbsp; &nbsp; <span class="blue">int</span> height = (<span class="blue">int</span>) (width * bb.AspectRatio + 0.5);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Specify transformation target rectangle </span>
+&nbsp; &nbsp; <span class="green">// including a margin.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> bottom = height - (_margin + _margin);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Point</span>[] parallelogramPoints = <span class="blue">new</span> <span class="teal">Point</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( _margin, bottom ), <span class="green">// upper left</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( width - _margin, bottom ), <span class="green">// upper right</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( _margin, _margin ) <span class="green">// lower left</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Transform from native loop coordinate system</span>
+&nbsp; &nbsp; <span class="green">// to target display coordinates.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Matrix</span> transform = <span class="blue">new</span> <span class="teal">Matrix</span>(
+&nbsp; &nbsp; &nbsp; bb.Rectangle, parallelogramPoints );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Bitmap</span> bmp = <span class="blue">new</span> <span class="teal">Bitmap</span>( width, height );
+&nbsp; &nbsp; <span class="teal">Graphics</span> graphics = <span class="teal">Graphics</span>.FromImage( bmp );
+&nbsp;
+&nbsp; &nbsp; graphics.Clear( System.Drawing.<span class="teal">Color</span>.White );
+&nbsp;
+&nbsp; &nbsp; DrawLoopsOnGraphics( graphics,
+&nbsp; &nbsp; &nbsp; roomLoops.GetGraphicsPathLines(), transform );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt;( 1 );
+&nbsp; &nbsp; loops.Add( <span class="blue">new</span> <span class="teal">Point</span>[] { } );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">JtPlacement2dInt</span> i <span class="blue">in</span> furnitureInstances )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Point2dInt</span> v = i.Translation;
+&nbsp; &nbsp; &nbsp; <span class="teal">Matrix</span> placement = <span class="blue">new</span> <span class="teal">Matrix</span>();
+&nbsp; &nbsp; &nbsp; placement.Rotate(i.Rotation);
+&nbsp; &nbsp; &nbsp; placement.Translate(v.X, v.Y, <span class="teal">MatrixOrder</span>.Append);
+&nbsp; &nbsp; &nbsp; placement.Multiply( transform, <span class="teal">MatrixOrder</span>.Append );
+&nbsp; &nbsp; &nbsp; loops[0] = furnitureLoops[i.SymbolId]
+&nbsp; &nbsp; &nbsp; &nbsp; .GetGraphicsPathLines();
+&nbsp;
+&nbsp; &nbsp; &nbsp; DrawLoopsOnGraphics( graphics, loops, placement );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Form</span> form = <span class="blue">new</span> <span class="teal">Form</span>();
+&nbsp; &nbsp; form.Text = caption;
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( width + 7, height + 13 );
+&nbsp; &nbsp; form.FormBorderStyle = <span class="teal">FormBorderStyle</span>
+&nbsp; &nbsp; &nbsp; .FixedToolWindow;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PictureBox</span> pb = <span class="blue">new</span> <span class="teal">PictureBox</span>();
+&nbsp; &nbsp; pb.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; pb.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; pb.Size = bmp.Size;
+&nbsp; &nbsp; pb.Parent = form;
+&nbsp; &nbsp; pb.Image = bmp;
+&nbsp;
+&nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; }
+}
+</pre>
+
+<p>Still very short and sweet, isn't it?</p>
+
+<p>Here is the result of displaying a room from the advanced sample project provided with Revit:</p>
+
+<center>
+<img src="img/room_with_furniture3.png" alt="Room with furniture"/>
+</center>
+
+<p>Those eight straight lines in the corners are columns.
+I should eliminate those.
+We don't want to move those around indiscriminately on a mobile device anyway, or the whole house might come crashing down around us.</p>
+
+
+<a name="8"></a>
+
+<h4>Caveats</h4>
+
+<p>Rudolf Honke wrote in a reaction to my plan described last time:
+
+<p>You say that you want to avoid redundant geometry data in your cloud project:
+
+<p>As you know, it is possible to modify the geometry of an individual family instance by cutting voids off it.
+The geometry of such an instance differs from other ones.
+
+<p>As far as I remember, modifying instance geometry this way has been possible since Revit 2012 or so; the API 2013 says:
+
+<p>"FamilyInstance.GetOriginalGeometry: Returns the original geometry of the instance, before the instance is modified by joins, cuts, coping, extensions, or other post-processing."
+
+<p>Thus, there are at least three groups of elements to be handled:
+
+<ul>
+<li>Individual elements, such as walls &ndash; have individual geometry, cannot be reused</li>
+<li>Family instances which have not been modified &ndash; can be instantiated, geometry is reusable</li>
+<li>Family instances which are post-processed, resulting in individual geometry &ndash; not reusable</li>
+</ul>
+
+<p>In this case, I am only handling furniture and equipment instances that I do not expect to be modified.</p>
+
+<p>After all, the plan is to move them around in the room, so they have to be free of constraints for it to work.</p>
+
+<p>Still, these considerations obviously have to be taken into account for other applications.</p>
+
+
+<a name="9"></a>
+
+<h4>Download</h4>
+
+<p>To wrap this up for the moment, here is
+
+<a href="zip/GeoSnoopSymbols.zip">GeoSnoopSymbols.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.
+
+<a name="10"></a>
+
+<h4>Next Steps</h4>
+
+<p>My next steps will be:</p>
+
+<ul>
+<li>Migrate this add-in from Revit 2013 to 2014.</li>
+<li>Implement server-side generated SVG code to display the room and furniture plan in CouchDB using Kanso.</li>
+<li>Implement editing of SVG on the mobile device and reflect changes back to CouchDB (I know how now).</li>
+<li>Implement Idling event handler and polling of CouchDB in the desktop add-in to reflect the changes back to the BIM in real-time.</li>
+<li>Implement an external application wrapper for the add-in providing four commands:</li>
+<ul>
+<li>Upload to cloud</li>
+<li>Refresh from cloud</li>
+<li>Subscribe to cloud</li>
+<li>Unsubscribe from cloud</li>
+</ul>
+</ul>
+
+<p>I know exactly how to address all these points now, no exceptions left.
+Yay!</p>
+
+<p>I look forward to hearing your comments and suggestions.</p>

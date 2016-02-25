@@ -1,0 +1,346 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1267276 [distinguishing part types - round, oval & rectangular elements] -->
+
+<h3>Distinguishing MEP Element Shape</h3>
+
+<p>Normally, when given a family instance, you can access the family name to obtain some information about it.
+For Revit MEP ducts, however, the duct shape is determined by an internal system family whose name is visible in the user interface but is not accessible through the API.
+
+<p>For instance, with ducts, you cannot access the family of a round duct.
+In the user interface, it appears to belong to a family named "Round Duct", but in fact this built-in system family and its name are not accessible through the API.
+
+<p>Fittings are represented by normal standard families, so this problem does not apply to them, only to ducts with the BuiltInCategory OST_DuctCurves
+.
+
+<p>Several people have asked for and probably implemented workarounds for this. 
+Here is one solution by Max, <a href="http://maciejszlek.pl">Maciej Szlek</a>, based on an analysis of the string value of the duct's Size parameter.
+He starts off by asking:
+
+<p><strong>Question:</strong> I wonder if there is some way to clearly determine the part type of a ductwork element, i.e. round, oval or rectangular. 
+How to distinguish this? 
+I can do it by regular expression matching for size parameter, but there must be a better way.
+
+<p><strong>Answer:</strong> Unfortunately, I am not aware of any good solution for this.
+What does your solution look like?
+
+<p><strong>Response:</strong> I assumed that if the family name like "round duct" is shown in Revit it would also be accessible through the API. As I see, that was a hasty assumption :)
+
+<p>To my work around: I simply noticed that the size parameter is displayed in a manner sufficient to clearly identify most duct elements. 
+Here is a code snippet to explain exactly what I mean:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( size.Split( <span class="maroon">'x'</span> ).Length == 3 ) <span class="green">// could use a regex &quot;[0-9]x[0-9]+-[0-9]+/[0-9]+&quot; but splitting is less costly</span>
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2rectangular&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( size.Split( <span class="maroon">'/'</span> ).Length == 3 )
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2oval&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+x[0-9]+-[0-9]+/[0-9]+&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2oval&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+/[0-9]+-[0-9]+x[0-9]+&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2rectangular&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+[^0-9]-[0-9]+x[0-9]+&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2rectangular&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+x[0-9]+-[0-9]+[^0-9]&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2round&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+[^0-9]-[0-9]+/[0-9]+&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2oval&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+/[0-9]+-[0-9]+[^0-9]&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2round&quot;</span>;
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Regex</span>( <span class="maroon">@&quot;[0-9]+[^0-9]-[0-9]+[^0-9]&quot;</span> )
+&nbsp; &nbsp; &nbsp; .IsMatch( size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2round&quot;</span>;
+&nbsp; <span class="blue">else</span> { <span class="blue">return</span> <span class="maroon">&quot;other case&quot;</span>; }
+</pre>
+
+<p>By the way, is there any convenient way to check if some parameter exists? 
+Element.get_Parameter("some_param") throws an exception if parameter doesn't exist. 
+There is a method Element.Parameters.Contains, but I don't know how to use it for a given parameter name.
+I want to check if an element has my shared parameter attached.
+
+<p><strong>Answer:</strong> Thank you for your interesting sample code. 
+Now I see what you mean by regular expressions, of course. 
+
+<p>I have one possible enhancement suggestion to make: if you call this method many times, I would suggest compiling the regular expressions and caching the compiled version instead of re-instantiating them all on each call.
+
+<p>Regarding checking whether a parameter exists, I always suggest using built-in parameters as much as possible. 
+If you call Element.get_Parameter( BuiltInParameter ) with an enum value that does not exist on the given element, it simply returns null without throwing an exception, I believe. 
+Of course that will not work for family parameters with no corresponding built-in parameter enum value. You could also try finding the Definition class instance representing the named parameter and calling Element.get_Parameter( Definition ). 
+That might return null as well instead of throwing an exception, but I don't know for sure.
+
+<p>By the way, your code includes the following expression:
+
+<!--
+
+<pre class="code">
+  return ( e.Category.Id.Equals( 
+    e.Document.Settings.Categories.get_Item( c ).Id ) ) 
+      ? true 
+      : false;
+</pre>
+
+<p>This is exactly equivalent to the following less verbose statement:
+
+-->
+
+<pre class="code">
+&nbsp; <span class="blue">return</span> e.Category.Id.Equals(
+&nbsp; &nbsp; e.Document.Settings.Categories.get_Item(
+&nbsp; &nbsp; &nbsp; c ).Id );
+</pre>
+
+<p>This can be significantly shortened and also implemented more effectively by using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+category comparison casting the built-in category to an integer</a>:
+
+<pre class="code">
+&nbsp; <span class="blue">return</span> e.Category.Id.IntegerValue.Equals( 
+&nbsp; &nbsp; (<span class="blue">int</span>) c );
+</pre>
+
+<p>I implemented a new Building Coder sample command CmdMepElementShape to test your method, and included the regular expression caching that I suggested.
+It fails for imperial units, though.
+
+<p><strong>Response:</strong> Hmm, I didn't think about imperial units. 
+I work with the metric unit system and the regular expressions in my function are compatible with this. 
+I extended it to work with imperial units as well, for some selected part types.
+There was not that much to modify, actually.
+
+<p>There are quite a lot part types, though, and many are not handled yet. 
+
+<p>I think it would be sufficient to make this function work fully correctly only for transitions and elbows, to start with.
+That will demonstrate the main principle. 
+If someone needs to handle other part types, it can be done analogously.
+
+<p>I couldn't switch my Revit to imperial units, so I'm not 100% sure if my regular expressions will work correctly. 
+I could switch parameters like Length in Manage &gt; Project Units, but I couldn't switch Size.
+I read that I can choose units system during Revit installation, so I tried to do this with a fresh installation, but I couldn't switch units in "Configure" because the option was blocked &ndash; maybe because it saw that country was Poland, I don't know.
+I even downloaded the newest update especially, and both metric and imperial templates &ndash; with no result.
+
+<p>Therefore, I don't know how Size parameter can be displayed by Revit in other than metric units &ndash; as "fractional inches" or "decimal inches" or else... and I had to write these regular expressions blindly.
+In metric units, for example, the Size parameter is always rounded to millimetres. 
+
+<p>I would be grateful if you check them again and where possible improve them, because that would be useful information for me as well. 
+The regular expressions for metric units, as previously, work fine. 
+The important thing is that the principles be clear for everyone.
+
+<p>Thinking further about it, I noticed two disadvantages of this solution.
+
+<p>The first one is that it has to contain regular expressions handling all Size parameter display cases due to the different units (optimistically only two: metric/imperial, pessimistically: many cases from "project units" formats &ndash; I don't know Revit well enough yet to be sure how it looks like but looking at metric example I think that would be the optimistic one).
+
+<p>Secondly, it returns the element shape well, but if one needs information about shape changes in the flow direction (like me), additional information about at least the preceding element is needed.
+
+<p>Here is a screen snapshot from a fragment of a sample project to show what I mean:
+
+<center>
+<img src="img/duct_shape_sequence.png" alt="Duct shape sequence"/>
+</center>
+
+<p>At first I assumed optimistically that the Size parameter value is dependent on the sequence in the flow direction, but it isn't. 
+The shape is returned from the family definition. 
+I tried to find some other parameter responsible for storing information about element's rotation in relation to flow direction or even the preceding path element but I only found parameters storing rotation/facing orientation/hand orientation in relation to absolute coordinates. 
+Actually, this doesn't have to be a disadvantage at all &ndash; it depends on the application. :)
+
+<p>You told me that the Element.get_Parameter method doesn't throw an exception for BuiltInParameters. This could be good solution for the first disadvantage (elements of different part types has different set of parameters), because it is independent on units system but it has its own weakness: we lose information about element shapes sequence completely.
+
+<p>I think the best solution would be using mix of the two above methods: checking existence of specific parameters for specified part type/category and the Size parameter analysis.
+
+<p><strong>Answer:</strong> Some additional information on flow direction is available from the element connectors.
+
+<p>Actually, come to think of it, the shape of the duct is available from the connectors as well.
+That might be a much more reliable and effective method to address this issue.
+Sorry for thinking of this so late.
+
+<p>Anyway, here is the complete code of the CmdMepElementShape sample command in its current state.
+First, we have the regular expression cache implementation that I mentioned above:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">RegexCache</span> : <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Regex</span>&gt;
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Apply regular expression pattern matching </span>
+&nbsp; <span class="gray">///</span><span class="green"> to a given input string. The compiled </span>
+&nbsp; <span class="gray">///</span><span class="green"> regular expression is cached for efficient </span>
+&nbsp; <span class="gray">///</span><span class="green"> future reuse.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;pattern&quot;&gt;</span><span class="green">Regular expression pattern</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;input&quot;&gt;</span><span class="green">Input string</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">True if input matches pattern, else false</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Match( <span class="blue">string</span> pattern, <span class="blue">string</span> input )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( pattern ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Add( pattern, <span class="blue">new</span> <span class="teal">Regex</span>( pattern ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">this</span>[pattern].IsMatch( input );
+&nbsp; }
+}
+</pre>
+
+<p>Then the predicate method to determine whether an element has a given built-in category:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> is_element_of_category( 
+&nbsp; <span class="teal">Element</span> e, 
+&nbsp; <span class="teal">BuiltInCategory</span> c )
+{
+&nbsp; <span class="green">//return e.Category.Id.Equals( </span>
+&nbsp; <span class="green">//&nbsp; e.Document.Settings.Categories.get_Item( </span>
+&nbsp; <span class="green">//&nbsp; &nbsp; c ).Id );</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> e.Category.Id.IntegerValue.Equals( 
+&nbsp; &nbsp; (<span class="blue">int</span>) c );
+}
+</pre>
+
+<p>Here is the main method we have been discussing, to determine a ductwork element's shape from its MEP PartType and Size parameter:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> GetElementShape( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="blue">if</span>( is_element_of_category( e, 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctCurves ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// simple case, no need to use regular expression</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> size = e.get_Parameter( <span class="maroon">&quot;Size&quot;</span> )
+&nbsp; &nbsp; &nbsp; .AsString();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( size.Split( <span class="maroon">'x'</span> ).Length == 2 )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular&quot;</span>;
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( size.Split( <span class="maroon">'/'</span> ).Length == 2 )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval&quot;</span>;
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( is_element_of_category( e, 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctFitting ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fi != <span class="blue">null</span> &amp;&amp; fi.MEPModel <span class="blue">is</span> <span class="teal">MechanicalFitting</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> size = e.get_Parameter( <span class="maroon">&quot;Size&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; .AsString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PartType</span> partType = ( fi.MEPModel <span class="blue">as</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MechanicalFitting</span> ).PartType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">PartType</span>.Elbow == partType
+&nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">PartType</span>.Transition == partType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// more complex case</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( size.Split( <span class="maroon">'x'</span> ).Length == 3 ) <span class="green">// or use Regex(&quot;[0-9]x[0-9]+-[0-9]+/[0-9]+&quot;) but splitting is less costly</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2rectangular&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( size.Split( <span class="maroon">'/'</span> ).Length == 3 ) <span class="green">// but if in imperial units size is in fractional inches format it has to be replaced by another regular expression</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2oval&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?x[0-9]+\&quot;?-[0-9]+\&quot;?/[0-9]+\&quot;?&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2oval&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?/[0-9]+\&quot;?-[0-9]+\&quot;?x[0-9]+\&quot;?&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2rectangular&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?[^0-9]-[0-9]+\&quot;?x[0-9]+\&quot;?&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2rectangular&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?x[0-9]+\&quot;?-[0-9]+\&quot;?[^0-9]&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;rectangular2round&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?[^0-9]-[0-9]+\&quot;?/[0-9]+\&quot;?&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2oval&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?/[0-9]+\&quot;?-[0-9]+\&quot;?[^0-9]&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;oval2round&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( _regexCache.Match( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;[0-9]+\&quot;?[^0-9]-[0-9]+\&quot;?[^0-9]&quot;</span>, size ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;round2round&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> { <span class="blue">return</span> <span class="maroon">&quot;other case&quot;</span>; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="green">// etc (for other part types)</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> 
+&nbsp; &nbsp; &nbsp; { 
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="green">// etc (for other categories)</span>
+&nbsp; &nbsp; <span class="blue">else</span> 
+&nbsp; &nbsp; { 
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="maroon">&quot;unknown&quot;</span>;
+}
+</pre>
+
+<p>Finally, here is the external command class implementation and its Execute method, which ties it all together, prompts the user to select a test element, and displays the result:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdMepElementShape</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = <span class="teal">Util</span>.SelectSingleElementOfType(
+&nbsp; &nbsp; &nbsp;&nbsp; uidoc, <span class="blue">typeof</span>( <span class="teal">Element</span> ), <span class="maroon">&quot;an element&quot;</span>, <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No element selected&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} is {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; &nbsp; GetElementShape( e ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_87.zip -->
+
+<a href="zip/bc_11_87.zip">
+version 2011.0.87.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.
+
+<p>Many thanks to Max for his research, in-depth explanation and useful sample solution.
+By the way, if you have suggestions for other ways to solve this, they will be more than welcome.
+Please let us know.
+Thank you!
+
+
+<p>***
+<p>The advantage of this is that it works in any flavour of Revit, even without RME, since it does not use the connector manager, which is only available in RME.

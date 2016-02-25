@@ -1,0 +1,130 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1261822 [Xdata of the DWG Export from Revit]
+  http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=5413808&linkID=4901650
+
+-->
+
+<h3>DWG and DXF Export Xdata Specification</h3>
+
+<p>I am still on my diving vacation on 
+
+<a href="http://en.wikipedia.org/wiki/Ko_Tao">
+Ko Tao</a>. 
+Unfortunately, the visibility under water was really terrible yesterday, and diving conditions are not that good in general.
+The rain that normally falls in November never came last year and now the water is warmer than usual.
+The 
+
+<a href="http://en.wikipedia.org/wiki/Coral">
+corals</a> that enter into a symbiosis with certain algae which give them their colour have shed their guests and are all white, or even worse, covered in dirt and grey or green.
+
+<p>Yesterday we dived at the 
+
+<a href="http://en.wikipedia.org/wiki/Diving_in_Ko_Tao">
+Southwest Pinnacle</a> at 
+
+a depth of 22 meters and aborted the dive after 25 minutes due to almost zero underwater visibilility, the worst ever seen, said some.
+
+We went over to Hin Ngam at Aow Leuk beach for a shallower dive away from the current, and that was a bit better.
+
+Anyway, today I am taking a day off diving and writing this instead.
+
+<p>Returning to Revit programming news, here is a technical note that has been available for quite a while that Joe just pointed out in a recent case and that I was not previously aware of:
+
+<h4>Revit DWG/DXF export: specification of the extended data (xdata)</h4>
+
+<p><strong>Question:</strong> A DWG/DXF file exported from Revit contains Extended Data (or Xdata) attached to each entity.  
+Could you explain what this data represents? 
+
+<p><strong>Answer:</strong> Every DWG (DXF) file created by Revit during the export contains Extended Data (or Xdata). 
+Xdata created by Revit has an associated application name "REVIT." 
+Each pair of values in the list defines the type identifier code and the value of an object parameter. 
+Here is a list of the data stored:
+
+<ol>
+<li>Element id
+<li>Category id
+<li>Sub-category id
+<li>Material id
+<li>Type id
+<li>Is Material Overridden By Face
+</ol>
+
+<p>The first five data items are structured in pairs:
+
+<ul>
+<li>First the above code 1 to 6 stored as a 16-bit integer with the DXF group code 1070.
+<li>Second the id data stored as a 32-bit integer with the DXF group code 1071.
+</ul>
+
+<p>The material override information only applies to polymesh objects. 
+There is no explicit value for that parameter. 
+If the record for it exists in the object, its value is true, otherwise false.
+
+<p>Each object created by Revit export can contain one record for each parameter. 
+The values of parameters are inherited by the hierarchy of the objects (e.g., from instance to block to polymesh). 
+The value defined in the object overrides the inherited value. 
+
+<p>The following is an example of an entity containing Revit's extended data in DXF format:
+
+<pre>
+AcDbEntity
+  83
+D-DOOR-SYMB
+...
+
+AcDbPolyFaceMesh
+...
+
+Extended entity definition data:
+1001
+REVIT
+1002
+{
+1070
+     1
+1071
+    52525
+1070
+     2
+1071
+    31431
+1070
+     3
+1071
+    27901
+1070
+     4
+1071
+    66553
+1070
+     5
+1071
+    12345
+1070
+     6
+1002
+}
+1001
+</pre>
+
+<p>This means that this polymesh entity came from the host object element with element id 52525, category id 31431, sub-category id 27901, material id 66553, type id 12345, and its material was defined in the Revit face itself and not inherited from the object definitions.  
+
+<h4>Named Object Dictionary Entries</h4>
+
+<p>The mapping between the category, sub-category and type ids and their names is stored in corresponding tables in the Named Object Dictionary (i.e., an AcDbDictioinary of the name "REVIT_DICTIONARY"). 
+REVIT_DICTIONARY contains the following identifiers: 
+
+<ul>
+<li>REVIT_CATEGORY_MAPPING: The definition of the mapping between category ids and category names.
+<li>REVIT_SUB_CATEGORY_MAPPING: The definition of the mapping between sub-category ids and sub-category names.
+<li>REVIT_TYPE_MAPPING: The definition of the mapping between type ids and type names.
+</ul>
+
+<p>Each table will be represented by an Xrecord stored as a DXF resbuf chain. 
+Each entry in the table represents the data pair with an id of type long and the name of type text.
+

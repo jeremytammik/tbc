@@ -1,0 +1,90 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Håkon Clausen Re: RevitRubyShell in 2014?
+
+-->
+
+<h3>RevitRubyShell for Revit 2014</h3>
+
+<p><a href="http://www.hclausen.net">H&aring;kon Clausen</a> of
+
+<a href="http://www.drofus.no">dRofus AS</a> published
+
+an updated version of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/meetings-football-and-revitrubyshell.html#2">RevitRubyShell</a>.
+
+In H&aring;kon own words:</p>
+
+<p>I have updated the add-in to 2014 and added new docking and idling features.
+
+<p>It was all completely modal in Revit 2013, which was a little inconvenient.
+There was some trouble with the key input focus working with modeless and idling in earlier versions, e.g., using the tab and enter keys.
+
+<p>In Revit 2014, the new dockable panel feature in combination with idling solves that cleanly.</p>
+
+<p>The add-in is updateable from the <a href="http://www.hclausen.net/RevitRubyShell/setup.exe">RevitRubyShell setup</a>.
+If you have any problems, try to uninstall the previous version first.</p>
+
+<p>The new source is also available from the <a href="https://github.com/hakonhc/RevitRubyShell">RevitRubyShell GitHub repository</a>.
+
+<p>If you have any feature suggestions, please let me know.</p>
+
+<p>Unfortunately, the SharpDeveloper Python and Ruby access built into Revit itself does not support direct interpreted interaction with the Revit API from the console, so this is currently the only way to have a real hands-on real-time experience with the API.
+All other options require you to implement and compile a macro or an external command and launch that.</p>
+
+
+<!-- 08422342 [Run Revit from debugger no mapped drives] -->
+
+<a name="2"></a>
+
+<h4>Running Revit from the Debugger on a Mapped Drive</h4>
+
+<p>Here is a generic Visual Studio 2012 security issue that can also affect Revit add-in development:</p>
+
+<p><strong>Question:</strong> I am using Visual Studio 2012 Professional as my authoring environment for Revit add-ins, and encountering the following problem, not limited to any particular version of Revit:</p>
+
+<p>When I run Revit from the debugger, its file dialogues do not display or allow access to any mapped drive letters.
+Local drives display, such as C: and DVD drives, for example, but no network drives or even local path drives mapped with the SUBST command.
+I can access network folders via their UNC paths, but cannot browse to the mapped drive.</p>
+
+<p>What's up?</p>
+
+
+<p><strong>Answer:</strong> You are running Visual Studio in admin mode, but executed your command as a normal user.
+
+<p>This is causing you to hit this
+
+<a href="http://social.msdn.microsoft.com/Forums/en-US/vssetup/thread/b833bde0-c3a3-46e3-8408-3ed5f0090c93">Visual Studio security issue</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Arrival in Massachusets and Tech Summit Pre-Recording</h4>
+
+<p>I arrived safe and sound in the USA and spent a pleasant, warm, sunny morning in
+
+<a href="http://en.wikipedia.org/wiki/Marblehead,_Massachusetts">
+Marblehead</a>.</p>
+
+<center>
+<img src="img/Marbleheadneck.jpg" alt="Marblehead" width="400"/>
+</center>
+
+<p>Before leaving, I posted a 30-minute preview
+
+<a href="http://thebuildingcoder.typepad.com/room_editor_preview/index.html">video recording</a>
+
+of my upcoming Tech Summit presentation on my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html">
+cloud-based simplified 2D Revit model editor</a>.
+
+The live presentation will probably also be recorded, so it remains to be seen which one I like better in the end.</p>
+
+
+

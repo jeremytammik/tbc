@@ -1,0 +1,81 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1261308 [Visual Studio 2010 and 2011 RST API] -->
+
+<h3>Visual Studio 2010 and the .NET Framework</h3>
+
+<p>In section 1.6 'Supported Programming Languages', the developer guide "Revit 2011 API Developer Guide.pdf" in the Revit SDK clearly states that "The Revit Platform API is fully accessible by any language compatible with the Microsoft .NET Framework 3.5, such as Visual Basic .NET or Visual C#."
+
+<p>In section 1.3 'Requirements', it also mentions that the programming environment recommended for going through the examples is Visual Studio 2008. 
+That is also the environment used to create and compile all the SDK samples.
+
+<p>We already once mentioned the possibility of using and debugging with 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/debugging-with-visual-studio-2010-and-rvtsamples.html">
+Visual Studio 2010</a>.
+
+Questions on this have been coming up more frequently recently.
+Here is one fundamental issue in connection with use of this version, with a clear and succinct answer by Joe Ye:
+
+<p><strong>Question:</strong> I am having difficulty getting my VB Revit plug-in application to run with the Revit 2011 API when using Visual Studio 2010.  
+Just to keep things simple, I went back through the HelloWorld tutorial just in case I was missing something.  
+The HelloWorld add-in shows up correctly in the external tools drop down menu during debugging, but nothing happens when it is selected.  
+The code does not appear to be executing.
+
+<p>I added the references and namespaces, and set the 'copy local' flag to false for the Revit API assemblies.  
+Still no luck.  
+
+<p>Maybe there is some problem with the add-in manifest file, but I cannot figure it out.  
+I also substituted a new GUID just in case there was a duplicate, but with no luck.
+
+<p>Here is the VB code that I am using to test with, in HelloWorld.vb:
+
+<pre class="code">
+<span class="blue">Imports</span> System
+<span class="blue">Imports</span> Autodesk.Revit.UI
+<span class="blue">Imports</span> Autodesk.Revit.DB
+&nbsp;
+<span class="blue">Public</span> <span class="blue">Class</span> HelloWorld
+&nbsp;&nbsp;&nbsp; <span class="blue">Implements</span> IExternalCommand
+&nbsp;&nbsp;&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp;&nbsp;&nbsp; &nbsp; <span class="blue">ByVal</span> revit <span class="blue">As</span> ExternalCommandData, _
+&nbsp;&nbsp;&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp;&nbsp;&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> ElementSet) _
+&nbsp;&nbsp;&nbsp; &nbsp; <span class="blue">As</span> Autodesk.Revit.UI.Result _
+&nbsp;&nbsp;&nbsp; &nbsp; <span class="blue">Implements</span> IExternalCommand.Execute
+&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TaskDialog.Show(<span class="maroon">&quot;Revit&quot;</span>, <span class="maroon">&quot;Hello World&quot;</span>)
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="blue">Return</span> Autodesk.Revit.UI.Result.Succeeded
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>This is my add-in manifest file HelloWorld.addin:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\...\HelloWorld\bin\Debug\HelloWorld.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>8983a66d-3a78-4db8-b88b-e5c92bf04644<span class="blue">&lt;/</span><span class="maroon">AddInId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HelloWorld.HelloWorld<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>HelloWorld<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>What can be wrong, please? 
+Please help.
+
+<p><strong>Answer:</strong> The recommended version of Visual Studio is 2008.
+Revit 2011 does not support the .NET framework 4.0, which is used by default in Visual studio 2010 to compile the plug-in.  
+
+<p>This might be causing an issue.
+Please change the compilation settings to use the .NET framework 3.5 or an earlier version and see if that works.
+
+<p><strong>Response:</strong> That solved the problem.
+Thanks!

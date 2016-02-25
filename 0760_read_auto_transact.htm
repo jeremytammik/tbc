@@ -1,0 +1,80 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Read-only and Automatic Transaction Modes</h3>
+
+<p>We have been discussing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/scope-and-dispose-transactions.html">
+transactions</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+their disposal</a> quite 
+
+a bit recently, with lots of interesting input from Guy Robinson and Arno&scaron;t L&ouml;bel.
+
+<p>They just submitted 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/edit-family-requires-no-transaction.html?cid=6a00e553e168978833016766068f67970b#comment-6a00e553e168978833016766068f67970b">
+comments</a> on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/edit-family-requires-no-transaction.html">
+EditFamily requiring a non-modifiable document</a> which 
+
+highlight another issue in this area worthwhile promoting to a post of its own to ensure that you take notice:
+
+
+<p><strong>Guy says:</strong> ... maybe it's time to recommend using the Manual transaction mode only and the removal of Automatic mode. 
+This would pave the way for removing the transaction and regeneration attributes all together.
+
+
+<p><strong>Jeremy says:</strong> I personally never use automatic transaction mode, but I do use both the manual and read-only ones.
+
+<p>It would actually be interesting to know the exact difference between an external command using read-only mode and one using manual without opening any transactions.
+
+
+<p><strong>Arno&scaron;t says:</strong> I believe I said it publicly before, but probably not on this blog yet:
+
+<p>First of all, <b>Automatic</b> Transaction Mode is considered obsolete, and we (Autodesk.Revit) do not recommend using it for new external applications. 
+It only exists to ensure compatibility with older applications. 
+The Automatic mode has many limitations (for what an external command can or cannot do), while it has virtually no benefits whatsoever. 
+It is likely it will go away in some future release of Revit.
+
+<p><b>Read-Only</b> transaction mode does two things (well, it's one thing, really, but I'll split it):
+
+<ul>
+<li>For one, the command using it cannot have any transactions and may not call any methods that modify a document, directly or indirectly, or even temporarily. 
+<li>Secondly, while this external command is being executed, nobody else is allowed to modify the document or have a transaction either; that includes Revit itself, but also applies to other applications that might be invoked through events (for example). 
+</ul>
+
+<p>All this basically guarantees that during the entire execution of the external command the current models all remain unmodified.
+
+
+<p><strong>Guy sums up enthusiastically:</strong> Yes, I've been a manual transaction person for a long time.
+
+<p>For various reasons, this enjoyable and thought provoking discussion has accelerated a process I have been slowly going through since the
+ R13 alpha's. 
+The richness of the R13 API effected a rethink, and issues such as transactions/exceptions, which I'll admit I hadn't changed my approach to for a very long time, are triggering more fundamental changes in attitude to the API.
+
+<p>I'd have to say compared to the R8 API I first played with a very long time ago, the speed, stability and functionality possible now is quite stunning. 
+And thinking why these scoping and other changes could be happening is making me rather excited.
+
+<p>With Win8/WinRT/iOS/mobile etc., though, apart from keeping it all logically in my brain it all makes for exciting times as a programmer, even if there aren't enough hours in the day ;-)
+
+
+<p><strong>Jeremy says:</strong> Wow, yes, talking about cloud and mobile computing and enough hours in the day, have you looked at Kean's latest posts on 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/creating-a-3d-viewer-for-our-apollonian-service-using-android-part-1.html">
+creating a 3D</a>
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-android-part-2.html">
+Android viewer</a>, 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/calling-a-web-service-from-a-unity3d-scene.html">
+calling a web-service from Unity</a>, 
+
+etc.?
+
+
+<p>Many thanks to Guy and Arno&scaron;t for this and all the other recent interesting discussions and insights!

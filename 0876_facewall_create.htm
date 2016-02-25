@@ -1,0 +1,173 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07905454 [Create wall by face] -->
+
+<h3>Create FaceWall on Slanted Mass Face</h3>
+
+<p>Happy New Year!
+
+<p>I hope you had a wonderful break and a good start into the New Year.</p>
+
+<p>I spent New Year's Eve with my sons and some friends in a Swiss mountain village.
+We had a nice hike up and snowboard ride down the neighbouring hill with the Wildhorn in the background:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2012/2012-12-31_lauenen/img_2071_cornelius_jeremy_wildhorn.jpg" alt="Hike in snow" width="400"/>
+</center>
+
+<p>Now back to work and the Revit API.
+Here is a question that came up just before Christmas:
+
+<a name="2"></a>
+
+<p><strong>Question:</strong> I'm trying to create a wall by face on a slanted conceptual mass face.
+Do you have any example code showing how this might work?
+
+<p><strong>Answer:</strong> Here is a simple method that can be run in a project containing one single conceptual mass family instance.
+It searches the mass for a slanted face whose normal is (-1, 0, 1) and creates a FaceWall instance on that with no problem:
+
+<pre>
+<span class="blue">void</span> CreateFaceWall( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi = collector
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> nnorm = <span class="blue">new</span> <span class="teal">XYZ</span>( -1, 0, 1 ).Normalize();
+&nbsp;
+&nbsp; <span class="blue">if</span>( fi != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Options</span> op = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; op.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp; &nbsp; <span class="green">//op.DetailLevel = DetailLevels.Undefined;</span>
+&nbsp; &nbsp; op.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> ge = fi.get_Geometry( op );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( ge != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> ge )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> &amp;&amp; solid.Faces.Size &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pf != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> fnorm = pf.Normal.Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( fnorm.IsAlmostEqualTo( nnorm ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> log = <span class="maroon">&quot;&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> done = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">WallType</span> t <span class="blue">in</span> doc.WallTypes )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( t != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = t.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> trans
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;Add wall&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FaceWall</span> fw = <span class="teal">FaceWall</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create( doc, id,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">WallLocationLine</span>.CoreExterior,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f.Reference );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( fw != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Succeeded&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Succeeded&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; done = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; log += t.Name + <span class="maroon">&quot;: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ex.Message + <span class="maroon">&quot;\r\n&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( done )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Failed&quot;</span>, log );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is the resulting wall:</p>
+
+<center>
+<img src="img/SlantedFaceWall.png" alt="Slanted FaceWall" width="400"/>
+</center>
+
+
+
+<a name="3"></a>
+
+<h4>Inaccessible Location Property</h4>
+
+<p><strong>Question:</strong> I tried to access the Location property of a FaceWall object.
+
+<p>However, nothing I tried leads to any useful result.
+In the following code snippet, both theCurve and thePoint remain null:</p>
+
+<pre>
+  Reference r1 = doc.Selection.PickObject(
+    ObjectType.Element, "Please pick a wall: " );
+
+  Element e1 = doc.GetElement( r1 );
+
+  FaceWall faceWall = e1 as FaceWall;
+
+  LocationCurve theCurve = faceWall.Location
+    as LocationCurve;
+
+  LocationPoint thePoint = faceWall.Location
+    as LocationPoint;
+</pre>
+
+<p><strong>Answer:</strong> Whenever a Revit element location is more complex than a simple point or curve, its Location property will contain more complex internal data (or possibly nothing at all) that currently cannot be represented by the Revit API.
+
+<p>In the case of a FaceWall, it is obvious that no simple point or curve would accurately represent the wall location.
+
+<p>In such cases, another option to determine a location for this kind of object is to analyse its geometry and use the information that provides.
+
+
+<a name="4"></a>
+
+<h4>Autodesk OrgOrgChart</h4>
+
+<p>For something completely different, here is an interesting graphical representation of the organisational changes Autodesk has been through in the last couple of years.</p>
+
+<p>The OrgOrgChart (Organic Organization Chart) project looks at the evolution of a company structure over time.
+A snapshot of the Autodesk organizational hierarchy was taken each day between May 2007 and June 2011:</p>
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/mkJ-Uy5dt5g" frameborder="0" allowfullscreen></iframe>
+
+<p>This representation is reminiscent of the Disk Tree visualization technique developed at Xerox Parc
+(Chi E.H., S.K. Card, 1999,
+<a href="http://www-users.cs.umn.edu/~echi/papers/infovis99/chi-wavs.pdf">Sensemaking of Evolving Web Sites Using Visualization Spreadsheets</a>,
+<i>Proceedings of the Symposium on Information Visualization (InfoVis '99)</i>, pp. 18-25),
+showing implicit and explicit affinities among information items and revealing relationships that are difficult to discover in traditional representations.
+Proximity or connections between items can reveal complex relationships in a comprehensive way, provide visual access to data structures, and enable detection of tendencies or patterns in the process.

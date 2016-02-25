@@ -1,0 +1,571 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07585783 [A sample for PartUtils.DivideParts] 
+C:\a\doc\revit\au\2011\doc2\CP5211_Mattison.docx
+C:\a\doc\revit\au\2011\doc2\CP5211_Mattison.pdf
+C:\a\doc\revit\au\2011\doc2\CP5211_Mattison_Assemblies_Groups_ExtensibleStorage.cs
+
+-->
+
+<h3>Parts, Assemblies, PartUtils and DivideParts</h3>
+
+<p>Let's end this eventful week with another big and imporant topic that we've neglected for much too long.
+
+<p>So far, I presented just one single example of using the PartUtils class, and other information provided on it by a Google search is also awfully scarce.
+
+<p>Piotr Zurek of 
+
+<a href="http://www.cadpro.co.nz/">
+CADPRO Systems Ltd</a> improved
+
+the situation by raising and promptly answering the following question:
+
+<p><strong>Question:</strong> I wonder whether you have any sample code showing how to use the PartUtils.DivideParts method. 
+
+<p>I'm trying hard to work it out but the documentation is pretty scarce on the topic. 
+
+<p><strong>Answer:</strong> I published a sample of using the PartUtils class demonstrating how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">
+retrieve detailed wall layer geometry</a>.
+
+<p>It exercises the CreateParts method, however, and not DivideParts, unfortunately.
+
+<p><strong>Response:</strong> Seems like I cracked it. 
+Attached a small working example.
+
+I'm just starting to play with the geometry related parts of the API, so this example is probably a bit clumsy  :-)
+
+<p><strong>Answer:</strong> I cleaned up your code a bit and tested it on the following simple wall:</p>
+
+<center>
+<img src="img/divide_parts_1.png" alt="Wall to divide into parts"/>
+</center>
+
+<p>I simply run your sample command 'Divide Parts' and select the wall.
+I then display parts instead of original elements by setting the 'Parts Visibility' view property to 'Show Parts', et voila:</p>
+
+<center>
+<img src="img/divide_parts_2.png" alt="Wall divided into parts"/>
+</center>
+
+<p>The wall is split into parts two ways, both by the CreateParts method, which separates the individual layers of the compound structure, and by DivideParts, which cuts each layer into divisions using the specified cutting curves or planes:</p>
+
+<center>
+<img src="img/divide_parts_3.png" alt="Wall layers and divided parts"/>
+</center>
+
+<p>I also appended the handout document from Harry Mattison and Enrique Galicia's class 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9528&jid=1727602">
+CP5211 &ndash; Construction Modelling and API for Builders</a> at 
+
+Autodesk University 2011, which explains the usage a bit more and is reproduced in full below.
+
+
+<p><strong>Response:</strong> Yes, that really provides a nice explanation of the whole topic.
+
+<p>I fixed some issues that you pointed out, and here is some further explanation:
+
+<p>For every division point I create a line, collinear with the wall going from a point 2 wall width in front of the division point to 2 wall widths after the division point.
+
+<p>Then I rotate those lines by 90 degrees to create curves perpendicular to the wall &ndash; those curves will be used to define the cutting lines (if I understand correctly).
+
+<p>Then based on endpoints of those curves I define reference planes used to divide the wall. Through my tests I have determined that it is not enough if the intersection curve is just 2*wall width.
+
+<p>It must have something to do with going beyond the extents of the dashed outline visible during manual editing of the division sketch. I don't know exactly what it has to be but 4*wall width works fine &ndash; the dashed outline seems to be just a bit more than twice the wall width.
+
+<p>This seems to work, but that was just trial and error.
+
+<p>Initially, I couldn't see my parts after the command completed. 
+That was easily solved by setting the parts visibility in the view by adding:
+
+<pre class="code">
+&nbsp; doc.ActiveView.PartsVisibility 
+&nbsp; &nbsp; = <span class="teal">PartsVisibility</span>.ShowPartsOnly;
+</pre>
+
+<p>My impression is that I have to use calls to both CreateParts and DivideParts for this to work, just like in the user interface: first you click 'Create Parts', then the 'Divide Parts' button is enabled.
+If I don't call CreateParts first, the call to PartUtils.ArePartsValidForDivide returns false.
+
+<p>Initially, I was using two lists of 'cutting definitions', providing intersectingReferenceIds and the curveArray. 
+Harry's AU materials make it clear that one of these can be empty.
+This very important detail is never mentioned anywhere in the API docs. 
+Understanding that allowed me to clean up the code and get rid of all the lines having to do with reference planes that I was initially using. 
+
+<p><strong>Answer:</strong> Great job!
+I cleaned it up yet a little bit more, e.g. by adding an exception handler in case the user cancels the wall selection.
+I moved the selection and type checking out of the transaction and reordered the later statements.
+
+<p>I modified the definition of the wall width vector. 
+It initially confused me that its direction followed the wall length instead of the width, and that you re-rotated it each time you translated it.
+
+<p>I simplified the geometrical manipulations a bit and changed the wall width vector to be perpendicular to the wall right from the start.
+The curveArray definition is significantly simplified, and I hope the geometrical manipulation is self-explanatory now.
+
+<p>Here is the final version of Piotr's 'Divide Parts' external command Execute method implementation:
+
+<pre class="code">
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == commandData )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;commandData&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WallSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select a wall to split into panels&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> wall = ( r == <span class="blue">null</span> || r.ElementId
+&nbsp; &nbsp; &nbsp; &nbsp; == <span class="teal">ElementId</span>.InvalidElementId )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : doc.GetElement( r.ElementId ) <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( wall == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Unable to retrieve wall.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> location
+&nbsp; &nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == location )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Unable to retrieve wall location curve.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = location.Curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == location )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Unable to retrieve wall location line.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; transaction.Start( <span class="maroon">&quot;Building panels&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; wallList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; wallList.Add( r.ElementId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">PartUtils</span>.AreElementsValidForCreateParts( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc, wallList ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PartUtils</span>.CreateParts( doc, wallList );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; parts 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">PartUtils</span>.GetAssociatedParts( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, wall.Id, <span class="blue">false</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">PartUtils</span>.ArePartsValidForDivide( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, parts ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> divisions = 5;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> origin = line.Origin;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> delta = line.Direction.Multiply(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.Length / divisions );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> shiftDelta
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Transform</span>.get_Translation( delta );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Construct a 90 degree rotation in the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// XY plane around the line start point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> rotation = <span class="teal">Transform</span>.get_Rotation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin, <span class="teal">XYZ</span>.BasisZ, 0.5 * <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// A vector perpendicular to the wall with</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// length equal to twice the wall witdh</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> wallWidthVector = rotation.OfVector(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.Direction.Multiply( 2 * wall.Width ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> intersectionLine
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = app.Create.NewLineBound( <span class="green">// Line.CreateBound</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin + wallWidthVector,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin - wallWidthVector );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; curveArray = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; divisions; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; intersectionLine = intersectionLine
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_Transformed( shiftDelta );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curveArray.Add( intersectionLine );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SketchPlane</span> divisionSketchPlane
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewSketchPlane(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.Create.NewPlane(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, line.Origin ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// An empty list of intersecting ElementIds</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; intersectionElementIds
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PartUtils</span>.DivideParts( doc, parts, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; intersectionElementIds, curveArray, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; divisionSketchPlane.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView.PartsVisibility 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">PartsVisibility</span>.ShowPartsOnly;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; transaction.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; {
+&nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+</pre>
+
+<p>Here is 
+
+<a href="zip/DivideParts.zip">DivideParts.zip</a> containing
+
+the source code, Visual Studio solution and add-in manifest of the 'Divide Parts' command.
+For completeness' sake, I also added the source code from Harry's AU presentation below to it.
+
+<p>Many thanks to Piotr for this exploration and sharing the result!
+
+
+
+<a name="2"></a>
+
+<h4>Revit Construction Modelling and API for Builders</h4>
+
+<p>As mentioned above, while exploring this issue for Piotr, I also came across Harry Mattison and Enrique Galicia's class 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9528&jid=1727602">
+CP5211 &ndash; Construction Modelling and API for Builders</a> at 
+
+Autodesk University 2011.
+
+It was mentioned in the overview of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-and-aec-api-classes-at-autodesk-university.html">
+Revit and AEC API Classes at AU 2011</a>, 
+
+and unfortunately I never had a chance to participate live in that class myself.
+
+<p>It discusses applying Revit construction modelling functionality creating parts, assemblies and assembly views.
+
+<p>It provides sample code exercising some PartUtils methods such as CreateParts, GetAssociatedParts, DivideParts, the PartMaker class, offsetting individual sub-parts, creating assembly instances and assembly views.
+
+<p>It also demonstrates using the VIEW_PARTS_VISIBILITY built-in parameter to programmatically set the part visibility in the view.
+Piotr shows a more modern and comfortable way to achieve that in Revit 2013, though, using the PartsVisibility property instead.
+
+<p>All in all, a nice complement to the sample presented above.
+
+<p>For your convenience and effective web searches, here is the full content of the AU handout document.
+
+<p>Please note that I have not reformatted Harry's original source code, so the lines are sometimes rather long and truncated in the blog post view.
+To see them in full, you can either copy and paste them to a text editor, open the original handout document provided below, or download the DivideParts source code provided above.
+
+
+<a name="21"></a>
+
+<h4>Introduction</h4>
+
+<p>Revit contains a wide variety of functionality that can be useful throughout the construction process. Scheduling, estimating, and coordination are a few of these areas, and there are many opportunities to use the Revit API to automate tasks related to construction modelling. The Revit API can help you perform construction modelling faster and more accurately.
+
+
+<a name="22"></a>
+
+<h4>Applying Revit Construction Modelling Functionality</h4>
+
+<p>This handout focuses on the new Construction Modelling features in Revit 2012 that support workflows for improved 4D sequencing, cost estimating, quantification, and other construction-related tasks by allowing you to create parts, assemblies, and assembly views in your Revit model.
+
+
+<a name="23"></a>
+
+<h4>Parts</h4>
+
+<p>Parts are dividing elements that can be created in Revit hosts such as walls, ceilings, floor slabs, and roofs. Dividing one of these elements creates new elements called <b>parts</b> which are associated with the element used to create them. 
+This <b>parent</b> element is not deleted or altered by the creation of the parts &ndash; the parent continues to exist and can be edited after parts have been created from it.
+
+<p>The importance of parts is that they allow your Revit model to reflect the difference between how objects are designed and how they are constructed. 
+For example, a large floor slab may be modeled as a single floor element in Revit, but it may not be constructed as a single element at a single time during the construction schedule. 
+By dividing the single floor into multiple parts, the model can better reflect the realities of the construction process and more construction data can be captured.
+
+<p>Parts can be divided into sub-parts using the UI or API by specifying curves that define the division or by providing a set of intersecting references such as levels, reference planes, or grids. Curves that divide parts can be created with either closed loops or open loops that intersect the boundaries of the parent element. 
+These parts will allow you to improve the design intelligence in your Revit model so that it can be used to produce more granular and accurate schedules, quantity takeoffs, and graphical views of the model.
+
+<p>After parts are created and divided, many different attributes of these parts can be modified to accurately indicate how the building will be built. For example, the material of a part created from a floor slab may have a different material than the remainder of the slab.
+
+<p>After creating parts, part list schedules can be created to more accurately track cost estimation and quantification data in the BIM model.
+
+<p>This example shows the situation before and after parts are created and divided by the following code:</p>
+
+<center>
+<img src="img/divide_parts_21.png" alt="Wall to divide into parts"/>
+</center>
+
+<pre class="code">
+&nbsp; Autodesk.Revit.ApplicationServices.<span class="teal">Application</span> app = commandData.Application.Application;
+&nbsp; <span class="teal">Document</span> doc = commandData.Application.ActiveUIDocument.Document;
+&nbsp; <span class="teal">UIDocument</span> uidoc = commandData.Application.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; idList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// Select an element to use for part creation. Can be a host element (floor, roof, etc) or a part created from one of these elements.</span>
+&nbsp; <span class="teal">Element</span> pickedElement = doc.GetElement( uidoc.Selection.PickObject( <span class="teal">ObjectType</span>.Element ) );
+&nbsp; idList.Add( pickedElement.Id );
+&nbsp;
+&nbsp; <span class="green">// Determine which elements to divide.</span>
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; elementIdsToDivide = <span class="blue">new</span> List&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; <span class="blue">if</span>( <span class="teal">PartUtils</span>.AreElementsValidForCreateParts( doc, idList ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// AreElementsValidForCreateParts returned true, so the selected element is not a part but it is an element that can be used to create a part. </span>
+&nbsp; &nbsp; <span class="teal">Transaction</span> createPartTransaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Create Part&quot;</span> );
+&nbsp; &nbsp; createPartTransaction.Start();
+&nbsp; &nbsp; <span class="teal">PartUtils</span>.CreateParts( doc, idList ); <span class="green">// create the parts</span>
+&nbsp; &nbsp; createPartTransaction.Commit();
+&nbsp;
+&nbsp; &nbsp; elementIdsToDivide = <span class="teal">PartUtils</span>.GetAssociatedParts( doc, pickedElement.Id, <span class="blue">true</span>, <span class="blue">true</span> ); <span class="green">// get the id of the newly created part</span>
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( pickedElement <span class="blue">is</span> <span class="teal">Part</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// The selected element is a part, so that part will be divided. </span>
+&nbsp; &nbsp; elementIdsToDivide.Add( pickedElement.Id );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Create geometry that will be used to divide the part. For this example, a new part will be divided from the main part that is one quarter of the face. More complex intelligence could be coded to divide the part based on construction logistics or the properties of the materials being used to create the part.</span>
+&nbsp; <span class="teal">XYZ</span> pointRight = <span class="blue">null</span>;
+&nbsp; <span class="teal">XYZ</span> pointTop = <span class="blue">null</span>;
+&nbsp; <span class="teal">XYZ</span> pointCorner = <span class="blue">null</span>;
+&nbsp; <span class="teal">XYZ</span> pointCenter = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketchPlane = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; opt.ComputeReferences = <span class="blue">true</span>;
+&nbsp; Autodesk.Revit.DB.<span class="teal">GeometryElement</span> geomElem = pickedElement.get_Geometry( opt );
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObject <span class="blue">in</span> geomElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( geomObject <span class="blue">is</span> <span class="teal">Solid</span> ) <span class="green">// get the solid geometry of the selected element</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = geomObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">FaceArray</span> faceArray = solid.Faces;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> faceArray )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// find the center of the face</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxUV</span> bbox = face.GetBoundingBox();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> center = <span class="blue">new</span> <span class="teal">UV</span>( ( bbox.Max.U - bbox.Min.U ) / 2 + bbox.Min.U, ( bbox.Max.V - bbox.Min.V ) / 2 + bbox.Min.V );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> faceNormal = face.ComputeNormal( center );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( faceNormal.IsAlmostEqualTo( <span class="teal">XYZ</span>.BasisZ ) ) <span class="green">// this example is designed to work with a floor or other element with a large face whose normal is in the Z direction</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> sketchPlaneTransaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Create Sketch Plane&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sketchPlaneTransaction.Start();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sketchPlane = doc.Create.NewSketchPlane( face <span class="blue">as</span> <span class="teal">PlanarFace</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sketchPlaneTransaction.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pointCenter = face.Evaluate( center );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> top = <span class="blue">new</span> <span class="teal">UV</span>( ( bbox.Max.U - bbox.Min.U ) / 2 + bbox.Min.U, bbox.Max.V );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pointTop = face.Evaluate( top );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> right = <span class="blue">new</span> <span class="teal">UV</span>( bbox.Max.U, ( bbox.Max.V - bbox.Min.V ) / 2 + bbox.Min.V );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pointRight = face.Evaluate( right );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> corner = <span class="blue">new</span> <span class="teal">UV</span>( bbox.Max.U, bbox.Max.V );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pointCorner = face.Evaluate( corner );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="green">// Create the curves that will be used for the part division.</span>
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; curveList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;();
+&nbsp; <span class="teal">Curve</span> curve1 = app.Create.NewLine( pointCenter, pointRight, <span class="blue">true</span> );
+&nbsp; curveList.Add( curve1 );
+&nbsp; <span class="teal">Curve</span> curve2 = app.Create.NewLine( pointRight, pointCorner, <span class="blue">true</span> );
+&nbsp; curveList.Add( curve2 );
+&nbsp; <span class="teal">Curve</span> curve3 = app.Create.NewLine( pointCorner, pointTop, <span class="blue">true</span> );
+&nbsp; curveList.Add( curve3 );
+&nbsp; <span class="teal">Curve</span> curve4 = app.Create.NewLine( pointTop, pointCenter, <span class="blue">true</span> );
+&nbsp; curveList.Add( curve4 );
+&nbsp;
+&nbsp; <span class="green">// intersectingReferenceIds will be empty for this example.</span>
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; intersectingReferenceIds = <span class="blue">new</span> List&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// Divide the part</span>
+&nbsp; <span class="teal">Transaction</span> dividePartTransaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Divide Part&quot;</span> );
+&nbsp; dividePartTransaction.Start();
+&nbsp; <span class="teal">PartMaker</span> maker = <span class="teal">PartUtils</span>.DivideParts( doc, elementIdsToDivide, intersectingReferenceIds, curveList, sketchPlane.Id );
+&nbsp; dividePartTransaction.Commit();
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; divElems = maker.GetDividedElementIds(); <span class="green">// Get the ids of the divided elements</span>
+&nbsp;
+&nbsp; <span class="green">// Set the view's &quot;Parts Visibility&quot; parameter so that parts are shown</span>
+&nbsp; <span class="teal">Parameter</span> partVisInView = doc.ActiveView.get_Parameter( <span class="teal">BuiltInParameter</span>.VIEW_PARTS_VISIBILITY );
+&nbsp; <span class="teal">Transaction</span> setPartVizTransaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Set View Parameter&quot;</span> );
+&nbsp; setPartVizTransaction.Start();
+&nbsp; partVisInView.Set( 0 ); <span class="green">// 0 = Show Parts, 1 = Show Original, 2 = Show Both</span>
+&nbsp; setPartVizTransaction.Commit();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Faces of parts (which correspond to layers of a compound host object) can be offset via the API to achieve the same result that can be obtained in the UI by dragging the part's shape handles. 
+This functionality provides customized control beyond the default layer configuration created by Revit.
+
+<p>Here is a wall converted to parts:</p>
+
+<center>
+<img src="img/divide_parts_22.png" alt="Wall converted to parts"/>
+</center>
+
+<p>The wall part faces can be individually offset by the code below to produce this result:</p>
+
+<center>
+<img src="img/divide_parts_23.png" alt="Wall part faces offset individually"/>
+</center>
+
+<pre class="code">
+&nbsp; <span class="teal">GeometryElement</span> geomElem = part.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObject <span class="blue">in</span> geomElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( geomObject <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = geomObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">FaceArray</span> faceArray = solid.Faces;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> faceArray )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( part.CanOffsetFace( face ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; part.SetFaceOffset( face, offsetCtr );
+&nbsp; &nbsp; &nbsp; &nbsp; offsetCtr += 0.1;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<a name="24"></a>
+
+<h4>Assemblies and Assembly Views</h4>
+
+<p>Assemblies are collections of elements that can be used in the Revit model to create shop drawings for prefabricated building components such as pre-cast walls, columns, beams, and floors. 
+Assemblies can be scheduled, visually isolated, and tagged. 
+
+<p>Every assembly has a primary element that determines the assembly's category. 
+Each assembly is shown in the Project Browser and can be used to create assembly views that display only that assembly. 
+
+<p>Read, write and create access to assemblies in the Revit environment is provided through the following two classes:
+
+<ul>
+<li>Autodesk.Revit.DB.Assembly.AssemblyInstance 
+<li>Autodesk.Revit.DB.Assembly.AssemblyType 
+</ul>
+
+<p>Other important methods include AssemblyInstance.GetMemberIds, AssemblyInstance.SetMemberIds, and AssemblyInstance.Disassemble.
+
+<p>Assembly Views display only the elements in the assembly and are created with methods of the AssemblyViewUtils class. 
+The command below shows how assemblies and assembly views can be created with the API.
+
+<p>Here are two columns and a beam selected before running it:</p>
+
+<center>
+<img src="img/divide_parts_24.png" alt="Two columns and a beam selected to create assembly"/>
+</center>
+
+<p>Running the command automatically creates an assembly and its associated views:</p>
+
+<center>
+<img src="img/divide_parts_25.png" alt="New assembly for selected columns and beam"/>
+</center>
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> doc = commandData.Application.ActiveUIDocument.Document;
+&nbsp; <span class="teal">UIDocument</span> uidoc = commandData.Application.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> categoryId = doc.get_Element( uidoc.Selection.GetElementIds().FirstOrDefault() ).Category.Id;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">AssemblyInstance</span>.IsValidNamingCategory( doc, categoryId, uidoc.Selection.GetElementIds() ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Transaction</span> transactionA = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Create Assembly&quot;</span> );
+&nbsp; &nbsp; transactionA.Start();
+&nbsp; &nbsp; <span class="teal">AssemblyInstance</span> assemblyInstance = <span class="teal">AssemblyInstance</span>.Create( doc, uidoc.Selection.GetElementIds(), categoryId );
+&nbsp; &nbsp; transactionA.Commit(); <span class="green">// need to commit the transaction to complete the creation of the assembly instance so it can be accessed in the code below</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> transactionB = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Create Assembly Views&quot;</span> );
+&nbsp; &nbsp; transactionB.Start();
+&nbsp; &nbsp; assemblyInstance.AssemblyTypeName = <span class="maroon">&quot;Assembly #1&quot;</span>; <span class="green">// rename the assembly</span>
+&nbsp; &nbsp; <span class="blue">if</span>( assemblyInstance.AllowsAssemblyViewCreation() ) <span class="green">// check to see if views can be created for this assembly</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> titleblockId = doc.TitleBlocks.Cast&lt;<span class="teal">FamilySymbol</span>&gt;().First&lt;<span class="teal">FamilySymbol</span>&gt;().Id; <span class="green">// find a titleblock</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// create a sheet, 3d view, sections, a material takeoff, and parts list for this assembly</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSheet</span> viewSheet = <span class="teal">AssemblyViewUtils</span>.CreateSheet( doc, assemblyInstance.Id, titleblockId );
+&nbsp; &nbsp; &nbsp; <span class="teal">View3D</span> view3d = <span class="teal">AssemblyViewUtils</span>.Create3DOrthographic( doc, assemblyInstance.Id );
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSection</span> detailSectionA = <span class="teal">AssemblyViewUtils</span>.CreateDetailSection( doc, assemblyInstance.Id, <span class="teal">AssemblyDetailViewOrientation</span>.DetailSectionA );
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSection</span> detailSectionB = <span class="teal">AssemblyViewUtils</span>.CreateDetailSection( doc, assemblyInstance.Id, <span class="teal">AssemblyDetailViewOrientation</span>.DetailSectionB );
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSection</span> detailSectionH = <span class="teal">AssemblyViewUtils</span>.CreateDetailSection( doc, assemblyInstance.Id, <span class="teal">AssemblyDetailViewOrientation</span>.HorizontalDetail );
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> materialTakeoff = <span class="teal">AssemblyViewUtils</span>.CreateMaterialTakeoff( doc, assemblyInstance.Id );
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> partList = <span class="teal">AssemblyViewUtils</span>.CreatePartList( doc, assemblyInstance.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Add graphical views to the newly created sheet. Schedules (the Parts List and Material Takeoff) cannot be added to sheets with the 2012 API.</span>
+&nbsp; &nbsp; &nbsp; viewSheet.AddView( view3d, <span class="blue">new</span> <span class="teal">UV</span>( 1, 1 ) );
+&nbsp; &nbsp; &nbsp; viewSheet.AddView( detailSectionA, <span class="blue">new</span> <span class="teal">UV</span>( 1.3, 1 ) );
+&nbsp; &nbsp; &nbsp; viewSheet.AddView( detailSectionB, <span class="blue">new</span> <span class="teal">UV</span>( 1, 1.3 ) );
+&nbsp; &nbsp; &nbsp; viewSheet.AddView( detailSectionH, <span class="blue">new</span> <span class="teal">UV</span>( 1.3, 1.3 ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; transactionB.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>For completeness' sake, here is the original handout document 
+
+<!-- C:\a\doc\revit\au\2011\doc2\CP5211_Mattison.pdf -->
+
+<a href="file:///C:/a/doc/revit/au/2011/doc2/CP5211_Mattison.pdf">CP5211_Mattison.pdf</a> itself.
+
+<p>If you log on to the AU web site, you will find that you have access to this very same handout document, and also to the original presentation, which I do not care to reproduce here, and 'additional materials', which turns out to be 
+
+<a href="file:///C:/a/doc/revit/au/2011/doc2/CP5211_Mattison_Assemblies_Groups_ExtensibleStorage.cs">C# source code</a> implementing 
+
+three further external commands demonstrating Revit API functionality related to assemblies, groups and extensible storage:
+
+<ul>
+<li>Create_Assembly_From_Group
+<li>Update_Assemblies_From_Groups
+<li>ReportStoredId
+</ul>
+
+<p>As far as I can tell, figuring out what they do and how they work is left as an exercise to the interested and motivated reader  :-)
+
+<p>Many thanks to Harry and Enrique for this nice overview and all the sample code!
+

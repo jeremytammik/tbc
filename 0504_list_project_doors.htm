@@ -1,0 +1,79 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Agnius Vasiliauskas Re: Controlling REVIT model from windows form 
+Gintaris Aksomitas Re: Information published in Your website
+
+-->
+
+<h3>Modeless Door Lister and Deleter</h3>
+
+<p>I arrived safely back home after taking a tranquil and uneventful train ride from Milano through Switzerland.
+No more airplanes or airports for me this year!
+There was actually not all that much snow in sight, and no disturbances whatsoever.
+Now I have a couple of days to try to pick up the threads of my normal life again, both work and private, after a full month of nonstop conferences and travelling.
+
+<p>Here is a pretty little sample application by Agnius Vasiliauskas, who also runs a very interesting blog named
+
+<a href="http://coding-experiments.blogspot.com">
+Coding experiments</a> covering 
+
+a number of programming problems in various languages, with a lot of solutions especially around mathematical Euler problems, image manipulation and analysis.
+
+<p>Agnius made his first excursion into the Revit API, with the following goals:
+
+<ul>
+<li>Create a Revit add-in with the following features:
+<li>Display a modeless form populated with all door instances in the project.
+<li>Show a preview image of each door in the form.
+<li>Add an option to delete each door in the DataGrid context menu.
+</ul>
+
+<p>Agnius adds: 
+I want my work to be useful for everybody else who develops for Revit. 
+Because of this, I send you my work, with the hope that maybe you will find it useful too. 
+
+<p>I created this add-in entirely from scratch based completely on the following publicly available information:
+
+<ul>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html">DevTV recordings</a> provided on the <a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+<li>The information provided in the Revit SDK, e.g. the Revit API help file, developer guide and samples.
+<li>Various posts on <a href="http://thebuildingcoder.typepad.com">The Building Coder</a>.
+</ul>
+
+<p>Here is a 
+
+<a href="http://oi51.tinypic.com/2gtoop2.jpg">
+screen snapshot of the add-in form</a> to provide a quick preview:</p>
+
+<center>
+<img src="img/ListProjectDoors.png" alt="List project doors" width="400"/>
+</center>
+
+<p>Here is the complete 
+
+<a href="zip/ListProjectDoors.zip">Visual Studio 2010 C# project</a> for 
+
+this Revit add-in as well.
+
+<p>Some of the solutions incorporated into the project are the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless dialogue handling</a> using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html"> 
+Idling event</a> to 
+
+communicate with Revit and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/get-type-id-and-preview-image.html">
+ElementType preview image</a>.
+
+I totally agree that it can prove useful for others as well.
+
+<p>Agnius' project door lister is a really impressive example of what somebody with good programming knowledge can achieve using the Revit API in very little time, starting from absolutely zero.
+Very many thanks to Agnius for sharing this!
+

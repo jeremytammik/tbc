@@ -1,0 +1,256 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07929213 [Revit API: Catching the object which triggers the event]
+http://forums.autodesk.com/t5/Autodesk-Revit-API/XYZ-IsAlmostEqualTo-problem/td-p/3701684
+
+-->
+
+<h3>URL and Other Buttons, XYZ Points and Vectors</h3>
+
+<p>Let me summarise a very few of the topics I have been chatting with people about in the past few days:
+
+<ul>
+<li><a href="#2">Ribbon button identification</a></li>
+<li><a href="#3">Opening a URL from a ribbon button</a></li>
+<li><a href="#4">XYZ comparison and point and vector behaviour</a></li>
+<li><a href="#5">Autodesk API overview</a></li>
+<li><a href="#6">The Green Building Studio GBS REST API</a></li>
+</ul>
+
+<p>Actually, to tell the truth, it is just one day, so far, this week.
+Wow, my days are too full.
+I am getting nothing else done!</p>
+
+<a name="2"></a>
+
+<h4>Ribbon Button Identification</h4>
+
+<p>Here is a simple question that came up a few times in the past:</p>
+
+<p><strong>Question:</strong> I have implemented a ribbon push button.
+Now I would like to find out which button was pushed in the event handler, i.e. external command, so that I can attach the same external command to handle multiple different buttons.
+How can this be achieved, please?
+
+<p>I would like to identify the button pushed and access its data in the external command Execute method.
+
+
+<p><strong>Answer:</strong> The official Revit API user interface design expects you to implement a separate command class for each push button.
+
+<p>If you do so, then you can identify the push button clicked by the user by the command class whose Execute method was triggered.
+
+<p>If you choose to circumvent this official approach somehow, e.g. by attaching the same external command implementation to several different push buttons, than you will have to identify them by some other means.
+
+<p>When you define a push button, you also specify its Name via the RibbonItemData.Name property. This name is unique across the entire ribbon, or at least within the panel containing the button, so you could use this to identify the button.
+
+<p>Unfortunately, the Revit API does not provide any support for finding out which push button was used to trigger the external command.
+
+<p>While this functionality is not provided by the Revit API, you may be able to make use of the generic .NET Framework libraries to find out.
+
+<p>For instance, you can
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/subscribing-to-ui-automation-events.html">
+subscribe to certain events</a> to
+
+receive a notification whenever a ribbon button is pressed by making use of the .NET
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a> library.
+
+<p>A concrete example of subscribing to a UI Automation event telling you which button was clicked is given by Rodolf Honke to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/pimp-my-autocad-or-revit-ribbon.html">
+pimp my ribbon</a>,
+
+where he shows how to implement an event listener for both Revit and AutoCAD ribbon systems:</p>
+
+<pre class="code">
+ComponentManager.UIElementActivated
+&nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;Autodesk.Windows
+&nbsp; &nbsp; .<span class="teal">UIElementActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; ComponentManager_UIElementActivated );
+&nbsp;
+<span class="blue">void</span> ComponentManager_UIElementActivated(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; Autodesk.Windows.<span class="teal">UIElementActivatedEventArgs</span> e )
+{
+&nbsp; <span class="green">// e.UiElement.PersistId says which item has been pressed</span>
+}
+</pre>
+
+<p>You will need to test whether this is of any use to you. This event listener may be pretty inefficient and slow.
+
+<p>The use of these APIs is unsupported and at your own risk.
+If you wish to use the unsupported UI Automation option, you will have to find out for yourself how to do so using the ample information available on the web and elsewhere.
+
+<p>Probably the easiest way to go is indeed tom implement a separate command handler for each button.
+If you have many commands requiring similar functionality, e.g. an identical initialisation procedure, you can either derive them all from one common base class, or wrap the common functionality in a method that you can call from each separate external command Execute method.</p>
+
+
+<a name="3"></a>
+
+<h4>Opening a URL from a Ribbon Button</h4>
+
+<p>Another, simpler, question on hooking up ribbon buttons was also happily and rapidly resolved:</p>
+
+<p><strong>Question:</strong> I am attempting to create a URL link like this:</p>
+
+<center>
+<img src="img/url_button_1.png" alt="URL ribbon button"/>
+</center>
+
+<p>How can I enable the user to click on the button and get the link to open in a web browser?
+I know how to create the ribbon panel and push button, but not how to connect to the URL in a web browser.
+
+<p><strong>Answer:</strong> Two options:
+
+<ol>
+<li>Official, easy, supported: implement an external command and launch the browser from that.</li>
+<li>Unofficial, harder, unsupported: use something else, e.g. the .NET framework UI Automation library discussed above.</li>
+</ol>
+
+<p><strong>Response:</strong> Option #1 worked and it was very easy indeed.
+All it required was adding just one line of code in the external command, System.Diagnostics.Process.Start, and then simply implementing it in the external application file.
+
+<p>This enables us to populate a custom ribbon panel that includes URLs linking to PDFs and webpages containing office Revit standards.
+This provides our staff a quick and easy way to access our standards within the Revit environment.
+
+<p>External command:</p>
+
+<center>
+<img src="img/url_button_2.png" alt="External command opening a URL"/>
+</center>
+
+<p>External application:</p>
+
+<center>
+<img src="img/url_button_3.png" alt="External application setting up ribbon button"/>
+</center>
+
+<p>Revit ribbon:</p>
+
+<center>
+<img src="img/url_button_4.png" alt="URL ribbon button"/>
+</center>
+
+
+
+
+<a name="4"></a>
+
+<h4>XYZ Comparison and Point and Vector Behaviour</h4>
+
+<p>A completely different topic deals with the Revit API XYZ class, its dual use to represent points and vectors, and how to compare them, raised by Graham Cook in the Revit API discussion forum in the thread on a
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/XYZ-IsAlmostEqualTo-problem/td-p/3701684">
+XYZ.IsAlmostEqualTo problem</a>:</p>
+
+<p><strong>Question:</strong> Maybe I'm misinterpreting the IsAlmostEqualTo method.
+I want to determine whether two points are within 4 inches of each other, i.e. 0.3333 feet.
+I thought the following code would achieve that:</p>
+
+<pre>
+  XYZ a = new XYZ(41.7, -76, 0);
+  XYZ b = new XYZ(4.7, -76, 0);
+  bool almostEqual = a.IsAlmostEqualTo(b, 0.333);
+</pre>
+
+<p>But even though in this example the two points are 37 feet apart, IsAlmostEqualTo returns true.
+Am I misunderstanding the tolerance part of the method?</p>
+
+<p><strong>Answer:</strong> The behaviour you observe is correct and intended and has a simple explanation:
+
+<p>IsAlmostEqualTo is implemented for vector comparison, not point comparison, and is mostly designed around small tolerances.
+The default for IsAlmostEqualTo with no tolerance input argument given is 1e-09.
+At small tolerances, points and vectors are more interchangeable, so I would use the default IsAlmostEqualTo to find "equivalent" points too.
+
+<p>Because this is a directional comparison, not a distance one, 0.333 for the epsilon means to check if the two vectors are within a significant angular range of each other, which the example input points actually pass.
+Even if the points are treated as vectors and normalized, they will still pass the comparison because of the wide epsilon permitted.
+
+<p>If you want to compare points with a non-tiny epsilon using the allowed distance between them, use XYZ.DistanceTo method instead.
+
+<p>The Util.cs module of The Building Coder samples provides example implementations of point comparison predicate methods.
+Here is
+
+<span class="asset  asset-generic at-xid-6a00e553e168978833017c326955af970b">
+<a href="http://thebuildingcoder.typepad.com/files/bc_13_99_4.zip">version 2013.0.99.4</a></span> from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/slab-boundary-revisited.html">
+slab boundary command update</a>.
+
+
+
+<a name="5"></a>
+
+<h4>Autodesk API Overview</h4>
+
+<p>Autodesk provides a large number of programming platforms and APIs.
+An overview is given by the
+
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=5781281">
+Platform Technologies</a> overview on the Autodesk Developer Network.
+
+Just to see and be astounded by their sheer number, here is a list of links to the associated developer pages:
+
+<ul>
+<li><a href="http://www.autodesk.com/develop3dsmax">3DS Max</a></li>
+<li><a href="http://www.autodesk.com/developadt">AutoCAD Architecture</a></li>
+<li><a href="http://www.autodesk.com/developapps">Autodesk Exchange Apps Developer Center</a></li>
+<li><a href="http://www.autodesk.com/developautocad">AutoCAD</a></li>
+<li><a href="http://www.autodesk.com/developcivil">AutoCAD Civil 3D</a></li>
+<li><a href="http://www.autodesk.com/developcloud">Cloud & Mobile</a></li>
+<li><a href="http://www.autodesk.com/developdwf">DWF</a></li>
+<li><a href="http://www.autodesk.com/developfbx">FBX</a></li>
+<li><a href="http://www.autodesk.com/developinventor">Inventor</a></li>
+<li><a href="http://www.autodesk.com/developmap">AutoCAD Map 3D</a></li>
+<li><a href="http://www.autodesk.com/developmapguide">Autodesk Infrastructure Map Server AIMS</a></li>
+<li><a href="http://www.autodesk.com/developmaya">Maya</a></li>
+<li><a href="http://www.autodesk.com/developmotionbuilder">MotionBuilder</a></li>
+<li><a href="http://www.autodesk.com/developnavisworks">Navisworks</a></li>
+<li><a href="http://www.autodesk.com/developrevit">Revit</a></li>
+<li><a href="http://www.autodesk.com/developvault">Vault</a></li>
+<li><a href="http://www.autodesk.com/developwiretap">Wiretap</a></li>
+<li><a href="http://www.autodesk.com/objectarx">ObjectARX</a></li>
+<li><a href="http://www.autodesk.com/oem">AutoCAD OEM</a></li>
+<li><a href="http://www.autodesk.com/realdwg">RealDWG</a></li>
+</ul>
+
+
+
+<a name="6"></a>
+
+<h4>The Green Building Studio GBS REST API</h4>
+
+<p>I recently played around with the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">
+BIM 360 Glue REST API</a>
+
+and showed how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">
+use Python to access it interactively</a>.
+
+I also recently mentioned the new
+
+<a href="http://autodesk.typepad.com/bpa">
+building performance analysis blog</a> which
+
+discusses topics such as the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html#0">
+Project Falcon</a> computational
+
+fluid dynamics Revit add-in and GBS, the Autodesk Green Building Studio cloud-based energy analysis web service.
+
+<p>Emile Kfouri now pointed out this discussion of the
+
+<a href="http://autodesk.typepad.com/bpa/2013/01/green-building-studio-api-part-i.html">
+GBS REST API</a> that
+
+will certainly enable you (yes, you!) to achieve very cool things.
+I am looking forward to hearing about your ideas!
+

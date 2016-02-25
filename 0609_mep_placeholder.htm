@@ -1,0 +1,488 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>MEP Placeholders</h3>
+
+<p>Happy 
+
+<a href="http://en.wikipedia.org/wiki/Independence_Day_%28United_States%29">
+Independence Day</a> to
+
+all US-Americans, and a wonderful Monday and beginning of the new week to all the rest of us!</p>
+
+<center>
+<img src="img/independence_day.jpg" alt="Independence Day"/>
+</center>
+
+<p>I recently discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html">
+Revit MEP 2012 API news</a> and 
+
+mentioned that MEP placeholders are one of the important new features in both the product and the API.
+
+<p>Mostly, new API features are demonstrated by some of the samples provided by the Revit SDK, but the placeholder elements form an exception to that rule.
+
+<p>Still, we did present an example of using them programmatically at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html#2">
+DevDays 2010</a> and in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html#2">
+Revit 2012 API webcast</a>.
+
+<p>Since this is a pretty neat little sample application and shows off some other nice API features besides the placeholder elements, I think it is worthwhile picking it up here in splendid isolation.
+That also gives me a chance to polish the code once again, in preparation for one of my upcoming Autodesk University 2011 classes, CP4453 "Everything in Place with Revit MEP Programming", an update of the material I already presented at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/autodesk-university-2010-class-materials.html">
+AU 2010</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/au-2009.html">
+2009</a>.
+
+
+<p>So, to get back to the placeholder sample, it defines the following two commands:
+
+<ol>
+<li><a href="#1">CreatePlaceholders</a> &ndash; Demonstrate the NewMechanicalSystem and Duct.CreatePlaceholder methods in conjunction with NewElbowFitting and NewCrossFitting.
+<li><a href="#2">ConvertPlaceholders</a> &ndash; Convert placeholder elements to real ducts.
+</ol>
+
+<p>Besides the placeholder functionality, it also shows off some other nifty generic Revit API stuff, such as:
+
+<ul>
+<li>Use of numerous generic collection methods and predicate functions to test for conditions in conjunction with Revit filtered element collectors.
+<li>Use of a transaction group with a number of transactions grouped in it.
+<li>The add-in manifest <a href="#3">limits the command visibility to Revit MEP</a>.
+</ul>
+
+
+<a name="1"></a>
+
+<h4>1. Create Placeholder Elements</h4>
+
+<p>The first command, to create the placeholder elements, makes use of a helper class EquipmentElement to encapsulate the required equipment element data, including its supply air connector and its location and direction:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">EquipmentElement</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">FamilyInstance</span> FamilyInstance;
+&nbsp; <span class="blue">public</span> <span class="teal">Connector</span> SupplyAirConnector;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> ConnectionPoint;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> ConnectionDirection;
+&nbsp;
+&nbsp; <span class="blue">public</span> EquipmentElement(
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> familyInstance,
+&nbsp; &nbsp; <span class="teal">Connector</span> supplyAirConnector,
+&nbsp; &nbsp; <span class="teal">XYZ</span> connectionPoint,
+&nbsp; &nbsp; <span class="teal">XYZ</span> connectionDirection )
+&nbsp; {
+&nbsp; &nbsp; FamilyInstance = familyInstance;
+&nbsp; &nbsp; SupplyAirConnector = supplyAirConnector;
+&nbsp; &nbsp; ConnectionPoint = connectionPoint;
+&nbsp; &nbsp; ConnectionDirection = connectionDirection;
+&nbsp; }
+}
+</pre>
+
+<p>Determination of the duct connectors and their matching neighbour connector is implemented by the GetDuctConnectorAt method, which returns the pair of connectors on a duct at a given location:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Connector</span> GetDuctConnectorAt(
+&nbsp; <span class="teal">Duct</span> duct,
+&nbsp; <span class="teal">XYZ</span> location,
+&nbsp; <span class="blue">out</span> <span class="teal">Connector</span> otherConnector )
+{
+&nbsp; otherConnector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Connector</span> targetConnector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">ConnectorManager</span> cm = duct.ConnectorManager;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> cm.Connectors )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( c.Origin.IsAlmostEqualTo( location ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; targetConnector = c;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; otherConnector = c;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> targetConnector;
+}
+</pre>
+
+<p>Creating a new duct system with the selected equipment and placeholder elements for the ducts and fittings hooking them all together requires the following steps:
+
+<ul>
+<li>Find duct type to use.
+<li>Find Level 1 to place ductwork.
+<li>Find all mechanical equipment elements.
+<li>Determine their connectors and set up EquipmentElement instances for them.
+<li>Determine a waypoint for the cross fitting from the XY centre point of all elements bounding boxes and a given height eleven feet over the floor.
+<li>Create a new MEP mechanical system element from all connectors.
+<li>Iterate over the equiment elements.
+<li>Create and connect placeholder ducts between them.
+<li>Add elbow and cross fittings.
+</ul>
+
+<p>Here is the source code for the mainline of the first command to create the placeholder elements implementing those steps, placing each step into its own transaction and assimilating all the transactions together into one single transaction group:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> ExecuteMepPlaceholders( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// Find duct type to use</span>
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; isRectangularRadiusDuctType 
+&nbsp; &nbsp; = dt =&gt; dt.Name.Contains( <span class="maroon">&quot;Radius Elbows / Tees&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> ductType 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">DuctType</span> ) )
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Element</span>&gt;( isRectangularRadiusDuctType );
+&nbsp;
+&nbsp; <span class="green">// Find Level 1 to place ductwork</span>
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">Level</span>, <span class="blue">bool</span>&gt; isLevel1 
+&nbsp; &nbsp; = level =&gt; level.Name.Equals( <span class="maroon">&quot;Level 1&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Level</span> level1 = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; .Cast&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; .First&lt;<span class="teal">Level</span>&gt;( isLevel1 );
+&nbsp;
+&nbsp; <span class="green">// Find all mechanical equipment elements</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; cats 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;( 2 );
+&nbsp;
+&nbsp; cats.Add( <span class="teal">BuiltInCategory</span>.OST_MechanicalEquipment );
+&nbsp; cats.Add( <span class="teal">BuiltInCategory</span>.OST_DuctTerminal );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> equipment 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementMulticategoryFilter</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; cats ) );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">EquipmentElement</span>&gt; equipmentElements 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">EquipmentElement</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> fi <span class="blue">in</span> equipment )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// find connectors</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorManager</span> cm 
+&nbsp; &nbsp; &nbsp; = fi.MEPModel.ConnectorManager;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> cs = cm.Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> cs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Domain</span>.DomainHvac == c.Domain 
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">DuctSystemType</span>.SupplyAir == c.DuctSystemType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// connector point and direction</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = c.Origin; 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = c.CoordinateSystem.BasisZ;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; equipmentElements.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">EquipmentElement</span>( fi, c, p, v ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Determine a waypoint for the cross fitting</span>
+&nbsp; <span class="green">// from the XY centre point of all elements</span>
+&nbsp; <span class="green">// bounding boxes and a given height eleven </span>
+&nbsp; <span class="green">// feet over the floor:</span>
+&nbsp;
+&nbsp; <span class="blue">double</span>[] min = <span class="blue">new</span> <span class="blue">double</span>[] { 
+&nbsp; &nbsp; <span class="blue">double</span>.PositiveInfinity, 
+&nbsp; &nbsp; <span class="blue">double</span>.PositiveInfinity };
+&nbsp;
+&nbsp; <span class="blue">double</span>[] max = <span class="blue">new</span> <span class="blue">double</span>[] { 
+&nbsp; &nbsp; <span class="blue">double</span>.NegativeInfinity, 
+&nbsp; &nbsp; <span class="blue">double</span>.NegativeInfinity };
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">EquipmentElement</span> e <span class="blue">in</span> equipmentElements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> box 
+&nbsp; &nbsp; &nbsp; = e.FamilyInstance.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 2; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; min[i] = box.Min[i] &lt; min[i] ? box.Min[i] : min[i];
+&nbsp; &nbsp; &nbsp; max[i] = box.Max[i] &gt; max[i] ? box.Max[i] : max[i];
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">double</span> verticalLocation = level1.Elevation + 11.0;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> wayPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 
+&nbsp; &nbsp; ( min[0] + max[0] ) / 2, 
+&nbsp; &nbsp; ( min[1] + max[1] ) / 2, 
+&nbsp; &nbsp; verticalLocation );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Waypoint found at {0}&quot;</span>, 
+&nbsp; &nbsp; PointString( wayPoint ) );
+&nbsp;
+&nbsp; <span class="teal">TransactionGroup</span> tGroup 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc );
+&nbsp;
+&nbsp; tGroup.Start( <span class="maroon">&quot;Auto-route placeholders&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// Create a new MEP mechanical system </span>
+&nbsp; <span class="green">// element from all connectors:</span>
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; t.Start( <span class="maroon">&quot;Create system&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> baseConnector = <span class="blue">null</span>;
+&nbsp; <span class="teal">ConnectorSet</span> newSystemCS = <span class="blue">new</span> <span class="teal">ConnectorSet</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">EquipmentElement</span> e <span class="blue">in</span> equipmentElements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e.FamilyInstance.Category.Id.Equals(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( <span class="teal">BuiltInCategory</span>.OST_MechanicalEquipment ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; baseConnector = e.SupplyAirConnector;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; newSystemCS.Insert( e.SupplyAirConnector );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; doc.Create.NewMechanicalSystem( baseConnector, 
+&nbsp; &nbsp; newSystemCS, <span class="teal">DuctSystemType</span>.SupplyAir );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="blue">bool</span> xFirst = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Connector</span>&gt; wayPointConnectors 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Connector</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">EquipmentElement</span> e <span class="blue">in</span> equipmentElements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Connector</span> nextConnector;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// if connector direction is vertical, </span>
+&nbsp; &nbsp; <span class="green">// add duct to reach target elevation</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !e.ConnectionDirection.IsAlmostEqualTo( <span class="teal">XYZ</span>.BasisZ ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Not implemented for initially non-vertical connectors&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create placeholder duct&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> secondPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( e.ConnectionPoint.X, 
+&nbsp; &nbsp; &nbsp; e.ConnectionPoint.Y, wayPoint.Z );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = <span class="teal">Duct</span>.CreatePlaceholder( doc,
+&nbsp; &nbsp; &nbsp; ductType.Id, level1.Id, e.ConnectionPoint, 
+&nbsp; &nbsp; &nbsp; secondPoint );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Connect duct&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> targetConnector = GetDuctConnectorAt( 
+&nbsp; &nbsp; &nbsp; duct, e.ConnectionPoint, <span class="blue">out</span> nextConnector );
+&nbsp;
+&nbsp; &nbsp; targetConnector.ConnectTo( e.SupplyAirConnector );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// all connections should make a right </span>
+&nbsp; &nbsp; <span class="green">// hand turn into the waypoint</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> nextConnectorPoint = nextConnector.Origin;
+&nbsp; &nbsp; <span class="teal">XYZ</span> nextWayPoint = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( xFirst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; nextWayPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( wayPoint.X, 
+&nbsp; &nbsp; &nbsp; &nbsp; nextConnectorPoint.Y, wayPoint.Z );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; nextWayPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( nextConnectorPoint.X, 
+&nbsp; &nbsp; &nbsp; &nbsp; wayPoint.Y, wayPoint.Z );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create placeholder duct&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Duct</span> nextDuct = <span class="teal">Duct</span>.CreatePlaceholder( doc, 
+&nbsp; &nbsp; &nbsp; ductType.Id, level1.Id, nextConnectorPoint, 
+&nbsp; &nbsp; &nbsp; nextWayPoint );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Add fitting&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> nextNextConnector;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> nextTargetConnector 
+&nbsp; &nbsp; &nbsp; = GetDuctConnectorAt( nextDuct, 
+&nbsp; &nbsp; &nbsp; &nbsp; nextConnectorPoint, <span class="blue">out</span> nextNextConnector );
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewElbowFitting( nextConnector, 
+&nbsp; &nbsp; &nbsp; nextTargetConnector );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create placeholder duct&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; nextDuct = <span class="teal">Duct</span>.CreatePlaceholder( doc, 
+&nbsp; &nbsp; &nbsp; ductType.Id, level1.Id, 
+&nbsp; &nbsp; &nbsp; nextNextConnector.Origin, wayPoint );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Add fitting&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> lastConnector;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> nextNextTargetConnector 
+&nbsp; &nbsp; &nbsp; = GetDuctConnectorAt( nextDuct, 
+&nbsp; &nbsp; &nbsp; &nbsp; nextNextConnector.Origin, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">out</span> lastConnector );
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewElbowFitting( nextNextConnector, 
+&nbsp; &nbsp; &nbsp; nextNextTargetConnector );
+&nbsp;
+&nbsp; &nbsp; wayPointConnectors.Add( lastConnector );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; xFirst = !xFirst;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( wayPointConnectors.Count != 4 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unexpected number of connectors&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; t.Start( <span class="maroon">&quot;Add cross fitting&quot;</span> );
+&nbsp;
+&nbsp; doc.Create.NewCrossFitting( 
+&nbsp; &nbsp; wayPointConnectors[0], wayPointConnectors[2], 
+&nbsp; &nbsp; wayPointConnectors[1], wayPointConnectors[3] );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; tGroup.Assimilate();
+}
+</pre>
+
+
+<a name="2"></a>
+
+<h4>2. Convert Placeholder Elements</h4>
+
+<p>The conversion of placeholder elements to real ductwork is much simpler, of course.
+The following code collects all placeholder elements, and calls ConvertDuctPlaceholders to convert them.
+Again, we make use of a generic predicate function to find the placeholder elements, and generic collection methods to create a list of their element ids:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Document</span> doc = commandData.View.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; t.Start( <span class="maroon">&quot;Convert placeholder network&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> ductCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">Duct</span>, <span class="blue">bool</span>&gt; isPlaceholder 
+&nbsp; &nbsp; = duct =&gt; duct.IsPlaceholder;
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Duct</span>&gt; ducts = ductCollector
+&nbsp; &nbsp; .OfType&lt;<span class="teal">Duct</span>&gt;()
+&nbsp; &nbsp; .Where&lt;<span class="teal">Duct</span>&gt;( isPlaceholder );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ductIds = ducts
+&nbsp; &nbsp; .Select&lt;<span class="teal">Duct</span>, <span class="teal">ElementId</span>&gt;( duct =&gt; duct.Id )
+&nbsp; &nbsp; .ToList&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">MechanicalUtils</span>.ConvertDuctPlaceholders( 
+&nbsp; &nbsp; doc, ductIds );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>3. Command Visibility in MEP only</h4>
+
+<p>As mentioned, the two commands are only visible in Revit MEP, because the add-in manifest specifies the following VisibilityMode tags:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Create MEP Placeholders<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Create MEP placeholder elements<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\a\lib\revit\2012\adn\webcast\src\MepPlaceholders\MepPlaceholders\bin\Debug\MepPlaceholders.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>MepPlaceholders.CreatePlaceholders<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>54b7cf02-64bd-4af5-a701-030a81e6c0d5<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>ADNP<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>Autodesk, Inc. www.autodesk.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInArchitecture<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInFamily<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInStructure<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleWhenNoActiveDocument<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Convert MEP Placeholders<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Convert MEP placeholder elements<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\a\lib\revit\2012\adn\webcast\src\MepPlaceholders\MepPlaceholders\bin\Debug\MepPlaceholders.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>MepPlaceholders.ConvertPlaceholders<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>2c834e62-3d55-4aae-95d9-5646a74dmaroon6<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>ADNP<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>Autodesk, Inc. www.autodesk.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInArchitecture<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInFamily<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleInStructure<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>NotVisibleWhenNoActiveDocument<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<h4>Sample Project</h4>
+
+<p>Here is a sample project providing a starting point for the command to run in:</p>
+
+<center>
+<img src="img/mep_placeholder01.png" alt="MEP placeholder initial starting point"/>
+</center>
+
+<p>After creation of the placeholder elements, all location points have been calculated and a complete well-connected system defined:</p>
+
+<center>
+<img src="img/mep_placeholder02.png" alt="MEP placeholder elements form a complete system"/>
+</center>
+
+<p>As soon as the exact element types to use are known, the placeholders can be converted to real ductwork:</p>
+
+<center>
+<img src="img/mep_placeholder03.png" alt="MEP placeholder elements converted to ductwork"/>
+</center>
+
+<p>Here is <a href="zip/MepPlaceholders.zip">MepPlaceholders.zip</a> containing the complete MEP placeholder sample source code, Visual Studio solution and add-in manifest.

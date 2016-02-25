@@ -1,0 +1,252 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Improved MEP Element Shape and Ararat</h3>
+
+<p>We recently talked about 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html">
+distinguishing Revit MEP duct element shapes</a>, 
+
+and Max aka 
+
+<a href="http://maciejszlek.pl">
+Maciej Szlek</a> presented 
+
+a solution based on the analysis of the string value of the duct's Size parameter.
+
+<p>I suggested that the algorithm might be improved, both to make it more general and robust and also to remove the dependency on the different string formats used for imperial and metric units. 
+It probably becomes more efficient as well, by the way.
+
+<p>Instead of looking at the duct size parameter, one can query it for its connectors and extract the shape from them directly, avoiding all string manipulations and language or unit dependencies.
+
+<p>Max went ahead and implemented this new algorithm.
+Simultaneously, he demonstrates that some useful helper methods can be reused from the Revit SDK samples, in this case ExtractMechanicalOrPipingSystem and ExtractSystemFromConnectors from the TraverseSystem sample.
+Here is the code of the new algorithm:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">public</span> <span class="blue">string</span> GetElementShape(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="teal">Element</span> pe = <span class="blue">null</span>,
+&nbsp; <span class="teal">Element</span> ne = <span class="blue">null</span> )
+{
+&nbsp; <span class="blue">if</span>( is_element_of_category( e, 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctCurves ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// assuming that transition is using to change shape..</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorManager</span> cm = ( e <span class="blue">as</span> <span class="teal">MEPCurve</span> )
+&nbsp; &nbsp; &nbsp; .ConnectorManager;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> cm.Connectors )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> c.Shape.ToString() 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; 2 &quot;</span> + c.Shape.ToString();
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( is_element_of_category( e, 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctFitting ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MEPSystem</span> system 
+&nbsp; &nbsp; &nbsp; = ExtractMechanicalOrPipingSystem( e );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; <span class="teal">MEPModel</span> mm = fi.MEPModel;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors 
+&nbsp; &nbsp; &nbsp; = mm.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fi != <span class="blue">null</span> &amp;&amp; mm <span class="blue">is</span> <span class="teal">MechanicalFitting</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PartType</span> partType 
+&nbsp; &nbsp; &nbsp; &nbsp; = ( mm <span class="blue">as</span> <span class="teal">MechanicalFitting</span> ).PartType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">PartType</span>.Elbow == partType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// assuming that transition is using to change shape..</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> c.Shape.ToString() 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; 2 &quot;</span> + c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">PartType</span>.Transition == partType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>[] tmp = <span class="blue">new</span> <span class="blue">string</span>[2];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( system != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( c.Direction == <span class="teal">FlowDirectionType</span>.In )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmp[0] = c.Shape.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( c.Direction == <span class="teal">FlowDirectionType</span>.Out )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmp[1] = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot; 2 &quot;</span>, tmp );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pe != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( is_connected_to( c, pe ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmp[0] = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmp[1] = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmp[i] = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pe != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot; 2 &quot;</span>, tmp );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot;-&quot;</span>, tmp );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">PartType</span>.Tee == partType
+&nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">PartType</span>.Cross == partType
+&nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">PartType</span>.Pants == partType
+&nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">PartType</span>.Wye == partType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> from, to;
+&nbsp; &nbsp; &nbsp; &nbsp; from = to = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; unk = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( system != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( c.Direction == <span class="teal">FlowDirectionType</span>.In )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; from = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; unk.Add( c.Shape.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ne != <span class="blue">null</span> &amp;&amp; is_connected_to( c, ne ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; to = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( to != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> from + <span class="maroon">&quot; 2 &quot;</span> + to;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> from + <span class="maroon">&quot; 2 &quot;</span> + <span class="blue">string</span>.Join( <span class="maroon">&quot;-&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; unk.ToArray() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ne != <span class="blue">null</span> &amp;&amp; is_connected_to( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c, ne ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; to = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pe != <span class="blue">null</span> &amp;&amp; is_connected_to( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c, pe ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; from = c.Shape.ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; unk.Add( c.Shape.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( to != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> from + <span class="maroon">&quot; 2 &quot;</span> + to;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( from != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> from + <span class="maroon">&quot; 2 &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="blue">string</span>.Join( <span class="maroon">&quot;-&quot;</span>, unk.ToArray() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot;-&quot;</span>, unk.ToArray() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="maroon">&quot;unknown&quot;</span>;
+}
+&nbsp;
+</pre>
+
+<p>It is encapsulated as a static method in the class MepElementShape.
+I created a second wrapper class MepElementShapeV1 for the first implementation and call them both in The Building Coder sample CmdMepElementShape external command Execute method like this:
+
+<pre class="code">
+&nbsp; <span class="teal">Element</span> e = &lt;selected element&gt;;
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} is {1} ({2})&quot;</span>,
+&nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; <span class="teal">MepElementShape</span>.GetElementShape( e ),
+&nbsp; &nbsp; <span class="teal">MepElementShapeV1</span>.GetElementShape( e ) ) );
+&nbsp;
+</pre>
+
+<p>This prints the following in the Visual Studio debug output window on selecting some of the elements generated by the AvoidObstruction SDK sample:
+
+<pre>
+Mechanical Equipment Parallel Fan Powered VAV 
+  <378728 Size 4 - 10 inch Inlet> is unknown (unknown)
+
+Duct Fittings Rectangular Duct Radius Elbow <382720 1.5 W> 
+  is RectProfile 2 RectProfile (rectangular2rectangular)
+
+Ducts <382719 Radius Elbows / Tees> 
+  is RectProfile 2 RectProfile (rectangular)
+
+Duct Fittings Rectangular Duct Tee <382736 Standard> 
+  is RectProfile 2 RectProfile-RectProfile (unknown)
+
+Air Terminals Supply Diffuser 
+  <378716 24 x 24 Face 12 x 12 Connection> is unknown (unknown)
+</pre>
+
+<p>As you see, the results are the same for the string-based first version as for the new connector-based one, except for the tee junction, which was not handled properly by the former.
+
+<p>Very many thanks to Max for implementing and sharing this!
+
+<p>Here is an updated
+
+<a href="zip/bc_12_87_3.zip">
+version 2012.0.87.3</a> of
+
+The Building Coder sample code including this new classification method.
+
+
+<a name="2"></a>
+
+<h4>Climbing the Ararat</h4>
+
+<p>I am off for another break now, this time a bit more adventurous, to climb 
+
+<a href="http://en.wikipedia.org/wiki/Mount_Ararat">
+Mount Ararat</a> in far Eastern Turkey.
+
+The flight from Istanbul to 
+
+<a href="http://simple.wikipedia.org/wiki/Van,_Turkey">
+Van</a>, the closest city, is longer than the one from Switzerland to Istanbul!
+
+<p>Since I am also busy preparing my 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/04/call-for-au-2011-proposals.html">
+Autodesk University proposals</a>, 
+
+which are due for submission today, as well as the upcoming Revit 2012 API webcast, I am pretty occupied and having difficulty finding time to even pack.
+With skis and winter clothing and mountain equipment, that is a non-trivial task...
+
+Still, I will make it, I am sure.</p>
+
+<center>
+<img src="img/ararat.jpg" alt="Mount Ararat"/>
+</center>

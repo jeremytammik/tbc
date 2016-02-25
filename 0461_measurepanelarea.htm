@@ -1,0 +1,122 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1263334 [Massing sample error], SPR #196189 -->
+
+<h3>MeasurePanelArea Update</h3>
+
+<p>Iffat Mai of 
+
+<a href="http://www.perkinswill.com">
+Perkins + Will</a> brought 
+
+up an issue with the MeasurePanelArea Revit SDK sample, handled by Joe Ye:
+
+<p><strong>Question:</strong> As we reviewed the Massing &gt; MeasurePanelArea SDK Sample, the following error message was displayed while trying to run it:</p>
+
+<center>
+<img src="img/MeasurePanelArea_error.jpg" alt="MeasurePanelArea error message"/>
+</center>
+
+<p>It says: "Input type is of an element type that exists in the API, but not in Revit's native object model. 
+Try using Autodesk.Revit.DB.FamilyInstance instead, and then post-processing the results to find the elements of interest." 
+
+<p><strong>Answer:</strong> This is due to the fact that the Panel class cannot be accepted by the FilteredElementCollector OfClass method, i.e. when calling
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span>
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Panel</span> ) );
+</pre>
+
+<p>This call is made in the GetElements template method:
+
+<pre class="code">
+&nbsp; <span class="blue">protected</span> <span class="teal">List</span>&lt;T&gt; 
+&nbsp; &nbsp; GetElements&lt;T&gt;() <span class="blue">where</span> T : <span class="teal">Element</span>
+</pre>
+
+<p>GetElements in turn is called by the method BuildPanelTypeList:
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> BuildPanelTypeList()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Panel</span>&gt; list = GetElements&lt;<span class="teal">Panel</span>&gt;();
+&nbsp; &nbsp; . . .
+&nbsp; } 
+</pre>
+
+<p>We already discussed this issue of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/filtering-for-a-nonnative-class.html">
+filtering for a non-native class</a> in
+
+some depth. 
+It applies to AnnotationSymbol, Panel, Room and several other classes.
+
+<p>I changed the sample slightly to add another non-template method to get all panels in current document instead:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; GetPanels()
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; m_uiDoc.Document );
+&nbsp;
+&nbsp; <span class="teal">BuiltInCategory</span> bic 
+&nbsp; &nbsp; = <span class="teal">BuiltInCategory</span>.OST_CurtainWallPanels;
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; .OfCategory( bic );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; panels = collector.ToElements();
+&nbsp;
+&nbsp; <span class="blue">return</span> panels;
+}
+</pre>
+
+<p>Here is my modified version of 
+
+<!-- 
+
+C:\a\lib\revit\2011\SDK\Samples\Massing\MeasurePanelArea\CS\FormPanelArea.cs
+C:\a\j\adn\case\bsd\1263334\FormPanelArea.cs
+
+windiff C:\a\lib\revit\2011\SDK\Samples\Massing\MeasurePanelArea\CS\FormPanelArea.cs  FormPanelArea.cs
+
+windiff C:\a\lib\revit\2011\SDK\Samples\Massing\MeasurePanelArea\CS\FormPanelArea.cs  C:\a\lib\revit\2011\SDK_q3\Samples\Massing\MeasurePanelArea\CS\FormPanelArea.cs
+
+windiff C:\a\lib\revit\2011\SDK\Samples\DoorSwing\CS\ C:\a\lib\revit\2011\SDK_q3\Samples\DoorSwing\CS\
+
+-->
+
+<a href="zip/FormPanelArea.cs">
+FormPanelArea.cs</a> with these changes.
+
+Please replace the existing version of the file with it.
+
+<p>Many thanks to Joe for this fix!
+
+<p>The newly released 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/subscription-release-and-updated-sdk.html">
+updated SDK</a> for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/revit-2011-web-update-2.html">
+web update 2</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/subscription-release-and-updated-sdk.html">
+subscription releases</a> includes 
+
+several other 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/subscription-release-and-updated-sdk.html#7">
+SDK sample updates</a>.
+
+Unfortunately the MeasurePanelArea fix was not made in time to be included in the SDK update.
+We also recently discussed a fix to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/doorswing-fix.html">
+DoorSwing SDK sample</a> which
+
+does not seem to have been included either.

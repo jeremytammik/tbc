@@ -1,0 +1,184 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Dale Bartlett
+CAD-BIM System Manager, Oman
+ATKINS
+Re: Building Coder - Label Export XData
+
+-->
+
+<h3>DWG Issues and Various Other Updates</h3>
+
+<p>One of the highlights mentioned in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#2">
+overview of the Revit 2014 API</a> is
+
+the FreeForm element API that enables modification of solid geometry imported from DWG or SAT.
+
+<p>Several other new DWG and DXF related features include import of DXF markup, import and link of SAT and SketchUp, and access to the DWG, IFC and DGN layer, linetype, lineweight, font and pattern tables.
+
+<p>One result of these enhancements is the possibility to access 3D coordinates in DWG import for the first time.</p>
+
+<p>Besides looking at that, I'll also point out a few other issues further down:</p>
+
+<ul>
+<li><a href="#2">Differentiate Label and Text in DWG export</a></li>
+<li><a href="#3">Element Ids in extensible storage</a></li>
+<li><a href="#4">All-zero language codes in the Revit product GUID</a></li>
+<li><a href="#5">Another dockable panel sample</a></li>
+</ul>
+
+<a name="1"></a>
+
+<h4>Access to 3D Coordinates in DWG Import</h4>
+
+<p>One DWG import aspect that has often been requested by developers in the past is the ability to explode 3D DWG files and obtain the resulting coordinates in the Revit project.</p>
+
+<p>Revit 2014 families now provide the ability to explode and retain such 3D geometry.
+
+<!--
+<p>The wiki mentions this under
+
+<a href="">
+...</a>
+</p>
+-->
+
+<p>Daniel Gijsbers discusses making use of this functionality to
+
+<a href="http://danielgijsbers.blogspot.de/2013/04/revit-2014-3d-dwg-in-families.html">
+correlate Civil 3D alignments with Revit Structure</a>.
+
+<p>In Revit 2013, one alternative way to achieve this was to implement an AutoCAD add-in that analyses the geometry and exports the 3D coordinate data.
+A separate Revit add-in could read the coordinate data and correlate it with the Revit geometry.
+
+<a name="2"></a>
+
+<h4>Differentiate Label and Text in DWG Export</h4>
+
+<p>On a related topic, how can I differentiate between Revit text and label elements after they have been exported to DWG?</p>
+
+<p>Revit Export to DWG results in Labels becoming Text rather than Attributes, as most users might prefer.
+
+<p>It would be interesting to have some flag or embedded information in the exported text that could be used in an AutoCAD application to post-process the information received from Revit and restore the attribute information.
+
+<p>Happily, the exported Labels have Extended Entity Data like this attached:</p>
+
+<pre class="prettify">
+  TypedValue 0 - type: 1001, value: REVIT
+  TypedValue 1 - type: 1002, value: {
+  TypedValue 2 - type: 1070, value: 1
+  TypedValue 3 - type: 1000, value: 245287
+  TypedValue 4 - type: 1002, value: }
+  TypedValue 5 - type: 1002, value: {
+  TypedValue 6 - type: 1070, value: 5
+  TypedValue 7 - type: 1000, value: 243658
+  TypedValue 8 - type: 1002, value: }
+  TypedValue 9 - type: 1002, value: {
+  TypedValue 10 - type: 1070, value: 2
+  TypedValue 11 - type: 1000, value: -2000280
+  TypedValue 12 - type: 1002, value: }
+</pre>
+
+<p>The xdata on Text elements, on the other hand, look like this instead:</p>
+
+<pre class="prettify">
+  TypedValue 0 - type: 1001, value: REVIT
+  TypedValue 1 - type: 1002, value: {
+  TypedValue 2 - type: 1070, value: 1
+  TypedValue 3 - type: 1000, value: 261323
+  TypedValue 4 - type: 1002, value: }
+  TypedValue 5 - type: 1002, value: {
+  TypedValue 6 - type: 1070, value: 5
+  TypedValue 7 - type: 1000, value: 209618
+  TypedValue 8 - type: 1002, value: }
+  TypedValue 9 - type: 1002, value: {
+  TypedValue 10 - type: 1070, value: 2
+  TypedValue 11 - type: 1000, value: -2000300
+  TypedValue 12 - type: 1002, value: }
+</pre>
+
+<p>The differing TypedValue 11 is consistently -2000300 for a text and -2000280 for a label element.
+
+<p>What does this mean?</p>
+
+<p>Well, is actually quite easy.</p>
+
+<p>On seeing these large negative numbers in this specific range, an experienced Revit developer will quickly suspect built-in category or parameter enumeration values.</p>
+
+<p>You can check what they actually represent in the Visual Studio debugger, by jumping to the definition of these enumerations and searching for the specific values.
+
+<p>Looking back at an ancient blog post on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/dwg-and-dxf-export-xdata-specification.html">DWG and DXF export Xdata specification</a>
+
+confirms that these numbers do indeed represent the built-in category of the source element and thus can be used to distinguish the two.</p>
+
+<p>Many thanks to Dale Bartlett, CAD-BIM System Manager at
+
+<a href="http://www.atkins-me.com">Atkins (Oman)</a>, for suggesting this topic.</p>
+
+<p>Dale adds:</p>
+
+<p>It will be interesting to see if this generates any comments.</p>
+
+<p>As far as the AutoCAD geometry export, the purpose was to build a 3D Space Frame from an engineer’s analysis drawing.
+I did in fact write an XML file from AutoCAD of the geometry and imported it into Revit to build the frame.</p>
+
+<p>It took an hour to build 20,000 elements, which was about a year less than doing it manually!</p>
+
+<p>I’ll revise it with 2014 to make it a one-step-inside-Revit process.</p>
+
+
+<!-- 08384534 [Storage of ElementId] -->
+
+<a name="3"></a>
+
+<h4>Element Ids in Extensible Storage</h4>
+
+<p><strong>Question:</strong> I need to store ElementId data using schemas within my Revit add-in.</p>
+
+<p>However, the API documentation states that "ids are subject to change during an Autodesk Revit session and as such should not be retained and used across repeated calls to external commands."</p>
+
+<p>My add-in will be used in a worksharing environment.
+My testing shows that if I try to save the integer value of an element id, and it changes, my saved id value will be invalid.
+However, if I store the actual ElementId in a schema I do not have this problem.</p>
+
+<p>Is saving the ElementId using a Schema safe?
+If not, do you have any suggestions or examples of how to safely store an identifier to elements in a schema?</p>
+
+<p><strong>Answer:</strong> Yes, it is completely safe to store ElementId data in extensible storage for the purposes you describe.
+
+<p>The statement you quote refers to the fact that the integer value of an element id will change between sessions.
+Basically, you can think of it as a pointer.
+When stored as an element id in extensible storage, the actual links between the associated elements are stored, and the resulting integer values are recalculated from scratch in every new session, maintaining the links intact.
+The integer value of an element id may be changed by worksharing updates as well, and these changes are also automatically handled for element ids stored in extensible storage, so it is perfectly safe to save them there.</p>
+
+
+<a name="4"></a>
+
+<h4>All-zero Language Codes in the Revit Product GUID</h4>
+
+<p>Watch out for all-zero language code identifiers in the Revit Product GUID due to the new Multiple Language Interface, or MUI, used in Revit 2014.
+
+<p>For details, please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/perpetual-guid-algorithm-and-revit-2014-product-guids.html#5">
+Revit Product 2014 GUID addendum</a>.
+
+<a name="5"></a>
+
+<h4>Another Dockable Panel Sample</h4>
+
+<p>Guy Robinson published another dockable dialogue sample which does not require a command to be registered.
+
+<p>For details, please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html#2">
+simpler dockable panel addendum</a>.

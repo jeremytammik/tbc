@@ -1,0 +1,118 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<!-- 
+
+  1251717 [Revit Family Editor API - How to scale a CurveArray?]
+  SPR #171868 [API wish: scaling method for XYZ, Curve, CurveArray and CurveArrArray classes]
+
+-->
+
+<h3>Scale a Curve</h3>
+
+<p>Now let us get back to really practical things again, after the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/practical-notes-on-impractical-things.html">
+practical notes on impractical things</a>, 
+
+and the more or less practical 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-boot-camp-on-mac.html">
+boot camp note</a>.</p>
+
+<p><strong>Question:</strong>
+I have a CurveArray object containing data defined in inches.
+Now I need to scale it to feet in order to feed it into a Revit API method to create an extrusion.
+How can I perform this scaling operation?
+I would obviously prefer not having to rebuild the entire CurveArray.
+How does one apply a scale factor to an existing CurveArray?</p>
+
+<p>I tried iterating over the Curve objects in the CurveArray but cannot figure out how to change the existing X, Y and Z coordinate values of the Curve objects.</p>
+
+<p>There appears to be a Multiply function for the XYZ object, which doesn't actually act on the XYZ object itself, but instead acts on and returns a new copy of the original object.
+No such function appears to exist for the Curve, CurveArray or CurveArrArray objects.</p>
+
+<p>Even if it did, acting on a copy wouldn't achieve the desired result.  
+A 'Scale' method for the XYZ, Curve, CurveArray and CurveArrArray objects, which acts on the data in those objects directly, would be a great thing to have.
+It is especially important due to the fact that Revit requires the data be in one specific set of database units only, for example when submitting it to functions for doing things like creating an extrusion.</p>
+
+<p><strong>Answer:</strong>
+Unfortunately, this is not possible in the current API. 
+You need to create a new curve.
+Here is an idea which may at least partly alleviate the problem:</p>
+
+<p>Curve.get_Transformed() can be used to simplify the process of creating a new curve scaled as desired.</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> ScaleCurves()
+{
+&nbsp; <span class="teal">CurveArray</span> cArray = PrepareCurveArray();
+&nbsp;
+&nbsp; <span class="teal">Transform</span> x = <span class="teal">Transform</span>.Identity;
+&nbsp; x = x.ScaleBasis( 1.0 / 12.0 );
+&nbsp;
+&nbsp; <span class="blue">int</span> numCurves = cArray.Size;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; numCurves; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Curve</span> curve = cArray.get_Item( i );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Curve</span> newCurve = curve.get_Transformed( x );
+&nbsp;
+&nbsp; &nbsp; cArray.set_Item( i, newCurve );
+&nbsp; }
+&nbsp;
+&nbsp; WriteProfile( <span class="maroon">&quot;After transformation&quot;</span>, cArray );
+}
+</pre>
+
+<p>You are still creating new curves, but not required to figure out how to scale each curve independently based on type.</p>
+
+<p><strong>Reply:</strong>
+That is definitely helpful code.
+I've been writing some extension methods to get around some of the limitations, essentially adding my own functions to the class definitions provided by the Revit API so my methods 'look' like they are part of the API itself.
+This new method for scaling curves is much cleaner than what I came up with, so I will definitely replace my extension method with this code.</p>
+
+<p>On a very vaguely related note, here is a pointer to some Revit tools for both users and developers:</p>
+
+<h4>Revit Family Tools</h4>
+
+<p>Version 2.3.0.0 of the 
+
+<a href="http://www.biggestbrains.com/revit/revitfamilytools">
+Revit Family Tools</a>
+
+is available from the 
+
+<a href="http://www.biggestbrains.com/revit">
+Revit Tools</a>
+
+page with the following functionality useful for all flavours of Revit:</p>
+
+<ul>
+<li>Comparing shared parameter files.
+<li>Merging shared parameter files.
+<li>Deleting RFA backup files, optionally recursively.
+<li>Copying CSV files created for Type Catalog usage to TXT files for easy change testing.
+<li>Reporting the versions of Revit used to create family files, optionally recursively.
+</ul>

@@ -1,0 +1,174 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1257116 [Duplicate Mark Values] -->
+
+<h3>Duplicate Mark Values</h3>
+
+<p>We already discussed the issue of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/door-marks.html">
+door marks</a> and
+
+implemented the Building Coder sample command CmdListMarks to demonstrate listing and modifying them programmatically.
+Here are a couple of additional questions that came up recently in this context from Dave Echols of
+
+<a href="http://www.haengineers.com">
+Hankins and Anderson, Inc.</a> which 
+
+led to some important hints on performance and exception handling:
+
+<p><strong>Question:</strong> We have some large Revit models that have thousands of errors due to duplicate mark values.
+On several of these, we have cleaned out the errors manually in order to speed up the loading of Revit.
+I have written the following external command to automate this process:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp; <span class="blue">int</span> num = 1;
+&nbsp; <span class="teal">ElementIterator</span> it = doc.Elements;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// get the BuiltInParameter.ALL_MODEL_MARK paremeter. </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// If the element does not have this paremeter, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// get_Parameter method returns null:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// we found an element with the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// BuiltInParameter.ALL_MODEL_MARK</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// parameter. Change the value and </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// increment our value:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p.Set( num.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; ++num;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Exception: &quot;</span> + ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; doc.EndTransaction();
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+
+<p>I have several questions concerning this code and any consequences that might arise from the way I am renumbering all elements with mark parameters:
+
+<ol>
+<li>In my code, I am iterating through all elements in the model in order to find elements that have the BuiltInParameter.ALL_MODEL_MARK parameter. I have tried using the Filter.NewParameterFilter method to find all of these occurrences, but have not been successful. Can you provide a sample that uses filters to find these elements more efficiently?
+
+<li>In my code, I am incrementing the value by one to provide a unique value for each element that has the BuiltInParameter.ALL_MODEL_MARK parameter. Are there any unintended consequences I need to be aware of if I implement this code in our production models?
+
+<li>Some other examples I have seen that fix the Duplicate Mark Values errors provide a unique indexed value for each element based on the category of the element.
+For example, I have 5 doors and 15 windows.
+My door index values would range from 1 to 5 and my window index values would range from 1 to 15.
+This approach took over 4 hours on one of our models.
+Performance is not a huge problem, because the solution is working, even though it is a little slow. 
+We do not use this command every day, so the importance to optimize it is not very high.
+Still, do I need to implement my command following this approach?
+
+<li>After digging into the Revit database using RvtMgdDbg and the Visual Studio debugger, I noticed the BuiltInParameter.ALL_MODEL_MARK parameter is tied to or is the BuiltInParameter.DOOR_NUMBER parameter (even for a DimensionType).
+You can see that by following these steps in RvtMgdDbg:
+</ol>
+
+<ul>
+<li>Snoop DB from the add-in menu.
+<li>Select an element.
+<li>Double-click on the Parameters property to open the Snoop Parameters dialogue.
+<li>Select the Built-in Enum Snoop button.
+<li>Select the ALL_MODEL_MARK built-in parameter.
+<li>Double-click the Definition property to view the Internal Definition.
+<li>The Built-in Param property has the value DOOR_NUMBER:
+</ul>
+
+<center>
+<img src="img/duplicate_mark_value.png" alt="ALL_MODEL_MARK definition"/>
+</center>
+
+<p>Are these two parameters the same object in the database? 
+If I change these mark values, will values change in schedules I generate from elements that have been changed?
+
+<p>Thanks for shedding some light on this issue.
+
+<p><strong>Answer:</strong> Thank you for your interesting query.
+As said, we already had a look at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/door-marks.html">
+listing and modifying door marks</a>.
+
+Now to address your specific questions:
+
+<ol>
+<li>The following method should do what you need:
+</ol>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all elements in the current active document </span>
+<span class="gray">///</span><span class="green"> having a non-empty value for the given parameter.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">int</span> GetElementsWithParameter(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements,
+&nbsp; <span class="teal">BuiltInParameter</span> bip,
+&nbsp; <span class="teal">Application</span> app )
+{
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> a
+&nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f = a.Filter.NewParameterFilter(
+&nbsp; &nbsp; bip, CriteriaFilterType.NotEqual, <span class="maroon">&quot;&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> doc.get_Elements( f, elements );
+}
+</pre>
+
+<ol start="2">
+<li>Not that I am aware of. As you can see in my door mark sample, I set the mark parameter to a completely arbitrary value and know of no ill consequences.
+
+<li>I am pretty sure that you do not need to implement this approach.
+It is probably done for individual reasons, users preferring to have their different element types numbered individually. There is nothing stopping you from doing it this way, but nothing forcing you to either, as far as I know.
+
+<br>I am also pretty sure that performance can be improved.
+Look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-2010-subscription-pack.html#4">
+Revit 2010 subscription pack API enhancements</a>.
+
+In previous versions, Revit regenerated the model after each and every modification, such as your update to the model mark parameter. From the subscription pack onwards, this regeneration can be avoided.
+
+<br>I see another serious performance issue in your code as well, by the way.
+To check whether the model mark has been set, you are starting up an exception handling block for each and every element in the Revit database, of which there are many!
+On very many of the elements, the mark value will not be present and an exception will be thrown and handled.
+This is a very costly operation.
+In general, you should never use exceptions to handle expected situations, such as the absence of this parameter.
+
+<a href="http://en.wikipedia.org/wiki/Exception_handling">
+Exceptions</a> should always be
+
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">
+exceptional, for handling unexpected errors</a>.
+
+Performance will probably be very significantly improved if you simply check whether e.get_Parameter returns null, in which case that element can be skipped, instead of causing an exception to be thrown.
+Actually, since you are already checking whether p is null, you should be able to simply remove the try-catch statements completely, or alternatively move them into the if block so that they only protect the actual setting of the parameter value.
+
+<li>I suggest you try this out yourself and see. Trusting my word for it would be fine, but controlling it for yourself is always better.
+</ol>

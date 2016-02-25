@@ -1,0 +1,138 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1252125 [Revit Family Editor - Unit Conversions] by CoderBoy -->
+
+<h3>Unit Conversion</h3>
+
+<p>Here is a useful and instructive reader-contributed unit conversion utility which has been submitted for addition to the official Revit SDK samples.
+
+<p>We discussed the Revit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">
+unit handling</a>
+
+in one of the very first posts to this blog.
+One main point discussed there is the fact that Revit internally uses a fixed set of internal database units which cannot be changed.
+For instance, all lengths are measured in feet.
+The post mentions the simple unit converter provided by the MidasLink sample, which makes use of hard-wired self-maintained conversion constants, and suggests a simple hands-on manual approach for determining any required conversion factor.
+
+<p>The unit conversion utility presented here demonstrates how this process can be automated to avoid the need for any hard-coded conversion factors at all.
+
+<p>Revit includes a comprehensive internal unit handling library. One use of this is to convert and display the internal Revit database units to whatever units the user prefers to see in the user interface.
+
+It would be nice to access this functionality from our external add-in applications as well, instead of maintaining our own conversion routines.
+
+We already discussed one idea for an approach to access the internal Revit functionality to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/formatting-units-strings.html">
+format unit strings</a>
+
+using the AsValueString and SetValueString methods on the Parameter class.
+Now we can present a unit conversion utility making use of this idea.
+
+<p>For completeness' sake, we also mention another area related to units that we touched on briefly, the exploration of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/unit-types-and-format-options.html">
+unit types and format options</a>
+
+by Matt and Saikat.
+
+<p>The aptly name UnitConversion utility presented here demonstrates accessing the internal Revit unit handling functionality to implement the inverse direction as well, and also provides a helpful user interface for determining and testing unit handling functionality and conversion factors.
+
+<p>The implementation follows the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html">
+service-oriented architecture</a> or
+
+SOA paradigm that we introduced yesterday for maximising the use of independent functions implementing mutually self-contained building blocks of functionality.
+
+<p>Here is a copy of the
+
+<a href="UnitConversion.zip">
+UnitConversion source code</a>.
+
+It is richly commented, and the comments include a wealth of additional information on details of the Revit unit handling methods that are not repeated in this text, so I recommend that you read through the source code and comments in addition to the following article describing the utility and its implementation:</p>
+
+<h4>Using the Revit API to Perform Unit Conversions for You</h4>
+
+<p>When using the Revit API and needing to store values into your document, Revit expects you to provide those values in the units of measure that Revit uses internally.
+This has been discussed previously in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">
+this article</a>.
+
+The generally accepted solution has been for you to manually determine the multipliers you need for the Unit Types with which you are working and essentially write your own unit converter, wherein you hard-code the multipliers you need and scale your data by them accordingly.
+
+<p>But sometimes it can be difficult to determine what those internal units of measure are, and thus what the multipliers are that you need to use in order to get the values you send to Revit via the API to have the correct meaning in Revit.
+
+<p>Normally, when using the Revit graphical interface, you set your Project Units to the units of measure in which you are working, type in your data in those units, and Revit takes care of the rest.
+This functionality is actually available in the API as well, preventing you from needing to determine multipliers, but it's not very intuitive to find.
+
+<p>The key piece of the puzzle is to use the 'SetValueString' method instead of the 'Set' method on a parameter.
+SetValueString takes a string representation of your value in the current project units and converts it for you to internal units when setting the value into the parameter.
+
+<p>For example, Revit uses Decimal Feet as the internal unit of measure for Length.
+If your project units for Length are set to inches, and you store into a parameter using SetValueString the string value for 12, Revit will automatically convert 12 inches into 1 foot and really store the value of 1 for you into the parameter.
+Using SetValueString, you don't even have to know that Revit has an internal unit of measure, let alone what those units of measure are.
+
+<p>Further, SetValueString allows you to override the current units of measure for the project by including unit symbols in your string.
+If, for example, your project units for Length are set to centimetres and you send the string value:  18" (with the trailing double quotes), Revit will interpret that as eighteen inches and will store the value 1.5 (one and a half feet) into your parameter for you.
+
+<p>As another example, having your project units for Length set to meters and using SetValueString with the value:  2' 3" (including the single and double quotes) will store the value 2.25 into the parameter.
+Revit knows how to do all the string parsing for you, and will throw an exception if you try to send it something it cannot interpret.
+
+<p>A parallel reverse function called AsValueString also exists in the Revit API.
+This will convert a parameter's internal value back to the string representation for the current project units.
+When the project units are Feet and Fractional Inches and a Length parameter has an internal value of 3.5, calling AsValueString will return the string 3' 6".
+
+<p>Using this knowledge, it is possible to write methods which can be used to help solve the unit conversion problem much more easily.
+For example, we can write a function to return the scale factor (multiplier) that is needed for a specific set of units of measure.
+We can also write a single function to set a parameter's value given the value and the units of measure in which that value was defined.
+
+<p>This has been accomplished in the UnitConversion sample, whose
+
+<a href="UnitConversion.zip">
+source code</a>
+
+accompanies this article.
+The code leverages the new Family Editor API, so will only work in Revit 2010.
+
+<p>Here is a sample image to show the functionality provided:
+
+<center>
+<img src="img/UnitConversion.png" alt="UnitConversion"/>
+</center>
+
+<p>We can see near the top of this form that for CFM or cubic feet per minute units, the scale factor (multiplier) we need to store our value into Revit is 0.01666666666666.
+You can copy that value to the clipboard from this form.
+So if we want to store 1000 CFM into Revit, we have to store the value 16.666666666.
+
+<p>For the mathematically inclined, this scale factor equates to 1/60, which tells us the internal units Revit uses for air flow are Cubic-Feet-per-Second.
+Interestingly, this unit is not available as a choice for Project Units in the Revit user interface, in spite of being used internally.
+That is one reason why it can be difficult to determine what scale factor should be used.
+
+<p>We can also see near the bottom of the form that when we store a value of 1.0 CFM, the internal value will be 0.01666666.
+This is actually how the scale factor can be determined for a given unit of measure:  set a display value of 1.0 for those units of measure and see what is stored internally. This procedure for determining the required conversion factor corresponds exactly to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">
+Jeremy's manual approach</a>:
+
+"To determine a unit conversion factor, set the parameter value to 1 in the user interface, then determine the value returned by the API; this will give you the exact conversion factor between the two."
+
+<p>Further, we can actually have Revit convert that value to a very different set of units of measure.
+In this case, we can have it convert 1.0 CFM to cubic meters per hour, which, as we can see near the bottom of the form, equates to 1.699010795520.
+That conversion is done using the AsValueString approach.
+
+<p>If you explore the sample code you will probably gain some more insights into how Revit works with parameters and units of measure.
+It's worth noting that this code was written following an n-tier,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html">
+service-oriented architecture</a>
+
+approach, as the comments in the code mention.
+
+<p>Because this architectural approach was used, it should not be difficult for you to extract the UnitFunctions class and perhaps put it into its own, separate assembly (DLL) for reuse in other projects.
+
+<p>However, at the very least you may find this sample application useful for providing accurate scale factors that can be copy-and-pasted directly from the form, if you still wish to embed hardcoded conversion factors into your code.

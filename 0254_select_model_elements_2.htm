@@ -1,0 +1,184 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1254479 [Additional Solids when retrieving a wall]
+  1254837 [All visible Elements]
+
+-->
+
+<h3>Select Model Elements 2</h3>
+
+<p>We already had several stabs at the topic of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+selecting all model elements</a>,
+
+i.e. all elements in a Revit BIM which contribute to the building geometry.
+Their main characteristic is that they have a non-null geometry which is visible on the graphics screen and really contributes to the physical building model.
+Unfortunately, some elements which are not part of the building itself also have valid geometry and need to be eliminated.
+
+<p>The latest version of the code that we presented still made use of a full iteration over all document elements, i.e. something like this:
+<pre class="code">
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = doc.Elements;
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>As we all know by now, this kind of full iteration over all document elements is unnecessarily time consuming and seldom useful, because an application is almost always only interested in a small subset of them.
+We will convert the model element selection to use element filtering, similarly to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/converting-to-filters.html">
+conversion to use filters</a> we 
+
+described for the Revit SDK FrameBuilder sample.
+
+<p>We can add both a type filter to eliminate a list of classes that we are not interested in, and also a built-in category filter to eliminate unwanted categories.
+Here is the list of unwanted types, i.e. classes of elements which are not model elements:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Type</span>[] _types_to_skip = <span class="blue">new</span> <span class="teal">Type</span>[] {
+&nbsp; <span class="blue">typeof</span>( <span class="teal">BasePoint</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">DetailLine</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Dimension</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Family</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyBase</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">FillPattern</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">gbXMLParamElem</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">GraphicsStyle</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Level</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">LinePattern</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">MaterialOther</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ModelLine</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Phase</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">PrintSetting</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ProjectInfo</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ProjectUnit</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ReferencePlane</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Room</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">RoomTag</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Sketch</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">SketchPlane</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Symbol</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">TextNote</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ViewDrafting</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">ViewSheet</span> ),
+&nbsp; <span class="blue">typeof</span>( <span class="teal">WallType</span> ),
+};
+</pre>
+
+<p>If you run into some additional unwanted element in your model that is not listed here, you can easily add it. 
+You might want to let us know as well by submitting a comment on it.
+
+<p>We define the following helper method to more succinctly create a type filter which eliminates all of these classes. 
+Given an existing type filter 'f', it adds another type 't' to it and returns the new expanded filter:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Filter</span> OrType(
+&nbsp; <span class="teal">Filter</span> f,
+&nbsp; <span class="teal">Type</span> t,
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf )
+{
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewTypeFilter( t );
+&nbsp; <span class="blue">return</span> cf.NewLogicOrFilter( f, f2 );
+}
+</pre>
+
+<p>We can make use of it to implement the first step of our external command Execute method like this:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; els = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+<span class="teal">Filter</span> f = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">Symbol</span> ) );
+<span class="blue">foreach</span>( <span class="teal">Type</span> t <span class="blue">in</span> _types_to_skip )
+{
+&nbsp; f = OrType( f, t, cf );
+}
+f = cf.NewLogicNotFilter( f );
+<span class="blue">int</span> n = doc.get_Elements( f, els );
+</pre>
+
+<p>In addition to the unwanted types, we know some built-in categories whose elements also do not contribute to the building geometry and should be eliminated, for instance:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">int</span>[] _bics_to_skip = <span class="blue">new</span> <span class="blue">int</span>[] {
+&nbsp; ( <span class="blue">int</span> ) <span class="teal">BuiltInCategory</span>.OST_PreviewLegendComponents,
+&nbsp; ( <span class="blue">int</span> ) <span class="teal">BuiltInCategory</span>.OST_IOSSketchGrid,
+&nbsp; ( <span class="blue">int</span> ) <span class="teal">BuiltInCategory</span>.OST_Cameras,
+};
+</pre>
+
+<p>We have converted them to integer values to make use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+language independent category comparison</a>. 
+
+The following helper method encapsulates the code to determine whether a given built-in category integer value is included in this list and the associated element thus needs to be skipped.
+It makes use of the generic Array.Exists method:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">bool</span> SkipThisBic( <span class="blue">int</span> bic )
+{
+&nbsp; <span class="blue">return</span> <span class="teal">Array</span>.Exists&lt;<span class="blue">int</span>&gt;(
+&nbsp; &nbsp; _bics_to_skip,
+&nbsp; &nbsp; <span class="blue">delegate</span>( <span class="blue">int</span> i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> i == bic;
+&nbsp; &nbsp; } );
+}
+</pre>
+
+<p>With these preparations in place, we can iterate over and list the model elements like this in the rest of the implementation of the external command Execute method:
+
+<pre class="code">
+<span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+n = 0;
+&nbsp;
+Geo.<span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> els )
+{
+&nbsp; <span class="blue">if</span>( (<span class="blue">null</span> != e.Category)
+&nbsp; &nbsp; &amp;&amp; !SkipThisBic( e.Category.Id.Value )
+&nbsp; &nbsp; &amp;&amp; (<span class="blue">null</span> != e.get_Geometry( opt )) )
+&nbsp; {
+&nbsp; &nbsp; ++n;
+&nbsp; &nbsp; s += <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;\r\n&nbsp; Category={0}; Name={1}; Id={2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; e.Category.Name, e.Name, e.Id.Value );
+&nbsp; }
+}
+&nbsp;
+s = <span class="blue">string</span>.Format(
+&nbsp; <span class="maroon">&quot;Project contains {0} model element{1}{2}&quot;</span>,
+&nbsp; n,
+&nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ),
+&nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;:&quot;</span> ) )
++ s;
+&nbsp;
+<span class="teal">LabUtils</span>.InfoMsg( s );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Here is today's snapshot of the updated version of the 
+
+<a href="zip/rac_labs_2009-11-24.zip">
+Revit API introduction labs</a>, 
+
+including the version of Lab 2-2 to select all model elements as described above.

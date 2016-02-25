@@ -1,0 +1,149 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Library Paths</h3>
+
+<p>Here is a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/addin-ribbon-panel-and-loading-one-single-type.html?cid=6a00e553e1689788330120a55cc27d970c#comment-6a00e553e1689788330120a55cc27d970c">
+question</a>
+
+posted by Edgar on how to modify the application options library paths:</p>
+
+<p><strong>Question:</strong>
+I'm having trouble updating the Revit options for library paths. 
+I'm not sure what I'm missing to update back to the database.</p>
+
+<p><strong>Answer:</strong>
+Since the library paths managed by the LibraryPaths property on the Autodesk.Revit.Options.Application class is a StringStringMap, this question is mostly on how to extract, add and modify data in such a collection.
+
+<p>A StringStringMap is simply a dictionary mapping a set of keys to a corresponding set of values.
+In this case, both the key and the value data type is string.
+
+<p>To begin with, here is a little utility method to list the contents of a StringStringMap and print out an explanatory header beforehand:</p>
+
+<pre class="code"> 
+<span class="blue">void</span> PrintMap( <span class="teal">StringStringMap</span> map, <span class="blue">string</span> description )
+{
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\n{0}:\n&quot;</span>, description );
+&nbsp;
+&nbsp; <span class="teal">StringStringMapIterator</span> it = map.ForwardIterator();
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} -&gt; {1}&quot;</span>, it.Key, it.Current );
+&nbsp; }
+}
+</pre>
+
+<p>We use a forward iterator to iterate over the contents, consisting of key-value pairs.
+The keys and values are printed out one by one. 
+Their data is read from the iterator Key and Current properties, respectively.
+
+<p>To add a new key and value pair to the string map, you can use the Insert method.
+Modification of an existing value can be accomplished using set_Item.
+
+<p>I implemented a new Building Coder sample external command CmdLibraryPaths to test and demonstrate this.
+Here is the code of its Execute method:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+<span class="teal">StringStringMap</span> map = app.Options.LibraryPaths;
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;Initial application options library paths&quot;</span> );
+&nbsp;
+<span class="blue">string</span> key = <span class="maroon">&quot;ImperialTestCreate&quot;</span>;
+<span class="blue">string</span> value = <span class="maroon">@&quot;C:\Documents and Settings\All Users\Application Data\Autodesk\RAC 2010\Imperial Library\Detail Components&quot;</span>;
+&nbsp;
+map.Insert( key, value );
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;After adding 'ImperialTestCreate' key&quot;</span> );
+&nbsp;
+map.set_Item( key, <span class="maroon">@&quot;C:\Temp&quot;</span> );
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;After modifying 'ImperialTestCreate' key&quot;</span> );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre> 
+
+<p>Launching this command will produce the following output in the Visual Studio debug output window:</p>
+
+<pre>
+Initial application options library paths:
+
+Metric Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library
+Metric Detail Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library\Detail Components
+
+After adding 'ImperialTestCreate' key:
+
+ImperialTestCreate -> C:\Documents and Settings\All Users\Application Data\Autodesk\RAC 2010\Imperial Library\Detail Components
+Metric Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library
+Metric Detail Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library\Detail Components
+
+After modifying 'ImperialTestCreate' key:
+
+ImperialTestCreate -> C:\Temp
+Metric Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library
+Metric Detail Library -> C:\Program Files\Autodesk Revit Architecture 2010\Program\Metric Library\Detail Components
+</pre>
+
+<p>Truncated lines can be seen in full by copy and pasting into an editor.</p>
+
+<p>Once I got this far, I started trying to see the results of my changes in the Revit user interface.
+The library paths are displayed by clicking on the big R button, the main menu button on the upper left of the Revit application window, and then selecting Options &gt; File Locations &gt; Places...
+
+<p>To my surprise, I saw no changes.
+I first thought that we added and modified a new key 'ImperialTestCreate' which is ignored by Revit.
+So I added a modification to one of the pre-existing Revit keys, and set the value of 'Metric Detail Library' to 'C:\Temp' as well.
+I still saw no changes.
+
+<p>It then dawned upon me that the statement 'map = app.Options.LibraryPaths' copies the current application options library paths into my own private StringStringMap instance stored in my local variable 'map'.
+All the changes I made are in my own local copy.
+To have any effect in Revit, I need to write back the changes into the Revit application object data, for instance using a statement such as 'app.Options.LibraryPaths = map'.
+After doing so, both the updated existing key as well as the new one added by me is displayed as expected in the user interface:</p>
+
+<center>
+<img src="img/updated_places.jpg" alt="Updated places"/>
+</center>
+
+<p>The updated code of the Execute method now looks like this:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+<span class="teal">StringStringMap</span> map = app.Options.LibraryPaths;
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;Initial application options library paths&quot;</span> );
+&nbsp;
+<span class="blue">string</span> key = <span class="maroon">&quot;ImperialTestCreate&quot;</span>;
+<span class="blue">string</span> value = <span class="maroon">@&quot;C:\Documents and Settings\All Users\Application Data\Autodesk\RAC 2010\Imperial Library\Detail Components&quot;</span>;
+&nbsp;
+map.Insert( key, value );
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;After adding 'ImperialTestCreate' key&quot;</span> );
+&nbsp;
+map.set_Item( key, <span class="maroon">@&quot;C:\Temp&quot;</span> );
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;After modifying 'ImperialTestCreate' key&quot;</span> );
+&nbsp;
+map.set_Item( <span class="maroon">&quot;Metric Detail Library&quot;</span>, <span class="maroon">@&quot;C:\Temp&quot;</span> );
+&nbsp;
+PrintMap( map, <span class="maroon">&quot;After modifying 'Metric Detail Library' key&quot;</span> );
+&nbsp;
+app.Options.LibraryPaths = map;
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11045.zip">
+version 1.1.0.45</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p><strong>Response:</strong>
+This works perfectly, thank you for the thorough explanation.
+Also, Thank you for the goodies!</p>

@@ -1,0 +1,162 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Champions Roundtable at AU</h3>
+
+<p>Tuesday we held a DevLab at AU successfully exploring and resolving a bunch of interesting issues.
+I hope to get around to documenting and sharing some of them soon, before being overwhelmed by other new exciting stuff.
+The most pressing priority first, though: sharing the notes from the Revit API roundtable session.</p>
+
+<p>My first session at AU was a very pleasant, comfortable and fun one, being a roundtable providing a free-for-all exchange of questions, views and feedback between the audience and a bunch of Autodesk employees.
+The Autodesk side included developers creating the Revit API, ADN developer supporters supporting people in making use of it, and consultants who actually use it themselves.
+The audience was you guys.</p>
+
+<p>We tried to keep the questions and answers short and to the point, and I tried to take notes of everything said.
+They are provided below, only very slightly edited for readability, and possibly cryptic for those of you who did not attend the session.
+I wish you some enjoyable head-scratching trying to decipher what we actually meant.</p>
+
+<p>Before we dive into the notes, here are its
+
+<a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4109">AU catalogue entry</a> and
+
+a very few slides listing the goal of this meeting and the panellists answering the questions:</p>
+
+<a name="2"></a>
+
+<h4>CP4109 &ndash; Revit API Round Table: Meet the Champions</h4>
+
+
+<h5>Class Summary</h5>
+
+<ul>
+<li>Interact with a panel of Autodesk Revit API experts
+<li>Ask questions and discuss topics of your choice
+<li>Get to know the people who shape the APIs you work with better
+<li>Explain your views, ideas and problems directly face to face
+</ul>
+
+<h5>Learning Objectives</h5>
+
+<p>At the end of this class, you will have
+
+<ul>
+<li>Interacted with a panel of Autodesk Revit API experts
+<li>Asked questions and discussed topics of your choice
+<li>Got to know the people who shape the APIs you work with better
+<li>Explained your views, ideas and problems directly face to face
+</ul>
+
+<h5>Panellists</h5>
+
+<ul>
+<li>Arno&scaron;t L&ouml;bel, Revit Developer
+<li>Augusto Gon&ccedil;alves, ADN
+<li>Jeremy Tammik, ADN
+<li>Miroslav Schonauer, Consulting
+<li>Saikat Bhattacharya, ADN
+<li>Steven Mycynek, Revit API Engineer
+</ul>
+
+<h5>Learning More</h5>
+
+<ul>
+<li><a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>: DevTV and My First Plugin Introduction, SDK, Samples, API Help
+<li><a href="http://www.autodesk.com/revitapi-help">Developer Guide and Online Help</a>
+<li><a href="http://www.autodesk.com/apitraining">API trainings, webcasts and archives</a> &gt; Revit API
+<li><a href="http://discussion.autodesk.com">Discussion groups</a> &gt; Revit Architecture &gt; Revit API
+<li><a href="http://www.autodesk.com/apitraining">API training classes</a>
+<li><a href="http://adndevblog.typepad.com/aec">ADN AEC DevBlog</a>
+<li><a href="http://thebuildingcoder.typepad.com">The Building Coder Revit API Blog</a>
+<li><a href="http://www.autodesk.com/joinadn">ADN</a> and <a href="http://www.autodesk.com/adnopen">ADN Open</a>, The Autodesk Developer Network
+<li><a href="http://adn.autodesk.com">DevHelp Online</a> for ADN members
+</ul>
+
+<h4>Almost Unedited Notes from the Session</h4>
+
+<p>Here are my session notes in a rough and almost verbatim Q&A format:
+
+<p>What is coming up in future versions? We cannot talk about that here. Please join ADN for more info, sign an NDA agreement.
+
+<p>Why are you guys using Macs? No Autodesk or Revit-specific reason.
+
+<p>What are some common themes or requests for API app development? Hard to say, depends on company; high level: getting data from Revit, enterprise wide integration, setting up a BIM enterprise structure, company specific needs...
+
+<p>How can I effectively run a batch operation to open successive work shared Revit files and run an external command on them? Keep track of the processes; expect to handle failure and recovery. What do you want to achieve? You can use journaling, but not recommended. Open file, close file. No problem in theory. We are not leaking any memory. Managed stuff gets garbage collected eventually. To launch command automatically, install an external application and register for the OnDocumentOpenend event. Lots of communication pipelines available, various messaging mechanisms. What do you want to achieve? Export data to SQL, for example. One app doing this in a batch process, download file from Revit server. Ensure that the app provides feedback on what it is doing, log the events, be able to study log file. Maybe 1000 files process well and one of them fails. Saikat created a plug-in of the month which batch processes RVT files to upgrade them to a newer version doing SaveAs; it also logs all events and writes to text file. You can also look at the progress notification introduced in Revit 2013, that provides more feedback
+
+<p>General organisation of elements inside Revit: family dictates behaviour, categories, etc. this limits some things, pretty strict structure. Will this change? No, not significantly. We can take this as feedback.
+
+<p>External RealDWG application creates 3D drawing using Revit API? Develop Revit external application which queries external data source, query it regularly to write feedback... Revit threading model does not allow for directly attaching, need to use some kind of messaging model. An external program cannot directly access the Revit API.
+
+<p>AutoCAD provides the command console allowing data access without GUI... is anything similar coming for Revit? That would be a nice enhancement. Originally there was no API for Revit, it was highly user focused, and the thought was it would never need an API.
+
+<p>It is currently not possible to access the Revit database without opening Revit. What is the reason for that? You are always opening an application to access its complex internal data structures. It may be happening in the background, invisibly. We should be able to provide some kind of RealDWG-like access sometime in the future to RVT as well.
+
+<p>We would like to parametrically change the model to run different energy simulations on it; changing one parameter affects many other ones, creating a new model to export, but I do not want to see the changes, just change the model without visual feedback. How can this be achieved? The Revit model is parametric, you cannot even query it without regeneration, and it is in an invalid state until regeneration, e.g. transaction committed, half-baked until then. You can open documents in the background, then they are not visualised. Call OpenDocumentFile, it opens in the database but not in the UI. Later we added OpenAndActivate, which does both. Regeneration is smart. Revit updates only the minimal set requiring it. If you regenerate twice in a row, the second call does nothing.
+
+<p>Do I need to commit the transaction to ensure the model is correctly updated? Technically yes, but sometimes no. Sometimes the transaction needs to be committed to propagate the changes fully, sometimes simply regenerating is sufficient.
+
+<p>The API is great at customising the ribbon, but a more important aspect of Revit is its parameters, and there is little help there for users. Is there any way to improve this? We looked at putting a real API around parameters. Talk with the product managers, they need to balance requirements. Parameters could definitely be easier to use.
+
+<p>Managing large numbers of large Revit project files, it is difficult to keep everything up to date. Some people create a new local file every day, even update the central file. How stable is the program? Do I need to do anything to protect my model? We only create small test models. Some people create huge files. Stability is getting better all the time; regression tests improve all the time. Best practices improve. Most Revit problems have to do with not following best practice. The Revit API and every add-in always needs to respect best practice, not fight it. Completely different from other CAD systems. Big investment, understand the product and best practice.
+
+<p>Managing Revit server effectively? What are the best practices? It may be ok to update users every year, but painful to do so for servers, it is painful to update servers every year like Revit users. Is Revit server on the same release cycle as the Revit product? What would the alternative be? The file format should not change every release.
+
+<p>Can we edit a group in the API? No, you have to ungroup and regroup. There are some blog posts on this. If multiple instances of the group exist, you have to replace all the instances.
+
+<p>The dynamic updater framework can display a missing updater warning. Can I suppress that? There is an option to suppress that screen. When you register the updater you can set it as optional, so the end user is not bothered by the message if it is missing. Before that option appeared, you could just open the file without the updater, choose to ignore the missing updater, and save the file before sending it to someone else. Now you can control it as the updater implementer.
+
+<p>Some families have options for how they look in different views. Can I make other categories do the thing? Some families will only allow plan view. Can you achieve this from the UI? No. In that case you cannot do it programmatically either. Now I have to go and tag every damper in the section. The aim is to provide API access to everything available in the UI.
+
+<p>Issues with shared families. A family with no instances placed creates an instance of its geometry even if it is not placed. If an instance is placed which conflicts with the geometry, it can cause a 'cannot make type' error. How can this be worked around? This is a regeneration issue. Query noted.
+
+<p>How can I check what Revit is doing? Use the progress notification, which tells you all the sub-steps happening during transactions. You might have to do some primitive benchmarking.
+
+<p>Are processes that occur during regen behind the scenes documented in the journal file? Some stuff is, it is up to the individual programmer. They can check a journal coming back from a customer. The content may be cryptic and does not explain. Sometimes debugging significantly impacts performance, of course.
+
+<p>When I open a transaction on a work shared model, should I verify that all elements can be modified before committing the transaction? I don't think you can check whether an individual element is modifiable. There was a plan, maybe, for that. This kind of feature has been requested. Currently the transaction will be rolled back. Actually you can check this somehow, maybe.
+
+<p>
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html#23">
+DesignScript</a> is
+
+now integrated in AutoCAD. Are there any plans for providing this in Revit as well? We would like to create parametric masses. DesignScript looks as if it is open enough to be integrated into Revit. No new language integration is simple, but it looks as if it might fit and be useful.
+
+<p>What are the most prominent issues you run across, the most common things that pops up? Install RevitLookup, explore the model. Driving from external process, use Idling event. Daily requests: multithreading, 100% API coverage of worksharing functionality, integration and speed. When we get several similar requests, we blog about them, either on The Building Coder or the ADN AEC DevBlog. Why do you ask this, actually? Just for sharing and discussing here together. Also we keep receiving recurring issues. It helps to know the real good solution. Another common issue: how to get data from Revit and export to Excel or Access, and reimport. It is easy, but customers face many challenges, lots of countrification needs. People coming from other CAD systems and used to the sketch plane modelling and create feature are a bit surprised by Revit family editor and constraints and dimensions etc. It is possible to create a dimensioned family and make it parametric through the API. That is not intuitive, that is a challenge. Take a few steps back, look at how Revit does things, and then reproduce that relationship programmatically. Revit is not mechanical engineering. Understand the UI first, and then move on to API.
+
+<p>Do you follow the Autodesk discussion forums? Yes.
+
+<p>Can I use formulas to establish parametric relations between different families, e.g. if I want the width of family A to be driven by the height of family B? Good question, not currently supported.
+
+<p>Can I access the document warnings? There is the failure API, but no access to the warnings. There are ways to get rid of failures. Install the failure processor at application level. You get called when transaction ends and if there are failures your processor is called and you can decide how to handle them. I get a model and it has 300 warnings in it. Can I get that list? The failure processor does not give you that list? No, probably not. If you go to look at warnings in Revit, you can export that list to a text file. It would be nice to be able to fix warnings such as the 'line off axis', provide tools and options to fix this, or an option to leave it as it is.
+
+<p>Every column I touch is part of a phase and design option. Currently the phase mapping is not part of the Revit API. I run into problems trying to match phases when they differ between linked and host model. We have a link API in 2013 and a list of additions, I think something more will be coming in that area. The goal for the API is to provide 100% access to all end user features. Right now all new features are automatically exposed to the API as well.
+
+<p>C# versus VB? It all goes to the same place. It all compiles to IL and can be decompiled as well.
+
+<p>Dispose is inherited through the class hierarchy from APIObject. Do we need to dispose of all the objects we use? It is probably good practice. It happens eventually through the GC. We have scoped objects, everything with a start and an end, e.g. transaction. If you dispose that, it is automatically ended. The easiest way is to use a 'using' block. You must call Commit, Rollback or Dispose. APIObject is only a very thin wrapper. Dispose does not actually do anything. If you need to clean up memory and access a lot of data from Revit, you may want to call Dispose yourself in between loop iterations, e.g. If you do not call Dispose, Revit will hold on to the object even if GC is called. If you call Dispose, then we let go. When the command ends, everything is disposed. Revit elements can have an unpredictable lifetime. It is always safer to hold on to an element id rather than an element. Native pointers are invalidated. You can test whether an element is invalid. You can modify an element, then delete it, undo the deletion, and the element pointer will go from valid to null and back to valid again. You do not have to refetch the element, actually, Revit handles its validity. The API creates a managed wrapper around the native pointer.
+
+<p>Error reporting. When a user has an error and we do not have all the info. Is there a central file location where more error reporting is available? Beside the journal there is something worksharing related log file, extension 'slog', monitoring activity between local and central, meant for programmers, not customers, that might provide some hints. Same folder as central file.
+
+<p>Insight into eTransmit? Visit Arno&scaron;t's AU session on Wednesday.
+
+<p>Unique id? Working with linked files, the unique id can actually be the same for different files. Looking for a view n a linked file, the view in link and host has the same unique id. Element id yes, of course, they only work within the session, and might change due to worksharing session, but unique id should be stable and unique. If you see a duplicate unique id, please report it to us.
+
+<p>What are the coolest projects you have seen? The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/meetings-football-and-revitrubyshell.html#2">
+ruby scripting plugin</a> and its
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/revitrubyshell-implementation-and-installer.html">
+installer</a>.
+
+<a href="http://www.architecture-tech.com/2012/09/zoom-to-awesome.html">
+ZoomToAwesome</a>, which basically consists of one single line of code.
+
+<p>A plugin can bring down Revit. This should not happen. Revit builds in protection in the external command framework that should shield Revit and the end user from all misbehaviour. Dynamic updaters as well. App can cause exception within exception, very hard to protect against. We make it as robust as possible, and still try to open up wide and give you all the options. Example: call a command, do something bad, invalid geometry, try to commit transaction, failure handling, try to resolve, you have a failure resolver, this causes another exception, things can get really bad. A point about add-ins, which is a limitation of .NET and Windows: if your add-in uses COM interop and dereferences an invalid pointer, we cannot protect against that. Unsafe code and p/invoke cannot be protected completely.
+
+<p>Reload the keynotes text file from the API. Not supported, sorry.
+
+<p>Building is data. Can we tap into that without dB link? Direct query?
+
+<p>Thank you for a very interesting discussion with numerous insights on both sides! Have fun using the Revit API!

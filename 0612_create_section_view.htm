@@ -1,0 +1,160 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+- BackSectionView.zip
+- C:\a\j\adn\case\bsd\1263484\src\BackSectionView\BackSectionView.sln
+- 1260841 [Rotated Section Box]
+- 1263484 [SectionView on the backside of an element] -- this one is important!
+- 1270722 [About your sample project named "CreateViewSection"]
+- 1267379 [Section Geometry] -- extracting the geometry of half a wall cut by a section view 
+- section view creation:
+- Konstanty S. 
+
+-->
+
+<h3>Section View Creation</h3>
+
+<p>I mentioned some basics of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/elevation-view.html">
+elevation and section view creation</a>
+
+a long time ago, but omitted to publicise the results of the ensuing discussion
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/elevation-view.html?cid=6a00e553e1689788330133f4c6fea6970b#comment-6a00e553e1689788330133f4c6fea6970b">
+with</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/elevation-view.html?cid=6a00e553e168978833013487e73089970c#comment-6a00e553e168978833013487e73089970c">
+Konstanty</a>
+
+and similar ones 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/autodesk-university-2010-class-materials.html?cid=6a00e553e1689788330134890c7687970c#comment-6a00e553e1689788330134890c7687970c">
+with 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/autodesk-university-2010-class-materials.html?cid=6a00e553e168978833013489161808970c#comment-6a00e553e168978833013489161808970c">
+Jenney</a>
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html?cid=6a00e553e168978833014e600d7423970c#comment-6a00e553e168978833014e600d7423970c">
+Bhavana</a>.
+
+The issue came up in some ADN cases as well, so it really is time to get a bit more information on this out there to you.
+
+<p><strong>Question:</strong> I see that the CreateViewSection SDK creates a detail view of a wall seen from one side. 
+
+How can I create similar top and front views of it?
+
+<p><strong>Answer:</strong> First of all, as always, of course, take a look at the developer guide, e.g. section 18.1.4 Creating and Deleting Views.
+It explains the different view types and how they are defined and created programmatically.
+
+<p>The main aspect in defining the section view direction is setting up the BoundingBoxXYZ appropriately.
+As you say, this is demonstrated by the CreateViewSection SDK sample.
+It sets up the bounding box used in the call to the NewViewSection method in a helper method GenerateBoundingBoxXYZ.
+The latter creates a new BoundingBoxXYZ and sets its Min and Max properties.
+The most important thing is its Transform property, which defines the origin and directions (RightDirection, UpDirection and ViewDirection) of the created view.
+That is defined by the GenerateTransform helper method, which branches off into different flavours depending on the selected element type, wall, beam or floor.
+In the case of a wall, it uses the wall location line to determine its midpoint and direction.
+
+<p>Here is some simpler code that does the same thing without branching out into any helper functions, uses the element bounding box to determine the view origin, and a hard-wired view direction to set up a front view:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> uiapp <span class="blue">As</span> <span class="teal">UIApplication</span> = commandData.Application
+&nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> <span class="teal">UIDocument</span> = uiapp.ActiveUIDocument
+&nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> <span class="teal">Application</span> = uiapp.Application
+&nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> <span class="teal">Document</span> = uidoc.Document
+&nbsp;
+&nbsp; <span class="blue">Dim</span> sel <span class="blue">As</span> <span class="teal">Selection</span> = uidoc.Selection
+&nbsp;
+&nbsp; <span class="blue">Dim</span> e <span class="blue">As</span> <span class="teal">Element</span> = sel.Elements(0)
+&nbsp;
+&nbsp; <span class="green">' get the element bounding box;</span>
+&nbsp; <span class="green">' 'nothing' means model geometry:</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> ebbox <span class="blue">As</span> <span class="teal">BoundingBoxXYZ</span> =
+&nbsp; &nbsp; e.BoundingBox(<span class="blue">Nothing</span>)
+&nbsp;
+&nbsp; <span class="green">' determine size of box</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> w <span class="blue">As</span> <span class="blue">Double</span> = (ebbox.Max.X - ebbox.Min.X)
+&nbsp; <span class="blue">Dim</span> d <span class="blue">As</span> <span class="blue">Double</span> = (ebbox.Max.Y - ebbox.Min.Y)
+&nbsp; <span class="blue">Dim</span> h <span class="blue">As</span> <span class="blue">Double</span> = (ebbox.Max.Z - ebbox.Min.Z)
+&nbsp;
+&nbsp; <span class="green">' make it easier to see, e.g., not too narrow</span>
+&nbsp;
+&nbsp; <span class="blue">If</span> w &lt; 10.0 <span class="blue">Then</span>
+&nbsp; &nbsp; w = 10.0
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">If</span> d &lt; 10.0 <span class="blue">Then</span>
+&nbsp; &nbsp; d = 10.0
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; <span class="green">' from front </span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> maxPt <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">New</span> <span class="teal">XYZ</span>(w, h, 0.0)
+&nbsp; <span class="blue">Dim</span> minPt <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">New</span> <span class="teal">XYZ</span>(-w, -h, -d)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> bbox <span class="blue">As</span> <span class="teal">BoundingBoxXYZ</span> = <span class="blue">New</span> <span class="teal">BoundingBoxXYZ</span>()
+&nbsp;
+&nbsp; bbox.Enabled = <span class="blue">True</span>
+&nbsp; bbox.Max = maxPt
+&nbsp; bbox.Min = minPt
+&nbsp;
+&nbsp; <span class="green">' set the transform</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> trans <span class="blue">As</span> <span class="teal">Transform</span> = <span class="teal">Transform</span>.Identity
+&nbsp;
+&nbsp; <span class="green">' find the mid point of the element</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> midPt <span class="blue">As</span> <span class="teal">XYZ</span> = 0.5 * (ebbox.Max + ebbox.Min)
+&nbsp;
+&nbsp; <span class="green">' set it as origin </span>
+&nbsp;
+&nbsp; trans.Origin = midPt
+&nbsp;
+&nbsp; <span class="green">' determine view direction </span>
+&nbsp;
+&nbsp; trans.BasisX = <span class="teal">XYZ</span>.BasisX
+&nbsp; trans.BasisY = <span class="teal">XYZ</span>.BasisZ
+&nbsp; trans.BasisZ = -<span class="teal">XYZ</span>.BasisY
+&nbsp;
+&nbsp; bbox.Transform = trans
+&nbsp;
+&nbsp; <span class="green">' create the section view</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> viewSection <span class="blue">As</span> <span class="teal">ViewSection</span> =
+&nbsp; &nbsp; doc.Create.NewViewSection(bbox)
+</pre>
+
+<p>To set up a different view, e.g. the right-hand side, you just modify the following lines:
+
+<pre class="code">
+&nbsp; <span class="green">' . . .</span>
+
+&nbsp; <span class="green">' from right </span>
+
+&nbsp; <span class="blue">Dim</span> maxPt <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">New</span> <span class="teal">XYZ</span>(d, h, 0.0)
+&nbsp; <span class="blue">Dim</span> minPt <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">New</span> <span class="teal">XYZ</span>(-d, -h, -w)
+
+&nbsp; <span class="green">' . . .</span>
+
+&nbsp; <span class="green">' determine view direction </span>
+
+&nbsp; trans.BasisX = <span class="teal">XYZ</span>.BasisY
+&nbsp; trans.BasisY = <span class="teal">XYZ</span>.BasisZ
+&nbsp; trans.BasisZ = <span class="teal">XYZ</span>.BasisX
+</pre>
+
+<p>For the sake of completeness and your comfort, here is <a href="zip/BackSectionView.zip">BackSectionView.zip</a> containing the rough draft of two entire little VB and C# sample projects.
+The C# version implements three methods GetFrontView, GetBackView and GetTopView, which may or may not fulfil the promise of their names, but at least they will give you a starting point.
+
+<a name="2"></a>
+
+<h4>Detail View, Not Section View</h4>
+
+<p>When using the NewViewSection method, you should be aware of the note at the end of the developer guide section 18.5 ViewSection, which points out that these views will appear as details views in the project browser, unlike section views created manually using section using the command View &gt; New &gt; Section, which show up under the Sections (Building Section) node in the Project Browser.
+

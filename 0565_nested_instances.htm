@@ -1,0 +1,164 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Joel Spahn and Harry Mattison RE: Nested Lighting Fixture Instances -->
+
+<h3>Nested Lighting Fixture Instances</h3>
+
+<p>We already looked at a couple of aspects of nested family instances, such as access to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instance geometry</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">
+creating nested families</a>
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/nested-family-instance.html">
+determining whether a family instance is nested</a>.
+
+
+<p>Now Joel Spahn of <a href="http://www.agi32.com">Lighting Analysts, Inc.</a> submitted a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/nested-family-utility-methods.html?cid=6a00e553e168978833014e86ea5f26970d#comment-6a00e553e168978833014e86ea5f26970d">
+comment</a> on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/nested-family-utility-methods.html">
+nested family utility methods</a> raising 
+
+a new question related to nested lighting fixtures, efficiently resolved by Harry Mattison of the Revit development team:
+
+<p><strong>Question:</strong> I have adapted this code to extract nested family instances and it works beautifully. 
+However, I have a new problem.
+
+<p>I need to extract  the location and position of all the light source elements in a lighting fixture family which contains nested lighting fixture family instances.
+
+<p>Based on my testing, the filtered element collector does not return nested family instances.  
+If this is true, how can I query the nested family instances?
+
+<p>My initial solution to this problem was to open the family document to collect and iterate the nested family instances. 
+There are two problems to this approach:
+
+<ol>
+<li>It is performance intensive and dramatically slows the operation.
+<li>It cannot handle "dynamic" families (most important).
+</ol>
+
+<p>That is, how can I extract the nested family instances if the quantity and position of the nested family instances is different for each instance of the parent family in the project?
+
+<p>Example: I have a lighting fixture family (track light) that contains nested lighting fixture family instances (each can-light on the track). The nested instances are part of an array which is defined by the parent instance in the project. 
+Each parent instance can have a different number of nested instances, as described in the documentation on
+
+<a href="http://docs.autodesk.com/REVIT/2010/ENU/Revit%20Architecture%202010%20Users%20Guide/RAC/index.html?url=WS73099cc142f487553b93539f117a2602bd5-62b4.htm,topicNumber=d0e97197">
+creating lighting fixtures with multiple light sources</a>.
+
+<p>Initially I thought that the FamilyInstance.SubComponents property would work for this, however it is always null! When does the SubComponents property return anything?  The API documentation is very sparse.
+
+<p>Any ideas on how to access nested family instances given the parent instance?  
+
+
+<p><strong>Answer:</strong> I need more information about the SubComponents property that is not working for you.
+I tried the following code with the "Table-Dining Round w Chairs.rfa" from the Revit Furniture library:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi = doc.get_Element( 
+&nbsp; &nbsp; uidoc.Selection.PickObject( 
+&nbsp; &nbsp; &nbsp; ObjectType.Element ).ElementId ) 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> subElemSet = fi.SubComponents;
+&nbsp;
+&nbsp; <span class="blue">if</span>( subElemSet != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> subElems = <span class="maroon">&quot;&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> ee <span class="blue">in</span> subElemSet )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> f = ee <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; subElems = subElems + f.Name + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Subcomponent count = &quot;</span> + subElemSet.Size 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\n&quot;</span> + subElems );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> super = fi.SuperComponent 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( super != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;SUPER component: &quot;</span> + super.Name );
+&nbsp; }
+</pre>
+
+<p>It provides the expected output:</p>
+
+<center>
+<img src="img/nested_instances_1.png" alt="Nested furniture instances"/>
+</center>
+
+<p><strong>Response:</strong> The sample code works for me as well when I select an instance of Table-Dining Round w Chairs.
+
+<p>However, it does not work when I select an instance Nested Table Lamp, which is a very simple Lighting Fixture family with four nested Lighting Fixture Families.  
+Both family instances are visible from the 3D view.
+
+<p><strong>Answer:</strong> The mesh geometry of the light sources can be found as follows:
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyInstance</span> fi;
+&nbsp; <span class="teal">GeometryElement</span> geomElem = fi.get_Geometry( 
+&nbsp; &nbsp; app.Create.NewGeometryOptions() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj 
+&nbsp; &nbsp; <span class="blue">in</span> geomElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> geomInst 
+&nbsp; &nbsp; &nbsp; = geomObj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( geomInst != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObject 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> geomInst.SymbolGeometry.Objects )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GraphicsStyle</span> gStyle = doc.get_Element( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; geomObject.GraphicsStyleId ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">GraphicsStyle</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( gStyle != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( gStyle.GraphicsStyleCategory.Name 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="maroon">&quot;Light Source&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Mesh</span> mesh = geomObject <span class="blue">as</span> <span class="teal">Mesh</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Is that sufficient for you to get the location & position information that you mentioned?
+
+<p>The lamps are not found by the SubComponents property because the "Shared" property is false:</p>
+
+<center>
+<img src="img/nested_instances_2.png" alt="Shared property is false"/>
+</center>
+
+<p>We will update the API documentation to explain this requirement.
+
+<p><strong>Response:</strong> I thought of using the mesh geometry, but this approach doesn't allow access to important parameter data such as the photometric data that the mesh is built from.
+
+<p>However, I forgot about the behaviour of "shared" light fixtures.  
+This seems to solve the issue and after sharing all the nested light fixtures, the subcomponents property works as expected.
+
+<p>Many thanks to Joel and Harry for this fruitful exploration, and for kindly sharing the results with us!

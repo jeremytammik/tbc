@@ -1,0 +1,157 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit MEP 2011 API</h3>
+<p>Revit 2010 and 2011 both put a strong focus on the development of Revit MEP, both from an end user and a programming point of view.
+The API features provided with Revit 2011 provide important new functionality for Revit MEP add-in developers.
+Of course, the entire platform API features such as dynamic update, analysis visualization, user interface integration, selection mechanism, transactions and other enhancements are applicable and extremely useful to MEP add-ins as well.
+A number of additional MEP specific enhancements have also been added.
+The main ones are the support for cable trays, conduits and panel schedules, all of which are fully supported by the API as well as the user interface.
+
+<a name="product"></a>
+<h3>Revit MEP Product Features</h3>
+<p>The key features of Revit MEP 2011 from a product point of view are the new cable tray and conduit elements and the support for electrical panel schedules.
+<h4>Cable Tray and Conduit</h4>
+<p>Revit 2011 includes support for modelling conduit and cable tray as unique object types. The goal of this feature is to represent real world conduit and cable tray for coordination purposes and for accurate and legible construction drawings.
+<p>Cable trays and conduits and can be routed as individual runs with or without individual fittings placed between straight sections. Conduit runs without fittings would be used for conduit that is bent to change directions instead of having actual fittings. When using conduit or cable tray runs without fittings, you can now use a new schedule type to report the overall length of the run. These schedule types have categories of Conduit Runs and Cable Tray Runs respectively.
+<p>Cable trays can be drawn as channel or ladder type.
+<p>Conduits can be connected to cable tray segments. The conduit does not have to actually touch the cable tray to connect. For example, you can connect a conduit 6
+ below the cable tray and have the conduit end update if the cable tray segment is moved.
+<p>Conduit and cable tray each support graphics with varying levels of detail in fine, medium, and coarse display.
+<p>A new type of connector is now available for connecting conduit to equipment. This new surface connector enables an entire face of a piece of equipment to accept conduit connections without having to manually add individual conduit connectors to the equipment. This makes connecting to equipment such as switchgear, transformers and panels faster and easier.
+<h4>Panel Schedules</h4>
+<p>You can create a schedule that lists the circuits connected to a panel, and displays information about each circuit such as location on the panel, circuit name, apparent loads, etc. Panel schedules display three main information sections: a header, circuit table, and a loads summary. A new Panel Schedule view for the selected panel is displayed in the drawing area, and panel schedules are added to the project browser under the Panel Schedules folder. A panel schedule shows the following data:
+<ul>
+<li>Panel Name
+<li>Distribution System supported by the panel
+<li>Number of phases available from the panel
+<li>Number of wires specified for the distribution system assigned to this panel
+<li>Rating of the mains feeding the panel
+<li>Type of mounting (Surface or Recessed)
+<li>Type of case enclosing the panel
+<li>Room where the panel is installed
+<li>Name assigned to a load circuit
+<li>Rated trip current for a circuit breaker
+<li>Number of poles on the circuit breaker
+<li>Circuit number
+<li>Phases
+<li>Apparent load (VA) for each of the phases
+<li>Total apparent load for all three phases
+<li>Manufacturer
+<li>Notation of any changes made to the panel
+<li>Root Means Square amperage
+</ul>
+<p>Additional circuit and panel information to display can be specified in the panel schedule templates.
+<h4>Other Enhancements</h4>
+<h5>Placing Valves and Fittings in Section or Elevation Views</h5>
+<p>It is now possible to place valves, fittings, and other types of duct or piping accessories while in an elevation or section view. For example, you can switch to an elevation view and place a valve in a vertical pipe.
+<h5>Tagging of MEP Elements during placement</h5>
+<p>You can now tag MEP components as they are being placed instead of doing so in a separate step.
+<h5>Piping Companion Flanges</h5>
+<p>There is a new pipe fitting type for flanges. If you define a flanged pipe type, you can edit the type and specify a companion flange that will be automatically inserted between the pipes and flanged fittings and on connections to equipment like pumps.
+<h5>Oval Duct</h5>
+<p>Oval ducts are now available in addition to the rectangular and round duct shapes. New size separators are available for oval duct size annotations and oval ducts can be used in duct sizing.
+<h5>Demand Factors and Load Categories</h5>
+<p>Demand factors have been updated to allow for more control over how demand loads are calculated and can be customized. Load categories are customizable and can be displayed in panel schedules.
+<h5>New Electrical Content</h5>
+<p>Many new types of electrical content have been added. New content is provided for communications, fire safety, data, nurse call, etc. Control panels have been added in addition to the individual controls or devices, so several of these objects can be connected to their appropriate panels.
+
+<a name="api"></a>
+<h3>The Revit MEP API</h3>
+<p>Many of the enhancements to the Revit 2011 MEP specific API are related to the electrical domain, since the HVAC and mechanical domains were a primary focus of the previous
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/revit-mep-api.html">
+Revit MEP 2010 API</a> release.
+We later also presented a full overview of the
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html">
+entire Revit MEP API</a>.
+<p>Paralleling the product features, the cable tray, conduit and panel schedules are the main areas of enhancement in 2011.
+A number of other topics have been addressed as well.
+
+<h4>Cable Tray and Conduit</h4>
+<p>The entire new cable tray and conduit feature is fully exposed through the API. Whatever can be done in the user interface should be possible using the API as well. A number of new classes and elements related to the cable tray and conduit ones have been added. The major ones are:
+<ul>
+<li>CableTrayConduitBase &ndash; the base class for cable trays and conduits.
+<li>CableTrayConduitRunBase &ndash; the base class for cable tray and conduit runs.
+<li>CableTray &ndash; a cable tray instance.
+<li>CableTrayType &ndash; a cable tray type.
+<li>CableTrayRun &ndash; a cable tray run.
+<li>Conduit &ndash; a conduit instance.
+<li>ConduitType &ndash; a conduit type.
+<li>ConduitRun &ndash; a conduit run.
+</ul>
+<p>As a result of the introduction of these new conduit elements, the previously existing classes ConduitType and ConduitTypeSet have been renamed to WireConduitType and WireConduitTypeSet.
+<h4>Panel Schedules</h4>
+<p>A new comprehensive API has been introduced to support access to panel schedules and their contents. The major classes exposed by this API are:
+<ul>
+<li>TableView &ndash; represents a view that shows a table.
+<li>TableData &ndash; holds most of the data describing the table row, column, and cells.
+<li>TableSectionData &ndash; holds row, column and cell data for a TableData instance.
+<li>PanelScheduleView &ndash; represents a view that shows a panel schedule.
+<li>PanelScheduleData &ndash; holds most of the layout, appearance, row, column, and cell style data.
+<li>PanelScheduleTemplate &ndash; represents a branch panel, a switchboard or a data panel template.
+<li>PanelScheduleSheetSegment &ndash; represents a segment of a panel schedule sheet instance.
+<li>PanelScheduleSheetInstance &ndash; represents an instance of a panel schedule placed on sheet.
+</ul>
+<h4>Other Enhancements</h4>
+<h5>New Element Creation Paradigm</h5>
+<p>In previous versions of the Revit API, almost all new element creation functionality was provided by the creation application and document classes in the Autodesk.Revit.Creation namespace. The Revit 2011 API introduces a new paradigm for by providing creation methods for new elements as static members on the classes themselves. This paradigm is demonstrated by the new Revit MEP API classes. For instance, to create a new Conduit element, you use the static Create method on the Conduit class:
+<pre class="code">
+&nbsp; <span class="teal">Conduit</span> conduit = <span class="teal">Conduit</span>.Create(
+&nbsp; &nbsp; doc, idConduitType,
+&nbsp; &nbsp; startPoint, endPoint,
+&nbsp; &nbsp; idLevel );
+</pre>
+<h5>EnergyDataSettings</h5>
+<p>For greater clarity, the gbXMLParamElem class has been renamed to EnergyDataSettings, and some of its members were renamed as well.
+<h5>Validation in ElectricalSystem Properties</h5>
+<p>The ElectricalSystem properties Length and VoltageDrop now throw an InvalidOperationException when the value cannot be computed, instead of returning zero.
+<h5>WireMaterialType, InsulationType, TemperatureRatingType</h5>
+<p>These classes now inherit from ElementType.
+<h5>DuctConnector, PipeConnector, ElectricalConnector</h5>
+<p>These classes now inherit from a new common ConnectorElement base class.
+<h5>Demand Factor and Load Classifications</h5>
+<p>The ElectricalSystem LoadClassification property has been replaced with a new property LoadClassifications. It returns a semicolon-delimited string listing the load classifications assigned to the system. Load classifications are now elements and can be found through regular element iteration.
+<p>The class DemandFactor was replaced by ElectricalDemandFactorDefinition.
+<p>The ElectricalSetting method GetDemandFactor has been replaced by the DemandFactorId property on the ElectricalLoadClassification class, which returns the id of the ElectricalDemandFactorDefinition element assigned to the load classification.
+
+<a name="samples"></a>
+<h4>Revit MEP API Samples</h4>
+<p>For completeness' sake, here is a complete overview of available Revit MEP API samples:</p>
+<ul>
+<li>Revit SDK Samples
+<ul>
+<li>CreateAirHandler
+<li>AddSpaceAndZone
+<li>AutoRoute
+<li>AvoidObstruction
+<li>PanelSchedule&nbsp<strong>*</strong>
+<li>PowerCircuit
+<li>TraverseSystem
+</ul>
+<li>Electrical System Hierarchy
+<li>HVAC Air Terminal Sizing
+<li>Pipe to Conduit Converter&nbsp<strong>*</strong>
+<li>Cable Tray Fitting Creation&nbsp<strong>*</strong>
+</ul>
+<p>From what we discussed above, you can probably guess that the new ones for Revit MEP 2011 are the ones marked with an asterisk dealing with panel schedules, conduits, and cable trays.</p>
+We discussed the existing samples in the
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html">
+Revit MEP API overview</a> and the Autodesk University 2009 presentation
+<a href="http://au.autodesk.com/?nd=class&session_id=5269">
+CP308-2 All Systems Go in the New Autodesk Revit MEP API</a>.
+<h5>Panel Schedules</h5>
+<p>The Revit SDK includes one new MEP specific sample application named PanelSchedule. It defines three external commands to demonstrate the use of the new panel schedule API:
+<ul>
+<li>PanelScheduleExport &ndash; retrieve the panel schedule view data and generate a CSV file or HTML page to display it.
+<li>InstanceViewCreation &ndash; create a panel schedule view instance for a selected electrical panel.
+<li>SheetImport &ndash; place panel schedule views on a sheet view.
+</ul>
+<h5>Pipe to Conduit Converter</h5>
+<p>Just last week, I presented my
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">
+pipe to conduit converter</a> add-in sample application p2c demonstrating a practical use of the new conduit elements.
+In addition, it implements a useful end user utility for converting pipes to conduits, and offered a great opportunity to discuss many aspect of the generic new Revit 2011 API functionality.
+<h5>Cable Tray Fitting Creation</h5>
+<p>The creation of cable tray elements is also based on the new element creation paradigm mentioned above for conduits and is pretty straightforward.
+To add fittings between the straight cable tray segments requires exact alignment of the segments, however, and will be the topic of a future post.

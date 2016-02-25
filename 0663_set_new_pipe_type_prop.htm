@@ -1,0 +1,196 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1271394 [Revise new pipeType information] -->
+
+<h3>Set New Pipe Type Properties</h3>
+
+<p>Here is an interesting Revit MEP API question on setting the preferred elbow, tee and junction type information after creating a new Revit MEP pipe type, answered by my colleague Joe Ye in Beijing:
+
+<p><strong>Question:</strong> I am creating a new Revit MEP pipe type by filtering for all element types of the category OST_PipeCurves and selecting the one named "Standard".
+On the resulting new ElementType instance, I would like to define the preferred settings as follows:
+
+<ul>
+<li>Change the preferred elbow from 'Elbow - Generic: Standard ' to 'Elbow - Thread - MI - Class 150: Standard'.
+<li>Change the preferred tee from 'Tee - Generic: Standard' to 'Tee - Thread - MI - Class 150: Standard'.
+<li>Change the preferred junction type from 'Tee' to 'Tap'.
+</ul>
+
+<p>Can you show me in C# how to achieve this, please?
+
+
+<p><strong>Answer:</strong> These three changes can be achieved by changing the values of some properties on the PipeType element:
+
+<ul>
+<li>Elbow: the default elbow fitting of the MEP curve type. 
+<li>Tee: the default tee fitting of the MEP curve type.
+<li>PreferredJunctionType: the preferred junction type of the MEP curve type.
+</ul> 
+
+<p>The values stored in the first two properties are family symbols.
+You need to find the desired target element in the Revit database and assign it to them.
+
+<p>For example, for the elbow, you can filter out the desired FamilySymbol 'Elbow - Thread - MI - Class 150: Standard'. 
+This element's class is 'FamilySymbol' and its built-in category is 'OST_PipeFitting'.
+Use these two filters and the traverse the returned element collection to find the target FamilySymbol by name comparison, and assign it to the Elbow property.
+
+<p>Instead of using the PipeType Elbow property, you can also use the generic Revit parameter access and the appropriate built-in parameter.
+This can be determined by exploring an existing pipe type using the RevitLookup database snoop tool.
+In that case, you can assign the value by calling the Parameter.Set(ElementId) method and passing in the family symbol element id.
+
+<p>Setting the desired tee is similar to the elbow.
+In this case, you can filter out the target FamilySymbol 'Tee - Thread - MI - Class 150: Standard' and assign it to the Tee property, or its element id to the equivalent parameter.
+
+<p>For the preferred Junction Type, you specify your choice using an integer value to indicate one of the two available options. 
+0 indicates Tap, and 1 indicates Tee.
+
+<p>So in your case, you would assign the integer value 0 to the 'Preferred Junction Type' property or parameter.
+
+<p>The complete code making use of the generic parameter access might look like this:
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.DB.Plumbing;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> rvtDoc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( rvtDoc );
+&nbsp;
+&nbsp; &nbsp; collector.OfCategory( <span class="teal">BuiltInCategory</span>.OST_PipeCurves );
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ElementType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PipeType</span> pipeType = <span class="blue">null</span>;
+
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> ptype <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.Compare( ptype.Name, <span class="maroon">&quot;standard&quot;</span>, <span class="blue">true</span> ) == 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; pipeType = ptype <span class="blue">as</span> <span class="teal">PipeType</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pipeType != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> name = <span class="maroon">&quot;ADNNewType&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( rvtDoc )
+&nbsp; &nbsp; &nbsp; trans.Start(&nbsp; <span class="maroon">&quot;Set Pipe Type Information&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementType</span> newType = pipeType.Duplicate( name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( newType != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id1 = FindFamilyType( rvtDoc, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Elbow - Threaded - MI - Class 150&quot;</span>, <span class="maroon">&quot;Standard&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_PipeFitting ).Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id2 = FindFamilyType( rvtDoc, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Tee - Threaded - MI - Class 150&quot;</span>, <span class="maroon">&quot;Standard&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_PipeFitting ).Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; newType.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_CURVETYPE_DEFAULT_ELBOW_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( id1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; newType.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_CURVETYPE_DEFAULT_TEE_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( id2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; newType.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_CURVETYPE_PREFERRED_BRANCH_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( 0 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Find an element of the given type, name, </span>
+&nbsp; <span class="gray">///</span><span class="green"> and category (optional).</span>
+&nbsp; <span class="gray">///</span><span class="green"> You can use this, for example, to find a </span>
+&nbsp; <span class="gray">///</span><span class="green"> specific wall and window family with the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given name, e.g.:</span>
+&nbsp; <span class="gray">///</span><span class="green"> FindFamilyType( _doc, GetType(WallType), </span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp;&nbsp; &quot;Basic Wall&quot;, &quot;Generic - 200mm&quot; ) </span>
+&nbsp; <span class="gray">///</span><span class="green"> FindFamilyType( _doc, GetType(FamilySymbol), </span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp;&nbsp; &quot;M_Single-Flush&quot;, &quot;0915 x 2134mm&quot;, </span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp;&nbsp; BuiltInCategory.OST_Doors ) </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> FindFamilyType( 
+&nbsp; &nbsp; <span class="teal">Document</span> rvtDoc, 
+&nbsp; &nbsp; <span class="teal">Type</span> targetType,
+&nbsp; &nbsp; <span class="blue">string</span> targetFamilyName, 
+&nbsp; &nbsp; <span class="blue">string</span> targetTypeName, 
+&nbsp; &nbsp; <span class="teal">Nullable</span>&lt;<span class="teal">BuiltInCategory</span>&gt; targetCategory )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( rvtDoc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( targetType );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( targetCategory.HasValue )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; collector.OfCategory( targetCategory.Value );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Parse the collection for the given names </span>
+&nbsp; &nbsp; <span class="green">// using LINQ</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> targetElems =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">from</span> element <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name.Equals( targetTypeName ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; element.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SYMBOL_FAMILY_NAME_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsString().Equals( targetFamilyName )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> element;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Put the result as a list of element fo accessibility. </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; elems = targetElems.ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Return the result.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( elems.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> elems[0];
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+}
+</pre>
+
+<p>By the way, these preferred element options can also be set to None.
+This is achieved just like we described for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/set-underlay-display-property-to-none.html">
+setting the underlay display property</a>,
+
+by using the parameter setting approach and providing ElementId.InvalidElementId as a value, e.g.
+
+<pre class="code">
+&nbsp; &nbsp; newType.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_CURVETYPE_DEFAULT_ELBOW_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; .Set( ElementId.InvalidElementId );
+</pre>
+
+<p>Many thanks to Joe for this solution!

@@ -1,0 +1,90 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!--
+1250505 [To store type,mechanical and geometric properties of sections]
+
+email subject Re: IFC-export format for (steel) beams in C:\a\doc\revit\ifc_export_format
+
+C:\a\doc\revit\ifc_export_format\Concrete and Precast Concrete Shapes.zip
+C:\a\doc\revit\ifc_export_format\Steel and Wood Shapes.doc
+-->
+
+<h3>Revit Library Shape Type Catalogue Parameters</h3>
+
+<p>A query on the property sets used by Revit on IFC export of steel beams led to the unearthing of some useful documentation of the parameters and dimensions used to define some commonly used shapes in the Revit type library.</p>
+
+<p><strong>Question:</strong>
+I am analysing an IFC export file created by Revit and trying to retrieve the exact dimensions of steel beams in the model.
+IFC has a standard specification for these which is publicly available.
+Revit apparently uses some own property sets and assigns them to standard IFC beam objects.
+These custom property sets are obviously not part of the IFC specification.
+What are the exact specification of these parameters and their meanings?</p>
+
+<p><strong>Answer:</strong>
+The Revit beam parameters are indeed exported in a Revit specific property set.
+No standard parameters have been defined for the different structural profiles.
+Here is some documentation including pictures and parameter values for some structural profiles and other shapes.
+These documents were created back in early 2006 illustrating the parameters of the most commonly used shapes in the Revit library.
+Please note that a lot of new content files have been created since then:</p>
+
+<ul>
+<li><a href="zip/Concrete_and_Precast_Concrete_Shapes.zip">Concrete and Precast Concrete Shapes.zip</a>
+<li><a href="zip/Steel_and_Wood_Shapes.zip">Steel and Wood Shapes.doc</a>
+</ul>
+
+<p>The former is a set of images, the latter a document describing the parameter format used in the part catalogue text files.</p>
+
+<p>The images for the concrete and precast concrete shapes describes the dimensions and parameters used in each of the following families:</p>
+
+<ul>
+<li>Concrete-Rectangular Beam.rfa
+<li>Precast-Double Tee.rfa
+<li>Precast-Inverted Tee.rfa
+<li>Precast-L Shaped Beam.rfa
+<li>Precast-Rectangular Beam.rfa
+<li>Precast-Single Tee.rfa
+</ul>
+
+<p>The images included are simply screen snapshots of two different views of the geometry and dimensioning and one of the Family Types dialogue listing the corresponding dimensions and parameters of a specific type.</p>
+
+<p>The steel and wood shapes document is more comprehensive and explains the format of the text files used to specify type parameters:</p>
+
+<img src="img/type_catalogue_text_file.png" alt="Type catalogue text file"/>
+
+<p>Here is a list of the families and corresponding text files described in this document:</p>
+
+<ul>
+<li>I-Shape(W Shape): M_W-Wide Flange.txt
+<li>M-Shape (Miscellaneous Wide Flange): M_M-Miscellaneous Wide Flange.txt
+<li>HP-Shape (HP-Bearing Pile): M_HP-Bearing Pile.txt
+<li>C-Shape (Channel): M_HP-Bearing Pile.txt
+<li>MC-Shape (Miscellaneous Channel): M_MC-Miscellaneous Channel.txt
+<li>ST- Structural Tee: M_ST-Structural Tee.txt
+<li>MT- Structural Tee: M_MT-Structural Tee.txt
+<li>WT- Structural Tee: M_WT-Structural Tee.txt
+<li>L-Angle: M_L-Angle.txt
+<li>LL-Double Angle: M_L-Angle.txt
+<li>Hollow Tube: M_HSS-Hollow Structural Section.txt
+<li>Circular Hollow Tube: M_HSS-Round Structural Tubing.txt
+</ul>
+
+<ul>
+<li>Pipe Column: M_Pipe-Column.rfa
+<li>Open Web Steel Joist: M_K-Series Bar Joist-Angle Web.rfa, M_K-Series Bar Joist-Rod Web.rfa, M_DLH-Series Bar Joist.rfa, M_LH-Series Bar Joist.rfa
+<li>Columns- Lumber: M_Dimension Lumber-Column.rfa
+<li>Columns- Timber: M_Timber-Column.rfa
+<li>Beam- Lumber: M_Dimension Lumber.rfa
+<li>Plywood Web Joist: M_Plywood Web Joist.rfa
+<li>Beam- Timber: M_Timber.rfa
+<li>Open Web Wood Joist: M_Wood Open Web Joist.rfa
+</ul>
+
+<p>Most of the information included describes the parameters by showing their association with dimensioning on the model geometry, for instance like this for the miscellaneous wide flange:</p>
+
+<img src="img/miscellaneous_wide_flange.gif" alt="Miscellaneous wide flange dimensions"/>
+

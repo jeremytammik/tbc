@@ -1,0 +1,186 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+  1246556 [Extract UV coordinates, Color and Texture data], email to revit api by harry, 'How can we get UV values like FBX Exporter?'
+  1250604 [Revit Api : Getting texture coordinates]
+  C:\a\j\adn\case\special\marat\todo_marat.txt
+  From: Ben Nolan Subject: Texture coordinates in the revit SDK?
+
+-->
+
+<h3>Texture Data UV Coordinates and FBX</h3>
+
+<p>Still on vacation in Andalusia, mostly dealing with pretty basic issues and facts of life such as cold rainy weather and a leaking roof, here is another quick post from cold storage:
+
+<p><strong>Question:</strong> How can I access the texture data on a Revit model using the Revit API?
+
+I am interested in extracting the UV coordinates, colour and texture data on element faces.
+How can I retrieve the UV texture coordinate information?
+
+<p>I am currently using the FBX SDK to retrieve the texture file name from the texture library.
+Is this the preferred method?
+Any samples would be greatly appreciated!
+
+<p>A closely related question came up again recently in an email from Ben Nolan:
+
+<p><strong>Question:</strong> I love the Building Coder.
+But there's a topic you haven't covered &ndash; do you know if it's possible to export textures coordinates from within the Revit SDK?
+We've seen the UVArray class, but can't work out how to get an UVArray from a mesh or other geometry object.
+
+<p><strong>Answer:</strong> The Revit API has some ability to extract information about material assets from an RVT file.
+
+For example, the following code snippet traverses some of the asset information available in Revit.
+It can be extended by handling the remaining AssetPropertyType enum cases.
+It also queries the faces of an element and extracts XYZ information from its triangulation vertices.
+It attempts to extract some UV information, but that is probably not useful for the texture mapping context:
+
+<pre>
+ElementSet collection = doc.Selection.Elements;
+foreach (Autodesk.Revit.Element e in collection)
+{
+  String s = "";
+  Asset a = e.Category.Material.RenderAppearance;
+  for (int index = 0; index < a.Size; index++)
+  {
+    AssetProperty ap = a[index];
+    if (ap.Type == AssetPropertyType.APT_String)
+    {
+      AssetPropertyString value_str
+        = a[index] as AssetPropertyString;
+
+      s += ap.Name + ": " + value_str.Value + "\n";
+    }
+    if (ap.Type == AssetPropertyType.APT_Boolean)
+    {
+      AssetPropertyBoolean value_bool
+        = a[index] as AssetPropertyBoolean;
+
+      s += ap.Name + ": " + value_bool.Value + "\n";
+    }
+    if (ap.Type == AssetPropertyType.APT_Float)
+    {
+      AssetPropertyFloat value_float
+        = a[index] as AssetPropertyFloat;
+
+      s += ap.Name + ": " + value_float.Value + "\n";
+    }
+  }
+  MessageBox.Show(s);
+
+  Options options = app.Create.NewGeometryOptions();
+  options.DetailLevel = Options.DetailLevels.Fine;
+  Element geom = e.get_Geometry(options);
+
+  foreach (GeometryObject geomObject in geom.Objects)
+  {
+    if (geomObject.GetType() == typeof(Mesh))
+    {
+    }
+    else if (geomObject.GetType() == typeof(Solid))
+    {
+      s = "";
+      int nbFace = 0;
+      Solid geomSolid = (Solid)geomObject;
+      foreach (Face geomFace in geomSolid.Faces)
+      {
+
+/*
+        Mesh geomMesh = geomFace.Triangulate();
+        XYZArray vertices = geomMesh.Vertices;
+        int nbVertex = vertices.Size;
+        uint indexA = 0; uint indexB = 0; uint indexC = 0;
+        for (int i = 0; i < geomMesh.NumTriangles; i++)
+        {
+          MeshTriangle triangle = geomMesh.get_Triangle(i);
+          indexA = triangle.get_Index(0);
+          indexB = triangle.get_Index(1);
+          indexC = triangle.get_Index(2);
+        }
+*/
+
+        foreach (EdgeArray geomEdges in geomFace.EdgeLoops)
+        {
+          foreach (Edge geomEdge in geomEdges)
+          {
+            foreach (UV geomUV in
+              geomEdge.TessellateOnFace(geomFace))
+            {
+              s += "Face: "+ nbFace
+                + " UV: " + geomUV.U + " " + geomUV.V + "\n";
+            }
+          }
+        }
+        nbFace++;
+      }
+      MessageBox.Show(s);
+    }
+  }
+}
+</pre>
+
+<p>It would be nice to be able to directly obtain the UV information something like this, analogously to the XYZ data for the face mesh vertices:
+
+<pre>
+Mesh geomMesh = geomFace.Triangulate();
+XYZArray vertices = geomMesh.Vertices;
+UVArray uvs = geomMesh.UVs;
+</pre>
+
+<p>However the mesh vertices accessible through the API are the XYZ coordinates of each vertex.
+The texture mapping is probably defined by the UV coordinates for each vertex that would be calculated if the mesh was unfolded and flattened into a plane.
+That information is currently not accessible through the API.
+
+<p>There is an alternative approach, though, using the FBX file format.
+
+<p>The FBX format is purpose-built for exchanging information about materials, appearance, and rendering properties. By contrast, the Revit API has only limited ability to extract information about material assets from an RVT file.
+
+<p>The FBX format is consistent amongst other Autodesk products such as Maya and 3DStudio.
+
+<p>In the FBX SDK, the ImportScene sample program might be helpful.
+You can use it like this:
+
+<ul>
+<li>Create a wall in Revit Architecture.
+<li>Export an FBX file using File > Export > 3DS Max FBX.
+<li>Run the FBX SDK sample 'ImportScene' on the generated FBX file.
+<li>Import the FBX file into 3DS Max.
+</ul>
+
+<p>3DS Max reads and displays the Revit model including all its Mesh, UV information, Material and Texture information.
+This means that the FBX file has all the required information.
+The support file assetlibrary_base.fbx probably also includes some library material and texture information.
+
+<p>I removed the comment from the following line 93 in main.cxx:
+
+<pre>
+lSdkManager-&gt;GetIOPluginRegistry()-&gt;RegisterReader(
+  CreateMyOwnReader,
+  GetMyOwnReaderInfo,
+  lPluginId,
+  lRegisteredCount,
+  FillOwnReaderIOSettings );
+</pre>
+
+<p>Then the sample displays UV coordinates like these:
+
+<pre>
+Mesh Name: Basic Wall kudo [105571]
+Control Points
+Control Point 0
+Coordinates: -47.403542, 16.331938, 0.000000
+ . . .
+Control Point 7
+Coordinates: 33.961288, 17.198078, 0.000000
+
+Polygons
+Polygon 0
+Coordinates: -47.403542, 16.331938, 26.246719
+Texture UV (on layer 0): 0.000000, 26.246719
+Coordinates: -47.403542, 16.331938, 0.000000
+Texture UV (on layer 0): 0.000000, 0.000000
+Coordinates: 33.961288, 16.331938, 26.246719
+Texture UV (on layer 0): 81.364830, 26.246719
+</pre>

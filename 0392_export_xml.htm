@@ -1,0 +1,169 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Export Data to XML</h3>
+
+<p>Here is another issue of general interest and that arose during the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/devlab-and-birthday.html">
+DevLab in Waltham</a> last week:
+
+<p><strong>Question:</strong> How can I export some Revit model data to an XML file, for instance certain sheet properties? 
+
+<p><strong>Answer:</strong> That is actually very easy.
+All you need to do is:
+
+<ul>
+<li>Collect the Revit elements of interest, for instance all sheets.
+<li>Extract and save the data of interest from them, for instance the sheet number.
+<li>Iterate over the data collection and export it to XML.
+</ul>
+
+<p>You could of course also skip saving the data in an intermediate container and export it to an external file directly.
+Adding the intermediate step might be useful, for instance to sort the data items or add other processing.
+
+<p>Exporting to XML is easy, because the .NET framework includes lots of XML formatting functionality.
+It would also be easy to generate your own XML output file by hand, though.
+ 
+<p>Here is a super simple little ViewSheet data container to use for the intermediate storage:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">SheetData</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsPlaceholder { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> SheetNumber { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> SheetData( <span class="teal">ViewSheet</span> v )
+&nbsp; {
+&nbsp; &nbsp; IsPlaceholder = v.IsPlaceholder;
+&nbsp; &nbsp; Name = v.Name;
+&nbsp; &nbsp; SheetNumber = v.SheetNumber;
+&nbsp; }
+}
+</pre>
+
+<p>Obviously this data holder is rather overly simplistic, but you can easily add other items of interest to you to it.
+
+<p>I implemented a new Building Coder sample command which performs the steps outlined above making use of this data container class:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdSheetData</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve all sheets</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; a.OfCategory( <span class="teal">BuiltInCategory</span>.OST_Sheets );
+&nbsp; &nbsp; a.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewSheet</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create a collection of all relevant data</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">SheetData</span>&gt; data = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">SheetData</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> v <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// create some data for each sheet and add </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to some serializable collection called Data</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">SheetData</span> item = <span class="blue">new</span> <span class="teal">SheetData</span>( v );
+&nbsp; &nbsp; &nbsp; data.Add( item );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// write out data collection to xml</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XmlTextWriter</span> w = <span class="blue">new</span> <span class="teal">XmlTextWriter</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;C:/SheetData.xml&quot;</span>, <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; w.Formatting = <span class="teal">Formatting</span>.Indented;
+&nbsp; &nbsp; w.WriteStartDocument();
+&nbsp; &nbsp; w.WriteComment( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot; SheetData from {0} on {1} by Jeremy &quot;</span>,
+&nbsp; &nbsp; &nbsp; doc.PathName, <span class="teal">DateTime</span>.Now ) );
+&nbsp;
+&nbsp; &nbsp; w.WriteStartElement( <span class="maroon">&quot;ViewSheets&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SheetData</span> item <span class="blue">in</span> data )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; w.WriteStartElement( <span class="maroon">&quot;ViewSheet&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; w.WriteElementString( <span class="maroon">&quot;IsPlaceholder&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; item.IsPlaceholder.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; w.WriteElementString( <span class="maroon">&quot;Name&quot;</span>, item.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; w.WriteElementString( <span class="maroon">&quot;SheetNumber&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; item.SheetNumber );
+&nbsp;
+&nbsp; &nbsp; &nbsp; w.WriteEndElement();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; w.WriteEndElement();
+&nbsp; &nbsp; w.WriteEndDocument();
+&nbsp; &nbsp; w.Close();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is the XML file resulting from running this command in a simple Revit model:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;!--</span><span class="green"> SheetData from C:\tmp\sheets_and_views.rvt </span>
+<span class="green">&nbsp; &nbsp;&nbsp; on 2010-06-12 18:16:48 by Jeremy </span><span class="blue">--&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">ViewSheets</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>False<span class="blue">&lt;/</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Unnamed<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>A101<span class="blue">&lt;/</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>False<span class="blue">&lt;/</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Unnamed<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>A102<span class="blue">&lt;/</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>False<span class="blue">&lt;/</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Unnamed<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>A103<span class="blue">&lt;/</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>False<span class="blue">&lt;/</span><span class="maroon">IsPlaceholder</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Unnamed<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>A104<span class="blue">&lt;/</span><span class="maroon">SheetNumber</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">ViewSheet</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">ViewSheets</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I initially created this as a stand-alone application, and here is the add-in manifest file, source code, and Visual Studio solution for that, compressed in the archive file 
+
+<a href="zip/SheetData.zip">
+SheetData.zip</a>.
+
+<p>As said, since it seems useful to keep track of this simple XML exporting functionality for future use as well, I also added the command to The Building Coder samples.
+Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_72.zip -->
+
+<a href="zip/bc_11_72.zip">
+version 2011.0.72.0</a>
+
+of the complete source code and Visual Studio solution including the new command.
+Since I use a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+RvtSamples include file</a>
+
+BcSamples.txt to load The Building Coder samples, included in the archive file, I provide no separate add-in manifest files for these commands.

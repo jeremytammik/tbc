@@ -1,0 +1,89 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: Explode DWGs -->
+
+<h3>Explode a DWG</h3>
+
+<p>After yesterday's very practical note on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html">
+creating a pipe cap</a>, 
+
+here is another slightly less practical note from Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a>, 
+
+who picked up on Sami's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/subscribing-to-ui-automation-events.html?cid=6a00e553e1689788330148c78dc659970c#comment-6a00e553e1689788330148c78dc659970c">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/subscribing-to-ui-automation-events.html">
+subscribing to UI Automation events</a>. 
+
+Sami asks:
+
+<p><strong>Question:</strong> Is it possible to explode an imported DWG file using the API?
+
+<p><strong>Answer:</strong> After showing the mechanism of 
+
+<!-- 531_commands_and_views.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/command-and-conquer-when-switching-views.html">
+invoking commands twice</a>, 
+
+I do think this can be achieved.
+
+<p>Just like all other ribbon elements, also the 'Explode' buttons are accessible via UI Automation.
+
+<p>By the way, I have noticed that sometimes an ImportInstance does not contain all the geometry that is visible to the user, even using tiny DWGs consisting just of a few lines or curves.
+If we explode it after import, we can access all the lines by subscribing to the DocumentChanged event and reading the event argument GetAddedElementIds data, because the explosion results are added to the database as individual new Revit elements.
+This way, we can work around the issue of the missing elements and retrieve all the DWG data we need.
+
+<p>After collecting the geometrical data, we could roll back the transaction to undo the explosion.
+If we are using UI Automation, though, we have already left our own command context, so we cannot manipulate the transaction programmatically.
+Even in this case, though, we can still undo the operation by again using UI Automation to simulate a click on the Undo button.
+
+<h4>UI Event Subscription Sample</h4>
+
+<p>Slightly less practical?
+
+<p>Who said anything about slightly less practical?
+
+<p>Here is a complete sample application demonstrating some aspects of event handling using UI Automation:
+
+<p>I am not the kind of person who says how easy it is to do something and then laughs maliciously in the background watching the others struggle.
+
+<p>In contrary, as an autodidact, I depend on easy-to-read information myself, and have no use for vague hints lacking concrete information, too.
+
+<p>To make my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html">
+former UIAutomation hints</a> more 
+
+substantial, here is a Visual Studio project 
+
+<a href="zip/RevitUIAutoSamples2.zip">
+RevitUIAutoSamples.zip</a>
+
+containing two mechanisms:
+
+<ul>
+<li>Subscribing to events such as ribbon bar clicks and Revit main window boundary changes.
+<li>Invoking a command twice + pressing the DWG explode button afterwards.
+</ul>
+
+<p>Please note that this is all very experimental.
+For instance, the ribbon bar click subscription might hang if your ribbon item is a child of a SplitButton or a ListItem.
+
+<p>I am very glad if you find this useful!
+
+<p>Funnily enough, Kean is also talking about 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/02/exploding-autocad-objects-using-net.html">
+exploding AutoCAD objects using .NET</a> at
+
+this very moment.

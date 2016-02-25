@@ -1,0 +1,205 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07535477 [Determine if a room resides within an area] 
+C:\a\j\adn\case\sfdc\07535477\src\DisplayBoundary\DisplayBoundary.sln
+
+-->
+
+<h3>Room in Area Predicate via Point in Polygon Test</h3>
+
+<p>I presented a sample last week showing how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/graphically-display-area-boundary-loops.html">
+access area boundary loops</a> and 
+
+display the result graphically by creating corresponding model curves.
+
+<p>Jeroen van Vlierden of 
+
+<a href="http://www.icn-solutions.nl">
+ICN Solutions BV</a> took
+
+this idea one step further by combining the area boundary loop extraction with my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/point-in-polygon-containment-algorithm.html">
+point in polygon containment algorithm</a> to
+
+find out whether a given room resides within an area.
+
+<!-- <p>We simply have to put together all the pieces. -->
+
+<p>He also pointed out that my area boundary sample attempts to use the Area class directly in a filtered element collector, which is not allowed, as I explained when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/accessing-room-data.html">
+accessing room data</a>.
+
+<p>Jeroen explains:
+
+<p>I can now implement the point in polygon test.
+
+<p>Thank you very much for solving my problem.
+This will help me determine which rooms are part of which area and therefore also which windows belong to which area. 
+It is part of a program in which we want to determine how many square meters glass is being used in user specified areas.
+
+<p>I implemented your point in polygon test as an extension method of the area element type.
+C# is such an elegant language ;-)
+
+<p>I use extension methods a lot to extend the Revit API with my own methods, especially when it comes to dealing with various kinds of parameters etc.
+
+<p>After using them for a while, I will not even remember they are not part of the official API.
+
+<p>The only thing that will not work correctly (yet) is when there is an arc part of the polygon.
+
+<p>One easy way to deal approximately with the arc (and all other non-linear segments as well) would be to make use of the Revit API geometric tessellation functionality, reducing everything to (approximate) straight line segments.
+This is extremely simple, since all curve elements implement the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curves.html">
+Tessellate method</a> returning 
+
+a list of XYZ approximation points.
+Its use is demonstrated in numerous places in the SDK samples.
+
+<p>I reused your code based on UV points by writing an extension method to convert XYZ to UV and I have added a constructor to the PointInPoly class that allows a List of XYZ points to define the PointInPoly class.
+
+<p>Here is my version of the point in polygon implementation 
+
+<a href="zip/room_in_area_PointInPoly.cs.txt">PointInPoly.cs</a>.
+
+<p>Here is the entire code of the various extension methods defined in the module
+
+<a href="zip/room_in_area_PointInPolyExtensions.cs.txt">PointInPolyExtensions.cs</a>:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">PointInPolyExtensions</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add new point to list, unless already present.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> AddToPunten(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; XYZarray,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> p = XYZarray.Where(
+&nbsp; &nbsp; &nbsp; c =&gt; <span class="teal">Math</span>.Abs( c.X - p1.X ) &lt; 0.001
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( c.Y - p1.Y ) &lt; 0.001 )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( p == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; XYZarray.Add( p1 );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a list of boundary </span>
+&nbsp; <span class="gray">///</span><span class="green"> points for the given room.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; MaakPuntArray(
+&nbsp; &nbsp; <span class="teal">Room</span> room )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; &nbsp; opt.SpatialElementBoundaryLocation
+&nbsp; &nbsp; &nbsp; = <span class="teal">SpatialElementBoundaryLocation</span>.Center;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> boundaries = room.GetBoundarySegments(
+&nbsp; &nbsp; &nbsp; opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> MaakPuntArray( boundaries );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a list of boundary points </span>
+&nbsp; <span class="gray">///</span><span class="green"> for the given boundary segments.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; MaakPuntArray(
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; boundaries )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; puntArray = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> bl <span class="blue">in</span> boundaries )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> s <span class="blue">in</span> bl )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> c = s.Curve;
+&nbsp; &nbsp; &nbsp; &nbsp; AddToPunten( puntArray, c.get_EndPoint( 0 ) );
+&nbsp; &nbsp; &nbsp; &nbsp; AddToPunten( puntArray, c.get_EndPoint( 1 ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; puntArray.Add( puntArray.First() );
+&nbsp; &nbsp; <span class="blue">return</span> puntArray;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a list of boundary </span>
+&nbsp; <span class="gray">///</span><span class="green"> points for the given area.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; MaakPuntArray(
+&nbsp; &nbsp; <span class="teal">Area</span> area )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; &nbsp; opt.SpatialElementBoundaryLocation
+&nbsp; &nbsp; &nbsp; = <span class="teal">SpatialElementBoundaryLocation</span>.Center;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> boundaries = area.GetBoundarySegments(
+&nbsp; &nbsp; &nbsp; opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> MaakPuntArray( boundaries );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Check whether this area contains a given point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> AreaContains( <span class="blue">this</span> <span class="teal">Area</span> a, <span class="teal">XYZ</span> p1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> ret = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">var</span> p = MaakPuntArray( a );
+&nbsp; &nbsp; <span class="teal">PointInPoly</span> pp = <span class="blue">new</span> <span class="teal">PointInPoly</span>();
+&nbsp; &nbsp; ret = pp.PolyGonContains( p, p1 );
+&nbsp; &nbsp; <span class="blue">return</span> ret;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Check whether this room contains a given point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> RoomContains( <span class="blue">this</span> <span class="teal">Room</span> r, <span class="teal">XYZ</span> p1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> ret = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">var</span> p = MaakPuntArray( r );
+&nbsp; &nbsp; <span class="teal">PointInPoly</span> pp = <span class="blue">new</span> <span class="teal">PointInPoly</span>();
+&nbsp; &nbsp; ret = pp.PolyGonContains( p, p1 );
+&nbsp; &nbsp; <span class="blue">return</span> ret;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Project an XYZ point to a UV one in the </span>
+&nbsp; <span class="gray">///</span><span class="green"> XY plane by simply dropping the Z coordinate.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">UV</span> TOUV( <span class="blue">this</span> <span class="teal">XYZ</span> point )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UV</span> ret = <span class="blue">new</span> <span class="teal">UV</span>( point.X, point.Y );
+&nbsp; &nbsp; <span class="blue">return</span> ret;
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to Jeroen for this discussion and nice example!
+
+<p>For completeness' sake and your convenience, here is an updated version of the 
+
+<a href="zip/DisplayBoundary2.zip">
+DisplayBoundary sample</a> including 
+
+<ul>
+<li>The fix to filter for spatial elements instead of areas
+<li>The point in polygon algorithm
+<li>Jeroen's extension methods
+</ul>
+
+<p>Enjoy!

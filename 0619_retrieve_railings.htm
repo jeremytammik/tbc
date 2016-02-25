@@ -1,0 +1,152 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1271057 [Unable to get Railing objects] -->
+
+<h3>Retrieve Railing Elements</h3>
+
+<!-- 
+
+298_column_stair_geometry.htm  
+346_stairs_on_level.htm
+097_list_railing_types.htm
+
+-->
+
+<p>I already mentioned that API access to stairs and railings is currently still a bit patchy.
+Still, you can 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/retrieving-column-and-stair-geometry.html">
+retrieve their geometry</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html">
+determine the instances on a given level</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-railing-types.html">
+list the railing types</a>.
+
+<p>As you can see from the comments by Berria and Andrew, it is currently 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-railing-types.html?cid=6a00e553e1689788330112790ba9af28a4#comment-6a00e553e1689788330112790ba9af28a4">
+not possible</a> to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/create-room-on-level-in-phase.html?cid=6a00e553e168978833011168f39e48970c#comment-6a00e553e168978833011168f39e48970c">
+create railings</a>,
+
+even though I did once implement a command named 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">
+CmdNewRailing</a> in 
+
+The Building Coder samples to test this which unfortunately does <strong>not</strong> create a new railing instance.
+
+<p>Anyway, as discussed with Renzo, we can easily
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html?cid=6a00e553e168978833013489158949970c#comment-6a00e553e168978833013489158949970c">
+retrieve railing instances</a>.
+
+This question of retrieving railings came up again now, and here is yet another answer and snippet of sample code to address it, this time demonstrating a nice compact concatenation of filtered element collector, generic LINQ, and string methods to create a string listing the element ids of all instances found.
+First, here is the question:
+
+<p><strong>Question:</strong> I implemented the following code to retrieve railing instances, but it does not do what I expect, and colElmts.Count always returns zero:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> FilterList <span class="blue">As</span> Generic.<span class="teal">IList</span>(<span class="blue">Of</span> DB.<span class="teal">ElementFilter</span>) =
+&nbsp; &nbsp; <span class="blue">New</span> Generic.<span class="teal">List</span>(<span class="blue">Of</span> DB.<span class="teal">ElementFilter</span>)
+
+&nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> DB.<span class="teal">FilteredElementCollector</span> =
+&nbsp; &nbsp; <span class="blue">New</span> DB.<span class="teal">FilteredElementCollector</span>(doc)
+
+&nbsp; <span class="blue">Dim</span> Filter <span class="blue">As</span> DB.<span class="teal">ElementCategoryFilter</span> =
+&nbsp; &nbsp; <span class="blue">New</span> DB.<span class="teal">ElementCategoryFilter</span>(<span class="teal">BuiltInCategory</span>.OST_Railings)
+
+&nbsp; <span class="blue">Dim</span> LOrF <span class="blue">As</span> DB.<span class="teal">LogicalOrFilter</span> =
+&nbsp; &nbsp; <span class="blue">New</span> DB.<span class="teal">LogicalOrFilter</span>(FilterList)
+
+&nbsp; <span class="blue">Dim</span> colElmts <span class="blue">As</span> Generic.<span class="teal">List</span>(<span class="blue">Of</span> DB.<span class="teal">Element</span>) =
+&nbsp; &nbsp; collector.WherePasses(LOrF).
+&nbsp; &nbsp; WhereElementIsNotElementType.ToElements()
+</pre>
+
+<p>The problem only occurs with railings. 
+All other categories seem to work fine. 
+By the way, the current user selection in rvtDoc.Selection does return railing objects if they have been selected in the user interface.
+
+
+
+<p><strong>Answer:</strong> As mentioned above, railings are currently not represented by the Revit API, so there is only limited API access to them.
+
+<p>Still, you should be able to retrieve them using filters in the manner you indicate.
+
+<p>I implemented some sample code based on yours and ran it on the model you provided:</p>
+
+<center>
+<img src="img/railings.png" alt="Railings"/>
+</center>
+
+<p>The initial code does indeed retrieve zero elements.
+
+<p>I thereupon analysed the railings using RevitLookup, and see that their built-in category is not OST_Railings, which is what you are filtering for, but OST_StairsRailing. Modifying my code to retrieve that category produces the following:</p>
+
+<center>
+<img src="img/railings_selected.png" alt="Selected railings"/>
+</center>
+
+<p>Here is the modified code producing that message &ndash; only four lines of relevant code, albeit two of them rather long and sub-divided:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> [] ids
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StairsRailing )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Element</span>,<span class="blue">string</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Id.IntegerValue.ToString() )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToArray&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = ids.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = (0 == n)
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;No railings selected.&quot;</span>
+&nbsp; &nbsp; &nbsp; : (n.ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; railing&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; selected: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, ids )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;.&quot;</span>);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Railings&quot;</span>, s );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The moral of the story is: use RevitLookup to explore your model. Use the exact built-in category of the objects that you are looking for.
+
+<p>You might of course want to filter for all the different variations of the railing category, in which case the approach described to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+retrieve all MEP</a> or 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">
+structural elements</a> might 
+
+be of interest to you, since it includes handling of multiple categories.
+
+<p>Here is <a href="zip/FilterRailings.zip">FilterRailings.zip</a> containing the complete Visual Studio solution including source code and add-in manifest file for my little test command.
+

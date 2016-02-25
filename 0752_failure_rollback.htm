@@ -1,0 +1,216 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07116567 [Failure Handler] -->
+
+<h3>Failure Rollback</h3>
+
+<p>I am in full blast preparing and updating material for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/migrating-vsta-macros-to-sharpdevelop.html#1">
+Revit API training in Munich</a> starting 
+
+the day after tomorrow, as well as the upcoming 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/devcamp-and-refresh-display-for-a-kinetic-facade.html#1">
+AEC DevCamp conference</a> and
+
+another event that I have not even mentioned here yet:
+
+
+
+<h4>Revit 2013 API Webcast</h4>
+
+<p>We will be holding a webcast on the Revit 2013 API on May 17, Ascension Day 
+
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=10417086&siteID=123112&cname=Revit%20API,%20Webcast,%20May%2017%202012,%20201226">register</a>).
+
+A list of all the ADN DevTech training opportunities is provided by the 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Training Course Schedule</a>, 
+
+entering "Revit API" as the course topic. 
+I'll write something about the webcast topics anon.
+
+<p>Another important piece of news from the ADN team is the launch of a new series of blogs:
+
+
+
+<h4>ADN DevBlogs</h4>
+
+<p>The Autodesk Developer Network ADN team started the launch of a series of new blogs, marking a significant shift from material that's only available to ADN members, like technical solutions known as DevNotes on the ADN extranet, to creating material that's publicly available to everyone.
+The first two are up and running now:
+
+<ul>
+<li><a href="http://adndevblog.typepad.com/autocad">AutoCAD DevBlog</a>
+<li><a href="http://adndevblog.typepad.com/infrastructure">Infrastructure Modeling DevBlog</a>
+</ul>
+
+<p>More ADN DevBlogs for AEC, Manufacturing and Media & Entertainment will coming soon.
+For more information, please refer to 
+
+<a href="http://adndevblog.typepad.com/autocad/2012/02/welcome.html">
+Stephen Preston's welcome post</a>.
+
+
+
+<p>Back to the nuts and bolts of the Revit API, here is a case brought up and eventually solved by Mario Guttman of
+
+<a href="http://www.perkinswill.com">
+Perkins+Will</a>:
+
+
+
+
+<a name="1"></a>
+
+<h4>Roll Back Failure Suppressing all Messages, both Warnings and Errors</h4>
+
+
+
+<p><strong>Question:</strong> I am trying to implement a failure handler that will silently respond to all warnings. 
+I am happy to roll back the transaction or delete the elements but I can't seem to get rid of the dialogue box with failures other than warnings.
+
+
+<p><strong>Answer:</strong> I figured it out. 
+
+<p>In case anyone is interested, I needed an additional statement in the FailureHandler class:
+
+<pre class="code">
+  return FailureProcessingResult
+    .ProceedWithRollBack;
+</pre>
+
+<p>I also needed another statement with the transaction start:
+
+<pre class="code">
+  failureHandlingOptions
+    .SetClearAfterRollback( true );
+</pre>
+
+<p>Here is a more complete description and solution:
+
+<p>I'm running a program that creates a lot of new Revit elements.
+The process may fail in the middle for some reason. 
+I don't want the user to have to respond to a dialogue each time; I just want the program to keep going with the next element. 
+
+<p>Specifically, if it is a warning, I want to ignore it, and if it is any other kind of error, I want to cancel creating that element and continue with the next one. 
+
+<p>I do want to record the errors so I can inform the user at the end about what problems were encountered.
+
+<p>I looked at your posting on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html ">
+Failure API</a> about 
+
+how to handle failure messages, and also the Revit 2012 API Developer Guide and sample code, but didn't quite find what I was looking for. 
+
+<p>I finally figured it out and thought you might like to share this:
+
+<p>To begin with, you need to create a FailureHandler class; mine looks like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">FailureHandler</span> : <span class="teal">IFailuresPreprocessor</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> ErrorMessage { <span class="blue">set</span>; <span class="blue">get</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> ErrorSeverity { <span class="blue">set</span>; <span class="blue">get</span>; }
+&nbsp;
+&nbsp; <span class="blue">public</span> FailureHandler()
+&nbsp; {
+&nbsp; &nbsp; ErrorMessage = <span class="maroon">&quot;&quot;</span>;
+&nbsp; &nbsp; ErrorSeverity = <span class="maroon">&quot;&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">FailureProcessingResult</span> PreprocessFailures( 
+&nbsp; &nbsp; <span class="teal">FailuresAccessor</span> failuresAccessor )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; failureMessages 
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> 
+&nbsp; &nbsp; &nbsp; failureMessageAccessor <span class="blue">in</span> failureMessages )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// We're just deleting all of the warning level </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// failures and rolling back any others</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureDefinitionId</span> id = failureMessageAccessor
+&nbsp; &nbsp; &nbsp; &nbsp; .GetFailureDefinitionId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMessage = failureMessageAccessor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetDescriptionText();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMessage = <span class="maroon">&quot;Unknown Error&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FailureSeverity</span> failureSeverity 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = failureMessageAccessor.GetSeverity();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorSeverity = failureSeverity.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( failureSeverity == <span class="teal">FailureSeverity</span>.Warning )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.DeleteWarning( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failureMessageAccessor );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ProceedWithRollBack;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span> 
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+}
+</pre>
+
+<p>Then, in the body of the main program you need something like:
+
+<pre class="code">
+&nbsp; <span class="teal">Transaction</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">FailureHandlingOptions</span> failureHandlingOptions 
+&nbsp; &nbsp; = transaction.GetFailureHandlingOptions();
+&nbsp;
+&nbsp; <span class="teal">FailureHandler</span> failureHandler 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FailureHandler</span>();
+&nbsp;
+&nbsp; failureHandlingOptions.SetFailuresPreprocessor( 
+&nbsp; &nbsp; failureHandler );
+&nbsp;
+&nbsp; failureHandlingOptions.SetClearAfterRollback( 
+&nbsp; &nbsp; <span class="blue">true</span> );
+&nbsp;
+&nbsp; transaction.SetFailureHandlingOptions( 
+&nbsp; &nbsp; failureHandlingOptions );
+&nbsp;
+&nbsp; transaction.Start( <span class="maroon">&quot;Transaction Name&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// Do something here that causes the error</span>
+&nbsp;
+&nbsp; transaction.Commit();
+&nbsp;
+&nbsp; <span class="green">// The following is just illustrative. </span>
+&nbsp; <span class="green">// In reality we would collect the errors </span>
+&nbsp; <span class="green">// to show later.</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( failureHandler.ErrorMessage != <span class="maroon">&quot;&quot;</span> )
+&nbsp; {
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show( 
+&nbsp; &nbsp; &nbsp; failureHandler.ErrorSeverity + <span class="maroon">&quot; || &quot;</span>
+&nbsp; &nbsp; &nbsp; + failureHandler.ErrorMessage );
+&nbsp; }
+</pre>
+
+<p>Many thanks to Mario for all his research and friendly sharing!

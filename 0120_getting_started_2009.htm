@@ -1,0 +1,169 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Getting Started with the Revit 2009 API</h3>
+
+<p>Here is a succinct overview of some resources available for getting started using the Revit API, compiled by Mikako Harada.
+The individual items have been mentioned in previous posts, and links to those are included.
+This document provides a useful and up-to-date overview for the current state, still focused on Revit 2009.
+You can expect an update of this material later in a couple of month's time, when the training material has been enhanced for Revit 2010.</p>
+
+<ol>
+<li><a href=#1>Setting up the Environment</a></li>
+<li><a href=#2>Where to Start</a></li>
+<li><a href=#3>For more information</a></li>
+<li><a href=#4>Looking forward for Revit 2010</a></li>
+</ol>
+
+<a name="1"></a>
+
+<h3>1. Setting up the Environment</h3>
+
+<p><strong>Revit Product</strong> – you can download the latest version of the released products from the 
+
+<a href="http://www.autodesk.com">
+Autodesk product page</a> 
+
+&gt; Products &gt; Alphabetically.
+From each Revit product page, look under Product Download. 
+Here are the current links, but note that the exact locations may change:</p>
+
+<ul>
+<li><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262388">Revit Architecture</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262907">Revit MEP</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9339705">Revit Structure</a></li>
+</ul>
+
+<p>Without an activation code, you can only use Revit in view-only mode.<p>
+
+<p><strong>Revit SDK</strong> – the Revit SDK is included in every Revit install.</p>
+
+<ul>
+<li>DVD version: \Utilities\Common\Software Development Kit\Revit 2009 SDK.zip
+<li>Web version: <Revit>\Download\Utilities\Common\Software Development Kit\Revit 2009 SDK.zip
+</ul>
+
+<p><strong>RevitAPI.dll</strong> is part of every Revit installation and is located in the folder <Revit install>\Program.</p>
+
+<p><strong>Development Environment</strong> – Microsoft Visual Studio 2005 for Revit 2009, and Visual Studio 2008 + SP1 for Revit 2010.
+The Express edition can also be used.</p>
+
+<p><strong>Revit API Documentation</strong> – The Revit SDK includes a Developer Guide, help file, and many samples. 
+More detailed information on the SDK contents and how to manage, build and load the samples was discussed in some early blog posts:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/08/getting-started.html">Getting Started with the Revit API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/08/the-revit-sdk-c.html">The Revit SDK Contents</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/08/managing-sdk-sa.html">Managing SDK Samples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/the-sdk-samples.html">The SDK Samples Solution SDKSamples2009.sln</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">Loading SDK Samples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/debugging-a-rev.html">Debugging a Revit Add-In</a></li>
+</ul>
+
+<p>Yet more information for beginners is included in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/getting_started/">
+Getting Started</a>
+
+category.</p>
+
+<a name="2"></a>
+
+<h3>2. Where to Start</h3>
+
+<p><strong>a.</strong> Watch the training video  - The best way to start will be to watch our 
+
+<a href="http://download.autodesk.com/media/adn/Revit2009APIWebcast_06May2008.zip">
+webcast material</a>.
+
+This includes a recording of the webcast, the Powerpoint presentation, and training labs source code.  
+This material is also available from the 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Developer Center training schedule page</a>.
+
+There is a 
+
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=2484975">
+Revit Architecture and Revit Structure section</a>
+
+in the Developer Center which provides other material including a polished version of the recording called DevTV, which is available for 
+
+<a href="http://download.autodesk.com/media/adn/DevTV_Introduction_to_Revit_Programming.zip">
+download</a>
+
+or 
+
+<a href="http://download.autodesk.com/media/adn/DevTV_Introduction_to_Revit_Programming">
+online viewing</a>.
+
+It is slightly out of date, being based on Revit 2008. 
+But you can still get the basic idea. 
+You may want to see which one is suited for you.</p>
+
+<p><strong>b.</strong> Try running the HelloRevit sample yourself, go through the Labs code, and then look at some further samples in the SDK. 
+The following samples provide good starting points:</p>
+
+<ul>
+<li>RevitCommands
+<li>Fire Rating
+<li>Viewers/ElementViewer
+<li>CreateBeamsColumnsBraces
+</ul>
+
+<p><strong>c.</strong> A must-have tool is 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+RvtMgdDbg</a>,
+
+which we discussed in a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+separate post</a>.</p>
+
+<a name="3"></a>
+
+<h3>3. For more information</h3>
+
+<ul>
+<li><a href="http://au.autodesk.com">Autodesk University</a>: search for 'Revit' in the Developer or Customization tracks.
+Here are a few classes held by us at last year’s AU with material providing additional information:
+<ul>
+<li>DE101-3 The Revit SDK Sample Smörgåsbord</li>
+<li>DE111-3 A Closer Look at the Revit Database with the Revit API</li>
+<li>DE205-3 Enhancing Your Revit Add-In</li>
+</ul>
+You should be able to sign up and have access to this material.</li>
+
+<li><a href="http://discussion.autodesk.com">Autodesk Discussion Groups</a>
+&gt; Revit Architecture &gt; Revit API.</li>
+
+<li><a href="http://adn.autodesk.com">Autodesk Developer Network</a>, the ADN web site, accessible to ADN members only, where you can:
+
+<ul>
+<li>Search DevNotes, which are Q & A pages.</li>
+<li>Submit questions through DevHelp Online.</li>
+</ul>
+
+</ul>
+
+<a name="4"></a>
+
+<h3>4. Looking forward to Revit 2010</h3>
+
+<p>We will be migrating and updating our training material for the Revit 2010 API in the coming months.
+The first intermediate result will be the 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+webcast training</a>
+
+on April 29<sup>th</sup>.
+
+If you are interested in learning more about what is coming for Revit 2010, please take a look at the recording of the recent 
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=12554549&linkID=4901650">Developer Days Online AEC webcast</a>.

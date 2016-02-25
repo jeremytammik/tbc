@@ -1,0 +1,224 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- C:\a\src\revit\object_relationship\src\ObjRel -->
+
+<h3>Object Relationships</h3>
+
+<p>We already discussed several uses of the Document.Delete method to discover object relationships, e.g. the relationship between a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+tag and the tagged element</a>, a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+wall and its footing</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+host and its hosted elements</a>, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">
+title block of a sheet</a>, or 
+
+host elements and their openings for the purposes of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+gross material quantity determination</a>.
+
+Another use of it is to obtain the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/unmodified-element-geometry.html">
+unmodified element geometry</a>.
+
+<p>Here is a very neat little sample named ObjRel by Saikat Bhattacharya that shows how to use the method to determine generic objects relationships in a building model and display the results in a tree view.
+The tree view is hosted by a .NET form, implemented by a class named Result.
+
+<p>The really neat trick of Saikat's implementation lies in the helper method GetDependentsElementIds and its three lines of code that determine all object relationships in a generic fashion by creating a transaction, calling the Delete method to obtain the dependent element ids, and aborting the transaction to restore the original state:
+
+<pre class="code">
+<span class="teal">ElementIdSet</span> GetDependentsElementIds( 
+&nbsp; <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">Document</span> doc = _app.ActiveDocument;
+&nbsp;
+&nbsp; doc.BeginTransaction();
+&nbsp;
+&nbsp; <span class="teal">ElementIdSet</span> ids = doc.Delete( e );
+&nbsp;
+&nbsp; doc.AbortTransaction();
+&nbsp;
+&nbsp; <span class="blue">return</span> ids;
+}
+</pre>
+
+<p>This method is used by the two tree view helper methods DisplayNode and CreateRelationships to populate the tree view with all BIM elements having relationships with other objects in the model:
+
+<ul>
+<li>DisplayNode:
+     This recursive method creates the tree nodes 
+     based on dependent element ids. Each node 
+     displays its element name, category and id.
+<li>CreateRelationships :
+     Creates the tree node with the initial node,
+     populates it, and maintains a list of elements 
+     already included in the nodes to avoid duplication.
+</ul>
+
+<p>Here is the implementation of these two and the tree view dialogue constructor calling them:
+
+<pre class="code">
+<span class="blue">void</span> DisplayNode( <span class="teal">Element</span> e, <span class="teal">TreeNode</span> node )
+{
+&nbsp; <span class="blue">string</span> cat = (<span class="blue">null</span> == e.Category) 
+&nbsp; &nbsp; ? <span class="maroon">&quot;&lt;category unknown&gt;&quot;</span> 
+&nbsp; &nbsp; : e.Category.Name;
+&nbsp;
+&nbsp; <span class="blue">string</span> label = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}: {1} {2}&quot;</span>, 
+&nbsp; &nbsp; e.Name, cat, e.Id.Value );
+&nbsp;
+&nbsp; <span class="teal">TreeNode</span> father = node.Nodes.Add( label );
+&nbsp;
+&nbsp; <span class="green">// save element id to handle select event, </span>
+&nbsp; <span class="green">// cf. treeView1_AfterSelect:</span>
+&nbsp;
+&nbsp; father.ImageKey = e.Id.Value.ToString(); 
+&nbsp;
+&nbsp; <span class="teal">ElementIdSet</span> ids = GetDependentsElementIds( e );
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != ids &amp;&amp; 1 &lt; ids.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = _app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id1 <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = id1;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e2 = doc.get_Element( <span class="blue">ref</span> id );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e2 != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !e2.Id.Equals( e.Id ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !_displayedElems.Contains( e2 ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _displayedElems.Insert( e2 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DisplayNode( e2, father );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( ex.Message.ToString() );
+&nbsp; }
+}
+&nbsp;
+<span class="blue">void</span> CreateRelationships()
+{
+&nbsp; rootNode = <span class="blue">new</span> <span class="teal">TreeNode</span>( _app.ActiveDocument.Title );
+&nbsp; <span class="blue">this</span>.treeView1.Nodes.Add( rootNode );
+&nbsp;
+&nbsp; _displayedElems = <span class="blue">new</span> <span class="teal">ElementSet</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> _elems )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !_displayedElems.Contains( e ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; DisplayNode( e, rootNode );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> Result( <span class="teal">ElementSet</span> elems, Autodesk.Revit.<span class="teal">Application</span> app )
+{
+&nbsp; _elems = elems;
+&nbsp; _app = app;
+&nbsp;
+&nbsp; InitializeComponent();
+&nbsp; CreateRelationships();
+&nbsp;
+&nbsp; treeView1.AfterSelect 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">TreeViewEventHandler</span>( 
+&nbsp; &nbsp; &nbsp; treeView1_AfterSelect );
+}
+</pre>
+
+<p>Here is the external command Execute mainline implementation.
+It creates a set of all model elements with visible graphics and representing a valid physical part of the building model and sends it the Result dialogue constructor, which calls the CreateRelationships method which in turn uses DisplayNode and GetDependentsElementIds to determine and display all dependencies:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+Autodesk.Revit.Geometry.<span class="teal">Options</span> opt 
+&nbsp; = app.Create.NewGeometryOptions();
+&nbsp;
+<span class="teal">BuiltInCategory</span> bicPreviewLegendComponent 
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_PreviewLegendComponents;
+&nbsp;
+<span class="blue">int</span> iBic = ( <span class="blue">int</span> ) bicPreviewLegendComponent;
+&nbsp;
+<span class="blue">try</span>
+{
+&nbsp; <span class="green">// select all model elements:</span>
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> a = app.Create.NewElementSet();
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = app.ActiveDocument.Elements;
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Symbol</span> )
+&nbsp; &nbsp; &nbsp; &amp;&amp; !( e <span class="blue">is</span> <span class="teal">FamilyBase</span> )
+&nbsp; &nbsp; &nbsp; &amp;&amp; ( <span class="blue">null</span> != e.Category )
+&nbsp; &nbsp; &nbsp; &amp;&amp; ( iBic != e.Category.Id.Value )
+&nbsp; &nbsp; &nbsp; &amp;&amp; ( <span class="blue">null</span> != e.get_Geometry( opt ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.Insert( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// show the object relationship dialog</span>
+&nbsp;
+&nbsp; <span class="teal">Result</span> res = <span class="blue">new</span> <span class="teal">Result</span>( a, app );
+&nbsp; res.ShowDialog();
+}
+<span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+{
+&nbsp; message = ex.Message;
+}
+<span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+</pre>
+
+<p>We can use the following simple model to see the relationships displayed by this tool. 
+Here is a 3D view showing the physical building model:</p>
+
+<center>
+<img src="img/SimpleHouse3d.png" alt="Simple house 3D view"/>
+</center>
+
+<p>The model also includes a few annotation elements which are only visible in plan view:</p>
+
+<center>
+<img src="img/SimpleHousePlan.png" alt="Simple house plan view"/>
+</center>
+
+<p>Here is the result of running the ObjRel command on this model and then fully expanding the tree view nodes to display all of the nested relationships detected:</p>
+
+<center>
+<img src="img/SimpleHouseObjRel.png" alt="Simple house object relationships"/>
+</center>
+
+<p>As you can see, a number of relationships between various objects have been determined and are displayed, and many of the types of relationships are ones which we had not previously explicitly noted.
+
+<p>Here is the complete 
+
+<a href="zip/ObjRel.zip">
+ObjRel</a>
+
+source code and Visual Studio solution including the sample model we used.</p>
+
+<p>Many thanks to Saikat for this brilliant idea of making such generic use of the Delete method to determine all object relationships and the neat little sample to demonstrate its use so succinctly and powerfully!
+

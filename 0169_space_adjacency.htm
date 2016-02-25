@@ -1,0 +1,380 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Space Adjacency</h3>
+
+<p>We looked at the topic of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+room and wall adjacency</a>
+
+a while back.
+Martin Schmid now implemented a nice little related utility to check adjacencies between spaces. 
+It demonstrates a beautiful use of the new Space.IsPointInSpace method.
+Here is an example of the kind of situation he is interested in:</p>
+
+<img src="img/adjacent_spaces.png" alt="Adjacent spaces"/>
+
+<p>The aim is to obtain a list of all adjacent spaces from this model.</p>
+
+<p>Martin added a new external command CmdSpaceAdjacency to The Building Coder sample application to analyse and report the space adjacency relationships in such a model.
+Here are some more implementation notes on this from Martin:</p>
+
+<span style="color: darkblue">
+
+<p>Basically, this command starts by collecting all the segments from all spaces, tessellating any curved segments.  
+It then iterates each space's segments over all the other spaces' segments to find the segment 'closest' to it.  
+This is done by FindClosestSegments( segmentPairs, segments );</p>
+
+<p>However, just because a pair of segments from two different spaces are 'close' to one another, doesn't necessarily mean they are to be considered adjacent. 
+There could be an outlying 'space', e.g., a storage shed or garage, and one surface of the space would be considered 'closest' to the main building itself, but in terms of being 'adjacent' for analysis, there is actually a considerable 'air space' between them. 
+Therefore, we need to limit how far apart spaces can be to be considered adjacent.</p>
+
+<p>To achieve this, DetermineAdjacencies( spaceAdjacencies, segmentPairs ) checks whether the midpoints between each pair are closer than a specified tolerance.
+It also calculates a test point that should be within the adjacent space and uses the new Space.IsPointInSpace method to check whether this is true.</p>
+
+<p>This work s on the test models so far. 
+I have not yet tested on a larger dataset.  
+The implementation is probably not optimal, but is a start.</p>
+
+<p>After speaking with a customer about this, I learned that they needed to limit 'adjacency' to spaces that share a common door between them.  
+Implementing this was actually a little more straightforward:
+each door knows its 'to room' and 'from room', and this can be queried from the model by inspecting the 'linked' model data.
+Each space knows what room encloses it, and this info is available in the 'host' model.
+Thus, I was able to establish a relationship between doors and Spaces to figure out the adjacencies.
+So that is yet another different method for a different analysis scenario.</p>
+
+<p>It would be nice if there was actually a relationship in Revit between spaces and the walls that enclose it. 
+Also, this is all more cumbersome when working with linked files.  
+There may be another route, for instance if the ray intersection algorithm could be used to intelligently to seek for room or space boundaries and wall surfaces only.
+However, I found that in linked models, it seems that there is no way to determine exactly what object is being hit by the ray. 
+Apparently, it only tells you that it hit a 'linked model', but not what particular object or type within that linked model.  
+There are probably some API requirements to eke out of these example scenarios, but I'll leave that for later.<p>
+
+</span>
+
+<p>So much for Martin's explanation of this algorithm and other related work of his.
+Here are some more comments of mine on this command implementation based on reverse engineering:</p>
+
+<p>The CmdSpaceAdjacency command works with the following data items:</p>
+
+<ul>
+<li>Segment: a helper class to manage a space boundary segment, managing start and end point and the associated space and including some methods to obtain and compare slope and distance to other segments.
+<li>List&lt;Segment&gt; segments: a list of all spaces' boundary segments.
+<li>Dictionary&lt;Segment, Segment&gt; segmentPairs: a dictionary mapping each segment to the closest other segment in the set.
+<li>Dictionary&lt;Space, List&lt;Space&gt;&gt; spaceAdjacencies: a dictionary mapping each space to a list of all other spaces directly adjacent to it.
+</ul>
+
+<p>This data is generated and processed step by step by the following methods:</p>
+
+<ul
+<li>GetBoundaries: determine all boundary segments for a given space. This method is applied in a loop to all selected spaces, or all spaces in the project if none were manually preselected.
+<li>FindClosestSegments: iterate over the list of segments and determine the closest other segment for each one. This is not fool-proof, since it simply calculates the distance between the midpoints of each segment.
+<li>DetermineAdjacencies: determine the space adjacencies from the pairs of closest boundary segments using the Space.IsPointInSpace method.
+<li>ReportAdjacencies: print the results to the Visual Studio debug output console.
+</ul>
+
+<p>Here is the Segment class implementation:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">Segment</span>
+{
+&nbsp; <span class="teal">XYZ</span> _sp;
+&nbsp; <span class="teal">XYZ</span> _ep;
+&nbsp; <span class="teal">Space</span> _space;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> StartPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _sp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> EndPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _ep; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Space</span> Space
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _space; }
+&nbsp; &nbsp; <span class="blue">set</span> { _space = <span class="blue">value</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> Segment( <span class="teal">XYZ</span> sp, <span class="teal">XYZ</span> ep, <span class="teal">Space</span> space )
+&nbsp; {
+&nbsp; &nbsp; _sp = sp;
+&nbsp; &nbsp; _ep = ep;
+&nbsp; &nbsp; _space = space;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> Slope
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> deltaX = _sp.X - _ep.X;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> deltaY = _sp.Y - _ep.Y;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( deltaX != 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> deltaY / deltaX;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsHorizontal
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _sp.Y == _ep.Y;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsVertical
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _sp.X == _ep.X;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">new</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( _sp ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( _ep ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> MidPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _sp + 0.5 * ( _ep - _sp );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> DirectionTo( <span class="teal">Segment</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = a.MidPoint - MidPoint;
+&nbsp; &nbsp; <span class="blue">return</span> v.IsZero ? v : v.Normalized;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> Distance( <span class="teal">Segment</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> MidPoint.Distance( a.MidPoint );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Parallel( <span class="teal">Segment</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ( IsVertical &amp;&amp; a.IsVertical )
+&nbsp; &nbsp; &nbsp; || ( IsHorizontal &amp;&amp; a.IsHorizontal )
+&nbsp; &nbsp; &nbsp; || <span class="teal">Util</span>.IsEqual( Slope, a.Slope );
+&nbsp; }
+}
+</pre>
+
+<p>GetBoundaries simply asks a space for its boundary curves, tessellates them, and generates Segment instances for the result:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> GetBoundaries(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Segment</span>&gt; segments,
+&nbsp; <span class="teal">Space</span> space )
+{
+&nbsp; <span class="teal">BoundarySegmentArrayArray</span> boundaries
+&nbsp; &nbsp; = space.Boundary;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegmentArray</span> b <span class="blue">in</span> boundaries )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> s <span class="blue">in</span> b )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = s.Curve;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> a = curve.Tessellate();
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; a.Size; i++ )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Segment</span> segment = <span class="blue">new</span> <span class="teal">Segment</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.get_Item( i - 1 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.get_Item( i ), space );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; segments.Add( segment );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>FindClosestSegments iterates over the list of segments and determines the closest other segment for each one by comparing the distance between their midpoints, returning The resulting closest pairs:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> FindClosestSegments(
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">Segment</span>, <span class="teal">Segment</span>&gt; segmentPairs,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Segment</span>&gt; segments )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Segment</span> segOuter <span class="blue">in</span> segments )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> first = <span class="blue">true</span>;
+&nbsp; &nbsp; <span class="blue">double</span> dist = 0;
+&nbsp; &nbsp; <span class="teal">Segment</span> closest = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Segment</span> segInner <span class="blue">in</span> segments )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( segOuter == segInner )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( segInner.Space == segOuter.Space )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> d = segOuter.Distance(
+&nbsp; &nbsp; &nbsp; &nbsp; segInner );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( first || d &lt; dist )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; dist = d;
+&nbsp; &nbsp; &nbsp; &nbsp; first = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; closest = segInner;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; segmentPairs.Add( segOuter, closest );
+&nbsp; }
+}
+</pre>
+
+<p>DetermineAdjacencies determines the space adjacencies from the pairs of closest boundary segments using the Space.IsPointInSpace method.
+It analyses the relationship between the two closest segments s and t. 
+If their distance exceeds the maximum wall thickness, the spaces are not considered adjacent.
+Otherwise, a test point two millimetres away from s in the direction of t is calculated and the Space.IsPointInSpace method applied to it to test whether it really lies within the candidate neighbouring space:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> DetermineAdjacencies(
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">Space</span>, <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt;&gt; a,
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">Segment</span>, <span class="teal">Segment</span>&gt; segmentPairs )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Segment</span> s <span class="blue">in</span> segmentPairs.Keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Segment</span> t = segmentPairs[s];
+&nbsp; &nbsp; <span class="blue">double</span> d = s.Distance( t );
+&nbsp; &nbsp; <span class="blue">if</span>( d &lt; MaxWallThickness )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> direction = s.DirectionTo( t );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> startPt = t.MidPoint;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> testPoint = startPt + direction * D2mm;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( t.Space.IsPointInSpace( testPoint ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !a.ContainsKey( s.Space ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.Add( s.Space, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt;() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !a[s.Space].Contains( t.Space ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a[s.Space].Add( t.Space );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Finally, ReportAdjacencies prints the results to the Visual Studio debug output console:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> PrintSpaceInfo(
+&nbsp; <span class="blue">string</span> indent,
+&nbsp; <span class="teal">Space</span> space )
+{
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0}{1} {2}&quot;</span>, indent,
+&nbsp; &nbsp; space.Name, space.Number );
+}
+&nbsp;
+<span class="blue">private</span> <span class="blue">void</span> ReportAdjacencies(
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">Space</span>, <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt;&gt; spaceAdjacencies )
+{
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;\nReport Space Adjacencies:&quot;</span> );
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Space</span> space <span class="blue">in</span> spaceAdjacencies.Keys )
+&nbsp; {
+&nbsp; &nbsp; PrintSpaceInfo( <span class="maroon">&quot;&quot;</span>, space );
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Space</span> adj <span class="blue">in</span> spaceAdjacencies[space] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; PrintSpaceInfo( <span class="maroon">&quot;&nbsp; &quot;</span>, adj );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is the code of the Execute method which performs these steps in sequence:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; spaces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+<span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; spaces, doc, <span class="blue">typeof</span>( <span class="teal">Space</span> ) ) )
+{
+&nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; message = (0 &lt; sel.Elements.Size)
+&nbsp; &nbsp; ? <span class="maroon">&quot;Please select some space elements.&quot;</span>
+&nbsp; &nbsp; : <span class="maroon">&quot;No space elements found.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Segment</span>&gt; segments = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Segment</span>&gt;();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Space</span> space <span class="blue">in</span> spaces )
+{
+&nbsp; GetBoundaries( segments, space );
+}
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="teal">Segment</span>, <span class="teal">Segment</span>&gt; segmentPairs
+&nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">Segment</span>, <span class="teal">Segment</span>&gt;();
+&nbsp;
+FindClosestSegments( segmentPairs, segments );
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="teal">Space</span>, <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt;&gt; spaceAdjacencies
+&nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">Space</span>, <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt;&gt;();
+&nbsp;
+DetermineAdjacencies(
+&nbsp; spaceAdjacencies, segmentPairs );
+&nbsp;
+ReportAdjacencies( spaceAdjacencies );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Here is the result of running the new command CmdSpaceAdjacency on the sample shown above:</p>
+
+<pre>
+Report Space Adjacencies:
+
+Space 1 1
+  Space 2 2
+Space 2 2
+  Space 4 4
+  Space 3 3
+  Space 1 1
+Space 3 3
+  Space 2 2
+  Space 4 4
+Space 4 4
+  Space 2 2
+  Space 5 5
+  Space 3 3
+Space 5 5
+  Space 4 4
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11038.zip">
+version 1.1.0.38</a>
+
+of the complete Visual Studio solution with the new command.</p>
+
+<p>As Martin pointed out above, this sample provides a solution for one specific case.
+It may not be totally reliable under all circumstances, and as Martin already discovered, many other approaches and different requirements for space adjacency analysis may occur.
+It does however provide a wonderful example of what can be achieved with relatively little effort.
+And as said, it also shows a really nice use of the new Space.IsPointInSpace method.</p>
+
+<p>Very many thanks to Martin for providing this interesting sample!</p>

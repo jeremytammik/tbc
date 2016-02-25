@@ -1,0 +1,274 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add-In Manifest and Guidize</h3>
+
+<p>Developers have always had a lot of complaints about the Revit.ini add-in registration facility.
+It was hard to access and modify the file in the Revit installation directory and the same file is shared by all users.
+Revit 2011 offers a completely new and vastly improved add-in registration facility using add-in manifest  files.
+The new mechanism supports a number of new options and there is no reason to continue using the obsolete Revit.ini mechanism.
+Let's have a look at this new mechanism and also present a little tool that I developed to simplify one aspect in the creation of these files:
+
+<ul>
+<li><a href="#1">Add-In Manifest Files</a></li>
+<li><a href="#2">Add-In Manifest Tags</a></li>
+<li><a href="#3">Add-In Manifest Encoding</a></li>
+<li><a href="#4">Add-In Client Id</a></li>
+<li><a href="#5">Guidize</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Add-In Manifest Files</h4>
+
+<p>An add-in manifest is an XML file located in specific location on the hard disk.
+It can apply either to a specific user or all.
+There are some required tags which must be specified for both an external application and an external command, such as Assembly, FullClassName, ClientId.
+An external command also uses the Text and Description tags.
+These required tags provide the same information as the entries used in the obsolete Revit.ini add-in registration mechanism.
+However, the add-in manifest also offers a large number of exciting new functionality, and therefore many new optional tags can be used to define tooltip, image, visibility, availability, localisation and other features.
+
+<p>Here is an example of a minimal add-in manifest file for an external command:
+
+<pre>
+&lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
+&lt;RevitAddIn&gt;
+  &lt;AddIn Type="Command"&gt;
+    &lt;Text&gt;Convert Pipes to Conduits&lt;/Text&gt;
+    &lt;Description&gt;Convert Pipes to Conduits&lt;/Description&gt;
+    &lt;Assembly&gt;C:\src\p2c\p2c\bin\Debug\p2c.dll&lt;/Assembly&gt;
+    &lt;FullClassName&gt;p2c.Command&lt;/FullClassName&gt;
+    &lt;ClientId&gt;835d6ad1-1a99-4039-95dc-e752ff635928&lt;/ClientId&gt;
+  &lt;/AddIn&gt;
+&lt;/RevitAddIn&gt;
+</pre>
+
+<p>Manifest files are read automatically by Revit when they are placed in one of the following two locations in the Application Data folder on a user's system. 
+There are separate locations for individual users or all users, and they also depend on whether you are running Windows XP or Vista/Windows 7:
+
+<ul>
+<li>For a specific user:
+
+<ul>
+<li>For Windows XP - C:\Documents and Settings\<user>\Application Data\Autodesk\Revit\Addins\2011
+<li>For Vista/Windows 7 - C:\Users\<user>\AppData\Roaming\Autodesk\Revit\Addins\2011
+</ul>
+
+<li>For all users:
+
+<ul>
+<li>For Windows XP - C:\Documents and Settings\All Users\Application Data\Autodesk\Revit\Addins\2011
+<li>For Vista/Windows 7 - C:\ProgramData\Autodesk\Revit\Addins\2011
+</ul>
+
+</ul>
+
+<p>All files with an '.addin' filename extension found in these locations will be read and processed by Revit during start-up. Multiple add-ins may be loaded by a single manifest file. The manifest file syntax defines tags allowing you to specify all the information previously defined in the Revit.ini registration data, i.e. assembly path, full class name, text and description:
+
+<p>This significantly simplifies installation, since all you have to do is copy the add-in assembly to your hard disk, update the assembly path specified in the manifest file, and copy the manifest file to the desired location where Revit can pick it up without affecting any other existing functionality or touching any Revit files or other parts of the Revit installation.
+
+<p>So to install an add-in, you simply copy the manifest file to the appropriate application data location on the hard disk.
+An installer may obviously need to update the assembly path.
+The Revit SDK includes the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">
+add-in utility DLL</a> which
+
+can be used to edit or automatically generate the manifest file on the fly.
+It supports reading, writing and manipulation of manifest files and also querying the Revit product installation locations.
+
+<p>One little thing to note is that for a serious application, due to .NET framework restrictions and issues with Load versus LoadFrom, it is recommended to place the add-in into the Revit Program folder in the same location as Revit.exe.
+
+<p>The Revit.ini registration mechanism remains in place for the 2011 release but will be removed in the future.
+It does not offer any of the new capabilities listed below.
+
+
+<a name="2"></a>
+
+<h4>Add-In Manifest Tags</h4>
+
+<p>The basic and obligatory add-in manifest tags include:</p>
+
+<ul>
+<li><strong>Assembly:</strong>
+The full path to the add-in assembly file. Required for all ExternalCommands and ExternalApplications.
+
+<li><strong>FullClassName:</strong>
+The full name of the class in the assembly file which implements IExternalCommand or IExternalApplication. Required for all ExternalCommands and ExternalApplications.
+
+<li><strong>ClientId:</strong>
+A GUID which represents the id of this particular application. ClientIds must be unique for a given session of Revit. Autodesk recommends you generate a unique GUID for each registered application or command. Required for all ExternalCommands and ExternalApplications.  The property UIApplication.ActiveAddInId provides programmatic access to this value, if required.
+
+<li><strong>Name:</strong>
+The name of application. Required; for ExternalApplications only.
+
+<li><strong>Text:</strong>
+The name of the button. Optional; use this tag for ExternalCommands only. The default is "External Tool".
+
+<li><strong>Description:</strong>
+Short description of the command, will be used as the button tooltip. Optional; use this tag for ExternalCommands only. The default is a tooltip with just the command text.
+
+</ul>
+
+<p>The add-in manifest mechanism also supports a long list of additional new functionality.
+Here is a complete list of the remaining XML tags that can be used in an add-in manifest file:
+
+<ul>
+<li><strong>VisibilityMode:</strong>
+Provides the ability to specify if the command is visible in project documents, family documents, or no document at all. Also provides the ability to specify the discipline(s) where the command should be visible. Multiple values may be set for this option. Optional; use this tag for ExternalCommands only. The default is to display the command in all modes and disciplines, including when there is no active document. Previously written external commands which need to run against the active document should either be modified to ensure that the code deals with invocation of the command when there is no active document, or apply the NotVisibleWhenNoActiveDocument mode.
+
+<li><strong>AvailabilityClassName:</strong>
+The full name of the class in the assembly file which implemented IExternalCommandAvailability. This class allows the command button to be selectively greyed out depending on context. Optional; use this tag for ExternalCommands only. The default is a command that is available whenever it is visible.
+
+<li><strong>LargeImage:</strong>
+The path to the icon to use for the button in the External Tools pull-down menu. The icon should be 32 x 32 pixels for best results. Optional; use this tag for ExternalCommands only. The default is to show a button without an icon.
+
+<li><strong>LongDescription:</strong>
+Long description of the command, will be used as part of the button's extended tooltip.
+This tooltip is shown when the mouse hovers over the command for a long amount of time.
+You can split the text of this option into multiple paragraphs by placing &lt;p&gt; tags around each paragraph.
+Optional; use this tag for ExternalCommands only.
+If neither of this property and TooltipImage are supplied, the button will not have an extended tooltip.
+
+<li><strong>TooltipImage:</strong>
+The path to an image file to show as a part of the button extended tooltip, shown when the mouse hovers over the command for a longer amount of time. Optional; use this tag for ExternalCommands only. If neither of this property and TooltipImage are supplied, the button will not have an extended tooltip.
+
+<li><strong>LanguageType:</strong>
+Localization setting for Text, Description, LargeImage, LongDescription, and TooltipImage of external tools buttons. Revit will load the resource values from the specified language resource DLL. The value can be one of the eleven languages supported by Revit. If no LanguageType is specified, the language resource which the current session of Revit is using will be automatically loaded. For more details see the section on Localization.
+</ul>
+
+<p>As you can see, there is a large amount of very useful new functionality buried in here!
+For full details, especially on localisation, external command accessibility and the IExternalCommandAvailability interface, please refer to the What's New section in the Revit API documentation.
+
+
+<a name="3"></a>
+
+<h4>Add-In Manifest Encoding</h4>
+
+<p>One detail that may require some attention is the encoding of the add-in manifest file.
+Note that the xml tag also specifies the encoding, for example utf-8, utf-16, and others.
+You need to ensure that the file really is stored in a format matching that attribute.
+
+<p>A common problem during beta testing was to define the encoding="utf-16" in the xml tag, but actually save the manifest file as ASCII. As said, the file encoding needs to correspond to the defined encoding,
+so one would either have to change the encoding to "ASCII" or save the add-in file as UTF-16.
+
+<p>The simplest possible editor to use is probably Notepad, where you can use File &gt; Save As... &gt; Encoding &gt; ANSI or Unicode.
+
+<p>In Visual Studio 2008, you can use File &gt; Save As... &gt; Drop down list button  &gt; Save with Encoding... &gt; Yes &gt; Encoding: &gt; Choose the encoding &gt; Line endings: Current Setting &gt; OK.
+
+<p>Here is an overview of some of the possible encoding settings:
+
+<ul>
+<li>"us-ascii"
+<ul>
+<li>Notepad: ANSI
+<li>Notepad++: Encode in ANSI
+<li>VS Save As: US-ASCII - Codepage 20127
+<li>VS Properties &gt; Encoding: US-ASCII
+</ul>
+
+<li>"utf-8"
+<ul>
+<li>Notepad: UTF-8
+<li>Notepad++: Encode in UTF-8
+<li>VS Save As: Unicode (UTF-8 with signature) - Codepage 65001
+<li>VS Properties &gt; Encoding: Unicode (UTF-8)
+</ul>
+
+<li>"utf-16"
+<ul>
+<li>Notepad: Unicode
+<li>Notepad++: Encode in UCS-2 Little Endian
+<li>VS Save As: Unicode - Codepage 1200
+<li>VS Properties &gt; Encoding: Unicode
+</ul>
+
+<li>"unicodeFFFE"
+<ul>
+<li>Notepad: Unicode big endian
+<li>Notepad++: Encode in UCS-2 Big Endian
+<li>VS Save As: Unicode (Big-Endian) - Codepage 1201
+<li>VS Properties &gt; Encoding: Unicode (Big-Endian)
+</ul>
+</ul>
+
+
+<a name="4"></a>
+
+<h4>Add-In Client Id</h4>
+
+<p>As you saw in the example add-in manifest presented above, the basic required information is completely analogous to the entries used in Revit.ini, except for the new client id.
+
+<p>As described in the overview of the manifest tags, it is a
+
+<a href="http://en.wikipedia.org/wiki/Guid">
+GUID</a> which
+
+represents the id of this particular application.
+We discussed GUIDs in the context of the element identifiers generated for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/uniqueid-dwf-and-ifc-guid.html">
+DWF and IFC export</a>.
+
+<p>You can query an application's client id programmatically through the API property UIApplication.ActiveAddInId.
+
+<p>The client id must be unique, and every single external command requires its own id.
+You cannot reuse the same client id for several commands, even if they are defined and implemented by the same application.
+
+<p>There are several different ways to generate a unique GUID for any purpose.
+One is provided with Visual Studio, guidgen.exe:</p>
+
+<center>
+<img src="img/guidgen.png" alt="Guidgen"/>
+</center>
+
+<p>On my system, this utility is located in the folder C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools.</p>
+
+<p>A new GUID can also be generated by the .NET framework API call System.Guid.NewGuid(), which I make use of in the utility presented below.</p>
+
+
+<a name="5"></a>
+
+<h4>Guidize</h4>
+
+<p>I want to present a little tool that I developed to automatically populate the client id tag in the new add-in manifest file.
+
+<!-- C:\a\doc\revit\blog\draft\guidizer.txt -->
+
+<p>As we discussed above, the new command registration mechanism requires every Revit plug-in to define its own unique client id in the add-in manifest file.
+While porting the Revit Introduction Labs and implementing add-in manifest files for all its commands, I got tired of manually generating GUIDs with gudgen.exe and editing them into the manifest files.
+I implemented a little tool that enabled me to write the manifest files without client id entries, and then let the tool populate them automatically afterwards.
+That saved me from manually running and copy and pasting dozens of client ids.
+
+<p>So, in case anybody is tired of manually generating GUIDs for Revit commands, I proudly present guidize, a Revit Add-In Manifest File Client Id GUID Generator.
+
+<p>It reads a Revit add-in manifest file, searches for all the ClientId tags, and populates them with newly generated GUIDs.
+By default it only populates empty ones, so that existing GUIDs are not overwritten.
+However, with the -o switch, you can also overwrite existing ones.
+The option -b creates a backup file, and the -v verbose mode prints out some info on what the tool is doing:
+
+<pre>
+C:\a\j\adn\case\bsd\1256939\ >guidize -?
+guidize 1.0 -- populate Revit add-in manifest file ClientId tags
+Copyright (C) 2010 by Jeremy Tammik, Autodesk Inc. All rights reserved.
+
+usage: guidize [options] manifest_file
+  -? or -h  help
+  -b        backup previous version of the manifest file
+  -o        overwrite existing ClientId entries
+  -v        verbose
+</pre>
+
+<p>After manually creating and editing dozens of GUIDs and with the prospect of requiring many more, I found this little tool to be an extremely comfortable addition to my kit.
+
+<p>Here is the complete
+
+<a href="guidize_src.zip">source code and Visual Studio solution file</a>,
+
+and also the ready-built
+
+<a href="guidize_exe.zip">executable</a> for
+
+non-programmers.

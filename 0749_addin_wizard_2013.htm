@@ -1,0 +1,99 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add-In Wizard for Revit 2013</h3>
+
+<p>I have been using an updated version of my Visual Studio Revit C# add-in wizard for Revit 2013 for a while now and thought you might find it useful as well.
+
+<p>It now generates a bit more boiler-plate code up front which can be simply deleted if not needed:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="green">// Retrieve elements from database</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.INVALID )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp;
+&nbsp; <span class="green">// Filtered element collector is iterable</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( e.Name );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; tx.Start();
+&nbsp; tx.Commit();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>For the full description of the wizards, please refer to these previous posts:
+
+<!--
+
+415_devtv_addin_templates.htm
+451_revit_2011_devtv.htm
+498_snow_and_woe.htm
+523_ui_auto_design_option.htm
+541_application_attributes.htm
+662_addin_wizard_2012_ur2.htm
+
+-->
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64 bit versions</a> for C# and VB.
+
+<li>Support for the 
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012 API</a> for 
+
+C# and VB.
+
+<li>Updated C# and VB versions placing
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#3">
+assembly DLL alongside add-in manifest</a> and
+
+including other changes.
+
+</ul>
+
+<p>To install, simply copy the zip file to the Visual Studio C# project template folder in your local file system:
+
+<ul>
+<li><a href="zip/RevitAddinWizardQuasarRP.zip">RevitAddinWizardQuasarRP.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+</ul>
+
+<p>Any volunteers to create and test the VB version?
+
+

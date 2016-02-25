@@ -1,0 +1,81 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Determine Revit Demo Mode and Serial Number</h3>
+
+<p>Last week's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/determine-revit-demo-mode-revisited.html">
+updated Revit demo mode determination</a> prompted
+
+a lively discussion between two strong Revit API experts and blog contributors,
+
+<a href="http://www.facebook.com/profile.php?id=100003616852588">
+Victor Chekalin</a> and
+
+<a href="http://www.acadgraph.de/">
+Rudolf Honke</a> the
+
+Revitalizer, partly on how to further improve the demo mode detection, and mainly on the value and risks of using unsupported features in your products.
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/determine-revit-demo-mode-revisited.html#comments">
+thread</a> is
+
+well worth a read, and I like Victor's final suggestion of reading the Revit serial number instead of using the language dependent title bar caption enough to update The Building Coder sample accordingly.
+He says:
+
+<blockquote>
+
+<p>Just reference the UIFrameworkServices.dll assembly and read the Revit serial number with the InfoCenterService class static method ProductSerialNumber.
+If Revit is running in demo mode, the serial number is 000-00000000.
+<p><a href="http://pastebin.com/Lt8WUVhE">Here</a> is the full source code.
+<p>Simple, isn't it?</p>
+</blockquote>
+
+<p>Victor also points out that it is obviously much easier to use System.Diagnostics.Process.GetCurrentProcess().MainWindowTitle to read the Revit main window caption than to do so using the WinAPI and user32.dll functionality.</p>
+
+<p>I updated the CmdDemoCheck to make use of this and report both the serial number and the demo status:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Language independent serial number check:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> serial_number = UIFrameworkServices
+&nbsp; &nbsp; &nbsp; .<span class="teal">InfoCenterService</span>.ProductSerialNumber;
+&nbsp;
+&nbsp; &nbsp; isDemo = serial_number.Equals( <span class="maroon">&quot;000-00000000&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sDemo = isDemo ? <span class="maroon">&quot;Demo&quot;</span> : <span class="maroon">&quot;Production&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Serial Number and Demo Version Check&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Serial number: {0} : {1} version.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; serial_number, sDemo ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Running this command on my system now produces the following result:</p>
+
+<center>
+<img src="img/sn_demo_mode.png" alt="Serial number and demo mode report"/>
+</center>
+
+<p>Here is
+
+<a href="zip/bc_13_100_1.zip">version 2013.0.100.1</a> of
+
+The Building Coder samples including the updated CmdDemoCheck command and serial number detection.
+
+<p>Many thanks to Victor and Rudolf for their discussion and numerous creative suggestions.</p>

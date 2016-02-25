@@ -1,0 +1,82 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1262389 [How to map BuiltinParameter to parameter name]
+1271309 [[Vanguard] Accessing the definition of a BuiltIn parameter] 
+
+-->
+
+<h3>Built-in Parameter Name and LabelUtils</h3>
+
+<p>Over a year ago, I mentioned the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/user-visible-enumeration-value-labels.html">
+LabelUtils class</a> introduced 
+
+in the Revit 2011 API. 
+Here is another question that came up and shows that it might be useful to point it out again:
+
+
+<p><strong>Question:</strong> I need access to the definition of an internal (built-in) parameter, because I want to retrieve its name via Autodesk.Revit.DB.Definition.Name. 
+I know there's an overload of the Element.Parameter property which takes a BuiltInParameter argument.
+The problem is that there is no element available at the time when I need to obtain the parameter name. 
+So I am looking for something similar to Document.Settings.Categories which allows global access to built-in categories. 
+I've tried to find something similar via Document.ParameterBindings, but this map seems to contain only external definitions, i.e. definitions of shared parameters, not of built-in ones.
+
+
+<p><strong>Answer:</strong> Is this what you are after?
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInParameter</span> bip <span class="blue">in</span> 
+&nbsp; &nbsp; <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; s += <span class="maroon">&quot;\r\n&quot;</span> + bip.ToString();
+&nbsp; }
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Parameter Names&quot;</span>, s ); 
+</pre>
+
+<p>It retrieves the string values of all the built-in parameter enumeration values.
+
+
+<p><strong>Reponse:</strong> No, I do not want to use the BuiltInParameter.ToString method, since the string is presented to the user. 
+Therefore, I would like to use the Parameter.Definition.Name instead, which is user friendlier and also localized.
+
+<p>To access the definition name, I would need to have an element with all the parameters I am interested in attached to it. 
+If I had such an element 'e', I could use the following code to create a mapping from built-in parameters to the corresponding user visible names:
+
+<pre class="code">
+&nbsp; <span class="teal">Element</span> e;
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">BuiltInParameter</span>, <span class="blue">string</span>&gt; mapBipToName 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">BuiltInParameter</span>, <span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInParameter</span> bip <span class="blue">in</span>
+&nbsp; &nbsp; <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// translate built-in enum to parameter name</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( bip );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; mapBipToName.Add( bip, p.Definition.Name );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>However, I do not have such an element available.
+
+
+<p><strong>Answer:</strong> Please have a look at the LabelUtils class, especially its GetLabelFor method taking a BuiltInParameter argument.
+
+<p>It returns the user-visible name for a given built-in parameter. 
+The name is obtained in the current Revit language.
+
+
+<p><strong>Reponse:</strong> Exactly what I was looking for! Thank you.
+

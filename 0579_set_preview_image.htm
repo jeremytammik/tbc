@@ -1,0 +1,156 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Setting preview image/view for a Revit document using Revit 2012 API
+http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=16925306&linkID=4901650
+
+-->
+
+<h3>Set Preview Image</h3>
+
+<p>While I am 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html#2">
+away</a>, 
+
+here is a useful article to keep you occupied by my colleague Saikat Bhattacharya:
+
+<h3>Setting preview image/view for a Revit document using Revit 2012 API</h3>
+
+<p><strong>Question:</strong> How can I set the preview image/view for a Revit document using the Revit 2012 API?
+In particular, when I load an older version of Revit document and do a SaveAs using the API, how can I set its preview image? 
+
+
+<p><strong>Answer:</strong> There are two ways to set a preview image on a Revit document using the API.
+
+<p>The first approach uses DocumentPreviewSettings to assign a permanent view to the document to always be used for preview settings. This is done by serializing this preview id into the document. Using this approach, the preview view will be permanently set for the document.
+
+<p>In the user interface, when we save a file, typically a permanent view for the preview generation is not assigned. It is only assigned if the users click on the Options button in the SaveAs dialog and select a view other than 'Active view/sheet' in the Preview Source of the dialog. It is this permanent view that can be extracted and set using the DocumentPreviewSettings API. If there is no permanent preview view assigned here, Revit will use the default active view/sheet to generate the preview.
+
+<p>The other approach set a temporary preview view id which will be used during the single save operation and is not serialized to the document. This can be done using the Document.Save(SaveOptions) or Document.SaveAs(SaveAsOptions). Both these option classes have a setting for the preview view id.
+
+<p>In a typical use case of OpenDocumentFile(), performing certain changes to the document and then saving the file either using a Save or SaveAs results in Revit having no way to know how to save a preview and so previews are lost. This is where Save(SaveOptions) or SaveAs(SaveAsOptions) helps. However, setting the temporary preview view settings using the save options can become challenging since API users would still not know which view to be set as preview &ndash; the Document.ActiveView does not work for an un-displayed document. Here, there are two ways of approaching this:
+
+<p><strong>1.</strong> Using a new API called StartingViewSettings, which helps access the initial view settings for a document which returns the view that will be initially opened when a model is opened. This view is usually set by the user and can be accessed from the user interface by accessing the 'Manage' tab in which we need to click on the 'Starting View' button. If API users get a valid view from the StartingViewSettings and end up using this for setting the preview view, it is recommended that this view be set as preview using the temporary setting (which is to use the Save(SaveOptions) or the SaveAs(SaveAsOptions) method and not the DocumentPreviewSettings. StartingViewSettings works only for Revit projects and will throw an exception if used with a Revit family file (RFA). If the starting view has not been set by the user, we will see '&lt;Last Viewed&gt;' as the current settings. On the API side, this means that the StartingViewSettings.ViewId will return a InvalidElementId in which case we need to follow the second approach.
+
+<p><strong>2.</strong> The other approach is to make an algorithmic choice e.g. finding the 3D view (ensuring that this is not a template) and using this view as temporary preview view setting. If no 3D views are found, then the API user can decide on using plan views instead, etc. If you end up using this algorithmic approach for setting the preview view, it is recommended that the preview be set using the temporary setting (which is to use the Save(SaveOptions) or the SaveAs(SaveAsOptions) method and not the DocumentPreviewSettings. 
+
+<p>The following lines of code show a typical use of the various APIs which help in setting the preview. 
+It covers all the various approaches mentioned above:
+
+<pre class="code">
+&nbsp; <span class="green">// Open Revit file</span>
+&nbsp; <span class="teal">Document</span> doc = cmdData.Application.Application
+&nbsp; &nbsp; .OpenDocumentFile( file.FullName );
+&nbsp;
+&nbsp; <span class="green">// Create transaction and start</span>
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;T1&quot;</span> );
+&nbsp; trans.Start();
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// Create thumbnails for preview </span>
+&nbsp; <span class="teal">DocumentPreviewSettings</span> previewSettings =
+&nbsp; &nbsp; doc.GetDocumentPreviewSettings();
+&nbsp;
+&nbsp; <span class="teal">SaveAsOptions</span> saveOpts = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>();
+&nbsp;
+&nbsp; <span class="green">// Check for permanent preview view</span>
+&nbsp; <span class="blue">if</span>( doc
+&nbsp; &nbsp; .GetDocumentPreviewSettings()
+&nbsp; &nbsp; .PreviewViewId
+&nbsp; &nbsp; .Equals( <span class="teal">ElementId</span>.InvalidElementId ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Access the intial view</span>
+&nbsp; &nbsp; <span class="teal">StartingViewSettings</span> startingViewSettings 
+&nbsp; &nbsp; &nbsp; = <span class="teal">StartingViewSettings</span>.GetStartingViewSettings( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !startingViewSettings.ViewId.Equals( 
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>.InvalidElementId ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// If valid, then set the viewId</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//previewSettings.PreviewViewId </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; = startingViewSettings.ViewId;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; saveOpts.PreviewViewId 
+&nbsp; &nbsp; &nbsp; &nbsp; = startingViewSettings.ViewId;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Algorithmic approach - look for 3D views</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; IEnumerable views 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">from</span> Autodesk.Revit.DB.<span class="teal">View</span> f
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> ( f.ViewType == <span class="teal">ViewType</span>.ThreeD
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !f.IsTemplate )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> f;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> bNotFound = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> vw <span class="blue">in</span> views )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !vw.IsTemplate )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//If we were to set the preview view permanently, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// we would use the following two commented lines</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//previewSettings.PreviewViewId = vw.Id;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//previewSettings.ForceViewUpdate( true );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Set the temporary view</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; saveOpts.PreviewViewId = vw.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; bNotFound = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If no 3D view is obtained, look for other valid views</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( bNotFound )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; IEnumerable viewsNon3D
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">from</span> <span class="teal">View</span> fNon3D
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> ( fNon3D.ViewType == <span class="teal">ViewType</span>.FloorPlan
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || fNon3D.ViewType == <span class="teal">ViewType</span>.EngineeringPlan
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || fNon3D.ViewType == <span class="teal">ViewType</span>.Elevation
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || fNon3D.ViewType == <span class="teal">ViewType</span>.Section
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !fNon3D.IsTemplate )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> fNon3D;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> vw <span class="blue">in</span> viewsNon3D )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !vw.IsTemplate )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If we were to set the preview view permanently, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// we would use the following two commented lines</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//previewSettings.PreviewViewId = vw.Id;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//previewSettings.ForceViewUpdate( true );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; saveOpts.PreviewViewId = vw.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Commit transaction</span>
+&nbsp; trans.Commit();
+&nbsp;
+&nbsp; <span class="green">// Save Revit file to target destination</span>
+&nbsp; doc.SaveAs( destPath + <span class="maroon">&quot;\\&quot;</span> + file.Name, saveOpts );
+&nbsp;
+&nbsp; <span class="green">// Close document</span>
+&nbsp; doc.Close();
+&nbsp;
+</pre>
+
+<p>Many thanks to Saikat for this useful explanation!

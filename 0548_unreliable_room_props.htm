@@ -1,0 +1,113 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: windows by room -->
+
+<h3>Unreliable Room Properties</h3>
+
+<p>We often discussed the properties linking hosted elements to their host, such as a door or window hosted by a wall.
+One of the first and most fundamental posts on this topic is the trusty old 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+relationship inverter</a>.
+
+<p>Unfortunately, it is not always so trustworthy after all, not due to any flaw in the algorithm itself, but based on the 
+
+<a href="http://en.wikipedia.org/wiki/Garbage_In,_Garbage_Out">
+GIGO</a> principle of
+
+<a href="http://en.wikipedia.org/wiki/Garbage_In,_Garbage_Out">
+garbage in, garbage out</a>.
+
+<p>The underlying properties may simply not always be correctly set.
+
+<p>Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a> recently 
+
+pointed out that a family instance may be 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html">
+lacking its Level property</a>.
+
+<p>Here another observation by Rudolf on the Room, ToRoom and FromRoom properties of windows.
+
+<p>Note that we recently looked at a problem dealing with the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/phase-dependent-room-properties.html">
+phase dependent FromRoom and ToRoom</a> properties 
+
+on family instances, and you need to take the phase into account when querying them, but that does apparently not help in this case.
+
+<p>Rudolf says:
+
+<p>Besides the fact that one must make sure that a property is not null before one use it to retrieve elements using a filtered element collector, there can occur other problems as well.
+
+<p>Here is a situation showing two rooms with a window of the same type and direction each:</p>
+
+<center>
+<img src="img/rh_windows_by_room_1.png" alt="Two rooms with windows" width="600"/>
+</center>
+
+<p>The left room's element id is 212140; the right one's is 212143.
+
+<p>If we look at the window properties, the left window has a valid 'FromRoom' property, but 'ToRoom' is null:</p>
+
+<center>
+<img src="img/rh_windows_by_room_2.png" alt="Left window properties"/>
+</center>
+
+<p>In contrast, the right window has a valid 'ToRoom' property, but 'FromRoom' is null:</p>
+
+<center>
+<img src="img/rh_windows_by_room_3.png" alt="Right window properties"/>
+</center>
+
+<p>Both the left and the right window are hosted in the same wall.
+They differ in their 'Mirrored' property, even though they are correctly placed.
+If I mirror one of them by pressing its control arrows, their 'Mirrored' property becomes equal, but one of them faces in the wrong direction, of course.
+In this picture, the left window is now turned inside out:</p>
+
+<center>
+<img src="img/rh_windows_by_room_4.png" alt="Flipped window facing the wrong way" width="600"/>
+</center>
+
+<p><strong>So in this case, how can we reliably collect windows by room?</strong>
+
+<p>We have to check both properties &ndash; if one is valid, we find the corresponding room, using a simple 'OR' condition.
+This will still not work if there is a window between two rooms, because this middle window would belong to both rooms.
+
+<p>For test purposes, I put a window of another type between our two rooms.
+As you can see, this window has both the 'ToRoom' and 'FromRoom' properties set, but it also has a valid value for its 'Room' property, in addition.
+Some windows have this, others don't:</p>
+
+<center>
+<img src="img/rh_windows_by_room_5.png" alt="Window properties between two rooms"/>
+</center>
+ 
+<p>How can we handle all these situations? 
+Should we check all three properties and select the room that occurs most often?
+We also could say that this window belongs to both rooms, but, be aware; we must make sure that it will not be counted twice if we sum the windows of all rooms.
+
+<p>To cut a long story short: you cannot always rely on properties, and need to be prepared for certain irregularities.
+
+<p>Rudolf did some further testing, including an analysis of the phases involved, and continues:
+
+<p>The issue with the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html">
+unreliable Level property</a> happened 
+
+in a different file, and I think that was a different problem, namely the invisibility of 'nulled' parameters in the UI, making it impossible for the user to correct them.
+
+<p>I tested accessing the properties using all phases.
+The phases of windows and rooms are all identical.
+
+<p>I think that the theme of these two issues is 'don't rely on properties', in general.
+And you see that even a corrupted project or family file may work pretty well and continue to be used and worked on.
+What I want to express is that there might be thousands of RVTs and RFAs out there in the world that have lost part of their structural integrity.
+People continue working with them and don't even notice that they are damaged because these damages are just limited locally.
+So we developers and every application we produce must be prepared to handle these sort of files because we cannot give all of them to ADN support to fix...
+

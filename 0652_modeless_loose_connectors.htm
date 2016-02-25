@@ -1,0 +1,453 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Yet Another Modeless Update</h3>
+
+<p>Here is a rather exciting post for me that I spent quite some time on in the past few days.
+
+<p>I recently published an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/modeless-loose-connector-navigator-update.html">
+updated version for Revit 2012</a>
+
+of my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+Revit 2011 modeless loose connector navigator</a> and
+
+fixed some flaws pointed out repeatedly by Arno&scaron;t L&ouml;bel at the same time.
+
+<p>Please refer to the original post for a full description of the application, since here I am focusing only on the modeless interaction with the Idling event.
+
+<p>The main fix I implemented was to instantiate an external application in addition to the original external command, and ensure that I subscribe only once to the Idling event, not every time the command is called.
+
+<p>I actually thought I had understood all the important aspect of modeless interaction with Revit, but was soon to discover how mistaken I was at the time.
+Maybe there are some important lessons to be learned from the following analysis for you as well?
+
+<p>When writing a later note about the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/modeless-forms-in-revit.html">
+basics of interacting with Revit from an external context</a>, 
+
+I noticed a few other flaws remaining to be fixed as well.
+
+<p>Most pertinently, like any other call-back, Idling costs time and should be used sparingly.
+
+<p>I was of course already aware of this, but still, it prompted me to rethink and revisit my code once again, and subscribe to the Idling event only while the modeless form is actually being displayed.
+
+<p>The relevant changes that I ended up with in my first attempt were the following:
+
+<ol>
+<li>In the external application, do not subscribe to Idling on start-up, just keep a static pointer to the UIControlledApplication instance.
+<li>In the external command, subscribe to the form Load and FormClosing events.
+<li>In the form Load and FormClosing events, subscribe to and unsubscribe from the Idling event.
+</ol>
+
+<p>In my naivety, that seemed like a clean and pretty optimal solution to me, and also not overly complex.
+
+<p>Here are some lines of code illustrating this, first subscribing to the form events from the external command Execute method:
+
+<pre class="code">
+&nbsp; <span class="teal">LooseConnectorNavigator</span> navigator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LooseConnectorNavigator</span>(
+&nbsp; &nbsp; &nbsp; data,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SetElementId</span>( SetPendingElementId ) );
+&nbsp;
+&nbsp; navigator.Load += <span class="blue">new</span> <span class="teal">EventHandler</span>( 
+&nbsp; &nbsp; navigator_Load );
+&nbsp;
+&nbsp; navigator.FormClosing 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">FormClosingEventHandler</span>( 
+&nbsp; &nbsp; &nbsp; navigator_FormClosing );
+&nbsp;
+&nbsp; navigator.Show( _hWndRevit );
+</pre>
+
+<p>Within the form events, I subscribe to and unsubscribe from the application events:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> The application subscribes to the Idling event</span>
+<span class="gray">///</span><span class="green"> when the modeless loose connector navigator is</span>
+<span class="gray">///</span><span class="green"> displayed.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> navigator_Load( <span class="blue">object</span> sender, <span class="teal">EventArgs</span> e )
+{
+&nbsp; <span class="teal">App</span>.UIControlledApplication.Idling
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;( OnIdling );
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> The application unsubscribes from the Idling </span>
+<span class="gray">///</span><span class="green"> event as soon as the modeless loose connector </span>
+<span class="gray">///</span><span class="green"> navigator is closed.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> navigator_FormClosing(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">FormClosingEventArgs</span> e )
+{
+&nbsp; <span class="teal">App</span>.UIControlledApplication.Idling
+&nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;( OnIdling );
+}
+</pre>
+
+<p><b>Don't do this!</b>
+
+<p>Here is the explanation why.
+
+<p>Luckily, I asked Arno&scaron;t for his opinion again, and he replied:
+
+<ol>
+<li>Static pointer to the UIControlledApplication instance: I do not think you need the pointer until your external command is called to be executed, if you need it at all (I do not think you do).
+<li>Subscribe to the form events: you need to subscribe to Idling from the external command Execution method. I do not care about the form events &ndash; those are all yours; do whatever you want in them <b>except calling Revit API</b>.
+<li>Subscribe to and unsubscribe from the Idling event in the form events:  you cannot subscribe to or unsubscribe from Revit events from your internal form events. They mean nothing to Revit. You can only make the subscription when Revit calls your app &ndash; that is from OnStartup, command.Execute, event handlers (<b>Revit</b> event handlers), etc.
+</ol>
+
+<p>If I am correctly guessing what your goal is, the following should be the workflow:
+
+<ul>
+<li>Do nothing in OnStartup
+<li>From your Command.Execute subscribe to Idling. The handler should be a method of your external application. Set up an internal Boolean to flag (in the app) that you have done this.
+<li>When the end user clicks a command (a control, I assume) in your dialog:
+<ul>
+<li>Set an internal variable (let's call it requestId) indicating that it happened.
+<li>Disable the controls in your dialog including the one the user just clicked (Cancel should still be available though).
+</ul>
+<li>In every OnIdling call, check:
+<ul>
+<li>If the dialog is no longer visible:
+<ul>
+<li>Unsubscribe from Idling.
+<li>Reset the Boolean flag you set in Command.Execute so you know you are not subscribed anymore (this could be done by other means, of course; I am just showing one possible way).
+</ul>
+</ul>
+<ul>
+<li>If the dialog is still visible:
+<ul>
+<li>If your requestId is not set, do nothing.
+<li>If your requestId has been set:
+<ul>
+<li>Make Revit to do what the user requested.
+<li>Clear the requestId variable.
+<li>Enable the controls in your dialog again.
+</ul>
+</ul>
+</ul>
+<li>From OnShutdown you should unsubscribe from Idling if you are still listening to it, and I think you should close your dialog if it has not been closed by the end user yet. I believe it is just a nice thing to do and I would implement it that way.
+<!--
+<ul>
+<li>If your dialog is closed by the end user before Revit closes: In the next OnIdling, check the Boolean flag you set in Command.Execute. If it is still set, it means you are still subscribing to Idling. If so, unsubscribe; otherwise you do not have to do anything (Idling related).
+<li>If your dialog is not closed by the end user before Revit closes: I think the dialog should not stay open after Revit has been closed already. 
+That is why I recommended you check your dialog and your Idling subscription at OnShutdown too. From there  
+</ul>
+-->
+</ul>
+
+<p>That feedback was quite a shock to me and took a while to digest.
+
+<p>It also led me to raise a couple of supplementary questions:
+
+<p><strong>Question:</strong> Why do you think that I do not need the pointer to the UIControlledApplication instance?
+
+<p>Because I can use the Application property passed in by the command data instead?
+
+<p>Yes, that would simplify things a bit.
+
+<p><strong>Answer:</strong> Yes, that is what I meant. 
+You do need to set it in OnStartup, because you get it later again in your Command.Execute and in the OnIdling as well (if you need it there).
+
+<p><strong>Question:</strong> Ah yes, I see the difference between subscribing to the Idling event from within the command and within the form Load event. 
+That is something I should improve. 
+I made a mistake there.
+And you are saying that I cannot even unsubscribe from Idling from the form events?
+
+<p><strong>Answer:</strong> No, you cannot. 
+Your form events are completely unattached from Revit. 
+They happen on a different thread. 
+They are like any other methods running on a different thread (not the main thread on which Revit calls out). 
+I believe I've seen this mistake made several times. 
+I also 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">
+mentioned some of these flaws</a> after
+
+looking at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/modeless-door-lister-and-deleter.html">
+modeless door lister</a>.
+
+<p><strong>Question:</strong> This all seems a bit strange and extreme to me. 
+I mean, these are application events, and the application is there forever, as long as the session is active. 
+I understand that officially I cannot touch the Revit API outside of the specified Revit call-back notifications, but still...
+
+<p><strong>Answer:</strong> Yes, but not our application (Revit). 
+It is your application &ndash; except for the time Revit explicitly calls it, it does not have anything to do in it (and that is mutual).
+
+<p><strong>Question:</strong> I was under the assumption that subscribing to an event does not make use of the Revit API. 
+I thought it uses pure .NET functionality and that the application object is available for me to attach an event handler to it, with no use of the Revit API at all.
+
+<p><strong>Answer:</strong> That is not correct. 
+All public events have their corresponding framework internally in Revit. 
+In order to subscribe or unsubscribe, something needs to be modified somewhere in Revit, which means allocations/reallocations are likely to be made. 
+That is not going to be safe in a multithreaded environment (I mean, not that it couldn't be in theory, but it might be not in Revit, currently).
+
+<p><strong>Question:</strong> Initially I did not see the point of the additional complexity and strict separation between the form and Revit events that you require in your suggestion.
+After working through these answers of yours, I reread you suggested new algorithm, and it makes complete sense.
+
+<p><strong>Answer:</strong> Yes, it does sound a bit complex when you read it first, but like you learned, it is not as complex once you take time to think about it and especially once you start using it that way. 
+I believe the complexity is just due to the multi-threading nature, which is what any modeless interaction is essentially based upon.
+
+<p><strong>Question:</strong> I still do not understand the importance of unsubscribing in OnShutdown, since Revit will shut down anyway at that point.
+Is that for future-proofing, for some future situation in which possibly the add-in may be shut down but the Revit session remains active?
+
+<p><strong>Answer:</strong> It is really not critical, but I consider it a nice thing to do and we do log unsubscribed events in journals. 
+You can look at it this way: while it is not essentially important to close all your open files (and other resources) in your application (Windows will close them when the process get killed), an application is considered well behaved if it does close everything, and I always do so.
+
+<p><strong>Question:</strong> Does it makes any difference subscribing to the Idling event from the UIApplication class that I obtain from the Execute command data, or using a static variable initialised from the OnStartup UIControlledApplication instead?
+
+<p><strong>Answer:</strong> It does matter from where you subscribe and it does not matter if you use UIApplication or UIControlledApplication. 
+Those two application objects share the event repository internally, so subscribing through one is technically identical to subscribing through the other one. 
+In your particular case, I recommended subscribing from your command, because that is when you start needing it, actually; you did not need it in OnStartup yet.
+
+<p>You should not need to store a pointer (a tracking handle in .NET, to be exact) to the application object (to neither one), because it should always be available to you when you are actually permitted to use it &ndash; you get it, directly or indirectly, in OnStartup, in command.execute, in Events, in updaters, etc; there is no need to store it anywhere. 
+If you think it simplifies you code, you can keep the UIControlledApplication variable that you initialised in OnStartup, but my implementation would be different (of course, all programmers have different habits, it does not mean that one is better). 
+I would pass the application as an argument to ShowForm, although it seems you do not need to call Subscribe from ShowForm. 
+It looks like you can call Subscribe from your Execute after ShowForm returned success. 
+I would pass the application object to both Subscribe and Unsubscribe as an argument. (It is simply my preferred way of using arguments over having global variables.)
+
+<p><strong>Question:</strong> I will follow every single piece of your advice, except passing the arguments to the subscribe methods.
+I also almost fanatically try to avoid global variables wherever possible.
+I tried my very best to do that here as well, but it requires me to call two static methods on the App class instead of one from the command Execute method, and to create at least three different overloads of the Subscribe and Unsubscribe methods taking either UIApplication or UIControlledApplication arguments.
+It also forces the application Subscribe method called from the command to be public instead of private.
+All in all, that turns out to be just too much.
+
+<p><strong>Answer:</strong> Your code is good.
+I did not realize the need for overloading Unsubscribe &ndash; I think you have a point there.
+
+<p>In the end, I improved my implementation to follow Arno&scaron;t's advice as follows:
+
+<ul>
+<li>Moved the OnIdling handler from the external command to the external application.
+<li>Moved the pending element id handling to the external application too.
+<li>Implemented a static singleton LooseConnectorNavigator instance.
+<li>Implemented a static Show method to initialise it in the LooseConnectorNavigator class.
+<li>Subscribe to the FormClosing event to set it to null when the modeless form is closed.
+<li>Implemented a static IsShowing predicate in the LooseConnectorNavigator class to check whether the modeless form is displayed.
+<li>Subscribe to the Idling event from the external command Execute method.
+<li>Unsubscribe from the Idling event in the OnIdling event if the modeless dialog has been closed.
+<li>Ensure that I am unsubscribed from the Idling event and the modeless form is closed in the application OnShutdown handler.
+</ul>
+
+<p>Once this is done, there is actually no reason any longer for the command to communicate with the modeless form anymore.
+It is better to limit the knowledge of and connection between the various classes as much as possible, so I removed all references of the modeless form from the command class to the application class.
+This means that I also:
+
+<ul>
+<li>Moved the static Revit window handle variable and its initialisation to the external application and its OnStartup method.
+<li>Implemented three methods in the application class to show the modeless form, subscribe to and unsubscribe from the Idling event.
+</ul>
+
+<p>The OnStartup method also stores a pointer to the UIControlledApplication instance in a static variable, so that the UIApplication instance does not need to be passed in from the external command when needed:
+
+<pre class="code">
+<span class="blue">#region</span> Revit window handle
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Revit application window handle, used</span>
+<span class="gray">///</span><span class="green"> as parent for modeless dialogue.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="teal">JtWindowHandle</span> _hWndRevit = <span class="blue">null</span>;
+<span class="blue">#endregion</span> <span class="green">// Revit window handle</span>
+&nbsp;
+<span class="blue">static</span> <span class="teal">UIControlledApplication</span> _a;
+&nbsp;
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="teal">ProductType</span> pt = a.ControlledApplication.Product;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">ProductType</span>.MEP == pt )
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Revit window handle
+&nbsp; &nbsp; <span class="green">// Set up IWin32Window instance encapsulating </span>
+&nbsp; &nbsp; <span class="green">// main Revit application window handle:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Process</span> process = <span class="teal">Process</span>.GetCurrentProcess();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntPtr</span> h = process.MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>( h );
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Revit window handle</span>
+&nbsp;
+&nbsp; &nbsp; _a = a;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+}
+</pre>
+
+<p>The external command implementation is vastly simplified and disconnected from both the modeless form and the Idling event handling.
+It no longer even worries about the Revit window handle needed to display the form properly associated with the Revit main window.
+All it does now is call one single static method ShowForm on the application class before terminating to pass in the current data to display in the form:
+
+<pre class="code">
+&nbsp; <span class="green">// Cleaned up all the complexity and encapsulated</span>
+&nbsp; <span class="green">// it in one single call to the external application:</span>
+&nbsp;
+&nbsp; <span class="teal">App</span>.ShowForm( data );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>The ShowForm method handles and hides all the complexities of managing the form and the subscription to the Idling event:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ShowForm( 
+&nbsp; <span class="teal">SortableBindingList</span>&lt;<span class="teal">ConnectorData</span>&gt; data )
+{
+&nbsp; <span class="teal">LooseConnectorNavigator</span>.Show( data,
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SetElementId</span>( SetPendingElementId ),
+&nbsp; &nbsp; _hWndRevit );
+&nbsp;
+&nbsp; Subscribe();
+}
+</pre>
+
+<p>The methods to subscribe and unsubscribe can even remain private to the application class and ensure that we only subscribe once:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Keep track of our subscription status.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">bool</span> _subscribing = <span class="blue">false</span>;
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Subscribe to the Idling event if not yet already done.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">void</span> Subscribe()
+{
+&nbsp; <span class="blue">if</span>( !_subscribing )
+&nbsp; {
+&nbsp; &nbsp; _a.Idling 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp;
+&nbsp; &nbsp; _subscribing = <span class="blue">true</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Unsubscribe from the Idling event </span>
+<span class="gray">///</span><span class="green"> if we are currently subscribed.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">void</span> Unsubscribe()
+{
+&nbsp; <span class="blue">if</span>( _subscribing )
+&nbsp; {
+&nbsp; &nbsp; _a.Idling 
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp;
+&nbsp; &nbsp; _subscribing = <span class="blue">false</span>;
+&nbsp; }
+}
+</pre>
+
+<p>Except for the additional check to unsubscribe from the Idling event if the modeless form has been closed, the Idling event handler is unchanged from the previous implementation:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Revit Idling event handler.</span>
+<span class="gray">///</span><span class="green"> Whenever the user has selected an element to </span>
+<span class="gray">///</span><span class="green"> zoom to in the modeless dialogue, the pending</span>
+<span class="gray">///</span><span class="green"> element id is set. The event handler picks it</span>
+<span class="gray">///</span><span class="green"> up and zooms to it. We are not modifying the</span>
+<span class="gray">///</span><span class="green"> Revit document, so it seems we can get away </span>
+<span class="gray">///</span><span class="green"> with not starting a transaction.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> OnIdling(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">IdlingEventArgs</span> ea )
+{
+&nbsp; <span class="blue">if</span>( !<span class="teal">LooseConnectorNavigator</span>.IsShowing )
+&nbsp; {
+&nbsp; &nbsp; Unsubscribe();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> id = _pending_element_id;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 != id )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Support both 2011, where sender is an </span>
+&nbsp; &nbsp; <span class="green">// Application instance, and 2012, where </span>
+&nbsp; &nbsp; <span class="green">// it is a UIApplication instance:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp
+&nbsp; &nbsp; &nbsp; = sender <span class="blue">is</span> <span class="teal">UIApplication</span>
+&nbsp; &nbsp; &nbsp; &nbsp; ? sender <span class="blue">as</span> <span class="teal">UIApplication</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="blue">new</span> <span class="teal">UIApplication</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sender <span class="blue">as</span> <span class="teal">Application</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc
+&nbsp; &nbsp; &nbsp; = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc
+&nbsp; &nbsp; &nbsp; = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> eid = <span class="blue">new</span> <span class="teal">ElementId</span>( id );
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( eid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element id {0} requested --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; id, <span class="blue">new</span> <span class="teal">ElementData</span>( e, doc ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Look, mom, no transaction required!</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Clear();
+&nbsp; &nbsp; uidoc.Selection.Elements.Add( e );
+&nbsp; &nbsp; uidoc.ShowElements( e );
+&nbsp;
+&nbsp; &nbsp; _pending_element_id = 0;
+&nbsp; }
+}
+</pre>
+
+<p>Finally, in the OnShutdown method, we make sure that we both close the modeless form, if it is open, and unsubscribe from the Idling event, if we are subscribed:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="teal">LooseConnectorNavigator</span>.Shutdown();
+&nbsp;
+&nbsp; Unsubscribe();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The code itself did not change that much from my original implementation.
+Most of these changes just involved juggling existing snippets around to satisfy the recommendations listed above, and adding some trivial logic.
+
+<p>As far as I can tell, it all still works, and it feels better than ever before  :-)
+
+<p>I think this has been nagging at me subconsciously ever since I did not dive in deep into the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">
+door lister flaws</a> highlighted 
+
+by Arno&scaron;t, so it is a real relief to have it finally sorted out now.
+
+<p>For comparison purposes, here are two separate downloads,
+
+<a href="loose_connectors_9.zip">loose_connectors_9.zip</a> containing 
+
+the flawed version 2012.0.0.9 from my initial attempt before receiving and finally understanding the additional advice, and 
+
+<a href="loose_connectors_11.zip">loose_connectors_11.zip</a> containing 
+
+the fixed and hopefully final version 2012.0.0.11.
+
+Don't mix them up, please!

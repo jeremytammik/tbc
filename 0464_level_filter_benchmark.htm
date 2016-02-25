@@ -1,0 +1,263 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1264055 [Filtering by Level] -->
+
+<h3>Level Filter Benchmark</h3>
+
+<p>Yesterday I published Kevin Vandecar's handout document from his AEC DevCamp presentation on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">
+filtered element collectors</a>,
+
+and right away an interesting case cropped up which motivated a closer look at one of his samples.
+By the way, many of his samples are very interesting to have a closer look at, which I plan to do soon as well.
+For now, let's start off with an analysis of the ElementLevelFilter, based on the following question:
+
+<p><strong>Question:</strong> A quick question this time:
+I want to retrieve a set of elements filtered by the floor level they are on.
+For example &ndash; get all the rooms on Level 1.
+
+<p>I can use the Level property, but I understand this would be significantly slower than a parameter filter.
+
+<p>Among the countless built-in parameters, I cannot seem to find one for this purpose.
+
+<p>Any suggestions?
+
+<p><strong>Answer:</strong> Thank you for your short query.
+The answer has turned out to be significantly longer and more interesting than I initially expected.
+
+<p>Just as you say, you could simply postprocess your elements by querying the Level property using LINQ or explicit coding, and that would indeed be slower than using some built-in Revit element filtering functionality.
+
+<p>To begin with, I thought that I can answer your question twice over by referring to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html#1">
+parameter filter</a> blog post.
+
+<p>On one hand, it answers your question by pointing to the ElementLevelFilter, which is a slow filter used to match elements by their associated level, exactly as you require.
+Example code for using this filter is given in the Revit API help document RevitAPI.chm under 'ElementLevelFilter Class'.
+
+<p>On the other hand, the post also points out that this filter cannot be used for beams, since its Level property is not implemented, and for those you can use a parameter filter checking for the built-in parameter INSTANCE_REFERENCE_LEVEL_PARAM instead.
+This parameter is probably not applicable for all elements, though, so you might have to use some other one for other element types.
+
+<p>Maybe (and hopefully) the ElementLevelFilter will fulfil all your specific needs.
+
+<p>On the third hand, assuming we don't run out of hands, I am just working on Kevin Vandecar's filtered element collector benchmark code which he created for AEC DevCamp in Boston back in June, and it includes one sample command which exactly answers your question and includes some benchmark code to prove the point.
+
+<p>The command FilterParameterEx2 determines all family instances on a specific level using and benchmarking three different methods:
+
+<ul>
+<li>ElementLevelFilter.
+<li>ElementParameterFilter based on the built-in FAMILY_LEVEL_PARAM parameter.
+<li>LINQ post-processing check of the family instance Level property.
+</ul>
+
+<p>Here is the complete code of the command:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">FilterParameterEx2</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _level_name = <span class="maroon">&quot;Level 2&quot;</span>; <span class="green">// &quot;02 - Floor&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Level 2 example criteria</span>
+&nbsp; &nbsp; <span class="teal">ElementId</span> levelId = <span class="teal">Util</span>.FindLevelId( doc, 
+&nbsp; &nbsp; &nbsp; _level_name );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Stopwatch</span> sw = <span class="blue">new</span> <span class="teal">Stopwatch</span>();
+&nbsp; &nbsp; <span class="blue">string</span> names = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use the Level filter to find all </span>
+&nbsp; &nbsp; <span class="green">// FamilyInstances with desired Level.</span>
+&nbsp; &nbsp; <span class="green">// Note this is a slow filter.</span>
+&nbsp;
+&nbsp; &nbsp; sw.Reset();
+&nbsp; &nbsp; sw.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementLevelFilter</span> filterElementsOnLevel 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementLevelFilter</span>( levelId );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector1 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector1.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filterElementsOnLevel );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; listLevel 
+&nbsp; &nbsp; &nbsp; = collector1.ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Now that we have only what we want, </span>
+&nbsp; &nbsp; <span class="green">// foreach process them into a report.</span>
+&nbsp;
+&nbsp; &nbsp; names = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> instance <span class="blue">in</span> listLevel )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; names += <span class="maroon">&quot;\nLevel Name = &quot;</span> + instance.Level.Name 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; Instance name = &quot;</span> + instance.Name 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; id: &quot;</span> + instance.Id.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; sw.Stop();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.ShowElapsedTime( sw, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Using ElementLevelFilter to find &quot;</span>
+&nbsp; &nbsp; &nbsp; + listLevel.Count().ToString() 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; family instances on a given level: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + names );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use ElementParameterFilter to find all </span>
+&nbsp; &nbsp; <span class="green">// FamilyInstances with desired Level by </span>
+&nbsp; &nbsp; <span class="green">// finding the data in the FAMILY_LEVEL_PARAM </span>
+&nbsp; &nbsp; <span class="green">// parameter.</span>
+&nbsp;
+&nbsp; &nbsp; sw.Reset();
+&nbsp; &nbsp; sw.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span> bip 
+&nbsp; &nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.FAMILY_LEVEL_PARAM;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterValueProvider</span> provider = <span class="blue">new</span> 
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterValueProvider</span>( <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericEquals</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>( 
+&nbsp; &nbsp; &nbsp; provider, evaluator, levelId );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> filter 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector2 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector2.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; listLevelParam 
+&nbsp; &nbsp; &nbsp; = collector2.ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Now that we have only what we want, </span>
+&nbsp; &nbsp; <span class="green">// foreach process them into a report.</span>
+&nbsp;
+&nbsp; &nbsp; names = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> instance <span class="blue">in</span> listLevelParam )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; names += <span class="maroon">&quot;\nLevel Name = &quot;</span> + instance.Level.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; Instance name = &quot;</span> + instance.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; id: &quot;</span> + instance.Id.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; sw.Stop();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.ShowElapsedTime( sw, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Using Element Parameter Filter: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + listLevelParam.Count().ToString() + names );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use LINQ to find all FamilyInstances </span>
+&nbsp; &nbsp; <span class="green">// with desired Level.</span>
+&nbsp;
+&nbsp; &nbsp; sw.Reset();
+&nbsp; &nbsp; sw.Start();
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector3 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector3.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">FamilyInstance</span>&gt; listLevelLINQ 
+&nbsp; &nbsp; &nbsp; = collector3.OfType&lt;<span class="teal">FamilyInstance</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use LINQ to filter down those that </span>
+&nbsp; &nbsp; <span class="green">// match the desired level name.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Level</span> level = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">FamilyInstance</span>&gt; listFiOnLevelLINQ 
+&nbsp; &nbsp; &nbsp; = <span class="blue">from</span> fi <span class="blue">in</span> listLevelLINQ
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> ( ( level = fi.Level ) != <span class="blue">null</span> ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( level.Id.Equals( levelId ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> fi;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Now that we have only what we want, </span>
+&nbsp; &nbsp; <span class="green">// foreach process them into a report.</span>
+&nbsp;
+&nbsp; &nbsp; names = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> instance <span class="blue">in</span> listFiOnLevelLINQ )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; names += <span class="maroon">&quot;\nLevel Name = &quot;</span> + instance.Level.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; Instance name = &quot;</span> + instance.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;&nbsp;&nbsp; id: &quot;</span> + instance.Id.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; sw.Stop();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.ShowElapsedTime( sw, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Using LINQ to find &quot;</span> 
+&nbsp; &nbsp; &nbsp; + listFiOnLevelLINQ.Count&lt;<span class="teal">FamilyInstance</span>&gt;().ToString() 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; family instances on a specific level: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + names );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>I ran it on the ArchSample.rvt model file included in Kevin's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">
+presentation material</a> posted yesterday.
+
+<p>The first results showed that the parameter filter was faster than the level filter, even doing the exact job that the element filter was designed to do.
+In several different attempts, it consistently took more or less the following numbers of milliseconds to retrieve 52 elements using the three different methods:
+
+<ul>
+<li>48 ms - element level filter
+<li>38 ms - parameter filter
+<li>71 ms - LINQ
+</ul>
+
+<p>After rerunning the tests several more times, it does seem that the level filter is faster in general after all.
+Here are some more test run results in ArchSample.rvt, as well as in rac_advanced_sample_project.rvt, a sample file included in the basic Revit Architecture installation.
+To run in the letter model, you need to change the target level name to something else than "Level 2", e.g. "02 - Floor".
+
+<p>In the following table, A stands for the ArchSample.rvt model file, B for rac_advanced_sample_project.rvt, and L, P and Q for the time for each run in milliseconds for the level filter, parameter filter and LINQ query, respectively:</p>
+
+<table>
+<tr><th align="right">Model</th><th align="right">L</th><th align="right">P</th><th align="right">Q</th></tr>
+<tr><td align="right">A</td><td align="right">11</td><td align="right">24</td><td align="right">38</td></tr>
+<tr><td align="right">A</td><td align="right">11</td><td align="right">24</td><td align="right">37</td></tr>
+<tr><td align="right">A</td><td align="right">11</td><td align="right">8</td><td align="right">62</td></tr>
+<tr><td align="right">A</td><td align="right">11</td><td align="right">23</td><td align="right">38</td></tr>
+<tr><td align="right">A</td><td align="right">7</td><td align="right">24</td><td align="right">37</td></tr>
+<tr><td align="right">A</td><td align="right">46</td><td align="right">25</td><td align="right">68</td></tr>
+<tr><td align="right">A</td><td align="right">23</td><td align="right">28</td><td align="right">39</td></tr>
+<tr><td align="right">A</td><td align="right">11</td><td align="right">7</td><td align="right">38</td></tr>
+<tr><td align="right">A</td><td align="right">13</td><td align="right">24</td><td align="right">11</td></tr>
+<tr><td align="right">B</td><td align="right">79</td><td align="right">101</td><td align="right">273</td></tr>
+<tr><td align="right">B</td><td align="right">56</td><td align="right">102</td><td align="right">276</td></tr>
+<tr><td align="right">B</td><td align="right">84</td><td align="right">104</td><td align="right">173</td></tr>
+</table>
+
+<p>It seems that the level filter is fastest after all, as we would hope.
+And certainly the LINQ query is consistently slowest.
+
+<p>You might want to compare the performances of the various filters with your own data sets.
+
+<p>I would also assume that the level filter provides maximum simplicity and probably minimal future maintenance worries.
+
+<p>Here is
+
+<a href="zip/FilterExamples02.zip">FilterExamples02.zip</a> containing
+
+an updated version of Kevin's code samples and benchmarking code.

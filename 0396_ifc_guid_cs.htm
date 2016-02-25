@@ -1,0 +1,119 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>IFC GUID Algorithm in C#</h3>
+
+<p>Today is the first day of the Munich
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html#devlabs">
+DevLab</a>.
+
+This one is for five whole days.
+I am looking forward to the week here and will be very pleased if it is as exciting and productive as the two days at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/devlab-and-birthday.html">
+Waltham DevLab</a>.
+
+<p>Meanwhile and unrelated to the DevLabs, H&aring;kon Clausen of
+
+<a href="http://www.nosyko.no">
+Nosyko AS</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/uniqueid-dwf-and-ifc-guid.html?cid=6a00e553e168978833013483a258c1970c#comment-6a00e553e168978833013483a258c1970c">
+commented</a> on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/uniqueid-dwf-and-ifc-guid.html">
+UniqueId, DWF and IFC GUID</a> discussion
+
+and submitted a port of the IFC GUID algorithm discussed there to C#.
+He also has an issue with the IFC GUID associated with certain types in the model:
+
+<p><strong>Comment:</strong> Since I'm not a great fan of dependencies to unmanaged code I did some work on converting the C part to C#. I could post it if someone is interested.
+
+<p>I'm having some trouble though with mismatch between the GUID I calculate and the one exported to IFC.
+
+<p>If I try to calculate the IFC GUID for some family symbols it works only for some of them.
+
+<p>For instance, the GUID on furniture types seems to match with the GUID on the corresponding IFC object IfcFurnitureType.
+However the GUID on a door symbol does not correspond with the GUID on the exported IfcDoorStyle.
+I guess it has to do with the IfcDoorStyle often being exported multiple times for some strange reasons, but even if it's one to one, the GUID does not match.
+Is there any way to calculate the right GUID for these elements too?
+
+<p><strong>Response:</strong> I cannot say much about why it might fail for some family symbols.
+
+<p>In Revit 2011, there is a new API method which may provide the correct exported element GUIDs that you are looking for:
+
+<p style="color:darkblue">Export id: The static method ExportUtils.GetExportId retrieves the GUID representing an element in DWF and IFC export. This id is used in the contents of DWF export and IFC export and it should be used only when cross-referencing to the contents of these export formats. When storing Ids that will need to be mapped back to elements in future sessions, UniqueId must be used instead.</p>
+
+<p><strong>Answer:</strong> Thanks for the tip. I was not aware of that GetExportId function.
+After testing it, I guess this does the same that you showed in your post on how to get from the Revit UniqueID string to a .NET GUID.
+Here is a solution <a href="zip/IfcGuidHakon.zip">IfcGuidHakon.zip</a> including the translation of the IFC GUID algorithm to C#.
+I placed some documentation in the code.
+My reason for translating it was simply to avoid native code and possibly deployment issues on 32 bit and 64 bit platforms.
+
+<p>My use case is to export ID's that will later be used in an external application and compared against an IFC export.
+I have found that this technique works very well for a lot of elements (e.g. rooms) but family symbols are a little tricky it seems (and I do not mean instances - my application is only concerned with the number of instances for a given symbol, not the instances in itself).
+The ExportUtils.GetExportId did not help either.
+I think that the reason is perhaps in the IFC export and also that there is not always a 1-1 match between Revit and the exported IFC model.
+Taking the Basic example from Revit 2011, a door symbol (e.g. Single-Flush 813x2134) that is exported as an IfcDoorStyle does not have the same GUID as the one encoded from the door symbol, but as I mentioned, all furniture types match.
+That specific door symbol is also exported as two IfcDoorStyle instances for some reason, perhaps because of the some difference in geometry.
+It seems like there is no way to identify the Revit family symbol based on the information on the corresponding IFC object.
+There is a TAG attribute on the IFC objects (6 digit integer) but I have not found out where that information is coming from in Revit.
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\IfcGuidHakon.zip -->
+
+<a href="zip/IfcGuidHakon.zip">IfcGuidHakon.zip</a>
+
+containing the complete source code and Visual Studio solution of this algorithm and a command line program for testing it.
+
+<!--
+
+From: Harry Mattison
+Sent: Sunday, June 13, 2010 02:06
+Subject: RE: duplicate ifc guid for exported types and symbols
+
+Hi Angel,
+
+Could you help with this question about IFC export?
+
+Thanks,
+Harry
+
+From: Håkon Clausen
+Sent: Monday, June 14, 2010 08:05
+To: Jeremy Tammik
+Subject: Re: GUID comment
+
+Dear Jeremy,
+
+It looks good.
+
+Since you wrote "duplicate guids", just let me clarify that there is no duplication of GUIDS in the IFC file. It's just that e.g. a door or a window symbol do not get the GUID I expect using technique in the IFC file and there are a lot of cases where one symbol is generating several IFC object with different GUIDs and I'm not sure how Revit computes these GUIDs. Please let me now if I'm making myself hard to understand :)
+
+Håkon
+
+-->
+
+
+<a name="2"></a>
+
+<h4>Important Update</h4>
+
+<p>2014-07-02: Thanks to the issue reported by Paul Marsland in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html#comment-6a00e553e16897883301a3fcfb4b4b970b">
+comment</a> below,
+
+H&aring;kon took another look at the code and replied:</p>
+
+<p>I tracked down a bug in the algorithm.
+It was a silly typo, a call to BitConverter.ToInt16 should be BitConverter.ToUInt16 like all the rest...</p>
+
+<p>I updated the code a bit, added some tests and created the
+
+<a href="https://github.com/hakonhc/IfcGuid">IfcGuid GitHub repository</a> to
+
+host it.</p>

@@ -1,0 +1,162 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259590 [Support Multiple Verticals with New .addin Install Feature] -->
+
+<h3>Add-In Applications for Multiple Revit Products</h3>
+
+<p>We recently discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/addin-visibility-mode.html">
+add-in visibility mode</a>,
+
+which only applies to external commands.
+The Revit API does not provide a similar built-in facility to control the loading and availability of an external application.
+
+<p>This turned out to be an issue for Dave Echols of 
+
+<a href="http://www.ha-inc.com">
+Hankins and Anderson, Inc.</a>,
+
+who very friendlily is sharing his solution to this lack with us here:
+
+<h4>Managing Custom Applications for Multiple Revit Products</h4>
+
+<p>As a follow-up on and complement to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/addin-visibility-mode.html">
+Add-In Visibility Mode</a> posting, 
+
+our company faces a different issue. We have multiple Revit products installed on our workstations and use IExternalApplication custom applications to load our applications and commands. I use a modified version of the RvtSamples menu system included with the SDK to load our custom commands and build the Ribbon panels. Moving to the new .addin manifest installation process in Revit 2011 caused some initial concern.  Our custom applications are organized by major discipline and each discipline is contained in its own class within out ApplicationLoader assembly. All the applications defined in the .addin file were being loaded in all three Revit products. As a result of this new organization, MEP Ribbon panels and commands were visible in the Architecture and Structural products. Our .addin manifest is shown below.
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>2ec9c787-d029-460b-8fd9-003ec80254ab<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.EventManager<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Global Event Manager<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>44e53d5e-3b1d-4eb9-a29c-18c93f86ad04<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.HaLoader<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Global Commands<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>f7ae3726-1987-40df-9aa5-225aa1e9c95f<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.ElectricalLoader<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Electrical Commands<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>7d43fa76-f249-4453-9bd5-91b7601fb486<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.HvacLoader<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>HVAC Commands<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>a5b99559-a5ff-4fb5-863e-3031e5e715a2<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.LifeSafetyLoader<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Life Safety Commands<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>0155a264-2682-4c62-9f15-c4a28fbc4417<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HA.ApplicationLoader.PlumbingLoader<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Plumbing Commands<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>(Copy and paste to an editor to see the complete truncated lines.)
+
+<p>When I first contacted ADN about this anomaly, I was pointed to the VisibilityMode tag as shown in the above posting. I pointed out I was working with applications, which do not support the VisibilityMode tag (maybe they should). As a consequence, I needed to find a code solution that would allow me to use the new installation process. After several attempts of trial and error, I was able to produce a solution that works well and is very simple to implement. Our OnStartup methods in each of our custom applications looked like the following in Revit 2010.
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; <span class="teal">UIControlledApplication</span> uiControlledApp )
+{
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// add code here to load custom commands </span>
+&nbsp; &nbsp; <span class="green">// and build the Ribbon Panel</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( e.Message );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+}
+</pre>
+
+<p>This is very standard stuff and does not need to be changed if the application is global to all Revit products. 
+I made the following additions to check for the currently running Revit product and base the loading of the application on that result. 
+The code below should only create the Ribbon panel and load the commands if the application is running in the Revit MEP product.
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; <span class="teal">UIControlledApplication</span> uiControlledApp )
+{
+&nbsp; <span class="teal">Result</span> rc = <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Control the loading of the AddIn </span>
+&nbsp; &nbsp; <span class="green">// based on the product we are running</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ProductType</span> pt = uiControlledApp
+&nbsp; &nbsp; &nbsp; .ControlledApplication.Product;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// always check this</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pt == <span class="teal">ProductType</span>.Unknown )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// we must be in RAC to continue. </span>
+&nbsp; &nbsp; <span class="green">// Comment out if running MEP or RST</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//if( pt != ProductType.Architecture)</span>
+&nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; <span class="green">// return Result.Cancelled;</span>
+&nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// we must be in MEP to continue. </span>
+&nbsp; &nbsp; <span class="green">// Comment out if running RAC or RST</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pt != <span class="teal">ProductType</span>.MEP )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// we must be in RST to continue. </span>
+&nbsp; &nbsp; <span class="green">// Comment out if running RAC or MEP</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//if(pt != ProductType.Structure)</span>
+&nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; <span class="green">// return Result.Cancelled;</span>
+&nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// add code here to load custom commands </span>
+&nbsp; &nbsp; <span class="green">// and build the Ribbon Panel</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( e.Message );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+}
+</pre>
+
+<p>By making the above changes in our custom application code and using the functionality in the new RevitAddInUtility.dll, I was able to create a single install script for all three Revit products and control the installation and uninstallation of our applications in a seamless manner.
+
+<p>Thank you very much, Dave, for sharing this solution with us!

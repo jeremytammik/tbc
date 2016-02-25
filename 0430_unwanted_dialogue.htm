@@ -1,0 +1,215 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  - 1260838 [Unwanted dialog]
+  - 1261367 [Move items in Group element]
+  - 1261753 [DialogBoxShowing event]
+
+-->
+
+<h3>Suppress Unwanted Dialogue</h3>
+
+<p>I am posting this in advance from Pattaya before leaving laptop-less for Cambodia, so that you have a little something for the duration of my absence.
+
+<p>Before I left on vacation, we had several queries on suppressing unwanted dialogues, and we also looked at this issue in some depth discussing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html">
+editing elements inside groups</a>.
+
+Here are some further examples of the questions and solutions we found:
+
+<p><strong>Question:</strong> I am importing a DWG containing AutoCAD solids into a Revit document.
+The DWG imports just fine but we always get a dialogue stating that "Some ACIS objects could not be imported.  To import them, use AutoCAD to convert them into polymesh objects and reimport."
+Oddly, when launching the same process manually in the Revit user interface, we get the same successful end result without any dialogue.  
+Is there a way to suppress the unwanted dialogue?
+
+<p><strong>Answer:</strong> As mentioned in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html">
+last post</a>,
+
+there are several different possible ways to suppress unwanted dialogues in Revit 2011.
+
+<ol>
+
+<li>The old method that was already available in Revit 2010 was to use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+DialogBoxShowing event</a>, 
+
+which can be used to dismiss a dialogue programmatically.
+
+<li>The Revit 2011 API also includes a comprehensive 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+failure processing API</a>,
+
+which can be do much more than the DialogBoxShowing event.
+
+<li>If all else fails and you just want to get rid of the dialogue box by any means, you can also use the Windows API to detect when it is displayed and dismiss it using my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">
+dialogue clicker application</a> to 
+
+suppress it.
+</ol>
+
+<p><strong>Question:</strong> I used the following code to suppress a dialogue box that appears when reloading modified families:
+
+<pre class="code">
+<span class="blue">void</span> myDialogBoxShowing(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+{
+&nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e1
+&nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( e1 != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e1.DialogId.Equals(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Family_Already_Exists&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e1.OverrideResult(
+&nbsp; &nbsp; &nbsp; &nbsp; ( <span class="blue">int</span> ) <span class="teal">TaskDialogResult</span>.CommandLink1 ); <span class="green">// 1001</span>
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>How can I suppress this dialogue box that is displayed when I delete a linked RVT file?</p>
+
+<center>
+<img src="img/unwanted_dlg_linked_rvt.jpg" alt="Delete linked RVT file dialogue"/>
+</center>
+
+<p><strong>Answer:</strong> I would suggest using the Failure API to suppress that dialogue.
+
+<p><strong>Response:</strong> Thanks you for your quick reply.
+It works fine and is easier to control.
+
+<p>I still have to figure out how to override with another option instead of the default one, in case of a warning dialogue box with more than one button.
+In my case, I want to pick "Remove Link" instead of "OK".
+Here is the code:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">WarningSwallower</span> 
+&nbsp; : <span class="teal">IFailuresPreprocessor</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">FailureProcessingResult</span> 
+&nbsp; &nbsp; PreprocessFailures( <span class="teal">FailuresAccessor</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; failures 
+&nbsp; &nbsp; &nbsp; = a.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> f <span class="blue">in</span> failures )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//if (f.GetSeverity().ToString() == &quot;Warning&quot;)</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//a.DeleteWarning(f);</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureDefinitionId</span> id 
+&nbsp; &nbsp; &nbsp; &nbsp; = f.GetFailureDefinitionId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( id == <span class="teal">BuiltInFailures</span>.<span class="teal">LinkFailures</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .DeleteLinkSymbolPrompt )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// only default option being choosen, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// not good enough!</span>
+&nbsp; &nbsp; &nbsp; &nbsp; a.DeleteWarning( f ); 
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+}
+</pre>
+
+<p>Is there a way within the Failure API to suppress the warning and specifying a non-default option?
+
+<p>The closest possibility I see is to set the FailureResolutionType.
+I tried that, but it does not work.
+
+<p><strong>Answer:</strong> Could you please try to use the ResolveFailure method to mimic clicking the 'Remove Link' button?
+
+Here is a code snippet showing how to resolve a failure, excerpted from the Revit 2011 SDK ErrorHandling sample:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">FailureProcessingResult</span> ProcessFailures( 
+&nbsp; <span class="teal">FailuresAccessor</span> failuresAccessor )
+{
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; fmas 
+&nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; <span class="blue">if</span>( fmas.Count == 0 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">String</span> transactionName 
+&nbsp; &nbsp; = failuresAccessor.GetTransactionName();
+&nbsp;
+&nbsp; <span class="blue">if</span>( transactionName.Equals( 
+&nbsp; &nbsp; <span class="maroon">&quot;Error_FailuresProcessor&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> fma <span class="blue">in</span> fmas )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureDefinitionId</span> id 
+&nbsp; &nbsp; &nbsp; &nbsp; = fma.GetFailureDefinitionId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( id == <span class="teal">Command</span>.m_idError )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.ResolveFailure( fma );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>
+&nbsp; &nbsp; &nbsp; .ProceedWithCommit;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+}
+</pre>
+
+<p><strong>Response:</strong> I just tested using the ResolveFailure method, and it still seems not to be working, i.e. the dialogue box is still showing up using this code:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">FailureProcessingResult</span> PreprocessFailures( 
+&nbsp; <span class="teal">FailuresAccessor</span> a )
+{
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; failures 
+&nbsp; &nbsp; = a.GetFailureMessages();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> f <span class="blue">in</span> failures )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FailureDefinitionId</span> id 
+&nbsp; &nbsp; &nbsp; = f.GetFailureDefinitionId();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( id == <span class="teal">BuiltInFailures</span>.<span class="teal">LinkFailures</span>
+&nbsp; &nbsp; &nbsp; .DeleteLinkSymbolPrompt )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// only default option being choosen, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// not good enough!</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//a.DeleteWarning(f); </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// cannot suppress dialogue box</span>
+&nbsp; &nbsp; &nbsp; a.ResolveFailure( f ); 
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+}
+</pre>
+
+<p>DeleteWarning is working, the only problem is that it only uses the default OK option.
+Certainly there must be a way to specify another option when deleting a warning?
+
+<p><strong>Answer:</strong> Please try to use a class derived from IFailureProcessor, and implement its ResolveFailure method appropriately.
+
+<p>If all else fails, a workaround would be to delete the remaining RVT model link via the API after you dismiss the warning using the default option.
+
+<p><strong>Correction:</strong> Aleksey Moiseyev very friendlily pointed out that the ResolveFailure method shown above is still not working, i.e. the dialogue box is still showing up using the code shown.
+
+<p>The method should be returning the FailureProcessingResult ProceedWithCommit, not Continue. The latter allows the error dialog to appear as usual, whereas the former suppresses it. 
+
+<p>Thank you very much, Aleksey, for pointing this out, and sorry for the erroneous original post!

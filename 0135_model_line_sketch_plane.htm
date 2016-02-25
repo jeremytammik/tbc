@@ -1,0 +1,156 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Model Line Sketch Plane</h3>
+
+<p>Model lines always reside in a sketch plane, which can give rise to some issues.
+One of these issues is the question of whether it really is necessary to generate a separate sketch plane for every single model line.
+Another question which recently came up is how to handle a Move request which would take the model line off the sketch plane it belongs to.
+Before diving into these topics, there are two bits of recent Revit API relevant news to share.</p>
+
+<h4>Revit API Introduction Webcast Recording</h4>
+
+<p>The recording of the 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Revit API Introduction webcast</a>
+
+held last week on Wednesday April 29<sup>th</sup> has been posted to the Developer Center and the ADN web site.</p>
+
+<h4>Updated Revit 2010 SDK</h4>
+
+<p>An updated version of the 
+
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=2484975">
+Revit 2010 SDK</a>
+
+is available. 
+The changes mostly affect the documentation.</p>
+
+<h4>Model Line must Reside in Sketch Plane</h4>
+
+<p>Returning to the model lines and sketch planes, here are some slightly edited musings on that by Miroslav Schonauer of Autodesk:</p>
+
+<p><strong>Question:</strong>
+In the Revit user interface, a model line is always created on the current work plane.
+Subsequently moving the line or grip-moving the endpoints always retains the line within that given plane.
+This plane can be accessed via the API through the Line element SketchPlane property.</p>
+
+<p>In the API, we create a new model curve using the method</p>
+
+<pre>
+public ModelCurve NewModelCurve(
+  Curve geometryCurve,
+  SketchPlane sketchPlane )
+</pre>
+
+<p>One might expect an exception to be thrown if the curve specified does not reside within the given SketchPlane.
+This is not the case, though.
+One can create any line on any plane, for instance using the Revit SDK ModelLines sample.
+As an example, I created a vertical line using the first SketchPlane stored in the Revit database, which always seems to be the XY plane.<p>
+
+<p>The recommended approach is to create a plane containing the desired line and use that as the sketch plane when creating the line. I would like to avoid this for two reasons:</p>
+
+<ul>
+<li>I want to avoid having potentially thousands of extra SketchPlane objects in my model.
+<li>I want to avoid the additional code to create or find a suitable plane for each line.
+</ul>
+
+<p>It would be convenient if we could use one single default sketch plane to host all our model lines, regardless of whether the line actually resides on that plane or not.
+One would not have to care about the sketch plane, or create a sketch plane containing the line every time a new line is required.</p>
+
+<p>The question is whether this behaviour is intentional or allowed by omission, in which case it would be dangerous to design any code based on these premises.
+Maybe the API will throw an error in future releases, or the model will misbehave under certain circumstances.</p>
+
+<p>After more experimenting in the user interface, I observe that if I grip move the endpoints of such a line after its out-of-plane API creation, the line drops onto the plane, so it starts to behave as standard in the user interface. If the line is not edited, for instance by pinning it to prevent this, the RVT file can be happily saved, re-opened and the line legally remains as created via API.</p>
+
+<p>So apparently there is no absolute requirement built into the Revit geometrical parametric engine for a line to fully reside on its sketch plane. It may be different for other curve types like arcs and splines, etc. Apparently it is only the user interface layer that forces such behaviour, which of course is consistent with Revit’s parametric BIM concepts.</p>
+
+<p>The question is, can one rely on this extended API behaviour?</p>
+
+<p><strong>Answer:</strong>
+The answer is <strong>no</strong>. The NewModelCurve method should actually check if the geometry curve lies within the given sketch plane. If the curve lies outside plane, other functions relying on the sketch plane might go wrong.</p>
+
+<p>In Revit 2010, when working in a mass family, you can create a CurveByPoints without having to use a sketch plane.
+In any other family or project environment, however, a sketch plane is still required.</p>
+
+<p>An earlier discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/model-line-creation.html">
+creating model lines</a>
+
+provides sample code demonstrating the sketch plane creation for each model line.
+Here is another method for creating a model line with an associated sketch plane to host it, also provided by Miro.
+It uses the Z axis to span the sketch plane for non-vertical lines, and otherwise the Y axis:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">ModelLine</span> CreateModelLine(
+&nbsp; Autodesk.Revit.<span class="teal">Application</span> app,
+&nbsp; <span class="teal">XYZ</span> p,
+&nbsp; <span class="teal">XYZ</span> q )
+{
+&nbsp; <span class="blue">if</span>( p.Distance( q ) &lt; <span class="teal">Util</span>.MinLineLength ) <span class="blue">return</span> <span class="blue">null</span>;
+
+&nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp;
+&nbsp; <span class="blue">double</span> dxy = <span class="teal">Math</span>.Abs( v.X ) + <span class="teal">Math</span>.Abs( v.Y );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> w = ( dxy &gt; <span class="teal">Util</span>.TolPointOnPlane )
+&nbsp; &nbsp; ? <span class="teal">XYZ</span>.BasisZ
+&nbsp; &nbsp; : <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> norm = v.Cross( w ).Normalized;
+&nbsp;
+&nbsp; <span class="teal">Plane</span> plane = app.Create.NewPlane( norm, p );
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> creDoc
+&nbsp; &nbsp; = app.ActiveDocument.Create;
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketchPlane = creDoc.NewSketchPlane( plane );
+&nbsp;
+&nbsp; <span class="blue">return</span> creDoc.NewModelCurve(
+&nbsp; &nbsp; app.Create.NewLine( p, q, <span class="blue">true</span> ),
+&nbsp; &nbsp; sketchPlane ) <span class="blue">as</span> <span class="teal">ModelLine</span>;
+}
+</pre>
+
+<p>With this discussion in place, let us look at a related question on moving model lines.</p>
+
+<h4>Using the Move method on model lines</h4>
+
+<p><strong>Question:</strong>
+I am attempting to use the Move method on an ElementSet containing ModelCurve instances. The Move method returns true, signifying that the elements were moved, but they are not.
+Looking at the elements in 3D, they still remain at elevation 0.0, although the Move operation changed the elevation 0.0 to elevation -10.0 using the vector NewXYZ(0,0,-10).
+Does Move only work of some element types?
+Do I need to do something different to get it to work with ModelCurve instances?</p>
+
+<p>Is there an example of using the Move method with ModelCurve instances?
+Is there a better way to change the elevation of these elements?</p>
+
+<p><strong>Answer:</strong>
+As far as I know, the Move method can be used on any Revit model elements.
+However, there may be other constraints on these elements as well, which take priority over the Move request.</p>
+
+<p>The case of model curves is probably one example of such behaviour.
+Every model curve resides on a specific sketch plane, and cannot be moved off it.
+In your case, the sketch plane hosting the model lines may well be a horizontal plane with elevation 0.0.
+In that case, attempts to change the elevation of the model curves will fail, because regardless of the Z coordinate you specify, they will always be forced back into the sketch plane they reside in.</p>
+
+<p>As explained above, a model curve really must lie in the sketch plane it belongs to.
+An application generating model lines programmatically can take two approaches:</p>
+
+<ul>
+<li>The simplistic approach generates a separate sketch plane for every new model line.
+<li>A more complex approach searches for an existing sketch plane containing the new model line to use to host it, and only generates a new sketch plane if no fitting one already exists.</li>
+</ul>
+
+<p>In any case, the application needs to ensure that the model lines generated really do lie in the sketch plane they are assigned to.</p>
+
+<p>In your case, you need to check that the move operation retains the curve within the same plane.
+From your description above, though, that would not appear to be the case.</p>
+
+<p>Alternatively, you would have to place the model curves on a new sketch plane, which will probably require recreating them from scratch, for instance using a method similar to the ones described above.</p>

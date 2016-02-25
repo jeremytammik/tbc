@@ -1,0 +1,216 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266905 [Create Cap to the start point of the pipe] -->
+
+<h3>Create a Pipe Cap</h3>
+
+<p>Things have been a bit hectic for me in the last few days, with several complex cases to solve.
+I also suddenly and unexpectedly had to find out how to apply for a visa to Saudi Arabia, which is a kind of interesting process.
+Apparently, you start out with the inviting company in Saudi Arabia, which has to issue an invitation letter. This has to include a reference number, for which a form needs to be filled in and submitted to the Ministry of Foreign Affairs.
+With that in place, a letter from my company addressed to the embassy of Saudi Arabia in Bern can be submitted to request the visa. This letter must be legalised by the chamber of commerce in Switzerland. 
+So quite an impressive process before I can even get started applying...
+
+<p>Anyway, another thing that came up today that was immediately solvable is the following simple question on how to create a new cap on a pipe in the Revit MEP context:
+
+<p><strong>Question:</strong> The Revit SDK samples do not include any example showing how to create a cap on as pipe. 
+Can you show me how to do it in C#?
+
+<p>Let's say I create a pipe as follows:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">Document</span> rvtDoc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> start = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> end = <span class="blue">new</span> <span class="teal">XYZ</span>( 6, 0, 4 );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( rvtDoc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ElementType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">PipeType</span> pipeType = collector.FirstElement() 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">PipeType</span>;
+&nbsp;
+&nbsp; <span class="teal">Pipe</span> pipe = rvtDoc.Create.NewPipe( 
+&nbsp; &nbsp; start, end, pipeType );
+&nbsp;
+&nbsp; pipe.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_PIPE_DIAMETER_PARAM )
+&nbsp; &nbsp; .Set( 0.1667 ); <span class="green">// revise to 2&quot; dia pipe</span>
+</pre>
+
+<p>In the project browser I see the node Families &gt; Pipe Fittings &gt; M_Cap - Generic &gt; Standard.
+
+<p>How can I use that family to create a 2" dia cap at the start point of the 2" dia pipe in C#?
+
+<p><strong>Answer:</strong> The solution is simple, actually, in the following two steps:
+
+<ol>
+<li>Insert a cap family instance.
+<li>Connect it to the pipe.
+</ol>
+
+<p>By the way, in your code, you are selecting the pipe type from a collector returning all element types. 
+That seems a bit liberal to me. 
+I would suggest adding a filter for the built-in category as well.
+
+<p>Here is my code that does just that.
+First, I need to define a few constants to identify and load the cap symbol:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _libFolder = <span class="maroon">&quot;C:/Documents and Settings&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;/All Users/Application Data/Autodesk/RME 2011&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;/Metric Library/Pipe/Fittings/Generic&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _rfaExtension = <span class="maroon">&quot;.rfa&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _capFamilyName = <span class="maroon">&quot;M_Cap - Generic&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _capSymbolName = <span class="maroon">&quot;Standard&quot;</span>;
+</pre>
+
+<p>I then create the pipe like before, select the cap family symbol, and insert an instance of it at the end point of the pipe:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">PipeType</span> pipeType
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ElementType</span> ) )
+&nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_PipeCurves )
+&nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">PipeType</span>;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> start = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> end = <span class="blue">new</span> <span class="teal">XYZ</span>( 6, 0, 4 );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, 
+&nbsp; &nbsp; <span class="maroon">&quot;Create Pipe Cap&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="teal">Pipe</span> pipe = doc.Create.NewPipe( 
+&nbsp; &nbsp; start, end, pipeType );
+&nbsp;
+&nbsp; pipe.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_PIPE_DIAMETER_PARAM )
+&nbsp; &nbsp; .Set( 0.1667 ); <span class="green">// revise to 2&quot; dia pipe</span>
+&nbsp;
+&nbsp; <span class="green">// get cap symbol:</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt; symbols = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt;(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_PipeFitting )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">FamilySymbol</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">FamilySymbol</span>&gt;( s 
+&nbsp; &nbsp; &nbsp; &nbsp; =&gt; s.Family.Name.Equals( _capFamilyName ) ) );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> capSymbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; symbols.Count )
+&nbsp; {
+&nbsp; &nbsp; capSymbol = symbols[0];
+&nbsp; }
+&nbsp; <span class="blue">else</span> 
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> filename = <span class="teal">Path</span>.Combine( _libFolder, 
+&nbsp; &nbsp; &nbsp; _capFamilyName + _rfaExtension );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// requires a transaction, obviously:</span>
+&nbsp;
+&nbsp; &nbsp; doc.LoadFamilySymbol( filename, _capSymbolName, 
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> capSymbol );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( capSymbol.Family.Name.Equals( _capFamilyName ),
+&nbsp; &nbsp; <span class="maroon">&quot;expected cap pipe fitting to be of family &quot;</span> + _capFamilyName );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi = doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; end, capSymbol, <span class="teal">StructuralType</span>.NonStructural );
+</pre>
+
+<p>The result of running the code so far looks like this:</p>
+
+<center>
+<img src="img/pipe_cap_unconnected.png" alt="Pipe cap unconnected"/>
+</center>
+
+<p>This implements the first step above.
+As you can see, the cap is not connected to the pipe, and it also has a wrong diameter.
+
+<p>To implement the second step, we need to pick the suitable connectors on the cap and the pipe and hook them up with each other.
+On the cap, there is just one connector, so that is easy.
+
+<p>On the pipe, there are two, and it is more complex.
+The order of connectors returned by the connector manager may change, so one should always use a location or some other criterion to select the right one.
+In this case, we check the distance of the pipe connectors to the endpoint we are capping and pick the closest one.
+
+<p>Once the two connectors have been selected, we can connect them to each other:
+
+<pre class="code">
+&nbsp; <span class="green">// pick connector on cap:</span>
+&nbsp;
+&nbsp; <span class="teal">ConnectorSet</span> connectors 
+&nbsp; &nbsp; = fi.MEPModel.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 1 == connectors.Size,
+&nbsp; &nbsp; <span class="maroon">&quot;expected nly one connector on pipe cap element&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> cap_end = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; {
+&nbsp; &nbsp; cap_end = c;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// pick closest connector on pipe:</span>
+&nbsp;
+&nbsp; connectors = pipe.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="teal">Connector</span> pipe_end = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// the order of connectors returned by the </span>
+&nbsp; <span class="green">// connector manager may change, so we </span>
+&nbsp; <span class="green">// always use a location (or even more </span>
+&nbsp; <span class="green">// information if several connectors are </span>
+&nbsp; <span class="green">// at the same location) to get the right</span>
+&nbsp; <span class="green">// connector!</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> dist = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = c.Origin;
+&nbsp; &nbsp; <span class="blue">double</span> d = p.DistanceTo( end );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( d &lt; dist )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; dist = d;
+&nbsp; &nbsp; &nbsp; pipe_end = c;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; cap_end.ConnectTo( pipe_end );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>The result of running the complete code looks like this:</p>
+
+<center>
+<img src="img/pipe_cap_connected.png" alt="Pipe cap connected"/>
+</center>
+
+<p>As you can see, the cap is now automatically positioned and dimensioned correctly with no further input required from my side.
+
+<p>Here is 
+
+<a href="zip/CreatePipeCap.zip">
+CreatePipeCap.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this command.

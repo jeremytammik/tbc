@@ -1,0 +1,277 @@
+<!-- 
+
+1272675 [lock AssemblyInstance elements]
+1272576 [Prevent Deletion of Element]
+
+-->
+
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Lock the Model, e.g. Prevent Deletion</h3>
+
+<p>I recently discussed two common and interesting issues with developers which ended up being easily resolved:
+
+<ul>
+<li>Locking the state of certain programmatically generated parts of the model to prevent the user from messing them up.
+<li>Simpler still, prevent deletion of certain elements.
+</ul>
+
+<p>Both of these issues can be efficiently addressed using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+Failure API</a>.
+
+It allows us to 
+
+<ul>
+<li>Define our own failure conditions.
+<li>Post pre-defined or custom failures.
+<li>Handle failures, e.g. 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/suppress-unwanted-dialogue.html">
+suppress unwanted messages</a> or
+
+completely replace the standard failure processing.
+</ul>
+
+<p>The Revit SDK includes the ErrorHandling sample to demonstrate all of these features,
+and we later returned to this topic to discuss various 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/failure-api-take-two.html">
+failure API aspects in more depth</a>.
+
+<p>So here is the first query that came up:
+
+
+<a name="1"></a>
+
+<h4>Lock Down Part of the Model</h4>
+
+<p><strong>Question:</strong> I am creating certain AssemblyInstance elements in the model programmatically and would like to prevent the user from being able to modify these.
+
+<p>How can I use the API to lock these elements?
+
+<p>It should be impossible to disassemble them and edit or remove elements.
+How can I achieve this?
+
+
+<p><strong>Answer:</strong> This can be achieved using the Failure API. 
+Section 26.1.1 'Defining and registering a failure' in the developer guide shows how you can define a new failure. 
+If you maintain a cache keeping track of the original state of all your assembly instances, you can define a failure that is triggered when anything is changed in any assembly instance. 
+
+<p>The failure API is linked with the Dynamic Model Update framework DMU.
+
+<p>The simpler DocumentChanged event is not cancellable, unfortunately, or you could simply use that.
+
+<p>Below, I demonstrate the detailed implementation steps for the simpler task of simply preventing deletion of certain elements, which does not require keeping track of their previous state.
+
+
+
+<a name="2"></a>
+
+<h4>Prevent Deletion of Elements</h4>
+
+<p><strong>Question:</strong> How do I prevent the deletion of an element? 
+I tried to use DocumentChanged and IUpdater, but both of those seem to be "after the fact" type interfaces.
+
+<p><strong>Answer:</strong> As said, DocumentChanged is indeed after the fact.
+
+<p>The IUpdater is on the right track.
+It is part of the Dynamic Model Update framework DMU and ties in with the failure API, which enables you to easily achieve what you need.
+
+<p>To prove it, I implemented a small sample application PreventDeletion.
+It implements three things:
+
+<ul>
+<li>An external command allowing the user to specify which elements to protect from deletion.
+<li>A class DeletionUpdater derived from IUpdater which prevents deletion of selected elements.
+<li>An external application to register the updater and its trigger.
+</ul>
+
+<p>All three components are extremely simple.
+Let's start with the external command.
+It maintains a list of protected element ids and implements an externally accessible IsProtected method:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _protectedIds 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> IsProtected( <span class="teal">ElementId</span> id )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _protectedIds.Contains( id );
+&nbsp; }
+</pre>
+
+<p>The command itself asks the user to select elements to protect and adds their ids to the list:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; refs = sel.PickObjects( <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick elements to prevent from deletion. &quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != refs &amp;&amp; 0 &lt; refs.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> refs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = r.ElementId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !_protectedIds.Contains( id ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _protectedIds.Add( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">int</span> n = refs.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( Caption, <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} new element{1} selected and protected &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; from deletion, {2} in total.&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ), 
+&nbsp; &nbsp; &nbsp; _protectedIds.Count ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The deletion updater is just as simple.
+The only tricky thing about it is that it defines a custom failure definition in its constructor.
+The severity of the failure is specified as error, so the user really cannot ignore it, which will prevent the elements from being deleted.
+Whatever action that caused the deletion will have to be undone:
+
+<pre class="code">
+<span class="blue">public</span> DeletionUpdater( <span class="teal">AddInId</span> addInId )
+{
+&nbsp; _appId = addInId;
+&nbsp;
+&nbsp; _updaterId = <span class="blue">new</span> <span class="teal">UpdaterId</span>( _appId, <span class="blue">new</span> <span class="teal">Guid</span>( 
+&nbsp; &nbsp; <span class="maroon">&quot;6f453eba-4b9a-40df-b637-eb72a9ebf008&quot;</span> ) );
+&nbsp;
+&nbsp; _failureId = <span class="blue">new</span> <span class="teal">FailureDefinitionId</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;33ba8315-e031-493f-af92-4f417b6ccf70&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="teal">FailureDefinition</span> failureDefinition
+&nbsp; &nbsp; = <span class="teal">FailureDefinition</span>.CreateFailureDefinition(
+&nbsp; &nbsp; &nbsp; _failureId, <span class="teal">FailureSeverity</span>.Error,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;PreventDeletion: sorry, this element cannot be deleted.&quot;</span> );
+}
+</pre>
+
+<p>The updater Execute method simply checks whether any of the deleted element ids are protected from deletion and posts the failure if that is the case:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> Execute( <span class="teal">UpdaterData</span> data )
+{
+&nbsp; <span class="teal">Document</span> doc = data.GetDocument();
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> data.GetDeletedElementIds() )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Command</span>.IsProtected( id ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureMessage</span> failureMessage 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FailureMessage</span>( _failureId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; failureMessage.SetFailingElement(id);
+&nbsp; &nbsp; &nbsp; doc.PostFailure(failureMessage);
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>In the external application, all we have to do is register the updater and its trigger in the start-up method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="teal">DeletionUpdater</span> deletionUpdater 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">DeletionUpdater</span>( a.ActiveAddInId );
+&nbsp;
+&nbsp; <span class="teal">UpdaterRegistry</span>.RegisterUpdater( 
+&nbsp; &nbsp; deletionUpdater );
+&nbsp;
+&nbsp; <span class="teal">ElementClassFilter</span> filter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp;
+&nbsp; <span class="teal">UpdaterRegistry</span>.AddTrigger( 
+&nbsp; &nbsp; deletionUpdater.GetUpdaterId(), filter, 
+&nbsp; &nbsp; <span class="teal">Element</span>.GetChangeTypeElementDeletion() );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>If I specify that an element is protected from deletion using the command above and then try to delete it anyway, the standard Revit error message is displayed:</p>
+
+<center>
+<img src="img/deletion_prevention_error.png" alt="Prevent deletion error message"/>
+</center>
+
+<p>If this message should not be seen by the user, you can easily use the failure handling functionality mentioned above to suppress it.
+
+<p>Here is 
+
+<a href="zip/PreventDeletion.zip">
+PreventDeletion.zip</a> including 
+
+the complete source code and Visual Studio solution of this command.
+
+
+
+<p>Finally, my first personal use of the failure API  :-)
+
+
+<a name="3"></a>
+
+<h4>Entry Points to Point Clouds in Revit</h4>
+
+<p>Here is a short note on a non-API-related issue, an overview of some introductory material on point clouds in Revit from a user point of view:
+
+<p><strong>Question:</strong> I am interested in retrofit projects and would like to understand better what I can do in Revit using point clouds.
+Where should I start, please?
+
+<p><strong>Answer:</strong> Here are a couple of starting points for you:
+
+<ul>
+<li>There are videos on the 
+
+<a href="http://www.youtube.com/user/AutodeskBuilding">
+AutodeskBuilding</a> youtube 
+
+channel, where the 
+
+<a href="http://www.youtube.com/watch?v=1NAzX5xcfO4">
+overview video</a> is 
+
+probably the best place to start.
+
+<li>An interesting web site to look at is 
+
+<a href="http://www.ebim.co.uk">
+eBIM</a>, 
+
+of a company in the UK that built an entire business model around as-built BIM authoring in Revit.  
+
+<li>The very nice data set to understand the point cloud integration is provided by the 
+
+<a href="http://revit.downloads.autodesk.com/download/2012Datasets/210 King.zip">
+Revit model and point cloud of the 210 King office in Toronto</a>.
+</ul>

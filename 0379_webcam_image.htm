@@ -1,0 +1,305 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Grabbing an Internet Webcam Image</h3>
+
+<p>I am in full tilt preparing for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+AEC DevCamp</a> conference 
+
+(<a href="http://devcamps2010.autodeskevents.net/index.cfm?event=cms.page&id=SID3FA5EEFA001D080A3456040FDD1BD93C">web site</a>) in 
+
+Boston next week, June 7-9, and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html#devlabs">
+DevLabs</a> in Waltham following immediately afterwards
+
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=6703509&siteID=123112&cname=DevLab (AEC), Waltham, Jun 10 2010, 201039">register</a>).
+
+<p>One of my sessions at the DevCamp discusses migration to and advanced use of the new Revit 2011 API features. 
+Since some of the new features will be covered by other presentations held by members of the development team, I picked an area that was off their radar and ended up choosing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a> that I recently talked about.
+
+I mentioned that it provides some exciting new possibilities, since it allows more interaction with external applications and goes one step closer towards providing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous access</a> to the Revit API.
+
+<p>Looking for an example of using this event, I pondered various potential providers of external graphical data that changes over time.
+One obvious source of live images is an Internet webcam. 
+
+<p>The idea of displaying a live image in the Revit model also has the added advantage of allowing me to try my hand at using the new analysis visualisation framework and setting up an own spatial field primitive to display pixel data on the face of a Revit model element.
+We looked at one such example discussing the DistanceToSurfaces SDK sample making use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#2">
+dynamic model update</a> mechanism.
+
+<h4>Reading the Matterhorn Webcam JPEG Image Data</h4>
+
+<p>Before I dive into the Revit specific use of this, let me explain how I retrieve the image data that I plan to use from the Internet, since I spent some time myself exploring that issue. 
+It took me a while to discover that all I have to do to access a webcam image is establish what URL to use and then read the byte data from it to obtain the jpeg data to display.
+
+<p>For instance, one of the first webcam candidates that sprang to mind was the
+
+<a href="http://en.wikipedia.org/wiki/Matterhorn">
+Matterhorn</a>, 
+
+probably the best-know Swiss mountain. 
+One Matterhorn webcam image is provided by the URL
+
+<a href="http://www.ggb.ch/webcam.php">
+http://www.ggb.ch/webcam.php</a>.
+
+Exploring the HTML information provided on that page, I discovered that the webcam image itself is read from the URL
+
+<a href="http://www.ggb.ch/webcam.php?e_1__getimage=1">
+http://www.ggb.ch/webcam.php?e_1__getimage=1</a>.
+
+<p>Here is a short Python script that shows how easy it is to read this image data from the URL and create a JPEG file named 'a.jpg' from it:
+
+<pre class="code">
+import urllib
+
+def get_html_content( url ):
+  f = urllib.urlopen( url )
+  s = f.read()
+  f.close()
+  return s
+
+def main():
+  url = 'http://www.ggb.ch/webcam.php?e_1__getimage=1'
+  data = get_html_content( url )
+
+  f = open( 'a.jpg', 'wb' )
+  f.write( data )
+  f.close()
+
+main()
+</pre>
+
+<h4>Grabbing the Matterhorn Webcam Image in .NET</h4>
+
+<p>Thanks to the powerful libraries provided by the .NET framework, reading the Matterhorn image data in .NET is not much less succinct than the minimalistic Python script.
+This code also adds a call to Process.Start to test display the result in the default image viewer:
+
+<pre class="code">
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Drawing;
+<span class="blue">using</span> System.Drawing.Imaging;
+<span class="blue">using</span> System.Net;
+<span class="blue">using</span> System.IO;
+&nbsp;
+<span class="blue">namespace</span> GrabJpg
+{
+&nbsp; <span class="blue">class</span> <span class="teal">Program</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _url =
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;http://www.ggb.ch/webcam.php?e_1__getimage=1&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">WebClient</span> client = <span class="blue">new</span> <span class="teal">WebClient</span>() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">byte</span>[] data = client.DownloadData( _url );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Image</span> img = <span class="teal">Image</span>.FromStream( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">MemoryStream</span>( data ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename = <span class="maroon">&quot;a.jpg&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; img.Save( filename, <span class="teal">ImageFormat</span>.Jpeg );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Process</span>.Start( filename ); <span class="green">// test display</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>To ensure that all possible required information is available, here is
+
+<a href="zip/GrabJpg.zip">
+GrabJpg.zip</a>
+
+containing the source code and Visual Studio solution for this sample.
+
+
+<h4>Picadilly Circus is More Dynamic</h4>
+
+<p>After looking at the Matterhorn image a couple of times and noticing that it does not change as much as I would like, since its main use it to show what the current weather is like up there, I looked around for something a little more dynamic.
+
+<p>My next candidate was 
+
+<a href="http://en.wikipedia.org/wiki/Piccadilly_Circus">
+Picadilly Circus</a> in London, since that tends to have some people and vehicles moving around it.
+
+I found a webcam displaying an image of it which required a slightly more convoluted path to access the final underlying image data, since its URL is embedded within a tag named 'snapshoturl' in an XML data stream. 
+Anyway, the image data URL that one ends up with is 
+
+<a href="http://cameras.camvista.com/webcams/cam2_Piccadilly.jpg">
+http://cameras.camvista.com/webcams/cam2_Piccadilly.jpg</a>.
+
+<p>Here is a Python script accessing that image data, creating a JPEG file named 'a.jpg' from it, and starting up the default image viewer to display it on the screen:
+
+<pre class="code">
+import popen2, urllib
+
+def get_html_content( url ):
+  f = urllib.urlopen( url )
+  s = f.read()
+  f.close()
+  return s
+
+def main():
+  url = 'http://www.camvista.com/xml/10086.xml'
+  data = get_html_content( url )
+
+  # data is an xml file pointing to the jpg url
+
+  print data
+
+  tag = 'snapshoturl'
+  i = data.find( '&lt;' + tag + '&gt;' )
+  print i
+  if -1 &lt; i:
+    i = i + len(tag) + 2
+    print i
+    url = data[i:]
+    print url
+    i = url.find( '&lt;/' + tag + '&gt;' )
+    print i
+    url = url[:i]
+    print url
+
+    data = get_html_content( url )
+
+    f = open( 'a.jpg', 'wb' )
+    f.write( data )
+    f.close()
+
+    popen2.popen2( 'a.jpg' )
+
+main()
+</pre>
+
+<p>A typical view of Picadilly Circus from this webcam on an early Thursday morning before too many people start milling around looks like this:</p>
+
+<center>
+<img src="img/webcam_picadilly.jpg" alt="Webcam image of Picadilly Circus"/>
+</center>
+
+<h4>Conversion to Greyscale Image</h4>
+
+<p>Another issue that I need to consider in order to display a bitmap image using the Revit analysis visualisation framework is that the latter is not designed to display RGB data.
+In order to use it to display a colour image, one option would be to calculate a palette of selected colours based on the most common pixel colours in the given image, and then assign each display point in the Revit model one of the palette colours.
+Another possibility, which seems a lot simpler to me initially, is to convert the colour image to a greyscale one, and then use values between zero and one for the analysis data to feed into the AVF spatial field primitive.
+
+<p>One method that I found to convert a bitmap to a greyscale image using the .NET framework is to make use of the FormatConvertedBitmap class.
+Unfortunately, it cannot be initialised directly from the Image instance that we created from the JPEG image data stream.
+It does provide a constructor taking a BitmapSource argument, though, and I discovered that I can create such an instance from the Image that I have using the following method:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">BitmapSource</span> ConvertBitmapToBitmapSource( 
+&nbsp; <span class="teal">Bitmap</span> bmp )
+{
+&nbsp; <span class="blue">return</span> System.Windows.Interop.<span class="teal">Imaging</span>
+&nbsp; &nbsp; .CreateBitmapSourceFromHBitmap( 
+&nbsp; &nbsp; &nbsp; bmp.GetHbitmap(), 
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero, 
+&nbsp; &nbsp; &nbsp; <span class="teal">Int32Rect</span>.Empty, 
+&nbsp; &nbsp; &nbsp; <span class="teal">BitmapSizeOptions</span>.FromEmptyOptions() );
+}
+</pre>
+
+<p>With that method in place, I can pass the image data through the following conversion sequence to feed the format conversion:
+
+<ol>
+<li>byte[] from URL using DownloadData
+<li>MemoryStream from byte[] using constructor
+<li>Image from MemoryStream using Image.FromStream
+<li>Bitmap from Image using GetThumbnailImage
+<li>BitmapSource from Bitmap using ConvertBitmapToBitmapSource
+<li>Set FormatConvertedBitmap.Source using BitmapSource
+</ol>
+
+<p>I end up with the following little console application mainline to read the webcam image data from the specified URL, convert it to a greyscale image, save that to a JPEG file, and display it for test purposes:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _url = 
+&nbsp; <span class="maroon">&quot;http://www.ggb.ch/webcam.php?e_1__getimage=1&quot;</span>;
+&nbsp;
+<span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+{
+&nbsp; <span class="blue">using</span>( <span class="teal">WebClient</span> client = <span class="blue">new</span> <span class="teal">WebClient</span>() )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">byte</span>[] data = client.DownloadData( _url );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Image</span> img = <span class="teal">Image</span>.FromStream( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">MemoryStream</span>( data ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename = <span class="maroon">&quot;a.jpg&quot;</span>;
+&nbsp; &nbsp; &nbsp; img.Save( filename, <span class="teal">ImageFormat</span>.Jpeg );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// test display original:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Process</span>.Start( filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// scale down to half size in each direction:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> w = img.Width &gt;&gt; 1; 
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> h = img.Height &gt;&gt; 1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Bitmap</span> bitmap = <span class="blue">new</span> <span class="teal">Bitmap</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; img.GetThumbnailImage( w, h, <span class="blue">null</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FormatConvertedBitmap</span> grey 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FormatConvertedBitmap</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; grey.BeginInit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; grey.Source 
+&nbsp; &nbsp; &nbsp; &nbsp; = ConvertBitmapToBitmapSource( bitmap );
+&nbsp;
+&nbsp; &nbsp; &nbsp; grey.DestinationFormat 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">PixelFormats</span>.Gray32Float;
+&nbsp;
+&nbsp; &nbsp; &nbsp; grey.EndInit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">JpegBitmapEncoder</span> encoder 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JpegBitmapEncoder</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; encoder.Frames.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BitmapFrame</span>.Create( grey ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; encoder.QualityLevel = 25;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename2 = <span class="maroon">&quot;a2.jpg&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FileStream</span> file = <span class="blue">new</span> <span class="teal">FileStream</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; filename2, <span class="teal">FileMode</span>.Create, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FileAccess</span>.Write );
+&nbsp;
+&nbsp; &nbsp; &nbsp; encoder.Save( file );
+&nbsp; &nbsp; &nbsp; file.Close();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// test display greyscale:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Process</span>.Start( filename2 ); 
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/GrabGreyJpg.zip">
+GrabGreyJpg.zip</a>
+
+containing the complete source code and Visual Studio solution for this console application.
+
+<p>With these preparations in place, we are all set to return to Revit and make use of these image grabbing methods to implement an Idling event handler to paint a real-time view onto a face of any arbitrary building element.
+For instance, wouldn't it be neat to create a building model whose windows display a real-time view of some beautiful natural park?

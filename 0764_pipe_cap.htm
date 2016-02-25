@@ -1,0 +1,260 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Mick Kulik Re: Creating a Pipe Cap in Revit MEP 2012 -->
+
+<h3>Create a Pipe Cap</h3>
+
+<p>Happily mixing the different Revit versions, let me follow up my work on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html">
+Revit MEP 2013 API</a> and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+updated AdnRme sample</a> by 
+
+another MEP related topic.
+
+<p>Before getting to that, though, here is a brief heads-up for a new technology preview on Autodesk Labs:
+
+
+<a name="1"></a>
+
+<h4>BIM Coordinator</h4>
+
+<p>The effective organization of project data in shared or related coordinates is essential to effective collaboration across disciplines and good quality project information. 
+
+<a href="http://labs.autodesk.com/utilities/bim_coordinator">
+BIM Coordinator</a> for 
+
+AutoCAD Civil 3D and Revit is a technology preview that assists project team members with building and site grids.</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/aSxbv7QPero" frameborder="0" allowfullscreen></iframe>
+
+<p>Here is a brief overview taken from the labs:
+
+<p><b>Building grids</b> are generally selected based on the layout and shape of the building, usually using the lower left corner of the selected orientation as a reference point. Building grids are established by the lead designer of a project for use by all members of the building design team. This grid ensures that different disciplines' building designs use the same reference for purposes of building analyses, drawing production, and other tasks requiring coordinated building data.
+
+<p><b>Site grids</b> are generally based on Northing and Easting coordinates. They are usually established for a region; although arbitrary grids can be established for a single project or site. For example, in the UK most sites are related to the Ordinance Survey (OS) grid. Site elevations (levels) are also based on an OS benchmark or other site/project benchmark.
+
+<p><a href="http://labs.autodesk.com/utilities/bim_coordinator">
+BIM Coordinator</a> automates the more error-prone manual steps in the coordination of site and building grids between the AutoCAD and Revit environments, currently for the 2012 versions. The tool specifies one common XYZ point and its orientation in the XY plane between the two coordinate systems. This reference point defines the relationship between the building and site grid.
+
+<p>Miroslav Schonauer will be explaining some background and sharing source code from this utility at the upcoming 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/aec-devcamp-coming-up-again.html">
+AEC DevCamp</a> in 
+
+Waltham June 6-7.
+ 
+
+<a name="2"></a>
+
+<h4>Create a Pipe Cap</h4>
+
+<p>Back to the Revit MEP API, I presented an example to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html">
+create a pipe cap</a> in 
+
+Revit 2011 over a year ago.
+
+<p>Now Mick Kulik of
+
+<a href="http://www.hydracad.com">
+Hydratec, Inc.</a> discovered 
+
+that the existing sample code did not work in his case, and worked together with Saikat Bhattacharya at the AutoCAD DevLab in San Rafael to fix this issue for Revit 2012.
+
+<p>Here is the original problem and its solution:
+
+<p><strong>Question:</strong> Following the post about 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html">
+creating a pipe cap</a>, 
+
+I was not able to get a cap to connect to a pipe in Revit MEP 2012.
+The Error is "Line is too short". 
+Is there a new way to connect caps to pipes in Revit MEP 2012?
+
+<p><strong>Answer:</strong> Saikat came down to give us a hand last week at the AutoCAD DevLab in San Rafael.
+He had some sample code to attach caps to sloping pipes.
+I was able to massage his code to fit our needs, and have attached his 
+
+<a href="zip/CapAtStartOfPipe.zip">
+sample project CapAtStartOfPipe.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this command.
+
+<p>Saikat's code worked on all the cases we tested except when trying to connect the cap to a non-sloped vertical pipe, so I built in a case to handle it which worked for my test cases:
+
+<pre class="code">
+&nbsp; <span class="green">// rotate the cap if necessary</span>
+&nbsp;
+&nbsp; <span class="green">// rotate about Z first</span>
+
+&nbsp; <span class="teal">XYZ</span> pipeHorizontalDirection 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">XYZ</span>( dir.X, dir.Y, 0.0 ).Normalize();
+&nbsp;
+&nbsp; <span class="teal">ConnectorSet</span> c2 
+&nbsp; &nbsp; = fi.MEPModel.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="teal">Connector</span> capConnector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> c2 )
+&nbsp; { 
+&nbsp; &nbsp; capConnector = c; 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> connectorDirection 
+&nbsp; &nbsp; = -capConnector.CoordinateSystem.BasisZ;
+&nbsp;
+&nbsp; <span class="blue">double</span> zRotationAngle 
+&nbsp; &nbsp; = pipeHorizontalDirection.AngleTo( 
+&nbsp; &nbsp; &nbsp; connectorDirection );
+&nbsp;
+&nbsp; <span class="teal">Transform</span> trf = <span class="teal">Transform</span>.get_Rotation( 
+&nbsp; &nbsp; start, <span class="teal">XYZ</span>.BasisZ, zRotationAngle );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> testRotation = trf.OfVector( 
+&nbsp; &nbsp; connectorDirection ).Normalize();
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( testRotation.DotProduct( 
+&nbsp; &nbsp; pipeHorizontalDirection ) - 1 ) &gt; 0.00001 )
+&nbsp; {
+&nbsp; &nbsp; zRotationAngle = -zRotationAngle;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Line</span> axis = doc.Application.Create.NewLineBound( 
+&nbsp; &nbsp; start, start + <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( 
+&nbsp; &nbsp; doc, fi.Id, axis, zRotationAngle );
+&nbsp;
+&nbsp; <span class="green">// Need to rotate vertically?</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( dir.DotProduct( <span class="teal">XYZ</span>.BasisZ ) ) 
+&nbsp; &nbsp; &gt; 0.000001 )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// if pipe is straight up and down, </span>
+&nbsp; &nbsp; <span class="green">// kludge it my way else</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( dir.X == 0 &amp;&amp; dir.Y == 0 &amp;&amp; dir.Z != 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> yaxis = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 1.0, 0.0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> rotationAngle = dir.AngleTo( yaxis );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( dir.Z == 1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; rotationAngle = -rotationAngle;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; axis = doc.Application.Create.NewLine( 
+&nbsp; &nbsp; &nbsp; &nbsp; start, yaxis, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc, fi.Id, axis, rotationAngle );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> sloped pipes
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> rotationAngle = dir.AngleTo( 
+&nbsp; &nbsp; &nbsp; &nbsp; pipeHorizontalDirection );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = pipeHorizontalDirection
+&nbsp; &nbsp; &nbsp; &nbsp; .CrossProduct( <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; &nbsp; trf = <span class="teal">Transform</span>.get_Rotation( 
+&nbsp; &nbsp; &nbsp; &nbsp; start, normal, rotationAngle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; testRotation = trf.OfVector( dir ).Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( testRotation.DotProduct( 
+&nbsp; &nbsp; &nbsp; &nbsp; pipeHorizontalDirection ) - 1 ) &lt; 0.00001 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; rotationAngle = -rotationAngle;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; axis = doc.Application.Create.NewLineBound( 
+&nbsp; &nbsp; &nbsp; &nbsp; start, start + normal );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc, fi.Id, axis, rotationAngle );
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span>
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// pick connector on cap:</span>
+&nbsp;
+&nbsp; <span class="teal">ConnectorSet</span> connectors 
+&nbsp; &nbsp; = fi.MEPModel.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 1 == connectors.Size, 
+&nbsp; &nbsp; <span class="maroon">&quot;expected only one connector on pipe cap element&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> cap_end = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; { 
+&nbsp; &nbsp; cap_end = c; 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// pick closest connector on pipe:</span>
+&nbsp;
+&nbsp; connectors = pipe.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; <span class="teal">Connector</span> pipe_end = <span class="blue">null</span>;
+&nbsp; <span class="blue">double</span> dist = <span class="blue">double</span>.MaxValue;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = c.Origin;
+&nbsp; &nbsp; <span class="blue">double</span> d = p.DistanceTo( start );
+&nbsp; &nbsp; <span class="blue">if</span>( d &lt; dist )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; dist = d;
+&nbsp; &nbsp; &nbsp; pipe_end = c;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; pipe_end.ConnectTo( cap_end );
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// After ConnectTo, the cap size is double, so </span>
+&nbsp; <span class="green">// need to change the nominal radius to half.</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( fi != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> pipeConnectors 
+&nbsp; &nbsp; &nbsp; = pipe.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> pipeEnd = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> pipeConnectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pipeEnd = c;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">double</span> radius = pipeEnd.Radius;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> para = fi.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Nominal Radius&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( para != <span class="blue">null</span> &amp;&amp; !para.IsReadOnly )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; para.Set( radius );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Here is a screen capture of the result of testing caps on a vertical pipe:</p>
+
+<center>
+<img src="img/CapTest1.png" alt="Cap test on vertical pipe"/>
+</center>
+
+<p>Many thanks to Saikat and Mick for providing this new sample!

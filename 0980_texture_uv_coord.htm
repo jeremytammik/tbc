@@ -1,0 +1,239 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+- 08465651 [How to get material texture path on IExportContext?]
+  retrieve the texture path assigned to current render apperance
+
+  Arno&scaron;t L&ouml;bel
+  Arnost Lobel RE: Autodesk Discussion Groups Subscription: 1 Update: Re: Obtaining texture UV coordinates
+
+http://forums.autodesk.com/t5/Autodesk-Revit-API/Obtaining-texture-UV-coordinates/m-p/3947006/highlight/false#M4060
+  Arnost Lobel RE: Autodesk Discussion Groups Subscription: 1 Update: Re: Obtaining texture UV coordinates
+
+Dan Lin: IFC information
+  https://internal.autodesk360beta.com/portal/profile/20121022642/Dan%20Lin
+
+- Scott RE: Read nested family
+  How can I test whether it is nested within another family, whether it has families nested within, and if so which families?
+  If the family is 'Shared', then within the project that contains Family B, you will also be able to see the elements and types of Family A.
+  The typical use I’ve seen for this is for furniture, e.g. Table and Chairs family also containing a chair family that can be placed independently. ‘
+  If the family is not shared (the more typical case), then as Jeremy states you need to get the Family’s document to see the members it contains.  In memory, this would be via EditFamily().
+  If a family A is nested within a family B, then you can open family B and read the family elements in its database; A should appear. furthermore, there should be one or more family symbols of A and one or more family instances of A in B's database.
+  So just running the appropriate filtered element collectors will answer the question.
+  Here are some related blog posts:
+
+-->
+
+<h3>Texture Bitmap and UV Coordinates</h3>
+
+<p>Yesterday, I mentioned the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">
+custom exporter framework</a> providing
+
+direct access to the Revit viewing and rendering graphics pipeline.</p>
+
+<p>That brings new possibilities to a related area that we discussed way back in 2010: how to obtain
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/texture-data-uv-coordinates-and-fbx.html">
+texture data UV coordinates</a>.
+
+At the time, the Revit API did not provide this information, and a work-around based on the Revit FBX export helped a little.</p>
+
+<!-- <p>One unfortunate side effect of the enhancements to the cross-product handling of materials was that they became even more of a black box with inaccessible internals.</p> -->
+
+<p>Happily, the custom exporter framework opens that up a bit more.
+Let us look at that and sundry other recent little queries:</p>
+
+<ul>
+<li><a href="#2">Obtaining texture UV coordinates</li>
+<li><a href="#3">Texture bitmap access</li>
+<li><a href="#4">Calculating and marking shaded areas in the BIM</li>
+<li><a href="#5">Nested family predicate</li>
+<li><a href="#6">IFC viewer</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Obtaining Texture UV Coordinates</h4>
+
+<p>This question was raised again in a
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/Obtaining-texture-UV-coordinates/m-p/3947006/highlight/false#M4060">
+forum thread on obtaining texture UV coordinates</a>:</p>
+
+<p><strong>Question:</strong> I coded a Revit plugin that renders a scene &ndash; and calculates the UV coordinates for each vertex.
+Unfortunately there are a number of situations where UV mapping is wrong &ndash; even with planar mapping.
+So my question is, how can I get correct UV's?</p>
+
+<p><strong>Answer by Arno&scaron;t L&ouml;bel:</strong> Indeed, the regular Revit geometry API does not provide accurate UV texture mapping data.</p>
+
+<p>However, correct UVs can be retrieved from the CustomExporter via an ExportContext in Revit 2014, a.k.a. Visualization API.
+The OnPolymesh callback of the context receives PolymeshTopology objects that have UVs for each mesh.</p>
+
+<p>The CustomExporter should be used for most (if not all) export and render external applications.</p>
+
+<p><strong>Response:</strong> I implemented the proposed solution and can confirm that it works extremely well.
+Thank you!
+My only criticism is that it still doesn't allow obtaining texture map named assigned to materials in the OnMaterial method.
+I also noticed that the ArchVision RPC (cutout geometry) props do not get sent to ExportContext.
+But still a huge step forward.
+
+<p><strong>Answer by Arno&scaron;t:</strong> Thank you for making progress and reporting on it. :-)
+It seems the Custom Exporter is the right tool for you to utilize.
+I am sorry about the textures and RPCs.
+However we are under rather strict copyright obligations and we are not allowed to export data for RPCs in any of our export formats, including custom exports.
+As for the textures, although there are no such strict restrictions, the entire material component is &ndash; technically &ndash; not part of Revit code and its internal API does not allow us to acquire texture paths, at least not easily (as far as I know).
+Hopefully, the material component keeps on improving going forward allowing us expanding the functionality of custom exporters in future releases of the Revit API.
+
+
+<a name="3"></a>
+
+<h4>Texture Bitmap Access</h4>
+
+<p>As you can see from the item above, the texture UV coordinates are available, and the bitmap is not.</p>
+
+<p>As a workaround for that, Artur Brzegowy, who provided the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#5">
+custom exporter to Collada</a> published
+
+yesterday, suggested getting the texture memory data instead:</p>
+
+<p>One possibility might be to create a simple plane on the fly, assign the given material on it, and make a screen snapshot of the texture using document.ExportImage or some other method.</p>
+
+<p>Rudolf Honke was also interested in access to the texture bitmap, and initially suggested:</p>
+
+<p>We are obviously looking for a full texture bitmap like this:</p>
+
+<center>
+<img src="img/rh_texture_01.png" alt="Sample texture bitmap"/>
+</center>
+
+<p>The MaterialNode provides a property named ThumbnailFile returning the path if a file that contains a thumbnail image of the material.
+That is not presumably to small a preview to be useful, not a full-scale image like above.</p>
+
+<p>We could also grab a texture preview image from the material browser:</p>
+
+<center>
+<img src="img/rh_texture_02.png" alt="Material browser" width="400"/>
+</center>
+
+<p>Unfortunately, the preview image here does not just display the texture, but other objects as well.</p>
+
+<p>Based on Artur's idea, I suggested to Rudolf:</p>
+
+<ul>
+<li>Create a new temporary project</li>
+<li>Create a large cube</li>
+<li>Assign it the desired material</li>
+<li>Create a screen snapshot of that</li>
+</ul>
+
+<p>Rudolf reports: I tried it out and am happy to say that it works.</p>
+
+<p>I have one little issue with the line width, though:</p>
+
+<center>
+<img src="img/rh_texture_03.png" alt="Sample bitmap" width="200"/>
+</center>
+
+<p>I am requesting TL, thin lines, because the image can be cropped better that way.
+The thin lines appear just fine in the standard display.</p>
+
+<p>However, the exported images are adorned with a thick border.</p>
+
+<p>I can obtain the desired bitmap anyway, of course.</p>
+
+<p>Because of this, though, it might be better to grab the screen image directly rather than passing it through the Document.ExportImage method.
+That would provide real 'what you see is what you get'.</p>
+
+<p>Here is a partial cropped screen snapshot of the result &ndash; the original sample image includes 86 different textures:</p>
+
+<center>
+<img src="img/rh_texture_04.png" alt="Texture bitmap results"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Calculating and Marking Shaded Areas in the BIM</h4>
+
+<p>On a completely different topic, say we have a roof with a tall chimney in a Revit building model and enable the sun settings so that shadows are displayed.
+
+<p><strong>Question:</strong> How can we programmatically find out which area on the roof is under shadow?
+
+<p><strong>Answer:</strong> Project both the chimney and the roof onto a plane in the direction of the sunlight and then calculate the overlap.
+
+<p><strong>Response:</strong> Will that be accurate?
+Is there a direct API to get the shaded area?
+
+<p><strong>Answer:</strong> Yes, of course it is accurate.
+No, there is no direct API support for that.
+
+<p>You can use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+extrusion analyser</a> to
+
+determine the shaded area projected onto a plane.
+Project the roof itself onto the same plane as well.
+Then use a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+2D Boolean operation on the plane</a> to
+
+determine the overlap.</p>
+
+<p>Projecting these results from the plane back onto the roof for different hours of the day would enable you to display the outlines of the shadows as required.</p>
+
+
+<a name="5"></a>
+
+<h4>Nested Family Predicate</h4>
+
+<p>Here is another unrelated topic, closer to the kernel Revit API this time:
+
+<p><strong>Question:</strong> How can I test whether a family is nested within another family, whether it has families nested within itself, and if so which ones?</p>
+
+<p><strong>Answer:</strong>  If a family A is nested within a family B, and the family is 'Shared', then you will also be able to see the elements and types of family A in any project containing family B.
+
+<p>One typical use of this is for furniture, e.g. a Table and Chairs family may contain a chair family that can be placed independently.</p>
+
+<p>If the family is not shared, which is the more typical case, then you need to open the family’s document to see the members it contains.
+This can be achieved in memory via the EditFamily method.</p>
+
+<p>You can open family B and read the family elements in its database; A will appear as a Family element.
+Furthermore, there should be one or more family symbols of A and one or more family instances of A in B's database.</p>
+
+<p>Therefore, just running the appropriate filtered element collectors will answer the question quickly, easily and efficiently.</p>
+
+<p>Here are some previous discussions related to this:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">Nested instance geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">Nested family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/nested-family-instance.html">Nested family instance</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/nested-family-utility-methods.html">Nested family utility methods</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/nested-lighting-fixture-instances.html">Nested lighting fixture instances</a></li>
+</ul>
+
+
+<a name="6"></a>
+
+<h4>IFC Viewer</h4>
+
+<p>Finally, on yet another unrelated topic, here is some IFC news and pointers that might come in handy:
+
+<p>Navisworks supports IFC only, not ifcXML and ifcZip. The currently supported version is IFC2X3 and lower, not yet IFC4
+
+(<a href="http://www.buildingsmart-tech.org/specifications/ifc-overview/ifc-overview-summary">IFC specification</a>).</p>
+
+<p>IFC doesn’t support texture. Colour support is also patchy, although the Navisworks 2014 SP1 significantly improves the situation.</p>
+
+<p>As regards IFC viewers, the <a href="http://www.solibri.com/">Solibri model viewer</a> appears to be quite good.

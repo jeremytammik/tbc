@@ -1,0 +1,102 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>RevitRubyShell Implementation and Installer</h3>
+
+<p>I had a very impressive train ride on Friday evening on my way up to meet my friends to climb the 
+
+<a href="http://en.wikipedia.org/wiki/Spitzhorn">Spitzhorn</a> mountain, 
+
+happening to take the 
+
+<a href="http://www.myswitzerland.com/en/montreux-chateau-d-oex-gstaad-panoramic-express.html">
+panoramic express</a> up 
+
+from Montreux to Gstaad, completely by chance. 
+I was just expecting a normal train ride, but it turned out to be extremely beautiful, the most comfortable way I have yet experienced to get an almost overwhelming impression of Swiss mountain beauty without having to do any hiking, just looking out of the train window.
+We made it to the summit on Saturday
+
+(<a href="http://www.facebook.com/media/set/?set=a.4253220338006.2173087.1510729143&type=1">photos</a>):</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-07-07_spitzhorn/jeremy_on_gipfelkreuz.jpg" alt="Jeremy on Spitzhorn peak cross" width="400"/>
+</center>
+
+<p>Last week, I provided a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/meetings-football-and-revitrubyshell.html#2">
+short description</a> of
+
+the interactive real-time Revit programming environment 
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+RevitRubyShell</a> provided 
+
+by 
+
+<a href="http://www.hclausen.net">H&aring;kon Clausen</a> and 
+
+mentioned how impressed I was by its minimalistic single-click
+
+<a href="http://www.hclausen.net/RevitRubyShell/setup.exe">
+installer</a>.
+
+<p>In the train on the way up to Gstaad, I took a closer look at it.
+H&aring;kon points out that RevitRubyShell is heavily inspired by 
+
+<a href="http://code.google.com/p/revitpythonshell">
+RevitPythonShell</a> and 
+
+Jimmy Schementi's article about 
+
+<a href="http://blog.jimmy.schementi.com/2009/12/ironruby-rubyconf-2009-part-35.html">
+embedding IronRuby</a>.
+
+<p>The entire source code is provided on the 
+
+<a href="http://en.wikipedia.org/wiki/GitHub">
+GitHub social coding platform</a>.
+
+<a href="https://github.com">
+GitHub</a> is a web-based hosting service for software development projects using the 
+
+<a href="http://git-scm.com">
+Git revision control system</a>.
+
+<p>I found the RevitRubyShell source impressive and edifying, sporting a number of aspects well worth looking at in depth for most Revit API programmers, and for that matter most .NET programmers in general as well.
+I probably missed lots of other interesting features, but here are some that sprang to eye:
+
+<ul>
+<li>Optimal use of numerous bits of .NET functionality to achieve a lot with a minimum of code.
+<li>Use of XAML to implement its shell window form, including use of tabs and command buttons.
+<li>A couple of useful extension methods for the .NET KeyEventArgs and RichTextBox classes.
+<li>One-click installer making use of RevitAddInUtility and its RevitProductUtility and AddInManifestUtility classes.
+</ul>
+
+<p>I sat down with the RevitRubyShell console and tried to figure out how to count the number of doors in the Revit basic sample model.
+<p>It took me a bit of fiddling and googling, but this seems to do the trick:
+
+<pre>
+bic = BuiltInCategory.OST_Doors
+
+doors = FilteredElementCollector.new(doc)
+  .OfCategory( bic ).ToElements();
+
+count = doors.select {|d| d.is_a?( FamilyInstance )}.size
+
+=> 29
+</pre>
+
+<p>Only three lines of pretty obvious code, even if you know just a little bit of Ruby and the Revit API:</p>
+
+<center>
+<img src="img/ruby_door_count.png" alt="Door count in Ruby"/>
+</center>
+
+<p>I find this pretty impressive, once again.
+The handling is totally intuitive, and everything simply works.
+Brilliant.
+
+<p>Many thanks again to H&aring;kon for developing and sharing this!
+

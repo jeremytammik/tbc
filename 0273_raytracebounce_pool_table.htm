@@ -1,0 +1,385 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>RayTraceBounce Pool Table</h3>
+
+<p>In spite of yesterday's promise to stop, here is yet one more last minute  Christmas present from Harry Matttison of the Revit API development team.
+In Harry's own words: "Here is a modification to make the ray shooting SDK example RayTraceBounce a bit more fun ... it works and can amuse a 6 year old, if nothing else."
+
+<p>Harry's sample uses the ray tracing capabilities of the FindReferencesByDirection method to simulate a pool table.
+The model defines the table, six pockets, and a cue.
+The cue can be positioned in any way you like.
+Once positioned, you launch the RaytraceBouncePool command to calculate the walls that the ball will encounter if leaving the cue in a straight line and the reflections off them until it hits a pocket.
+The number of total reflections required is counted and reported.
+Here is a shot with four reflections:</p>
+
+<center>
+<img src="img/pool_table_1.png" alt="Pool table simulation in Revit"/>
+</center>
+
+<p>Here is another one with just two:</p>
+
+<center>
+<img src="img/pool_table_2.png" alt="Pool table simulation in Revit"/>
+</center>
+
+<p>The command makes use of a couple of handy utility methods:
+
+<ul>
+<li>Get3DView returns the view named "{3D}" in the current document.
+<li>DeleteLines deletes the lines from the previous run.
+<li>MakeLine creates a model line with the given start point, end point, and line style.
+</ul>
+
+<p>Here is the source code of the entire external command and its utility methods, which Harry placed in the namespace RayTraceBounce:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RaytraceBouncePool</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="green">// have a line style &quot;bounce&quot; created in the </span>
+&nbsp; <span class="green">// document before running this</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Maximum number of bounces to calculate.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _max_bounces = 100;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Message box caption.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _caption = <span class="maroon">&quot;RayTraceBounce Pool Table&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">ExternalCommandData</span> cdata;
+&nbsp; <span class="teal">Application</span> app;
+&nbsp; <span class="teal">Document</span> doc;
+&nbsp; <span class="teal">Face</span> face = <span class="blue">null</span>;
+&nbsp; <span class="teal">Reference</span> rClosest = <span class="blue">null</span>;
+&nbsp; <span class="teal">View3D</span> view = <span class="blue">null</span>;
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> epsilon = 0.00000001;
+&nbsp; <span class="blue">int</span> LineCount = 0;
+&nbsp; <span class="blue">int</span> RayCount = 0;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; cdata = commandData;
+&nbsp; &nbsp; app = commandData.Application;
+&nbsp; &nbsp; doc = app.ActiveDocument;
+&nbsp; &nbsp; Get3DView();
+&nbsp; &nbsp; DeleteLines();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// find the cue</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> direction = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> startpt = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt; list 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> filter = app.Create.Filter
+&nbsp; &nbsp; &nbsp; .NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> num = app.ActiveDocument.get_Elements( 
+&nbsp; &nbsp; &nbsp; filter, list );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Revit.<span class="teal">Element</span> e <span class="blue">in</span> list )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Name == <span class="maroon">&quot;cue&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = e.Location 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; direction = lc.Curve.ComputeDerivatives( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, <span class="blue">true</span> ).BasisX;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; startpt = lc.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( <span class="maroon">&quot;A default 3D view (named {3D}) &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; must exist before running this command&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; _caption );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> ctr = 1; ctr &lt;= _max_bounces; ++ctr )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ReferenceArray</span> references 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.FindReferencesByDirection( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startpt, direction, view );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; rClosest = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; FindClosestReference( references );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( rClosest == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( <span class="maroon">&quot;Ray &quot;</span> + ctr + <span class="maroon">&quot; aborted. &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;No closest face reference found.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> endpt = <span class="blue">new</span> <span class="teal">XYZ</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rClosest.GlobalPoint.X, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rClosest.GlobalPoint.Y, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rClosest.GlobalPoint.Z );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( startpt.AlmostEqual( endpt ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Start and end points are equal. Ray &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ctr + <span class="maroon">&quot; aborted\n&quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + startpt.X + <span class="maroon">&quot;, &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + startpt.Y + <span class="maroon">&quot;, &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + startpt.Z,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; MakeLine( startpt, endpt, direction, <span class="maroon">&quot;bounce&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; RayCount = RayCount + 1;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face = rClosest.GeometryObject <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( rClosest.Element.Category.Name == <span class="maroon">&quot;Doors&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( <span class="maroon">&quot;You sank the ball with &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ctr + <span class="maroon">&quot; shots.&quot;</span>, _caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> endptUV = rClosest.UVPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// face normal where ray hits</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> faceNormal = face.ComputeDerivatives( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; endptUV ).BasisZ;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transformation to get it in terms of </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// document coordinates instead of the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// parent symbol</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormal = rClosest.Transform.OfVector( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormal );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// http://www.fvastro.org/presentations/ray_tracing.htm</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> directionMirrored = direction 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; - 2 * direction.Dot( faceNormal ) * faceNormal;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get ready to shoot the next ray</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; direction = directionMirrored; 
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startpt = endpt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Find closest reference.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;references&quot;&gt;</span><span class="green">Input array of references</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Reference</span> FindClosestReference( 
+&nbsp; &nbsp; <span class="teal">ReferenceArray</span> references )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> face_prox = <span class="teal">Double</span>.PositiveInfinity;
+&nbsp; &nbsp; <span class="blue">double</span> edge_prox = <span class="teal">Double</span>.PositiveInfinity;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> references )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r.Element.Category.Name != <span class="maroon">&quot;Generic Models&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; face = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; face = r.GeometryObject <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Edge</span> edge = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; edge = r.GeometryObject <span class="blue">as</span> <span class="teal">Edge</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// when startpoint is on a surface, should </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// FindReferencesByDirection find that surface?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( r.ProximityParameter ) &lt; face_prox 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; r.ProximityParameter &gt; epsilon ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rClosest = r;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face_prox = <span class="teal">Math</span>.Abs( r.ProximityParameter );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( edge != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// when startpoint is on a surface, should </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// FindReferencesByDirection find that surface?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( r.ProximityParameter ) &lt; edge_prox 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; r.ProximityParameter &gt; epsilon ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; edge_prox = <span class="teal">Math</span>.Abs( r.ProximityParameter );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// stop bouncing if there is an edge at least </span>
+&nbsp; &nbsp; <span class="green">// as close as the neareast face - there is no </span>
+&nbsp; &nbsp; <span class="green">// single angle of reflection for a ray </span>
+&nbsp; &nbsp; <span class="green">// striking a line</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( edge_prox &lt;= face_prox )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; rClosest = <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rClosest;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create a model line with the given start, end point, and line style.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;sp&quot;&gt;</span><span class="green">Start point</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;ep&quot;&gt;</span><span class="green">End point</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;direction&quot;&gt;</span><span class="green">Sketch plane normal vector</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;style&quot;&gt;</span><span class="green">Line style name</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> MakeLine( 
+&nbsp; &nbsp; <span class="teal">XYZ</span> sp, 
+&nbsp; &nbsp; <span class="teal">XYZ</span> ep, 
+&nbsp; &nbsp; <span class="teal">XYZ</span> direction, 
+&nbsp; &nbsp; <span class="blue">string</span> style )
+&nbsp; {
+&nbsp; &nbsp; LineCount = LineCount + 1;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = app.Create.NewLineBound( sp, ep );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> geometryPlane = app.Create.NewPlane( 
+&nbsp; &nbsp; &nbsp; direction, sp );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> skplane = doc.Create.NewSketchPlane( 
+&nbsp; &nbsp; &nbsp; geometryPlane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> mcurve = doc.Create.NewModelCurve( 
+&nbsp; &nbsp; &nbsp; line, skplane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementArray</span> lsArr = mcurve.LineStyles;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Revit.<span class="teal">Element</span> e <span class="blue">in</span> lsArr )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Name == style )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; mcurve.LineStyle = e;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the view named &quot;{3D}&quot; in the current document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Get3DView()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt; list 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> filter = app.Create.Filter.NewTypeFilter( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">View3D</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Int64</span> num = app.ActiveDocument.get_Elements( 
+&nbsp; &nbsp; &nbsp; filter, list );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Revit.<span class="teal">Element</span> v <span class="blue">in</span> list )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( v.Name == <span class="maroon">&quot;{3D}&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; view = v <span class="blue">as</span> <span class="teal">View3D</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Delete the lines from the previous run.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> DeleteLines()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt; list 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;Autodesk.Revit.<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Filter</span> filter = app.Create.Filter.NewTypeFilter( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">CurveElement</span> ), <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Int64</span> num = app.ActiveDocument.get_Elements( 
+&nbsp; &nbsp; &nbsp; filter, list );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Revit.<span class="teal">Element</span> e <span class="blue">in</span> list )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ModelCurve</span> mc = e <span class="blue">as</span> <span class="teal">ModelCurve</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( mc != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( mc.LineStyle.Name == <span class="maroon">&quot;bounce&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || mc.LineStyle.Name == <span class="maroon">&quot;normal&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.ActiveDocument.Delete( e );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>I integrated this into the standard RayTraceBounce SDK sample code by adding a second external command implementation class named RaytraceBouncePool to the existing project, and the following lines to my RvtSamples.txt file that I use to load all the SDK samples:
+
+<pre>
+Geometry
+RayTraceBounce Pool Table
+Simulate a pool table.
+LargeImage: 
+Image: 
+C:\...\SDK\Samples\RaytraceBounce\RayTraceBounce.dll
+RayTraceBounce.RaytraceBouncePool
+</pre>
+
+<p>Here is the source file 
+
+<a href="C:\a\lib\revit\2010\SDK\Samples\RaytraceBounce\CS\RaytraceBouncePool.cs">
+RaytraceBouncePool.cs</a> and the sample project 
+
+<a href="C:\a\lib\revit\2010\SDK\Samples\RaytraceBounce\PoolTable.rvt">
+PoolTable.rvt</a> defining 
+
+the pool table and cue for downloading.
+I placed the sample project into the RaytraceBounce subdirectory of the SDK Samples folder, and the source file into the CS subdirectory below it.</p>
+
+<p>I hope this helps further understanding of the possibilities of the Revit API and the FindReferencesByDirection method, and provides a bit of fun as well.
+
+<p>Many thanks to Harry for this nice sample!
+
+<p>Once again, and this time for good, a Very Merry Christmas and a Happy New Year to you all!</p>
+
+<center>
+<img src="img/merry_christmas.jpg" alt="Merry Chsristmas"/>
+</center>
+
+<h4>Addenda</h4>
+
+<p>Harry added some notes on this later:
+
+<p>It's fine to publish it, but I will feel bad if anyone considers an API example like this a Christmas gift &nbsp; :-) &nbsp; 
+I'd feel bad because I don't think it is a very good present &ndash; sort of like getting underwear or socks as a gift. Not exactly a new iPod or Wii.
+But that is no reason not to post it and I hope others enjoy it.
+After all, underwear and socks are useful and necessary.
+
+<p>By the way, this is a lot more fun if you add doc.Save() at the beginning and then after each call to MakeLine so that the view updates after each bounce.
+
+<p>Anthony '8-Ball' Hauck noted that the message displayed should actually read "You sank the ball with 5 banks."

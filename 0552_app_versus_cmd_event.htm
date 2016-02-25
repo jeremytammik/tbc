@@ -1,0 +1,65 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1264002 [overwrite dialogue box missing when load updated family using insert] -->
+
+<h3>Application Versus Command Event</h3>
+
+<p>Here is an interesting observation by Ning Zhou on the difference between registering a handler for the DialogBoxShowing event in an external application versus an external command.
+
+<p>Here is the initial query:
+
+<p><strong>Question:</strong> We have an add-in which loads multiple families and suppresses the warning message which is displayed in case family instances already exist for some of them by registering a DialogBoxShowing event handler.
+
+<p>The problem with this is that the installation of this event handler also affects the normal Revit load family behaviour from the user interface. 
+The warning message is suppressed for load family using insert, but load family using reload still displays it. 
+
+<p>If I uninstall our add-in, both load family methods display the warning message again. 
+
+<p>Can you provide any solution or workaround for this? 
+
+<p>Here are the relevant code snippets to explain what we are doing:
+
+<pre class="code">
+<span class="blue">public</span> CmdResult OnStartup(
+&nbsp; <span class="teal">UIControlledApplication</span> application )
+{
+&nbsp; application.DialogBoxShowing
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; myDialogBoxShowing );
+&nbsp; <span class="green">// ... </span>
+}
+&nbsp;
+<span class="blue">void</span> myDialogBoxShowing(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+{
+&nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e1
+&nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( e1 != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; e1.DialogId.Equals(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Family_Already_Exists&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; e1.OverrideResult( ( <span class="blue">int</span> ) 
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialogResult</span>.CommandLink1 ); <span class="green">// 1001</span>
+&nbsp; }
+}
+</pre>
+
+<p><strong>Solution:</strong> I fixed it myself by placing the DialogBoxShowing event at command level instead of application level. 
+
+<!--
+<p>I assume that the loading of a modified family by "insert" is based on application level,
+and loading the modified family by "reload" is based on command level? 
+-->
+
+<p><strong>Response:</strong> Yes, exactly, if you register the DialogBoxShowing event handler at the beginning of an external command and then unregister it again at the end of the command, the warning message will be suppressed only for the duration of your command.
+
+<p>After your command ends, the dialogue suppressing mechanism is deactivated again.
+Without the double negation: the messages are displayed as normal again.
+This explains why the warning dialogue box is showing again when you manually insert a family file. 
+
+<p>If you register the DialogBoxShowing event handler in the external application OnStartup method, the dialogue suppressing mechanism is always active. 
+Then it can dismiss the warning dialogue both when your own external command is programmatically loading families and also when you manually insert a family file from disk through the user interface. 

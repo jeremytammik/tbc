@@ -1,0 +1,271 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07431217 [set elbow fitting properties]
+Jaiganesh S.Ve Re: ElbowDiameterQuery.zip
+
+-->
+
+<h3>Elbow Fitting Selection and Dimensioning</h3>
+
+<p>Vacation time is approaching fast for me and lots of things need finishing off beforehand.
+
+<p>Meanwhile, one thing that had a number of developers champing at their bits for a while now finally came to fruition:
+
+
+<a name="1"></a>
+
+<h4>Autodesk Exchange Store</h4>
+
+<p>The 
+
+<a href="http://apps.exchange.autodesk.com">Autodesk Exchange</a> store is now open for application submissions.
+
+<a href="http://adndevblog.typepad.com/autocad/stephen-preston.html">Stephen Preston</a>
+
+already published several articles exaplaining the full details:
+
+<ul>
+<li>
+<a href="http://adndevblog.typepad.com/aec/2012/07/autodesk-exchange-apps-summary-information.html">
+Summary information</a>
+
+<li>
+<a href="http://adndevblog.typepad.com/aec/2012/07/exchange-apps-information-for-revit-developers.html">
+Information for Revit developers</a>
+
+<li>
+<a href="http://adndevblog.typepad.com/aec/2012/07/publishing-on-the-autodesk-exchange-store.html">
+Publishing an app</a>
+</ul>
+
+<p>Here is another topic that recently kept me busy, with some helpful input from Martin Schmid and Steve Mycynek:
+
+<a name="2"></a>
+
+<h4>Selecting a Pipe Elbow Fitting</h4>
+
+<p><strong>Question:</strong> I need to set the diameter of a pipe elbow fitting programmatically. 
+The elbow diameter obviously needs to be adapted to the pipe diameter.
+The two pipes may also have different diameters.
+
+<p>I tried using the NewElbowFitting method to insert the elbow and simply pass in the two pipe connectors to it like this:
+
+<pre class="code">
+  doc.Create.NewElbowFitting( con1, con2 );
+</pre>
+
+<p>This does successfully create an elbow fitting instance.
+However, I don't see how to control which elbow symbol is inserted by this method.
+Is there any way to influence this?
+
+<!-- 
+
+<p>Find the attached image to see what is the actual problem and code snippet we used to create elbow connection between 2 pipes. But its end up with a different size(diameter) elbow.
+
+C:\a\j\adn\case\sfdc\07431217\attach\capture.png
+
+<p>How to change the default elbow diameter? 
+
+<p>Herewith, i have attached the sample solution,addin,error image and sample file(.rvt). 
+
+C:\a\j\adn\case\sfdc\07431217\src\PipeCreation-Elbow\PipeCreation.sln
+C:\a\j\adn\case\sfdc\07431217\attach\PipeModel-AD.rvt
+
+-->
+
+
+
+<p><strong>Answer:</strong> Calling the NewElbowFitting method is similar to using the Trim tool in the user interface.
+When this method is called, Revit automatically chooses the appropriate elbow for you.
+
+<p>In Revit 2013, you can control the selection process through the routing preferences, whereas previous versions only enabled you to define one single default elbow, tee, etc.
+The routing preferences support multiple settings for different materials and sizes. 
+
+<p>The routing preferences API is demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#3">
+RoutingPreferenceTools</a> SDK sample.
+
+It implements three commands, one for analysis and reporting purposes, two for importing and exporting routing preferences to XML:
+
+<ul>
+<li>Routing Preference Analysis: Analyze the routing preferences of a given pipe type to check for common problems, using the routing preferences API to look at all rules and criteria for a given PipeType.
+
+<li>Routing Preference Builder with its two commands CommandReadPreferences and CommandWritePreferences: Set pipe type, fitting, and routing preferences in a project from data in an XML file and export these preferences to XML for archival, documentation, and collaboration purposes, allowing a user to work with routing preference data in a shareable XML format suitable for reuse in a wide variety of BIM management environments. 
+</ul>
+
+<p>When you call NewElbowFitting, it inspects the pipe type 
+
+<!-- (not sure if it inspects that of Pipe1 or Pipe2, as it is conceivable they could be different) -->
+
+and finds the first elbow in the appropriate routing preferences.
+
+<p>If the elbow inlet and outlet sizes differ, you need a reducing elbow.
+
+
+
+<a name="3"></a>
+
+<h4>How to Use the Routing Preferences API to Set the Elbow Symbol</h4>
+
+<p>The NewElbowFitting method will insert the elbow symbol specified in the routing preferences. 
+Please note that while RP will choose the first symbol in the rule list that matches its criteria, you can always programmatically either set size criteria to ensure a later symbol is chosen for a given scenario, or re-order the rules using RoutingPreferenceManager RemoveRule and AddRule methods, at least temporarily, to force RP to choose a different elbow symbol than normal.
+
+<p>For example, if you have defined routing preference for 'Elbow Reducing - Threaded - MI - Class 150.rfa' and call this method, you will get an elbow that has different connection sizes as shown below on the left.
+If you don't have a transitioning elbow, but you do have a reducer defined, you will get a result as below right.
+Note that the reducer is quite odd in this particular model file  :-)</p>
+
+<center>
+<img src="img/reducing_elbow.png" alt="Reducer and trainsition elbow" width="600"/>
+</center>
+
+<p>In this case, both the Reducing Elbow and the Elbow + Reducer 'work'; which is used depends on their order in the definition of the RP.  
+
+<p>The RP is the only way to influence this selection, both in the UI and in the API.
+
+
+<a name="4"></a>
+
+<h4>I Beg to Differ</h4>
+
+<p>In some cases, the outer diameter of the fitting and the pipes may differ.
+This is a content issue.  
+Pipes and fittings are selected and connected based on the pipe 'Nominal Diameter' and the 'Nominal Diameter' of the fitting connector.  
+In the Pipe Settings, a user can make the 'outer diameter' of a pipe bigger or smaller than its nominal diameter.  
+
+<p>Here is an example with the following pipe type properties:
+
+<ul>
+<li>Diameter 18 mm
+<li>Outer Diameter 18 mm
+<li>Inner Diameter 16 mm
+<li>Size 18 mm
+</ul>
+
+<p>The generic pipe elbow fitting connected to the pipes by calling the NewElbowFitting method has the following properties:
+
+<ul>
+<li>Nominal Diameter 18 mm
+<li>Size 18 mm - 18 mm
+</ul>
+
+<!--
+<p>As far as Revit is concerned, these two fit together perfectly well.
+From a human point of view, however, a pipe with an *outer* diameter of 18 mm obviously does not fit with an elbow with a *nominal* diameter of 18 mm.
+-->
+
+<center>
+<img src="img/pipe_elbow_diameter_discrepancy.png" alt="Pipe and elbow diameters"/>
+</center>
+
+<p>For a fitting, the geometry of the elbow is completely arbitrary.  
+
+<p>If you would like the elbow and pipe to have the same outer diameter, there are two ways to achieve this:
+
+<ol>
+<li>Make the outer diameter of the pipes bigger.  
+<li>Modify the geometry of the elbow to be smaller.  
+</ol>
+
+<p>Welded pipe fittings, for example, would have the same outer diameter, whereas threaded fittings, PVC, and others, typically have a larger outer diameter than the pipe itself, because the pipe engages into the fitting.
+
+
+<!--
+<p>Although the two pipes in the sample model are the same size, you may actually be requesting a reducing elbow where the inlet size and the outlet sizes are different? This should not be any problem at all.
+
+<p>When you call NewElbowFitting, it inspects the Pipe Type (not sure if it inspects that of Pipe1 or Pipe2, as it is conceivable they could be different), and then finds the first Elbow in the routing preference that 'works'.
+
+<p>As an example, if 'Elbow Reducing - Threaded - MI - Class 150.rfa' is in the routing preference, and you call this same method (which I suspect is very similar to using the 'Trim' tool in the UI) you will get an elbow that has different connection sizes (as per the image below/left.  If you don't have a transitioning elbow, but you do have a reducer defined, you will get a result as below/right. Note, however, that in your particular model file, your reducer is quite odd.  
+
+<p>In this case, both the Reducing Elbow and the Elbow + Reducer 'work', so which is used is dependent on their order in the definition in the RP.  As in the UI, in the API there is no way to influence this otherwise.
+
+<p>C:\a\j\adn\case\sfdc\07431217\attach\reducing_elbow.png 
+
+<p>As for the fact that the outer diameter of the fitting and the pipes are different, this is indeed a content issue.  Pipes/fittings connected based on the Pipes 'Nominal Diameter', and the 'Nominal Diameter' of the fitting's connector.  In the Pipe Settings, a user can make the 'outer diameter' of a pipe bigger or smaller than its nominal.  Further, for a fitting, the geometry of the elbow is completely arbitrary.  So, there would be two ways to 'fix' the issue below... 1) make the outer diameter of the pipes bigger.  2) modify the geometry of the elbow to be smaller.  Welded pipe/fittings, for example, would have the same outer diameter... however, threaded fittings, PVC, and others, typically will have a larger outer diameter than the pipe itself (because the pipe engages into the fitting).
+
+<p>C:\a\j\adn\case\sfdc\07431217\attach\pipe_elbow_diameter_discrepancy.png
+-->
+
+
+<!-- 07448471 [Pipe Data] -->
+
+<a name="5"></a>
+
+<h4>Change Elbow Dimension</h4>
+
+<p>Saikat handled an independent but related case that also happened to catch my attention:
+
+<p><strong>Question:</strong> 
+
+How can I change the diameter of an elbow pipe fitting, depending on the pipe diameter? 
+
+<p><strong>Answer</strong> by Saikat Bhattacharya:
+
+To test this, I created a pipe with an elbow fitting attached at one end. 
+In the user interface, you can see that the nominal diameter parameter of the pipe is disabled, i.e. greyed out.
+The only thing I can do interactively in the user interface is modify the Nominal <b>Radius</b> of the pipe. 
+
+<p>Based on this observation, I wrote the following few lines of code to modify the Nominal Radius of the selected elbow fitting using the API and it worked well:
+ 
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uiDoc = uiApp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;Change Diameter&quot;</span> );
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> uiDoc.Selection.Elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> i = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = i.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Nominal Radius&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; p.Set( 10 * 0.08333 );
+&nbsp; }
+&nbsp; trans.Commit();
+</pre>
+
+<p>For the complete solution and additional background information, please refer to Saikat's article on
+
+<a href="http://adndevblog.typepad.com/aec/2012/07/changing-the-diameter-of-an-elbow-fitting-in-revit-mep-using-the-api.html">
+changing the diameter of an elbow fitting</a>.
+
+
+<!--
+<a name="2"></a>
+
+<h4>Updated Revit MEP 2013 API Overview</h4>
+
+<p>In preparation for AU...
+
+<p>rme_api_ppt.pdf
+-->
+
+
+
+<!-- SPR #125677 [API Wish: executing external command programmatically] -->
+
+<a name="6"></a>
+
+<h4>Invoke External Command on Start-up</h4>
+
+<p>Finally, to wrap this up, a little note on another issue that also cropped up and really is completely unrelated  :-)
+
+<p><strong>Question:</strong> I would like to call my Revit add-in in a batch operation in order to process multiple Revit files. 
+The process would involve starting Revit, loading a model, invoking my add-in, and shutting down the application afterwards. 
+I don't see any obvious command line option to achieve this.
+Is it possible at all?
+
+<p><strong>Answer:</strong> Yes. 
+This can be easily addressed by creating an external application, implementing appropriate OnStartup and DocumentOpened events, and driving the whole thing through a journal file or even directly from the command line.
+
+
+
+
+<a href="">
+</a>

@@ -1,0 +1,67 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit Python Shell</h3>
+
+<p>Here is number two of my collection of Christmas presents.
+This one may actually be the biggest, and should give us all ample material to play with over the holiday season and indeed also use for productive work indefinitely onwards.
+
+<p>Daren Thomas of the <a href="http://www.gt.arch.ethz.ch">Professur f&uuml;r Geb&auml;udetechnik, Institut f&uuml;r Hochbautechnik</a> at the technical university ETH Z&uuml;rich has published a 
+
+<a href="http://darenatwork.blogspot.com/2009/12/introducing-revitpythonshell.html">
+Python Shell for Revit</a>.
+
+It was implemented using IronPython and is used to automate the running of daily tests of a building energy analysis package.
+Hosting IronPython via a Revit plug-in is a now solved problem. 
+Daren's intention is to continue publishing samples of what you can do with it pretty regularly in the future.
+
+<p>The 
+
+<a href="http://code.google.com/p/revitpythonshell">
+source code</a> is 
+
+available under the GNU General Public License v3 from a 
+
+<a href="http://subversion.tigris.org">
+Subversion</a> repository on 
+
+<a href="http://code.google.com">
+code.google.com</a>.
+
+It is documented, though there is currently little other stand-alone documentation.
+One would probably want to look for the IExternalApplication entry point and go from there. 
+What the application does is:
+
+<ul>
+<li>Add a button to the Revit ribbon to start the python shell.
+<li>Execute a python script entered in a text box, with output going to a separate window.
+</ul>
+
+<p>Daren describes one of the main scripts like this: it "will open up an interactive interpreter loop known as a REPL that will let you explore the Revit API. 
+And by explore, I mean type a statement, hit enter, see the results, carry on. It doesn't get easier as this!"
+
+<p>If you know 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">RvtMgdDbg</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2009/10/rvtmgddbg-for-revit-2010.html">for 2010</a>)
+
+and appreciate the possibilities it offers to manually dive into the Revit database via the Revit API by using hardcoded queries to explore elements and their properties, imagine enhanced functionality with complete freedom to interactively execute any arbitrary method on the elements, store the results, and continue processing those in any desired manner.
+
+<!-- <p>Daren has also implemented a module revitutil.py providing a bunch of wrapper classes to make the Revit API more pythonic.
+
+<p>A nice thing to have next would be a sort of tinker-away-work-bench, which requires adding an interactive shell. Should not be too difficult, says Daren... -->
+
+<p>One main objective in releasing this code is the hope that it will make exploring the Revit API a lot easier and thus help push its bounds as far as possible.
+
+<h4>Feedback and Participation</h4>
+
+If you decide to take a look at the package, please also provide feedback to Daren, especially answers to the following two questions:
+
+<ul>
+<li>Are the installation instructions adequate?
+<li>Have you encountered any problems?
+</ul>
+
+<p>Daren also points out that he would be happy to grant commit access to the source repository for any serious contributors.

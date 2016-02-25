@@ -1,0 +1,501 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Family API Add-in</h3>
+
+<p>Welcome to the second part of the detailed discussion on use of the Family API in the project environment, covering scenario 2 from the following list of topics:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html">
+Family editor product functionality</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#2">
+Key family concepts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#2b">
+Building your first parametric Revit family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3">
+Slide deck bullets</a></li>
+<!-- <li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3b">
+Building your first parametric Revit family slide deck bullets</a></li> -->
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#4">
+Complete slide decks</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">
+Family API topics</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#10">
+API scenario 1 &ndash; load family and place instances</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#11">
+Checking whether a family is loaded</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#12">
+Find a database element by type and name</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#13">
+Loading a family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#14">
+Placing family instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#15">
+Accessing the newly placed instances</a></li>
+</ul>
+
+<li><a href="#20">
+API scenario 2 &ndash; select and modify instances</a></li>
+<ul>
+<li><a href="#21">
+Creating a new family type</a></li>
+<li><a href="#22">
+Selecting instances with pre- and post-selection</a></li>
+<li><a href="#23">
+Modifying a family instance symbol</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#30">
+API scenario 3 &ndash; instance and symbol retrieval, nested type modification</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#31">
+Retrieve specific family symbols</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#32">
+Retrieve specific family instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#33">
+Display available door panel types</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#34">
+Modify a nested family type</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#40">
+External application</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#50">
+Conclusion and download</a></li>
+</ul>
+
+<p>The product functionality was presented by Steven Campbell in his classes on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html">
+key family concepts</a> at the
+
+<a href="http://www.autodesk.ru/adsk/servlet/pc/index?id=21516340&amp;siteID=871736">
+Revit API DevCamp in Moscow</a>,
+
+and API scenario 1 is covered by the previous post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html">
+loading a family and placing instances</a>.</p>
+
+<!-- showing the programmatic use of the functionality presented by Steven Campbell at the -->
+
+<p>Scenario 3 and the external application remain to be discussed tomorrow.</p>
+
+
+
+
+<a name="20"></a>
+
+<h4>API Scenario 2 &ndash; Selecting and Modifying Instances</h4>
+
+<p>We demonstrate the modification of selected family instances by creating a new type for the previously loaded family and assigning the resulting symbol to them.
+
+<p>Before creating the new family type by applying the Duplicate method to an existing one, we have to check whether it already exists.</p>
+
+<p>The selection of the instances to modify supports both pre- and post- selection.</p>
+
+
+
+
+<a name="21"></a>
+
+<h4>Creating a New Family Type</h4>
+
+<p>Creation of a new family type for an already loaded family is easy, because we can simply call the Duplicate method on one of its existing types.</p>
+
+<p>The new type is created with the specified name and its parameter values are set accordingly.</p>
+
+<p>In this case, create a new table symbol and modify its length, width and depth.
+All three of these specify a distance, which is always stored internally in the Revit database using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">
+imperial units</a>,
+
+i.e. feet.</p>
+
+<p>Assuming that we wish to set the three parameters using metric values given in millimetres, we need to apply a conversion factor.
+Here is the helper method SetElementParameterInMm that sets the value of the named parameter on the given element to a new length specified in millimetres:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set the value of the named parameter </span>
+&nbsp; <span class="gray">///</span><span class="green"> on the given element to a new length</span>
+&nbsp; <span class="gray">///</span><span class="green"> specified in millimetres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> SetElementParameterInMm(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name,
+&nbsp; &nbsp; <span class="blue">double</span> lengthInMm )
+&nbsp; {
+&nbsp; &nbsp; e.get_Parameter( parameter_name )
+&nbsp; &nbsp; &nbsp; .Set( <span class="teal">Util</span>.MmToFoot( lengthInMm ) );
+&nbsp; }
+</pre>
+
+<p>Furthermore, we set the material of the new table symbol to glass.
+The material is specified by setting the values of the "Top material" and "Leg material" parameters of the symbol to the element id of the corresponding Material database element.</p>
+
+<p>This is implemented by the following CreateNewType method taking the existing family symbol as its input argument:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create new table type</span>
+&nbsp; <span class="gray">///</span><span class="green"> Type Name: 1200x750x380mm</span>
+&nbsp; <span class="gray">///</span><span class="green"> Parameters to change:</span>
+&nbsp; <span class="gray">///</span><span class="green"> Width = 1200</span>
+&nbsp; <span class="gray">///</span><span class="green"> Depth = 750</span>
+&nbsp; <span class="gray">///</span><span class="green"> Height = 380</span>
+&nbsp; <span class="gray">///</span><span class="green"> Top Material = Glass</span>
+&nbsp; <span class="gray">///</span><span class="green"> Leg Material = Glass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">FamilySymbol</span> CreateNewType( <span class="teal">FamilySymbol</span> oldType )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> sym = oldType.Duplicate(
+&nbsp; &nbsp; &nbsp; _type_name ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; SetElementParameterInMm( sym, <span class="maroon">&quot;Width&quot;</span>, 1200 );
+&nbsp; &nbsp; SetElementParameterInMm( sym, <span class="maroon">&quot;Depth&quot;</span>, 750 );
+&nbsp; &nbsp; SetElementParameterInMm( sym, <span class="maroon">&quot;Height&quot;</span>, 380 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> material_glass = <span class="teal">Util</span>.FindElementByName(
+&nbsp; &nbsp; &nbsp; sym.Document, <span class="blue">typeof</span>( <span class="teal">Material</span> ), <span class="maroon">&quot;Glass&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = material_glass.Id;
+&nbsp;
+&nbsp; &nbsp; sym.get_Parameter( <span class="maroon">&quot;Top Material&quot;</span> ).Set( id );
+&nbsp; &nbsp; sym.get_Parameter( <span class="maroon">&quot;Leg Material&quot;</span> ).Set( id );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> sym;
+&nbsp; }
+</pre>
+
+<p>As said, before calling this method, we need to ensure that the new symbol has not already been created.</p>
+
+<p>The retrieval of a family symbol can make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#12">FindElementByName helper method</a> that
+
+we already used to check for the existence of the family itself before attempting to load it into the project.</p>
+
+<p>In this case, we search for a FamilySymbol class instance with the target type name.</p>
+
+<p>Again, additional filters could be applied to optimise the retrieval in a big project containing a large number of instances, e.g. by adding a category and possibly other criteria, preferably using quick filters, if possible.</p>
+
+<p>The name comparison could also be speeded up by converting it to a parameter filter instead of using .NET post-processing of the results returned by the filtered element collector.</p>
+
+<p>The call to the helper function and potential call to create a new type can be implemented in one single statement making use of the .NET null coalescing operator '??':</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Retrieve existing type or create new</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> symbol
+&nbsp; &nbsp; = <span class="teal">Util</span>.FindElementByName( doc,
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), _type_name )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>
+&nbsp; &nbsp; ?? CreateNewType( tables[0].Symbol );
+</pre>
+
+
+<a name="22"></a>
+
+<h4>Selecting Instances with Pre- and Post-selection</h4>
+
+<p>However, before we proceed to create and apply the new type, we handle the selection process of the family instances to modify.</p>
+
+<p>Pre-selection is handled by retrieving the element contained in the UIDocument Selection collection.</p>
+
+<p>Post-selection can be implemented using the PickObjects method, and its ease of use is vastly enhanced by providing a selection filter implementing the ISelectionFilter interface to disable picking any undesired elements.</p>
+
+<p>I implemented a complete pre- and post-selection handler class named TableSelector for this.
+The impact to make use of it in the external command mainline is reduced to the pure minimal:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TableSelector</span> selector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TableSelector</span>( uidoc );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FamilyInstance</span>&gt; tables
+&nbsp; &nbsp; = selector.SelectedTables;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == tables )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> selector.Return();
+&nbsp; }
+</pre>
+
+<p>As you can see, the TableSelector interface just requires three public methods:</p>
+
+<ul>
+<li>The constructor, doing all the work.</li>
+<li>The SelectedTables property returning the result.</li>
+<li>The Return method, called to return in case of failure or cancellation and possibly report an error, if needed.</li>
+</ul>
+
+<p>It defines a common filtering helper method IsTable that it uses both to implement the internal ISelectionFilter and to check the validity of pre-selected elements.</p>
+
+<p>This specific
+implementation requires a family instance element
+of the furniture category belonging to the named
+family:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> IsTable( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat = e.Category;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != cat )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( cat.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Furniture ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> fname = fi.Symbol.Family.Name;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; rc = fname.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CmdTableLoadPlace</span>.FamilyName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>By making use of this helper method, the selection filter implementation becomes completely trivial:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">TableSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> IsTable( e );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>The rest of the TableSelector class implementation just has to define the member data, and the three public interfaces:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">TableSelector</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _usage_error = <span class="maroon">&quot;Please pre-select &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;only table family instances to modify &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;before launching this command.&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt; _tables;
+&nbsp; <span class="blue">string</span> _msg;
+&nbsp; <span class="teal">Result</span> _result;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return selected tables or null</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">IList</span>&lt;<span class="teal">FamilyInstance</span>&gt; SelectedTables
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _tables;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Instantiate and run table selector</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> TableSelector( <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; _tables = <span class="blue">null</span>;
+&nbsp; &nbsp; _msg = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _msg = <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span>;
+&nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Check for a pre-selected tables</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 != n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _msg = _usage_error;
+&nbsp; &nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !IsTable( e ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _msg = _usage_error;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _tables )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _tables = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt;( n );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _tables.Add( e <span class="blue">as</span> <span class="teal">FamilyInstance</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If no tables were pre-selected, </span>
+&nbsp; &nbsp; <span class="green">// prompt for post-selection</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _tables
+&nbsp; &nbsp; &nbsp; || 0 == _tables.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; refs = sel.PickObjects( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">TableSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select tables to be modified.&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != refs &amp;&amp; 0 &lt; refs.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _tables = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>, <span class="teal">FamilyInstance</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r =&gt; doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span> ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; <span class="blue">null</span> == _tables || 0 &lt; _tables.Count,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ensure that we do not return a non-null but empty collection&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _result = (<span class="blue">null</span> == _tables) <span class="green">// || 0 == _tables.Count</span>
+&nbsp; &nbsp; &nbsp; ? <span class="teal">Result</span>.Cancelled
+&nbsp; &nbsp; &nbsp; : <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the cancellation or failure code</span>
+&nbsp; <span class="gray">///</span><span class="green"> to Revit and display a message if there is </span>
+&nbsp; <span class="gray">///</span><span class="green"> anything to say.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Return()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Result</span>.Failed == _result )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 &lt; _msg.Length,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected error message&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( _msg );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> _result;
+&nbsp; }
+}
+</pre>
+
+<p>Please note that the isolation of all the validity checking in the one single IsTable filtering helper method makes it very simple to generalise this class, which is one of my (many) next plans.</p>
+
+
+
+<a name="23"></a>
+
+<h4>Modifying a Family Instance Symbol</h4>
+
+<p>One the new family symbol has been either retrieved or freshly created and the selection of the existing family instances to modify is successfully completed, the actual modification is trivial; it just requires iterating over the selected instances and modifying the value of their read-write Symbol property.</p>
+
+<p>Here is the complete source code of the external command Execute mainline implementing this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create a new table type and </span>
+<span class="gray">///</span><span class="green"> modify selected instances.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdTableNewTypeModify</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _usage_error = <span class="maroon">&quot;Please pre-select &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;only table elements before running &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;this command.&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Name of the new table family type.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _type_name = <span class="maroon">&quot;1200x750x380mm&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TableSelector</span> selector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TableSelector</span>( uidoc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FamilyInstance</span>&gt; tables
+&nbsp; &nbsp; &nbsp; = selector.SelectedTables;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == tables )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> selector.Return();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Type and Modify Instances&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve existing type or create new</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Util</span>.FindElementByName( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), _type_name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>
+&nbsp; &nbsp; &nbsp; &nbsp; ?? CreateNewType( tables[0].Symbol );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> table <span class="blue">in</span> tables )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="teal">Util</span>.ElementDescription(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; table ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; table.Symbol = symbol;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">family API topics overview</a> for
+
+a snapshot of the full Visual Studio solution implementing this..</p>

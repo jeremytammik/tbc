@@ -1,0 +1,278 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Getting Started with the Revit API</h3>
+
+<p>I am regularly forced to return to this topic, to provide a useful starting point for beginners.
+
+<p>The amount of available material is getting huge, and some help is required deciding where to start exploring the Revit API.</p>
+
+<p>The most important thing to be aware of is the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+<p>Start there by looking at the three DevTV video introductions and then work through the
+
+<a href="http://www.autodesk.com/myfirstrevitplugin">My First Revit Plug-in</a> tutorial.
+
+<p>In these tutorials, you are shown how to locate, install and use the most basic development tools and information, including:</p>
+
+<ul>
+<li>The Revit SDK or Software Developer Kit, including
+<ul>
+<li>The Revit API help file RevitAPI.chm</li>
+<li>RevitLookup, an interactive database element and relationship explorer and massive source code example in itself</li>
+<li>The SDK sample collection, including</li>
+<ul>
+<li>The samples themselves, each one equipped with its own read-me file</li>
+<li>SamplesReadMe.htm: documentation and overview</li>
+<li>SDKSamples2013.sln: a Visual Studio solution to compile all samples in one go</li>
+<li>RvtSamples: an external application to load, test and debug all samples</li>
+</ul>
+</ul>
+</li>
+
+<li>The Revit API
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00006-API_Developer%27s_Guide">
+Developer Guide</a></li>
+
+</ul>
+
+<p>More detailed overviews of the available Getting Started material are provided for both Revit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/getting-started-with-the-revit-2012-api.html">
+2012</a> (still valid for 2013) and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html#4">
+2013</a>.
+
+You should also take a look at the list of things to do to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">prepare for a hands-on Revit API training</a>.
+
+
+<p>I suggest performing these steps:</p>
+
+<ul>
+<li>Watch the videos</li>
+<li>Work through the tutorial</li>
+<li>Install and explore the SDK</li>
+<li>Compile, install and test RevitLookup</li>
+<li>Compile the SDK samples</li>
+<li>Install and test RvtSamples</li>
+<li>Use RevitLookup to explore a Revit database or two</li>
+<li>Browse the documentation and developers guide to your heart's content</li>
+</ul>
+
+<p>Once you have completed these steps, you will be amply set up and ready to go,
+
+<a href="http://www.englishclub.com/ref/esl/Idioms/R/raring_to_go_477.htm">
+raring</a> to
+
+get started properly on your own project.</p>
+
+<p>Here is a list of typical questions you might run into:</p>
+
+<ul>
+<li><a href="#02">How can I determine the relationship and dependency between elements?</a></li>
+<li><a href="#03">How can I integrate Revit data with an external database?</a></li>
+<li><a href="#04">How can I extract DWFX data from Revit?</a></li>
+<li><a href="#05">How can I modify the DWFX results?</a></li>
+<li><a href="#06">How can I extract a thumbnail image for a specific element?</a></li>
+<li><a href="#07">How can I get a total count of properties, attributes and custom attributes for a given element?</a></li>
+<li><a href="#08">How can I compare the properties of two elements?</a></li>
+<li><a href="#09">When extracting data from Revit, what is the best approach to organize and retrieve that data?</a></li>
+<li><a href="#10">Is there a standard for all families and element types (symbols) that remains the same from model to model?</a></li>
+<li><a href="#11">Is there an easy way to list of all families and element types from a model?</a></li>
+<li><a href="#12">What methods are there to "walk" all objects?</a></li>
+</ul>
+
+<a name="02"></a>
+
+<h4>How can I determine the relationship and dependency between elements?</h4>
+
+<p>Revit maintains a huge number of different relationships between database elements. How to determine these depends on the elements in question.
+
+<p>An extremely important tool to explore the relationships between elements in the Revit database is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">
+RevitLookup</a>,
+
+included with the Revit SDK.
+Use of RevitLookup to explore the Revit database and relationships between elements is discussed and demonstrated in a large number of subsequent posts on The Building Coder blog.
+
+<p>An important technique to discover relationships that are not officially provided through the Revit API is demonstrated by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+object relationship analyser</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">VB</a>).
+
+Use of this technique is also discussed and demonstrated in many places.
+
+<p>Most relationships are accessible through much simpler official means, though.
+
+<p>As said, it depends on what elements you are talking about.
+
+
+
+<a name="03"></a>
+
+<h4>How can I integrate Revit data with an external database?</h4>
+
+<p>Please look at the following discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/database-integration.html">Database integration</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/integration-with-a-database-or-erp-system.html">ERP systems</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/delux-database-enabled-loading-and-updating.html">Delux database</a></li>
+</ul>
+
+
+
+
+<a name="04"></a>
+
+<h4>How can I extract DWFX data from Revit?</h4>
+
+<p>Use the Document.Export method taking (String, String, ViewSet, DWFXExportOptions) arguments.</p>
+
+
+
+<a name="05"></a>
+
+<h4>How can I modify the DWFX results?</h4>
+
+<p>You can export the DWFX.
+For any further modifications, you would have to take recourse to the
+
+<a href="http://www.autodesk.mx/adsk/servlet/item?siteID=123112&id=5522878">
+DWF Toolkit</a>.</p>
+
+
+<a name="06"></a>
+
+<h4>How can I extract a thumbnail image for a specific element?</h4>
+
+<p>Look at the discussions on</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/rvt-and-rfa-thumbnail-image.html">RVT and RFA thumbnail image</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/open-revit-ole-storage.html">OLE storage</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html">BasicFileInfo</a></li>
+</ul>
+
+
+
+
+<a name="07"></a>
+
+<h4>How can I get a total count of properties, attributes and custom attributes for a given element?</h4>
+
+<p>You can easily achieve this, but there is no specific API call provided for this task.
+You have to implement it yourself, and the number will vary depending on your requirements, criteria, and implementation.</p>
+
+
+
+<a name="08"></a>
+
+<h4>How can I compare the properties of two elements?</h4>
+
+<p>[Q] For instance, if two different objects have a property of the same name, can their values be compared or summarized together?
+E.g., a property of "Material" for a length of pipe might be copper; will a property of the same name on a copper elbow joint have the same "Material" value?</p>
+
+<p>[A] I am pretty sure that a clever user can create a project in which this will not be the case.</p>
+
+
+
+<a name="09"></a>
+
+<h4>When extracting data from Revit, what is the best approach to organize and retrieve that data?</h4>
+
+<p>That depends completely on your own needs.
+You will need to perform a careful analysis.
+Look at the <a href="#03">database integration links</a> listed above.</p>
+
+
+<a name="10"></a>
+
+<h4>Is there a standard for all family element types (symbols) that remains the same from model to model?</h4>
+
+<p>No, unfortunately, the contrary is true.
+Families and types are completely user defined, and creating their definitions is just as much an art as a science.</p>
+
+
+
+<a name="11"></a>
+
+<h4>Is there an easy way to list of all families and element types from a model?</h4>
+
+<p>Yes.
+To list all types, just filter for all ElementType objects:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsElementType();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} {1} is an ElementType.&quot;</span>,
+&nbsp; &nbsp; &nbsp; e.Name, e.Id.IntegerValue );
+&nbsp; }
+</pre>
+
+<p>To retrieve the families that they belong to, you can use the FamilySymbol.Family property.</p>
+
+<p>And: I can promise you some surprises if you start exploring this :-)</p>
+
+
+
+<a name="12"></a>
+
+<h4>What methods are there to "walk" all objects?</h4>
+
+<p>The filtered element collector is the only way to access in and retrieve elements from the Revit database, unless you have a unique id or an element id and can access the individual object directly.
+
+<p>Please look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/units-and-revitlookup.html#3">
+RevitLookup</a> application,
+
+which is provided in source code as part of the Revit SDK.
+
+<p>First of all, it is an invaluable tool both for developers and even end users to interactively explore the database and relationships such as the ones you are asking about.
+
+<p>Secondly, it iterates the entire database and walks all the objects, so you can use that code directly.</p>
+
+
+
+<a name="13"></a>
+
+<h4>Conclusion</h4>
+
+<p>I hope you find this useful.</p>
+
+<p>In general, almost every single question that you run into in your initial steps of implementing a Revit add-in has already been asked and answered somewhere.
+Make good use of the help file, global search of the sample code, developer guide and then turn to an Internet query.</p>
+
+<p>Believe me, it is easy and it is fun... both the development part and the research... it is all creative  :-)</p>
+
+<p>Good luck!</p>
+
+
+
+
+<a name="14"></a>
+
+<h4>Project Tracking for Kids</h4>
+
+<p>Oh, and one last thing... also fun...
+
+<a href="http://www.atlassian.com/jirajr">where tracking is child's play</a>...
+
+a few days late for April first  :-)</p>
+

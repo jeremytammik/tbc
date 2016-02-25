@@ -1,0 +1,358 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Family API &ndash; Nested Type, Instance and Symbol Retrieval</h3>
+
+<p>Welcome to the third and final part of the detailed discussion on use of the Family API in the project environment, covering scenario 3 and the remainder from the following list of topics:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html">
+Family editor product functionality</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#2">
+Key family concepts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#2b">
+Building your first parametric Revit family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3">
+Slide deck bullets</a></li>
+<!-- <li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#3b">
+Building your first parametric Revit family slide deck bullets</a></li> -->
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#4">
+Complete slide decks</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html#5">
+Family API topics</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#10">
+API scenario 1 &ndash; load family and place instances</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#11">
+Checking whether a family is loaded</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#12">
+Find a database element by type and name</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#13">
+Loading a family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#14">
+Placing family instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html#15">
+Accessing the newly placed instances</a></li>
+</ul>
+
+<li><a href="#20">
+API scenario 2 &ndash; select and modify instances</a></li>
+<ul>
+<li><a href="#21">
+Creating a new family type</a></li>
+<li><a href="#22">
+Selecting instances with pre- and post-selection</a></li>
+<li><a href="#23">
+Modifying a family instance symbol</a></li>
+</ul>
+
+<li><a href="#30">
+API scenario 3 &ndash; instance and symbol retrieval, nested type modification</a></li>
+<ul>
+<li><a href="#31">
+Retrieve specific family symbols</a></li>
+<li><a href="#32">
+Retrieve specific family instances</a></li>
+<li><a href="#33">
+Display available door panel types</a></li>
+<li><a href="#34">
+Modify a nested family type</a></li>
+</ul>
+
+<li><a href="#40">
+External application</a></li>
+
+<li><a href="#50">
+Conclusion and download</a></li>
+
+<li><a href="#60">
+Focus!</a></li>
+</ul>
+
+<p>The product functionality was presented by Steven Campbell in his classes on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html">
+key family concepts</a> at the
+
+<a href="http://www.autodesk.ru/adsk/servlet/pc/index?id=21516340&amp;siteID=871736">
+Revit API DevCamp in Moscow</a>,
+
+and API scenario 1-2 are covered by the previous posts on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html">
+loading a family, placing instances</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html">
+creating a type, selecting and modifying instances</a>.</p>
+
+
+<a name="30"></a>
+
+<h4>API Scenario 3 &ndash; Instance and Symbol Retrieval, Nested Type Modification</h4>
+
+<p>The previous scenario discussed the manual selection of family instances or other elements using either pre- or post-selection. What if you want to automatically select and modify all instances of a specific type?</p>
+
+<p>This time around, the family that we are driving is more complex, consisting of a kitchen cabinet making use of nested families defining different door styles.</p>
+
+<p>For the modification, we pick a modification of the door style, i.e. a modification of a nested type, which is identified by the element id of the corresponding family type.</p>
+
+<center>
+<img src="img/CmdKitchenUpdate.png" alt="Kitchen model" width="300"/>
+</center>
+
+<p>The third and final sample command in this series demonstrating use of the family API in the project context is CmdKitchenUpdate.
+It is designed to be launched in a model representing a kitchen design.
+It determines all applicable door panel types, automatically selects all kitchen cabinets, displays their current door style, prompts for a new one, and sets the selected type to all cabinets.</p>
+
+
+<a name="31"></a>
+
+<h4>Retrieving Specific Family Symbols</h4>
+
+<p>The first step in this process is to determine all the available and applicable door panel types.</p>
+
+<p>As always, we make use of a filtered element collector.
+In this case, we need to retrieve family symbols of the generic model category.
+To identify the door panel types, we post-process the results using a generic LINQ Where method checking for element names beginning with the substring "Door Panel - " like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Retrieve all door panel types</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; door_panel_types = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_GenericModel )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) )
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Element</span>&gt;( e =&gt; e.Name.StartsWith(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Door Panel - &quot;</span> ) ) );
+</pre>
+
+
+
+<a name="32"></a>
+
+<h4>Retrieving Specific Family Instances</h4>
+
+<p>In order to globally change the casework door panel type, we need to select all kitchen cabinet instances in the database.</p>
+
+<p>Once again, we use a filtered element collector.
+Filtering for family instances of the casework category provides two obvious quick filters to apply.</p>
+
+<p>I could apply other filters as well, and would do so if working in a large model.</p>
+
+<p>As a final test I check for the presence of the "Door Panel Type" parameter that I wish to set.
+
+<p>In a large model, for optimal efficiency, I could implement this using a parameter filter.
+In this small model, however, we can get by just post-processing the results instead, like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Retrieve all cabinet instances </span>
+&nbsp; <span class="green">// with a door panel type parameter:</span>
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; casework
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Casework )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Element</span>&gt;( e =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">null</span> != e.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Door Panel Type&quot;</span> )) );
+</pre>
+
+
+<a name="33"></a>
+
+<h4>Display Available Door Panel Types</h4>
+
+<p>The retrieval of the available door panel types and the casework elements to apply them to from the database actually constitute the main tasks in this command.</p>
+
+<p>The remainder is pretty trivial:</p>
+
+<ul>
+<li>Display the current door panel type setting, or '*VARIES*', if several are in use.</li>
+<li>Display a list of all available door panel types and prompt the user to select one.</li>
+<li>Apply the selected type to all cabinet elements.</li>
+</ul>
+
+<p>The two display tasks are handled by the following simple .NET form:</p>
+
+<center>
+<img src="img/CmdKitchenUpdate2.png" alt="Door panel style selection" width="250"/>
+</center>
+
+<p>The form stores the list of door panel element types that it receives as an input argument to its constructor as its combo box data source, and displays the Name property of these elements as the combo box selection entries, which leads to an extremely compact and effective implementation.</p>
+
+<p>Furthermore, the selected item can be returned directly as the Revit database element it is:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> DoorPanelTypeSelectorForm(
+&nbsp; &nbsp; <span class="blue">string</span> current_door_panel_type_name,
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; door_panel_types )
+&nbsp; {
+&nbsp; &nbsp; InitializeComponent();
+&nbsp; &nbsp; label2.Text = current_door_panel_type_name;
+&nbsp; &nbsp; comboBox1.DataSource = door_panel_types;
+&nbsp; &nbsp; comboBox1.DisplayMember = <span class="maroon">&quot;Name&quot;</span>;
+&nbsp; &nbsp; comboBox1.SelectedIndex = 0;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Element</span> SelectedItem
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> comboBox1.SelectedItem <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="34"></a>
+
+<h4>Modifying a Nested Family Type</h4>
+
+<p>Once the form has been displayed and the user has made her selection, applying the selected door panel type to the cabinet instances is achieved by simply setting the door panel type parameter value to the selected type element id, obviously requiring a transaction:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Display form to select new door panel type</span>
+&nbsp;
+&nbsp; <span class="teal">DoorPanelTypeSelectorForm</span> form
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">DoorPanelTypeSelectorForm</span>(
+&nbsp; &nbsp; &nbsp; current_door_panel_type_name,
+&nbsp; &nbsp; &nbsp; door_panel_types );
+&nbsp;
+&nbsp; <span class="blue">if</span>( System.Windows.Forms.<span class="teal">DialogResult</span>.OK
+&nbsp; &nbsp; == form.ShowDialog() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> door_panel_type
+&nbsp; &nbsp; &nbsp; = form.SelectedItem <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = door_panel_type.Id;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Modify Door Panel Type&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> casework )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Door Panel Type&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p.Set( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="40"></a>
+
+<h4>External Application</h4>
+
+<p>The external application implementation is very simple.</p>
+
+<p>Since we have only three commands to display, we can present them all at once using stacked ribbon buttons:</p>
+
+<center>
+<img src="img/CmdKitchenUpdate3.png" alt="External application" width="180"/>
+</center>
+
+<p>Here is the complete external application source code:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add buttons for our three commands </span>
+&nbsp; <span class="gray">///</span><span class="green"> to the ribbon panel.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> PopulatePanel( <span class="teal">RibbonPanel</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly()
+&nbsp; &nbsp; &nbsp; .Location;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonItemData</span> i1 = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TableLoadPlace&quot;</span>, <span class="maroon">&quot;1 Table Load and Place&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; path, <span class="maroon">&quot;FamilyApi.CmdTableLoadPlace&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; i1.ToolTip = <span class="maroon">&quot;Load the table family and &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;place table instances&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonItemData</span> i2 = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TableModify&quot;</span>, <span class="maroon">&quot;2 Table New Type Modify&quot;</span>,
+&nbsp; &nbsp; &nbsp; path, <span class="maroon">&quot;FamilyApi.CmdTableNewTypeModify&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; i2.ToolTip = <span class="maroon">&quot;Create new table type and &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;modify selected instances&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonItemData</span> i3 = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;KitchenUpdate&quot;</span>, <span class="maroon">&quot;3 Kitchen Update&quot;</span>,
+&nbsp; &nbsp; &nbsp; path, <span class="maroon">&quot;FamilyApi.CmdKitchenUpdate&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; i3.ToolTip = <span class="maroon">&quot;Select and update all &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;kitchen cabinets&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; p.AddStackedItems( i1, i2, i3 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; PopulatePanel(
+&nbsp; &nbsp; &nbsp; a.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Caption ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="50"></a>
+
+<h4>Conclusion and Download</h4>
+
+<p>Ok, I think I finally covered just about everything I have to say about this.
+Although some points could bear further elaboration...</p>
+
+<p>I am happy with this very pure implementation.</p>
+
+<p>I am a bit surprised that it took three extensive blog posts to cover the material that I presented live in Moscow in less than fifteen minutes.
+I hope it is useful and appreciated.</p>
+
+<p>For the sake of completeness, here is a slightly updated archive file
+
+<a href="zip/FamilyApi10.zip">FamilyApi10.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this sample, plus the
+
+<a href="file:////a/rvt/family_api_table.rfa">table family RFA</a> and
+
+<a href="file:////a/rvt/family_api_kitchen.rvt">kitchen model RVT</a> to
+
+experiment with.</p>
+
+
+<a name="60"></a>
+
+<h4>Focus!</h4>
+
+<p>Before closing, let me add a pointer to a self-evident aspect of work and time management that we have all heard far too many times and yet bears repeating once again:</p>
+
+<p>A
+
+<a href="http://www.linkedin.com/today/post/article/20130627224702-13780238-a-harvard-economist-s-surprisingly-simple-productivity-secret">
+surprisingly simple productivity secret</a> is
+
+to identify priorities and then give yourself some time to focus completely on the task at hand for a while, removing all distractions, in particular switching off interruptions such as email and messages for a while.</p>
+
+<p>How many times will I have to continue hearing that message before it finally sinks in?</p>

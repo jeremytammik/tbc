@@ -1,0 +1,151 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 08444651 [location view on sheet] -->
+
+<h3>Setting the Exact Same Location for two Views on a Sheet</h3>
+
+<p>A recent developer query requests a method to define the exact same location for two views on a sheet.</p>
+
+<p>This was possible to achieve in Revit 2013 and previous releases, and some related API behaviour apparently changed in Revit 2014.</p>
+
+<p>A simple but clever trick enables achieving this reliably in Revit 2014 as well.</p>
+
+
+<p><strong>Question:</strong> I noticed that sometimes when I place views on a sheet the location is somewhat shifted.</p>
+
+<p>I have a Revit sample model and C# add-in that places ViewPlans on a newly created sheet.</p>
+
+<p>The two views are placed at exactly the same location on the sheet, but they do not end up on top of each other anyway.</p>
+
+<p>Am I doing something wrong, and if that is the case, how can I fix this?</p>
+
+
+
+
+<p><strong>Answer:</strong> We investigated this and found that there is an issue with the calculation of the viewport position.</p>
+
+<p>The good news is that there is a workaround: you can temporarily set the crop box for both views to be suitably large and identical.</p>
+
+<p>That way, the viewport boundaries will be identical, and you can align them easily on the sheet.</p>
+
+<p>Then restore the previous crop box settings.</p>
+
+<p>Here is a function with hard-wired element ids that does this for the two views in the sample project you provided:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> test4( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> savedBox1 = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> savedBox2 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> typ = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 143899 ) ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewPlan</span> go1 = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205387 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewPlan</span> vg1 = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205424 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Save current crop box</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( go1.CropBoxActive )
+&nbsp; &nbsp; &nbsp; savedBox1 = go1.CropBox;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( vg1.CropBoxActive )
+&nbsp; &nbsp; &nbsp; savedBox2 = vg1.CropBox;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( savedBox1 != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Set crop box for 2nd view = 1st</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; vg1.CropBox = savedBox1;
+&nbsp; &nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Set both views to semi-random </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// but large crop box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> newBox = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp; &nbsp; &nbsp; newBox.set_MinEnabled( 0, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.set_MinEnabled( 1, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.set_MinEnabled( 2, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( -2000, -2000, 0 );
+&nbsp; &nbsp; &nbsp; newBox.set_MaxEnabled( 0, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.set_MaxEnabled( 1, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.set_MaxEnabled( 2, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; newBox.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( 2000, 2000, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; vg1.CropBox = newBox;
+&nbsp; &nbsp; &nbsp; go1.CropBox = newBox;
+&nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp; &nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; go1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create sheets and viewports</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> vSheet = <span class="teal">ViewSheet</span>.Create( doc, typ.Id );
+&nbsp; &nbsp; vSheet.Name = <span class="maroon">&quot;test3&quot;</span>;
+&nbsp; &nbsp; <span class="blue">var</span> location2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> v12 = <span class="teal">Viewport</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, vSheet.Id, go1.Id, location2 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> v22 = <span class="teal">Viewport</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, vSheet.Id, vg1.Id, location2 );
+&nbsp;
+&nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Align lower left - works because </span>
+&nbsp; &nbsp; <span class="green">// crop boxes are same</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Outline</span> outline1 = v12.GetBoxOutline();
+&nbsp; &nbsp; <span class="teal">Outline</span> outline2 = v22.GetBoxOutline();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> min1 = outline1.MinimumPoint;
+&nbsp; &nbsp; <span class="teal">XYZ</span> min2 = outline2.MinimumPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> diffToMove = min1 - min2;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement(
+&nbsp; &nbsp; &nbsp; doc, v22.Id, diffToMove );
+&nbsp;
+&nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Restore view crop boxes</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( savedBox1 == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; go1.CropBoxActive = <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; go1.CropBox = savedBox1;
+&nbsp; &nbsp; &nbsp; go1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; go1.CropBoxVisible = <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( savedBox2 == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; vg1.CropBox = savedBox2;
+&nbsp; &nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; vg1.CropBoxVisible = <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Now the result looks correct. Hope this helps.</p>
+
+
+<p><strong>Response:</strong> I am happy to inform you that I tested your workaround in a couple of scenarios in our main application and it continues to work well. Thank you!</p>

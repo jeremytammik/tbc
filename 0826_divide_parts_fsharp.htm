@@ -1,0 +1,330 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07585783 [A sample for PartUtils.DivideParts] 
+C:\a\j\adn\case\sfdc\07585783\src\
+
+-->
+
+<h3>DivideParts in F#</h3>
+
+<p>My internet connection died last night. 
+After worrying and testing quite a bit last night and this morning, I laid a temporary cable from my neighbour's router. 
+Shortly after I finished, my own connection came back up again, after about 14 hours downtime. 
+<a href="http://en.wikipedia.org/wiki/Murphy%27s_law">Murphy's law</a> remains valid, as always. 
+Very reassuring :-) 
+There is lots of building work going on nearby, so probably they broke it and fixed it with no explanations given.
+Anyway, I am back to normal now and 
+
+<a href="http://en.wikipedia.org/wiki/Crossed_fingers">
+keeping my fingers crossed</a>.
+
+<p>Last week, I presented a C# sample by Piotr Zurek of 
+
+<a href="http://www.cadpro.co.nz/">
+CADPRO Systems Ltd</a> exercising the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/parts-assemblies-partutils-and-divideparts.html">
+PartUtils class and its DivideParts method</a>.
+
+<p>As an experiment and for comparison purposes, Piotr decided to port this to F# as well.
+In his own words:
+
+<p>As an exercise, I decided to port this example to F# to see how it works and whether the F# syntax offers any benefits over C#.
+
+
+<a name="2"></a>
+
+<h4>Lessons Learned</h4>
+
+<p>Here are some of the lessons learned:
+
+<h5>Let Not Use</h5>
+
+<p>Initially, the F# version of the command ran fine only the first time I launched it, and failed in the call to PickObject with an InvalidOperationException saying "The managed object is not valid" on the second call.
+
+<p>After isolating the call to PickObject, I changed the following four initialisation statements:
+
+<pre class="code">
+&nbsp; <span class="blue">use</span> uiApp = commandData.Application
+&nbsp; <span class="blue">use</span> app&nbsp; = uiApp.Application
+&nbsp; <span class="blue">use</span> uiDoc = uiApp.ActiveUIDocument
+&nbsp; <span class="blue">use</span> doc&nbsp; = uiDoc.Document
+</pre>
+
+<p>It turns out that this is wrong, since the F# 'use' statement is just like 'using' in C#.
+
+<p>So when these objects fall out of scope, Dispose will be called on them.
+Since they belong to Revit, they don't like being disposed of by external code.
+Changing 'use' to 'let' fixed that problem:
+
+<pre class="code">
+&nbsp; <span class="blue">let</span> uiApp = commandData.Application
+&nbsp; <span class="blue">let</span> app&nbsp; = uiApp.Application
+&nbsp; <span class="blue">let</span> uiDoc = uiApp.ActiveUIDocument
+&nbsp; <span class="blue">let</span> doc&nbsp; = uiDoc.Document
+</pre>
+
+<p>Thanks to Kean Walmsley for this explanation.
+
+
+<h5>Pattern Matching Versus :?</h5>
+
+<p>At one point, I made a little bit of use of F# pattern matching to implement the WallSelectionFilter AllowElement method like this:
+
+<pre class="code">
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> x.AllowElement(element) =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">match</span> element <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; &nbsp; | :? Wall <span class="blue">as</span> element <span class="blue">-&gt;</span> <span class="blue">true</span>
+&nbsp; &nbsp; &nbsp; &nbsp; | _ <span class="blue">-&gt;</span> <span class="blue">false</span>
+</pre>
+
+<p>However, on further consideration, it is clearer and more succinct to use the F# ':?' operator, which is an equivalent of 'is' in C#, like this:
+
+<pre class="code">
+<span class="blue">type</span> WallSelectionFilter() =
+&nbsp; <span class="blue">class</span>
+&nbsp; &nbsp; <span class="blue">interface</span> ISelectionFilter <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> x.AllowElement(element) = element :? Wall
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> x.AllowReference(reference, xyz) = <span class="blue">false</span>
+&nbsp; <span class="blue">end</span>
+</pre>
+
+
+<h5>Implementing an Exception Handler</h5>
+
+<p>I initially removed the 'try-catch' exception handler around the call to PickObject to handle a user cancelling the pick operation.
+On consideration, I found that it translates to 'try-with' in F#.
+The piping symbol '|' means pretty much 'data received from the last operation':
+
+<pre class="code">
+&nbsp; <span class="blue">let</span> reference = 
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; ObjectType.Element, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> WallSelectionFilter(), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select a wall to split into panels&quot;</span>)
+&nbsp; &nbsp; <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; | :? Autodesk.Revit.Exceptions.
+&nbsp; &nbsp; &nbsp; &nbsp; OperationCanceledException <span class="blue">-&gt;</span> <span class="blue">null</span>
+</pre>
+
+<p>Exiting the mainline execution requires an if-else statement as well: if reference is null, return Result.Canceled. 
+The best solution is probably more 
+
+<a href="http://en.wikipedia.org/wiki/Functional_programming">functional</a>, 
+
+though.
+
+
+<a name="3"></a>
+
+<h4>Final Implementation</h4>
+
+<p>Here is the final complete F# implementation of this external command:
+
+<pre class="code">
+<span class="blue">namespace</span> FSharpPanelBuilder
+&nbsp;
+<span class="blue">open</span> System
+<span class="blue">open</span> System.Collections.Generic
+&nbsp;
+<span class="blue">open</span> Autodesk.Revit
+<span class="blue">open</span> Autodesk.Revit.UI
+<span class="blue">open</span> Autodesk.Revit.Attributes
+<span class="blue">open</span> Autodesk.Revit.DB
+<span class="blue">open</span> Autodesk.Revit.UI.Selection
+&nbsp;
+<span class="blue">type</span> WallSelectionFilter() =
+&nbsp; <span class="blue">class</span>
+&nbsp; &nbsp; <span class="blue">interface</span> ISelectionFilter <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> x.AllowElement(element) = element :? Wall
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> x.AllowReference(reference, xyz) = <span class="blue">false</span>
+&nbsp; <span class="blue">end</span>
+&nbsp;
+[&lt;Transaction(TransactionMode.Manual)&gt;]
+<span class="blue">type</span> Command() =
+&nbsp; <span class="blue">class</span>
+&nbsp; &nbsp; <span class="blue">interface</span> IExternalCommand <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">member</span> this.Execute(commandData, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message : string byref, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; elements ) =
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> uiApp = commandData.Application
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> app&nbsp; = uiApp.Application
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> uiDoc = uiApp.ActiveUIDocument
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> doc&nbsp; = uiDoc.Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> sel = uiDoc.Selection
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> reference = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ObjectType.Element, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> WallSelectionFilter(), 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select a wall to split into panels&quot;</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">with</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | :? Autodesk.Revit.Exceptions.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OperationCanceledException <span class="blue">-&gt;</span> <span class="blue">null</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span> reference = <span class="blue">null</span> <span class="blue">then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; TaskDialog.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;F# Panel Builder&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Operation was canceled&quot;</span>) |&gt; ignore
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.UI.Result.Cancelled
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> wall = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.GetElement(reference.ElementId) :?&gt; Wall
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> locationCurve = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.Location :?&gt; LocationCurve
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> line = locationCurve.Curve :?&gt; Line
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">use</span> transaction = <span class="blue">new</span> Transaction(doc)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> status = transaction.Start(<span class="maroon">&quot;Building panels&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> wallList = <span class="blue">new</span> List&lt;ElementId&gt;(1)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wallList.Add(reference.ElementId)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PartUtils.CreateParts(doc, wallList)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Regenerate()
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> parts = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PartUtils.GetAssociatedParts(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, wall.Id, <span class="blue">false</span>, <span class="blue">false</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> divisions = 15
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> origin = line.Origin
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> delta = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.Direction.Multiply(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.Length / (float)divisions)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> shiftDelta = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Transform.get_Translation(delta)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> rotation = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Transform.get_Rotation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin, XYZ.BasisZ, 0.5 * Math.PI)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> wallWidthVector = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rotation.OfVector(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.Direction.Multiply(2. * wall.Width))
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> <span class="blue">mutable</span> intersectionLine = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin + wallWidthVector, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; origin - wallWidthVector)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> curveArray = <span class="blue">new</span> List&lt;Curve&gt;()
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span> i = 1 <span class="blue">to</span> divisions <span class="blue">do</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; intersectionLine &lt;- 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; intersectionLine.get_Transformed(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; shiftDelta) :?&gt; Line
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curveArray.Add(intersectionLine)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> divisionSketchPlane = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewSketchPlane(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> Plane(XYZ.BasisZ, line.Origin))
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> intersectionElementsIds = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> List&lt;ElementId&gt;()
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> partMaker = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PartUtils.DivideParts(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, parts, intersectionElementsIds, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curveArray, divisionSketchPlane.Id)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView.PartsVisibility &lt;- 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PartsVisibility.ShowPartsOnly
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; transaction.Commit() |&gt; ignore
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Result.Succeeded
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">with</span> ex <span class="blue">-&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; TaskDialog.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;F# Panel Builder&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ex.Message) |&gt; ignore
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Result.Failed
+&nbsp;
+&nbsp; <span class="blue">end</span>
+</pre>
+
+<p>The code is a straight translation from C# into F#, almost without making any use of F# specific concepts.
+
+<p>Later on, it would be nice to rewrite it to be a bit more
+
+<a href="http://en.wikipedia.org/wiki/Functional_programming">functional</a>.
+
+<p>I really like how expressive and concise F# is, but switching between F# and C# causes me horrible headaches. :-)
+
+
+<a name="4"></a>
+
+<h4>Git and GitHub Source Code Management</h4>
+
+<p>I placed the entire project on 
+
+<a href="https://github.com">
+GitHub</a>:
+
+<ul>
+<li><a href="https://github.com/pzurek/FSharpPanelBuilder">
+https://github.com/pzurek/FSharpPanelBuilder</a>.
+</ul>
+
+<p>GitHub a source code collaboration platform based on the version control system git, a fast, efficient, distributed system for collaborative software development.
+It enables you to easily fork, send pull requests and manage all your public and private git repositories.
+
+<p>I love it. 
+Here at CADPRO I don't get too much chance to use it collaboratively, since I am usually the only person working on a project. 
+
+<p>When playing with open source projects, that's another story and git is a brilliant tool for it. 
+Some people claim that is it hard and too complicated, but for me that was the first distributed source control system I used and I didn't find it too hard to grasp. 
+
+<p>The thing that makes Git amazing is GitHub. 
+They just put a nice desktop and web interface on it and make it nice and easy to use. 
+
+<p>Besides looking at the 
+
+<a href="https://github.com/pzurek/FSharpPanelBuilder">
+main project page</a>, 
+
+you can 
+
+<a href="https://github.com/pzurek/FSharpPanelBuilder/zipball/master">
+download the whole project as a zip file</a>.
+
+<p>GitHub also provides a little tool that help with publishing source code on the Internet.
+Gist.github.com allows you to create snippets of code and then embed them in other websites. 
+
+<p>As an example, I pasted the 
+
+<a href="https://gist.github.com/3702963">
+command.fs file from the F# sample</a>.
+
+<p>Many thanks to Piotr for all this information, research and comparison!
+
+
+<a name="5"></a>
+
+<h4>Retrieving Line Styles</h4>
+
+<p>Mikako Harada published sample code showing how to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/retrieving-a-list-of-line-styles.html">
+retrieve all line styles</a> through
+
+the CurveElement GetLineStyleIds property.
+
+<p>If you don't have a curve element handy to invoke the property on, you can simply create a temporary one, for instance a detail line in the currently active view.
+Created in a separate transaction which is rolled back afterwards, it enables access to the line styles with no effect on the database.

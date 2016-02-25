@@ -1,0 +1,104 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Import LandXML Surface</h3>
+
+<p>Someone recently asked for an API within Revit for handling LandXML data.
+There is no API for LandXML, but there is nothing to stop us from using standard XML parsing to read LandXML files and use the standard Revit API to generate terrain and other objects.
+
+<p>Here is a solution provided by Emmanuel Weyermann of Autodesk demonstrating how to parse a LandXML file and generate a topography surface in the Revit database from its data.
+I added it as a new external command CmdLandXml to The Building Coder sample application.
+It prompts the user to select a LandXML input file, parses it to obtain a list of XYZ points, and passes this list to the dedicated API method NewTopographySurface to create the surface.
+Here is the entire code of the external command's Execute method:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+W.<span class="teal">OpenFileDialog</span> dlg = <span class="blue">new</span> W.<span class="teal">OpenFileDialog</span>();
+&nbsp;
+dlg.Filter = <span class="maroon">&quot;LandXML files (*.xml)|*.xml&quot;</span>;
+&nbsp;
+dlg.Title = <span class="maroon">&quot;Import LandXML and &quot;</span>
+&nbsp; + <span class="maroon">&quot;Create TopographySurface&quot;</span>;
+&nbsp;
+<span class="blue">if</span>( dlg.ShowDialog() != W.<span class="teal">DialogResult</span>.OK )
+{
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Cancelled;
+}
+&nbsp;
+<span class="teal">XmlDocument</span> xmlDoc = <span class="blue">new</span> <span class="teal">XmlDocument</span>();
+xmlDoc.Load( dlg.FileName );
+&nbsp;
+<span class="teal">XmlNodeList</span> pnts 
+&nbsp; = xmlDoc.GetElementsByTagName( <span class="maroon">&quot;Pnts&quot;</span> );
+&nbsp;
+<span class="blue">char</span>[] separator = <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">' '</span> };
+<span class="blue">double</span> x = 0, y = 0, z = 0;
+<span class="teal">XYZ</span> xyz;
+&nbsp;
+<span class="teal">XYZArray</span> pts = app.Create.NewXYZArray();
+&nbsp;
+<span class="blue">for</span>( <span class="blue">int</span> k = 0; k &lt; pnts.Count; ++k )
+{
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; 
+&nbsp; &nbsp; i &lt; pnts[k].ChildNodes.Count; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> j = 1;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> text = pnts[k].ChildNodes[i].InnerText;
+&nbsp; &nbsp; <span class="blue">string</span>[] coords = text.Split( separator );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> coord <span class="blue">in</span> coords )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( j )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 1:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x = <span class="teal">Double</span>.Parse( coord );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 2:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; y = <span class="teal">Double</span>.Parse( coord );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 3:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; z = <span class="teal">Double</span>.Parse( coord );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; j++;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; xyz = <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, z );
+&nbsp; &nbsp; pts.Append( xyz );
+&nbsp; }
+}
+&nbsp;
+<span class="teal">TopographySurface</span> surface 
+&nbsp; = doc.Create.NewTopographySurface( pts );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>You need to change the view property to display topography to see the resulting surface after running this command.
+
+<p>One limitation of this sample is that it does not check what units are defined on the LandXML file.
+
+<p>Here is a zip file
+
+<a href="zip/LandXMLfiles.zip">LandXMLfiles.zip</a>
+
+containing Emmanuel's original solution as well as a sample LandXML input file.
+The resulting topography surface displayed by Revit after reading in and processing the file looks like this:
+
+<center>
+<img src="img/landxml_topography_surface.png" alt="LandXML topography surface"/>
+</center>
+
+<p>Here is
+
+<a href="zip/bc11057.zip">
+version 1.1.0.57</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>Many thanks to Emmanuel for providing this interesting sample!

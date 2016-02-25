@@ -1,0 +1,44 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1268812 [64-bit compilation]
+1268897 [Revit API crash at getting window elements geometry on 64bit sistems]
+SPR# 205866  Documentation: need to include dev. environment info. for unmanaged C++ for mixed mode developers
+DevNote: Development environment for mixed mode C++ for Revit 2012 
+http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=16977078&linkID=4901650
+Xiaodong Liang Re: Chinese Revit case: Error on 64bits
+
+-->
+
+<h3>Mixed Mode C++ in Revit 2012</h3>
+
+<p>Here is a short note to start the week, on an issue that arose a couple of times using mixed mode C++ development in Revit 2012.
+This information was originally published on the members-only 
+
+<a href="http://www.autodesk.com/joinadn">
+ADN web site</a> as 
+
+a technical solution on the
+
+<a href="http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=16977078&linkID=4901650">
+development environment for mixed mode C++ for Revit 2012</a>:
+
+<p><strong>Question:</strong> I have a mixed mode C++ application. 
+When I run it on a machine where no version of Visual Studio was ever installed, I see the following error message:
+
+<p style="color:darkblue">Revit cannot run the external application "SimpleTest". 
+<br>Contact the provider for assistance.
+<br>System.IO.FileNotFoundException:
+<br>Could not load file or assembly 'SimpleTest.dll' or one of its dependencies. 
+The specified module could not be found.
+
+<p>It seems as if some components that come with VS2010 are missing in the Revit installation. 
+How can I solve this, please?
+
+<p><strong>Answer:</strong> Even though Revit 2012 uses the VS 2010 IDE and .NET 4.0, the native Revit code is compiled with the VS 2008 C++ compiler, and not with VS 2010. 
+When an add-in makes use of unmanaged C++ code built with VS 2010 components, those components are not provided by the Revit installation. 
+
+<p>There are two ways to solve this: you can either (1) set up your native C++ projects to use the VS 2008 compiler, or (2) install the VS 2010 redistributables yourself together with your add-in. 

@@ -1,0 +1,325 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script language="JavaScript">
+// from http://www.sevenwires.com/play/UpsideDownLetters.html
+function flipString(aString) {
+  var last = aString.length - 1;
+  var result = new Array(aString.length)
+  for (var i = last; i >= 0; --i) {
+    var c = aString.charAt(i)
+    var r = flipTable[c]
+    result[last - i] = r != undefined ? r : c
+    }
+  return result.join('')
+}
+var flipTable = {
+a : '\u0250',
+b : 'q',
+c : '\u0254',
+d : 'p',
+e : '\u01DD',
+f : '\u025F',
+g : '\u0183',
+h : '\u0265',
+i : '\u0131',
+j : '\u027E',
+k : '\u029E',
+l : '\u05DF',
+m : '\u026F',
+n : 'u',
+r : '\u0279',
+t : '\u0287',
+v : '\u028C',
+w : '\u028D',
+y : '\u028E',
+'.' : '\u02D9',
+'[' : ']',
+'(' : ')',
+'{' : '}',
+'?' : '\u00BF',
+'!' : '\u00A1',
+"\'" : ',',
+'<' : '>',
+'_' : '\u203E',
+'"' : '\u201E',
+'\\' : '\\',
+';' : '\u061B',
+'\u203F' : '\u2040',
+'\u2045' : '\u2046',
+'\u2234' : '\u2235'
+}
+for (i in flipTable) {
+  flipTable[flipTable[i]] = i
+}
+</script>
+</head>
+
+<body onload="document.all.flipped.innerHTML=flipString(document.all.flipped.innerHTML)">
+
+<!-- 
+
+<body onload="alert('onload');document.all.flipped.innerHTML=flipString('the final trailing comma');alert('done');">
+
+1264869 [How do I find the elevation profile (sketch) of a wall]
+1265025 [Filled region, sketch and sketch plane]
+http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=16037230&linkID=4901650
+
+-->
+
+<h3>Access to Sketch and Sketch Plane</h3>
+
+<p>I just presented my first Revit API class here at AU 2010, 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=6943&jid=614479">
+CP228-2</a>, on the optimal use of the Revit 2011 programming features and the Idling event.
+I already posted my AU
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/autodesk-university-2010-classes.html">
+class descriptions</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/autodesk-university-2010-class-materials.html">
+materials</a>.
+
+The presentation went well and was good fun. 
+The next one, 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=7246&jid=614479">
+CP234-2</a>,
+
+on Revit 2011 programming optimization and filtered element collectors, is scheduled in an hour's time.
+Right now I am sitting in on 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=7107&jid=613470">
+Matt Mason's presentation on Revit parameters</a>.
+
+<p>Meanwhile, here is another interesting application of the doc.Delete method to access related elements that we already explored several times in the past for determining
+
+<!--
+
+107_room_on_level_in_phase.htm:      doc.Delete( room );
+146_host_reference.htm:&nbsp; &nbsp; delIds = doc.Delete( wall );
+150_unload_family_type.htm:&nbsp; &nbsp; &nbsp; doc.Delete( e );
+216_remove_geometry_rfa.htm:&nbsp; <span class="teal">ElementIdSet</span> ids =
+247_title_block_of_sheet.htm:doc.Delete method to detect dependent elements</a>.
+307_unmodified_geometry.htm:<p>Probably the most reliable way to solve this prob
+314_object_relationship.htm:&nbsp; <span class="teal">ElementIdSet</span> ids =
+334_anonymous_methods_vb.htm:&nbsp; &nbsp; doc.Delete( symbol );
+360_p2c.htm:&nbsp; doc.Delete( pipe );
+419_transaction_migration.htm:&nbsp; &nbsp; delIds = doc.Delete( wall );
+476_purge_text_note_types.htm:&nbsp; doc.Delete( textNoteTypes );
+479_launch_command.htm:&nbsp; &nbsp; <span class="green">// doc.delete(nw) may n
+484_failure_api.htm:&nbsp; &nbsp; doc.Delete( elem );
+488_mirror_in_new_family.htm:&nbsp; familyDoc.Delete(famInst)
+
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+all kinds of useful object relationships</a>.
+
+Now Joe Ye picked it up again to solve the following questions:
+
+<p><strong>Question:</strong> When creating a floor, roof, filled region, etc., a sketch and a sketch plane are required. 
+I want to retrieve the sketch and sketch plane from an existing element. 
+However there is no API to do that. 
+Could you please tell me how to find these objects? 
+
+<p><strong>Answer:</strong> When creating a floor, slab and filled region etc., you draw a profile to define the element shape.  
+Revit automatically creates a sketch and sketch plane for the profile. 
+If the host element is deleted, the sketch and sketch plane are deleted accordingly. 
+The Document.Delete method returns all deleted element ids. 
+This mechanism can be used as follows to access the desired elements:
+
+<ul>
+<li>Create a temporary transaction.
+<li>Delete the target element inside the transaction.
+<li>The sketch and sketch plane ids are included in the returned element id list. 
+<li>Filter out the target elements. 
+<li>Roll back the transaction to restore the target and all dependent elements and the model to its original state.
+</ul>
+
+<!--
+
+<p>Here is some sample code showing the usage:
+
+<pre class="code">
+using System;
+using System.Collections.Generic;
+//using System.Windows.Forms;
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+
+
+[TransactionAttribute(TransactionMode.Manual)]
+[RegenerationAttribute(RegenerationOption.Manual)]
+public class RevitCommand : IExternalCommand
+{
+    public Result Execute(ExternalCommandData commandData,
+      ref string messages,
+      ElementSet elements)
+    {
+      UIApplication app = commandData.Application;
+      UIDocument uiDoc = app.ActiveUIDocument;
+      Document doc = uiDoc.Document;
+
+      Selection sel = uiDoc.Selection;
+      Reference ref1 = sel.PickObject(ObjectType.Element, "Please pick an element");
+      Element elem = ref1.Element;
+      Transaction trans = new Transaction(doc);
+      trans.Start("test");
+      ICollection<ElementId> ids = doc.Delete(elem);
+
+      trans.RollBack();
+      string strName = "Host Id = " + elem.Id.IntegerValue.ToString() + "\r\n";
+      foreach (ElementId id in ids)
+      {
+        Element elemIter = doc.get_Element(id);
+        if (elemIter is Sketch || elemIter is SketchPlane)
+        {
+          strName += "Id = " + id.IntegerValue.ToString() + ";" + elemIter.Name
+            + " ;" + elemIter.GetType().ToString() + "\r\n";
+        }
+      }
+
+      TaskDialog.Show("test", strName);
+   
+      return Result.Succeeded;
+    }
+}
+</pre>
+
+-->
+
+<p>Using this approach, all elements that are closely related with a specified element can be retrieved. 
+For example, the detail lines that form the profile of a wall can be found.
+
+<p>Here is another similar question that can be answered using the same approach:
+
+<p><strong>Question:</strong> I need to find out whether a given wall has an elevation profile and if so which. 
+I tried using a filtered element collector to retrieve all sketch objects in the model, but they have no properties that I can use to associate them with the wall.
+
+<p>Is there a way for a given wall element to find if there is a SketchPlane associated with it that defines its elevation profile? 
+
+<p>Or, alternatively, is there a way for a given SketchPlane to find which object in the database it is attached to? 
+
+<p><strong>Answer:</strong> Just like above, one possible way is to delete the wall in a transaction using Document.Delete, which returns the deleted element ids. The wall and the sketch will be returned in the ElementId list. Then roll back the transaction, so the model remains unchanged.
+
+<p>Here is the resulting list of elements that were deleted due to the deletion of a specific sample wall element hosting them.
+As you can see, the sketch element is included in the list:</p>
+
+<center>
+<img src="img/wall_with_sketch.png" alt="Wall with sketch" width="400"/>
+</center>
+
+<p>I used Joe's suggestion to create a new Building Coder sample external command CmdGetSketchElements to retrieve and list all the sketch elements associated with a selected host.
+
+<p>I added a variable 'showOnlySketchElements' to choose whether to list only the sketch elements, or all related elements.
+
+<p>I first implemented the string building code explicitly, then commented it out and rewrote it using generic Linq methods. 
+You can judge for yourself which variation you find clearer (and see whether you spot the obvious flaw in the StringBuilder implementation (<span id="flipped">the final trailing comma</span>)):
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdGetSketchElements</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _caption = <span class="maroon">&quot;Retrieve Sketch Elements&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject( <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = r.Element;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; &nbsp; trans.Start( _caption );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = doc.Delete( elem );
+&nbsp;
+&nbsp; &nbsp; trans.RollBack();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> showOnlySketchElements = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">/*</span>
+<span class="green">&nbsp; &nbsp; StringBuilder s = new StringBuilder( </span>
+<span class="green">&nbsp; &nbsp; &nbsp; _caption</span>
+<span class="green">&nbsp; &nbsp; &nbsp; + &quot; for host element &quot;</span>
+<span class="green">&nbsp; &nbsp; &nbsp; + Util.ElementDescription( elem )</span>
+<span class="green">&nbsp; &nbsp; &nbsp; + &quot;: &quot; );</span>
+&nbsp;
+<span class="green">&nbsp; &nbsp; foreach( ElementId id in ids )</span>
+<span class="green">&nbsp; &nbsp; {</span>
+<span class="green">&nbsp; &nbsp; &nbsp; Element e = doc.get_Element( id );</span>
+&nbsp;
+<span class="green">&nbsp; &nbsp; &nbsp; if( !showOnlySketchElements</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; || e is Sketch</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; || e is SketchPlane )</span>
+<span class="green">&nbsp; &nbsp; &nbsp; {</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; s.Append( Util.ElementDescription( e ) + &quot;, &quot; );</span>
+<span class="green">&nbsp; &nbsp; &nbsp; }</span>
+<span class="green">&nbsp; &nbsp; }</span>
+<span class="green">&nbsp; &nbsp; */</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; ids.Select( id =&gt; doc.get_Element( id ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = _caption
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; for host element &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.ElementDescription( elem )
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;: &quot;</span>;
+&nbsp;
+&nbsp; &nbsp; s += <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; a.Where( e =&gt; !showOnlySketchElements
+&nbsp; &nbsp; &nbsp; &nbsp; || e <span class="blue">is</span> <span class="teal">Sketch</span>
+&nbsp; &nbsp; &nbsp; &nbsp; || e <span class="blue">is</span> <span class="teal">SketchPlane</span> )
+&nbsp; &nbsp; &nbsp; .Select( e =&gt; <span class="teal">Util</span>.ElementDescription( e ) )
+&nbsp; &nbsp; &nbsp; .ToArray() );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( s );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is a simple sample model with a single floor element:
+
+<center>
+<img src="img/floor_with_sketch.png" alt="Floor with sketch"/>
+</center>
+
+<p>Running the command on this returns the following list of all related elements:
+
+<p>Retrieve Sketch Elements for host element Floors &lt;130589 Generic Floor - 400mm&gt;: SketchPlane &lt;130587 Level 1&gt;, Sketch &lt;130588 Sketch&gt;, Floors &lt;130589 Generic Floor - 400mm&gt;, &lt;Sketch&gt; &lt;130592 Model Lines&gt;, &lt;Sketch&gt; &lt;130595 Model Lines&gt;, &lt;Sketch&gt; &lt;130598 Model Lines&gt;, &lt;Sketch&gt; &lt;130601 Model Lines&gt;, &lt;Sketch&gt; &lt;130604 Model Lines&gt;, &lt;Sketch&gt; &lt;130607 Model Lines&gt;, &lt;Sketch&gt; &lt;130610 Model Lines&gt;, SketchPlane &lt;130621 Level 1&gt;, Sketch &lt;130622 Sketch&gt;, Floor opening cut &lt;130623 Opening Cut&gt;, &lt;Sketch&gt; &lt;130643 Model Lines&gt;, &lt;Sketch&gt; &lt;130667 Model Lines&gt;, &lt;Sketch&gt; &lt;130686 Model Lines&gt;, &lt;Sketch&gt; &lt;130702 Model Lines&gt;, &lt;Sketch&gt; &lt;130721 Model Lines&gt;, &lt;Sketch&gt; &lt;130752 Model Lines&gt;, Automatic Sketch Dimensions &lt;130775 Linear Dimension Style&gt;, Automatic Sketch Dimensions &lt;130776 Linear Dimension Style&gt;, Automatic Sketch Dimensions &lt;130777 Linear Dimension Style&gt;, Automatic Sketch Dimensions &lt;130778 Linear Dimension Style&gt;, Automatic Sketch Dimensions &lt;130779 Linear Dimension Style&gt;, SketchPlane &lt;130832 Level 1&gt;, Sketch &lt;130833 Sketch&gt;, Floor opening cut &lt;130834 Opening Cut&gt;, &lt;Sketch&gt; &lt;130848 Model Lines&gt;, &lt;Sketch&gt; &lt;130861 Model Lines&gt;, &lt;Sketch&gt; &lt;130878 Model Lines&gt;, &lt;Sketch&gt; &lt;130894 Model Lines&gt;, Automatic Sketch Dimensions &lt;130909 Linear Dimension Style&gt;, Automatic Sketch Dimensions &lt;130910 Linear Dimension Style&gt;, SketchPlane &lt;131013 Level 1&gt;, Sketch &lt;131014 Sketch&gt;, Floor opening cut &lt;131015 Opening Cut&gt;, &lt;Sketch&gt; &lt;131062 Model Lines&gt;, Automatic Sketch Dimensions &lt;131065 Linear Dimension Style&gt;
+
+<p>As you can see, there are a large number of elements associated with this floor, including the sketch elements that we are interested in.
+
+<p>Setting 'showOnlySketchElements' to true returns the sketch elements only:
+
+<p>Retrieve Sketch Elements for host element Floors &lt;130589 Generic Floor - 400mm&gt;: SketchPlane &lt;130587 Level 1&gt;, Sketch &lt;130588 Sketch&gt;, SketchPlane &lt;130621 Level 1&gt;, Sketch &lt;130622 Sketch&gt;, SketchPlane &lt;130832 Level 1&gt;, Sketch &lt;130833 Sketch&gt;, SketchPlane &lt;131013 Level 1&gt;, Sketch &lt;131014 Sketch&gt;
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_81.zip -->
+
+<a href="zip/bc_11_81.zip">
+version 2011.0.81.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.
+
+</body>
+</html>

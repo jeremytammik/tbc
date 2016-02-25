@@ -1,0 +1,223 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Autodesk University 2009
+CP222-3 Analyze Geometry of Buildings Using the Autodesk Revit API -- Scott Conover
+C:\a\doc\revit\au\2009\doc2\AU09_CP222-3_Analyze_Geometry_Revit_API.pdf
+C:\a\doc\revit\au\2009\doc2\Illustrations\AUMainRibbonPanel.sln
+
+-->
+
+<h3>Material Quantity Extraction</h5>
+
+<p>This is the tenth and last part of Scott Conover's Autodesk University 2009 class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>.
+
+<p>One common analytical requirement is to extract material quantities of elements in the document.
+Revit 2010 introduced methods to directly obtain the material volumes and areas computed by Revit for material takeoff schedules:</p>
+
+<ul>
+<li>Element.Materials &ndash; obtains a list of materials within an element.
+<li>Element.GetMaterialVolume &ndash; obtains the volume of a particular material in an element.
+<li>Element.GetMaterialArea &ndash; obtains the area of a particular material in an element.
+</ul>
+
+<p>The methods apply to categories of elements where Category.HasMaterialQuantities property is true.
+In practice, this is limited to elements that use compound structure, like walls, roofs, floors, ceilings, a few other basic 3D elements like stairs, plus 3D families where materials can be assigned to geometry of the family, like windows, doors, columns, MEP equipment and fixtures, and generic model families.
+Note that within these categories there are further restrictions about how material quantities can be extracted.
+For example, curtain walls and curtain roofs will not report any material quantities themselves; the materials used by these constructs can be extracted from the individual panel elements that make up the curtain system.
+As a side note from Jeremy, I just wonder whether these methods for querying the material volumes might possibly also be useful for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+determination of all model elements</a>.
+
+<p>Note that the volumes and areas computed by Revit may be approximate in some cases.
+For example, for individual layers within a wall, minor discrepancies might appear between the volumes visible in the model and those shown in the material takeoff schedule.
+These discrepancies tend to occur when you use the wall sweep tool to add a sweep or a reveal to a wall, or under certain join conditions.</p>
+
+<h4>Temporary Element Suppression</h4>
+
+<p>These methods allow you to extract the material quantities for an as-modelled Revit project.
+But what if you need to extract gross material quantities of layered elements like walls, floors, and roofs, where the quantities are extracted before they are cut or modified by other elements?</p>
+
+<p>What is needed to extract gross material quantities is a way to remove elements that cut other elements.
+In fact, this capability exists in the Revit API, but it may not be obvious: it is the temporary use of the Delete method. When you delete elements that cut other elements, the cut element's geometry is restored to its original state.
+As another side note from Jeremy, we have already discussed some other interesting and surprising uses of temporary element deletion to determine the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+association between a tag and the tagged element</a>, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+relationship between a wall and its wall footing</a>, or any
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+host and its hosted elements</a>, and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">
+title block of a sheet</a>.
+
+<p>Note that use of the Hide method instead of Delete is not sufficient for this; Hide will remove display of the cutting elements, but the holes left behind are still present.
+Here is a wall before the hide of cutting elements:</p>
+
+<center>
+<img src="img/abg10_wall_before_hide.png" alt="Wall before hide of cutting elements"/>
+</center>
+
+Here is the same wall after hiding its hosted cutting elements, with the holes still remaining:</p>
+
+<center>
+<img src="img/abg10_wall_after_hide.png" alt="Wall after hide of cutting elements"/>
+</center>
+
+<p>Instead of hide, you will want to make a temporary deletion: this can be done by creating a transaction, executing the deletion, extracting the needed quantities, and then aborting the transaction.
+Here is the same wall after the cutting elements have been deleted:</p>
+
+<center>
+<img src="img/abg10_wall_after_delete.png" alt="Wall after deletion of cutting elements"/>
+</center>
+
+<h4>Example: Extraction of Gross and Net Material Quantities</h4>
+
+<p>In this example, we combine both the material quantity extraction tools and temporary suppression of cutting elements (opening, windows, and doors), to extract both gross and net material quantities.</p>
+
+<center>
+<img src="img/abg10_material_quantities.png" alt="Gross and net material quantities"/>
+</center>
+
+<p>Please refer to Scott's
+
+<a href="http://au.autodesk.com/?nd=class&session_id=5256">
+AU class material</a> for
+
+the full source code of this sample project.
+
+<!-- todo: extract some of the source code, there is interesting stuff in there. -->
+
+
+<p>The code implementing the material quantity extraction is in the module ElementMaterialQuantities.cs and is very nicely structured.
+It includes some interesting snippets that are well worth highlighting here.
+Scott defines a storage class MaterialQuantities for the extracted material quantities and an interface and base class MaterialQuantityCalculator implementing a material quantity calculator for all element types.
+Its main calculation method is self-explanatory:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> CalculateMaterialQuantities()
+{&nbsp; &nbsp;&nbsp;
+&nbsp; CollectElements();
+&nbsp; CalculateNetMaterialQuantities();
+&nbsp; CalculateGrossMaterialQuantities();
+}
+</pre>
+
+<p>Some of its other methods include:
+
+<ul>
+<li>CalculateMaterialQuantitiesOfElement to calculate and store material quantities for a given element.
+<li>DeleteAllCuttingElements to delete all elements that cut out of target elements, to allow for calculation of gross material quantities.
+<li>CalculateNetMaterialQuantities to calculate net material quantities for the target elements.
+<li>CalculateGrossMaterialQuantities to calculate gross material quantities for the target elements, i.e. material quantities with all openings, doors and windows removed.
+</ul>
+
+<p>The difference between the two latter is worth highlighting:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> CalculateNetMaterialQuantities()
+{
+&nbsp; <span class="blue">foreach</span> (Autodesk.Revit.<span class="teal">Element</span> e <span class="blue">in</span> m_elementsToProcess)
+&nbsp; {
+&nbsp; &nbsp; CalculateMaterialQuantitiesOfElement(e);
+&nbsp; }
+}
+&nbsp;
+<span class="blue">private</span> <span class="blue">void</span> CalculateGrossMaterialQuantities()
+{
+&nbsp; m_calculatingGrossQuantities = <span class="blue">true</span>;
+&nbsp;
+&nbsp; m_doc.BeginTransaction();
+&nbsp;
+&nbsp; DeleteAllCuttingElements();
+&nbsp;
+&nbsp; <span class="blue">foreach</span> (Autodesk.Revit.<span class="teal">Element</span> e <span class="blue">in</span> m_elementsToProcess)
+&nbsp; {
+&nbsp; &nbsp; CalculateMaterialQuantitiesOfElement(e);
+&nbsp; }
+&nbsp;
+&nbsp; m_doc.AbortTransaction();
+}
+</pre>
+
+<p>Different specialised classes for specific element types such as walls, floors and roofs are derived from the base class and simply differ in their manner of selecting the target elements, which is obviously done using Revit API element filtering.
+
+<p>The command mainline then defines a template method to execute a calculator for one type of Revit element:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> ExecuteCalculationsWith&lt;T&gt;()
+&nbsp; <span class="blue">where</span> T : <span class="teal">MaterialQuantityCalculator</span>, <span class="blue">new</span>()
+{
+&nbsp; T calculator = <span class="blue">new</span> T ();
+&nbsp; calculator.SetDocument(m_doc);
+&nbsp; calculator.CalculateMaterialQuantities();
+&nbsp; calculator.ReportResults(m_writer);
+}
+</pre>
+
+<p>Using the template method and the individual element handlers, the command mainline is as simple as this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; Autodesk.Revit.<span class="teal">ExternalCommandData</span> revit,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; Autodesk.Revit.<span class="teal">ElementSet</span> elements)
+{
+&nbsp; m_app = revit.Application;
+&nbsp; m_doc = m_app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="blue">string</span> filename = <span class="maroon">&quot;C:/CalculateMaterialQuantities.csv&quot;</span>;
+&nbsp;
+&nbsp; m_writer = <span class="blue">new</span> <span class="teal">StreamWriter</span>( filename );
+&nbsp;
+&nbsp; ExecuteCalculationsWith&lt;
+&nbsp; &nbsp; <span class="teal">RoofMaterialQuantityCalculator</span>&gt;();
+&nbsp;
+&nbsp; ExecuteCalculationsWith&lt;
+&nbsp; &nbsp; <span class="teal">WallMaterialQuantityCalculator</span>&gt;();
+&nbsp;
+&nbsp; ExecuteCalculationsWith&lt;
+&nbsp; &nbsp; <span class="teal">FloorMaterialQuantityCalculator</span>&gt;();
+&nbsp;
+&nbsp; m_writer.Close();
+&nbsp;
+&nbsp; <span class="teal">Process</span>.Start( <span class="maroon">&quot;Excel&quot;</span>, filename );
+&nbsp;
+&nbsp; <span class="green">// This operation doesn't change the model, </span>
+&nbsp; <span class="green">// so return cancelled to cancel the transaction</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Cancelled;
+}
+</pre>
+
+<p>This concludes this series based on Scott's AU presentation.
+Very many thanks to Scott for all the novel and important information and the many powerful examples he provided!
+
+
+<a name="2"></a>
+
+<p><strong>Addendum:</strong> On request, I now uploaded Scott's ORIGINAL AU 2009 class handout,
+
+<!-- http://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf -->
+
+<a href="file:////a/doc/au/2009/doc2/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf">
+AU09_CP222-3_Analyze_Geometry_Revit_API.pdf</a>.</p>
+
+<p>Please also take a look at the article on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/curve-following-face-and-bounding-box-implementation.html">
+AsCurveFollowingFace and SortCurvesContiguous</a>;
+
+it presents an updated version of Scott Conover's Geometry API handout document from the Autodesk University 2011 class,
+
+<a href="zip/cp4011_conover.pdf">cp4011_conover.pdf</a>.</p>

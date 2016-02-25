@@ -1,0 +1,53 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Change Section View Type and Hide Cut Line</h3>
+
+<p>Leo raised a couple of questions on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/section-view-creation.html">
+section view creation</a> 
+
+in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/section-view-creation.html?cid=6a00e553e168978833016766a448ba970b#comment-6a00e553e168978833016766a448ba970b">
+comment</a> which 
+
+Rudolf Honke very kindly answers thus:
+
+<p><strong>1. Hide view:</strong> 
+To hide the cutting line in a plan view, you can use this parameter:
+
+<pre class="code">
+&nbsp; viewSection.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; .SECTION_COARSER_SCALE_PULLDOWN_METRIC )
+&nbsp; &nbsp; &nbsp; .Set( 1 );
+</pre>
+ 
+<p><strong>2. Generate section view:</strong> 
+In Revit 2013, you can use the static method
+ 
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ViewSection</span> CreateSection(
+&nbsp; &nbsp; Document document,
+&nbsp; &nbsp; <span class="teal">ElementId</span> viewFamilyTypeId,
+&nbsp; &nbsp; BoundingBoxXYZ sectionBox
+&nbsp; )
+</pre>
+
+<p>In Revit 2012, you can use document.Create.NewViewSection( BoundingBoxXYZ );
+ 
+<p><strong>3. Change the type of a detail view:</strong> 
+Each view has a view type, e.g. a section view symbol.
+These symbols have no category to help identify them, they are  just generic ElementType instances.
+The types can be retrieved using their name, e.g. "Section" etc.
+Once you have a view symbol, you can change the view type by simply setting its type id:
+
+<pre class="code">
+  viewSection.ChangeTypeId( symbolSection.Id ); 
+</pre>
+ 
+<p>Since section symbols are identified by name, they are language dependent and there is no guarantee to find them at all, depending on the template being used.
+
+<p>Many thanks to Rudolf for these important hints!

@@ -1,0 +1,507 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Чекалин Виктор Владимирович RE: Extensible storage extensions
+/a/doc/revit/blog/doc/VC_Extensible_Storage_Extension_draft_post.docx
+
+-->
+
+<h3>Effortless Extensible Storage</h3>
+
+<p>Today we proudly present an exciting and powerful extensible storage utility class library by
+
+<a href="http://www.facebook.com/profile.php?id=100003616852588">
+Victor Chekalin</a>.
+
+I'll also add some other assorted items at the end:</p>
+
+<ul>
+<li><a href="#2">Extensible storage extension</a></li>
+<li><a href="#3">Example 1 &ndash; save integer value to an element</a></li>
+<li><a href="#4">Example 2 &ndash; map field and sub-entity value</a></li>
+<li><a href="#5">Extensible storage extension conclusion</a></li>
+<li><a href="#6">Zoom and pan in Revit 2013 preview control</a></li>
+<li><a href="#7">Display real-time interactive element properties</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Extensible Storage Extension</h4>
+
+<p>I think everyone of us has used shared parameters to save custom data in a Revit document.
+If you created shared parameters programmatically, you know it was not easy.
+Unfortunately, it was the only way to store own data in a Revit document.</p>
+
+<p>When Revit  2012 was released I was very happy that Autodesk made one more way to store auxiliary data in a document.
+It was a really exciting enhancement.</p>
+
+<p>But when I started to use it in the real projects I noticed some inconveniences when using ExStorage in code.
+I need to create a lot of code to create a schema, need to remember entity field names and their types, always check if schema or entity or field is null etc.
+It was especially difficult to use complex schemas, with Sub-Schemas and with Array or Map fields.
+It is even harder when using Sub-Schema in the Map field.
+For example, here is the sample code snippet from a real project:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Family</span> family = ( elementType <span class="blue">as</span> <span class="teal">FamilySymbol</span> )
+&nbsp; &nbsp; .Family;
+&nbsp;
+&nbsp; <span class="blue">var</span> familyEntity = family.GetEntity(
+&nbsp; &nbsp; _familySchema );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !familyEntity.IsValid() )
+&nbsp; {
+&nbsp; &nbsp; familyEntity = <span class="blue">new</span> <span class="teal">Entity</span>( _familySchema );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> fsField = _familySchema.GetField(
+&nbsp; &nbsp; <span class="maroon">&quot;FamilySymbolsInfo&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">var</span> familySymbolsData =
+&nbsp; &nbsp; familyEntity.Get&lt;IDictionary&lt;<span class="blue">string</span>, <span class="teal">Entity</span>&gt;&gt;(
+&nbsp; &nbsp; &nbsp; fsField );
+&nbsp;
+&nbsp; <span class="teal">Entity</span> elementTypeEntity;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !familySymbolsData.TryGetValue(
+&nbsp; &nbsp; elementType.Name, <span class="blue">out</span> elementTypeEntity ) )
+&nbsp; {
+&nbsp; &nbsp; elementTypeEntity = <span class="blue">new</span> <span class="teal">Entity</span>(
+&nbsp; &nbsp; &nbsp; fsField.SubSchemaGUID );
+&nbsp; }
+&nbsp;
+&nbsp; elementTypeEntity.Set( <span class="maroon">&quot;Entity&quot;</span>,
+&nbsp; &nbsp; serializedString );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !familySymbolsData.ContainsKey(
+&nbsp; &nbsp; elementType.Name ) )
+&nbsp; {
+&nbsp; &nbsp; familySymbolsData.Add( elementType.Name,
+&nbsp; &nbsp; &nbsp; elementTypeEntity );
+&nbsp; }
+&nbsp;
+&nbsp; familyEntity.Set( fsField, familySymbolsData );
+&nbsp;
+&nbsp; family.SetEntity( familyEntity );
+</pre>
+
+
+<p>Pretty simple, isn't it?  :-)
+<p>Of course not...
+
+<p>Very easy to make a mistake and quite difficult to understand what is written there.
+The more I used ExStorage, the more I wanted to make it easier to use.</p>
+
+<p>The Revit API help states the following about Extensible Storage: '... allows you to create your own class-like Schema data structures and attach instances of them...'
+I thought &ndash; 'Why it is class-like and instances?
+Why can't I use exactly a class to define Schema and use instance of a class to attach it to the Revit element?'</p>
+
+<p>Thus was born the idea of the Extensible Storage Extension.
+The idea is simple: define a special class describing the ExStorage schema, where class properties are schema fields.
+To attach data to an element, create an instance of the class, set it properties and set to the element.
+Sounds good.</p>
+
+<p>As the result I implemented all what I wanted to do in my extension.</p>
+
+<p>The extension supports all extensible storage features such as:</p>
+
+<ul>
+<li>Simple field</li>
+<li>Array field</li>
+<li>Map field</li>
+<li>Sub entities</li>
+<li>Documentations</li>
+<li>VendorID</li>
+<li>DisplayUnit</li>
+</ul>
+
+<p>Let's look at the examples and compare it with the default using Extensible Storage.</p>
+
+
+<a name="3"></a>
+
+<h4>Example 1 &ndash; Save Integer Value to an Element</h4>
+
+<p>To save an integer value to an element using standard Extensible storage methods, we can use the following code:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// 1. Looking for the schema in the memory</span>
+&nbsp;
+&nbsp; <span class="teal">Schema</span> schema = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// 2. Check if schema exists in the memory or not</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( schema == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// 3. Create it, if not</span>
+&nbsp;
+&nbsp; &nbsp; schema = CreateSchema();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// 4. Create entity of the specific schema</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; <span class="green">// 5. Set the value for the Field.</span>
+&nbsp; <span class="green">// HERE WE HAVE TO REMEMEBER THE </span>
+&nbsp; <span class="green">// NAME OF THE SCHEMA FIELD</span>
+&nbsp; <span class="green">// It would be better to check if the field with</span>
+&nbsp; <span class="green">// such name exists in the schema</span>
+&nbsp;
+&nbsp; entity.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 888 );
+&nbsp;
+&nbsp; <span class="green">// 6. Attach entity to the element</span>
+&nbsp;
+&nbsp; element.SetEntity( entity );
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">Schema</span> CreateSchema()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;SimpleIntSchema&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Have to define the field name as string and </span>
+&nbsp; &nbsp; <span class="green">// set the type using typeof method</span>
+
+&nbsp; &nbsp; schemaBuilder.AddSimpleField( <span class="maroon">&quot;SomeValue&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="blue">int</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> schemaBuilder.Finish();
+&nbsp; }
+</pre>
+
+
+<p>Here we achieve the same using the Extensible Storage Extension:</p>
+
+<p>Define the special class at first:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Set schema Id and Schema name as class attributes</span>
+&nbsp;
+&nbsp; [Schema( <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BB&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;SimpleIntSchema&quot;</span> )]
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">IntEntity</span> : IRevitEntity
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Mark the property as Schema field using attributes</span>
+&nbsp;
+&nbsp; &nbsp; [Field]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> SomeValue { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+
+<p>Attach an instance of this class to the element:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Create a new instance of the class</span>
+&nbsp;
+&nbsp; <span class="teal">IntEntity</span> intEntity =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">IntEntity</span>();
+&nbsp;
+&nbsp; <span class="green">// Set property value</span>
+&nbsp;
+&nbsp; intEntity.SomeValue = 777;
+&nbsp;
+&nbsp; <span class="green">// Attach to the element</span>
+&nbsp;
+&nbsp; element.SetEntity( intEntity );
+</pre>
+
+
+<p>That's it.
+<p>Amazing, isn't it?
+<p>Just compare the two approaches.
+<p>What is easier &ndash; to work with the ordinary .NET classes, or use a lot of methods to work with Schemas and Entities?
+<p>I think the answer is obvious.</p>
+
+<p>Here is a similar comparison of the code to read a value.</p>
+
+<p>Default approach:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> schema = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( schema != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> entity = element.GetEntity( schema2 );
+&nbsp; &nbsp; <span class="blue">var</span> someValue = entity.Get&lt;<span class="blue">int</span>&gt;( <span class="maroon">&quot;SomeValue&quot;</span> );
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Entity value&quot;</span>,
+&nbsp; &nbsp; &nbsp; someValue.ToString() );
+&nbsp; }
+</pre>
+
+
+<p>My extensible storage extension approach:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> intEntity2 = element.GetEntity&lt;<span class="teal">IntEntity</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">if</span>( intEntity2 != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Entity value&quot;</span>,
+&nbsp; &nbsp; &nbsp; intEntity2.SomeValue.ToString() );
+&nbsp; }
+</pre>
+
+<p>Let's look at another more complicated example.</p>
+
+
+<a name="4"></a>
+
+<h4>Example 2 &ndash; Map Field and Sub-Entity Value</h4>
+
+<p>Here is some code to set up a complex entity using the default ExStorage methods:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Check if schema exists in the memory.</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> schema3 = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;1899FD3C-7046-4B53-945A-AA1370B8C577&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( schema3 == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create if not</span>
+&nbsp;
+&nbsp; &nbsp; schema3 = CreateComplexSchema();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> entity4 = <span class="blue">new</span> <span class="teal">Entity</span>( schema3 );
+&nbsp;
+&nbsp; <span class="green">// Map fields</span>
+&nbsp; IDictionary&lt;<span class="blue">int</span>, <span class="teal">Entity</span>&gt; mapOfEntities
+&nbsp; &nbsp; = <span class="blue">new</span> Dictionary&lt;<span class="blue">int</span>, <span class="teal">Entity</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// Create sub-entity 1</span>
+&nbsp; <span class="blue">var</span> entity7 = <span class="blue">new</span> <span class="teal">Entity</span>( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; entity7.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 7 );
+&nbsp;
+&nbsp; <span class="green">// create sub-entity 2</span>
+&nbsp; <span class="blue">var</span> entity8 = <span class="blue">new</span> <span class="teal">Entity</span>( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; entity8.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 8 );
+&nbsp;
+&nbsp; mapOfEntities.Add( 7, entity7 );
+&nbsp; mapOfEntities.Add( 8, entity8 );
+&nbsp;
+&nbsp; entity4.Set( <span class="maroon">&quot;MapField&quot;</span>, mapOfEntities );
+&nbsp;
+&nbsp; element.SetEntity( entity4 );
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">Schema</span> CreateComplexSchema()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder = <span class="blue">new</span> <span class="teal">SchemaBuilder</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;1899FD3C-7046-4B53-945A-AA1370B8C577&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;ComplexSchema&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> mapField = schemaBuilder.AddMapField(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;MapField&quot;</span>, <span class="blue">typeof</span>( <span class="blue">int</span> ), <span class="blue">typeof</span>( <span class="teal">Entity</span> ) );
+&nbsp;
+&nbsp; &nbsp; mapField.SetSubSchemaGUID( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;4E5B6F62-B8B3-4A2F-9B06-DDD953D4D4BC&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; mapField.SetDocumentation(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Map field documentation&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> schemaBuilder.Finish();
+&nbsp; }
+</pre>
+
+
+<p>We can use the following to change a value in the map field:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> entity10 = element.GetEntity( schema3 );
+&nbsp;
+&nbsp; <span class="blue">var</span> mapField =
+&nbsp; &nbsp; entity10.Get&lt;IDictionary&lt;<span class="blue">int</span>, <span class="teal">Entity</span>&gt;&gt;(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;MapField&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( mapField != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( mapField.ContainsKey( 8 ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> entity11 = mapField[8];
+&nbsp; &nbsp; &nbsp; entity11.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 999 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Write changes</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; entity10.Set( <span class="maroon">&quot;MapField&quot;</span>, mapField );
+&nbsp;
+&nbsp; &nbsp; &nbsp; element.SetEntity( entity10 );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<p>Here is the code to achieve the same result using the extension:</p>
+
+<pre class="code">
+&nbsp; [Schema( <span class="maroon">&quot;93CC69FC-AB6F-451A-B075-A5D9467569C2&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ComplexSchema&quot;</span> )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">ComplexEntity</span> : IRevitEntity
+&nbsp; {
+&nbsp; &nbsp; [Field]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> SimpleField { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; [Field]
+&nbsp; &nbsp; <span class="blue">public</span> List&lt;<span class="teal">IntEntity</span>&gt; ArrayField { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; [Field]
+&nbsp; &nbsp; <span class="blue">public</span> Dictionary&lt;<span class="blue">int</span>, <span class="teal">IntEntity</span>&gt; MapField { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">ComplexEntity</span> complexEntity = <span class="blue">new</span> <span class="teal">ComplexEntity</span>();
+&nbsp;
+&nbsp; complexEntity.MapField
+&nbsp; &nbsp; = <span class="blue">new</span> Dictionary&lt;<span class="blue">int</span>, <span class="teal">IntEntity</span>&gt;
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; {9, <span class="blue">new</span> <span class="teal">IntEntity</span>(){SomeValue = 9}},
+&nbsp; &nbsp; &nbsp; {10, <span class="blue">new</span> <span class="teal">IntEntity</span>(){SomeValue = 10}}
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; element.SetEntity( complexEntity );
+</pre>
+
+
+<p>Change the value like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> complexEntity2 = element
+&nbsp; &nbsp; .GetEntity&lt;<span class="teal">ComplexEntity</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">if</span>( complexEntity2 != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( complexEntity.MapField.ContainsKey( 9 ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> entityInMapField = complexEntity.MapField[9];
+&nbsp;
+&nbsp; &nbsp; &nbsp; entityInMapField.SomeValue = 9898;
+&nbsp;
+&nbsp; &nbsp; &nbsp; element.SetEntity( complexEntity2 );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Extensible Storage Extension Conclusion</h4>
+
+<p>My extensible storage extension provides an easy and safe way to use extensible storage.
+You use standard .NET classes instead a lot of RevitAPI classes and methods.</p>
+
+<p>If you use extensible storage a lot, you should evaluate the benefits of my extension.
+If you never used ExStorage, I hope that my extension will help you to begin using it.</p>
+
+<p>You may download the source code and more samples from the
+
+<a href="https://github.com/chekalin-v/VCExtensibleStorageExtension">
+GitHub repository</a>.
+
+If you do not know how to use Git you can simply download it as a complete
+
+<a href="https://github.com/chekalin-v/VCExtensibleStorageExtension/archive/master.zip">
+zip archive</a>.</p>
+
+<p>If you do not need the source code, you may download the
+
+<a href="https://raw.github.com/chekalin-v/VCExtensibleStorageExtension/master/bin/Release/VCExtensibleStorageExtension.dll">
+.NET assembly</a> only,
+
+reference it in your add-in project and immediately take advantage of all the benefits of my extension.</p>
+
+<p>I hope this information is useful for all Revit developers.</p>
+
+<p>Many thanks to Victor for this beautiful and powerful tool!</p>
+
+
+
+<!-- SPR #227281 [preview control does not support the pan operation (hold mouse wheel and move).] -->
+
+<a name="6"></a>
+
+<h4>Zoom and Pan in Revit 2013 Preview Control</h4>
+
+<p>I myself ran into some confusion using the preview control in Revit 2013.
+Others ran into similar issues, so here is a clarification:</p>
+
+<p><strong>Question:</strong> I notice varying behaviour of the preview control in different versions of Revit 2013.
+If you compile and load the PreviewControl sample add-in from the Revit 2013
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">
+UIAPI SDK sample</a>,
+
+you can pan around in the model using the mouse wheel or the context menu.
+This no longer works in the service packs.
+How should we deal with this, please?
+
+<p><strong>Answer:</strong> Yes, I noticed something similar myself when implementing my
+
+minimal DevCamp
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#23">
+PreviewControlSimple</a> sample
+
+for the session on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#2">
+Revit 2013 UI API enhancements</a>.
+
+<p>I would suggest trying to encapsulate the whole use of the preview control in a transaction.
+<p>The zoom and pan is actually affecting the real live Revit viewport, i.e., modifying the database, so it requires a transaction.
+<p>I believe that you can get all three kinds of behaviour by panning and zooming in a preview control:
+
+<ul>
+<li>No transaction &rarr; exception on touching the view cube</li>
+<li>No transaction &rarr; nothing happens (like you describe)</li>
+<li>Transaction &rarr; should work afaik</li>
+</ul>
+
+<p>Therefore, the simple solution is to simply encapsulate your use of the control in a transaction.</p>
+
+<p>If you commit it afterwards, the Revit viewport will be affected by the panning and zooming. If not, not.</p>
+
+<p>I'm happy to announce that this should no longer be an issue in Revit 2014.</p>
+
+
+
+<a name="7"></a>
+
+<h4>Display Real-time Interactive Element Properties</h4>
+
+<p><strong>Question:</strong> I have implemented a tool that displays some properties of a selected element on the add-in button click.
+
+<p>I would like to enable the user to just click my add-in button once, go on selecting elements, and display updated properties on each new selection.
+
+<p>How could that be achieved?</p>
+
+<p><strong>Answer:</strong> To achieve this, you have to work in a modeless context and make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">Idling event</a>.
+
+<p>Here is an obsolete sample describing a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/modeless-pressure-drop-tool.html">modeless pressure drop tool</a>
+
+posted before the advent of Idling.
+That might give you some bright ideas, but definitely do not use it as is!</p>
+
+<p>Here is a more up-to-date sample making use of the Idling event to display the contents of the current selection set, which is pretty close to what you are searching for.</p>
+
+<p>I strongly suggest basing anything making use of the Idling event, or an external event, which is a simplified wrapper around that,  on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#1">
+ModelessForm_ExternalEvent and ModelessForm_IdlingEvent</a> SDK
+
+samples introduced in Revit 2013.

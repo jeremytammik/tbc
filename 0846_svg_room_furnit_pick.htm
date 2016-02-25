@@ -1,0 +1,655 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Room Polygon and Furniture Picker in SVG</h3>
+
+<p>I documented a number of personal and possibly naive ideas and experiments regarding
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/mobile-device-room-location.html">
+mobile device room location</a> as
+
+a result of my previous so-called education day four weeks back.
+Well, last Friday I had another one  :-)
+
+<p>This time I took a deeper and hopefully very slightly wiser look at ideas for enabling the following kind of workflow:
+
+<ul>
+<li>Extract relevant data from the BIM.
+<li>Populate a cloud database to provide ubiquitous access to relevant data.
+<li>Serve up relevant data in an easily consumable format, e.g. for mobile devices.
+<li>Enable interaction with the data, e.g. query and update.
+</ul>
+
+<p>I spent some time thinking about how to implement a suitable viewer with support for picking.
+
+<p>My colleagues
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">
+Philippe</a> and
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/adam-nagy.html">
+Adam</a> have
+
+developed and documented a powerful and impressive
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile">
+cloud and mobile based workflow</a> including
+
+a 3D viewer implementation supporting object selection for a number of CAD authoring environments, obviously including AutoCAD, Inventor and Revit, posting data to the cloud, e.g. Azure, for consumption on various Android and iOS mobile devices, etc.
+
+<p>I would love to be able to achieve the same effect with significantly less effort.
+
+<a href="http://programmer.97things.oreilly.com/wiki/index.php/Be_Stupid_and_Lazy">
+Lazy</a>...
+
+<p>I already suggested that it might be possible to use
+
+<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">
+scalable vector graphics</a> SVG
+
+for this kind of thing last time I looked at the cloud and mobile topic.
+
+<p>I still think it really does provide everything I need, since its
+
+<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics#Functionality">
+base functionality</a> includes
+
+support for interactivity, linking and metadata, among many other things.
+
+<p>My goal here today is to prove that SVG is a good choice for
+providing, displaying, and interacting with 2D graphical data.
+
+<p>It is supported by all devices and requires only minimal JavaScript programming to achieve useful results, so an easily tested and extremely portable cross-platform solution seems very feasible.
+
+<p>Today my goal is to supply
+
+<a href="http://www.phrases.org.uk/meanings/proof-of-the-pudding.html">
+the proof of the pudding</a>.
+
+Specifically, I wish to prove that I can use SVG to achieve the following:
+
+<ul>
+<li>Display a room boundary and contained items as coloured polygons using SVG.
+The items may be furniture, or any kind of family instance, e.g. simply represented by their bounding boxes.
+<li>Embed the SVG into a standard HTML page displayable on any browser, so that it can be viewed and manipulated on any mobile device.
+<li>Identify and interact with the displayed objects, e.g. identify the room or furniture and display information about a selected item.
+</ul>
+
+<p>I'll discuss the following steps towards this goal:
+
+<ol>
+<li><a href="#1">Embed SVG in HTML</a>
+<li><a href="#2">Colour picker</a>
+<li><a href="#3">Polygons and groups</a>
+<li><a href="#4">Room and furniture picker</a>
+<li><a href="#5">Struggle with Safari</a>
+</ol>
+
+
+<a name="1"></a>
+
+<h4>Embed SVG in HTML</h4>
+
+<p>I would very much like to show you the results of my SVG experiments right here and now on this page.
+
+<p>An easy way to almost achieve this would be to simply provide normal hypertext links to the different SVG web pages I describe.
+
+<p>A much nicer, more elegant and compelling approach is obviously to embed the SVG directly into this page, which presumably ultimately consists of HTML.
+
+<p>There are a number of different possibilities to
+
+<a href="http://www.w3schools.com/svg/svg_inhtml.asp">
+embed SVG into HTML</a>,
+
+which as always are somewhat browser dependent.
+
+<p>After some experimenting in the Typepad blog editor, I decided to use the embed tag, which is consequently the technique you will be enjoying further down if you read on.
+
+<p>All my following examples are accessible in two ways, both using a hypertext link to open up a new page presenting the SVG, and an embedded inline version that you can interact with in situ.
+You can of course view this page's source in your browser to examine both methods.
+
+
+<a name="2"></a>
+
+<h4>Colour Picker</h4>
+
+<p>I started out searching the web for the terms "svg pick".
+
+<p>One hit was a pretty impressive
+
+<a href="http://www.kevcom.com/colorpicker">
+SVG colour picker</a> implemented
+
+and published by Kevin Hughes in 2004 as a way to learn SVG:</p>
+
+<center>
+<img src="img/svg_color_picker.png" alt="SVG Colour Picker"/>
+</center>
+
+<p>It includes documentation, links to learn SVG, and additional SVG notes.
+
+<p>A colour picker seems like a good starting point, although I found this particular example a bit overwhelming for a project that I was hoping to finish in just a couple of hours.
+I searched for something simpler instead, and turned up a presentation on
+
+<a href="http://www.svgopen.org/2009/papers/12-Using_Canvas_in_SVG">
+using canvas in SVG</a> by
+
+Klaus F&ouml;rster of the University of Innsbruck including a much simpler
+
+<a href="http://tirolatlas.uibk.ac.at/papers/svgopen2009/ex_colors.html">
+CSS3 colour picker</a> which
+
+helped get me started implementing my very own
+
+<a href="file:///C:/a/src/web/svg/color_picker_simple/color_picker_jt.svg">colour picker</a>:</p>
+
+<div style="text-align:center">
+<embed src="file:///C:/a/src/web/svg/color_picker_simple/color_picker_jt.svg" type="image/svg+xml" height="335"/>
+</div>
+
+<p>Do as the man says: click on one of the little coloured rectangles at the top, and the selected colour is displayed in the bottom.
+
+<p>That provides pretty conclusive evidence that we really can display simple geometric shapes, interactively pick them, and react on the selection, all within a standard web page in a browser with no additional software installed, doesn't it?
+
+<p>How is this achieved?
+
+<p>This implementation requires three files: an image displaying the coloured boxes to select at the top, a JavaScript helper file, and the SVG itself.
+
+<p>The main component is the following SVG code, embedded into the HTML page using the embed tag (copy to a text editor to see the truncated lines in full):
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">us-ascii</span>&quot;<span class="blue"> ?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">svg</span><span class="blue"> </span><span class="red">xmlns</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/2000/svg</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp;&nbsp; </span><span class="red">xmlns:xlink</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/1999/xlink</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">title</span><span class="blue">&gt;</span>Jeremy's SVG color picker<span class="blue">&lt;/</span><span class="maroon">title</span><span class="blue">&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">script</span><span class="blue"> </span><span class="red">type</span><span class="blue">=</span>&quot;<span class="blue">text/javascript</span>&quot;<span class="blue"> </span><span class="red">xlink:href</span><span class="blue">=</span>&quot;<span class="blue">SVGCanvasElement.js</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">script</span><span class="blue"> </span><span class="red">type</span><span class="blue">=</span>&quot;<span class="blue">text/javascript</span>&quot;<span class="blue">&gt;&lt;![CDATA[</span>
+<span class="gray">window.onload = function() {</span>
+<span class="gray">&nbsp; var canvas = new SVGCanvasElement(10,10,240,240);</span>
+<span class="gray">&nbsp; var context = canvas.getContext('2d');</span>
+<span class="gray">&nbsp; var image = document.getElementById('svgImage');</span>
+<span class="gray">&nbsp; var hint = document.getElementById('svgHint').lastChild;</span>
+<span class="gray">&nbsp; var active = document.getElementById('activeColor');</span>
+<span class="gray">&nbsp; var marked = document.getElementById('markedColor');</span>
+&nbsp;
+<span class="gray">&nbsp; context.drawImage(</span>
+<span class="gray">&nbsp; &nbsp; canvas.importImage(image),0,0,canvas.width,canvas.height</span>
+<span class="gray">&nbsp; );</span>
+<span class="gray">&nbsp; context.canvas.parentNode.style.display = 'none';</span>
+&nbsp;
+<span class="gray">&nbsp; image.onclick = function(evt) {</span>
+<span class="gray">&nbsp; &nbsp; var sx = evt.clientX-image.x.baseVal.value;</span>
+<span class="gray">&nbsp; &nbsp; var sy = evt.clientY-image.y.baseVal.value;</span>
+<span class="gray">&nbsp; &nbsp; var pxArr = context.getImageData(sx,sy,1,1).data;</span>
+<span class="gray">&nbsp; &nbsp; var fill = 'rgb('+pxArr[0]+','+pxArr[1]+','+pxArr[2]+')';</span>
+<span class="gray">&nbsp; &nbsp; var opac = 1.0/255.0*pxArr[3];</span>
+<span class="gray">&nbsp; &nbsp; active.setAttributeNS(null,&quot;fill&quot;,fill);</span>
+<span class="gray">&nbsp; &nbsp; active.setAttributeNS(null,&quot;fill-opacity&quot;,opac);</span>
+<span class="gray">&nbsp; &nbsp; marked.x.baseVal.value = evt.clientX - (sx % 20);</span>
+<span class="gray">&nbsp; &nbsp; marked.y.baseVal.value = evt.clientY - (sy % 20);</span>
+<span class="gray">&nbsp; &nbsp; hint.firstChild.nodeValue = &quot;fill='&quot;+fill+&quot;' fill-opacity='&quot;+opac+&quot;'&quot;;</span>
+<span class="gray">&nbsp; };</span>
+<span class="gray">};</span>
+<span class="blue">]]&gt;&lt;/</span><span class="maroon">script</span><span class="blue">&gt;</span>
+&nbsp;
+<span class="blue">&lt;</span><span class="maroon">image</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">svgImage</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">xlink:href</span><span class="blue">=</span>&quot;<span class="blue">img/svg_css3_colors.png</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">activeColor</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">260</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">30</span>&quot;<span class="blue"> </span><span class="red">stroke</span><span class="blue">=</span>&quot;<span class="blue">#000</span>&quot;<span class="blue"> </span><span class="red">fill</span><span class="blue">=</span>&quot;<span class="blue">none</span>&quot;<span class="blue"> </span><span class="red">shape-rendering</span><span class="blue">=</span>&quot;<span class="blue">crispEdges</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">markedColor</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">-20</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">-20</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">19</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">19</span>&quot;<span class="blue"> </span><span class="red">stroke</span><span class="blue">=</span>&quot;<span class="blue">#000</span>&quot;<span class="blue"> </span><span class="red">fill</span><span class="blue">=</span>&quot;<span class="blue">none</span>&quot;<span class="blue"> </span><span class="red">shape-rendering</span><span class="blue">=</span>&quot;<span class="blue">crispEdges</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">text</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">svgTipp</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">310</span>&quot;<span class="blue"> </span><span class="red">font-size</span><span class="blue">=</span>&quot;<span class="blue">16px</span>&quot;<span class="blue">&gt;</span>click CSS3 color palette to pick a color<span class="blue">&lt;/</span><span class="maroon">text</span><span class="blue">&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">text</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">svgHint</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">330</span>&quot;<span class="blue"> </span><span class="red">font-size</span><span class="blue">=</span>&quot;<span class="blue">16px</span>&quot;<span class="blue">&gt;&lt;</span><span class="maroon">tspan</span><span class="blue">&gt;&lt;/</span><span class="maroon">tspan</span><span class="blue">&gt;&lt;</span><span class="maroon">tspan</span><span class="blue">&gt;</span>picked<span class="blue">&lt;/</span><span class="maroon">tspan</span><span class="blue">&gt;&lt;/</span><span class="maroon">text</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">svg</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I must admit that I did have to fiddle around considerably in the blog hosting file manager to figure out where best to place the three inter-dependant files.
+The best solution, as always, was the simplest.
+
+<p>This colour picker is completely based on Klaus' work, with only minimal cleanup and perfectionistic improvements, such as painting a 19 by 19 rectangle around the picked colour instead of a 20 by 20 one.
+
+<p>Again, how does it work?
+The SVG code defines five elements:
+
+<ul>
+<li>The image element to display an image presenting all the selectable colours.
+<li>A large rectangle at the bottom to be filled with the currently selected colour.
+<li>A small 19 by 19 pixel rectangle to be moved around to mark the current colour selection inside the palette image.
+<li>A static text element prompting you to pick a colour.
+<li>A dynamic text element displaying the large rectangle's current fill and fill-opacity attribute values.
+</ul>
+
+<p>These elements are retrieved using a snippet of JavaScript code executed on loading the page.
+The code also subscribes to the JavaScript onclick event.
+The event handler manipulates the elements as shown.
+Specifically, the getImageData function retrieves the colour and opacity of the picked point, which is used to calculate the settings and populate the various elements appropriately.
+
+<p>I would say that this provides a credible proof of concept.
+
+
+<a name="3"></a>
+
+<h4>Polygon and Groups</h4>
+
+<p>Next step: as said, I want to display a room retrieved from the building model and various items contained in it using polygons.
+
+<p>How do I display an arbitrary polygon in SVG?
+
+<p>Searching the web turned up this succinct and complete
+
+<a href="http://upload.wikimedia.org/wikipedia/commons/5/55/SFA_Polygon_with_hole.svg">
+polygon with a hole</a> sample
+
+SVG file which basically says it all with no need for any further explanation at all:
+
+<center>
+<embed src="http://upload.wikimedia.org/wikipedia/commons/5/55/SFA_Polygon_with_hole.svg" type="image/svg+xml" height="52"/>
+</center>
+
+<p>It displays a quadrilateral polygon with a triangular hole, which requires just one single SVG element, and adds a group around it for identification purposes:
+
+<pre class="code">
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">polygon</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,50.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">path</span><span class="blue"> </span><span class="red">d</span><span class="blue">=</span>&quot;<span class="blue">M 35 -10 L 10 -20 15 -40 45 -45 Z M 20 -30 L 35 -35 30 -20 Z</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;fill-opacity:0.2;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">fill-rule</span><span class="blue">=</span>&quot;<span class="blue">evenodd</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I must admit that I went no further to read any documentation;
+I just based all my further experiments on the following assumptions and guesswork.
+Will I regret this?
+It was quick and fun, anyway.
+And it worked  :-)
+
+<p>Just guessing, I assume that 'M' stands for 'move to', and 'L' stands for 'draw a line to', and 'Z' closes the polygon.
+These keywords are followed by pairs of X and Y coordinates to define the polygon loop start and vertex points.
+Note the 'evenodd' fill-rule attribute, which I assume leaves holes in odd-levelled interior loops.
+I further assume that an interior loop within a hole is considered filled again with this setting.
+Cool.
+
+<p>As you can try out and see for yourself in the room picker provided below, the hole is indeed not considered to be part of the polygon, and picking inside the hole will return nil.
+
+<p>In addition to the polygon, which is what it is all about, this neat little example also adds X and Y gridlines to simplify orientation and analysis, plus square markers for the polygon vertices, filled for the start and empty for the subsequent points.
+
+<p>Here is the complete SVG file implementing all this.
+Note the three groups defined around the grid lines, polygon, and marker points:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">UTF-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;!--</span><span class="green"> Created on 15 Mar 2011 by Mike Toews in Vim </span><span class="blue">--&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">svg</span>
+<span class="blue">&nbsp; </span><span class="red">xmlns:svg</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/2000/svg</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">xmlns</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/2000/svg</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.1</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">51</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">51</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">background</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">51</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">51</span>&quot;<span class="blue"> </span><span class="red">fill</span><span class="blue">=</span>&quot;<span class="blue">white</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">grid</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">30</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">30</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">40</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">40</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">30</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">30</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">40</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">40</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">50</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">polygon</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,50.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">path</span><span class="blue"> </span><span class="red">d</span><span class="blue">=</span>&quot;<span class="blue">M 35 -10 L 10 -20 15 -40 45 -45 Z M 20 -30 L 35 -35 30 -20 Z</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;fill-opacity:0.2;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">fill-rule</span><span class="blue">=</span>&quot;<span class="blue">evenodd</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">points</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(-1.5,48.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">outer point 1/5</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(35,-10)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">outer point 2</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(10,-20)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:white;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">outer point 3</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(15,-40)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:white;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">outer point 4</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(45,-45)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:white;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">inner point 1/4</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(20,-30)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">inner point 2</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(35,-35)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:white;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">inner point 3</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">4</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(30,-20)</span>&quot;<span class="blue"> </span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:white;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">svg</span><span class="blue">&gt;</span>
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Room and Furniture Picker</h4>
+
+<p>With all of this in hand, let's hand-craft a sample SVG file displaying a room and a couple of bits of furniture, allowing us to pick individual elements
+, reacting to and displaying the pick results.
+
+<p>After the preparation above, it is surprisingly easy, actually, and impressively self-contained.
+Here is
+
+<a href="file:///C:/a/src/web/svg/room_pick/room_pick.svg">Jeremy's room and furniture picker</a>:
+
+<div style="text-align:center">
+<embed src="file:///C:/a/src/web/svg/room_pick/room_pick.svg" type="image/svg+xml" height="202"/>
+</div>
+
+<p>Here is the entire implementation, omitting most of the trivial grid line definition (copy and paste to an editor or view selection source to see the full truncated lines):
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">us-ascii</span>&quot;<span class="blue"> ?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">svg</span>
+<span class="blue">&nbsp; </span><span class="red">xmlns:svg</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/2000/svg</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">xmlns</span><span class="blue">=</span>&quot;<span class="blue">http://www.w3.org/2000/svg</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.1</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">241</span>&quot;
+<span class="blue">&nbsp; </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">201</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">title</span><span class="blue">&gt;</span>Jeremy's SVG Room and Furniture Picker<span class="blue">&lt;/</span><span class="maroon">title</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">script</span><span class="blue"> </span><span class="red">type</span><span class="blue">=</span>&quot;<span class="blue">text/javascript</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;![CDATA[</span>
+<span class="gray">window.onload = function() {</span>
+<span class="gray">&nbsp; var result = document.getElementById('result');</span>
+<span class="gray">&nbsp; window.onclick = function(e) {</span>
+<span class="gray">&nbsp; &nbsp; var id = e.target.id;</span>
+<span class="gray">&nbsp; &nbsp; if(0==id.length){id=&quot;&lt;nil&gt;&quot;;}</span>
+<span class="gray">&nbsp; &nbsp; var x = e.clientX;</span>
+<span class="gray">&nbsp; &nbsp; var y = e.clientY;</span>
+<span class="gray">&nbsp; &nbsp; var s = &quot;id='&quot; + id + &quot;' @ &quot; + x + &quot;,&quot; + y;</span>
+<span class="gray">&nbsp; &nbsp; result.firstChild.nodeValue = s;</span>
+<span class="gray">&nbsp; };</span>
+<span class="gray">};</span>
+<span class="blue">]]&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">script</span><span class="blue">&gt;</span>
+&nbsp;
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">background</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">300</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">200</span>&quot;<span class="blue"> </span><span class="red">fill</span><span class="blue">=</span>&quot;<span class="blue">white</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">grid</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+
+...
+
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">path</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">room</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">d</span><span class="blue">=</span>&quot;<span class="blue">M 20 20 L 220 20 220 150 150 150 150 100 20 100 Z M 160 120 L 210 120 210 140 160 140 Z</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;fill-opacity:0.2;stroke:blue;stroke-width:1</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">fill-rule</span><span class="blue">=</span>&quot;<span class="blue">evenodd</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">furniture</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">table</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">100</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(50,50)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair1</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(37,55)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair2</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(60,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair3</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(80,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair4</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(100,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair5</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(120,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">text</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">result</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">180</span>&quot;<span class="blue"> </span><span class="red">font-size</span><span class="blue">=</span>&quot;<span class="blue">16px</span>&quot;<span class="blue">&gt;</span>Welcome. Please click around.<span class="blue">&lt;/</span><span class="maroon">text</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">svg</span><span class="blue">&gt;</span>
+</pre>
+
+<p>Well, that was interesting for me at least.
+
+<p>A logical next step would be the implementation of a web service as described above to be populated with room and furniture data and serve it up on request in SVG and other formats.
+
+<p>No need for an own viewer implementation; I can use the functionality built into the browser on my mobile device.
+
+
+
+
+<a name="5"></a>
+
+<h4>Struggle with Safari</h4>
+
+<p>Oh no!
+
+<p>There I was, proudly bragging my head off about the cross-browser capabilities of SVG, and thinking I had solved all problems in the world.
+
+<p>I just tested my furniture picker on both an iOS iPad and an Android tablet.
+
+<p>Thank God it works on one of them.
+
+<p>Unfortunately the Safari browser does not react to the picks.
+
+<p>I may or may not have made some error in my SVG or JavaScript coding that Safari does not like and other browsers overlook.
+
+<p>It may or may not work with some other browser on iOS.
+
+<p>I may or may not find a solution that is better still.
+
+<p>Ouch, painful.
+Sorry.
+Still, there we are for the moment.
+
+<p>A happy update: I found a solution by
+
+<a href="http://philarcher.org">Phil Archer</a> of
+
+<a href="http://www.w3.org">W3C</a> of
+
+that does work on Safari as well as my PC Firefox and Android tablet browser, a
+
+<a href="http://philarcher.org/diary/svgtest">simple SVG in HTML test page</a>.
+
+<p>Phil says that the preferred method is to use the <code>object</code> element and define the SVG file
+using the <code>src</code> attribute.
+
+<p>He further presents samples using <code>embed</code> and <code>iframe</code>.
+
+<p>All three work fine on all browsers I tested, including Safari on the iPad.
+
+<p>I reimplemented my room and furniture picker JavaScript code based on Phil's sample SVG.
+Here is a normal hypertext link to the updated cross-country implementation, as well as inline versions using both embed and object tags.
+They all work on all browsers I tested, which include Firefox on the PC, Safari on the iPad, and the Android browser:
+
+<p>Hypertext link:</p>
+
+<a href="http://thebuildingcoder.typepad.com/files/room_pick_3-1.svg">room_pick_3.svg</a> on the web,
+
+<a href="file:///C:/a/src/web/svg/room_pick/room_pick_3.svg">room_pick_3.svg</a> locally.</li>
+
+<p>Embed web:</p>
+
+<embed src="http://thebuildingcoder.typepad.com/files/room_pick_3-1.svg" type="image/svg+xml" height="202" />
+
+<p>Embed local:</p>
+
+<embed src="file:///C:/a/src/web/svg/room_pick/room_pick_3.svg" type="image/svg+xml" height="202"/>
+
+<p>Object:</p>
+
+<object type="image/svg+xml" data="http://thebuildingcoder.typepad.com/files/room_pick_3.svg" height="330">
+alt : Your browser has no SVG support. Please install
+<a href="http://www.adobe.com/svg/viewer/install/">Adobe SVG Viewer</a> plugin (for Internet Explorer) or use
+<a href="http://www.getfirefox.com/">Firefox</a>, <a href="http://www.opera.com/">Opera</a> or
+<a href="http://www.apple.com/safari/download/">Safari</a> instead.
+</object>
+</p>
+
+<p>For completness' sake, here is the updated source code:
+
+<pre class="code">
+<span class="blue">&lt;</span><span class="maroon">svg</span><span class="blue"> </span>
+<span class="blue">&nbsp;&nbsp; </span><span class="red">xmlns</span><span class="blue">=</span>'<span class="blue">http://www.w3.org/2000/svg</span>'<span class="blue"> </span>
+<span class="blue">&nbsp;&nbsp; </span><span class="red">xmlns:xlink</span><span class="blue">=</span>'<span class="blue">http://www.w3.org/1999/xlink</span>'
+<span class="blue">&nbsp;&nbsp; </span><span class="red">onload</span><span class="blue">=</span>'<span class="blue">startup(evt)</span>'<span class="blue">&gt;</span>
+&nbsp;
+<span class="blue">&lt;</span><span class="maroon">script</span><span class="blue">&gt;&lt;![CDATA[</span>
+<span class="gray">&nbsp; var SVGDocument = null;</span>
+<span class="gray">&nbsp; var SVGRoot = null;</span>
+<span class="gray">&nbsp; var count=0;</span>
+<span class="gray">&nbsp; var svgns = 'http://www.w3.org/2000/svg';</span>
+<span class="gray">&nbsp; var xlinkns = 'http://www.w3.org/1999/xlink';</span>
+<span class="gray">&nbsp; var result = null;</span>
+&nbsp;
+<span class="gray">function startup(evt){</span>
+<span class="gray">&nbsp; O=evt.target</span>
+<span class="gray">&nbsp; SVGDoc = O.ownerDocument;</span>
+<span class="gray">&nbsp; SVGRoot = SVGDoc.documentElement;</span>
+<span class="gray">&nbsp; result = SVGDoc.getElementById('result');</span>
+<span class="gray">&nbsp; O.setAttribute(&quot;onclick&quot;,&quot;report(evt)&quot;);</span>
+<span class="gray">}</span>
+<span class="gray">function report(evt){</span>
+<span class="gray">&nbsp; id = evt.target.id;</span>
+<span class="gray">&nbsp; if(0==id.length){id=&quot;&lt;nil&gt;&quot;;}</span>
+<span class="gray">&nbsp; x=evt.clientX; </span>
+<span class="gray">&nbsp; y=evt.clientY; </span>
+<span class="gray">&nbsp; s = &quot;id='&quot; + id + &quot;' @ &quot; + x + &quot;,&quot; + y;</span>
+<span class="gray">&nbsp; result.firstChild.nodeValue = s;</span>
+<span class="gray">}</span>
+<span class="blue">]]&gt;&lt;/</span><span class="maroon">script</span><span class="blue">&gt;</span>
+&nbsp;
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">background</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">300</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">200</span>&quot;<span class="blue"> </span><span class="red">fill</span><span class="blue">=</span>&quot;<span class="blue">white</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">grid</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+
+...
+
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">line</span><span class="blue"> </span><span class="red">x1</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">y1</span><span class="blue">=</span>&quot;<span class="blue">0</span>&quot;<span class="blue"> </span><span class="red">x2</span><span class="blue">=</span>&quot;<span class="blue">240</span>&quot;<span class="blue"> </span><span class="red">y2</span><span class="blue">=</span>&quot;<span class="blue">200</span>&quot;<span class="blue"> </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">stroke:#ddd;stroke-width:1</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">path</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">room</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">d</span><span class="blue">=</span>&quot;<span class="blue">M 20 20 L 220 20 220 150 150 150 150 100 20 100 Z M 160 120 L 210 120 210 140 160 140 Z</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;fill-opacity:0.2;stroke:blue;stroke-width:1</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; </span><span class="red">fill-rule</span><span class="blue">=</span>&quot;<span class="blue">evenodd</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">g</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">furniture</span>&quot;<span class="blue"> </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(0.5,0.5)</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">table</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">100</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(50,50)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair1</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(37,55)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair2</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(60,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair3</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(80,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair4</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(100,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">rect</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">chair5</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">10</span>&quot;<span class="blue"> </span><span class="red">height</span><span class="blue">=</span>&quot;<span class="blue">8</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">transform</span><span class="blue">=</span>&quot;<span class="blue">translate(120,75)</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">style</span><span class="blue">=</span>&quot;<span class="blue">fill:blue;stroke:blue;stroke-width:1</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">g</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">text</span><span class="blue"> </span><span class="red">id</span><span class="blue">=</span>&quot;<span class="blue">result</span>&quot;<span class="blue"> </span><span class="red">x</span><span class="blue">=</span>&quot;<span class="blue">20</span>&quot;<span class="blue"> </span><span class="red">y</span><span class="blue">=</span>&quot;<span class="blue">180</span>&quot;<span class="blue"> </span><span class="red">font-size</span><span class="blue">=</span>&quot;<span class="blue">16px</span>&quot;<span class="blue">&gt;</span>Welcome. Please click around.<span class="blue">&lt;/</span><span class="maroon">text</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">svg</span><span class="blue">&gt;</span>
+</pre>
+
+<p>Of course, if you are a real programmer, you will not trust me that the code presented above is up to date, follow the links above to the real live SVG file, and view its source instead.
+
+<p>Wow, that was quite a bit of extra unexpected effort.
+I'm afraid my education day stretched on a little bit beyond Friday...
+I hope you find it useful.
+
+
+
+<a name="6"></a>
+
+<h4>Immutable UV and XYZ Classes</h4>
+
+<p>Turning to a completely different topic:
+
+<p>The UV and XYZ classes were made
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/xyz-immutable.html">
+immutable in Revit 2011</a>,
+
+obviously also affecting other elements like the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/immutable-pointload-force.html">
+PointLoad Force and Moment properties</a>.
+
+<p>I provided some explanations for this change back then in 2010, and would now like to add the point provided by Albert Szilvasy via Kean Walmsley to explain why AutoCAD.NET
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/10/why-are-point2d-and-point3d-objects-immutable.html">
+Point2d and Point3d objects are immutable</a>:
+
+<blockquote>
+
+<p>The same reason why System.String is immutable.
+
+<p>The problem is that a mutable type is confusing to use when it appears as a property return value. For example:
+
+<pre class="code">
+  class A
+  {
+    public XYZ prop {get;}
+  };
+
+  A a;
+
+  a.prop.X = 1.0;
+</pre>
+
+<p>Would this syntax mean that I can set the X value of a read-only property? Or would this simply mean that I set the X value of a temporary point object returned by prop?
+</blockquote>
+
+<p>Just as Kean says: there you have it. :-)
+
+<p>Unfortunately, there are some other areas in the Revit API where this very confusion still arises from time to time.
+
+
+<hr>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Real Cross-Platform Interactive 2D Graphics Using SVG</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</p>
+
+
+<p>Hi everybody.
+
+<p>This is my first post to the Cloud and Mobile DevBlog.
+
+<p>All I will do here is point out that I spent my education day last Friday exploring how to display and interact with 2D graphics in a browser using SVG and JavaScript by implementing a very simple
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/room-polygon-and-furniture-picker-in-svg.html">
+room polygon and furniture picker in SVG</a>.
+
+<p>The main goal was to enable picking and identifying objects and ensuring that the same code and interaction is supported on all mobile devices, in particular both Android and Safari on iOS.
+
+<p>The latter added an additional little challenge at the end.
+
+<p>Here is the final result:</p>
+
+<embed src="http://thebuildingcoder.typepad.com/files/room_pick_3-1.svg" type="image/svg+xml" height="202" />
+
+<p>Try it out on your phone or somewhere!
+
+<p>I hope you find it useful.

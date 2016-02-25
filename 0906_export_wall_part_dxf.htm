@@ -1,0 +1,573 @@
+﻿<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+<body>
+
+<h3>Export Wall Parts Individually to DXF</h3>
+
+<p>I am back from my vacation.
+It was a wonderful break, and I feel ready and happy to get back to grips with everyday life and work again.
+
+<p>A query from a colleague caught up with me already on the way back, on exporting a whole bunch of selected wall panel parts to individual DXF files.
+That gave me something nice and interesting to fiddle with during the nightly train ride up from Napoli to Milano and led to the following issues:</p>
+
+<ul>
+<li><a href="#2">Exporting individual compound wall gyp wallboard parts</a></li>
+<li><a href="#3">Handling and dismissing a warning message</a></li>
+<li><a href="#4">Adding support for both pre- and post- part selection</a></li>
+<li><a href="#5">Handling temporary transactions and regeneration</a></li>
+</ul>
+
+<p>Before getting to that, though, here are a few final notes on my last vacation day in Napoli.</p>
+
+
+
+<a name="1"></a>
+
+<h4>Last Day in Napoli</h4>
+
+<p>I had some wonderful pastry in the
+
+<a href="http://www.tripadvisor.com/Restaurant_Review-g187785-d1129216-Reviews-Gran_Bar_Riviera-Naples_Province_of_Naples_Campania.html">
+Gran Bar Riviera</a> pasticceria
+
+on the Riviera di Chiaia.
+Incidentally, an old palazzo partially collapsed there last week, just a few hundred meters away from where I was staying.</p>
+
+<img src="file:///j/photo/jeremy/2013/2013-03-08_napoli/p1000534_collapsed_house_cropped.jpg" alt="Collapsed palazzo in Riviera di Chiaia" width="200"/>
+
+&nbsp;
+
+<img src="file:///j/photo/jeremy/2013/2013-03-08_napoli/p1000586_gabriele_shoemaker_cropped.jpg" alt="Shoemaker Gabriele" width="200"/>
+
+&nbsp;
+
+<img src="file:///j/photo/jeremy/2013/2013-03-08_napoli/p1000587_gabriele_jeremy.jpg" alt="Gabriele and Jeremy" width="200"/>
+
+<p>Further, I took a pair of old shoes to Gabriele, an extremely sweet and happy 86 years old shoemaker in the Spanish quarter.
+He repaired them and they look better than new now.
+He also invited us to coffee and told me his life story.
+If you ever need a pair of shoes fixed, be sure to look him up in Vico Lungo del Gelso, 108, I-80134 Napoli  :-)</p>
+
+<p>Two final parting pictures capturing some of the decrepit charm of Naples...</p>
+
+<img src="file:///j/photo/jeremy/2013/2013-03-08_napoli/p1000580.jpg" alt="Impressions from the Spanish quarter" width="200"/>
+
+&nbsp;
+
+<img src="file:///j/photo/jeremy/2013/2013-03-08_napoli/p1000592.jpg" alt="Impressions from the Spanish quarter" width="200"/>
+
+<p>Anyway, now I am back at work now again, and we return to the Revit API and my nocturnal dabbling on the train.</p>
+
+
+<a name="2"></a>
+
+<h4>Exporting Individual Compound Wall Gyp Wallboard Parts</h4>
+
+<p>This query came in from my colleague William Spier, MEP &amp; Design to Fabrication SME at Autodesk
+(<a href="http://www.youtube.com/AutodeskMEPTechs">YouTube</a>,
+<a href="http://familyjewels.typepad.com">Revit Family Jewels</a>).
+He says:
+
+<p><strong>Question:</strong> I would like to customise two pretty easy things.
+
+<p>The scenario is a compound wall on which I divide the gyp wallboard into standard (4’x8’) sheet size parts.
+I need to export each of those sheets/parts to DXF format, but even though I have divided them into parts, Revit still groups them and exports them as one single DXF file &ndash; not as separate ones, like I need.
+The only way around this is to isolate each part one at a time and export each one individually, which is WAY too laborious.
+
+<p>So I need to customize the export process so that:</p>
+
+<ol>
+<li>Each part exports as a separate part, even though I globally selected them.</li>
+<li>Each part exports named by its own unique code/identifier &ndash; whatever coding keeps each one distinct in the parts schedule.</li>
+</ol>
+
+<p>Here is a snapshot from a simple sample project:</p>
+
+<center>
+<img src="img/sample_wall_parts.png" alt="Sample wall parts" width="200"/>
+</center>
+
+
+<p><strong>Answer:</strong> A first search for related API methods turn up the following potentially useful items:
+
+<ul>
+<li>Document.Export( string, string, ICollection&lt;ElementId&gt;, DXFExportOptions )
+<li>View.IsolateElementTemporary(	ElementId )
+<li>Part.ParentDividedElementId property (obsolete)
+<li>Part.GetSourceElementOriginalCategoryIds method (obsolete)
+<li>Part.GetSourceElementIds method
+</ul>
+
+<p>Skipping the obsolete ones, it turns out to be really easy to implement a first working version that I packaged in an external command named ExportWallboard.
+
+<p>I first check that a valid document is provided and a 3D view is active that we can use for isolating and exporting each part:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view || !( view <span class="blue">is</span> <span class="teal">View3D</span> ) )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; 3D view.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Define the list of views to export, </span>
+&nbsp; <span class="green">// including only the current 3D view</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; viewIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; viewIds.Add( view.Id );
+</pre>
+
+<p>Basically, all that is required is to follow the steps suggested above:</p>
+
+<ul>
+<li>Isolate each part</li>
+<li>Define the DXF filename</li>
+<li>Call the export method</li>
+</ul>
+
+<pre class="code">
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( e <span class="blue">is</span> <span class="teal">Part</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;expected parts only&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">LinkElementId</span>&gt; lids
+&nbsp; &nbsp; = part.GetSourceElementIds();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 1 == lids.Count,
+&nbsp; &nbsp; <span class="maroon">&quot;unexpected multiple part source elements.&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">LinkElementId</span> lid = lids.First&lt;<span class="teal">LinkElementId</span>&gt;();
+&nbsp; <span class="teal">ElementId</span> hostId = lid.HostElementId;
+&nbsp; <span class="teal">ElementId</span> linkedId = lid.LinkedElementId;
+&nbsp; <span class="teal">ElementId</span> parentId = hostId;
+&nbsp; <span class="teal">ElementId</span> partId = e.Id;
+&nbsp;
+&nbsp; filename = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}_{1}&quot;</span>,
+&nbsp; &nbsp; parentId, partId );
+&nbsp;
+&nbsp; view.IsolateElementTemporary( partId );
+&nbsp;
+&nbsp; doc.Export( _folder, filename, viewIds, opt );
+</pre>
+
+<p>The IsolateElementTemporary method requires a transaction, so even though the whole operation is theoretically read-only, we still need to specify manual transaction mode for this command.
+We encapsulate the isolate and export method in a transaction that is later rolled back, so the model ends up unchanged after all.</p>
+
+
+<a name="3"></a>
+
+<h3>Handling and Dismissing a Warning Message</h3>
+
+<p>However, a complication arises:
+
+<p>Calling the Export method with an isolated element in the current view displays a task dialogue warning message:
+
+<center>
+<img src="img/export_with_isolate_warning.png" alt="Exporting a view with isolated element warning" width="400"/>
+</center>
+
+<p>I repeatedly discussed how to automatically handle messages like this in the past, e.g. to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/detach-workset-and-taskdialog-command-link-order.html">
+detach a workset</a>.</p>
+
+<p>To be notified of this message, we subscribe to the DialogShowing event:</p>
+
+<pre class="code">
+&nbsp; uiapp.DialogBoxShowing
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; OnDialogBoxShowing );
+</pre>
+
+<p>Do not forget to unsubscribe afterwards.
+In this case, we can do so at the end of the command.
+
+<p>To ensure that the unsubscription is performed whatever happens, regardless of any potential errors, I encapsulate the whole operation in a try statement and unsubscribe in its 'finally' clause.
+
+<pre class="code">
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Register event handler for </span>
+&nbsp; &nbsp; <span class="green">// &quot;TaskDialog_Really_Print_Or_Export_Temp_View_Modes&quot; </span>
+&nbsp; &nbsp; <span class="green">// dialogue</span>
+&nbsp;
+&nbsp; &nbsp; uiapp.DialogBoxShowing
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDialogBoxShowing );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DXFExportOptions</span> opt = <span class="blue">new</span> <span class="teal">DXFExportOptions</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Transaction Name&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; view.IsolateElementTemporary( partId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Export( _folder, filename, viewIds, opt );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// We do not commit the transaction, because</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// we do not want any modifications saved.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// The transaction is only created and started</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// because it is required by the</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// IsolateElementTemporary method.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Since the transaction is not committed, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the changes are automatically discarded.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//tx.Commit();</span>
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">finally</span>
+&nbsp; {
+&nbsp; &nbsp; uiapp.DialogBoxShowing
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDialogBoxShowing );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Initially, I did not yet know exactly which dialogue id to use to identify this specific message.
+I therefore first implemented a dummy DialogBoxShowing event handler, triggered the event, and determined the dialogue id to use by re-running the command and looking at the event handler argument in the debugger.
+
+<p>As it turns out, the required dialogue id in our case is "TaskDialog_Really_Print_Or_Export_Temp_View_Modes".
+We wish to retain the temporary isolate mode and export, i.e. select the second command link option.
+Therefore, the final dialogue box showing event handler implementation becomes:
+
+<pre class="code">
+<span class="blue">void</span> OnDialogBoxShowing(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+{
+&nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e2
+&nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e2 &amp;&amp; e2.DialogId.Equals(
+&nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Really_Print_Or_Export_Temp_View_Modes&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; e.OverrideResult(
+&nbsp; &nbsp; &nbsp; (<span class="blue">int</span>)<span class="teal">TaskDialogResult</span>.CommandLink2 );
+&nbsp; }
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h3>Adding Support for both Pre- and Post- Part Selection</h3>
+
+<p>In the initial implementation, I just went ahead and used the pre-selected set of parts defined by the user before launching the external command, accessible via the uidoc.Selection.Elements collection.
+
+<p>However, it is much more user friendly to also support post-selection.
+For that case, it is also useful to implement a selection filter to simplify easy mass selection of the parts.
+
+<p>In order to handle the elements identically regardless of whether they were pre- or post-selected, I convert the selection set to a list of element ids in both cases.
+
+<p>For the pre-selection, I iterate over the pre-selected elements and test each one as follows:
+
+<pre class="code">
+&nbsp; <span class="green">// Iterate over all pre-selected parts</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; sel.Elements.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Part</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only gyp wallboard&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; parts before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">LinkElementId</span>&gt; lids
+&nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 != lids.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Gyp wallboard parts has multiple&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; source elements.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LinkElementId</span> lid = lids.First&lt;<span class="teal">LinkElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> hostId = lid.HostElementId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> linkedId = lid.LinkedElementId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> parentId = hostId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> partId = e.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine parent category</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> parent = doc.GetElement( parentId );
+&nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = parent.Category;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; cids
+&nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementOriginalCategoryIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 != cids.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Gyp wallboard parts has multiple&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; source element categories.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> cid = cids.First&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//cat = doc.GetElement( id ) as Category;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Expected parent category is OST_Walls</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic
+&nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">BuiltInCategory</span>)cid.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">BuiltInCategory</span>.OST_Walls != bic )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Pleqase pre-select only &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; gyp wallboard parts.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; ids.Add( partId );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only gyp wallboard&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; parts before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The category of the source elements can be determined using the Part.GetSourceElementOriginalCategoryIds method, which unsurprisingly turns out to be OST_Walls.</p>
+
+<p>I use that to check the part source element category like this in the final selection filter implementation:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">WallPartSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != part )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; cids
+&nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementOriginalCategoryIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 == cids.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> cid = cids.First&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">BuiltInCategory</span>)cid.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; rc = ( <span class="teal">BuiltInCategory</span>.OST_Walls == bic );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<!--
+<p>Running this test code shows that the desired parent category is OST_Walls, as expected.
+
+<p>Based on that, I implemented the following wall part selection filter:
+-->
+
+<p>For the post-selection, the selection filter ensures that no inappropriate parts can be selected, so no additional scan is required to test the references returned by the PickObjects method.
+
+<p>I can use a generic LINQ method to convert the collection of resulting references to the list of element ids:
+
+<pre class="code">
+&nbsp; <span class="green">// If no parts were pre-selected, </span>
+&nbsp; <span class="green">// prompt for post-selection</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; refs = sel.PickObjects( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WallPartSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select wall parts.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>, <span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.ElementId ) );
+&nbsp; }
+</pre>
+
+<p>Here is
+
+<a href="zip/ExportWallboard03.zip">
+ExportWallboard03.zip</a> including the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.
+
+<p>There are obviously still some implementation details to iron out.
+
+
+
+<a name="5"></a>
+
+<h3>Handling Temporary Transactions and Regeneration</h3>
+
+<p>Luckily, I took a closer look at the generated DXF output files before letting this command loose on humanity.</p>
+
+<p>To my horror, I discovered that all files generated except the first one contain no geometry.</p>
+
+<p>As it turns out, there is an issue with the regeneration and view settings in my original implementation.</p>
+
+<p>After quite a bit of experimentation, I found out that I can successfully generate the individual files if I add the following steps:</p>
+
+<ul>
+<li>Add code to switch off the first temporary isolation before applying the next one.</li>
+<li>Commit the transaction to temporaily isolate each part before calling Export.</li>
+<li>This requires encapsulating all the temporary transactions in a group and rolling back the entire group instead of the individual transactions, as described for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">temporary transaction trick touchup</a>.</li>
+
+<li>Separate the code to switch off the last temporary isolation and applying the new one into separate transactions.</li>
+</ul>
+
+<p>The resulting loop exporting all the parts ends up looking like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> txg = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; txg.Start( <span class="maroon">&quot;Export Wall Parts&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( e <span class="blue">is</span> <span class="teal">Part</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected parts only&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">LinkElementId</span>&gt; lids
+&nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 == lids.Count,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;unexpected multiple part source elements.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LinkElementId</span> lid = lids.First&lt;<span class="teal">LinkElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> hostId = lid.HostElementId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> linkedId = lid.LinkedElementId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> parentId = hostId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> partId = e.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; filename = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}_{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parentId, partId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( view.IsTemporaryHideIsolateActive() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Disable Temporary Isolate&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view.DisableTemporaryViewMode(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TemporaryViewMode</span>.TemporaryHideIsolate );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( !view.IsTemporaryHideIsolateActive(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected to turn off temporary hide/isolate&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Export Wall Part &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + partId.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; view.IsolateElementTemporary( partId ); <span class="green">// requires transaction</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//List&lt;ElementId&gt; unhideIds = new List&lt;ElementId&gt;( 1 );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//unhideIds.Add( partId );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//view.UnhideElements( unhideIds );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//doc.Regenerate(); // this is insufficient</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Export( _folder, filename, viewIds, opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// We do not commit the transaction group, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// because no modifications should be saved.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// The transaction group is only created and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// started to encapsulate the transactions </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// required by the IsolateElementTemporary </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// method. Since the transaction group is not </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// committed, the changes are automatically </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// discarded.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//txg.Commit();</span>
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Here is
+
+<a href="zip/ExportWallboard04.zip">
+ExportWallboard04.zip</a> including the source code, Visual Studio solution and add-in manifest of the updated version.
+
+<p>I certainly expect more implementation details to crop up that need ironing out.
+
+<p>For instance, I could imagine adding some code to delete the PCP files that are generated together with the DXF output.
+Or is there any reason to keep them?</p>
+
+<p>I can also imagine that the part identification needs improving.
+Currently, the command simply uses the part and its source element ids.
+Maybe the part unique id would be better, or the parent element id needs checking, or is unnecessary snd can be completely removed.
+
+<p>Anyway, for a first stab, this implementation now looks pretty good to me.</p>
+
+</body>
+</html>

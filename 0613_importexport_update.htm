@@ -1,0 +1,211 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Kurt Schempp Re: Thank you, another question. -->
+
+<h3>ImportExport Update</h3>
+
+<p>I mentioned some features of the ImportExport SDK sample in previous posts, e.g. on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/porting-from-c-to-vbnet.html">
+porting it from C# to VB</a>, setting the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/dwg-export-filename.html">
+DWG export filename</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/modify-the-dwf-export-filename.html">
+modifying the DWF export filename</a>, and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/export-3d-view-to-2d-dwf.html">
+exporting a 3D view to 2D DWF</a>.
+
+<p>Now Kurt Schrempp ran into a little problem with this sample. 
+He says: I solved my problem. 
+Here is the issue:
+When you try to export as DWG, it requires and gives you options to define the layer mapping. 
+If you don't open up the layer mapping options dialogue, no default settings are set, and a null argument exception is thrown. 
+
+<p>Kurt provided a slightly updated version which fixes that and some other minor problems of the standard implementation.
+The main fix is to automatically open the dialogue so that the default options are instantiated and set.
+If this step is not performed, and the associated property is left set to its default value of null, the sample fails in Revit 2012.
+
+<p>In Kurt's words: 
+There are actually two errors due to similar things. 
+One is based on the layer options, the other on the selected views when selecting more than just the current view. 
+
+<p>To reproduce the layer bug, launch ImportExport &gt; Select Export &gt; Select DWG format &gt; Click OK &gt; Select Directory &gt; Click Save.
+
+<p>Now, because the options button is optional, and it is skipped by default, the error should come up.
+
+<p>To reproduce the view bug, launch ImportExport &gt; Select Export &gt; Select DWG format &gt; Click OK &gt; Select Directory &gt; Select the "Selected views/sheets" Radio Button &gt; Click Options &gt; Click Ok &gt; Click Save.
+
+<p>In this one, because the "..." button to select views is optional, no default views are set, similarly to the layer options issue, so a different error comes up.
+
+<p>Here is an image that illustrates a solution for this:</p>
+
+<center>
+<img src="img/KurtSchremppImportExportFix.png" alt="ImportExport fix" width="400"/>
+</center>
+
+<p>Here is the options button click handler implementation:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> buttonOptions_Click(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">EventArgs</span> e )
+{
+&nbsp; <span class="green">// Export dwg</span>
+&nbsp; <span class="blue">if</span>( m_exportData.ExportFormat 
+&nbsp; &nbsp; == <span class="teal">ExportFormat</span>.DWG )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> contain3DView = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( radioButtonCurrentView.Checked )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m_exportData.Is3DView )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; contain3DView = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m_exportData.SelectViewsData
+&nbsp; &nbsp; &nbsp; &nbsp; .Contain3DView )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; contain3DView = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExportDWGData</span> exportDWGData 
+&nbsp; &nbsp; &nbsp; = m_exportData <span class="blue">as</span> <span class="teal">ExportDWGData</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">ExportDWGOptionsForm</span> exportOptionsForm 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExportDWGOptionsForm</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; exportDWGData.ExportOptionsData, 
+&nbsp; &nbsp; &nbsp; &nbsp; contain3DView ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; exportOptionsForm.ShowDialog();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; // . . .
+}
+</pre>
+
+<p>It sets up the DWGExportOptions parameter:
+
+<pre class="code">
+&nbsp; <span class="teal">DWGExportOptions</span> dwgExportOptions = <span class="blue">new</span> <span class="teal">DWGExportOptions</span>();
+&nbsp; dwgExportOptions.ExportingAreas = m_exportOptionsData.ExportAreas;
+&nbsp; dwgExportOptions.ExportOfSolids = m_exportOptionsData.ExportSolid;
+&nbsp; dwgExportOptions.FileVersion = m_exportFileVersion;
+&nbsp; dwgExportOptions.LayerMapping = m_exportOptionsData.ExportLayerMapping;
+&nbsp; dwgExportOptions.LineScaling = m_exportOptionsData.ExportLineScaling;
+&nbsp; dwgExportOptions.MergedViews = m_exportOptionsData.ExportMergeFiles;
+&nbsp; dwgExportOptions.PropOverrides = m_exportOptionsData.ExportLayersAndProperties;
+&nbsp; dwgExportOptions.SharedCoords = m_exportOptionsData.ExportCoorSystem;
+&nbsp; dwgExportOptions.TargetUnit = m_exportOptionsData.ExportUnit;
+</pre>
+
+<p>These properties aren't set until this window initializes. 
+So unless you click the "Options" button on the previous form, the values are null, thus throwing the exception.
+
+<p>All I did was make it so the options form displays as soon as the export form comes up, setting the defaults immediately.
+
+<p>Here is the code of my <a href="zip/ImportExportKs.zip">modified version of the ImportExport SDK sample</a> which opens up the two windows automatically, so there are no null defaults.
+
+<p>It implements a couple of other small changes as well.
+Here is a list of the differing files:
+
+<ul>
+<li>ExportData.cs &ndash; modify output filename
+<li>ExportDWGData.cs &ndash; rename output file
+<li>ExportWithViewsForm.cs &ndash; display layer mapping and options as discussed above
+<li>SelectViewsForm.cs &ndash; additional handling of 2D and 3D views
+</ul>
+
+<p>Many thanks to Kurt for these insights and sharing his update!
+
+
+<a name="2"></a>
+
+<h4>Avoid Casting Twice</h4>
+
+<p>Here is an additional little note on casting efficiency.
+
+<p>This code accesses the directory containing an external referenced file:
+
+<pre class="code">
+&nbsp; <span class="teal">Type</span> T = es.Current.GetType();
+&nbsp; <span class="blue">if</span>( T == <span class="blue">typeof</span>( <span class="teal">ImportInstance</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ImportInstance</span> imp = es.Current 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ImportInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( imp.IsLinked )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalFileReference</span> el = <span class="teal">ExternalFileUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .GetExternalFileReference( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; actdoc, imp.GetTypeId() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( el != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; directory = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ConvertModelPathToUserVisiblePath(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; el.GetAbsolutePath() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; error = <span class="maroon">&quot;The import instance you selected&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; is not linked into the project.&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>It can be simplified by using the 'is' statement, replacing the first two lines by the following more readable statement:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( es.Current <span class="blue">is</span> <span class="teal">ImportInstance</span> )
+</pre>
+
+<p>We can go one step further, though, because the next line is casting to an ImportInstance.
+The sequence of statements saying 'if x is Y then: Z z = x as Y' is basically performing the cast twice over.
+You can avoid that unneccessary cost by casting once only and testing the result agains null.
+In this case, we can combine the first if statement with the cast and the second if statement, i.e. combine the line above with the one folowing it line and just say:
+
+<pre class="code">
+&nbsp; <span class="teal">ImportInstance</span> imp = es.Current 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ImportInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != imp &amp;&amp; imp.IsLinked )
+</pre>
+
+<p>This eliminates the first two lines altogether, leaving just this:
+
+<pre class="code">
+&nbsp; <span class="teal">ImportInstance</span> imp = es.Current 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ImportInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != imp &amp;&amp; imp.IsLinked )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ExternalFileReference</span> el = <span class="teal">ExternalFileUtils</span>
+&nbsp; &nbsp; &nbsp; .GetExternalFileReference(
+&nbsp; &nbsp; &nbsp; &nbsp; actdoc, imp.GetTypeId() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( el != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; directory = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .ConvertModelPathToUserVisiblePath(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; el.GetAbsolutePath() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; error = <span class="maroon">&quot;The import instance you selected&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; is not linked into the project.&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>For more details, you can refer to sections 8.2.2 'The is Operator', 8.2.3 'The as Operator', and especially 8.2.4 'The is Operator Versus the as Operator' in this 
+
+<a href="http://etutorials.org/Programming/Programming+C.Sharp/Part+I+The+C+Language/Chapter+8.+Interfaces/8.2+Accessing+Interface+Methods">
+C# tutorial</a>.

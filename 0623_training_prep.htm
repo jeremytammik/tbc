@@ -1,0 +1,89 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit API Training Preparation</h3>
+
+<p>Yesterday I pointed out that the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/revit-api-training-material.html">
+Revit 2012 API training material</a> is 
+
+now available online from the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> and
+
+provided a more or less detailed overview of its content.
+
+<p>In addition to downloading and working through that, there are a couple of other preparations that I recommend my training participants to work through up front:
+
+<ul>
+<li>Install the Revit SDK.
+<li>Install RevitLookup.
+<li>Install RvtSamples.
+<li>Work through the developer guide <a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/API_Dev_Guide/0001-Introduc1/0012-Getting_12">hands-on walk-through tutorials</a>.
+<li>Work through the <a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html">DevTV classes</a>.
+<li>Work through the <a href="http://thebuildingcoder.typepad.com/blog/2011/05/my-first-revit-plug-in.html">My First Revit Plugin</a> tutorial.
+</ul>
+
+<p>The SDK, DevTV classes, and first plugin tutorial are all available from the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+<p>RevitLookup, RvtSamples, and the developer guide are part of the SDK, and the developer guide is also 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/API_Dev_Guide">available online</a>.
+
+<p>Whether you work through the developer guide hands-on walk-throughs, the DevTV classes or the 'first plugin' material first is up to you.
+The content covered overlaps to some extent.
+
+<p>If you like, you can postpone the installation of the SDK until after you have worked through these.
+Working through them first will deepen your understanding of the installation of Revit add-ins, which will be useful for setting up RevitLookup and RvtSamples.
+
+<p>Once you have done all or most of this, you will be in a good shape to work through the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/revit-api-training-material.html">
+Revit 2012 API training material</a>,
+
+which provides a pretty thorough introduction to all the basics of the Revit API.
+
+<p>Everything beyond goes into more depth in specific areas of your interest, either related to the particular Revit flavour appropriate to your domain or specialised advanced areas within the Revit API.
+
+<p>Here are a few more notes on the installation of the SDK, RevitLookup and RvtSamples:
+
+<p>Installing the SDK is trivial; it is an executable file, so you run it and specify a location of your choice to place the contents into.
+
+<p>To install 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">
+RevitLookup</a> (formerly 
+
+RvtMgdDbg, described 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+here</a> in detail), 
+
+you open the Visual Studio project in the RevitLookup subfolder of the SDK installation folder, compile it, edit the add-in manifest file to point to the correct assembly location specifying the path of your add-in DLL, and copy that to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#1">
+appropriate</a>
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/API_Dev_Guide/0001-Introduc1/0018-Add-In_I18/0022-Add-in_R22">
+location</a> (replace '2011' by '2012') for Revit to pick up.
+
+<p>RvtSamples provides an interface to load and run all of the hundred-plus other SDK samples, instead of installing them individually.
+Therefore, it requires you to compile all the other SDK samples as well, as described in the following posts:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/08/managing-sdk-sa.html">Managing SDK samples</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">Loading SDK samples</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">Loading The Building Coder samples</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/04/installing-the-revit-2010-sdk.html">Compiling and loading all the SDK samples</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">RvtSamples Conversion from 2009 to 2010</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">Migrating the Building Coder Samples to Revit 2012</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/updated-sdk-for-revit-2012-update-release-1.html">Updating my SDK installation for Revit 2012 Update Release 1</a>.
+</ul>
+
+<p>I hope that this information is complete enough to get anybody interested in the Revit API happily started.
+Please let me know if you discover anything missing.
+

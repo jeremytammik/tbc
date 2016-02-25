@@ -1,0 +1,71 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255063 [How can I change the value of a shared parameter in a family?] -->
+
+<h3>Change Family Parameter Value</h3>
+
+<p>Here is another issue dealing with family parameters, after the notes on how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/family-parameter-value.html">
+read the values of family parameters</a> and
+
+looking at the family parameter values via the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/extract-part-atoms.html">
+part atom export</a>.
+
+<p><strong>Question:</strong> I'm using the AutoParameter SDK example to add parameters to my families. 
+It was customized so that only specific parameters from the shared parameters file are added to the families (i.e. we have a large shared parameters file, and we only want certain ones added to these families) using a switch statement along with the parameter names to find. 
+When we add a parameter with a checkbox, it's automatically checked. 
+We need to go back after it was added and uncheck it. 
+I went through a number of SDK examples but haven't found one that helps. 
+Can you send me a snippet that shows how to do this? 
+I am using C#.
+
+<p><strong>Answer:</strong> Do the parameters you have added in the family appear checked in the user interface of the project after being loaded into the document environment? 
+In that case, I assume that the parameters you have added have a Boolean data type and an initial value of True. 
+If so, the check mark should be removed if you set their initial value to False. 
+For instance, in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-family-creation-api-labs.html">
+RFA family labs</a>, 
+
+the addParameter method adds two real-values parameters:
+
+<pre class="code">
+<span class="blue">void</span> addParameters()
+{
+&nbsp; <span class="teal">FamilyManager</span> mgr = _rvtDoc.FamilyManager;
+&nbsp;
+&nbsp; <span class="green">// API parameter group for Dimension is PG_GEOMETRY:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">FamilyParameter</span> paramTw = mgr.AddParameter( 
+&nbsp; &nbsp; <span class="maroon">&quot;Tw&quot;</span>, <span class="teal">BuiltInParameterGroup</span>.PG_GEOMETRY, 
+&nbsp; &nbsp; <span class="teal">ParameterType</span>.Length, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">FamilyParameter</span> paramTd = mgr.AddParameter( 
+&nbsp; &nbsp; <span class="maroon">&quot;Td&quot;</span>, <span class="teal">BuiltInParameterGroup</span>.PG_GEOMETRY, 
+&nbsp; &nbsp; <span class="teal">ParameterType</span>.Length, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="green">// set initial values:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">double</span> tw = mmToFeet( 150.0 );
+&nbsp; <span class="blue">double</span> td = mmToFeet( 150.0 );
+&nbsp; mgr.Set( paramTw, tw );
+&nbsp; mgr.Set( paramTd, td );
+}
+</pre>
+
+<p>In your case, you might be able to use something like:
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyParameter</span> paramDan = mgr.AddParameter(
+&nbsp; &nbsp; <span class="maroon">&quot;Dan&quot;</span>, <span class="teal">BuiltInParameterGroup</span>.PG_TEXT, 
+&nbsp; &nbsp; <span class="teal">ParameterType</span>.YesNo, <span class="blue">true</span> );
+&nbsp;
+&nbsp; mgr.Set( paramDan, 0 );
+</pre>
+
+<p><strong>Response:</strong> Thanks! that's exactly what I needed.

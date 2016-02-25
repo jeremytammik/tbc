@@ -1,0 +1,179 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1261421 [May I change the Family symbol via programming] -->
+
+<h3>Change Element Type</h3>
+
+<p>Here is a simple question that we have touched upon in passing a couple of times, but never previously elevated to the honour of an own post.
+It also provides an opportunity to highlight one of the more interesting basic Revit API introduction labs that I always wanted to discuss in some detail:
+
+<p><strong>Question:</strong> I can retrieve all the family instances in the document. 
+I would now like to programmatically change their family symbols to match certain given requirements.
+Could you please explain how I can change the family symbol of a given instance?
+
+<p>A similar question was also raised in a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/creating-a-new-family-symbol.html?cid=6a00e553e1689788330128760d9099970c#comment-6a00e553e1689788330128760d9099970c">
+comment</a> by 
+
+<a href="http://www.cbp.co.nz">
+Anthony Forlong</a>:
+
+<p><strong>Question:</strong> I've been trying to adapt your wall code to enable a user to change a family symbol to another type (of the same family).
+I can duplicate the selected symbol and change parameters etc.; however I am unable to find a way to replace the selected symbol with the new one.
+
+<p><strong>Answer:</strong> The answer is to simply assign the new type to the FamilyInstance Symbol property.
+
+<p>Here are two examples of doing this that we presented here in the past:
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-api-cases-1.html#3">
+Duplicating a type and assigning the new type to a family instance</a>:
+<br>
+<pre class="code">
+inst.Symbol = dupSym;
+</pre>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-form-creation-api.html">
+Changing the symbol of a curtain panel family instance to a glazed type</a>:
+<br>
+<pre class="code">
+fi.Symbol = pFamilySymbol.glazed;
+</pre>
+</ul>
+
+<p>By the way, the symbol of a family instance is also referred to as the element type, and represented in the Revit API by the ElementType class. 
+
+<p>For a more complex and complete example, the Revit API introduction external command Lab3_4_ChangeSelectedInstanceType demonstrates how to change the symbol of a selected instance. 
+It shows a couple of other interesting techniques as well on the way.
+
+<p>Lab3_4_ChangeSelectedInstanceType is a form-based utility to change the type or symbol of a selected standard family instance and implements the following steps:
+
+<ul>
+<li>Retrieve a single preselected family instance or prompt the user to select one interactively.
+<li>Determine its category.
+<li>Retrieve all families that can be used to represent that category.
+<li>For each of the applicable families, retrieve all their symbols and insert them into a mapping from family name to a list of the symbols it contains.
+<li>Display a dialogue box prompting the user to select one of applicable symbols from one the families.
+<li>Change the family instance type to the selected symbol.
+</ul>
+
+<p>The important line of code that addresses your question is at the end of the Execute method:
+
+<pre class="code">
+&nbsp; inst.Symbol = form.cmbType.SelectedItem 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+</pre>
+
+<p>For completeness sake, here is the entire code of the Execute method implementing the steps listed above:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Lab3_4_ChangeSelectedInstanceType</span> 
+&nbsp; : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> inst = 
+&nbsp; &nbsp; &nbsp; <span class="teal">LabUtils</span>.GetSingleSelectedElementOrPrompt(
+&nbsp; &nbsp; &nbsp; &nbsp; uidoc, <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">LabUtils</span>.ErrorMsg( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Selected element is not a &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;standard family instance.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// determine selected instance category:</span>
+
+&nbsp; &nbsp; <span class="teal">Category</span> instCat = inst.Category;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt;&gt; 
+&nbsp; &nbsp; &nbsp; mapFamilyToSymbols
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">WaitCursor</span> waitCursor = <span class="blue">new</span> <span class="teal">WaitCursor</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// find all corresponding families and types:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> families
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; families.OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> families )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> categoryMatches = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// we cannot trust f.Category or </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// f.FamilyCategory, so grab the category </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// from first family symbol instead:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> sym <span class="blue">in</span> f.Symbols )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categoryMatches = sym.Category.Id.Equals( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instCat.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( categoryMatches )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt; symbols 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> sym <span class="blue">in</span> f.Symbols )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbols.Add( sym );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; mapFamilyToSymbols.Add( f.Name, symbols );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// display the form allowing the user to select </span>
+&nbsp; &nbsp; <span class="green">// a family and a type, and assign this type </span>
+&nbsp; &nbsp; <span class="green">// to the instance.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Lab3_4_Form</span> form 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Lab3_4_Form</span>( mapFamilyToSymbols );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( System.Windows.Forms.<span class="teal">DialogResult</span>.OK 
+&nbsp; &nbsp; &nbsp; == form.ShowDialog() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; inst.Symbol = form.cmbType.SelectedItem 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LabUtils</span>.InfoMsg( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Successfully changed family : type to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + form.cmbFamily.Text + <span class="maroon">&quot; : &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + form.cmbType.Text );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is a snapshot of my current version of the Revit API introduction labs including the Lab3_4_ChangeSelectedInstanceType external command, 
+
+<!-- C:\a\doc\revit\blog\zip\rac_labs_2010-07-16.zip -->
+
+<a href="zip/rac_labs_2010-07-16.zip">
+rac_labs_2010-07-16.zip</a>.

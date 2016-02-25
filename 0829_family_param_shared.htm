@@ -1,0 +1,142 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07641757 [FamilyParameter.IsShared]
+
+-->
+
+<h3>FamilyParameter IsShared Property</h3>
+
+<p>A long time ago, we discussed a workaround to access the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/access-to-shared-family-parameter-guid.html">
+shared family parameter GUID</a>
+
+using 
+
+<a href="http://en.wikipedia.org/wiki/Reflection_%28computer_programming%29">
+reflection</a>,
+
+more specifically (and obviously)
+
+<a href="http://msdn.microsoft.com/en-us/library/f7ykdhsy.aspx">
+.NET Reflection</a>.
+
+If you are new to this, here is an in-depth Code Project article on
+
+<a href="http://www.codeproject.com/Articles/55710/Reflection-in-NET">
+Reflection in .NET</a>.
+
+<p>Now Victor Chekalin, or Виктор Чекалин, ran into this issue as well and presents a much improved solution.
+
+<p>Here is the background and our discussion on this:
+
+
+<p><strong>Question:</strong> Why does the FamilyParameter class have no IsShared Property, like the Parameter class does? 
+I need to get list of all FamilyParameters and all their properties, including GUID.
+
+<p>Now, if I call the GUID property on a FamilyParameter that is not shared, Revit throws an InvalidOperationException.
+The only way I can check whether the FamilyParameter is shared or not is try to get GUID property and handle the exception if it is not shared.
+
+<p>This is a problem, because intercepting the exception takes a lot of time, and if a family has a lot of FamilyParameters, the program freezes significantly.
+
+<p>Why did the API developers implement this odd behaviour and not add an IsShared property to the FamilyParameter? 
+Alternatively, they could just return null if the FamilyParameter is not shared.
+
+
+<p><strong>Answer:</strong> Sorry about that.
+These properties can be accessed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/access-to-shared-family-parameter-guid.html">
+using .NET Reflection</a>.
+
+
+<p><strong>Response:</strong> Yes, that looks as if it would help me.
+
+<p>I looked at RevitAPI.dll using Reflector and find it harder still to understand why the API developers didn't add the IsShared property to the FamilyParameter class. 
+It is just a wrapper for the Parameter class, and it would just take one or two lines of code, e.g.
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsShared
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> getParameter().IsShared; }
+&nbsp; }
+</pre>
+
+<p>Re-examining your post, though, maybe I understand after all:
+the GUID and IsShared properties were only added to the Parameter class in the Revit 2011 API.
+I guess that it was simply an oversight and they forgot add the new properties to the FamilyParameters as well.
+Maybe I'm wrong.
+
+<p>I hope this property is added in the future versions of the Revit API. 
+As I can see from the post comments, I am not the only one wanting to see an IsShared property.
+
+
+<a name="2"></a>
+
+<h4>Implementing a FamilyParameter IsShared Extension Method</h4>
+
+<p>Based on your sample in the post, I wrote a simple extension method:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsShared( 
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">FamilyParameter</span> familyParameter )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> mi = familyParameter
+&nbsp; &nbsp; &nbsp; .GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;getParameter&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BindingFlags</span>.Instance 
+&nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.NonPublic );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == mi )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">InvalidOperationException</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Could not find getParameter method&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> parameter = mi.Invoke( familyParameter, 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { } ) <span class="blue">as</span> <span class="teal">Parameter</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> parameter.IsShared;
+&nbsp; }
+</pre>
+
+<p>I used the internal getParameter method instead the m_Parameter field, because it is not recommended to use fields from other classes. 
+Also, the getParameter method is used in most of the code that I saw in Reflector, not the m_Parameter field.
+
+<a name="3"></a>
+
+<h4>Using the FamilyParameter IsShared Extension Method</h4>
+
+<p>The use of the new method is completely obvious:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyParameter</span> fp <span class="blue">in</span> mgr.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( fp.IsShared() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; familyTypeParameter.Guid = fp.GUID;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>It works much faster than triggering and catching the exception, e.g. 
+
+<pre class="code">
+&nbsp; <span class="blue">try</span> { <span class="blue">var</span> guid = parameter.GUID; } 
+&nbsp; <span class="blue">catch</span>() {}
+</pre>
+
+<p>Thank you again for reminding me about reflection.
+
+
+<p><strong>Answer:</strong> Many thanks to <b>you</b>, Victor, for your analysis, clean implementation, and sharing this with us!
+
+<p>Here is an updated 
+
+<a href="zip/bc_13_99_2.zip">version 2013.0.99.2</a> of 
+
+The Building Coder samples including the extension method and a test call to it in the CmdFamilyParamGuid external command.

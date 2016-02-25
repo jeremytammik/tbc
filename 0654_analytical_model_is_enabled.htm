@@ -1,0 +1,23 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06656526 [Checking Analysis Enabled for Beams / Columns] -->
+
+<h3>Analytical Model IsEnabled Method and Parameter</h3>
+
+<p>I recently mentioned the changes in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/reference-to-analytical-curve.html">
+accessing the analytical model</a> in 
+
+the Revit Structure 2012 API.
+
+<p>We just discovered a little issue and an effective workaround related to the AnalyticalModel IsEnabled method, which reports whether the analytical model is currently enabled or disabled.
+Right now, it does not do that, but throws an exception for all members except walls.
+The Enable and CanDisable methods have similar problems.
+This will soon be resolved.
+Meanwhile, here is a simple workaround to avoid the issue by accessing the underlying data directly:
+
+<p>The correct "enable" parameter is on the physical element, not its analytical model, and accessible through the built-in parameter STRUCTURAL_ANALYTICAL_MODEL. 
+To enable the analytical model, e.g. for a wall, simply set STRUCTURAL_ANALYTICAL_MODEL to true on the wall element, not on the analytical wall element.

@@ -1,0 +1,69 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Text Size</h3>
+
+<p>I am back again from the 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/07/recovering-from-autodesks-european-football-tournament-2011.html">
+Autodesk European Football Tournament 2011</a> in Verona, Italy,
+
+vividly described in more detail by Kean on his blog.
+We were both part of the combined Global Services (to which we of ADN belong) and Worldwide Marketing team:</p>
+
+<!-- C:\j\photo\jeremy\2011\2011-07-02_verona_football\gs_and_m_team.jpg -->
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-07-02_verona_football/gs_and_m_team.jpg" alt="Autodesk GS&M Team 2011" width="400"/>
+</center>
+
+<p>Back to the Revit API, we already looked at some aspects of text formatting such as 
+
+<!--
+335_textnote_alignment.htm
+393_text_rotation.htm
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitlookup-and-textnote-alignment.html">
+textnote alignment</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/textnote-rotation.html">
+rotation</a>.
+
+Here is a still more immediate and simpler issue:
+
+<p><strong>Question:</strong> I created some text using the NewTextNote method.
+Now I would like to change its size or font like a normal user might do using Edit type &gt; Text size.
+How can that be achieved programmatically?
+
+<p><strong>Answer:</strong> The Text Size parameter can be set as follows:
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject( 
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element );
+&nbsp;
+&nbsp; <span class="teal">TextElement</span> text = doc.GetElement( r ) 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">TextElement</span>;
+&nbsp;
+&nbsp; <span class="teal">TextElementType</span> textType = text.Symbol;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> textSize = textType.get_Parameter( 
+&nbsp; &nbsp; <span class="maroon">&quot;Text Size&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> transaction 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; transaction.Start( <span class="maroon">&quot;change text size&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// units are in feet, so this is 1/8&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> newSize = ( 1.0 / 8.0 ) * ( 1.0 / 12.0 ); 
+&nbsp;
+&nbsp; textSize.Set( newSize );
+&nbsp;
+&nbsp; transaction.Commit();
+</pre>
+
+<p>Obviously, it would be better still to use the built-in parameter enumeration value to identify the text size parameter, rather than the language dependent user display parameter name.
+

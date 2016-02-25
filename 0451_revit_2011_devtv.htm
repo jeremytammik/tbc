@@ -1,0 +1,139 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2011 DevTV</h3>
+
+<p>The Revit DevTV recordings are probably the absolutely most efficient learning resource for quickly getting a hands-on experience of programming Revit. They include
+
+<ul>
+<li>Overview of the SDK
+<li>Installation of samples 
+<li>Creating your first add-in
+<li>Iterating over database elements
+<li>Selecting an element
+<li>Extracting element parameter data
+<li>... And much more!
+</ul>
+
+<p>The first version was created for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/08/getting-started.html">
+Revit 2008</a>, 
+
+and that was reused for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/08/getting-started.html">
+Revit 2009 training material</a> as well.
+
+Augusto Gon&ccedil;alves of Autodesk Brazil created an updated version for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/updated-devtv-introduction-to-revit-programming.html">
+Revit 2010</a> in 
+
+December 2009, and he also created the wonderful 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+DevTV add-in templates for Revit 2011</a>.
+
+<p>Now we have a vastly improved version for the Revit 2011 API.
+It is split into two parts to make it more manageable.
+Part 1 was again created by Augusto, in English and Portuguese, and Part 2 by Adam Nagy.
+They are hosted on the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> site 
+
+and also accessible through the following links which I copied from there:
+
+<ul>
+<li>DevTV: Introduction to Revit 2011 Programming - Part 1:
+<br>A short video tutorial demonstrating the basic steps to start developing with Revit .NET API. 
+<br><a href="http://download.autodesk.com/media/adn/DevTV_Revit_API_2011_English_Part1/Revit_2011_DevTV_EN.html">
+View online</a> &ndash;
+<a href="http://download.autodesk.com/media/adn/DevTV_Revit_API_2011_English_Part1.zip">
+Download</a>
+</ul>
+<ul>
+<li>DevTV: Introduction to Revit 2011 Programming (Portuguese):
+<br>Introdu&ccedil;&atilde;o &agrave; Programa&ccedil;&atilde;o Revit
+<br>Uma videoaula de curta dura&ccedil;&atilde;o que mostra as etapas b&aacute;sicas para come&ccedil;ar a programar com a API Revit .NET.
+<br><a href="http://download.autodesk.com/media/adn/DevTV_Revit_API_2011_Portugues_Parte1/Revit_2011_Portugues.html">
+View online</a> &ndash;
+<a href="http://download.autodesk.com/media/adn/DevTV_Revit_API_2011_Portugues_Parte1.zip">
+Download</a>
+</ul>
+<ul>
+<li>DevTV: Introduction to Revit 2011 Programming – Part 2:
+<!-- <br>A short video tutorial demonstrating the basic steps to start developing with Revit .NET API. -->
+<br>A short video tutorial demonstrating selection and filtering API through a room renumbering application.
+<br><a href="http://download.autodesk.com/media/adn/DevTv_Revit_NET_English-Part2/Revit%20DevTV%20-%20part%202.html">
+View online</a> &ndash;
+<a href="http://download.autodesk.com/media/adn/DevTv_Revit_NET_English-Part2.zip">
+Download</a>
+</ul>
+
+<p>Here are the detailed tables of contents:
+
+<h5>Part 1</h5>
+
+<ol>
+<li>Introduction
+<li>Hello World
+<li>Add-In Manager
+<li>External Command
+<li>Selection
+<li>Revit Lookup
+<li>Database
+<li>Filters
+<li>Parameters
+<li>Learning More
+</ol>
+
+<h5>Part 2</h5>
+
+<ol>
+<li>Introduction
+<li>Add-In in Action
+<li>Add-In Framework
+<li>Picking Objects
+<li>RevitLookup Tool
+<li>Element Filtering
+<li>Testing the Add-In
+<li>Add-In Manager
+<li>Learning More
+</ol>
+
+<h5>Part 2 Expands on Part 1</h5>
+
+<p>There is a certain apparent overlap between the two tables of content, because the two presentations cover related materials using different examples and highlighting different important aspects.
+Part 2 is a significant expansion over Part 1, however. As Adam puts it, the difference is that Part 2 discusses how to use what you learned in Part 1:
+
+<ol>
+<li>Introduction &ndash; Part of the DevTV framework.
+<li>Add-In in Action &ndash; explains what the add-in will do.
+<li>Add-In Framework &ndash; refers back to Part 1 without going into details.
+<li>Picking Objects &ndash; Part 1 talks about iterating the currently selected objects, Part 2 talks about picking.
+<li>RevitLookup Tool &ndash; Part 1 has a quick look at it but does not 'use' it, whereas Part 2 does.
+<li>Element Filtering &ndash; Part 1 presented the OfClass and OfCategory shortcuts; Part 2 goes further by showing WherePasses and ParameterFilter.
+<li>Testing the Add-In &ndash; just a very quick test this time.
+<li>Add-In Manager &ndash; Part 2 actually shows how to use it, while Part 1 just mentioned it.
+<li>Learning More &ndash; Part of the DevTV framework.
+</ol>
+
+<a name="template_update"></a>
+
+<h5>DevTV Template Update</h5>
+
+<p>By the way, it is extremely easy to edit the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+DevTV Visual Studio Wizard templates</a> included with Part 1.
+
+Simply unzip the files to the hard disk, edit them just as you see fit, and zip them back up again.
+
+For example, here is 
+
+<a href="zip/TemplateRevitArchAddinCsJt.zip">
+my personalised C# DevTV template</a> which 
+
+generates an absolutely minimal C# Revit add-in skeleton with all comments removed and some additional copyright information added to the assembly properties.

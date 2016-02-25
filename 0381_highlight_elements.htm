@@ -1,0 +1,119 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Highlight Elements</h3>
+
+<p>I arrived in Boston and am now acclimatising in preparation for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+AEC DevCamp</a> conference 
+
+(<a href="http://devcamps2010.autodeskevents.net/index.cfm?event=cms.page&id=SID3FA5EEFA001D080A3456040FDD1BD93C">web site</a>) starting 
+
+on Monday and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html#devlabs">
+DevLabs</a> in Waltham following afterwards
+
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=6703509&siteID=123112&cname=DevLab (AEC), Waltham, Jun 10 2010, 201039">register</a>).
+
+<p>Meanwhile, here is a quick 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html?cid=6a00e553e1689788330133efe49023970b#comment-6a00e553e1689788330133efe49023970b">
+question from Soub</a> that 
+
+we have actually provided a solution for a couple of times in the past but not explicitly pointed out yet.
+
+<p><strong>Question:</strong> I have a question related to the API for highlighting elements in Revit Architecture based on the Element ID input.
+Could you please help me by explaining how to highlight multiple elements based on IDs?
+
+<p><strong>Answer:</strong> There is really no difference between highlighting a single element or multiple ones.
+All you need to do is add them to the current selection set managed by the Revit UI document, or to the third argument to the Execute method, and then return a Cancelled or Failed result code.
+
+<p>An example of the first approach is provided by the command
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/south-facing-walls.html">
+highlighting south facing walls</a>.
+
+The main lines of interest there in this context are the ones accessing the current selection set, adding specific elements to it, and setting the property to the new collection:
+
+<pre class="code">
+<span class="teal">SelElementSet</span> selElements = Document.Selection.Elements;
+&nbsp;
+<span class="teal">IEnumerable</span>&lt;<span class="teal">Wall</span>&gt; walls = CollectExteriorWalls();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+{
+&nbsp; <span class="teal">XYZ</span> exteriorDirection = GetExteriorWallDirection( wall );
+&nbsp;
+&nbsp; <span class="blue">bool</span> isSouthFacing = IsSouthFacing( exteriorDirection );
+&nbsp;
+&nbsp; <span class="blue">if</span>( isSouthFacing )
+&nbsp; {
+&nbsp; &nbsp; selElements.Add( wall );
+&nbsp; }
+}
+&nbsp;
+Document.Selection.Elements = selElements;
+</pre>
+
+<p>The code presented there is based on Revit 2010.
+It has been updated for the Revit 2011 API in the DirectionCalculation SDK sample and now looks like this:
+
+<pre class="code">
+&nbsp; <span class="teal">UIDocument</span> uiDoc = <span class="blue">new</span> <span class="teal">UIDocument</span>( Document );
+&nbsp;
+&nbsp; Autodesk.Revit.UI.Selection.<span class="teal">SelElementSet</span>
+&nbsp; &nbsp; selElements = uiDoc.Selection.Elements;
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Wall</span>&gt; walls
+&nbsp; &nbsp; = CollectExteriorWalls();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> exteriorDirection
+&nbsp; &nbsp; &nbsp; = GetExteriorWallDirection( wall );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( useProjectLocationNorth )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; exteriorDirection
+&nbsp; &nbsp; &nbsp; &nbsp; = TransformByProjectLocation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; exteriorDirection );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> isSouthFacing
+&nbsp; &nbsp; &nbsp; = IsSouthFacing( exteriorDirection );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( isSouthFacing )
+&nbsp; &nbsp; &nbsp; selElements.Insert( wall );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Select all walls which had the proper direction.</span>
+&nbsp; uiDoc.Selection.Elements = selElements;
+</pre>
+
+<p>As said, you can also highlight elements graphically by adding them to the third argument of an external command Execute method and then returning a Cancelled or Failed result code:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> revit,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; elements.Insert( e );
+
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+}
+</pre>
+
+<p>This is demonstrated by the Lab1_2_CommandArguments of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">
+Revit API introduction labs</a>.

@@ -1,0 +1,88 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Updated Revit MEP 2013 Material</h3>
+
+<p>I presented the Revit MEP API at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#5">
+AEC DevCamp</a> in 
+
+June.
+In preparation for that, I provided a quick 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html">
+Revit 2013 MEP API overview</a> and 
+
+migrated and more fully described the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+AdnRme sample application</a>.
+
+I will be presenting on this topic again at
+
+<a href="http://au.autodesk.com">
+Autodesk University</a> in 
+
+November, so I revisited the material and fleshed out the description of the Revit 2013 changes a bit more. 
+Here is the completed overview:
+
+<a name="2"></a>
+
+<h4>The Revit MEP 2013 API</h4>
+
+<p>The information provided in this section is based on the Revit API help file RevitAPI.chm 'What's New' section. The help file is available as part of the Revit SDK from the Revit developer page (cf. Further Reading at the end).
+<p>One of the main Revit MEP 2013 product features is the support for routing preferences. Previously, you could only define one single default elbow, tee, etc. The routing preferences support multiple settings for different materials and sizes. 
+
+<a name="3"></a>
+
+<h4>Routing Preferences</h4>
+<p>The routing preferences enable you to select your preferred pipe and duct fitting types for various materials and sizes. It can be used to set routing preference policies for end users and query fittings and segments used for given size criteria.
+<p>The RoutingPreferenceManager class is used to manage routing preference rules for segments and fittings or query the fitting or segment chosen by Revit for a given size condition. The MEPCurveType class now provides a RoutingPreferenceManager property to access the main routing preferences object for that type. This is currently only support by the derived PipeType and DuctType classes.
+<p>Routing preferences choose the first symbol in a rule list matching the given criteria. To ensure that a certain symbol is chosen for a given scenario, you can either set appropriate size criteria, or temporarily re-order the rules using the RemoveRule and AddRule methods.
+<p>Programmatic use of routing preferences is demonstrated by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#3">
+RoutingPreferenceTools</a> SDK sample. 
+
+<a name="4"></a>
+
+<h4>Flow Analysis Sections</h4>
+<p>The MEPSection base class has been introduced to represent duct and pipe sections, i.e. a series of connected elements, mainly for pressure loss calculation. A section includes ducts or pipes, fittings, terminals and accessories, where all section members have same the flow analysis properties, e.g. Flow, Size, Velocity, Friction and Roughness. An element can belong to multiple sections. For example, a tee fitting with three connectors usually belongs to three sections, and a tap will divide a duct or pipe segment into two sections.
+
+<a name="5"></a>
+
+<h4>Fluid Viscosity and Density</h4>
+<p>Revit MEP 2013 provides support for more precise temperature dependant friction calculation via the new FluidTemperature class, which can represent viscosity and density properties at a given temperature. The FluidType class has been extended to provide read and write access to a collection of FluidTemperature objects representing the fluid properties at various different temperatures. This collection can be accessed and manipulated using the new AddTemperature, GetTemperature, RemoveTemperature and GetFluidTemperatureSetIteratormethods.
+
+<a name="6"></a>
+
+<h4>Thermal Properties</h4>
+<p>Thermal properties have been enhanced in several areas. New properties are provided on the ThermalProperties class, e.g. Absorptance, HeatTransferCoefficient, Roughness, ThermalMass, ThermalResistance. These are available on BIM elements such as wall, floor, ceiling, roof, door, window, etc.
+<p>The new ThermalAsset class is provided, representing the properties of a material pertinent to energy analysis. It is specified using the PropertySetElement and SetMaterialAspectByPropertySet classes.
+<p>The gbXML export provides more precise control of thermal properties of BIM types. They can be set to use calculated values or pre-defined values from Constructions.xml using the MEPBuildingConstruction methods GetBuildingConstructionOverride and SetBuildingConstructionOverride. The EnergyDataSettings.IncludeThermalProperties flag determines whether thermal information from model assemblies and components is included in the gbXML export.
+
+<a name="7"></a>
+
+<h4>More Revit MEP API News</h4>
+<p>Other enhancements include read and write access to spare circuit values, retrieval of more of the localised user-visible display strings for enumeration values.
+<p>ConnectorProfileType and PartType enumeration changes, ConnectorElement changes and new static creation methods, more LabelUtils access to localised user-visible display strings, access to panel schedule spare circuit values, a light and light group API, 
+<p>The new ReferenceIntersector class provides a simpler access to geometric ray-tracing analysis.
+<p>Finally, a new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html#3">
+external services framework</a> has been put into place. It wraps external service functionality, which can be used to enable encapsulation and replacement of various calculation and analysis workflows, providing a basis for future MEP calculations and structural code checking. It is already in place and fully functional, but not yet used, so no examples are yet provided.
+
+<!--
+C:\a\doc\revit\au\2012\doc\CP4108_rme_api.pdf
+C:\a\doc\revit\au\2012\doc\CP4108_rme_api_ppt.pdf
+-->
+
+<a name="8"></a>
+
+<p>For completeness' sake, here is a preview of my AU
+
+<a href="file:///C:/a/doc/revit/au/2012/doc/CP4108_rme_api_ppt.pdf">presentation</a> and
+
+<a href="file:///C:/a/doc/revit/au/2012/doc/CP4108_rme_api.pdf">handout document</a>.

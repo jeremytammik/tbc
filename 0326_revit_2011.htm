@@ -1,0 +1,128 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2011 is Coming</h3>
+
+<p>Guy Robinson said it in May 2009: 
+
+<a href="http://redbolts.com/blog/post/2009/05/07/Revit-2011-the-most-significant-release-EVER.aspx">
+Revit 2011 - the most significant release EVER</a>.
+
+He was referring to something completely different and might have meant it more as a joke at the time, but from an API point of view, it is suddenly true today.
+
+<p>The autodesk.com web site 
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?id=8909451&siteID=123112">
+alphabetical list of products</a>
+
+now points to new releases of all three flavours of Revit:
+
+<ul>
+<li><a href="http://usa.autodesk.com/adsk/servlet/pc/index?id=3781831&siteID=123112">
+Revit Architecture</a> &ndash; 
+
+<a href="http://images.autodesk.com/adsk/files/autodesk_revit_architecture_2011_brochure.pdf">
+Brochure</a>
+
+<li><a href="http://usa.autodesk.com/adsk/servlet/pc/index?siteID=123112&id=6861034">
+Revit MEP</a> &ndash; 
+
+<a href="http://images.autodesk.com/adsk/files/autodesk_revit_mep_overview_brochure_us.pdf">
+Brochure</a>
+
+<li><a href="http://usa.autodesk.com/adsk/servlet/pc/index?id=5523749&siteID=123112">
+Revit Structure</a> &ndash; 
+
+<a href="http://images.autodesk.com/adsk/files/revit_structure_2011_overview_brochure_us.pdf">
+Brochure</a>
+</ul>
+
+<!-- 
+
+C:\download\adsk\revit\2011\rtm\autodesk_revit_architecture_2011_brochure.pdf
+C:\download\adsk\revit\2011\rtm\autodesk_revit_mep_overview_brochure_us.pdf
+C:\download\adsk\revit\2011\rtm\revit_structure_2011_overview_brochure_us.pdf
+
+<p>Some blog posts have already appeared, e.g. on
+
+<a href="http://revitoped.blogspot.com/2010/03/revit-2011-let-noise-begin.html">
+Revit OpEd</a> and 
+
+<a href="http://bimboom.blogspot.com/search/label/Blog-2011">
+Revit 3D</a>.
+
+-->
+
+<p>Leaving the product side of things for others to deal with, let's turn to the API.
+In this release, the Revit API has undergone both major renovation and major enhancement.
+The changes will affect every single application, both new and existing, so it will require more porting effort this time around, but very worthwhile and more future proof as a result.
+
+<p>The major renovations include:
+
+<ul>
+<li>Changes to the Revit API namespaces: the namespaces have been refactored for much greater clarity.
+<li>Split of Revit API DLL into two assemblies, for database access and the user interface portion.
+<li>New classes for XYZ, UV, and ElementId: these ubiquitous objects have been promoted to classes now, some of their methods renamed, and generic .NET collections replace many of the custom Revit collection classes.
+<li>Replacement for Symbol and properties that access types: the Symbol class has been renamed to ElementType.
+<li>New transaction interfaces.
+<li>New ExternalCommand and ExternalApplication registration mechanism: bye-bye, Revit.ini! With vastly enhanced control over command loading, availability in different contexts, ribbon resources and localisation.
+<li>Localisation support 
+<li>External Command Accessibility.
+<li>External Command and External Application registration utility vastly simplifying the implementation of an add-in installer.
+<li>Attributes for configuring ExternalCommand and ExternalApplication behaviour: Transaction mode and Regeneration option.
+<li>New element iteration interfaces: completely revamped element iteration and filtering access.
+<li>Revit exceptions.
+<li>Replacement for AnalyticalModel.
+<li>Replacement for gbXMLParamElem: new EnergyDataSettings class.
+</ul>
+
+<p>Some of the major enhancements are:
+
+<ul>
+<li>Dynamic Model Update: finally, a possibility to react to changes, including modifications of single elements, and dynamically update the model. Whopee!
+<li>Elements changed event: another possibility to react to changes after every transaction gets committed, undone, or redone.
+<li>Failure API: ability for an add-in to define and post failures and react to them.
+<li>Select elements, points on elements, faces and edges: a host of powerful new element and sub-element picking features!
+<li>Pick point on the view active work plane: we finally have the long-awaited pick point functionality!
+<li>Additional options for ribbon customization.
+<li>Create and display Revit-style task dialogues.
+<li>Idling event: an event is raised when it is safe for an add-in to access the active document between user interactions, and allows changes to a document if a new transaction is opened.
+<li>Sun and shadows settings element.
+<li>Revamped MEP demand factor and load classifications.
+<li>Panel schedules: a new comprehensive API to support access to panel schedules and their contents.
+<li>Cable tray and conduit: new classes and elements introduced.
+<li>Analysis Visualization Framework: a mechanism for an analysis application to easily display computation results as transient 3D data in the Revit model.
+</ul>
+
+<center>
+<img src="img/analysis_visualisation.png" alt="Analysis visualisation"/>
+</center>
+
+<p>A host of other new features are coming as well, but these are more than enough to get anyone familiar with the API very excited indeed.
+
+<p>I will be covering these enhancements as fast as I can, of course.
+Everything is documented in the beta version of the Revit SDK, so you don't have to wait for me!
+
+<p>ADN members have access to the beta version on the ADN web site.
+Non ADN members will have to wait until the final release is available, I'm afraid.
+
+<p>There is a huge amount of material to cover, and I am really looking forward to diving into all this now.
+
+<p>As mentioned above, some of these changes affect every single existing application, so migration will be an issue for people who have already developed something.
+
+<p>Since some of the changes are so ubiquitous that every single application is affected, one of the things I am thinking of posting is a quick overview of 'My First Revit 2011 Add-In', which will touch on most of the new features that you immediately encounter when working with the new API.
+
+<p>So stay tuned, and let's celebrate!
+
+<h4>Revit 2011 Release Date</h4>
+
+<p>I just discovered that the 
+
+<a href="http://bimboom.blogspot.com/2010/03/finally2011-release-dates-for-revit-and.html">
+Revit 2011 release date</a> has gone public on 
+
+<a href="http://www.revit3d.com">
+Revit3d.com</a>, 
+
+and thought that might be intersting to share here as well: April 8.

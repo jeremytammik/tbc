@@ -1,0 +1,324 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Room Editor Project Overview and CouchDB Configuration</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+here are some issues I tackled since my last report:
+
+<ul>
+<li><a href="#2">Project Overview</a></li>
+<li><a href="#3">Replicating a CouchDB with Python</a></li>
+<li><a href="#4">Same origin policy snag and resolution</a></li>
+<li><a href="#5">Learning and struggling with CouchApps</a></li>
+<li><a href="#6">Relief moving to Kanso</a></li>
+<li><a href="#7">Next steps</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Project Overview</h4>
+
+<p>To recapitulate, the grand plan is to grab a 2D floor plan with furniture and equipment layout from the BIM, upload it to the cloud, and make it accessible for viewing on mobile devices:</p>
+
+<center>
+<img src="img/desktop_cloud_mobile_2_upload.png" alt="Upload from desktop to cloud and view on mobile device" width="200"/>
+</center>
+
+<p>Furthermore, I am enabling some simple editing operations on the mobile device, e.g. to move the furniture and equipment around in the room a bit, update the cloud-based data repository, and reflect these changes back into the desktop BIM:</p>
+
+<center>
+<img src="img/desktop_cloud_mobile_3_edit_and_download.png" alt="Edit on mobile device, update data repository and BIM" width="200"/>
+</center>
+
+<p>All of this with absolutely nil installation on the mobile device, and thus totally ubiquitous, using
+
+<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">
+SVG</a> and
+
+<a href="http://en.wikipedia.org/wiki/Server-side_scripting">
+server-side scripting</a>.</p>
+
+<p>I already addressed a number of issues in realising this project and am documenting my progress here on the blog, in the three categories
+
+<a href="http://thebuildingcoder.typepad.com/blog/desktop">desktop</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/cloud">cloud</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/mobile">mobile</a>.
+
+<p>Here is an overview of the results presented so far, both for this project and some previous related topics, classified into those three categories:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html">Project overview and Tech Summit proposal</a></td></tr>
+<li>Desktop</li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html">Room plan view boundary loops</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">Sort and orient curves to form a contiguous loop</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">Extrusion analyser and plan view boundaries</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/curve-following-face-and-bounding-box-implementation.html">Curve following face and bounding box implementation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html">GeoSnoop boundary curve loop visualisation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/desktop-to-cloud-via-dreamseat-couchdb-client.html">Desktop to cloud via DreamSeat CouchDB Client</a></td></tr>
+</ul>
+<li>Cloud</li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/getting-going-with-the-cloud.html">Getting Going with the Cloud</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/apollonian-packing-of-spheres-via-web-service-and-avf.html">Apollonian Sphere Packing Web Service and AVF</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">The BIM 360 Glue Viewer and REST API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">BIM 360 Glue REST API Authentication Using Python</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html">Free Cloud Based Data Repository with NoSQL, CouchDB, and IrisCouch</a></li>
+</ul>
+<li>Mobile</li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/validate-roof-type-and-view-obj-on-android.html">Testing my OBJ exporter on Android</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/mobile-device-room-location.html">Mobile Device Room Location</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/10/room-polygon-and-furniture-picker-in-svg.html">Room Polygon and Furniture Picker in SVG</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/2d-svg-editing-on-mobile-device-with-rapha%C3%ABl.html">2D SVG Editing on Mobile Device with Raphael</a></li>
+</ul>
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>Replicating a CouchDB with Python</h4>
+
+<p>In my last step, I determined the room, furniture and equipment plan view boundary polygons and uploaded them to a CouchDB database in the cloud, hosted on IrisCouch.</p>
+
+<p>To play around interactively with that data, I would prefer to store it locally instead of on the server.</p>
+
+<p>The easiest way to achieve this is to replicate the database.</p>
+
+<p>Replicating a CouchDB repository is trivial, since it has built-in support for that.</p>
+
+<p>All you need to do is specify the source and target database name and URL.</p>
+
+<p>Also, as you may know, I love Python for command-line scripting.</p>
+
+<p>Happily, several
+
+<a href="http://wiki.apache.org/couchdb/Getting_started_with_Python">
+CouchDB interfaces for Python</a> are
+
+available.
+As you can see on that page, they can be pretty simple.</p>
+
+<p><a href="http://couchdbkit.org">
+Couchdbkit</a> seems
+
+well supported and does the job.</p>
+
+<p>Here is a little Python script that replicates the database 'rooms' created by my Revit add-in in IrisCouch from the web to a new database 'rooms2' my local CouchDB installation:</p>
+
+<pre class="code">
+<span style="color: #808080">#!/usr/bin/python</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">couchdb</span>
+
+server <span style="color: #303030">=</span> couchdb<span style="color: #303030">.</span>Server()
+server<span style="color: #303030">.</span>create( <span style="background-color: #fff0f0">&#39;rooms2&#39;</span> )
+server<span style="color: #303030">.</span>replicate(
+  <span style="background-color: #fff0f0">&#39;http://jt.iriscouch.com/rooms&#39;</span>,
+  <span style="background-color: #fff0f0">&#39;rooms2&#39;</span> )
+</pre>
+
+<p>You cannot make it much shorter or simpler than that, can you?</p>
+
+
+<a name="4"></a>
+
+<h4>Same Origin Policy Snag and Resolution</h4>
+
+<p>I was originally envisioning a simple architecture composed of three components on the desktop, in the cloud, and on the mobile device, respectively, as illustrated above.</p>
+
+<p>I started looking at how to access the cloud-based data repository from the mobile device and closed my last foray into this area mentioning that I had a nasty surprise discovering that the strict
+
+<a href="http://www.w3.org/Security/wiki/Same_Origin_Policy">
+same origin policy</a> prevents
+
+my simple JavaScript application from accessing my IrisCouch domain, so I cannot easily read the data on the mobile device in the manner I had expected.
+
+<p>The discovery cost me a few grey hairs and some sleep, but I found a good and obvious solution for that which you are probably all aware of already:
+
+<a href="http://en.wikipedia.org/wiki/Server-side_scripting">
+server-side scripting</a>.
+
+<p>In fact, this even simplifies things, in the end, since I really have nothing at all to install or implement on the mobile device, and my list of components to implement is reduced from three to two.
+Ok, it adds some complication to the cloud stuff, of course... or actually just additional learning opportunities.</p>
+
+<p>I had already decided that NoSQL and the CouchDB implementation look like good candidates for my data repository requirements, and that I can test and host them in the cloud for free using the IrisCouch server.
+Please refer to the link in the overview above for more info on these.</p>
+
+<p>Happily, CouchDB offers full support for server-side scripting.
+The same-origin policy effectively requires that the HTML from which the JavaScript is loaded must be served up from CouchDB.
+This can be done by attaching an HTML document to a CouchDB document.
+You can do this manually, or through the use of CouchApps.
+
+
+<a name="5"></a>
+
+<h4>Learning and Struggling with CouchApps</h4>
+
+<p>CouchApps are CouchDB generation environments and tools for web application developers interested in creating database-driven applications using nothing but HTML, CSS, and JavaScript.
+
+<p>A CouchApp is simply a collection of files that completely defines a CouchDB database to simplify development, deployment and maintenance.
+Simple command-line tools are used to synchronise the file collection with the real live CouchDB implementation.</p>
+
+<p>I dived into several of the numerous CouchApp tutorials and was so excited I ended up spending entire nights at it, once with no sleep at all.</p>
+
+<p>Here are some of the things I looked at:</p>
+
+<ul>
+<li><a href="http://www.couchapp.org/page/getting-started">Getting started</a></li>
+<li><a href="http://blog.edparcell.com/using-jquery-and-couchdb-to-build-a-simple-we">Build a simple CouchApp</a></li>
+<li><a href="http://www.ibm.com/developerworks/opensource/tutorials/os-couchapp/index.html">Good IBM CouchApp tutorial</a></li>
+<li><a href="http://railsware.com/blog/2012/03/12/couchdb-and-couchapp-part-1">A short and effective CouchApp and JavaScript tutorial</a></li>
+<li><a href="http://couchapp.org/page/index">A better introduction and some more modern alternatives</a></li>
+<li><a href="http://daleharvey.github.io/jquery.couch.js-docs/symbols/index.html">Documentation for jquery.couch.js</a></li>
+<li><a href="http://vimeo.com/26147136">A very clear and impressive CouchApp video tutorial</a> by Max Ogden</li>
+<li><a href="https://github.com/mikeal/node.couchapp.js">Very impressive node CouchApp JavaScript library node.couchapp.js</a></li>
+<li><a href="https://github.com/maxogden/art-of-node">Using node.js for effective asynchronous processing</a></li>
+<li><a href="http://jsconf.eu/2010/speaker/nodejs_couchdb_crazy_delicious.html">node.js + CouchDB == Crazy Delicious</a> video presentation</li>
+</ul>
+
+<p>Unfortunately, I found it pretty confusing.
+I learned a huge amount and achieved very little, partly due to the fact that several different CouchApp implementations exist and are used in parallel, and the tutorials do not specify exactly which version they are based on.</p>
+
+<p>Still, I learned enough to continue feeling very enthusiastic about this approach, and then found an easier solution.</p>
+
+
+<a name="6"></a>
+
+<h4>Relief Moving to Kanso</h4>
+
+<p>After struggling with different CouchApp implementations, I discovered
+
+<a href="http://kan.so">Kanso</a>,
+
+toting itself "the best way to create and share apps on CouchDB".
+
+<p>With the little that I know so far, I fully agree with that.
+Apparently, kanso is the Japanese phrase for simplicity, or, more specifically, simplifying the complex.</p>
+
+<p>So easy!
+Everything works!
+The
+
+<a href="http://kan.so/docs">
+documentation</a>
+
+includes a short and succinct getting started tutorial that explains a lot.</p>
+
+<!--
+<p>Before showing you my first use of Kanso to read and present my room loops uploaded from the Revit add-in, stored in CouchDB on the cloud, via server-side scripting, I'll just update my add-in a bit to export the model and levl data as well as the room and furniture, then replicate the IrisCouch cloud hosted database on my local machine using a short Python script for easier access.</p>
+-->
+
+<p>Later I found
+
+<a href="http://caolan.github.io/kanso/guides/getting_started.html">
+another tutorial</a> that
+
+goes further faster than the one included in the documentation pages.
+
+<p>Later still, I found this extremely well documented
+
+<a href="https://github.com/mauget/opto3-couchapp">
+complete application</a> that
+
+can be
+
+<a href="http://mauget.cloudant.com/opto3/_design/opto/index.html">
+tested online</a> and
+
+demonstrates numerous additional important new features.</p>
+
+<p>After studying these samples and trying to reuse some of the powerful functionality they provide, I am returning more and more often to the
+
+<a href="http://guide.couchdb.org">Definite Guide for CouchDB</a> and
+
+finally starting to understand the basics of view, show and list functions, etc.</p>
+
+<p>Bit by bit, I am managing to get some SVG graphics to display in my server-side scripts.
+Making use of the Raphael library, as I was planning to do, may prove hard, since there is no ready-built Kanso package for it.
+I may therefore revert to implementing my room furniture placement editor in pure SVG instead.</p>
+
+
+<a name="7"></a>
+
+<h4>Next Steps</h4>
+
+<p>My next steps will be:</p>
+
+<ul>
+<li>Separation of symbol and instance data in my add-in and database structure: currently, the furniture loops are placed absolutely, and multiple instances of a symbol duplicate the same loop over and over again at different locations. I will rewrite this to separate the furniture loop definition, defined by the family symbol, and its placement, defined by the instance. This needs to be done anyway to enable editing the placement data through the editor interaction on the mobile device.</li>
+<li>Learn how to use templates in Kanso.</li>
+<li>Implement server-side generated SVG code to display the room and furniture plan in CouchDB using Kanso.</li>
+<li>Implement editing of SVG on the mobile device and reflect changes back to CouchDB (I do not know how yet).</li>
+<li>Implement Idling event handler and polling of CouchDB in the desktop add-in to reflect the changes back to the BIM in real-time.</li>
+<li>Implement an external application wrapper for the add-in providing four commands:</li>
+<ul>
+<li>Upload to cloud</li>
+<li>Refresh from cloud</li>
+<li>Subscribe to cloud</li>
+<li>Unsubscribe from cloud</li>
+</ul>
+</ul>
+
+<p>I know exactly how to address all these points now, except for reflecting back the SVG editor changes to the CouchDB.</p>
+
+<p>I remain excited and optimistic and look forward to hearing your comments and suggestions.</p>
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Room Editor Project Overview and CouchDB Configuration</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</i></p>
+
+<p>I am continuing the research and development for my cloud-based round-trip 2D Revit model editing project.
+
+<p>To recapitulate, the grand plan is to grab a 2D floor plan with furniture and equipment layout from the BIM, upload it to the cloud, and make it accessible for viewing on mobile devices:</p>
+
+<center>
+<img src="img/desktop_cloud_mobile_2_upload.png" alt="Upload from desktop to cloud and view on mobile device" width="200"/>
+</center>
+
+<p>Furthermore, I am enabling some simple editing operations on the mobile device, e.g. to move the furniture and equipment around in the room a bit, update the cloud-based data repository, and reflect these changes back into the desktop BIM:</p>
+
+<center>
+<img src="img/desktop_cloud_mobile_3_edit_and_download.png" alt="Edit on mobile device, update data repository and BIM" width="200"/>
+</center>
+
+<p>All of this with absolutely nil installation on the mobile device, and thus totally ubiquitous, using
+
+<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">
+SVG</a> and
+
+<a href="http://en.wikipedia.org/wiki/Server-side_scripting">
+server-side scripting</a>.</p>
+
+<p>Here are some issues I tackled since my last report:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#2">Project Overview</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#3">Replicating a CouchDB with Python</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#4">Same origin policy snag and resolution</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#5">Learning and struggling with CouchApps</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#6">Relief moving to Kanso</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#7">Next steps</a></li>
+</ul>
+
+<p>Check it out, and please let us know what you think!</p>

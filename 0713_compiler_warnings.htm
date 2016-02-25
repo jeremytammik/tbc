@@ -1,0 +1,134 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Eliminating Compiler Warnings and Deprecated Calls</h3>
+
+<p>Migrating Revit add-ins from one version to the next is a regular topic, obviously, since we are generally provided with a new release every year.
+Therefore, it is eminently sensible to ensure that an add-in is easy to migrate by avoiding use of all obsolete API functionality.
+In some cases, you might also wish to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/intermediate-api-update-releases.html">
+support multiple versions</a>.
+
+I provided a simple example of an unusually graceful possibility to handle the differences between the Revit 2011 and 2012 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/cascaded-events-and-renaming-the-active-document.html#2">
+Idling event handler argument</a>.
+Most differences between different versions of the API will probably be slightly more difficult to handle as transparently as this.
+
+<p>Looking back at previous migrations, I discussed The Building Coder samples port from 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+Revit 2010 to the Revit 2011 API</a> and 
+
+Joe Ye later 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/plugin-migration-steps.html">
+added more detailed information</a> on
+
+that process.
+
+<p>The last time around, when migrating The Building Coder samples from 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">
+Revit 2011 to 2012</a>, 
+
+I provided an even more detailed description of the steps taken.
+
+<p>It still remained pretty quick and dirty, since I performed only very little random testing of the new version, just making sure that the add-in compiled correctly and a few of the numerous commands actually run.
+
+<p>So, until recently, the code was still making use of a number of deprecated API calls which caused compilation warnings.
+
+<p>I removed a few of those when updating the code accessing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/materials-collection-and-filtering.html">
+Materials collection</a>, 
+
+where I also provided the latest 
+
+<span class="asset  asset-generic at-xid-6a00e553e1689788330168e4fbbcc6970c"><a href="http://thebuildingcoder.typepad.com/files/bc_12_96_3-1.zip">version 2012.0.96.3</a></span> of 
+
+the solution.
+
+<p>The remaining warnings are caused by use of the Reference class ProximityParameter property and the FindReferencesByDirection method, which was replaced by FindReferencesWithContextByDirection.
+
+<p>Here they are in full &ndash; copy to a text editor to see the truncated lines:
+
+<pre>
+C:\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs(69,11): warning CS0618: 'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'
+C:\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs(86,14): warning CS0618: 'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'
+C:\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs(89,21): warning CS0618: 'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'
+C:\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs(239,14): warning CS0618: 'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'
+C:\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs(295,17): warning CS0618: 'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'
+C:\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs(305,19): warning CS0618: 'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'
+C:\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs(308,34): warning CS0618: 'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'
+
+Compile complete -- 0 errors, 7 warnings
+</pre>
+
+<p>Let's tackle those right here and now to future-proof this guy.
+
+<p>It turns out to be really simple.
+
+<p>Here is the original code snippet producing the warnings in the FindTopMostReference method in CmdNewSpotElevation.cs, which determines a reference 'ret' to the topmost face of a given element:
+
+<pre class="code">
+&nbsp; <span class="teal">ReferenceArray</span> references
+&nbsp; &nbsp; = doc.FindReferencesByDirection(
+&nbsp; &nbsp; &nbsp; centerOfTopOfBox, viewDirection, view3D );
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> references )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> re = doc.GetElement( r );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( re.Id.IntegerValue == e.Id.IntegerValue
+&nbsp; &nbsp; &nbsp; &amp;&amp; r.ProximityParameter &lt; closest )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ret = r;
+&nbsp; &nbsp; &nbsp; closest = r.ProximityParameter;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Instead of FindReferencesByDirection, we now use FindReferencesWithContextByDirection.
+It returns instances of the new ReferenceWithContext class instead of the old Reference class.
+They are packaged in a generic .NET container, no longer making use of the obsolete custom ReferenceArray collection class.
+Finally, the ProximityParameter property has been renamed to just Proximity.
+
+<p>The old code can thus be replaced by the following equivalent new lines:
+
+<!-- making use of FindReferencesWithContextByDirection and the new ReferenceWithContext class: -->
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ReferenceWithContext</span>&gt; references
+&nbsp; &nbsp; = doc.FindReferencesWithContextByDirection(
+&nbsp; &nbsp; &nbsp; centerOfTopOfBox, viewDirection, view3D );
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ReferenceWithContext</span> r <span class="blue">in</span> references )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> re = doc.GetElement( 
+&nbsp; &nbsp; &nbsp; r.GetReference() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( re.Id.IntegerValue == e.Id.IntegerValue
+&nbsp; &nbsp; &nbsp; &amp;&amp; r.Proximity &lt; closest )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ret = r.GetReference();
+&nbsp; &nbsp; &nbsp; closest = r.Proximity;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I made similar changes in the other module using this same ray casting functionality, CmdDimensionWallsFindRefs.cs, and now the entire solution compiles with zero warnings.
+
+<p>Here is 
+
+<a href="zip/bc_12_96_4.zip">
+version 2012.0.96.4</a> of
+
+The Building Coder samples all deprecated API calls eliminated.
+
+<p>Most of the obsolete lines are marked with comments saying '// 2011', and their replacements are marked '// 2012'.
+If you wish to analyse the exact differences, you can simply compare the code of this version with the 
+
+<span class="asset  asset-generic at-xid-6a00e553e1689788330168e4fbbcc6970c"><a href="http://thebuildingcoder.typepad.com/files/bc_12_96_3-1.zip">version 2012.0.96.3</a></span> mentioned above.

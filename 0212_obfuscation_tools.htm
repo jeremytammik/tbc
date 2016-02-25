@@ -1,0 +1,68 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Obfuscation Tools</h3>
+
+<p>We already explained the need for and basics of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/obfuscation.html">
+obfuscation</a>,
+
+and yet developers I meet are often still surprised to discover how easy it is to decompile their .NET application and obtain the original source code back from the released .NET assembly DLL.
+We can add new information on this topic and present details on some available tools now, because Greg Wesner of Autodesk kindly agreed to share his personal experience and research results using obfuscation with Revit applications:</p>
+
+<p>First of all, here is a 
+
+<a href="http://www.csharp411.com/net-obfuscators">
+list of most of the available obfuscators</a>
+
+with some additional background information and further links.
+
+<p>I gave up on Dotfuscator because I was having problems obfuscating things for Revit and their interface was not very good. 
+You have to exclude from obfuscation any methods that external apps call into or access. 
+This would include entry points like IExternalCommand and IExternalApplication methods.
+Virtually any DLL can be obfuscated to the point where it will not run.
+
+<p>I now use {smartassembly} which is working quite well for me. 
+It’s in the medium price range of the tools out there. 
+It does a fairly good job of drilling into the dependencies itself and determining what can and cannot be obfuscated. 
+Setting up the various options in these tools will make all the difference. 
+
+<p>To be honest, what really sold me on {smartassembly} was the fact that their trial software was a fully functional installation of their product. 
+You just can’t ship what you obfuscate until you pay for it. 
+Dotfuscator and another one I tried from Rustemsoft called Skater were both limited versions of their software,
+so it was very difficult to determine how effective they would be. 
+Skater in particular did not do a very good job of string mangling and the result was barely different from the code.
+If you are going to provide an evaluation copy, is it really a good idea to limit it to the point that it is unimpressive?
+
+<p>Here are some cool features in {smartassembly} beyond obfuscation:
+
+<ol>
+<li>It can merge in dependent DLLs or embed them. 
+Merging them will improve performance, embedding them just makes it more convenient, because your deliverable can be just one file.
+<li>It will prune code that will never get executed.
+Actually, I find this to be a nice analysis tool for applications that are developed over long periods of time &ndash; I’m amazed at how much code I write that I eventually end up abandoning.
+<li>It will add confusing metadata to the DLL so that .NET Reflector and MS IL Disassembler cannot view it. 
+This is a huge advantage because now you need hacking tools even to see what methods are exposed, and this provides a level of protection for even those methods that you could not obfuscate.
+<li>It will sign your assembly with a strong name after obfuscation.
+<li>It has some memory optimizations that can improve memory usage, which I have not tested.
+</ol>
+
+<p>My approach in setting up my projects was to enable all the security features I could to make it as safe as possible. 
+Then obfuscate the DLL and load and test it. 
+As I mentioned, {smartassembly} does a fairly good job of realizing that some methods are entry points for the DLL and it cannot mangle those signatures. 
+A couple of times I ended up with an obfuscated DLL that would not run. 
+So from there I went back in and began disabling features. 
+I start by excluding whole classes from obfuscation. 
+Once I find the class or classes that cannot be mangled, I try drilling down to see if there are just some particular methods that need to be excluded. 
+This is all I have really needed to do to get it working for me. 
+
+<p>I also considered .NET Reactor. 
+The price is really competitive and it has the added feature of creating time bombed versions of your software. 
+But a review I read said it had difficulty with complex applications.
+
+<p>I would have liked more time to evaluate this to determine if it would have worked for me. 
+I highly recommend trying out more than one of these tools before making a decision.
+
+<p>Obviously, these are just unofficial personal opinions, like everything else stated in this blog.

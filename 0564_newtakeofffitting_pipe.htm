@@ -1,0 +1,220 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266201 [How to use NewTakeOffFitting] -->
+
+<h3>Use of NewTakeOffFitting on a Pipe</h3>
+
+<p>I presented an example of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html">
+using the NewTakeOffFitting method on a duct</a> a 
+
+while back.
+The original question, however, was actually related to inserting a break into a pipe.
+That turned out to be a bit more tricky.
+This was also discovered by Kailash Kute, who posted 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e168978833014e86bffa63970d#comment-6a00e553e168978833014e86bffa63970d">
+a</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e168978833014e86c72a1a970d#comment-6a00e553e168978833014e86c72a1a970d">
+whole</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e1689788330147e36ef07c970b#comment-6a00e553e1689788330147e36ef07c970b">
+series</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e168978833014e86ef0cf3970d#comment-6a00e553e168978833014e86ef0cf3970d">
+of</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e168978833014e870b1b1b970d#comment-6a00e553e168978833014e870b1b1b970d">
+comments</a> on
+
+the topic.
+
+I will herewith reiterate my first answer to him and post the code that I had working to see whether that will help us move forward with this.
+
+<p><strong>Question:</strong> How can I create a new takeoff fitting at the midpoint of a pipe, thus breaking the pipe into two parts?
+
+<p><strong>Answer:</strong> The solution is similar to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html">
+creating a takeoff fitting on a duct</a>.
+
+<p>If you wish the coupling to break the pipe, it has to be a tee of some kind, i.e. a pipe tap or spud. 
+This requires a working "Pipe Spud" family.
+The discussion on
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-MEP/Pipe-Taps/m-p/2814072/highlight/true">
+pipe taps</a> in
+
+the Autodesk Revit MEP discussion forum provides such a sample pipe spud family which you can save locally and test on a project. 
+This is the recommended family type and category to use for now for a pipe outlet part.
+
+<p>For an example on using it manually, you can look at this 
+
+<a href="http://www.screencast.com/t/TApTeKqy">
+video showing how to load the fitting into a project and use it when drawing a pipe</a>.
+
+<p>Basically, you do the following:
+
+<ul>
+<li>Load the family into a project
+<li>Select Pipe from the ribbon
+<li>Select Edit Type
+<li>Change the preferred type to Tap
+<li>Set the pipe spud as the default tap
+<li>Click Apply/OK
+</ul>
+
+<p>Now when you draw a branch pipe off of the main, the spud will be placed at the intersection.
+
+<p>I rewrote the code demonstrating how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html">
+use the NewTakeOffFitting method on a duct</a> to
+
+operate on a pipe instead:
+
+<!-- C:\a\j\adn\case\bsd\1266201\src\CreateTakeoff\CreateTakeoff\Command.cs -->
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Revit external command to demonstrate </span>
+<span class="gray">///</span><span class="green"> NewTakeOffFitting method for pipes.</span>
+<span class="gray">///</span><span class="green"> </span>
+<span class="gray">///</span><span class="green"> Create two pipes in a new document</span>
+<span class="gray">///</span><span class="green"> and call NewTakeOffFitting to add</span>
+<span class="gray">///</span><span class="green"> a takeoff to connect them.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Result</span> result = <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> creDoc
+&nbsp; &nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// determine pipe type to use:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; collector.OfCategory(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_PipeCurves );
+&nbsp;
+&nbsp; &nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementType</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PipeType</span> pipeType
+&nbsp; &nbsp; &nbsp; &nbsp; = collector.FirstElement() <span class="blue">as</span> <span class="teal">PipeType</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pipeType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Message</span>.ShowError( <span class="maroon">&quot;No pipe types found.&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="teal">Message</span>.Caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// create pipe1 along X axis </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// from (0,0,0) to (6,0,0):</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> start = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> end = start + 6 * <span class="teal">XYZ</span>.BasisX;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> mid = 0.5 * ( start + end );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> pipe1 = creDoc.NewPipe(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; start, end, pipeType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// create pipe2 parallel to Y </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// axis from (1,2,0) to (1,4,0):</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; start = mid + 2 * <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; &nbsp; &nbsp; end = start + 2 * <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> pipe2 = creDoc.NewPipe(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; start, end, pipeType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// pick closest connector on pipe2:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> pipe2_start = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// just picking the first one is unreliable!</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the order of connector returned by the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// connector manager may change!</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// always use a location (or even more </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// information if 2 connectors are at </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the same location) to get the right</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// connector!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> dist = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipe2.ConnectorManager.Connectors )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = c.Origin;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> d = p.DistanceTo( mid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; dist )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dist = d;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipe2_start = c;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// create takeoff from pipe1 to pipe2:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> takeoff
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = creDoc.NewTakeoffFitting(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipe2_start, pipe1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; result = <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != t )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; }
+}
+</pre>
+
+<p>Everything said about the arguments to the NewTakeoffFitting method and the order of connectors returned by the connector manager in the case of ducts applies here as well, of course.
+
+<p>The command (which is simply named Command) in the attached project creates the following model when run in a project where the tap (not tee) and the pipe spud have been selected as the default pipe branch fittings:</p>
+
+<center>
+<img src="img/pipe_spud_takeoff.png" alt="Pipe spud takeoff on a pipe"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/CreateTakeoffPipe.zip">
+CreateTakeoffPipe.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this command.

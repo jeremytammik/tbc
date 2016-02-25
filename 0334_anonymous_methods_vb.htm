@@ -1,0 +1,252 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Anonymous Methods in VB</h3>
+
+<p>By the time you read this, I will be well on my way to the Revit API training that I am giving in Warsaw.
+The Revit API introduction labs that I am using for that include a few examples of post-processing the results of a Revit filtered collector query.
+I discussed several examples of such post-processing before Easter when 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+profiling the collector performance</a>.
+
+I and my colleagues were having some trouble converting the code from C# to VB, and I thought I would share some of our insights with you here.
+For instance, our command Lab3_7_DeleteFamilyType selects and deletes a specific hard-coded column type named "475 x 610mm":</p>
+
+<center>
+<img src="img/column_types.png" alt="Column types"/>
+</center>
+
+<p>We were using the following C# code and helper methods:
+
+<ul>
+<li>GetElementsOfType &ndash;
+     Return all elements of the requested class,
+     i.e. System.Type, matching the given built-in
+     category in the given document.
+<li>GetFamilySymbols &ndash;
+     Return all family symbols in the given document
+     matching the given built-in category.
+</ul>
+
+<p>Here are the helper method implementations:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">FilteredElementCollector</span>
+&nbsp; GetElementsOfType(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Type</span> type,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfCategory( bic );
+&nbsp; collector.OfClass( type );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector;
+}
+
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">FilteredElementCollector</span>
+&nbsp; GetFamilySymbols(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+{
+&nbsp; <span class="blue">return</span> GetElementsOfType( doc,
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), bic );
+}
+</pre>
+
+<p>Here is the trivial command mainline Execute method implementation making use of these to first retrieve all family symbols of the specified category, and then post-process the results to extract one specific instance matching the hard-coded name "475 x 610mm" and delete that specific individual type from the column family.
+
+<p>Actually, since we are still in the process of getting used to the new Revit 2011 API attributes and other paraphernalia, here is the complete command class implementation:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Lab3_7_DeleteFamilyType</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="teal">LabUtils</span>.GetFamilySymbols( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Columns );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> column_types = <span class="blue">from</span> element <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name.Equals( <span class="maroon">&quot;475 x 610mm&quot;</span> )
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> element;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = column_types
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FamilySymbol</span>&gt;()
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">FamilySymbol</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; doc.Delete( symbol );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>As you can see, we are still deriving the command class from our beloved IExternalCommand interface.
+We are also adding the new non-optional attributes defining its transaction mode and regeneration option.
+
+<p>GetFamilySymbols returns a FilteredElementCollector, and we process that collection using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/language-integrated-query-linq.html">
+LINQ</a>
+
+to extract the one and only symbol matching our target name in order to demonstrate deleting the symbol from the model.
+
+<p>The same code ported to VB.NET looks like this:
+
+<pre class="code">
+&lt;Transaction(TransactionMode.Automatic)&gt; _
+&lt;Regeneration(RegenerationOption.Manual)&gt; _
+<span class="blue">Public</span> <span class="blue">Class</span> Lab3_7_DeleteFamilyType
+&nbsp; <span class="blue">Implements</span> IExternalCommand
+
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> ExternalCommandData, _
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> ElementSet) <span class="blue">As</span> Result _
+&nbsp; &nbsp; <span class="blue">Implements</span> IExternalCommand.Execute
+
+&nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> UIApplication = commandData.Application
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> Document = app.ActiveUIDocument.Document
+
+&nbsp; &nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> FilteredElementCollector _
+&nbsp; &nbsp; &nbsp; = LabUtils.GetFamilySymbols( _
+&nbsp; &nbsp; &nbsp; &nbsp; doc, BuiltInCategory.OST_Columns)
+
+&nbsp; &nbsp; <span class="blue">Dim</span> column_types = <span class="blue">From</span> element <span class="blue">In</span> collector _
+&nbsp; &nbsp; &nbsp; <span class="blue">Where</span> element.Name.<span class="blue">Equals</span>(<span class="maroon">&quot;475 x 610mm&quot;</span>) _
+&nbsp; &nbsp; &nbsp; <span class="blue">Select</span> element
+
+&nbsp; &nbsp; <span class="blue">Dim</span> column_types_ienum <span class="blue">As</span> IEnumerable(<span class="blue">Of</span> Element)
+&nbsp; &nbsp; column_types_ienum = <span class="blue">CType</span>(column_types, IEnumerable(<span class="blue">Of</span> Element))
+
+&nbsp; &nbsp; <span class="blue">Dim</span> column_types_famsym <span class="blue">As</span> IEnumerable(<span class="blue">Of</span> FamilySymbol)
+&nbsp; &nbsp; column_types_famsym = column_types_ienum.Cast(<span class="blue">Of</span> FamilySymbol)()
+
+&nbsp; &nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> FamilySymbol = column_types_famsym.First()
+
+&nbsp; &nbsp; doc.Delete(symbol)
+
+&nbsp; &nbsp; <span class="blue">Return</span> Result.Succeeded
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>We added several extraneous lines of casting code to circumvent some runtime casting exceptions thrown when executing the VB code.</p>
+
+<p>Since I did not like all those extra lines of casting code, I suggested making use of an anonymous method instead of the explicit LINQ statement.
+Here is my suggestion to reduce the length of code and casts.
+Please note that it does not work, as we will explain below:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> FilteredElementCollector _
+&nbsp; &nbsp; = LabUtils.GetFamilySymbols( _
+&nbsp; &nbsp; &nbsp; doc, BuiltInCategory.OST_Columns)
+
+&nbsp; <span class="blue">Dim</span> name_equals = <span class="blue">Function</span>(e) e.Name.Equals(<span class="maroon">&quot;475 x 610mm&quot;</span>)
+
+&nbsp; <span class="blue">Dim</span> element <span class="blue">As</span> Element = collector.First(name_equals)
+
+&nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> FamilySymbol = <span class="blue">CType</span>(element, FamilySymbol)
+
+&nbsp; doc.Delete(symbol)
+</pre>
+
+<p>This is much shorter and easy to read.
+It also compiles perfectly well.
+Unfortunately, it throws the following exception during runtime:</p>
+
+<pre>
+Unable to cast object
+  of type 'VB$AnonymousDelegate_0`2[System.Object,System.Boolean]'
+  to type 'System.Func`2[Autodesk.Revit.DB.Element,System.Boolean]'.
+</pre>
+
+<p>What does this mean?
+Well, apparently the definition of 'name_equals' using 'Function(e)' is generating an anonymous VB delegate, whereas the generic First method is expecting a more specialised System.Func delegate.
+As a first step, I replaced 'Function(e)' by 'Function(e As Element)'.
+That improved things somewhat, because now at least the argument has the correct type, but the delegate is still an anonymous VB delegate and not a System.Func one.
+In a second step, I corrected that as well, and now I have the following, which works fine and is nice and short:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> name_equals <span class="blue">As</span> Func(<span class="blue">Of</span> Element, <span class="blue">Boolean</span>) _
+&nbsp; &nbsp; = <span class="blue">Function</span>(e <span class="blue">As</span> Element) e.Name.Equals(<span class="maroon">&quot;475 x 610mm&quot;</span>)
+</pre>
+
+<p>This prompted me to return to the C# version and try to shorten that a bit more as well.
+My first step was to replace the from-where-select statement by the generic algorithm First, like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="teal">LabUtils</span>.GetFamilySymbols( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Columns );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> symbol = collector.First&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;475 x 610mm&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; doc.Delete( symbol );
+</pre>
+
+<p>On second thoughts, I noticed that the doc.Delete method does not really care what kind of element I am passing in, so there is no need even to cast the retrieved symbol from Element to FamilySymbol, i.e. this shorter code does the job equally well:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="teal">LabUtils</span>.GetFamilySymbols( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Columns );
+&nbsp;
+&nbsp; <span class="teal">Element</span> symbol = collector.First&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;475 x 610mm&quot;</span> ) );
+&nbsp;
+&nbsp; doc.Delete( symbol );
+</pre>
+
+<p>Finally, let's take that insight back to the VB version and minimalise that also as follows:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> FilteredElementCollector _
+&nbsp; &nbsp; = LabUtils.GetFamilySymbols( _
+&nbsp; &nbsp; &nbsp; doc, BuiltInCategory.OST_Columns)
+
+&nbsp; <span class="blue">Dim</span> name_equals <span class="blue">As</span> Func(<span class="blue">Of</span> Element, <span class="blue">Boolean</span>) _
+&nbsp; &nbsp; = <span class="blue">Function</span>(e <span class="blue">As</span> Element) e.Name.Equals(<span class="maroon">&quot;475 x 610mm&quot;</span>)
+
+&nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> Element = collector.First(name_equals)
+
+&nbsp; doc.Delete(symbol)
+</pre>
+
+<p>Even more finally, we can make true use of the anonymous function facility in VB as well and eliminate the intermediate named functor like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> Element = collector.First( _
+&nbsp; &nbsp; <span class="blue">Function</span>(e <span class="blue">As</span> Element) e.Name.Equals(<span class="maroon">&quot;475 x 610mm&quot;</span>))
+</pre>
+
+<p>Now we have the same succinct sweetness in both versions.</p>
+
+<p>As we noticed when 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+benchmarking collector performance</a>,
+
+the speed of the anonymous method is exactly the same as using LINQ.
+
+<p>More importantly, what we also noticed was that using a parameter filter and the Revit filtering API instead of the explicit post-processing we are discussing here was much faster still, by almost a factor of two. 
+The fact is that filtering for a specific element name can just as well be achieved by a parameter filter, and an example was given in that discussion, and it used half the time that the comparable LINQ query does.
+
+<p>Still, I hope this helps make the anonymous functions and the power of the Revit 2011 filtering API more accessible to all you VB folks as well.
+Good luck and much success with that to you!</p>

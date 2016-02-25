@@ -1,0 +1,53 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<h3>Revit Integration with a Database or ERP System</h3>
+
+<p>A while ago, I published Miroslav Schonauer's popular high-level 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/database-integration.html">
+overview of Revit and database integration</a>. 
+
+Here is an additional useful note from Anthony Hauck on this topic:</p>
+
+<p><strong>Question:</strong>
+How can I integrate Revit with an ERP solution or an SQL database?</p>
+
+<p><strong>Answer:</strong>
+Revit information can be exported to an ODBC-compatible database. 
+ODBC export is a native feature of Revit. 
+The Labs posting 
+
+<a href="http://labs.autodesk.com/utilities/revit_rdb">
+RDBLink</a>
+
+demonstrates a similar capability using the API, with the additional feature of being able to change some parameters within a Revit model by editing the resulting database and re-importing the changes.
+Some of these parameter changes can affect Revit model geometry.</p>
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/rfa-version-grey-commands-family-context-and-rdb-link.html#4">
+availability of RDBLink</a>
+
+has already been mentioned briefly previously.</p>

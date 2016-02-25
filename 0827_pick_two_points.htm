@@ -1,0 +1,193 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07611511 [pick 2 points consecutively]
+
+-->
+
+<h3>Picking Two Points Consecutively</h3>
+
+<p>Here is a question on picking points while interacting with a modeless dialogue:
+
+<p><strong>Question:</strong> I want to pick two points consecutively using PickPoint.
+
+<p>I am using a modeless dialog, and have a section of code that is called when a button is pressed.
+
+<p>However, after picking the first point, an exception is thrown saying "The user aborted the pick operation".
+
+<p>Do you have a solution?
+
+<p><strong>Answer:</strong> I implemented a sample application providing an external command PickTwoPoints for you to demonstrate one possible solution.
+
+<p>I use the following code to generate and display a modeless dialogue to the user before the picking is initiated:
+
+<pre class="code">
+&nbsp; <span class="teal">Form</span> DisplayModelessForm( <span class="teal">IWin32Window</span> owner )
+&nbsp; {
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">Form</span> form
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>();
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 300, 100 );
+&nbsp; &nbsp; form.Text = <span class="maroon">&quot;Pick Two Points Modeless Form&quot;</span>;
+&nbsp; &nbsp; form.Show( owner );
+&nbsp; &nbsp; <span class="blue">return</span> form;
+&nbsp; }
+</pre>
+
+<p>The form is initially displayed, then hidden again before calling PickPoint.
+
+<p>As always when displaying a modeless form, I define its owner window to be the Revit main frame.
+
+<p>I use my JtWindowHandle wrapper class to convert the IntPtr returned by the Autodesk.Windows.ComponentManager ApplicationWindow property to an IWin32Window, which can be passed in to the form Show method to set its owner:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Wrapper class for converting </span>
+&nbsp; <span class="gray">///</span><span class="green"> IntPtr to IWin32Window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">JtWindowHandle</span> : <span class="teal">IWin32Window</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> _hwnd;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> JtWindowHandle( <span class="teal">IntPtr</span> h )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">IntPtr</span>.Zero != h,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected non-null window handle&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _hwnd = h;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">IntPtr</span> Handle
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> _hwnd;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The external command Execute method performs the following steps:
+
+<ul>
+<li>Determine the main Revit application window handle.
+<li>Display the dynamically generated modeless form.
+<li>Hide the form.
+<li>Select the two points.
+<li>Process the two resulting points, in this case by displaying them in the Visual Studio debug output window.
+<li>Redisplay the modeless form.
+<li>Close and terminate.
+</ul>
+
+<p>Here is the whole resulting Execute method mainline code implementing this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Form</span> form = DisplayModelessForm( 
+&nbsp; &nbsp; revit_window ) )
+&nbsp; {
+&nbsp; &nbsp; form.Hide();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = sel.PickPoint( <span class="maroon">&quot;Point 1&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = sel.PickPoint( <span class="maroon">&quot;Point 2&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The two points you selected are {0} and {1}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; PointString( p ), PointString( q ) ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( e.Message );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; form.Show();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>As it now stands, this can obviously be packaged in an external command using read-only transaction mode, since the database is not affected in any way.
+
+<p>Here is
+
+<a href="zip/PickTwoPoints.zip">PickTwoPoints.zip</a> containing
+
+the complete source code, entire Visual Studio solution and add-in manifest of the PickTwoPoints external command.
+
+
+<a name="2"></a>
+
+<h4>Automatically Store Revit Model as Blob in the Cloud</h4>
+
+<p>On the cloud and mobile front, Saikat Bhattacharya published an article describing his 
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/experiential-learning-gbxmlcloudsync-app.html">
+GbXmlCloudSync add-in</a> demonstrating
+
+how to use the DocumentSaved event and the Windows Azure blob storage service to automatically upload each new version of a Revit model to the cloud, for instance for environmental analysis.
+
+<p>This is part of his 
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2012/06/experiential-learning-with-windows-azure-blogpost-series-on-the-aec-devblog.html">
+Windows Azure experiential learning series</a>.
+
+
+
+<a name="3"></a>
+
+<h4>Autodesk 360 Videos for MEP and Structure</h4>
+
+<p>Autodesk BIM 360 enables MEP and structural engineers to improve and extend their BIM workflows.
+
+<p>For MEP, this can provide insight into energy consumption, improve visualisation, photorealistic presentation, and CFD simulation.
+Structural enhancement possibilities include access to simulation tools for more informed decisions, conducting computational heavy simulation earlier and more often, and optimising structural workflows with static and finite analysis tools.  
+
+<p>This could be the first step of a move towards the next generation of BIM for anyone, anywhere, at any time, with access to intelligent, model-based workflows through a broad range of cloud-based services providing mobility, accessibility, and infinite computing power.
+
+<p>Here is a freshly published 1 minute and 20 seconds video on 
+
+<a href="http://www.youtube.com/embed/IrazkFnnWY0">
+Autodesk BIM 360 for MEP engineers</a>:</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/IrazkFnnWY0" frameborder="0" allowfullscreen></iframe>
+
+<!--
+http://www.youtube.com/watch?v=IrazkFnnWY0&feature=youtu.be
+http://autode.sk/PeRS9g
+-->
+
+<p>Here is an even more succinct 1 minute video on 
+
+<a href="http://www.youtube.com/embed/Vlg7DlhITUQ">
+Autodesk BIM 360 for structural engineers</a>:</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/Vlg7DlhITUQ" frameborder="0" allowfullscreen></iframe>
+
+<!--
+http://www.youtube.com/watch?v=Vlg7DlhITUQ&feature=youtu.be
+http://autode.sk/PeRWWh
+-->
+
+<p>According to some, 
+
+<a href="http://www.cloudtweaks.com/2012/09/autodesk-cloud-offering-to-slash-simulation-cost-startups-rejoice">
+start-ups rejoice</a> at 
+
+the reduced simulation costs.

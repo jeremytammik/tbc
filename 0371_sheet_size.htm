@@ -1,0 +1,266 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259537 [Sheet Size (Width/Height) detection] -->
+
+<h3>Determine Sheet Size</h3>
+
+<p>We already discussed some issues related to sheets and title blocks, such as the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/viewports-and-sheets.html">
+relationship between viewports and sheets</a> and how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">
+retrieve the title block of a sheet</a>.
+
+<p>Here is a question on determining the size of a sheet which provides an opportunity to update these explorations based on the Revit 2011 platform.
+
+<p><strong>Question:</strong> Using the pre-release 2011 RevitAPI.dll I was able to detect the sheet width/height by iterating the ParameterSet collection for each element in the ViewSheet.ElementSet object. I was able to locate the "Sheet Height" and "Sheet Width" definitions.
+
+<p>With the new Revit 2011 release there are some major changes in the API. Could you please briefly explain how I can get the sheet's width/height with the new API?
+
+<p><strong>Answer:</strong> The approach you describe sounds rather inefficient. 
+Do you mean that you iterated over all the elements in the ViewSheet.ElementSet, and for each element iterated over all its parameters?
+
+<p>I would suggest that you enhance that, even if it did still work. 
+There is no need to iterate over all parameters, since you can access the specific parameters you want, either using the built-in parameter enumeration or their display name. Using the enumeration is much better, of course, since it is language independent.
+
+<p>Similarly, there is no need to iterate over multiple elements, since you can determine exactly which elements you need to access to obtain the data for a specific sheet.
+
+<p>As far as I can tell, the sheet itself does not have any information about its width and height. On the other hand, though, each sheet seems to have exactly one title block instance assigned to it, and that does include information on the sheet width and height.
+
+<p>I analysed a sample project using the Revit API Introduction labs built-in parameter checker and was unable to find any width and height data on the sheet itself. On the other hand, I did find the built-in parameters SHEET_WIDTH and SHEET_HEIGHT on the title block of the sheet. 
+
+<p>The document also has a collection of all loaded title block types which is accessible through the TitleBlocks property. These types do not list the sheet size themselves. Instead, they are referenced by the title block instances which do.
+
+<p>The relationship between sheets and their associated title blocks can be determined through the sheet number, which is available on both of these elements.
+
+<p>I implemented a new Building Coder sample command CmdSheetSize which illustrates some relationships between the title block, sheet and title block types. 
+It includes source code to access the sheet size for all title blocks. 
+For a given sheet number, you can locate the associated title block and retrieve the sheet size from that.
+Here are the steps it performs:
+
+<ul>
+<li>Iterate over the document TitleBlocks collection and lists some data for each title block element type.
+<li>Use a filtered element collector to retrieve and list the same elements.
+<li>Retrieves all title block and view sheet instances in the model.
+<li>List the sheet size defined by the title block instance.
+<li>Display the one-to-on correspondence between title block and view sheet instances, linked through the sheet number. 
+</ul>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdSheetSize</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a string value for the specified </span>
+&nbsp; <span class="gray">///</span><span class="green"> built-in parameter if it is available on </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given element, else an empty string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="blue">string</span> GetParameterValueString( 
+&nbsp; &nbsp; <span class="teal">Element</span> e, 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span> bip )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( bip );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( p.StorageType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Integer: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = p.AsInteger().ToString(); 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.ElementId: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = p.AsElementId().IntegerValue.ToString(); 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Double: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="teal">Util</span>.RealString( p.AsDouble() ); 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.String: 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} ({1})&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.AsValueString(), 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( p.AsDouble() ) ); 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>: s = <span class="maroon">&quot;&quot;</span>; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; s = <span class="maroon">&quot;, &quot;</span> + bip.ToString() + <span class="maroon">&quot;=&quot;</span> + s;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="teal">String</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p;
+&nbsp; &nbsp; <span class="blue">string</span> s;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = doc.TitleBlocks.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} title block element type{1} listed &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in doc.TitleBlocks collection{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, 
+&nbsp; &nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ), 
+&nbsp; &nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;:&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> tb <span class="blue">in</span> doc.TitleBlocks )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// these are the family symbols, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// i.e. the title block element types,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// i.e. not instances, i.e. not sheets, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and they obviously do not have any sheet </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// number, width or height, so 's' ends up empty:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = GetParameterValueString( tb, <span class="teal">BuiltInParameter</span>.SHEET_NUMBER )
+&nbsp; &nbsp; &nbsp; &nbsp; + GetParameterValueString( tb, <span class="teal">BuiltInParameter</span>.SHEET_WIDTH )
+&nbsp; &nbsp; &nbsp; &nbsp; + GetParameterValueString( tb, <span class="teal">BuiltInParameter</span>.SHEET_HEIGHT );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Title block element type {0} {1}&quot;</span> + s,
+&nbsp; &nbsp; &nbsp; &nbsp; tb.Name, tb.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// using this filter returns the same elements</span>
+&nbsp; &nbsp; <span class="green">// as the doc.TitleBlocks collection:</span>
+&nbsp;
+&nbsp; &nbsp; a = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; &nbsp; a.OfCategory( <span class="teal">BuiltInCategory</span>.OST_TitleBlocks );
+&nbsp; &nbsp; a.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} title block element type{1} &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;retrieved by filtered element collector{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, 
+&nbsp; &nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ), 
+&nbsp; &nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;:&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Title block element type {0} {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; symbol.Name, symbol.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve the title block instances:</span>
+&nbsp;
+&nbsp; &nbsp; a = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; &nbsp; a.OfCategory( <span class="teal">BuiltInCategory</span>.OST_TitleBlocks );
+&nbsp; &nbsp; a.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Title block instances:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p = e.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SHEET_NUMBER );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid sheet number&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> sheet_number = p.AsString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = e.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SHEET_WIDTH );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid sheet width&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> swidth = p.AsValueString();
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> width = p.AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = e.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SHEET_HEIGHT );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid sheet height&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> sheight = p.AsValueString();
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> height = p.AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> typeId = e.GetTypeId();
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> type = doc.get_Element( typeId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Sheet number {0} size is {1} x {2} &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;({3} x {4}), id {5}, type {6} {7}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; sheet_number, swidth, sheight,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( width ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( height ),
+&nbsp; &nbsp; &nbsp; &nbsp; e.Id.IntegerValue,
+&nbsp; &nbsp; &nbsp; &nbsp; type.Name, typeId.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve the view sheet instances:</span>
+&nbsp;
+&nbsp; &nbsp; a = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; &nbsp; a.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewSheet</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;View sheet instances:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> vs <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> number = vs.SheetNumber;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;View sheet name {0} number {1} id {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; vs.Name, vs.SheetNumber, 
+&nbsp; &nbsp; &nbsp; &nbsp; vs.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>As said, it iterates over the document TitleBlocks collection and lists some data for each title block element type, then shows that the same elements are also available through the filtered element collector.
+
+<p>It then retrieves the title block and the view sheet instances and shows that there is a one-to-on correspondence between them, linked through the sheet number.
+
+<p>Here is the output from this command in my sample project:
+
+<pre>
+2 title block element types listed in doc.TitleBlocks collection:
+Title block element type A0 metric 28295
+Title block element type A4 metric 129886
+2 title block element types retrieved by filtered element collector:
+Title block element type A0 metric 28295
+Title block element type A4 metric 129886
+Title block instances:
+Sheet number A101 size is 1188.0 x 840.0 (3.9 x 2.76), id 127154, type A0 metric 28295
+Sheet number A102 size is 1188.0 x 840.0 (3.9 x 2.76), id 127168, type A0 metric 28295
+Sheet number A103 size is 1188.0 x 840.0 (3.9 x 2.76), id 127182, type A0 metric 28295
+Sheet number A104 size is 210.0 x 297.0 (0.69 x 0.97), id 129892, type A4 metric 129886
+View sheet instances:
+View sheet name Unnamed number A101 id 127148
+View sheet name Unnamed number A102 id 127162
+View sheet name Unnamed number A103 id 127176
+View sheet name Unnamed number A104 id 129888
+</pre>
+
+<p>If you have a need for a direct mapping between the view sheets and the title block sizes, you could obviously use this information to create a bidirectional mapping as described for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+relationship inverter</a>.
+
+Then, for a given sheet 's', you might be able to use something like 'title_block[s.Number].Width/Height'.
+
+<p>Another little snippet of source code demonstrating these relationships is given by the sample code in the Revit API help file RevitAPI.chm in the description of the Document.NewViewSheet method.
+
+<p>Here is
+
+<a href="zip/bc_11_68.zip">
+version 2011.0.68.0</a>
+
+of The Building Coder sample source code and Visual Studio solution including the new command.

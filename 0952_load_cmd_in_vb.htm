@@ -1,0 +1,103 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08369102 [Modelss Form Error - starting a transation from an external application running outside of api context is not allowed]
+
+-->
+
+<h3>Load Your Own External Command on the Fly</h3>
+
+<p>How to reload an external Revit command without having to restart the Revit session has been a subject of discussion many times in the past, e.g. in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/reload-add-in-for-debug-without-restart.html">
+reloading an add-in for debug without restart</a>,
+
+which lists four possibilities:
+
+<ul>
+<li>Set up Visual Studio to efficiently load the desired project and the debugee, use the standard cycle hitting F5 to start debugging, and stop debugging when you need to make code changes.</li>
+<li>Use the
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+RevitRubyShell</a> or
+
+<a href="http://code.google.com/p/revitpythonshell">
+RevitPythonShell</a> to
+
+work interactively with the Revit API on the command line.</li>
+<li>Use the SharpDevelop IDE, temporarily converting the debugee source code to a macro.</li>
+<li>Use the AddInManager.</li>
+</ul>
+
+
+<p>Revit 2014 adds some new twists to the scenario by the introduction of the MacroManager API, which enables programmatic listing, creating, removing, editing, debugging, and running of macros, and the option to load an add-in mid-session without restarting Revit.
+Unfortunately, there is no option to unload an add-in, once loaded.</p>
+
+<p>The difficulty is that the AppDomain into which the add-in is loaded locks the add-in DLL, preventing any further changes to it.</p>
+
+<p>One could create a new individual AppDomain for each add-in to work around that.</p>
+
+<p>Another option is to not load the add-in from a DLL at all, but stream in the source code using reflection instead.</p>
+
+<p>Here is an example of the latter approach in VB by
+David Rock and Yamin Tengono of
+
+<a href="http://www.bse.com.au">
+BSE &ndash; Building Services Engineers</a>.
+
+David says:</p>
+
+<p>I am running my commands from the ribbon with the following function:</p>
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Sub</span> InvokeRevitCommand( _
+&nbsp; <span class="blue">ByVal</span> strCommandName <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="blue">Object</span>,
+&nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="blue">Object</span>,
+&nbsp; <span class="blue">ByVal</span> fullPathDllName <span class="blue">As</span> <span class="blue">String</span>)
+&nbsp;
+&nbsp; <span class="green">' Load the assembly into a byte array. </span>
+&nbsp; <span class="green">' This way it WON'T lock the dll to disk.</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> assemblyBytes <span class="blue">As</span> <span class="blue">Byte</span>() = File.ReadAllBytes(
+&nbsp; &nbsp; fullPathDllName)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> objAssembly <span class="blue">As</span> Assembly = Assembly.Load(
+&nbsp; &nbsp; assemblyBytes)
+&nbsp;
+&nbsp; <span class="green">' Walk through each type in the assembly.</span>
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> objType <span class="blue">As</span> Type <span class="blue">In</span> objAssembly.GetTypes()
+&nbsp; &nbsp; <span class="green">' Pick up a class.</span>
+&nbsp; &nbsp; <span class="blue">If</span> objType.IsClass <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> objType.Name.ToLower = strCommandName.ToLower <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> ibaseObject <span class="blue">As</span> <span class="blue">Object</span> = Activator.CreateInstance(objType)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> arguments <span class="blue">As</span> <span class="blue">Object</span>() = <span class="blue">New</span> <span class="blue">Object</span>() {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; commandData, message, elements}
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> result <span class="blue">As</span> <span class="blue">Object</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; result = objType.InvokeMember(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Execute&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; BindingFlags.[Default] <span class="blue">Or</span> BindingFlags.InvokeMethod,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Nothing</span>, ibaseObject, arguments)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit For</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>This way I can re-build the DLL without exiting Revit and my sometimes quite large Revit projects.</p>
+
+<p>I have over 100 Revit commands now and most are loaded via this dynamic method.
+This makes it super easy to update them on the fly.</p>
+
+<p>Very many thanks to David and Yamin for developing and sharing this effective solution!</p>

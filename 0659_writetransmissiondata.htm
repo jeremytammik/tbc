@@ -1,0 +1,136 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06651564 [API Question - How to load, unload, edit path of Revit link files?] 
+
+Harry Mattison RE: WriteTransmissionData sample?
+
+Adam Nagy: RE: How to access the transmissiondata of the model in Revit Server
+
+http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html
+
+http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html?cid=6a00e553e168978833014e8890c564970d#comment-6a00e553e16897883301
+
+-->
+
+<h3>Using the WriteTransmissionData Method</h3>
+
+<p>I presented a sample to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html">
+using the TransmissionData class to list linked files</a>,
+
+and Mike Caruso submitted a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html?cid=6a00e553e168978833014e8890c564970d#comment-6a00e553e16897883301">
+comment</a> asking 
+
+how to use it to set a new path on a RVT file.
+
+Furthermore, Guming recently asked 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/analytical-model-isenabled-method-and-parameter.html?cid=6a00e553e168978833015435b29a1e970c#comment-6a00e553e168978833015435b29a1e970c">
+how to make use of the ExternalFileReference class</a>.
+
+Here is a sample answering both of these questions:
+
+<p><strong>Question:</strong> Can you demonstrate how I would load, unload and make changes to the path of linked Revit files?
+
+<p><strong>Answer:</strong> Loading, unloading and editing path to referenced RVT files is possible using methods on the TransmissionData class. 
+Please note that the host RVT file must be closed in order to be editable by these methods.
+
+<p>The Revit API help file RevitAPI.chm description of the TransmissionData class includes a sample code snippet defining the aptly named method UnloadRevitLinks to unload all Revit links.
+
+<p>Here is a sample external command based on that to change the Revit linked model path:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green">&nbsp; This command will change the path of all linked</span>
+<span class="gray">///</span><span class="green">&nbsp; Revit files the next time the document at the </span>
+<span class="gray">///</span><span class="green">&nbsp; given location is opened. </span>
+<span class="gray">///</span><span class="green">&nbsp; Please refer to the TransmissionData reference</span>
+<span class="gray">///</span><span class="green">&nbsp; for more details.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdChangeLinkedFilePath</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilePath</span> location = <span class="blue">new</span> <span class="teal">FilePath</span>( <span class="maroon">&quot;C:/file.rvt&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TransmissionData</span> transData
+&nbsp; &nbsp; &nbsp; = <span class="teal">TransmissionData</span>.ReadTransmissionData(
+&nbsp; &nbsp; &nbsp; &nbsp; location );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != transData )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Collect all (immediate) external </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// references in the model</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; externalReferences
+&nbsp; &nbsp; &nbsp; &nbsp; = transData.GetAllExternalFileReferenceIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Find every reference that is a link</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> refId <span class="blue">in</span> externalReferences )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExternalFileReference</span> extRef
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = transData.GetLastSavedReferenceData(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; refId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( extRef.ExternalFileReferenceType
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="teal">ExternalFileReferenceType</span>.RevitLink )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Change the path of the linked file,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// leaving everything else unchanged:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; transData.SetDesiredReferenceData( refId,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilePath</span>( <span class="maroon">&quot;C:/MyNewPath/cut.rvt&quot;</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; extRef.PathType, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Make sure the IsTransmitted property is set</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; transData.IsTransmitted = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Modified transmission data must be saved </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// back to the model</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TransmissionData</span>.WriteTransmissionData(
+&nbsp; &nbsp; &nbsp; &nbsp; location, transData );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Unload Links&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The document does not have&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; any transmission data&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>By setting the four parameters of SetDesiredReferenceData method, you can also cause a loaded linked file to be unloaded, and vice versa.
+
+<p>Here is
+
+<a href="zip/bc_12_93.zip">
+version 2012.0.93.0</a> of
+
+The Building Coder samples including the new CmdChangeLinkedFilePath command.
+
+<p><strong>Response:</strong> Thank you! 
+That worked like a charm.
+

@@ -1,0 +1,102 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Plug-In Migration Steps</h3>
+
+<p>We discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+migration of The Building Coder samples</a> from
+
+the Revit 2010 to the Revit 2011 API and noted some of the required steps there, but skipped a lot of the obvious and onerous detailed information.
+
+Luckily, my colleague Joe Ye was more patient and precise when he migrated our Revit Structure labs and analysis link sample, and kept track of the required steps in great detail.
+So, without further ado, here are Joe's Revit 2011 plug-in project migration notes:
+
+<h4>Steps to migrate Revit 2010 code to Revit 2011</h4>
+
+<p>Before migrating the code, please read the What's New section in the Revit API help file RevitAPI.chm file to know what happened in the API.
+Then follow below steps.
+
+<ol>
+<li>Open the Revit code project in Visual Studio 2008.
+<li>Remove the reference to old Revit API assembly RevitAPI.dll.
+<li>Reference the new Revit API assemblies RevitAPI.dll and RevitAPIUI.dll, which are located in the Revit 2011 installation Program subfolder.
+<li>Replace old namespaces with the new ones, for example:
+
+<pre class="code">
+<span class="green">//using Autodesk.Revit;</span>
+<span class="green">//using Autodesk.Revit.Elements;</span>
+<span class="green">//using Autodesk.Revit.Structural.Enums;</span>
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+</pre>
+
+All namespace mappings are documented in 'Revit 2011 API Namespace Remapping.xlsx' file in SDK.
+<li>Decide what regeneration option and transaction mode are required for the external command or application classes.
+This is a non-trivial decision, cf.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">
+manual regeneration option risks</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">
+best practices</a>.
+
+<li>Add the regeneration option and transaction mode attributes, e.g.
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+</pre>
+
+<li>If you have used full class names, change the namespace of the IExternalCommand or IExternalApplication interfaces, ExternalCommandData class, and Result enumeration to Autodesk.Revit.UI.
+<li>The way to access the Application and Document instances changed.
+The command data argument now returns a new UIApplication class instance.
+Use the following code to access the database level application and active document objects:
+
+<pre class="code">
+<span class="teal">UIApplication</span> uiapp = commandData.Application;
+<span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+<span class="teal">Application</span> app = uiapp.Application;
+<span class="teal">Document</span> doc = uidoc.Document;
+</pre>
+
+In Revit 2010, there was no separation between the user interface and database level application and document objects.
+The application was accessed through the ExternalCommandData.Application property, and the active document through ExternalCommandData.Application.Document.
+
+<li>If the project has element iteration processes, you need to migrate these to use the new FilteredElementCollector class.
+Please refer to RevitAPI.chm and Revit 2011 API developer guide.pdf for detailed information.
+<li>Some classes were renamed. Please read the What's New section in RevitAPI.chm for detailed information, and replace the old class names with the ones.
+</ol>
+
+<h4>Other notes</h4>
+
+<ol>
+<li>Creating a new ElementId instance requires an argument, unlike Revit 2010.
+<li>The Document get_Element( ElementId ) method now takes an ElementId argument without the ref keyword, because ElementId is a class now.
+<li>TypeFilter changed to ElementClassFilter. Creating instance change to use New ElementClassFilter
+<li>CategoryFilter becomes ElementCategoryFilter. Other element filter class are also renamed.
+<li>Access to the Revit Structure analytical model changed.
+<li>The ElementId Value property changed to IntegerValue, so replace with the new property name.
+<li>When retrieving document elements, we need to set a filter explicitly. If no filter was set at all, an exception is thrown.
+<li>If the command is using the manual regeneration option and the code makes changes to the model, we need to explicitly create a transaction to update the model:
+
+<pre class="code">
+Transaction t = new Transaction(
+  doc, "Test" );
+
+t.Start();
+
+. . .
+
+t.Commit();
+</pre>
+
+<li>Some other detailed items are not listed here.
+Please refer to the API changes documentation for further information.
+</ol>
+
+<p>Many thanks to Joe for these detailed instructions!

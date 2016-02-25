@@ -1,0 +1,238 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1264280 [System.Runtime.InteropServices.SEHException, Autodesk.Revit.DB.Edge.Tessellate()]
+workaround for an exception getting solid edges
+1261003 [SEHException when iterating through SolidArray]
+1267023 [Revit API throws exceptions when Add In is running]
+1272126 [Exception thrown while Iterating elements]
+
+-->
+
+<h3>Exception on Copied Geometry</h3>
+
+<p>I have heard about some issues with different types of geometry access throwing an exception.
+As far as we know, there is a simple solution for most of them.
+Here is an example:
+
+<a name="1272126"></a>
+
+<p><strong>Question:</strong> I have a piece of code iterating over Revit elements and extracting their geometry.
+When run in release mode, it is causing an exception to be thrown.
+
+<p>I tested this in the sample model rac_basic_sample_project.rvt, but it also throws a similar exception in all other files I tried.
+
+<p>Here is the code that is causing the problem:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">protected</span> <span class="blue">bool</span> ParseElements( 
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElement 
+&nbsp; &nbsp; &nbsp; &nbsp; = e.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geoElement == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geoElement.Objects )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = obj 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> g2 = inst.SymbolGeometry;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( g2 != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> transformation = inst.Transform;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; g2 = g2.GetTransformed( transformation );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj2 <span class="blue">in</span> g2.Objects )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( obj2 <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj2 <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> material = e.Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Settings.Materials.get_Item( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face.MaterialElementId );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// obj is not GeometryInstance, check for solid</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid2 = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid2 == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid2.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This line which looks as if it should be read-only throws</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// &quot;Attempt to modify the model outside of transaction.&quot;:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> material 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = e.Document.Settings.Materials.get_Item( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face.MaterialElementId );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = commandData.Application.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> activeView = doc.ActiveView <span class="blue">as</span> <span class="teal">View3D</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( activeView == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this in a 3D view&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc, activeView.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;ParseElements Exception&quot;</span>;
+&nbsp;
+<span class="blue">#if</span> DEBUG
+<span class="gray">&nbsp; &nbsp; string debug_or_release = &quot;Debug&quot;;</span>
+<span class="blue">#else</span>
+&nbsp; &nbsp; <span class="blue">string</span> debug_or_release = <span class="maroon">&quot;Release&quot;</span>;
+<span class="blue">#endif</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Transaction is required by Materials.get_Item!?</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; t.Start( s );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( s, <span class="maroon">&quot;Start ParseElements &quot;</span> 
+&nbsp; &nbsp; &nbsp; + debug_or_release );
+&nbsp;
+&nbsp; &nbsp; ParseElements( collector );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( s, <span class="maroon">&quot;End ParseElements &quot;</span> 
+&nbsp; &nbsp; &nbsp; + debug_or_release );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>This code throws an exception saying "System.Runtime.InteropServices.SEHException (0x80004005): External component has thrown an exception".
+
+<p>If I comment out the statement 'g2 = g2.GetTransformed(transformation)', the exception is not thrown.
+
+<p>The exception is not also thrown in debug mode, only in release.
+
+<p><strong>Answer:</strong> I tested your code in Revit Architecture 2012, Build 20110622_0930, Update Release 1 and was unable to reproduce the issue, either in debug or release mode, either inside or outside the debugger.
+
+<p>After discussing the issue further with the development team, I received two pieces of good news for you:
+
+<p>Firstly, this issue can indeed happen with copied geometry. 
+By reassigning g2 to g2.Transformed(), you have released the handle for the original g2. 
+This may affect other handles you had previous obtained from g2, because all of the handles are tied together in native code.
+
+<p>The workaround is to make sure to keep the original g2 or some other GeometryElement handle in scope.
+One way to achieve this is to assign it with a C# 'using' statement and not overwrite it.
+
+<p>Secondly, some issues related to the geometry handles have been fixed in Revit 2012 update release 1. 
+Internally, the Revit geometry handles have been revamped.
+That explains why I was unable to reproduce the problem on my build.
+
+<p>That is a clear and succinct explanation, I think, which should enable you to avoid the problem completely.
+It also assures you that you may revert to being a bit more carefree in future versions of Revit, and do not have to take such care retaining the handles you receive.
+
+<p>By the way, similar issues did come up from time to time in the past as well, and the resolution was always the same:
+
+
+<a name="1264280"></a>
+
+<h4>Exception Using Tessellate</h4>
+
+<p><strong>Question:</strong> Calling the Tessellate method on edges sometimes causes the following error:
+
+<pre>
+Exception: System.Runtime.InteropServices.SEHException
+Message: External component has thrown an exception.
+...
+</pre>
+
+<p>The error happens when retrieving a list of points from beam and joist elements.
+<p>It does not happen all the time.
+I can run the add-in ten times on a specific project, and the exception may pop up just once or twice.
+
+<p><strong>Answer:</strong> This is due to a similar issue with the lifetime of the GeometryInstance object as described above.
+
+The scope workaround fixes it.
+
+
+
+
+<a name="1261003"></a>
+
+<h4>Exception Iterating through SolidArray</h4>
+
+<p><strong>Question:</strong> I am creating an exporter which takes solid geometry from Revit and exports it to another application. 
+For each element selected, the tool finds its solid geometry and then parses the solid geometry's faces. 
+First I create an empty SolidArray and pass it by reference into a helper method taken from one of the Revit API samples. 
+Once the SolidArray is filled, I attempt to iterate over those solids, then over each solid's faces. 
+I get a SEHException at random iterations on the SolidArray. 
+Is there another way to recursively extract solid geometries from Family Instances without this error?
+
+<p><strong>Answer:</strong> Looking at this in depth, we found that the crash is caused by the memory garbage collection.
+The solid handle you retrieved was garbage collected before you actually made use of it. 
+This is a problem for solids which you copy from the original ones obtained from Revit. 
+The workaround is to ensure that the solids stay in scope by putting them in a suitable stable container.
+
+
+
+<a name="1267023"></a>
+
+<h4>Exception Iterating Over Elements</h4>
+
+<p><strong>Question:</strong> I am developing an add-in for Revit that exports a file to another application. 
+In essence, it processes all geometry objects and places them into data structures that the other application can use. 
+
+<p>The initial versions worked perfectly, but upon trying to make the add-in more efficient by adding a background worker thread to perform the bulk of the work and more user friendly by adding a progress bar I began encountering exceptions being generated from within Revit API methods. 
+I am assuming these exceptions were caused by the addition of the background worker thread and the progress bar.
+The exceptions are only thrown when processing more complex geometry like families.
+Simple elements like floors, walls, roofs, topological surfaces and site components all work fine. 
+
+<p>In addition, if Revit is launched from the Visual Studio debugger, the add-in works fine.
+If Revit is launched directly and loads the debug version of the add-in assembly, it also works.
+The exceptions are thrown only when using the release version of the DLL and outside the debugger.
+
+<p><strong>Answer:</strong> Probably the solid handles you retrieve are being garbage collected before you use them in your subroutine accessing the solid object.
+As stated above, you simply need to ensure that the solid handles stay in scope.
+

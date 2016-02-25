@@ -1,0 +1,76 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Set Family Parameter Requires Type</h3>
+
+<p>I was running down to town to have tea with my friend Otto on Saturday morning, and happened to see this autumn leaf lying on the ground. 
+Turned back, picked it up, and made a picture of it in the sunshine on Otto's veranda. 
+It is completely unretouched, I promise!
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-11-12_autumn_leaf/autumn_leaf_narrow.jpg" alt="Autumn leaf" width="400"/>
+</center>
+
+<p>Back to the Revit API, here is a short note on another issue run into by Ishwar Nagwani, Technical Consultant in our Bangalore organisation, who recently contributed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/pick-corners-and-create-floor.html">
+pick points to create a new a floor</a> sample, and answered by Harry Mattison of the Revit development team.
+
+<p><strong>Question:</strong> I am trying to update an existing family parameter and set its value, but it is always throwing an InvalidOperationException saying "There is no current type".
+What is wrong?
+
+<p>Here is some minimal sample code to reproduce the issue.
+Only the family file name is hardcoded.
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; uiapp.OpenAndActivateDocument( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;C:\\Projects\\FY12\\GE Revit\\SWBD-AV2.rfa&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyManager</span> familyMgr = doc.FamilyManager;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyParameter</span> param = familyMgr.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Width&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == param )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; param = doc.FamilyManager.AddParameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Width&quot;</span>, <span class="teal">BuiltInParameterGroup</span>.PG_GEOMETRY, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Length, <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; familyMgr.Set( param, 0.2 ); <span class="green">// set the value</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<p><strong>Answer:</strong> The exception message actually says it all, albeit rather succinctly: "There is no current type".
+
+<p>FamilyManager.Set is used to set the value of a parameter for the current family type. 
+The family you are working with had no types defined, therefore Set could not work. 
+You can remedy this by adding a family type manually or with the following two lines:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( doc.FamilyManager.Types.Size == 0 )
+&nbsp; &nbsp; doc.FamilyManager.NewType( <span class="maroon">&quot;Type 1&quot;</span> );
+
+&nbsp; familyMgr.Set( param, 0.2 );
+</pre>
+
+<p>Again, thanks to Ishwar for sharing this!

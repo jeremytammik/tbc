@@ -1,0 +1,319 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Selection Watcher Using Idling Event</h3>
+
+<p>Here is a pretty cool example by Ken Goulding of using the Idling event to work around a little gap in the current Revit API.
+Ken posted a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html?cid=6a00e553e16897883301348655bd79970c#comment-6a00e553e16897883301348655bd79970c">
+comment</a> which 
+
+triggered a pretty interesting conversation and culminated in the 
+
+<a href="zip/SelectionWatcher.zip">SelectionWatcher</a> sample.
+
+<p>Another interesting item that cropped up was the possibility to use 
+
+<a href="http://visualstudio.pastebin.com">PasteBin</a> to
+
+share snippets of source code, as Ken did for parts of his initial implementation:
+
+<ul>
+<li><a href="http://visualstudio.pastebin.com/X5rBXSA6">Class implementation</a>
+<li><a href="http://visualstudio.pastebin.com/aNwEFRkZ">Sample usage</a>
+</ul>
+
+<p>The code listed there is now obsolete, though.
+
+<p>Here are some excerpts from our conversation that led up to this sample:
+
+<p><strong>Ken:</strong> When you mentioned "Element Level", I was hoping that included element selection events, but that does not seem to be the case. 
+
+As a work-around, I created a class that subscribes to the application Idling event and checks for selection changes. Given that the Idling event is called very frequently, I tried to be as efficient as possible at figuring out whether a change has happened, but there may be a simpler way? 
+
+<p><strong>Jeremy:</strong> Thank you for your query with the interesting idea and the source code. 
+Thank you also for the interesting PasteBin URLs. I was not previously aware of this possibility.
+
+<p>Regarding the element selection events, you are correct in your assessment that these are currently not provided by the Revit API.
+
+<p>Your use of the Idling event to implement a work-around sounds like a brilliant idea to me.
+
+<p><strong>Ken:</strong> I'm glad you see potential for the selection watcher class. 
+I was using it to link additional data (e.g. photographs) to room objects, but I'm sure your readers can find far more interesting uses for context-sensitive functionality.
+I added a few comments inline.
+Please let me know if anything is not clear,
+
+<p><strong>Jeremy:</strong> Thank you very much for the illuminating sample.
+I like it very much!
+I fixed two details which simplify things:
+ 
+<ol>
+<li>You need to set the 'Copy Local' flag to false on the references to the Revit API DLLs.
+<li>You can obtain the application object from the Idling event arguments, so there is no need for a global variable and a DocumentOpening event handler to set it.
+</ol>
+ 
+<p><strong>Ken:</strong> Thanks for the suggestions. 
+It is good to know that you don't need to copy the Revit API DLLs locally, since they are big.
+
+<p><strong>Jeremy:</strong> Here are some screen snapshots from an example run testing this.
+The selection watcher is an external application and defines its own ribbon panel.
+Here it is ripped off the ribbon bar and placed over the graphics area, so that it remains visible through a ribbon context switch:</p>
+
+<center>
+<img src="img/SelectionChanged0.png" alt="Selection Watcher ribbon panel"/>
+</center>
+
+<p>Here we have selected Room 5, which is displayed immediately by the selection watcher:</p>
+
+<center>
+<img src="img/SelectionChanged1.png" alt="One room selected"/>
+</center>
+
+<p>In this simple implementation, selection of multiple rooms is simply listed as such with no further details:</p>
+
+<center>
+<img src="img/SelectionChanged2.png" alt="Multiple rooms selected"/>
+</center>
+
+<p>For further details including some comments, please look at the source code in the archive file 
+
+<a href="zip/SelectionWatcher.zip">SelectionWatcher.zip</a>.
+
+It includes the full source code, complete Visual Studio solution and an add-in manifest file to load the application.
+
+<p>Here are a few implementation details to whet your appetite:
+
+<ul>
+<li>A standalone SelectionChangedWatcher class implementation which is completely separate from the external application.
+<li>The external application instantiates an instance of the SelectionChangedWatcher class and subscribes to its SelectionChanged event. 
+<li>The external application does not need to know how the SelectionChanged event is implemented, or that it is internally triggered by the Idling event.
+</ul>
+
+<p>This allows the following minimalistic implementation of the external application class, which just needs to set up its ribbon panel and text box to display the results, instantiate and subscribe to the selection watcher, and update the text box when changes occur:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+[<span class="teal">Journaling</span>( <span class="teal">JournalingMode</span>.NoCommandData )]
+&nbsp;
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">SelectionChangedExampleApp</span>
+&nbsp; : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">private</span> <span class="teal">SelectionChangedWatcher</span>
+&nbsp; &nbsp; _selectionChangedWatcher;
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">TextBox</span> _tb;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _selectionChangedWatcher
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SelectionChangedWatcher</span>( a );
+&nbsp;
+&nbsp; &nbsp; _selectionChangedWatcher.SelectionChanged
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; OnSelectionChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// it does not seem to be possible to add items </span>
+&nbsp; &nbsp; <span class="green">// to context-sensitive ribbon panels.</span>
+&nbsp; &nbsp; <span class="green">// however the user can detach this panel from </span>
+&nbsp; &nbsp; <span class="green">// the main ribbon so that it is not hidden by </span>
+&nbsp; &nbsp; <span class="green">// context-sensitive panels.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> rpSelectionWatcher
+&nbsp; &nbsp; &nbsp; = a.CreateRibbonPanel( <span class="maroon">&quot;Selection Watcher&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> t1 = <span class="blue">new</span> <span class="teal">TextBoxData</span>( <span class="maroon">&quot;txtInfo&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _tb = rpSelectionWatcher.AddItem( t1 ) <span class="blue">as</span> <span class="teal">TextBox</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnSelectionChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _selectionChangedWatcher.Selection )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ShowInfo( <span class="maroon">&quot;No selection&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// this example just reports the name of the </span>
+&nbsp; &nbsp; <span class="green">// room that is selected. Obviously any other</span>
+&nbsp; &nbsp; <span class="green">// kind of element can be handled instead.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Room</span>&gt; rooms = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Room</span>&gt;(
+&nbsp; &nbsp; &nbsp; _selectionChangedWatcher.Selection.OfType&lt;<span class="teal">Room</span>&gt;() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == rooms.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ShowInfo( <span class="maroon">&quot;No rooms selected&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( 1 == rooms.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ShowInfo( <span class="maroon">&quot;Room &quot;</span> + rooms[0].Number );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ShowInfo( <span class="maroon">&quot;Multiple rooms selected&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> ShowInfo( <span class="blue">string</span> p )
+&nbsp; {
+&nbsp; &nbsp; _tb.PromptText = p;
+&nbsp; }
+}
+</pre>
+
+<p>The SelectionChangedExample class is more interesting, of course.
+
+<ul>
+<li>It takes the UIControlledApplication as an argument, so that it can subscribe to the Idling event.
+<li>It manages the subscription to the Idling event internally, with no need for the client to be aware of that.
+<li>It uses an auto-implemented property to store a list of all currently selected elements.
+<li>Every selection change is registered in the Idling event handler, updates the selection property, and triggers the SelectionChanged event.
+</ul>
+
+<p>Here it is in all its glory:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">SelectionChangedWatcher</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">event</span> <span class="teal">EventHandler</span> SelectionChanged;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Auto-implemented property storing a list </span>
+&nbsp; <span class="gray">///</span><span class="green"> of all currently selected elements.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; Selection
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; <span class="blue">set</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; _lastSelIds;
+&nbsp;
+&nbsp; <span class="blue">public</span> SelectionChangedWatcher(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.Idling
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnIdling(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">IdlingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Idling events happen when the application has </span>
+&nbsp; &nbsp; <span class="green">// nothing else to do,</span>
+&nbsp; &nbsp; <span class="green">// They can happen very frequently and the user </span>
+&nbsp; &nbsp; <span class="green">// will experience a lag if this code takes a </span>
+&nbsp; &nbsp; <span class="green">// significant amount of time to execute.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiApplication
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SelElementSet</span> selected = uiApplication
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == selected.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != Selection &amp;&amp; 0 &lt; Selection.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// if something was selected previously, and </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// now the selection is empty, report change</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; HandleSelectionChange( selected );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="green">// elements are selected</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == Selection )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// previous selection was null, report change</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; HandleSelectionChange( selected );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( Selection.Count != selected.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// size has changed, no need to check </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// selection IDs, report the change</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HandleSelectionChange( selected );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// count is the same... </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// compare IDs to see if selection has changed</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( SelectionHasChanged( selected ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HandleSelectionChange( selected );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">bool</span> SelectionHasChanged(
+&nbsp; &nbsp; <span class="teal">SelElementSet</span> selected )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// we have already determined that the size of </span>
+&nbsp; &nbsp; <span class="green">// &quot;selected&quot; is the same as the last selection...</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> selected )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _lastSelIds[i] != e.Id.IntegerValue )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> HandleSelectionChange(
+&nbsp; &nbsp; <span class="teal">SelElementSet</span> selected )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// store the current list of elements in the </span>
+&nbsp; &nbsp; <span class="green">// Selection property and populate _lastSelIds </span>
+&nbsp; &nbsp; <span class="green">// with the current selection's ids</span>
+&nbsp;
+&nbsp; &nbsp; Selection = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; _lastSelIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> selected )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Selection.Add( e );
+&nbsp; &nbsp; &nbsp; _lastSelIds.Add( e.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; Call_SelectionChanged();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> Call_SelectionChanged()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( SelectionChanged != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; SelectionChanged( <span class="blue">this</span>, <span class="blue">new</span> <span class="teal">EventArgs</span>() );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Very many thanks to Ken for this idea and implementation and the fruitful discussion!

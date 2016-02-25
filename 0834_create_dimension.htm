@@ -1,0 +1,179 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07663455 [Create Dimension lines in drafting view] -->
+
+<h3>Create Dimension between Two Lines</h3>
+
+<p>Another one of those recurring questions: how to create dimensioning.
+
+<p>I took the opportunity to highlight how to search the samples, find a solution, and apply a correction to RevitLookup yourself.
+
+<p>You have the code.
+
+<p>May the Force be with you.
+
+<p><strong>Question:</strong> I tried to create detail drawings programmatically using the ItemFactoryBase NewDimension method.
+
+<p>I am creating detail lines in the drafting view based the on the geometry wall elements and would like to use Revit dimensioning to insert measurements into the detail drawings.
+
+<p>How do I obtain the reference for the detail lines of a drafting view to be able to call the NewDimension method?
+
+<p>I am sure that this is possible, since I can create dimension lines in a drafting view using the dimension line commands on the Annotate ribbon.
+
+
+<p><strong>Answer:</strong> Whenever you are faced with a question like this, please always begin by studying the three main official sources of information:
+
+<ul>
+<li>The Revit API help file RevitAPI.chm.
+<li>The online wikihelp Revit 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00006-API_Developer%27s_Guide">
+API Developer's Guide</a>.
+<li>The Revit SDK sample source code.
+</ul>
+
+<p>Normally, when researching an issue like this myself, I perform a global search across the entire project in the SDKSamples2013.sln solution.
+
+<p>This time, happily, I extended it to the entire samples directory instead, including RevitLookup.
+To tell the truth, I even searched my whole hard disk for all C# files containing NewDimension, because there were not that many in total.
+
+<p>This turned up the following hits in the Revit SDK folder (copy and paste to an editor to see the truncated lines):
+
+<pre>
+C:\...\SDK\RevitLookup\CS\Test\TestElements.cs(1255):               //        m_revitApp.ActiveUIDocument.Document.Create.NewDimension(dimension.View, line, dimension.References, dimension.DimensionType);
+C:\...\SDK\RevitLookup\CS\Test\TestElements.cs(1470):            m_revitApp.ActiveUIDocument.Document.Create.NewDimension(m_revitApp.ActiveUIDocument.Document.ActiveView,
+C:\...\SDK\RevitLookup\CS\Test\TestElements.cs(1475):            m_revitApp.ActiveUIDocument.Document.FamilyCreate.NewDimension(m_revitApp.ActiveUIDocument.Document.ActiveView,
+C:\...\SDK\RevitLookup\CS\Utils\Elements.cs(272):            Dimension dimensionClone = app.ActiveUIDocument.Document.Create.NewDimension(dimension.View, line, dimension.References);
+C:\...\SDK\Samples\CreateDimensions\CS\Command.cs(213):                    Dimension newDimension = doc.Create.NewDimension(
+C:\...\SDK\Samples\CreateDimensions\CS\Command1.cs(219):                    Dimension newDimension = doc.Create.NewDimension(
+C:\...\SDK\Samples\FamilyCreation\WindowWizard\CS\CreateDimension.cs(31):    /// The class allows users to create dimension using Document.FamilyCreate.NewDimension() function
+C:\...\SDK\Samples\FamilyCreation\WindowWizard\CS\CreateDimension.cs(91):            dim = m_document.FamilyCreate.NewDimension(view, line, refArray);
+C:\...\SDK\Samples\FamilyCreation\WindowWizard\CS\CreateDimension.cs(125):            dim = m_document.FamilyCreate.NewDimension(view, line, refArray);
+C:\...\SDK\Samples\FamilyCreation\WindowWizard\CS\CreateDimension.cs(160):            dim = m_document.FamilyCreate.NewDimension(view, line, refArray);
+</pre>
+
+<p>The very first of those, in the RevitLookup test framework, looks like it should answer your question right away:
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> location1 = <span class="teal">GeomUtils</span>.kOrigin;
+&nbsp; <span class="teal">XYZ</span> location2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 20.0, 0.0, 0.0 );
+&nbsp; <span class="teal">XYZ</span> location3 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 20.0, 0.0 );
+&nbsp; <span class="teal">XYZ</span> location4 = <span class="blue">new</span> <span class="teal">XYZ</span>( 20.0, 20.0, 0.0 );
+&nbsp;
+&nbsp; <span class="teal">Curve</span> curve1 = m_revitApp.Application.Create
+&nbsp; &nbsp; .NewLine( location1, location2, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">Curve</span> curve2 = m_revitApp.Application.Create
+&nbsp; &nbsp; .NewLine( location3, location4, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">DetailCurve</span> dCurve1 = <span class="blue">null</span>;
+&nbsp; <span class="teal">DetailCurve</span> dCurve2 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !doc.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; dCurve1 = doc.Create.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, curve1 );
+&nbsp;
+&nbsp; &nbsp; dCurve2 = doc.Create.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, curve2 );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != doc.OwnerFamily
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != doc.OwnerFamily.FamilyCategory )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !doc.OwnerFamily.FamilyCategory.Name
+&nbsp; &nbsp; &nbsp; &nbsp; .Contains( <span class="maroon">&quot;Detail&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please make sure you open a detail based family template.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RevitLookup&quot;</span>, <span class="teal">MessageBoxButtons</span>.OK,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBoxIcon</span>.Information );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; dCurve1 = doc.FamilyCreate.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, curve1 );
+&nbsp;
+&nbsp; &nbsp; dCurve2 = doc.FamilyCreate.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, curve2 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = m_revitApp.Application.Create.NewLine(
+&nbsp; &nbsp; location2, location4, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">ReferenceArray</span> refArray = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; refArray.Append( dCurve1.GeometryCurve.Reference );
+&nbsp; refArray.Append( dCurve2.GeometryCurve.Reference );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !doc.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; doc.Create.NewDimension( 
+&nbsp; &nbsp; &nbsp; doc.ActiveView, line, refArray );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; doc.FamilyCreate.NewDimension( 
+&nbsp; &nbsp; &nbsp; doc.ActiveView, line, refArray );
+&nbsp; }
+</pre>
+
+<p>I tried running this sample command by selecting the ribbon tab Add-Ins &gt; Revit Lookup &gt; Test Framework... &gt; Object Hierarchy &gt; APIObject &gt; Element &gt; Dimension &gt; OK.
+
+<p>That calls the DimensionHardWired method to do the job.
+
+<p>Unfortunately, it throws an exception saying "Attempt to modify the model outside of transaction".
+
+<p>I fixed it by adding the following lines right at the beginning of the method:
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;DimensionHardWired&quot;</span> );
+</pre>
+
+<p>Obviously, I need to commit the transaction and close the using statement at the end again:
+
+<pre class="code">
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+</pre>
+
+<p>Now is successfully completes with the following result:
+
+<center>
+<img src="img/new_dimension.png" alt="New dimension"/>
+</center>
+
+<p>You can also look at two The Building Coder samples creating wall dimensioning, either by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-by-iterating-faces.html">
+iterating over the wall faces</a> to
+
+pick the two suitable ones, or using 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-using-findreferencesbydirection.html">
+FindReferencesByDirection to shoot a ray</a> and
+
+find them directly.
+
+<p>They both retrieve the geometry references from the wall faces, and not from a simple detail line, though.
+
+<p>All together, this should provide more than enough to solve your issue.
+
+
+<a name="2"></a>
+
+<h4>Accessing the Path of a Family Document from the Family Instance</h4>
+
+<p>Before closing, here is pointer to a cool discovery by Saikat Bhattacharya: if you try to find the family document of a family instance and go through the path family instance &gt; family symbol &gt; family &gt; document, you end up at the document containing the family instance. 
+If you are actually after the family document defining the instance, you need to go through the EditFamily method instead.
+More details on
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/accessing-the-path-a-revit-family-document-from-the-family-instance.html">
+accessing the path of a family document from an instance</a>.
+

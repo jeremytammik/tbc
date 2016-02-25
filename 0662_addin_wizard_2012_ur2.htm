@@ -1,0 +1,205 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Product and Add-In Wizard Updates</h3>
+
+<p>Here are several interesting updates and other little news items that appeared recently.
+
+<ul>
+<li><a href="#2">Revit 2012 update release 2</a>
+<li><a href="#3">Visual Studio Revit add-in wizard update</a>
+<li><a href="#4">Removing an Add-In Registered by the Wizard</a>
+<li><a href="#5">Global Leadership Summit at the One Team Conference</a>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Revit 2012 Update Release 2</h4>
+
+<p>A few days ago, I was very surprised to hear that some people neglect to update their Revit products when intermediate updates appear.
+I find that incomprehensible.
+I updated all three flavours myself yesterday with zero hassle.
+
+<p>Revit 2012 Update Release 1 was published back in June 2011 and also included a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/updated-sdk-for-revit-2012-update-release-1.html">
+slightly updated Revit SDK</a>.
+
+<p>Revit 2012 Update Release 2 is now available and can be downloaded from the public Revit product pages:
+
+<ul>
+<li>
+<a href="http://www.autodesk.com/revitarchitecture">Revit Architecture</a> &gt; 
+<a href="http://images.autodesk.com/adsk/files/Enhancements_List_RAC_2012_UR2.pdf">Update Enhancement List</a> (pdf - 136Kb) &gt; 
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262001">Product Download</a></li>
+<li>
+<a href="http://www.autodesk.com/revitmep">Revit MEP</a> &gt; 
+<a href="http://images.autodesk.com/adsk/files/Enhancements_List_RME_2012_UR2.pdf">Update Enhancement List</a> (pdf - 146Kb) &gt; 
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262043">Product Download</a></li>
+<li>
+<a href="http://www.autodesk.com/revitstructure">Revit Structure</a> &gt; 
+<a href="http://images.autodesk.com/adsk/files/Enhancements_List_RST_2012_UR2.pdf">Update Enhancement List</a> (pdf - 200Kb) &gt; 
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262026">Product Download</a></li>
+</ul>
+
+<p>Please refer to the links above to read the separate lists of all the platform and product enhancements for Architecture, MEP and Structure.
+
+<p>Besides that, here are the API Enhancements made in this update, which are obviously shared across all flavours, since the Revit API is identical for all:
+
+<ul>
+<li>Corrects the sheet size calculation when exporting to one sheet to DWFx.
+<li>Improves stability during Reload Latest/Sync to Central when the document is not allowed to be modified.
+<li>Retains schemas during Sync to Central and allows central file to remain correct.
+<li>Reduces file corruption introduced by extensible storage.
+</ul>
+
+<p>I highly recommend installing these updates.
+
+
+<a name="3"></a>
+
+<h4>Visual Studio Revit Add-in Wizard Update</h4>
+
+<p>A while back, I updated my Visual Studio Revit add-in wizards to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+support the Revit 2012 API</a>.
+For the full description of these wizards, please refer to the previous posts:
+
+<!--
+
+415_devtv_addin_templates.htm
+451_revit_2011_devtv.htm
+498_snow_and_woe.htm
+523_ui_auto_design_option.htm
+541_application_attributes.htm
+
+-->
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64 bit versions</a> for C# and VB.
+
+</ul>
+
+<p>Now another issue gradually emerged which prompted me to revisit them once again:
+
+<p>When creating little sample projects, I have so far always left the resulting assembly DLLs in the Visual Studio bin/debug directory where they are created, and specified the full path to that location in the add-in manifest Assembly tag.
+For distributing projects, or moving them around, this is cumbersome, since the path always needs updating in the add-in manifest.
+Since the add-in manifest has to be copied to the Revit add-ins folder anyway, there is a pretty obvious and much more robust solution:
+simply copy the assembly DLL to the same location as the add-in manifest, and no path needs to be specified at all.
+
+<p>This led me to make appropriate changes to the C# add-in wizard for my own use.
+Besides that, I also changed some of the file encodings:
+
+<ul>
+<li>Converted the source code files from UTF-8 to ANSI encoding.
+<li>Removed the DLL path from the add-in manifest Assembly tag.
+<li>Instead, copy the assembly DLL together with the add-in manifest to the Revit add-in directory, so no path specification is needed.
+</ul>
+
+<!-- begin modified
+<p>I only created the update for C# so far, I'm ashamed to say, since that is all I use. -->
+
+<p>To install, simply copy the desired zip file to the appropriate location in your local file system:
+
+<ul>
+<li><a href="zip/TemplateRevitArch2012AddinCsJt_4.zip">TemplateRevitArch2012AddinCsJt_4.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+
+<li><a href="zip/TemplateRevitArch2012AddinVbJt_4.zip">TemplateRevitArch2012AddinVbJt_4.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>Which version of the wizard to use is actually a question of personal preference. <!-- end modified -->
+The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+previous one</a> avoids 
+
+the overhead of creating a copy of the add-in assembly DLL together with the add-in manifest in the Revit add-ins folder, and uses the original copy in its original build location instead, which is good. 
+On the other hand, it explicitly adds the full path of the build location to the add-in manifest, which makes it more of a hassle to move the add-in to a different location.
+I would say that the new one is better if you plan to share the add-in with others, and the old one has a slight advantage for purely personal, one-time use.
+
+
+<a name="4"></a>
+
+<h4>Removing an Add-In Registered by the Wizard</h4>
+
+<p>This ties in neatly with an issue that was raised by bthatcher in the Autodesk Revit API discussion group on 
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/looking-in-wrong-place-for-DLL/m-p/3181720#M2342">
+removing an add-In</a> registered 
+
+by the wizard:
+
+<p><strong>Question:</strong> I have a project in the '...\Visual Studio 2010\Projects\...'  directory and I have that path in the add-in file. But I'm getting an error about '...does not exist'. I have copied and pasted that path and DLL name into the add-in file, just like I always do, but for some reason it's still looking for it in the wrong place. 
+I started the project from a template I downloaded. 
+
+<p>Finally, I removed all add-ins from the add-in folder and uninstalled and reinstalled Revit. 
+I'm still getting the error "External Tools - Add-in Assembly Not Found". 
+I created two projects with this template. 
+The included add-in file had both Command and Application placeholders. 
+So I'm getting four errors, a command and application error for each project. 
+
+<p><strong>Answer:</strong> <p>The only thing that can cause a Revit add-in to be loaded, or searched for to cause that message to appear, is an add-in manifest in one of the two locations checked by Revit, for all users or a specific user. These locations again depend on the OS, whether Vista or XP, so you end up with four possible locations to check. They are listed in the Revit SDK developer guide:
+
+<p>For Windows XP:
+
+<p>C:\Documents and Settings\<your login>\Application Data\Autodesk\Revit\Addins\2012
+
+<p>or
+
+<p>C:\Documents and Settings\All Users\Application Data\Autodesk\Revit\Addins\2012
+
+<p>For Vista/Windows 7:
+
+<p>C:\Users\<your login>\AppData\Roaming\Autodesk\Revit\Addins\2012
+
+<p>or
+
+<p>C:\ProgramData\Autodesk\Revit\Addins\2012ÿ
+
+<p>If you have deleted all files in those two directories, the error cannot appear.
+
+<p>If the add-in manifest was placed there by the Visual Studio Revit add-In wizard, then you can also simply open that project in Visual Studio and select Build > Clean Solution to remove it again.
+
+
+<a name="5"></a>
+
+<h4>Global Leadership Summit at the One Team Conference</h4>
+
+<p>Of less interest to developers, but all the more so to leaders and visionaries, the 2012 incarnation of the Autodesk One Team Conference is scheduled for March next year,
+
+<a href=""http://otc2011.autodeskevents.com/index.cfm?event=savethedate">
+OTC 2012</a>. 
+
+At that event, on Thursday, March 15 2012, we are hosting the first ever Global Leadership Summit where senior leaders of Autodesk partners will explore as a group how to develop higher-performance within their organizations. 
+The summit consists of three tracks focused on Marketing, Sales Management and Consulting. 
+Participants will be asked to select a track and attend the track for the entire day. 
+If you are interested, please take a brief survey to help identify the top challenges in each track early on:
+
+<ul>
+<li><a href="http://www.surveymonkey.com/s/PP3W5J3">English</a>
+<li><a href="http://www.surveymonkey.com/s/3YMNC5G">French</a>
+<li><a href="http://www.surveymonkey.com/s/6HXGKVM">German</a>
+<li><a href="http://www.surveymonkey.com/s/3DFLGW6">Italian</a>
+<li><a href="http://www.surveymonkey.com/s/DMR2MPY">Russian</a>
+<li><a href="http://www.surveymonkey.com/s/39TSDYV">Spanish</a>
+</ul>
+

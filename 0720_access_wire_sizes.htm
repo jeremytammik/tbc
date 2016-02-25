@@ -1,0 +1,168 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06941649 [Revit Lookup - Snoop DB fails at the TemperatureRatingType Class]
+SPR #218732 [accessing wire size settings in TemperatureRatingType WireSizes property throws exception]
+
+-->
+
+<h3>Access Wire Sizes</h3>
+
+<p>Here is an interesting question that came up regarding the access to wire sizes.
+Using a filtered element collector to retrieve a TemperatureRatingType instance and attempting to read its wire sizes produces a problem that is in fact documented in the Revit API help file RevitAPI.chm, but the workaround is still worth pointing out.
+
+<p><strong>Question:</strong> I'm trying to access the wire size settings in a Revit model without success. 
+
+<p>The following code throws an exception saying "Object reference not set to an instance of an object" from the call to the TemperatureRatingType WireSizes property:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> col 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TemperatureRatingType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">TemperatureRatingType</span>&gt; trEnumerable 
+&nbsp; &nbsp; = col.ToElements().Cast&lt;<span class="teal">TemperatureRatingType</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">var</span> TempRatingReturn 
+&nbsp; &nbsp; = <span class="blue">from</span> rtelement <span class="blue">in</span> trEnumerable
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> rtelement.Name == <span class="maroon">&quot;60&quot;</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> rtelement;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">TemperatureRatingType</span> rt 
+&nbsp; &nbsp; <span class="blue">in</span> TempRatingReturn )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">WireSizeSet</span> wsset = rt.WireSizes;
+&nbsp; }
+</pre>
+
+
+<p><strong>Answer:</strong> You are absolutely right, and this is actually the documented and expected behaviour, although it may not be completely obvious from the API documentation.
+The description of the TemperatureRatingType class states the following:
+
+<p style="color:darkblue">Temperature rating type is defined based on corresponding wire material type. 
+It includes type information such as wire size, insulation type, correction factor, etc. 
+Only the temperature rating types which are retrieved from WireMaterialType can work well, so don't retrieve it from Revit document directly.
+
+<p>What this actually means is that the TemperatureRatingType object is not supported when retrieved through an ElementFilter. 
+It can be retrieved from the document electrical settings WireMaterialTypes collection instead.
+In fact, you <b>must</b> retrieve it from there in able to access the wire sizes.
+This may seem odd, but is currently a fact. 
+The workaround is thus very simple:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">WireMaterialType</span> wt <span class="blue">in</span> doc.Settings
+&nbsp; &nbsp; .ElectricalSetting.WireMaterialTypes )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">TemperatureRatingType</span> trt <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; wt.TemperatureRatings )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">WireSizeSet</span> ws = trt.WireSizes;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I implemented an add-in named ReadWireSizes which demonstrates both the exception being thrown and the workaround to retrieve the desired wire size settings from the electrical settings instead.
+
+<p>Here is the complete implementation of the external command Execute method:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Retrieve TemperatureRatingType from</span>
+&nbsp; <span class="green">// filtered element collector; their</span>
+&nbsp; <span class="green">// wire sizes cannot be accessed:</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TemperatureRatingType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">TemperatureRatingType</span>&gt; trEnumerable 
+&nbsp; &nbsp; = col.ToElements().Cast&lt;<span class="teal">TemperatureRatingType</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">var</span> TempRatingReturn 
+&nbsp; &nbsp; = <span class="blue">from</span> rtelement <span class="blue">in</span> trEnumerable
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> rtelement.Name == <span class="maroon">&quot;60&quot;</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> rtelement;
+&nbsp;
+&nbsp; <span class="green">// The wire sizes we are searching for:</span>
+&nbsp;
+&nbsp; <span class="teal">WireSizeSet</span> wsset = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Keep track of the target TemperatureRatingType:</span>
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> rtId = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">TemperatureRatingType</span> rt 
+&nbsp; &nbsp; <span class="blue">in</span> TempRatingReturn )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; rtId = rt.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This call fails:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; wsset = rt.WireSizes;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">NullReferenceException</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( ex.GetType().ToString() 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;: &quot;</span> + ex.Message );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( ex.Message.Equals( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Object reference not set to an instance of an object.&quot;</span> ), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected null reference exception&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Iterate over the electrical settings </span>
+&nbsp; <span class="green">// wire material types and use the target </span>
+&nbsp; <span class="green">// element id to identify the proper</span>
+&nbsp; <span class="green">// TemperatureRatingType:</span>
+&nbsp;
+&nbsp; <span class="teal">WireMaterialTypeSet</span> wts = doc.Settings
+&nbsp; &nbsp; .ElectricalSetting.WireMaterialTypes;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">WireMaterialType</span> wt <span class="blue">in</span> wts )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">TemperatureRatingType</span> rt 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> wt.TemperatureRatings )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( rtId == rt.Id )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; wsset = rt.WireSizes;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = wsset.Size;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} wire size{1} stored on temperature &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;rating type with element id {2}&quot;</span>,
+&nbsp; &nbsp; n, ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ), rtId ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Running this command in the rme_advanced_sample_project.rvt sample project provided with Revit 2012 MEP generates the following output in the Visual Studio debug output window:
+
+<pre>
+A first chance exception of type 'System
+  .NullReferenceException' occurred in RevitAPI.dll
+System.NullReferenceException: Object reference 
+  not set to an instance of an object.
+28 wire sizes stored on temperature rating type 
+  with element id 293221
+</pre>
+
+<p>Here is 
+
+<a href="zip/ReadWireSizes.zip">
+ReadWireSizes.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this external command.

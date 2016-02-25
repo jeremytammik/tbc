@@ -1,0 +1,51 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 08638684 [Schedule Table Titles are missing] -->
+
+<h3>Revit 2014 Update Release 1</h3>
+
+<p>Rather belatedly, let me point out that Revit 2014 Update Release 1 has been posted to the
+
+<a href="http://www.autodesk.com/products/autodesk-revit-family">
+Autodesk Revit</a> product pages:</p>
+
+<ul>
+<li><a href="http://usa.autodesk.com/adsk/servlet/ps/dl/item?siteID=123112&id=22002894&linkID=16831210">
+Revit 2014 Update Release 1</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/ps/dl/item?siteID=123112&id=22002645&linkID=21208796">
+Revit Architecture 2014 Update Release 1</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/ps/dl/item?siteID=123112&id=22002629&linkID=21208796">
+Revit MEP 2014 Update Release 1</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/ps/dl/item?siteID=123112&id=22002614&linkID=21208796">
+Revit Structure 2014 Update Release 1</a></li>
+</ul>
+
+<p>As usual, the update release uses service pack technology and does not require a full install.</p>
+
+<p>Prior to installing the Update Release 1, please verify that you are running the First Customer Ship build of Autodesk Revit 2014, build 20130308_1515.</p>
+
+<p>After the update, the build number specified in the Help &gt; About dialogue will be 20130709_2115.</p>
+
+
+<a name="2"></a>
+
+<h4>Revit 2014 Update Release 1 API Enhancements</h4>
+
+<p>Here is the list of API enhancements provided by this update:</p>
+
+<ul>
+<li>Allows a drag/drop operation (UIApplication.DoDragDrop) to initiate from a dockable window.</li>
+<li>Improves the ability to include any type of component inside a dockable window without it disappearing during Revit redraw efforts.</li>
+<li>Allows UIApplication.PostCommand() to work consistently for Add-in created commands.</li>
+<li>Triggers an updater callback for ElementChangeTypeGeometry related to rebar and other reinforcement elements when their geometry changes.</li>
+<li>Improves stability for FamilyManager.NewType() on families which have no defined types already.</li>
+<li>Allows FamilyManager.Set(ElementId) to work correctly for family parameters of type LoadClassification.</li>
+<li>Improves stability for reading Mesh and MeshTriangle elements.</li>
+<li>Creates the default schedule header automatically when schedules are created by ViewSchedule.Create() methods.</li>
+<li>Allows ViewSchedule.GroupHeaders() to succeed even if the schedule is not active.</li>
+<li>Allows Connector.DisconnectFrom() to consistently remove unneeded information from the associated element, so that it can be reconnected as needed.</li>
+<li>OpenOptions.SetOpenWorksetConfiguration() allows null to remove the existing configuration.</li>
+</ul>

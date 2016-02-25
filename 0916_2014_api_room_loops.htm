@@ -1,0 +1,396 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2014 API and Plan View Room Boundary Loops</h3>
+
+<p>I am continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>.
+
+<p>At the same time, Revit 2014 has been announced, and I am sure you are eager to hear more about that, especially from the API point of view, so let's have a look at that first.</p>
+
+
+<a name="2"></a>
+
+<h4>The Revit 2014 API</h4>
+
+<p>It is impossible to cover everything, and I have to start somewhere.</p>
+
+<p>Here are a couple of highlights:</p>
+
+<ul>
+<li>API access to the project browser and selected elements; API commands and macros are enabled.</li>
+<li>Copy and paste API supports copy within or between documents including view-specific elements.</li>
+<li>Full API support for the new non-rectangular crop regions.</li>
+<li>Schedule API now provides formatting control and read-write access to individual data items.</li>
+<li>Command API enables programmatic command launch including built-in Revit, external add-in and macro.</li>
+<li>Add-in API supports mid-session loading and execution.</li>
+<li>Displaced elements API enables exploded views.</li>
+<li>Join geometry API to create or remove a Boolean join and control join order.</li>
+<li>FreeForm element API enables modification of solid geometry imported from  e.g. DWG or SAT.</li>
+<li>Site API enables editing of topography surface points and supports sub-regions.</li>
+<li>MEP calculations are moved to external services and can be replaced by add-ins.</li>
+<li>Structural reinforcement and rebar enhancements.</li>
+<li>Enhanced document open, save and worksharing API.</li>
+<li>Linked model API supports loading, unloading, path manipulation, link identification and creation.</li>
+<li>Linked model interaction enables tag creation for linked rooms, linked element selection, geometric reference conversion, etc.</li>
+<li>Import DXF markup, import and link SAT and SketchUp.</li>
+<li>Export to NavisWorks via add-in, access DWG, IFC and DGN layer, linetype, lineweight, font and pattern tables.</li>
+<li>Direct API access to rendering output pipeline including all geometry and material properties.</li>
+<li>Macro API provides support for Python and Ruby development plus List, create, delete and execute modules, macros and security settings.</li>
+</ul>
+
+<p>How does that sound?</p>
+
+<p>Rather a lot of new stuff, isn't there?</p>
+
+<p>Rather a lot of <b>really exciting</b> new stuff, isn't there?</p>
+
+<p>Joe Ye describes a few of these API features in a little more detail on the
+
+<a href="http://adndevblog.typepad.com/aec/2013/03/revit-2014-announced.html">AEC DevBlog</a>.</p>
+
+<p>To round this off, here are the complete materials from the Revit 2014 DevDays presentations:</p>
+
+<ul>
+<li><a href="file:///a/lib/revit/2014/adn/devdays_online/revit_2014_api_presentation_slides.pdf">Presentation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/revit_2014_api/index.html">Recording</a>&nbsp;&nbsp;<a href="/a/lib/revit/2014/adn/devdays_online/camtasia/web/revit_2014_api/index.html">^</a></li>
+<li><a href="file:///a/lib/revit/2014/adn/devdays_online/revit_2014_api_sample_source_code.zip">Sample code</a></li>
+</ul>
+
+<p>We will have all the time in the world to explore this in more detail anon.</p>
+
+<p>The material provided above should keep you occupied over the Easter weekend, however  :-)</p>
+
+<p>Enjoy!</p>
+
+
+<a name="3"></a>
+
+<h4>Retrieving Plan View Room Boundary Polygon Loops</h4>
+
+<p>Returning to the cloud-based 2D model editing project, one of the first required components is an add-in that determines and uploads the room, furniture and equipment family instance boundary polygons to some globally accessible data repository for a simplified 2D plan view rendering on a mobile device.
+
+<p>As a first step in that direction, I revamped my code to retrieve and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/graphically-display-area-boundary-loops.html">
+graphically display area boundary loops</a> and
+
+combined it with the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html#7">
+integer-based point class</a> that
+
+I implemented for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">
+OBJ model exporter</a>.</p>
+
+<p>The task I want to achieve for the first part of this first step is to retrieve the room boundary and store the 2D loops in a cloud-based data repository.</p>
+
+<p>Since Revit does not support precision below one sixteenth of an inch, I might as well approximate all my data to something in that region.</p>
+
+<p>For performance and efficiency reasons, it is also useful to move my calculations from floating point double numbers to integers.</p>
+
+<p>Since I want to display my model on a mobile device with a limited resolution using SVG, integers also seem pretty appropriate.</p>
+
+<p>Very handily, a millimetre is just a little bit less than a sixteenth of an inch.</p>
+
+<p>That leads me to define the following integer-based 2D point class:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> An integer-based 2D point class.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">Point2dInt</span> : <span class="teal">IComparable</span>&lt;<span class="teal">Point2dInt</span>&gt;
+{
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> X { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Y { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _feet_to_mm = 25.4 * 12;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> ConvertFeetToMillimetres( <span class="blue">double</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">int</span>) ( _feet_to_mm * d + 0.5 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a 3D Revit XYZ to a 2D millimetre </span>
+&nbsp; <span class="gray">///</span><span class="green"> integer point by discarding the Z coordinate</span>
+&nbsp; <span class="gray">///</span><span class="green"> and scaling from feet to mm.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> Point2dInt( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; X = ConvertFeetToMillimetres( p.X );
+&nbsp; &nbsp; Y = ConvertFeetToMillimetres( p.Y );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> CompareTo( <span class="teal">Point2dInt</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> d = X - a.X;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = Y - a.Y;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1})&quot;</span>, X, Y );
+&nbsp; }
+}
+</pre>
+
+<p>A room boundary may include several loops, for instance if a room surrounds some other space such as an elevator, i.e. its outer boundary loop contains some interior loops representing 'holes'.</p>
+
+<p>Therefore, the room GetBoundarySegments method returns a list of loops, and each loop as a list of boundary segments:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops = room.
+&nbsp; &nbsp; GetBoundarySegments( opt );
+</pre>
+
+<p>I therefore define my own integer-based 2D loop and list of loops classes like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">JtLoop</span> : <span class="teal">List</span>&lt;<span class="teal">Point2dInt</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> JtLoop( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, <span class="blue">this</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">class</span> <span class="teal">JtLoops</span> : <span class="teal">List</span>&lt;<span class="teal">JtLoop</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> JtLoops( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The code to retrieve the boundary segments and convert them to my own representation can be implemented as follows:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve the room plan view boundary </span>
+<span class="gray">///</span><span class="green"> polygon loops and convert to 2D integer-based.</span>
+<span class="gray">///</span><span class="green"> For optimisation and consistency reasons, </span>
+<span class="gray">///</span><span class="green"> convert all coordinates to integer values in</span>
+<span class="gray">///</span><span class="green"> millimetres. Revit precision is limited to </span>
+<span class="gray">///</span><span class="green"> 1/16 of an inch, which is abaut 1.2 mm, anyway.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">JtLoops</span> GetRoomLoops( <span class="teal">Room</span> room )
+{
+&nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; opt.SpatialElementBoundaryLocation =
+&nbsp; &nbsp; <span class="teal">SpatialElementBoundaryLocation</span>.Center; <span class="green">// loops closed</span>
+&nbsp; &nbsp; <span class="green">//SpatialElementBoundaryLocation.Finish; // loops not closed</span>
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops = room.
+&nbsp; &nbsp; GetBoundarySegments( opt );
+&nbsp;
+&nbsp; <span class="blue">int</span> nLoops = loops.Count;
+&nbsp;
+&nbsp; <span class="teal">JtLoops</span> jtloops = <span class="blue">new</span> <span class="teal">JtLoops</span>( nLoops );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt; loop <span class="blue">in</span> loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> nSegments = loop.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtLoop</span> jtloop = <span class="blue">new</span> <span class="teal">JtLoop</span>( nSegments );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="blue">null</span>; <span class="green">// loop start point</span>
+&nbsp; &nbsp; <span class="teal">XYZ</span> p; <span class="green">// segment start point</span>
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="blue">null</span>; <span class="green">// segment end point</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> seg <span class="blue">in</span> loop )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p = seg.Curve.get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; jtloop.Add( <span class="blue">new</span> <span class="teal">Point2dInt</span>( p ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == q || q.IsAlmostEqualTo( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; q = seg.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p.ToUv() ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q.ToUv() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p0 = p; <span class="green">// save loop start point</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( p0 ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal loop start point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; jtloops.Add( jtloop );
+&nbsp; }
+&nbsp; <span class="blue">return</span> jtloops;
+}
+</pre>
+
+<p>My external command mainline Execute method driving this method also implements some fancy pre- and post-selection support and reporting code listing the contents of my 2D integer-based loops in the Visual Studio debug output window:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Iterate over all pre-selected rooms</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; sel.Elements.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Room</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only room&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; elements before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// If no rooms were pre-selected, </span>
+&nbsp; <span class="green">// prompt for post-selection</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; refs = sel.PickObjects( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">RoomSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select rooms.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>, <span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.ElementId ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( e <span class="blue">is</span> <span class="teal">Room</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected parts only&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtLoops</span> roomLoops = GetRoomLoops( e <span class="blue">as</span> <span class="teal">Room</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nLoops = roomLoops.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} has {1} loop{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ), nLoops,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( nLoops ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( nLoops ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">JtLoop</span> loop <span class="blue">in</span> roomLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0}: {1}&quot;</span>, i++, loop.ToString() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>I tested this on a simple sample room with one hole:</p>
+
+<center>
+<img src="img/room_with_hole.png" alt="Room with a hole" width="300"/>
+</center>
+
+<p>The original start and end points of the boundary segments for this room are reported as follows:</p>
+
+<pre class="code">
+  (9.03,10.13,0) --&gt; (-14.59,10.13,0)
+  (-14.59,10.13,0) --&gt; (-14.59,1.93,0)
+  (-14.59,1.93,0) --&gt; (-2.45,1.93,0)
+  (-2.45,1.93,0) --&gt; (-2.45,-3.98,0)
+  (-2.45,-3.98,0) --&gt; (9.03,-3.98,0)
+  (9.03,-3.98,0) --&gt; (9.03,10.13,0)
+  (0.98,-0.37,0) --&gt; (0.98,1.93,0)
+  (0.98,1.93,0) --&gt; (5.57,1.93,0)
+  (5.57,1.93,0) --&gt; (5.57,-0.37,0)
+  (5.57,-0.37,0) --&gt; (0.98,-0.37,0)
+</pre>
+
+<p>Converting these to my 2D integer-based loop classes and listing those generates the following debug output:</p>
+
+<pre class="code">
+Room Rooms &lt;212639 Room 1&gt; has 2 loops:
+  0: (2753,3087), (-4446,3087), (-4446,587),
+     (-746,587), (-746,-1212), (2753,-1212)
+  1: (298,-112), (298,587), (1698,587), (1698,-112)
+</pre>
+
+<p>So far, so good.</p>
+
+<p>As far as I can tell, all systems go.</p>
+
+<p>My next step for this add-in is to implement code to determine 2D plan view boundary polygons for the furniture and equipment family instances contained within the selected room.</p>
+
+<p>I am hoping to be able to make use of the ExtrusionAnalyzer class for this.
+As I mentioned, it is supplied a solid geometry, a plane, and a direction.
+From those, it calculates the outer boundary of the shadow cast by the solid onto the input plane along the extrusion direction.</p>
+
+<p>At the same time, I am continuing to explore options for a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html">
+cloud-based data repository</a>.</p>
+
+<p>And I have my day-to-day support tasks to attend to too...</p>
+
+<p>Anyway, here is
+
+<a href="zip/GetRoomLoops.zip">GetRoomLoops.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.

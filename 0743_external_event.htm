@@ -1,0 +1,233 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Idling Enhancements and External Events</h3>
+
+<p>Revit 2013 has been released, and I presented an overview of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a> and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html">
+new SDK samples</a> last week.
+
+<p>One of the areas of enhancement is the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling event</a> and 
+
+interaction with modeless dialogues, which also was the subject of Arno&scaron;t L&ouml;bel's Autodesk University 2011 class 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9879&jid=1763185">
+CP5381</a> on 
+
+asynchronous interactions and managing modeless UI. 
+As I mentioned, the enhancements and new functionality are demonstrated by the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#1">
+ModelessForm_ExternalEvent and ModelessForm_IdlingEvent</a> SDK
+
+samples.
+
+<p>Here is an overview of these enhancements from the recent ADN newsletter:
+
+<a name="1"></a>
+
+<h4>Overview</h4>
+
+<p>A number of features introduced in the Revit 2012 API have been enhanced in the Revit 2013 API based on the initial real-world experience gathered since the initial release of Revit 2012. For instance, this has led to the following added features related to the Idling and other events:
+
+<ul>
+<li>Control of the <a href="#2">Idling event repetition</a>
+<li>Idling event with <a href="#3">no active document</a>
+<li>New <a href="#4">external events framework</a>
+<li><a href="#5">RevitWebcam revisited</a>
+<li>Use of <a href="#6">OpenAndActivateDocument in event handlers</a>
+<li><a href="#7">Further information</a>
+</ul>
+
+<a name="2"></a>
+
+<h4>Idling Event Repetition</h4>
+
+<p>The Idling event has been changed to offer two different modes of behaviour. The default behaviour has changed, so pre-existing code that needs the original behaviour will have to explicitly select the non-default behaviour.
+
+<p>In the <b>default mode</b>, the event will be raised one single time each time Revit begins an idle session. Note that when the user is active in the Revit user interface, idle sessions begin whenever the mouse stops moving for a moment or when a command completes. However, if the user is not active in the user interface at all, Revit may not invoke additional idling sessions for quite some time; this means that an add-in may not be able to take advantage of time when the user leaves the machine completely idle for a period of time.
+
+<p>In the <b>non-default mode</b>, Revit keeps the idling session open and makes repeated calls to the event subscriber. In this mode, Revit will continue to make Idling calls even if the user is totally inactive. However, this can result in system performance degradation, because the CPU may remain fully engaged in serving Idling events.
+
+<p>You can specify the non-default Idling behaviour by calling the new <b>SetRaiseWithoutDelay</b> method on the IdlingEventArgs instance passed in to the event handler. This call has to be made each time the Idling event call-back is made. Revit will revert to the default single-call Idling behaviour as soon as this method is not called.
+
+<a name="3"></a>
+
+<h4>Idling Event with no Active Document</h4>
+
+<p>In contrast to the Revit 2012 behaviour, the Idling event now is invoked even when there is no document active in Revit.
+
+<a name="4"></a>
+
+<h4>External Events Framework</h4>
+
+<p>The Idling event enables an interaction between Revit and an external asynchronous process. The external process cannot directly invoke any Revit API methods, but it can send a request to be processed by the Idling event handler next time it is raised. One common use of this has turned out to be supporting the interaction of a modeless dialogue with Revit. In this kind of scenario, the Idling event handler never has anything to do except when such a request has been submitted, so most of the calls to it will simply return immediately.
+
+<p>This interaction is supported much simpler and much more efficiently by the new external events framework. It operates similarly to the Idling event with default frequency. Instead of implementing an event handler and setting up the handler to do nothing when there is no activity in your dialog, you do the following instead:
+
+<ul>
+<li>Implement an external event, derived from the IExternalEvent interface.
+<li>Create an instance of your external event by calling the ExternalEvent.Create method.
+<li>When the external asynchronous process triggers an event that requires a Revit action to be taken, call the Raise method on the external event instance.
+<li>Revit will wait for an available Idling time cycle and call the external event Execute method.
+</ul>
+
+<p>This framework is useful for modeless dialogue developers, because you can skip the default no-op implementation when nothing has happened, and just tell Revit when there is some work to do. It saves on the time required for Revit to make repeated calls to the Idling event when there is nothing to be done.
+<p>This is the complete specification of the external event interface:
+
+<pre class="code">
+&nbsp; <span class="green">// An interface to be executed when an external </span>
+&nbsp; <span class="green">// event is raised.</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// An instance of a class implementing this </span>
+&nbsp; <span class="green">// interface will be registered with Revit first, </span>
+&nbsp; <span class="green">// and every time the corresponding external event </span>
+&nbsp; <span class="green">// is raised, the Execute method of this interface </span>
+&nbsp; <span class="green">// will be invoked.</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">interface</span> <span class="teal">IExternalEventHandler</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Method called to handle the external event.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">void</span> Execute( <span class="teal">UIApplication</span> app );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// String identification of the event handler.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> GetName();
+&nbsp; }
+</pre>
+
+<p>Here is an example snippet of code creating an instance of an external event and starting a new thread to drive it from the same application:
+
+<pre class="code">
+&nbsp; _event = <span class="teal">ExternalEvent</span>.Create( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WebcamEventHandler</span>() );
+&nbsp;
+&nbsp; <span class="teal">Thread</span> thread = <span class="blue">new</span> <span class="teal">Thread</span>( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ThreadStart</span>( Run ) );
+&nbsp;
+&nbsp; thread.Start();
+</pre>
+
+<p>Here is part of the implementation of the Run method making use of the external event and calling its Raise method to request its Execute method to be called, in which the Revit API can be used again:
+
+<pre class="code">
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> External webcam event driver.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Check regularly whether the webcam image has </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> been updated. If so, update the spatial field </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> primitive with the new image data.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Currently, we only display a grey scale image.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Colour images could be handled as well by </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> defining a custom colour palette.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> Run()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _running = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( _running )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _data = <span class="blue">new</span> <span class="teal">GreyscaleBitmapData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _width, _height, _url );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">byte</span>[] hash = _data.HashValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _lastHash
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || 0 != CompareBytes( hash, _lastHash ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _lastHash = hash;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _event.Raise();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( _intervalMs );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>RevitWebcam Revisited</h4>
+
+<p>I implemented the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">
+RevitWebcam</a> sample 
+
+created to demonstrate use of the Idling event when it was introduced in the Revit 2011 API, and recently 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/revit-webcam-2012.html">
+migrated it to Revit 2012</a> in
+
+preparation for making use of this new 2013 functionality.
+
+<p>I now performed two further steps on it:
+
+<ol>
+<li>Enhance it with the new Idling functionality, and 
+<li>Convert it to make use of an external event instead of the Idling event. 
+</ol>
+
+<p>Here is 
+
+<a href="zip/RevitWebcam_2013.zip">RevitWebcam_2013.zip</a> containing 
+
+the following hopefully self-descriptive subfolders, each of which in turn contains a complete Visual Studio solution:
+
+<ul>
+<li>RevitWebcam2011
+<li>RevitWebcam2012_1_initial_migration
+<li>RevitWebcam2012_2_removed_warnings
+<li>RevitWebcam2012_3_final_cleanup
+<li>RevitWebcam2013_1_initial_migration
+<li>RevitWebcam2013_2_removed_warnings
+<li>RevitWebcam2013_3_idling_repetition
+<li>RevitWebcam2013_4_external_event
+<li>RevitWebcam2013_4_external_event_2
+</ul>
+
+<p>If you are interested in the evolution of the project, you can compare these with each other.
+
+<p>Please be aware that these projects are for demonstration purposes only and skip a lot of error checking.
+For instance, they do nothing protect themselves against the user switching or closing the active project or making other changed to the environment while they are running, so they should not be used as examples of real world application implementations.
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#1">
+ModelessForm_ExternalEvent and ModelessForm_IdlingEvent</a> SDK
+
+samples are probably a bit simpler and more safely built (by Arno&scaron;t) to handle these kind of issues  :-)
+
+
+<a name="6"></a>
+
+<h4>Calling OpenAndActivateDocument during Events</h4>
+
+<p>In the Revit 2012 API, the OpenAndActivateDocument method cannot be called from inside any event handler at all. Related to the new Idling and external event functionality, it may now be invoked from within event handlers under most circumstances, specifically under the following conditions:
+
+<ul>
+<li>From an external event if the original active document has no open transactions or transaction groups.
+<li>From any regular event handler including Idling and the new ApplicationInitialized event if 
+<ul>
+<li>There is no active document open yet in Revit, and
+<li>The event is not nested in any other event or in the execution of an external command.
+</ul>
+</ul>
+
+<p>In general, the new ApplicationInitialized event is more suitable than the Idling one for opening and activating the first document.
+
+
+<a name="7"></a>
+
+<h4>Further Information</h4>
+
+<p>All the information above and more is provided in the What's New section of the Revit API help file RevitAPI.chm included with the Revit SDK.
+
+<p>Download Revit 2013 today and see for yourself!

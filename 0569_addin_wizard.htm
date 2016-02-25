@@ -1,0 +1,100 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Visual Studio Add-In Wizards for Revit 2012</h3>
+
+<p>As I mentioned yesterday, this weekend was spent traveling to Verona to give a Revit API training here.
+Happily, I enjoyed some mountain air the weekend before, on Helgenhorn 2837m, 
+
+<a href="http://en.wikipedia.org/wiki/Bas%C3%B2dino" target="_blank">
+Basodino</a> 3273m and 
+
+Cima di Lago south of All'Acqua in the 
+
+<a href="http://en.wikipedia.org/wiki/Bedretto">
+Bedretto Valley</a>
+
+(<a href="https://picasaweb.google.com/104823077300843743475/BasodinoSTTour">more photos by Jogi</a>):
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-04-03_bedretto_basodino/DSCN1122.jpg" alt="Jeremy on Basodino" width="400"/>
+</center>
+
+<p>Anyway, that was last weekend; back to here and now in Verona, where I was busy yesterday, preparing for the training, starting today.
+
+<p>I already updated the DevTV Visual Studio wizards for creating skeleton C# and VB Revit 2011 add-ins several times in the past:
+
+<!--
+
+415_devtv_addin_templates.htm
+451_revit_2011_devtv.htm
+498_snow_and_woe.htm
+523_ui_auto_design_option.htm
+541_application_attributes.htm
+
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">Original introduction, benefits, and usage example</a> for C# and VB.
+<li>Personalised <a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">minimal C# version</a> for Revit 2011.
+<li>A short additional <a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">usage note</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">64 bit versions</a> for C# and VB.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/external-application-attributes.html">
+Updated C# version</a> without the extraneous transaction attribute on the external application.
+</ul>
+
+<p>One step in my preparations was to migrate the wizard templates to Visual Studio 2010 and the Revit 2012 API.
+Here is the first result:
+
+<ul>
+<li><a href="zip/TemplateRevitArch2012AddinCsJt_1.zip">TemplateRevitArch2012AddinCsJt_1.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+
+<li><a href="zip/TemplateRevitArch2012AddinVbJt_1.zip">TemplateRevitArch2012AddinVbJt_1.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>The two most important changes that I made for 2012 are:
+
+<ul>
+<li>Added required vendor id and optional vendor description to the add-in manifest file.
+<li>Removed the obsolete regeneration option attribute.
+</ul>
+
+<p>This is what the auto-generated add-in manifest now looks like:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Command RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Some description for RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>c:\tmp\revit\RevitAddin1\RevitAddin1\bin\debug\RevitAddin1.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>RevitAddin1.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>4e980ab7-e6f4-456f-b8cc-646ef733128c<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>TBC_<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>The Building Coder, http://thebuildingcoder.typepad.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Application RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>c:\tmp\revit\RevitAddin1\RevitAddin1\bin\debug\RevitAddin1.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>RevitAddin1.App<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>dddfad28-c7a0-45fe-836e-0eb03e919e81<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>TBC_<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>The Building Coder, http://thebuildingcoder.typepad.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I used The Building Coder 
+
+<a href="http://www.autodesk.com/symbreg">Autodesk Registered Developer Symbol RDS</a> "TBC_"
+
+for the vendor id.
+You should obviously replace that with your own id before using the template.
+
+<p>Whatever you would like to change, it is extremely easy to adapt the templates for your own personal use:
+
+<p>Simply unpack the zip file somewhere, make your changes, update the zip file with the modified files, and copy the new zip file to the appropriate location.
+

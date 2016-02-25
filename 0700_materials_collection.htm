@@ -1,0 +1,277 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+SPR #208568 [doc.Settings.Materials.Contains throws exception with RST 2012]
+SPR #217212 [Materials get_Item throws exception]
+
+From: Steven Mycynek 
+Sent: 19 December 2011 14:01
+To: Scott Conover; Jeremy Tammik
+Cc: Emile Kfouri; Peijun Liu
+Subject: RE: [SRD] Bug 217212 Reassigned To: Steven Mycynek By: Scott Conover 
+
+Hi everyone,
+
+We removed Settings.Materials completely in 2013, so I'd need to check the last SR of 2012 to see if this is still an issue.  I recommend using FilteredElementCollector.ofClass(typeof(Material)) instead.
+
+Thanks,
+Steve
+
+-->
+
+<h3>Materials Collection and Filtering</h3>
+
+<p>We already mentioned that null entries may be returned when 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/retrieving-materials.html">
+retrieving materials</a> from
+
+the document settings Materials collection.
+This raised a couple of more points, e.g. more on the 
+
+<a href="#2">
+null entries</a> and
+
+<a href="#3">
+using LINQ and filtered element collectors</a> to 
+
+retrieve materials.
+
+In the same context, we can also look at 
+
+<a href="#4">
+retrieving all materials used by an element</a> and
+
+<a href="#5">
+removing the deprecated material related API calls</a> in
+
+The Building Coder samples.
+
+
+
+
+<a name="2"></a>
+
+<h4>Materials Collection May Contain Null Entries</h4>
+
+<p>Quite a while ago, Rudolf Honke observed that the Document.Settings.Materials collection may contain empty entries.
+
+<p>This came up in a case where he wanted to list all the Materials sorted by name.
+The materials returned from the collection may have null values, in which case trying to access their name will obviously throw an exception:</p>
+
+<center>
+<img src="img/materials_null.png" alt="Null entry in Materials collection"/>
+</center>
+
+<p>In this case, you can simply skip the invalid material entries before sorting them, because otherwise the null values will make the Sort method crash.
+
+<!-- That's another case in the never-ending series called 'don't rely on Revit properties' because in this case Revit itself gives you results which must handled with caution. -->
+
+<p>Here is an example of how this can be handled to create a sorted generic .NET list of materials:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a list of the document's </span>
+&nbsp; <span class="gray">///</span><span class="green"> non-null materials sorted by name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt; GetSortedMaterials( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Materials</span> doc_materials = doc.Settings.Materials;
+&nbsp; &nbsp; <span class="blue">int</span> n = doc_materials.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt; materials_sorted 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt;( n );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Material</span> m <span class="blue">in</span> doc_materials )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; materials_sorted.Add( m );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; materials_sorted.Sort( 
+&nbsp; &nbsp; &nbsp; <span class="blue">delegate</span>( <span class="teal">Material</span> m1, <span class="teal">Material</span> m2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m1.Name.CompareTo( m2.Name );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; );
+&nbsp; &nbsp; <span class="blue">return</span> materials_sorted;
+&nbsp; }
+</pre>
+
+<p>As said, though, you can also use the filtered element collector to retrieve materials, e.g. using
+
+<pre class="code">
+&nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Material</span> ) );
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Material Filtering Using LINQ and Filtered Element Collectors</h4>
+
+<p>Victor Chekalin reported another issue in his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/retrieving-materials.html?cid=6a00e553e1689788330162fde14500970d#comment-6a00e553e1689788330162fde14500970d">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/retrieving-materials.html">
+retrieving materials</a>:
+
+<p><strong>Question:</strong> I've got a NullReferenceException when I used document.Settings.Materials.get_Item("Concrete");
+
+<p>This error occurred in a big real project. 
+I discovered that the Document.Materials collection contains null items. 
+How is it possible? 
+Is it a Revit internal database error or something else?
+
+<p>I solved my problem using Linq:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> material = document
+&nbsp; &nbsp; .Settings
+&nbsp; &nbsp; .Materials
+&nbsp; &nbsp; .OfType&lt;<span class="teal">Material</span>&gt;()
+&nbsp; &nbsp; .FirstOrDefault( m =&gt; m.Name.Equals( <span class="maroon">&quot;Concrete&quot;</span> ) );
+</pre>
+
+<p><strong>Answer:</strong> The materials collection in the Document.Settings.Materials property may indeed contain empty entries.
+
+<p>You need to check for null values and skip these invalid materials before trying to access them.
+
+<p>I guess that in your code snippet, the OfType filter eliminates the null entries.
+
+<p><strong>Response:</strong> Yes, of course I skip null entries when I iterate materials in loop or using Ling query.
+
+<p>But Materials.get_Item(string) it is a standard Revit method and it doesn't work when collection contains null entries. 
+So this needs to be fixed.
+
+<p>I used this method many times in my project because I thought it would work correctly and it must work in spite of the collection containing nulls. 
+But now, unfortunately for me, I must rewrite my code and change this method to my own :-(
+
+<p>One more problem that I'm interesting in: why does the Materials.get_Item method require an open transaction? 
+I'm just reading some data. 
+For example, when I read Element parameters, no transaction is required.
+
+<p><strong>Answer:</strong> As you may be aware, we have been if the process of replacing the material management in Revit by a new cross-product Autodesk materials library for several releases now.
+This will enhance interoperability between the products and provide many other benefits as well.
+For now, the simplest and most effective solution is to ignore the Materials collection and use a filtered element collector instead as described above.
+
+<p><strong>Response:</strong> Yes, you are right.  
+The FilteredElementCollector works without errors.
+
+<p>Here is a suggestion for extension methods to retrieve the collection of all materials and an individual material by name:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">DocumentExtensions</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;Material&gt; GetMaterials( 
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span> Document doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; FilteredElementCollector collector 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> FilteredElementCollector( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( Material ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;Material&gt;();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> Material GetMaterialByName( 
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span> Materials materials, 
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> materialName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> materials
+&nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;Material&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m =&gt; m.Name.Equals( materialName ) );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>They can be used like this:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> materialsInDocument = doc.GetMaterials();
+&nbsp;
+&nbsp; <span class="blue">var</span> concreteMaterial = doc.Settings.Materials
+&nbsp; &nbsp; .GetMaterialByName( materialName );
+</pre>
+
+<p>However, I can now see some new interesting effects :-) 
+
+<p>The number of materials retrieved via the collector differs from the Settings.Materials count. 
+In my test project, the collector retrieves 894 materials instead 853 materials in Settings.Materials.
+
+<p>Do you know why?
+
+
+
+<a name="4"></a>
+
+<h4>Retrieving Element and Material Relationships</h4>
+
+<p>To wrap this up, here is another question from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/retrieving-materials.html#comment-6a00e553e16897883301675ec00258970b">
+comment</a> by
+
+<a href="http://www.facebook.com/dan.tartaglia1">
+Dan Tartaglia</a> on 
+
+the same post:
+
+<p><strong>Question:</strong> Is there an easy way to know if a material is being used by an object in the active file?
+
+<p><strong>Answer:</strong> I am not aware of any other method than iterating over all elements and checking what they use, which is presumably exactly what you are <b>not</b> looking for.
+
+<p>Victor replied and added an example implementation:
+
+<p>As Jeremy says, the only way is to iterate all materials in all elements.
+
+<p>I use the following code to get all elements used by material:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> elementsWithMaterials =
+&nbsp; &nbsp; ( <span class="blue">from</span> el <span class="blue">in</span> elements
+&nbsp; &nbsp; &nbsp; <span class="blue">from</span> <span class="teal">Material</span> m <span class="blue">in</span> el.Materials
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> <span class="blue">new</span> ElementMaterial( el, m ) )
+&nbsp; &nbsp; .ToList();
+</pre>
+
+<p>Here I get element and materials in each element collection:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> groupedElementsInMaterial
+&nbsp; &nbsp; = elementsWithMaterials
+&nbsp; &nbsp; &nbsp; .GroupBy( x =&gt; x.Material, <span class="blue">new</span> ElementComparer() )
+&nbsp; &nbsp; &nbsp; .OrderBy( x =&gt; x.Key.Name );
+</pre>
+
+<p>Here, I group elements by material.
+
+<p>This gives the following nice tri-lingual result:</p>
+
+<center>
+<!-- <img src="http://s005.radikal.ru/i209/1112/18/c22f9d4b44bf.png" alt="Elements grouped by material"/> -->
+<img src="img/materials_grouped.png" alt="Elements grouped by material"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Cleaned Up Building Coder Samples</h4>
+
+<p>While we are at it, here is 
+
+<a href="zip/bc_12_96_3.zip">
+version 2012.0.96.3</a> of
+
+The Building Coder samples with the deprecated material related methods in CmdGetMaterials.cs replaced by new code which no longer produces any warnings in Revit the 2012 API.
+The obsolete lines are marked with comments saying '// 2011', and their replacements are marked '// 2012'.
+
+<p>There are still compilation warnings due to use of one deprecated method FindReferencesByDirection, which I plan to address soon as well.

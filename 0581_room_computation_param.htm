@@ -1,0 +1,76 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1268894 [Readonly properties in 2012 that were writable in Revit 2011] -->
+
+<h3>New Room Computation Parameters</h3>
+
+<p>Isidoro Aguilera of 
+
+<a href="http://aplicad.com">Aplicad</a> submitted a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html?cid=6a00e553e168978833014e8819fd5e970d#comment-6a00e553e168978833014e8819fd5e970d">comment</a> asking 
+
+how to migrate code making use of some room computation parameters from the Revit 2011 API to Revit 2012, specifically the built-in parameters
+
+<ul>
+<li>LEVEL_ATTR_ROOM_COMPUTATION_AUTOMATIC
+<li>LEVEL_ATTR_ROOM_COMPUTATION_HEIGHT
+</ul>
+
+<p><strong>Question:</strong> I'm migrating a plug-in from 2011 and 2012 and experienced problems with the level type parameters BuiltInParameter.LEVEL_ATTR_ROOM_COMPUTATION_AUTOMATIC and BuiltInParameter.LEVEL_ATTR_ROOM_COMPUTATION_HEIGHT.
+They were writable in Revit 2011, but are read-only in Revit 2012.
+
+<p>Have you experienced a similar issue when migrating your samples? 
+
+<p>The following code worked in Revit 2011, and fails in 2012:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( App.Document );
+&nbsp;
+&nbsp; IList elementos = collector
+&nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Levels )
+&nbsp; &nbsp; .WhereElementIsElementType()
+&nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> elementos )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; .LEVEL_ATTR_ROOM_COMPUTATION_AUTOMATIC );
+&nbsp;
+&nbsp; &nbsp; p.Set( 0 );
+&nbsp;
+&nbsp; &nbsp; p = e.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; .LEVEL_ATTR_ROOM_COMPUTATION_HEIGHT );
+&nbsp;
+&nbsp; &nbsp; p.Set( 0 );
+&nbsp; }
+&nbsp;
+</pre>
+
+<p><strong>Answer:</strong> In Revit 2012, levels no longer have the type parameters that existed in prior versions, and both the parameters you name are obsolete. 
+Instead of using LEVEL_ATTR_ROOM_COMPUTATION_HEIGHT, you can now use LEVEL_ROOM_COMPUTATION_HEIGHT like this:
+
+<pre class="code">
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; uidoc.Document );
+&nbsp;
+&nbsp; &nbsp; &nbsp; IList&lt;<span class="teal">Element</span>&gt; elementos = collector
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> elementos )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .LEVEL_ROOM_COMPUTATION_HEIGHT );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p.Set( 2.5 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+</pre>
+
+<p>For setting the room height, you can use ROOM_COMPUTATION_HEIGHT. 
+The functionality around LEVEL_ATTR_ROOM_COMPUTATION_AUTOMATIC is totally unsupported now.

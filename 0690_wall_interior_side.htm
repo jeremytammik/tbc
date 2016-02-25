@@ -1,0 +1,94 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1241653 [Exterior direction of a wall]
+06661019 [Family Insert Placement] 
+
+-->
+
+<h3>Interior Side of a Wall</h3>
+
+<p>I really enjoyed my little outing in Tel Aviv on Tuesday evening to the 
+
+<a href="http://en.wikipedia.org/wiki/5Rhythms">
+5Rhythms</a> 
+
+<a href="http://www.5rhythms-rivi.co.il/Preview.asp?Page=7594&WebsiteID=3751">
+City Wave</a> offered 
+
+by Rivi Diamond.
+
+<h4>Confusing Ramat Gan with Tel Aviv and First Hebrew Characters</h4>
+
+<p>Getting there turned out to be unexpectedly adventurous, because while I assumed that I was walking around in Tel Aviv, I was in fact in the neighbouring city Ramat Gan.
+Two parallel streets named Jabotinsky and Arlozorov span both of them, and I was running around in the area between them asking people for directions.
+I only had a map of the Tel Aviv part, and everybody pointed in completely different directions.
+Extremely confusing, if you don't know the deal.
+
+<p>I have since heard that it can get even worse, and that there is someplace nearby where two different Jabotinsky streets start at the same point, both with number 1, obviously, and head off in opposite directions.
+Anyway, I got there in the end, by bus.
+
+<p>I spent Wednesday back in conference space and meeting our local developer community here, followed by a very enjoyable evening with Hemi and Rani and my colleagues Partha, Adam, Philippe and Jim in the restaurant 
+
+<a href="http://www.boya.co.il">Boya</a> in 
+
+the Tel Aviv port area.
+
+<p>Hemi showed me how to say and write <span style="font-size:larger">&#1488;&#1504;&#1497; &#1500;&#1488; &#1502;&#1491;&#1489;&#1512; &#1506;&#1489;&#1512;&#1497;&#1514;</span> (ani lo mevin ivrit, I don't speak Hebrew) and <span style="font-size:larger">&#1500;&#1495;&#1497;&#1497;&#1501;</span> (lechaim, for life, cheers).
+To rescue me from having to pervert my pure ASCII HTML by saving it in Unicode format, I converted these characters to HTML escape codes using an
+
+<a href="http://www-atm.physics.ox.ac.uk/user/iwi/charmap.html">
+online Unicode character map</a> that
+
+I discovered when visiting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/cairo-and-free-net-books.html">
+Cairo</a>.
+
+<p>Afterwards, I walked (and ran) back to the hotel in Ramat Gan so the remaining people could squeeze into one single car (and we could save the taxi).
+It also enabled me to enjoy a bit of exercise and the almost full moon.
+
+<!-- <p>Thursday Partha and I are joining Dmitri Brickmann for a quick visit to Jerusalem before heading off to the next conference in Paris. -->
+
+
+<a name="2"></a>
+
+<h4>Revit Timeline</h4>
+
+<p>One interesting topic that came up at dinner with Jim Quanci and my other colleagues on Monday night in Moscow was the history and origins of Revit.
+I am still searching for more information on this, and so far Anthony Hauck very kindly pointed out the an AUGI thread listing the 
+
+<a href="http://forums.augi.com/showthread.php?t=20803">
+Revit Timeline</a>. 
+
+A more verbose and descriptive but less precise and exhaustive listing is given in the 
+
+<a href="http://en.wikipedia.org/wiki/Revit#History_of_Revit">
+history section</a> of the 
+
+<a href="http://en.wikipedia.org/wiki/Revit">
+Wikipedia article on Revit</a>.
+
+
+<a name="3"></a>
+
+<h4>Wall Orientation</h4>
+
+<p>Here is a simple question and succinct answer on the orientation of a wall, which we discussed in more depth when looking at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+wall compound layers</a>, 
+
+highlighting a simple fact that was not explicitly mentioned there:
+
+<p><strong>Question:</strong> How can I determine which side of a wall is on its interior? 
+
+<p><strong>Answer:</strong> Query the wall for its LocationCurve.
+When you are standing at the wall start point and looking toward the end point of its location curve, and assuming the wall's Flipped property is false, its interior side is on the right-hand side. 
+If the Flipped property is true, then the interior side of the wall is on the left.
+
+<p>Many thanks to my colleagues Joe Yes and Katsuaki Takamizawa-san for pointing this out so clearly! 
+

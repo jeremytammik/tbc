@@ -1,0 +1,190 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Filtered Element Collector Sample Overview</h3>
+
+<p>The developer conference in Paris went well, and Adam, Partha and I spent a nice day exploring Paris using their wonderful
+
+<a href="http://en.wikipedia.org/wiki/V%C3%A9lib%27">
+velib</a> bicycle rental system.
+
+You pay just one euro for a one-day membership.
+It allows you to pick up and return a bicycle at any one of the city's hundreds of completely automated and networked rental points.
+If you return the bike within thirty minutes, it is free of charge.
+Beyond that time, it costs a euro or two per half hour extra.
+
+<p>Here are some impressions of our tour; they also have a lot to do with filtering, by the way.
+First, here is a happy Karl Osti enjoying a smoke in Vienna airport en route from Moscow to Paris:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-12-11_devdays_paris/img_0037.jpg" alt="Karlo Osti enjoying a smoke" width="400"/>
+</center>
+
+<p>He can be retrieved using a dedicated <strong>CarloFilter</strong>, represented here by this smoker's cabin.
+
+<p>Karl, in turn, uses a <strong>MarlboroFilter</strong>.
+
+<p>Here are Adam and Partha using a <strong>BicycleFilter</strong>, after the first leg of rental bicycling up from Bercy along the
+
+<a href="http://en.wikipedia.org/wiki/Boulevard_du_Temple">
+Boulevard du Temple</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-12-11_devdays_paris/img_0046.jpg" alt="Adam and Partha enjoying the rental bicycles" width="400"/>
+</center>
+
+<p>Here are the three of us using a <strong>PedestrianBridgeFilter</strong> crossing the
+
+<a href="http://en.wikipedia.org/wiki/Canal_Saint-Martin">Canal Saint-Martin</a> at Quai de Valmy close to the
+<a href="http://en.wikipedia.org/wiki/Gare_de_l%27Est">Gare de l'Est</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-12-11_devdays_paris/img_0051.jpg" alt="Canal Saint-Martin close to the Gare de l'Est" width="400"/>
+</center>
+
+<p>And here we are on
+
+<a href="http://en.wikipedia.org/wiki/Montmartre">
+Montmartre</a> in
+
+front of the
+
+<a href="http://en.wikipedia.org/wiki/Basilica_of_the_Sacr%C3%A9_C%C5%93ur">
+Sacre Coeur basilica</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-12-11_devdays_paris/img_0063.jpg" alt="On Montmartre in front of Sacre Coeur" width="400"/>
+</center>
+
+<p>More photos are available in the
+
+<a href="http://www.facebook.com/album.php?aid=89693&id=1019863650&l=b9583fec63">
+Facebook album</a>.
+
+<p>Meanwhile, returning to Revit, here is something I have been waiting to do for quite a while now, but new things kept cropping up.
+After discussing my own
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+filtered element collector benchmarks</a> early
+
+on in the Revit 2011 release cycle,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/more-kevin-filtering-benchmarks.html">
+Kevin's filtering samples and benchmarks</a> last week,
+
+and a large number of other samples in between,
+I hope that we have covered everything relevant by now and the right moment has finally arrived to present a pretty extensive filtered element collector sample overview:
+
+<!--
+  regex and grep expression to find all htm files with a non-zero count of occurrences of 'collector'
+  grep -i -c collector *htm|grep -v :0
+
+333_collector_benchmark.htm:45
+334_anonymous_methods_vb.htm:26
+344_mirror_new_elements.htm:26
+345_manual_regeneration.htm:1
+346_stairs_on_level.htm:20
+349_migration_steps.htm:1
+350_failure_api.htm:4
+355_view_filter.htm:9
+359_preview_image.htm:5
+360_p2c.htm:6
+368_au_voting.htm:2
+370_revitlookup.htm:6
+371_sheet_size.htm:8
+380_revitwebcam.htm:3
+383_param_filter.htm:35
+384_elem_name_param_filter.htm:7
+392_export_xml.htm:2
+395_set_tag_type.htm:10
+397_filter_all_elements.htm:5
+398_retrieve_mep_elements.htm:7
+
+400_revit_parent_window.htm:1
+402_place_family_instance.htm:6
+404_structural_elements.htm:9
+
+(405_data_grid_view.htm:2
+410_change_element_type.htm:2
+417_linq_vs_tips.htm:2
+418_rst_dmu.htm:2)
+
+423_filter_shared_param.htm:5
+426_filter_non_native_class.htm:13
+(436_au_2010_classes.htm:2
+442_access_curtain_grid_panel.htm:2
+445_view_location_on_sheet.htm:3)
+446_filter_view_phase.htm:10
+
+453_model_elements.htm:10
+454_model_elements.htm:6
+461_measurepanelarea.htm:6
+463_filtered_element_collector.htm:21
+464_level_filter_benchmark.htm:16
+471_place_site_component.htm:7
+474_set_width_requires_regen.htm:1
+476_purge_text_note_types.htm:27
+479_launch_command.htm:10
+488_mirror_in_new_family.htm:6
+489_get_sketch.htm:2
+
+493_xml_family_usage.htm:8
+494_find_intersecting.htm:7
+497_more_kevin_samples.htm:19
+499_filter_sample_overview.htm:9
+
+-->
+
+<ul>
+<li>My first Revit 2011 plug-in, the <a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">pipe to conduit converter</a>.</li>
+<li>A very simple collector to retrieve <a href="http://thebuildingcoder.typepad.com/blog/2010/06/export-data-to-xml.html">view sheets</a>.</li>
+<li>Some utility methods to filter for <a href="http://thebuildingcoder.typepad.com/blog/2010/06/set-tag-type.html">levels and types</a> such as door type and a door tag type symbol</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html">newly added elements</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html">stairs on a level</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/04/filter-for-views-and-istemplate-predicate.html">views</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/05/get-type-id-and-preview-image.html">family instances and their family</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/05/determine-sheet-size.html">title block symbols and instances</a> to determine the sheet size.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html#3">AVF display styles with a specific name</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">MEP elements</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">structural elements</a>.</li>
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">text notes and text note types</a>.</li>
+
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/10/selecting-model-elements.html">
+model elements</a>, with some <a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+enhancements</a>.</li>
+
+<li>A <a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">collector performance benchmark</a> including several collector samples.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/anonymous-methods-in-vb.html">Using LINQ and anonymous methods in VB</a>.</li>
+<li>A RevitLookup update and <a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">retrieving all database elements</a>.</li>
+<li>Why <a href="http://thebuildingcoder.typepad.com/blog/2010/06/filter-for-all-elements.html"><strong>not</strong> to retrieve all database elements</a>.</li>
+<li>Many examples of <a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html">parameter filters</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">Parameter filter for an element name</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/08/elementparameterfilter-with-a-shared-parameter.html">Parameter filter for a shared parameter</a>.</li>
+<li>Filtering for a <a href="http://thebuildingcoder.typepad.com/blog/2010/08/filtering-for-a-nonnative-class.html">non-native class</a>, i.e. "an element type that exists in the API, but not in Revit's native object model".</li>
+<li>Resolving another non-native class issue, the Panel class in the <a href="http://thebuildingcoder.typepad.com/blog/2010/10/measurepanelarea_update.html">MeasurePanelArea</a> SDK sample.</li>
+<li>Filter for <a href="http://thebuildingcoder.typepad.com/blog/2010/09/filter-for-view-and-phase.html">view and phase</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/level-filter-benchmark.html">
+Level filter benchmark</a> comparing Level filter versus parameter filter versus LINQ post-processing to retrieve elements on a given level.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/xml-family-usage-report.html">
+XML family usage report</a> using FamilySymbolFilter and FamilyInstanceFilter.</li>
+
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html">
+intersecting elements</a> using collector viewId constructor, BoundingBoxIntersectsFilter and exclusion filter.</li>
+
+<li>Retrieving <a href="http://thebuildingcoder.typepad.com/blog/2010/11/launching-a-revit-command.html">
+wall types with a specific name</a> and <a href="http://thebuildingcoder.typepad.com/blog/2010/11/launching-a-revit-command.html">
+walls using a specific wall type</a> using parameter filters.</li>
+
+<li>Kevin's <a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">
+optimisation tips and tricks</a> presentation.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/more-kevin-filtering-benchmarks.html">
+Kevin's filtering samples and benchmarks</a>.</li>
+
+</ul>
+
+<p>I hope this provides a useful knowledge base to enable you to solve all your element retrieval needs.
+Obviously, some creativity on your side will also be required.

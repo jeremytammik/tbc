@@ -1,0 +1,218 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- SPR #159757 [Reference of Location Curve is null] -->
+
+<h3>Spot Elevation Creation on Top of Beam</h3>
+
+<p>Here is another interesting solution to discuss in between the series on the Revit API geometry library from Scott Conover's Autodesk University presentation on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>.
+
+This issue was also raised by Scott and deals with adding a spot elevation to a beam.
+It contains useful information both about spot elevation creation and using FindReferencesByDirection to find the top of a beam more easily than with get_Geometry.
+
+<p><strong>Question:</strong> I am trying to add a spot dimension to the location curve of a beam.
+However, when I ask the beam location curve for a reference, it returns null.
+I found the same when I tried to obtain a reference for the location curve of a wall.
+
+<p><strong>Answer:</strong> The assumption that a location curve can return a reference is completely incorrect.
+The location curve of a beam or wall does not represent a referenceable object.
+
+<p>A spot elevation should be created referencing a <strong>physical</strong> piece of geometry, for instance the <strong>top surface</strong> of the beam.
+You can still rely on the location curve to compute the nearest point of the spot elevation.
+
+<p>Below is the source code for a Revit 2010 VSTA macro that places three spot elevations on the top of a beam, at the midpoint and both ends.
+It defines three methods:
+
+<ul>
+<li>FindView &ndash; Return a view in the document with the given name.
+<li>FindTopMostReference &ndash; Return a reference to the topmost face of the given element.
+<li>NewSpotElevation &ndash; the macro entry point, creating new spot elevations on the top surface of a beam.
+</ul>
+
+<p>The implementation of FindView is pretty standard:
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">View</span> FindView( <span class="teal">Document</span> doc, <span class="teal">String</span> name )
+{
+&nbsp; <span class="teal">TypeFilter</span> filter = Create.Filter.NewTypeFilter(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">View</span> ), <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> iter = doc.get_Elements( filter );
+&nbsp; <span class="teal">View</span> ret = <span class="blue">null</span>;
+&nbsp;
+&nbsp; iter.Reset();
+&nbsp; <span class="blue">while</span>( iter.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = iter.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e.Name == name )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ret = e <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> ret;
+}
+</pre>
+
+<p>FindTopMostReference is much more interesting.
+We define a viewDirection vector pointing straight down, and a point centerOfTopOfBox that is located exactly above the element whose top surface we are targeting.
+Using FindReferencesByDirection and filtering the resulting intersections to get the closest reference that belongs to the given element guarantees that the top surface is identified.
+
+<p>The entire operation is encapsulated in a transaction.
+This is used for the creation of a temporary view which can then be discarded afterwards.
+We thus avoid having to search for an existing 3D view.  
+Remember that a 3D view is needed to use FindReferencesByDirection.
+The view is created within the transaction so we have a default 3D view to work with, and the transaction is then aborted so as not to keep the view around afterwards.
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">Reference</span> FindTopMostReference( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; doc.BeginTransaction();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> viewDirection = Create.NewXYZ( 0, 0, -1 );
+&nbsp;
+&nbsp; <span class="teal">View3D</span> view3D = doc.Create.NewView3D(
+&nbsp; &nbsp; viewDirection );
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> elemBoundingBox
+&nbsp; &nbsp; = e.get_BoundingBox( view3D );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> max = elemBoundingBox.Max;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> minAtMaxElevation = elemBoundingBox.Min;
+&nbsp;
+&nbsp; minAtMaxElevation.Z = max.Z;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> centerOfTopOfBox = minAtMaxElevation
+&nbsp; &nbsp; .Add( max ).Divide( 2 );
+&nbsp;
+&nbsp; centerOfTopOfBox.Z = centerOfTopOfBox.Z + 10;
+&nbsp;
+&nbsp; <span class="teal">ReferenceArray</span> references
+&nbsp; &nbsp; = doc.FindReferencesByDirection(
+&nbsp; &nbsp; &nbsp; centerOfTopOfBox, viewDirection, view3D );
+&nbsp;
+&nbsp; <span class="blue">double</span> closest = <span class="teal">Double</span>.PositiveInfinity;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> ret = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> references )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( r.Element.Id.Value == e.Id.Value
+&nbsp; &nbsp; &nbsp; &amp;&amp; r.ProximityParameter &lt; closest )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ret = r;
+&nbsp; &nbsp; &nbsp; closest = r.ProximityParameter;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; doc.AbortTransaction();
+&nbsp;
+&nbsp; <span class="blue">return</span> ret;
+}
+</pre>
+
+<p>Note how the reference is the face on the top of the element, whereas the target point is evaluated from the location curve parameter.
+This works even if the location alignment of the beam is along the bottom of the beam; the elevations are still at the top.
+
+<p>This method probably deserves being copied into your personal toolbox right away for reference and future reuse.
+It looks both generally useful and instructive to me.
+
+<p>Finally, here is the implementation of the NewSpotElevation macro mainline, which performs the following steps:
+
+<ul>
+<li>Find the view named "West".
+<li>Find the beam family instance with a specific hardcoded element id.
+<li>Use FindTopMostReference to obtain a reference to its top surface.
+<li>Retrieve its location curve.
+<li>Open a transaction to apply changes to the model.
+<li>Step along the location curve to create spot elevations along the top surface at the beginning, midpoint and end of the beam.
+<li>Close the transaction to apply the changes to the model.
+</ul>
+
+<p>Note that this is an application-level macro.
+Application-level macros are required to manage all their own transactions, whereas document-level macros automatically open a transaction on the active document, just like external commands.
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> NewSpotElevation()
+{
+&nbsp; <span class="teal">Document</span> doc = ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">View</span> westView = FindView( doc, <span class="maroon">&quot;West&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// define the hard coded element id of beam:</span>
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> instanceId = Create.NewElementId();
+&nbsp;
+&nbsp; instanceId.Value = 230298;
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> familyInstance = doc.get_Element(
+&nbsp; &nbsp; <span class="blue">ref</span> instanceId ) <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> topReference = FindTopMostReference(
+&nbsp; &nbsp; familyInstance );
+&nbsp;
+&nbsp; <span class="teal">LocationCurve</span> lCurve = familyInstance.Location
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; doc.BeginTransaction();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> beamIndex = 0; beamIndex &lt; 3; ++beamIndex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> lCurvePnt = lCurve.Curve.Evaluate(
+&nbsp; &nbsp; &nbsp; 0.5 * beamIndex, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> bendPnt = lCurvePnt.Add(
+&nbsp; &nbsp; &nbsp; Create.NewXYZ( 0, 1, 4 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> endPnt = lCurvePnt.Add(
+&nbsp; &nbsp; &nbsp; Create.NewXYZ( 0, 2, 4 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// NewSpotElevation arguments:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// View view, Reference reference, </span>
+&nbsp; &nbsp; <span class="green">// XYZ origin, XYZ bend, XYZ end, XYZ refPt, </span>
+&nbsp; &nbsp; <span class="green">// bool hasLeader</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SpotDimension</span> sd = doc.Create.NewSpotElevation(
+&nbsp; &nbsp; &nbsp; westView, topReference, lCurvePnt, bendPnt,
+&nbsp; &nbsp; &nbsp; endPnt, lCurvePnt, <span class="blue">true</span> );
+&nbsp; }
+&nbsp; doc.EndTransaction();
+}
+</pre>
+
+<p>Scott provided a 
+
+<a href="zip/ForSpotElevation.rvt">
+sample model ForSpotElevation.rvt</a>
+
+containing a beam that runs N-S so that the West view shows the three different spot elevations, displaying them even more clearly by putting it at an angle.
+
+<p>Here is the west view of the target beam before running the macro:</p>
+
+<center>
+<img src="img/spot_elevation_beam.png" alt="Original beam"/>
+</center>
+
+<p>Here are the resulting spot elevations created by the macro on the beam's top surface:</p>
+
+<center>
+<img src="img/spot_elevations_on_beam.png" alt="Spot elevations on beam"/>
+</center>
+
+<p>I converted Scott's VSTA macro source code to create a new Building Coder sample external command named CmdNewSpotElevation.
+Here is
+
+<a href="zip/bc11060.zip">
+version 1.1.0.60</a>
+
+of the complete Building Coder source code and Visual Studio solution including the new command.</p>
+
+<p>Many thanks to Scott for providing this useful and instructive solution!

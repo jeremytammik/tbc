@@ -1,0 +1,99 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Installing the Revit 2010 SDK</h3>
+
+<h4>Compiling the SDK samples</h4>
+
+<p>As discussed previously, you can 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/the-sdk-samples.html">
+use SDKSamples2010.sln to compile</a>
+
+all the samples in one fell swoop. 
+The various sample projects in this solution expect you to have all three flavours of Revit installed in the default locations, otherwise compilation will fail for some of the samples.</p>
+
+<p>So far, I installed only Revit Architecture 2010, not MEP or Structure. 
+In order to easily compile all the samples anyway, I simply copied the same RevitAPI.dll to the other two locations, so I now have three copies of it on my hard disk:</p>
+
+<ul>
+<li>C:\Program Files\Autodesk Revit Architecture 2010\Program\RevitAPI.dll</li>
+<li>C:\Program Files\Autodesk Revit MEP 2010\Program\RevitAPI.dll</li>
+<li>C:\Program Files\Autodesk Revit Structure 2010\Program\RevitAPI.dll</li>
+</ul>
+
+<p>Once this was done, I was immediately able to compile all the samples in one go using SDKSamples2010.sln.</p>
+
+<p>I noticed one little omission in the solution file, which you will notice if you try to run the Ribbon sample: the Ribbon sample commands are implemented in a separate assembly using the project file AddInCommands.csproj located in a subdirectory of the Ribbon one, and I had to add that to SDKSamples2010.sln myself.</p>
+
+<h4>Loading the SDK samples</h4>
+
+<p>I use the Revit SDK sample external application RvtSamples to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+load all Revit SDK external command samples</a>.</p>
+
+<p>To set this up for Revit 2010, I performed the following steps:</p>
+
+<ul>
+<li>I edited RvtSamples.txt in the SDK/Samples/RvtSamples folder and replaced Z:\SDK2010\Samples by my local SDK samples path.</li>
+<li>I compiled the RvtMgdDbg for 2010.</li>
+<li>I added an ExternalApplications section to Revit.ini in the Revit Program folder, with entries for the external applications RvtMgdDbg and RvtSamples:</li>
+</ul>
+
+<pre>
+[ExternalApplications]
+EACount=2
+
+EAAssembly1=C:\Program Files\Autodesk Revit Architecture 2010\Program\RvtMgdDbg.dll
+EAClassName1=RvtMgdDbg.App
+
+EAAssembly2=C:\a\lib\revit\2010\SDK\Samples\RvtSamples\CS\RvtSamples.dll
+EAClassName2=RvtSamples.Application
+</pre>
+
+<p>That's it, I am done and can now start up Revit.
+The Add-Ins menu item is available and the corresponding panel displayed even in zero document state:</p>
+
+<img src="img/2010_RvtSamples.gif" alt="RvtMgdDbg and RvtSamples in Add-Ins panel"/>
+
+<p>RvtMgdDbg is up and running in its own panel:</p>
+
+<img src="img/RvtMgdDbg_panel.png" alt="RvtMgdDbg Add-Ins panel"/>
+
+<p>RvtSamples now displays the samples sorted by category only, there are no longer any multiple menu hierarchies by various different classifications.
+Even though it is displayed in the zero document state, the menu entries are not active until a document has been opened:</p>
+
+<img src="img/2010_RvtSamples_2.gif" alt="RvtSamples pulldown buttons"/>
+
+<h4>Updating the ADN training material</h4>
+
+<p>The next thing I am interested in is updating the Revit API introduction labs and all the rest of our training material to 2010.
+One looming deadline is the upcoming 
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=6364883">
+webcast on the Revit API</a>
+
+on April 29<sup>th</sup>, one of our ADN 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+training classes</a>,
+
+which will require this material.</p>
+
+<p>By the way, our webcast plans for this year are more elaborate than in previous years.
+We are thinking of holding this first webcast to cover the basics and discuss new API areas, and following it up with several dedicated sessions focusing in more depth on various areas affected by the new API functionality, such as:</p>
+
+<ul>
+<li>Family editor user interface features</li>
+<li>Family API</li>
+<li>Conceptual design API and form creation</li>
+<li>Revit MEP API</li>
+</ul>
+
+<p>I'll keep you posted as these plans mature.</p>

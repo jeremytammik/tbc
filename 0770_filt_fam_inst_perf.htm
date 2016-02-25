@@ -1,0 +1,298 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07163719 [Bad performance to list family with family instance in the model] -->
+
+<h3>Family Usage Filtered Element Collector Performance</h3>
+
+<p>Since all access to the Revit database and its elements takes place through the filtered element collectors, it is extremely important to make efficient use of them.
+We have not looked at that topic for quite a while now.
+
+<!-- The last major contribution was an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/filtered-element-collector-sample-overview.html">
+overview of filtered element collectors examples</a> over
+
+a year ago. -->
+
+Here is an issue that recently cropped up which illustrates some interesting points.
+
+<p>I presented a filtered element sample for creating an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/xml-family-usage-report.html">
+XML family usage report</a> which
+
+iterates over all the loaded families and launches a new filter for each of them looking for its instances.
+
+<p>If you are only interested in families of certain categories, and furthermore only in ones that actually have instances in the model, then the approach presented there will almost certainly turn out to be inefficient in a large model.
+
+<p>That leads to the following query:
+
+<p><strong>Question:</strong> I tried to get a list of families which have instance in the model (not all families), but the performance is very bad if the model has loaded hundreds of family types.
+
+<p>Here is the VB.NET code (copy and paste to an editor to see the truncated lines in full):
+
+<pre class="code">
+<span class="blue">Sub</span> GetFamilyType(<span class="blue">ByVal</span> mydoc <span class="blue">As</span> Document)
+&nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> <span class="blue">New</span> Autodesk.Revit.DB.FilteredElementCollector(mydoc)
+&nbsp; <span class="blue">Dim</span> collection <span class="blue">As</span> ICollection(<span class="blue">Of</span> Autodesk.Revit.DB.Element) = collector.OfClass(<span class="blue">GetType</span>(DB.Family)).ToElements()
+&nbsp; <span class="green">' Get all families belong to a Category of current document&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span>
+&nbsp; <span class="blue">Dim</span> families <span class="blue">As</span> List(<span class="blue">Of</span> Family)
+&nbsp; <span class="blue">Dim</span> category <span class="blue">As</span> DB.Category = <span class="blue">Nothing</span>
+&nbsp; <span class="green">'Dim familylist As New Dictionary(Of String, Family)</span>
+&nbsp; <span class="blue">Dim</span> familyTypeCategoryList <span class="blue">As</span> <span class="blue">New</span> Dictionary(<span class="blue">Of</span> <span class="blue">String</span>, List(<span class="blue">Of</span> Family)) <span class="green">'Family list with Family Instance in the current model</span>
+&nbsp; <span class="blue">Dim</span> categoryList <span class="blue">As</span> <span class="blue">New</span> Dictionary(<span class="blue">Of</span> <span class="blue">String</span>, Category) <span class="green">'Category list with Family Instance in the current mode</span>
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> family <span class="blue">As</span> DB.Family <span class="blue">In</span> collection
+&nbsp; &nbsp; category = <span class="blue">Nothing</span>
+&nbsp; &nbsp; <span class="blue">If</span> family.Symbols.Size &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> symbols <span class="blue">As</span> FamilySymbolSetIterator = family.Symbols.ForwardIterator()
+&nbsp; &nbsp; &nbsp; symbols.Reset()
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> Autodesk.Revit.DB.FamilySymbol = <span class="blue">Nothing</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">While</span> symbols.MoveNext()
+&nbsp; &nbsp; &nbsp; &nbsp; symbol = <span class="blue">TryCast</span>(symbols.Current, Autodesk.Revit.DB.FamilySymbol)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'-------------------------</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'Bad performance with following code when the model has hundreds of family types</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'Anyway to improve it?&nbsp; </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'-------------------------</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'Find the symbol of which at least a Family instance exists&nbsp; &nbsp; </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> filter <span class="blue">As</span> <span class="blue">New</span> DB.FamilyInstanceFilter(mydoc, symbol.Id)
+&nbsp; &nbsp; &nbsp; &nbsp; collector = <span class="blue">New</span> Autodesk.Revit.DB.FilteredElementCollector(mydoc)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> familyInstances <span class="blue">As</span> ICollection(<span class="blue">Of</span> DB.Element) = collector.WherePasses(filter).ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> familyInstances.Count &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">'All symbols of a family are in the same category, different family might in then same category</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; category = symbol.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit While</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">While</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> category <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> familyTypeCategoryList.ContainsKey(category.Name) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyTypeCategoryList.Item(category.Name).Add(family)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; families = <span class="blue">New</span> List(<span class="blue">Of</span> DB.Family)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; families.Add(family)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyTypeCategoryList.Add(category.Name, families)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categoryList.Add(category.Name, category)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>Is there a quick filter to retrieve only the families having instances in the model?
+
+<p><strong>Answer:</strong> There are a few ways that this can be improved directly, and there are also some alternative approaches which may or may not improve performance, and which you would have to test yourself in your own environment using your real world models.
+
+<p>Remember to always
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/timer-code-for-benchmarking.html">
+benchmark your add-in performance</a>.
+
+<p>One thing that I note which will cost you some unnecessary time is the conversion of collectors to collections, for instance:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> collection <span class="blue">As</span> ICollection(
+&nbsp; &nbsp; &nbsp; <span class="blue">Of</span> Autodesk.Revit.DB.Element)
+&nbsp; &nbsp; = collector.OfClass(<span class="blue">GetType</span>(DB.Family))
+&nbsp; &nbsp; &nbsp; .ToElements()
+</pre>
+
+<p>There is no need for this conversion; you can iterate over the collector itself directly, so there is no reason to create a collection, which requires memory allocation and a conversion overhead.
+
+<p>Eliminating the conversion to collections will only have a small impact, though.
+Try it out; benchmark this and let me know the result, please.
+
+<p>Much more significantly, you are first collecting all the families in the model, and then launching a separate new filter for each in a loop to find all of its potential instances.
+
+<p>For each of the families, if any instance is found, you retrieve its category and check whether it is one of the categories of interest to you.
+
+<p>If not, or no instances were found, the family is skipped and all the effort spent on that family so far was wasted.
+
+<p>I would suggest a completely different algorithm:
+
+<ol>
+<li>Define the list of categories of interest to you.
+<li>Implement one single family instance filter for all of these categories.
+<li>Iterate over the result and determine which families they belong to, or which symbols they use.
+<li>If you use these families or symbols (or their names) as dictionary keys, you will create the desired list.
+<li>The dictionary value for each can be something minimal, like a count of all the family instances of each type, or larger, like a list of all the instance element ids.
+</ol>
+
+<p>The first two steps are illustrated in several places on the blog, for instance in the examples to retrieve
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+MEP elements, connectors</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">
+structural elements</a>.
+
+<p>I'm sure the remaining steps are demonstrated somewhere as well.
+
+<p>You can also look at the numerous other
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/filtered-element-collector-sample-overview.html">
+filtered element collector samples</a>.
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/xml-family-usage-report.html">
+XML family usage report</a>
+
+shows how to iterate specifically over families, which may however not help much in your case, since it looks at all families, regardless of their categories and whether they have any instances in the model.
+
+<p>It is thus similar to your original approach.
+
+<p>Actually, looking at your code, I think it may be based on that very post  :-)
+
+<p>I hope this solves the problem for you... I think it will, actually.
+
+
+<p><strong>Response:</strong> Thank you for your suggestion.
+Step 1 does not apply to our case since we don't know the categories until after we filter the family instances in the model.
+
+<p>Here is the code that we ended up with:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Sub</span> CreateFamilyTreeTest( _
+&nbsp; <span class="blue">ByVal</span> myDoc <span class="blue">As</span> <span class="teal">Document</span>)
+
+&nbsp; <span class="blue">Dim</span> collector <span class="blue">As</span> <span class="blue">New</span> <span class="teal">FilteredElementCollector</span>(myDoc)
+&nbsp; collector.WhereElementIsNotElementType()
+
+&nbsp; <span class="blue">Dim</span> familyInstances = <span class="blue">From</span> elem <span class="blue">In</span> collector _
+&nbsp; &nbsp; <span class="blue">Where</span> elem.Category <span class="blue">IsNot</span> <span class="blue">Nothing</span> _
+&nbsp; &nbsp; <span class="blue">And</span> <span class="blue">TypeOf</span> elem <span class="blue">Is</span> <span class="teal">FamilyInstance</span>()
+
+&nbsp; <span class="blue">Dim</span> familySymbols = <span class="blue">From</span> elem <span class="blue">In</span> collector _
+&nbsp; &nbsp; <span class="blue">Join</span> sb <span class="blue">In</span> familyInstances _
+&nbsp; &nbsp; <span class="blue">On</span> elem.UniqueId <span class="blue">Equals</span> <span class="blue">CType</span>(sb.ObjectType,
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span>).Family.UniqueId _
+&nbsp; &nbsp; <span class="blue">Where</span> <span class="blue">TypeOf</span> elem <span class="blue">Is</span> <span class="teal">Family</span> <span class="blue">Select</span> elem
+
+&nbsp; familySymbols = familySymbols.Distinct()
+
+&nbsp; <span class="blue">Dim</span> mapCatToFam <span class="blue">As</span> _
+&nbsp; &nbsp; <span class="blue">New</span> Dictionary(<span class="blue">Of</span> <span class="blue">String</span>, List(<span class="blue">Of</span> <span class="teal">Family</span>))
+
+&nbsp; <span class="blue">Dim</span> categoryList <span class="blue">As</span> _
+&nbsp; &nbsp; <span class="blue">New</span> Dictionary(<span class="blue">Of</span> <span class="blue">String</span>, <span class="teal">Category</span>)
+
+&nbsp; <span class="blue">Dim</span> families <span class="blue">As</span> List(<span class="blue">Of</span> <span class="teal">Family</span>)
+&nbsp; <span class="blue">Dim</span> category <span class="blue">As</span> <span class="teal">Category</span>
+&nbsp; <span class="blue">Dim</span> symbol <span class="blue">As</span> <span class="teal">FamilySymbol</span>
+
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> family <span class="blue">As</span> <span class="teal">Family</span> <span class="blue">In</span> familySymbols
+&nbsp; &nbsp; <span class="blue">If</span> family.Symbols.Size &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; symbol = family.Symbols(0)
+&nbsp; &nbsp; &nbsp; category = symbol.Category
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> mapCatToFam.ContainsKey(category.Name) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; mapCatToFam.Item(category.Name).Add(family)
+&nbsp; &nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; families = <span class="blue">New</span> List(<span class="blue">Of</span> <span class="teal">Family</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; families.Add(family)
+&nbsp; &nbsp; &nbsp; &nbsp; mapCatToFam.Add(category.Name, families)
+&nbsp; &nbsp; &nbsp; &nbsp; categoryList.Add(category.Name, category)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>It uses LINQ to improve the performance and takes about 10 seconds compared to the original 3-5 minutes.
+
+<p><strong>Addendum:</strong> 
+
+<a href="mailto:info@r-e-d.co.nz">Guy Robinson</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/family-usage-filtered-element-collector-performance.html?cid=6a00e553e1689788330168eba6f389970c#comment-6a00e553e1689788330168eba6f389970c">
+suggested below</a>
+
+making use of the .NET generic GroupBy method to simplify this further as follows:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> CreateFamilyTreeTest(
+&nbsp; <span class="teal">Document</span> myDoc )
+{
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; familiesCollector =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( myDoc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FamilyInstance</span>&gt;()
+&nbsp; &nbsp; &nbsp; <span class="green">// (family, familyInstances):</span>
+&nbsp; &nbsp; &nbsp; .GroupBy( fi =&gt; fi.Symbol.Family )
+&nbsp; &nbsp; &nbsp; .Select( f =&gt; f.Key );
+&nbsp;
+&nbsp; <span class="blue">var</span> mapCatToFam = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;&gt;();
+&nbsp;
+&nbsp; <span class="blue">var</span> categoryList = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>,
+&nbsp; &nbsp; <span class="teal">Category</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> f <span class="blue">in</span> familiesCollector )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> catName = f.Category.Name;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( mapCatToFam.ContainsKey( catName ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; mapCatToFam[catName].Add( f );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; mapCatToFam.Add( catName,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; { f } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; categoryList.Add( catName,
+&nbsp; &nbsp; &nbsp; &nbsp; f.Category );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>If you are interested in some background on the GroupBy method and an encouragement to use it whenever possible, here is a short 
+
+<a href="http://geekswithblogs.net/Martinez/archive/2009/10/29/linq-groupby-method-tutorial.aspx">
+introduction and tutorial</a>.
+
+
+<a name="3"></a>
+
+<h4>Class Property Initialiser</h4>
+
+<p>As one thing leads to another, I wondered about the missing pair of parenthesis in the new List initialiser above, and asked Guy about that.
+
+<p>Guy responds: When using collection initialisers the parentheses () are optional. 
+The code will compile and run both with and without them.
+
+<p>So 'new List&lt;Element&gt; { f, f };' is the same as writing:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> list = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; list.Add( f );
+&nbsp; list.Add( f );
+</pre>
+
+<p>You can also use initialisers for class properties. 
+So say I have a class like this:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Klass</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Prop1 { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Prop2 { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+<p>A new instance of that class can be initialised like this:
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> klass = <span class="blue">new</span> Klass
+&nbsp; {
+&nbsp; &nbsp; Prop1 = 23,
+&nbsp; &nbsp; Prop2 = <span class="maroon">&quot;some string&quot;</span>
+&nbsp; };
+</pre>
+
+<p>Saves a bit of typing ;-)
+
+<p>Many thanks to Guy for all his interesting hints and explanations!

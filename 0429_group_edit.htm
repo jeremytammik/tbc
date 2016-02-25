@@ -1,0 +1,265 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1260872 [editing members inside of groups] 
+  1261367 [Move items in Group element]
+
+-->
+
+<h3>Editing Elements inside Groups</h3>
+
+<p>Today is the last day here with my brother Marcus in Pattaya.
+We had a look at the 
+
+<a href="http://en.wikipedia.org/wiki/Sanctuary_of_Truth">
+Sanctuary of Truth</a> yesterday
+
+and I posted some 
+
+<a href="http://www.facebook.com/album.php?aid=66806&id=1019863650">
+photos</a> from 
+
+the beach in front of it, which was surprisingly quiet and lonely:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2010/2010-08-17_pattaya/Marcus01.jpg" alt="Marcus and Jeremy in front of the Sanctuary of Truth" width="400"/>
+</center>
+
+<p>Early tomorrow morning I will be heading off towards Cambodia and Angkor Wat, then spend a day or two in Bangkok, and return back here again to pick up my parked things before heading back to the airport.
+
+<p>I am a bit leery of taking any valuables with me to Cambodia, so the computer will be staying behind and I will remain offline for a week or so.
+So this is the last post you will see for a couple of days, and I will not be answering comments either for a while.
+
+<p>Returning to the Revit API, I discussed some aspects of Revit element groups in the past, such as how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html">
+create</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/rename-a-group.html">
+rename</a> a
+
+group.
+
+Here is another question on the topic of groups that came up repeatedly:
+
+<p><strong>Question:</strong> I am having trouble changing parameters of an element inside of a group that occurs in multiple locations in a project. Revit is displays the following error message:</p>
+
+<center>
+<img src="img/group_edit_error.png" alt="Group edit error"/>
+</center>
+
+<p>If I were doing this operation outside of the API I would first select the group, click "Edit Group", make the changes, and then click Finish.
+I'm not sure how to access the "edit group" functionality programmatically.
+I could ungroup the group, make changes, and then regroup it using the API but that would create new duplicate groups with different names.
+
+<p><strong>Answer:</strong> Unfortunately, the workaround you describe is the only way to achieve this at the moment.
+You have to ungroup a group before being able to modify elements in it.
+The document 'Getting Started with the Revit API.doc' in the Revit SDK provides the following information on this in the Question and Answer section:
+
+<span style="color:darkblue">
+
+<p><strong>Q:</strong> When exporting a model containing groups to an external program, the user receives an error at the end of the export:
+
+<p>"Changes to group "Group 1" are allowed only in group edit mode. Use the Edit Group command to make the change to all instances of the group. You may use the "Ungroup" option to proceed with this change by ungrouping the changed group instances."
+
+<p><strong>A:</strong> Currently the API does not permit changes to members of groups. You can programmatically ungroup, make the change, regroup and then swap the other instances of the old group to the new group to get the same effect.
+
+</span>
+
+<p>By the way, there are a number of other interesting questions addressed in that section as well, so it is well worth having a look at them.
+
+<p>Here is another version of the same question that I discussed in more depth with
+
+Henrik Bengtsson of
+
+<a href="http://www.lindab.se">
+Lindab</a>.
+
+This discussion highlights some additional points:
+
+<p><strong>Question:</strong> I am trying to move and rotate items inside a group but I cannot get it to work.
+
+<p>The actual problem is not so much to move or rotate the elements within the group as to get rid of the warning dialogue that pops up when something is changed inside an already existing group.
+
+<p>Can you provide a solution for moving and rotating elements within groups and avoiding this dialogue?
+
+<p><strong>Answer:</strong> I am sorry to say that you cannot change an element as long as it resides in a group, not even modify their parameters.
+In a previous case, a customer tried to edit parameter value of many elements included in a group.
+This failed, especially in large models.
+The workaround is ungroup the group first, edit the parameters, and then regroup the elements again.
+
+<p>Actually, an element parameter can indeed be edited and its parameter value changed when the element is contained in a group. However, a warning dialog is displayed saying 'A group has been changed outside group edit mode. The change is being allowed because there is only one instance of the type'. If one clicks 'OK', then the elements in group are changed. The only bother is the warning dialog.
+
+If you really insist on going this way, the dialogue can probably be suppressed by various means.
+There are several different possible ways to suppress unwanted dialogues in Revit 2011:
+
+<ul>
+<li>The old method using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+DialogBoxShowing event</a> that
+
+was already available in Revit 2010, which can be used to dismiss a dialogue programmatically.
+
+<li>The comprehensive
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+failure processing API</a> added
+
+to the Revit 2011 API, which can be do much more than that.
+
+<li>If all else fails and you just want to get rid of the dialogue box by any means, you can also use the Windows API to detect when it is displayed and dismiss it using my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">
+dialogue clicker application</a>.
+</ul>
+
+<p>However, the situation described above is only true and the suppression of the warning message will only work for one single instance of the group.
+If there are multiple instances, the whole editing operations fails.
+With large models and lots of groups, one can reportedly crash Revit by attempting to modify parameters of grouped element without ungrouping them first.
+
+<p>So I would suggest trying the same workaround in your case as well: ungroup the group, make the required modifications to the elements, and create a new group of them again.
+
+<p><strong>Response:</strong> Excellent work, as always...
+
+<p>The solution using the dialogue event did not work out for me.
+First of all, the group element selected when the command was executed was left in the model with a yellow colour when the command was finished.
+Secondly, the dialog pops up before it is closed down by the override method.
+It isn't completely pretty if that solution is included in an application for customers.
+If it has been an internal routine it wouldn't have mattered...
+
+<p>The second solution that you mentioned covering the Failure API worked like a rocket.
+I cannot see any problems with that at all, it just works perfectly.
+I took me some time to find the right BuiltInFailureID though ;-)
+
+<p>The third option is of course always a possibility but the Failure API wins this match by far!
+
+<p>When it comes to editing groups, there are two types of scenarios for me.
+
+<ol>
+<li>Change of parameter values in a group which is present in the model only once.
+This is possible to achieve using the API, but the problem has been the warning dialog.
+This is now handled with the Failure API.
+
+<li>Change of parameter values in a group which is present in the model more than once.
+Since this cannot be committed no matter what, I have handled this scenario before it can occur using our application.
+If the user tries to edit a group like that, I display a warning dialog if the group.grouptype.size is larger than one.
+</ol>
+
+<p>In my application, I will never encounter a case were the geometry content has to be changed in a group, because any changes in one of the groups causes the group to be deleted, re-created and placed in the model
+
+<p>If the need arises in the future, I can go for the solution you suggested and explode and regroup the items in the element set.
+
+<p>Here is the warning message I get:</p>
+
+<center>
+<img src="img/group_edit_mode_message.png" alt="Group edit mode message"/>
+</center>
+
+<p>It is not exactly the same as the one above, which is a sort of dead end, since the continue button is missing.
+
+<p>Here is some code from my project demonstrating the use of the Failure API and my IFailuresPreprocessor implementation.
+I have removed unnecessary bits to make it as clear and simple as possible:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> ExternalCommandData, _
+&nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> ElementSet) _
+&nbsp; <span class="blue">As</span> Result <span class="blue">Implements</span> IExternalCommand.Execute
+&nbsp;
+&nbsp; <span class="blue">Dim</span> trans <span class="blue">As</span> Transaction = <span class="blue">Nothing</span>
+&nbsp; <span class="blue">Dim</span> ebRes <span class="blue">As</span> <span class="blue">Boolean</span>
+&nbsp;
+&nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> ret <span class="blue">As</span> Result = <span class="blue">Nothing</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> Application _
+&nbsp; &nbsp; &nbsp; = commandData.Application.Application
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> UIDocument = app.ActiveUIDocument
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> Document = uidoc.Document
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> es <span class="blue">As</span> ElementSet = uidoc.Selection.Elements
+&nbsp;
+&nbsp; &nbsp; trans = <span class="blue">New</span> Transaction(doc, <span class="maroon">&quot;MyCommand&quot;</span>)
+&nbsp; &nbsp; trans.Start()
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> fhOpt <span class="blue">As</span> FailureHandlingOptions _
+&nbsp; &nbsp; &nbsp; = trans.GetFailureHandlingOptions()
+&nbsp;
+&nbsp; &nbsp; fhOpt.SetFailuresPreprocessor(<span class="blue">New</span> clsWallInfoFailure)
+&nbsp;
+&nbsp; &nbsp; trans.SetFailureHandlingOptions(fhOpt)
+&nbsp;
+&nbsp; &nbsp; ebRes = ChangeParametersAndSoOn(app, uidoc, doc, es)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> ebRes = <span class="blue">True</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; trans.Commit()
+&nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; trans.RollBack()
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; trans.RollBack()
+&nbsp; <span class="blue">Finally</span>
+&nbsp; &nbsp; trans.Dispose()
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+<span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">Public</span> <span class="blue">Class</span> clsWallInfoFailure
+&nbsp; <span class="blue">Implements</span> IFailuresPreprocessor
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> PreprocessFailures( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> failuresAccessor <span class="blue">As</span> FailuresAccessor) _
+&nbsp; &nbsp; <span class="blue">As</span> FailureProcessingResult _
+&nbsp; &nbsp; <span class="blue">Implements</span> IFailuresPreprocessor.PreprocessFailures
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> deleteWarning <span class="blue">As</span> <span class="blue">Boolean</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> flist <span class="blue">As</span> List(<span class="blue">Of</span> FailureMessageAccessor) _
+&nbsp; &nbsp; &nbsp; &nbsp; = failuresAccessor.GetFailureMessages
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> f <span class="blue">As</span> FailureMessageAccessor <span class="blue">In</span> flist
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> fDefId <span class="blue">As</span> FailureDefinitionId = f.GetFailureDefinitionId
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Select</span> <span class="blue">Case</span> fDefId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Case</span> BuiltInFailures.GroupFailures.AtomViolationWhenOnePlaceInstance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; deleteWarning = <span class="blue">True</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Select</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> deleteWarning = <span class="blue">True</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.DeleteWarning(f)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p><strong>Comment:</strong> One final little comment from Jeremy regarding the coding style using statements such as this:
+
+<pre class="code">
+&nbsp; &nbsp; <span class="blue">If</span> ebRes = <span class="blue">True</span> <span class="blue">Then</span>
+</pre>
+
+<p>I find the following statement more succinct and readable, and actually more correct:
+
+<pre class="code">
+&nbsp; &nbsp; <span class="blue">If</span> ebRes <span class="blue">Then</span>
+</pre>
+
+<p>Please refer to Kean's post on 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2010/02/testing-truth.html">
+testing truth</a> for
+
+a more in-depth discussion and further comments on this topic.

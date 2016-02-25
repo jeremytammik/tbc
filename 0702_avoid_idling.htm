@@ -1,0 +1,245 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1273117 [DocumentChanged and Idling Events] -->
+
+<h3>Avoid Idling</h3>
+
+<p>The advice to 'avoid Idling' may sound rather puritanical and a bit on the workaholic side, but I pay it special heed since it comes from Arno&scaron;t L&ouml;bel, Sr. Principal Engineer in the Revit development team, our resident Revit Idling expert, who already provided many (or almost all?) important insights in this and other related areas:
+
+<!--
+
+075_transaction_responsibility.htm:<p>Thank you to Arnost Lobel a
+348_regen_option_rules.htm:<p>Here is a first take at some best p
+353_asynchronous.htm:here is a very apt comprehensive summary of
+357_autojoinelements.htm:<p>Very many thanks to Mikako Harada, Sc
+//386_mep_system_creation.htm:<p>Yesterday was a great day here at
+456_close_active_doc.htm:collaboration with Joe Ye, and an explan
+509_list_project_doors_flaws.htm:<!-- Arnost Lobel Re: Modeless D
+531_commands_and_views.htm:<p><strong>Addendum:</strong> Arno&sca
+//538_zero_doc_ribbon.htm:<p<strong>Addendum:</strong> As Arno&scar
+541_application_attributes.htm:That is actually the reason why it
+567_extensible_storage.htm:<p>As Arno&scaron;t L&ouml;bel kindly
+652_modeless_loose_connectors.htm:by Arno&scaron;t, so it is a re
+673_elementid_relationships.htm:<p><strong>Addendum by Arno&scaro
+
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/transaction-responsibility.html">Transaction responsibility</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">Regeneration option best practices</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">Asynchronous API calls and Idling</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/autojoinelements.html">AutoJoinElements</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">Closing the active document and why not to</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">Modeless door lister flaws</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/command-and-conquer-when-switching-views.html">Warning addendum on switching views </a>
+<!-- <li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">enable-ribbon-items-in-zero-document-state addendum</a> -->
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/external-application-attributes.html">External application attributes</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">Extensible storage vendor id</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/09/yet-another-modeless-update.html">Modeless best practices</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">Warning on using undocumented ElementId relationships</a>
+</ul>
+
+<p>Arno&scaron;t also presented a class on the Idling event at Autodesk University 2011,
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9879&jid=1763185">
+<b>CP5381</b></a>, 
+
+on asynchronous interactions and managing modeless UI, which would be well worth a blog post all on its own.
+
+<p>Arno&scaron;t clarifies that he is absolutely not against the Idling event, in general. The arguments below are only about using or not using Idling in one specific pattern &ndash; reacting to modifications of the model when both external well as internal data (in the model) could be changed in effect of the initial modification. 
+In such situations he does not recommend utilizing the Idling event, because it does not support the pattern well.
+
+<p>There are, of course, situations where Idling is very much in place and some scenarios when it is quite necessary, such as interaction with modeless dialogues and multithreaded add-ins.
+
+<p>With that out of the way, here is an interesting conversation with a number of new important hints between Arno&scaron;t and Joe Offord of 
+
+<a href="http://www.enclos.com">
+Enclos</a> on 
+
+the pros and cons of 
+
+<ul>
+<li>DMU, the dynamic model update mechanism,
+<li>DCE, the DocumentChanged event, and
+<li>IE, the Idling event.
+</ul>
+
+<p><strong>Question:</strong> I have a process that is monitoring certain elements in a model via the DocumentChanged event. If I decide I need to perform a transaction on some of those elements I am storing the Document object via DocumentChangedEventArgs.GetDocument, along with some ElementIds, in a customized list that the Idling Event will process later. 
+I then subscribe to the Idling Event. 
+
+<p>When the Idling Event triggers I retrieve the same document object from my list and perform transactions with it. 
+
+<p>Is this a safe way of transferring elements between the DocumentChanged and Idling Events? 
+After attending Arno&scaron;t's class at AU I'm not 100% this transfer is "thread-safe". 
+If this isn't safe what would be a better way to define document-specific tasks for the Idling event to process? 
+I understand the DocumentChanged event does not me to make changes inside that event. 
+
+<p><strong>Answer:</strong> You present a design pattern that is not easy to solve or give a simple resolution for. 
+First of all, we need to know whether your approach is correct. 
+
+<p>We have two patterns for applications to react model changes: 
+
+<ol>
+<li>DMU &ndash; used when model changes trigger other changes in the same model
+<ol type="a">
+<li>The document is modifiable, naturally
+<li>The changes are all within the document  (the actions as well as the reactions) 
+<li>You do not need to know about Undo and Redo because Revit handles it automatically
+</ol>
+<li>DocumentChanged &ndash; used when model changes trigger changes to external data
+<ol type="a">
+<li>The document is not modifiable
+<li>The applied changes are made to external or non-model data
+<li>You need to know about Undo and Redo, because Revit does not manage the external data
+</ol>
+</ol>
+
+<p>You seem to be merging those two patterns.
+As mentioned above, we need to determine whether this is necessary at all.
+
+<p>My recommendations and answers: 
+
+<ul>
+<li>I, personally, do not recommend the DocumentChanged + Idling event, because &ndash; quite simply, it is not what Idling is for.
+<li>Is it a safe solution? Well, more appropriate question would be: Can it be implemented safely? The answer would be a yes; it can be implemented safely, but one needs to take into an account a lot of other things besides looking for DocumentChanged. When you have a gap between two calls into the API, you need to be aware of everything that can happen between those two times:
+<ul>
+<li>Document may be closed
+<li>Document may be saved, saved as, synced to central, reloaded latest, etc.
+</ul>
+<li>Besides all those other things that may happen between two events, it is indeed safe to rely on data gathered during the last DocumentChanged until the next Idling, because it is guaranteed that no other change has been done to the model (except the work-sharing operations mentioned above). To be absolutely certain about elements, always use Unique Ids over regular Ids. Unique Ids are guaranteed to works across work-sharing operations, regular Ids are not.
+<li>My preference is to do without the Idling event. I think that if I were challenged by the problem your customer is facing, I would try to implement it with DMU and DCh event only:
+<ul>
+<li>I would modify my external data on DCh even only
+<li>I would modify the model during DMU only
+<li>I would give a lot of thoughts to synchronize those two well
+</ul>
+</ul>
+
+<p>If I know more about the customer's project, I may be able to give more specific advices. Why do they need transactions if their tool is for is maintaining a live link between Revit elements and an external database, for example? 
+
+
+<p><strong>Response:</strong> Thank you for the feedback. 
+Let me try and further explain the problem I'm facing. 
+
+<!--
+<p>In Revit, I'm using a specific generic annotation family to track and quantify pieces of glass in the model. We have an external database that stores all the properties of a piece of glass (glass number, part name, part number, width, height, 
+building phase, etc). The annotation family has two custom instance text parameters: GLASS TYPE and GLASS NUMBER. In the external database, glass instances are tracked by their name and their host View name. I do not want to go 
+through reasons why we use an annotation symbol rather than modelling each piece of glass but I can assure you this is the most efficient method for us. It's largely due to the fact we're a subcontractor and want to leverage other parties' 
+models. 
+-->
+
+<p>In Revit, I'm using a specific generic annotation family to track and quantify my objects in the model. We have an external database that stores all their properties. The annotation family has custom instance text parameters. In the external database, instances are tracked by their name and their host View name. I do not want to go 
+through reasons why we use an annotation symbol rather than modelling each object but I can assure you this is the most efficient method for us. 
+
+<!--
+<p>Via the API I've created an interface that allows the user to pick a glass part from the database and have it drawn on a Revit view as an AnnotationSymbol. The parameters GLASS TYPE and GLASS NUMBER are automatically filled out via 
+the API. I then have a routine that counts up all the glass AnnotationSymbol instances in a particular view and manually draws them in a schedule using lines and text (as a Group: this is required because Revit will not create Schedules from 
+Generic Annotations). At the same time, all the instances of that glass are uploaded to the external database. 
+-->
+
+<p>Via the API I've created an interface that allows the user to pick an object from the database and have it drawn on a Revit view as an AnnotationSymbol. The parameters are automatically filled out via 
+the API. I then have a routine that counts up all the object AnnotationSymbol instances in a particular view and manually draws them in a schedule using lines and text (as a Group: this is required because Revit will not create Schedules from 
+Generic Annotations). At the same time, all the instances of that object are uploaded to the external database. 
+
+<p>Now, my goal is to have any changes to the model automatically sync with the external database. When a Document opens it collects all the existing annotation family instances and stores them in a global list using their ElementIds. I have 
+setup the DocumentChanged event set to track whether new instances of the annotation family have been created or previous instances have been deleted (by comparing the deleted ids). I would prefer to track the elements via UniqueId but 
+DocumentChanged only lists deleted elements via ElementId. If a change is flagged, I then subscribe to the IdlingEvent and store the Document HashCode and ElementId of the affected host View in global variables. 
+
+<p>When IdlingEvent triggers I first verify the global variable of the Document is still open by comparing the stored HashCode with the open Document HashCodes. If I find a match, I then verify the ElementId is still a View element in the document. 
+If both are ok I then collect all the family annotation instances in the view, verify their parameters match what the external database is showing, sync the elements with the external database, and redraw the schedule on the sheet. 
+
+<p>Hopefully this is making some sense. To recap, I need to do the following: 
+
+<ol>
+<li>Verify the parameters in the AnnotationSymbol specified match the properties set in the external database. 
+<li>Verify additions and deletions of the AnnotationSymbol instances are tracked "live" with the external database. 
+<li>Keep the report and schedule on each view current with number of AnnotationSymbols on the view. 
+</ol>
+
+<p>I realize this cannot always maintain a truly fool-proof connection with the external database so I also have an External Command that basically does the same thing that the Idling Event does. 
+
+<p>I welcome any suggestions to deal with unique problem. 
+
+<p><strong>Answer:</strong> I still think that the DMU+DCE combinations is a superior solution to using IE+DCE.
+
+<p>Here is how it should work:
+
+<ul>
+<li>On DMU, look for added and deleted glass annotations. If there are any, sync with the database and update the schedule in the model as needed
+<li>On DCE, only do something if the operation was Undone, or Redone, or GroupRolledBack. Ignore the other operations. When there is a change in added or deleted glass annotations, update the database but do not change the model (because it is being taken care of automatically by Revit)
+<li>There will be no need for having global variables storing the document and/or view
+</ul>
+
+<p>Like I said, the IE+DCE can be used, in theory, but:
+
+<ul>
+<li>It is less natural an implementation and more complex too
+<li>There is a lot more the application needs to look for
+<ul>
+<li>There is no guarantee Idling would be raised after DCE and before a document is saved or closed
+<li>Therefore subscribing to DocumentSaving, DocumentSavingAs and DocumentClosing
+<li>Event with those additional events it is not guaranteed a document would be always in sync with the external database when it is saved
+</ul>
+<li>It is much less efficient, especially with a lot of undos and redos, because the external application must do what Revit would have otherwise done automatically and far more efficiently.
+<li>The Idling event, though it looks like a viable solution in many cases, it is a good approach in a few specific scenarios, mostly involving modeless dialogues and work threads. Beside these very specific scenarios, there is always a better way &ndash; more efficient, more practical, and easier too.
+</ul>
+
+<p>Again, the rule for this and similar patterns is rather simple:
+
+<ol>
+<li>If you need to react to a changes in a model by making other changes to it, use DMU
+<li>If you need to react to changes in a model by making changes in an external database, use DCE
+<li>If you need both, you use both DMU and DCE, but you still follow the above tactic
+</ol>
+
+<!--
+<p>He also mentioned that he will look into the fact the Unique Id cannot be used when elements are deleted in near future. But irrespective of that, his helpful and detailed comments should help proceed further.  
+
+<a href="">
+</a>
+
+<pre class="code">
+</pre>
+-->
+
+<p><strong>Response:</strong> Although I really like the intent of DMU, I still see some major limitations of it in 2012: 
+
+<ol>
+<li>Inability to create new transactions inside the DMU 
+<li>Inability to create group elements inside the DMU 
+<li>DMU does not get called for rolled-backed or redone transactions (check me on this one)
+</ol>
+
+<p>Because of these limitations, I ended up using the (DCE+DMU)+IE for optimum performance.  
+The DCE and DMU events tracked changes to the model and called upon the IE when required.  
+The DCE tracks changes to AnnotationSymbols and DMU tracks changes to a specific View parameter.  
+The IE provided me the ultimate freedom to create transactions as I wish.  
+I understand there is a risk for things to change after DCE and before the IE.  
+Although the window for change is small, each programmer should decide how they want to deal with that risk. 
+
+
+<p><strong>Answer:</strong> I beg to disagree about the notion of DMU 'limitations'. Those listed above are not limitations, since DMU was designed exactly that way. No one is supposed to need a transaction and/or group inside a DMU, unless DMU is misused. Also, DMU does not need to be called at the event of Undo and Redo &ndash; if someone appears to need it, that someone does not use DMU correctly or is not clear on what the purpose of DMU is. I can only repeat what I wrote previously:
+
+<p>DMU &ndash; is for changes to the model in effect of other changes in the same model. All the changes will be and should be inside one transaction, because they are &ndash; obviously &ndash; related, which also mean that if one change is undone, the other (initial) changes need to be undone too. In another way &ndash; DMU is an extension of Revits regeneration, the last regeneration that always happens at the end of every transaction. 
+
+<p>DCE &ndash; is for changes to external data reacting to modifications to the model. No transactions are needed here and the model is not supposed to be touched.
+
+<p>I agree that IE gives the ultimate freedom; I disagree that the freedom should be utilized in this particular case, but I also made it clear that it was 'I' who would not use IE if 'I' was the one solving this particular problem. I do not want to tell users what they have to do &ndash; they should have the freedom to do whatever they desire. I just provide an explanation for why one solution is more favourable than the other. IE has very limited use when it is efficient and useful &ndash; beyond that recommended use it becomes not so efficient and troublesome to maintain.
+
+<h5>Extraneous Undo Entries</h5>
+
+<p>There is one more thing I do not 'like' about the Idling event, or &ndash; more precisely &ndash; about transactions created in the Idling event handler, when it is used outside of the recommended patterns (modeless dialogue, work threading, etc.). The transaction may come as a surprise to the unaware end user. The user pauses for a while, maybe leave her desk to get a cup of coffee, and when she returns there may be three new transactions on the undo stack. If I was her, I would most likely not like it. In contrast to that, changes made during DMU are expected &ndash; they are part of the action that is currently going on. There may not be transactions during DCE, so no surprises there. And if Idling is used to implement commands in a modeless dialogue, the user would not be surprised by an eventual transaction. In API programming it is not always about what way appears to be helpful to the programmer &ndash; it is about the end user. Revit addition should be made to best follow the natural flow of things. At least in my opinion.
+
+<p><strong>Response:</strong> Yes I agree IE isn't the prettiest solution to most problems.  The "mystery" transaction(s) created by the IE do affect the natural flow of the program.  I tried my utmost to keep the IE duration as minimal as possible.  I also took particular care to ensure I only created one transaction during the IE update.  I'm sure the user would be shocked to see multiple phantom transactions created repeatedly. 
+
+<p>My earlier use of the word "limitation" with regards to the DMU was probably misguided.  For my particular work-flow, in my opinion, the DMU was simply not versatile enough.  I needed to create groups on the fly and this is simply not permitted inside the DMU.  I forgot to mention I also tried creating new families (in place of the groups) and load them into the project during the DMU but again, this is not permitted.  I think this was the only thing that prevented me from using DMU+DCE without the IE. 
+
+<p><strong>Answer:</strong> Regarding your statement "only created one transaction during the IE update.  I'm sure the user would be shocked to see multiple phantom transactions created repeatedly":
+
+<p>I did not even mean that one application would create multiple transactions in one single Idling event. But if more add-ins were written this way, and if the users happened to have, say 10 of them, there may be 10 or more transactions during one Idling, and a lot more in one coffee break (with Revit left unattended). It is because one change could lead to another (in a different add-in), which may lead back and trigger yet another change or changes in the original add-in, and so on. Everything would be tied together so tightly so it could be quite a mystery to the end user to figure the course of changes. And when the user decided to undo just some of the involuntary transactions and if the synchronization between Idling and DCE in the individual add-ins is not written perfectly and robust, the hell may as well open for the user (and her document) ;-) I am kidding, of course, but the fact remains that such situations happen in the real world and it is very hard to maintain. That is why I always recommend keeping transaction short and the changes atomic. Splitting one change into one-transaction-now and another transaction-later is almost always opening the door for troubles. 
+
+<p>Again, this is my recommendation only.
+
+<p><strong>Response:</strong> I think we all prefer Revit not open a gateway to hell but it's nice to know it has that much power!  :)

@@ -1,0 +1,153 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!-- 
+
+  1251619 [SketchPlane of SectionView is null]
+
+-->
+
+<h3>View Sketch Plane</h3>
+
+<p>Some views provide a sketch plane, others do not. In particular, the section views do not. 
+Here is a little exploration into this subject prompted by the following question from Toste Wallmark of 
+
+<a href="http://www.i-tecton.com">
+Tecton Limited</a>:</p>
+
+<p><strong>Question:</strong>
+I'm trying to get the SketchPlane property of currently active view, which is a section view. 
+However, it returns null.
+Do I need to manually create a sketch plane for section views?
+Other types of views, like floor plans, do correctly return a SketchPlane object.</p>
+
+<p><strong>Answer:</strong>
+I implemented a little dedicated sample application to test your assertion, and I can reproduce what you say in the sample projects that I have looked at so far.</p>
+
+<p>I would recommend to always check whether the sketch plane returned from a view is null or not. 
+In case it is null, you will obviously have to create your own.
+You can do so using the view origin and direction. 
+These values are always available from the corresponding properties on the view object, even though the view plane is null.</p>
+
+<p>Here is the result of searching for all document elements that are of the View class or one of its five derived classes.
+Looking at a separate listing of all database elements, I noticed that many of the view related objects occur in pairs, like the elements used for level 1 and 2 below with the element id pairs (13073, 13077) and (15915, 15919). 
+In the other cases, the object type of only one of the two related objects is View, whereas the other is simply a Revit Element and thus does not appear in this list:</p>
+
+<center>
+<img src="img/view_sketch_planes.png" alt="View sketch planes"/>
+</center>
+
+<p>I also print out this list to the Visual Studio debug output window. 
+The overly long lines can be seen by copying this text to an editor:</p>
+
+<pre>
+List of document views' sketch planes: 
+
+View [3651] Project View origin (0,0,0) direction (0,-1,0): <null sketch>
+ViewPlan [13073] Level 1 origin (0,0,0) direction (0,0,1): Level 1 plane origin (0,0,0), plane normal (0,0,1)
+ViewPlan [13077] Level 1 origin (0,0,0) direction (0,0,1): Level 1 plane origin (0,0,0), plane normal (0,0,1)
+ViewPlan [15915] Level 2 origin (0,0,0) direction (0,0,1): Level 2 plane origin (0,0,13.12), plane normal (0,0,1)
+ViewPlan [15919] Level 2 origin (0,0,0) direction (0,0,1): Level 2 plane origin (0,0,13.12), plane normal (0,0,1)
+View [29152] North origin (-1.04,84.1,3.94) direction (0,1,0): <null sketch>
+View [29193] East origin (84.12,-2.54,3.94) direction (1,0,0): <null sketch>
+View [29214] West origin (-84.13,-2.42,3.94) direction (-1,0,0): <null sketch>
+View [29233] South origin (-1.08,-84.12,3.94) direction (0,-1,0): <null sketch>
+ViewPlan [29273] Site origin (0,0,0) direction (0,0,1): Level 1 plane origin (0,0,0), plane normal (0,0,1)
+View [92030] System Browser origin (0,0,0) direction (0,0,1): <null sketch>
+View [138046] Section 1 origin (-20.55,2.78,13.12) direction (-1,0,0): <null sketch>
+</pre>
+
+<p>Note that this list includes a view object for the system browser, which obviously has no sketch plane at all. 
+It still returns valid values for the view origin and direction.</p>
+
+<p>Here are the utility methods used by the external command which generates this list:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> RealString( <span class="blue">double</span> a )
+{
+&nbsp; <span class="blue">return</span> a.ToString( <span class="maroon">&quot;0.##&quot;</span> );
+}
+&nbsp;
+<span class="blue">static</span> <span class="blue">string</span> PointString( <span class="teal">XYZ</span> p )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;({0},{1},{2})&quot;</span>,
+&nbsp; &nbsp; RealString( p.X ), 
+&nbsp; &nbsp; RealString( p.Y ),
+&nbsp; &nbsp; RealString( p.Z ) );
+}
+&nbsp;
+<span class="blue">static</span> <span class="blue">string</span> PlaneString( <span class="teal">Plane</span> p )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;plane origin {0}, plane normal {1}&quot;</span>,
+&nbsp; &nbsp; PointString( p.Origin ), 
+&nbsp; &nbsp; PointString( p.Normal ) );
+}
+&nbsp;
+<span class="blue">static</span> <span class="teal">Filter</span> OrType( 
+&nbsp; <span class="teal">Filter</span> f, 
+&nbsp; <span class="teal">Type</span> t, 
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf )
+{
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewTypeFilter( t );
+&nbsp; <span class="blue">return</span> cf.NewLogicOrFilter( f, f2 );
+}
+</pre>
+
+<p>Here is the code of the external command Execute method:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">View</span> activeView = doc.ActiveView;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf 
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">Filter</span> f1 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+<span class="teal">Filter</span> f2 = OrType( f1, <span class="blue">typeof</span>( <span class="teal">View3D</span> ), cf );
+<span class="teal">Filter</span> f3 = OrType( f2, <span class="blue">typeof</span>( <span class="teal">ViewDrafting</span> ), cf );
+<span class="teal">Filter</span> f4 = OrType( f3, <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ), cf );
+<span class="teal">Filter</span> f5 = OrType( f4, <span class="blue">typeof</span>( <span class="teal">ViewSection</span> ), cf );
+<span class="teal">Filter</span> f6 = OrType( f5, <span class="blue">typeof</span>( <span class="teal">ViewSheet</span> ), cf );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; views = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+doc.get_Elements( f6, views );
+&nbsp;
+<span class="teal">Debug</span>.Assert( 0 &lt; views.Count, 
+&nbsp; <span class="maroon">&quot;expected document to have at leat one view&quot;</span> );
+&nbsp;
+<span class="blue">string</span> msg 
+&nbsp; = <span class="maroon">&quot;List of document views' sketch planes: &quot;</span> 
+&nbsp; + <span class="teal">Environment</span>.NewLine;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">View</span> view <span class="blue">in</span> views )
+{
+&nbsp; msg += <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;{0}{1} [{2}] {3} origin {4} direction {5}: &quot;</span>, 
+&nbsp; &nbsp; <span class="teal">Environment</span>.NewLine, 
+&nbsp; &nbsp; view.GetType().Name, 
+&nbsp; &nbsp; view.Id.Value, 
+&nbsp; &nbsp; view.Name,
+&nbsp; &nbsp; PointString( view.Origin ),
+&nbsp; &nbsp; PointString( view.ViewDirection ) );
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketch = view.SketchPlane;
+&nbsp; msg += ( <span class="blue">null</span> == sketch ) 
+&nbsp; &nbsp; ? <span class="maroon">&quot;&lt;null sketch&gt;&quot;</span> 
+&nbsp; &nbsp; : sketch.Name + <span class="maroon">&quot; &quot;</span> + PlaneString( sketch.Plane );
+}
+<span class="teal">Debug</span>.Print( msg );
+WinForms.<span class="teal">MessageBox</span>.Show( msg, <span class="maroon">&quot;View Sketch Planes&quot;</span> );
+<span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+</pre>
+
+<p>Note that specifying a type filter when calling the document get_Elements method does not return derived types, only the specific type given.
+Since I wish to retrieve all types derived from the View class as well as base class View elements, I need to create a Boolean expression or'ing together all of them.
+For this purpose, I invented a nice new little OrType method for succinctly or'ing together a sequence of type filters.</p>

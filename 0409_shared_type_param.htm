@@ -1,0 +1,77 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1260900 [Add Parameter to the Wall Type] -->
+
+<h3>Shared Type Parameter</h3>
+
+<p>The last time we looked at defining new shared parameters for different element categories was a long time ago, in the exploration of doing so for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/model-group-shared-parameter.html">
+model groups</a>.
+
+Here is another very basic question on defining shared parameters that we have not previously addressed:
+
+<p><strong>Question:</strong> I would like to add a new shared parameter to the wall type. 
+Unfortunately the code I am currently using adds it to the instances instead.
+How can I add this parameter to all wall types?
+Is it possible? 
+Can you send me some example code how to do it?
+Here is a screen snapshot which shows what I would like to achieve:</p>
+
+<center>
+<img src="img/wall_and_wall_type_properties.jpg" alt="Wall and wall type properties"/>
+</center>
+
+<p><strong>Answer:</strong> The answer to your query is short and sweet: use NewTypeBinding instead of NewInstanceBinding.
+
+<p>If you look at the description of the Binding class in the Revit API help, you will see the following detailed description:
+
+<p style="color:darkblue">Binding objects are used to take a parameter definition and bind it to one or more categories. This class is a base class for all types of parameter binding within Autodesk Revit. Once the binding objects are created and added to the document parameters will be added to elements in those categories specified in the binding. There are currently two types of binding available, Instance binding and Type binding. The key difference between the two is that the instance bound parameters appear on all instances of the elements in those categories. Changing the parameter on one does not affect the other instances of the parameter. The Type bound parameters appear only on the type object and is shared by all the instances that use that type. Changing the type bound parameter affects all instances of the elements that use that type. Note, a definition can only be bound to an instance or a type and not both.
+
+<p>To attach a shared parameter to some additional element type, you need to specify its category in the category set used to create the parameter binding.
+We explored how to find the category to use in some 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/model-group-shared-parameter.html">
+special cases</a> in 
+
+the past. 
+In all of the cases discussed so far, we always used the NewInstanceBinding method. 
+Your question gives me a welcome opportunity to try out the NewTypeBinding method as well.
+
+<p>The creation application provides the two sibling methods NewInstanceBinding and NewTypeBinding. Both can be fed with the same set of categories. They define a link between a shared parameter definition and the instances and type types of a specific category, respectively.
+
+<p>I updated The Building Coder sample external command CmdCreateSharedParams to add a type binding to walls in addition to the previous instance bindings.
+The only really relevant change is the addition of a Boolean argument typeParameter to the CreateSharedParameter method, and the line asking the creation application 'ca' to create the parameter binding, which now looks like this:
+
+<pre class="code">
+&nbsp; <span class="teal">Binding</span> binding = typeParameter
+&nbsp; &nbsp; ? ca.NewTypeBinding( catSet ) <span class="blue">as</span> <span class="teal">Binding</span>
+&nbsp; &nbsp; : ca.NewInstanceBinding( catSet ) <span class="blue">as</span> <span class="teal">Binding</span>;
+</pre>
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_74_2.zip -->
+
+<a href="zip/bc_11_74_2.zip">
+version 2011.0.74.2</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the updated command.
+
+<p>When I run it in a project with no model groups in it, it prints the following to the Visual Studio debug output console:
+
+<pre>
+Created a shared instance parameter 'SP1' for the Doors category.
+Created a shared instance parameter 'SP2' for the Walls category.
+Please insert a model group.
+Created a shared instance parameter 'SP3' for the Lines category.
+Created a shared type parameter 'SP4' for the Walls category.
+</pre>
+
+<p>Afterwards, the wall type has a shared parameter associated with it:</p>
+
+<center>
+<img src="img/new_wall_type_shared_param.png" alt="New wall type shared parameter"/>
+</center>

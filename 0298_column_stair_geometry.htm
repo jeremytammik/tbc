@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256480 [Problem accessing the Geometry of Columns and Stairs] -->
+
+<h3>Retrieving Column and Stair Geometry</h3>
+
+<p>We have had several questions related to the retrieval of the geometry of stair elements in the past.
+
+<!-- e.g. from
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html?cid=6a00e553e1689788330120a4fa02a6970b#comment-6a00e553e1689788330120a4fa02a6970b">Zorcad</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html?cid=6a00e553e1689788330120a6580066970c#comment-6a00e553e1689788330120a6580066970c">Ritish</a>
+[<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html?cid=6a00e553e1689788330120a60c5f30970b#comment-6a00e553e1689788330120a60c5f30970b">2</a>],
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html?cid=6a00e553e1689788330120a64e1d69970b#comment-6a00e553e1689788330120a64e1d69970b">Arjun</a>,
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html?cid=6a00e553e1689788330120a64e3f64970b#comment-6a00e553e1689788330120a64e3f64970b">Shifali</a>
+[<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html?cid=6a00e553e1689788330120a6a3c6f7970c#comment-6a00e553e1689788330120a6a3c6f7970c">2</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html?cid=6a00e553e1689788330120a6a76603970c#comment-6a00e553e1689788330120a6a76603970c">3</a>].
+
+-->
+
+We already explored the geometry of various other elements, e.g.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">slab boundary</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/slab-side-faces.html">slab side faces</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">wall elevation profile</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygon areas and outer loop</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">3D polygon areas</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/cylindrical-column.html">cylindrical columns</a>, and 
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/rectangular-duct-corners.html">MEP ducts</a>.
+
+<p>Here is now a solution by Joe Ye which may shed some new light on this issue.
+The main point is that all elements which are represented by instances of a symbol may either have their own local geometry assigned to them, if it is unique in some way, or they may be reusing the standard geometry defined for the family type, transformed to their local insertion point, if it can be reused unmodified and thus shared with all other instances.
+
+<p><strong>Question:</strong> I am trying to access the geometry data of different building elements in order to rebuilt them from their meshes and convert them to another format. 
+I had no problems converting walls, but some other objects don't provide access to their geometry data in the same way.
+
+<p>Problem #1: Columns. 
+I am filtering out all columns as FamilyInstances. 
+When I use the sample Revit 'Urban House' model, I can access their geometry, get the related solid and access the mesh from its faces. 
+
+<p>On the other hand, when I apply the same approach to another model of my own, this is not possible. 
+In this model, the attempt to cast the GeometryObjects to solids returns null. 
+Is there maybe something wrong with this model or the families used in it?
+
+<p>Another Problem here is filtering for columns which are not of the structural type StructuralType.Column. 
+I am doing this by accessing the Family.Instance.Category.Name which is not very elegant. 
+
+<p>Problem #2: Stairs.
+The problem I have with stairs is that I can cast the GeometryObjects to solids, but they do not contain any faces. 
+Is there maybe a different way to access the geometry of stairs, so that I can create a mesh from it? 
+
+<p><strong>Answer:</strong> The issue with the columns is that the ones used in your own sample model file are standalone columns which do not join or intersect with any other elements.  
+If a column or some other FamilyInstance element is joined to another element, its geometry might be changed by this operation.
+Therefore, each instance needs to maintain its own specific copy of the geometry.
+
+<p>On the other hand, a standalone column or FamilyInstance object that does not cut any other element can reuse the unmodified geometry defined by its family symbol.
+This helps reduce file size, since it avoids creating and maintaining multiple copies of the same geometry.
+
+<p>We therefore need to check whether the family instance geometry contains any solid of its own.
+If not, then it may be a standalone element, and we need to look at the symbol's geometry instead.
+The standalone element type geometry is accessible through Geometry &gt; Instance &gt; SymbolGeometry. 
+The geometry retrieved then needs to be transformed from the symbol definition coordinate system to the instance coordinate system by applying the transform retrieved from Geometry &gt; Instance &gt; Transform.
+
+<p>Here is a pseudo code example demonstrating this:
+
+<pre class="code">
+<span class="blue">void</span> generateSingleElement( <span class="teal">RvtElement</span> e )
+{
+&nbsp; <span class="teal">GeoElement</span> geo = e.get_Geometry( geomOption );
+&nbsp;
+&nbsp; <span class="blue">if</span>( geo != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> arr = geo.Objects;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> arr )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> geomSolid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geomSolid ) <span class="green">//+</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get geometry from this solid</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ...</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">GeoInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeoInstance</span> geoInst = obj <span class="blue">as</span> <span class="teal">GeoInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeoElement</span> geoElem = geoInst.SymbolGeometry;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> transform = geoInst.Transform;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> arr2 = geoElem.Objects;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// use the same method as above to obtain </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the nested geometry. please don't </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// forget to convert with the transform.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ...</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The other problem you mention is filtering the columns which do not have the structural type StructuralType.Column. 
+You need to be aware of the fact that a StructuralType is only applicable to structural elements, for example structural columns and structural beams. 
+Normal architectural column instances will not have a structural type assigned to them, so you cannot use this method to filter for them.
+In that case, you should use the more general approach of filtering for the desired combination of FamilyInstance type and column category. 
+
+<p>Regarding your issue with stairs, the solution is the same as for the columns.
+
+<p>Many thanks to Joe for handling this solution!

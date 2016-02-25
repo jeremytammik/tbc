@@ -1,0 +1,112 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1262959 [ExtractPartAtomFromFamilyFile throws AccessViolationException] 
+SPR #195773 [ExtractPartAtomFromFamilyFile throws exception in 64bit system, works well in 32bit system]
+SPR #192492 [extractPartAtomFromFamilyFile crashes on this file from Seek (64-bit)]
+
+-->
+
+<h3>Extract Part Atom Revisited</h3>
+
+<p>We briefly discussed the use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/extract-part-atoms.html">
+ExtractPartAtomFromFamilyFile</a> method in Revit 2010.
+
+Now the question on using this method arose again in the context of the Revit 2011 API:
+
+<p><strong>Question:</strong> I invoked the Autodesk.Revit.ApplicationServices.Application ExtractPartAtomFromFamilyFile method of on an RFA file, using the following code:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> createPartAtomFile(
+&nbsp; <span class="teal">Application</span> app,
+&nbsp; <span class="blue">string</span> rfaFilePath,
+&nbsp; <span class="blue">string</span> partAtomFilePath )
+{
+&nbsp; app.ExtractPartAtomFromFamilyFile(
+&nbsp; &nbsp; rfaFilePath,
+&nbsp; &nbsp; partAtomFilePath );
+}
+</pre>
+
+This threw an AccessViolationException with the following stack trace:
+
+<pre>
+AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt. 
+at extractPartAtomFromFamilyFile(AString* , AString* ) 
+at Autodesk.Revit.ApplicationServices.Application.ExtractPartAtomFromFamilyFile(String familyFilePath, String xmlFilePath) 
+... 
+... 
+</pre>
+
+<p>How can I avoid this exception and successfully generate the part atom XML for the RFA file? 
+
+<p><strong>Answer:</strong> Based on an answer to this question by my colleague Saikat Bhattacharya, I wrote a new Building Coder sample command CmdPartAtom to test run this method.
+The command implementation is achieved in the following few lines of code and successfully generates the part atom XML file:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdPartAtom</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Extract Part Atom&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> familyFilePath 
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;C:/Documents and Settings/All Users&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;/Application Data/Autodesk/RAC 2011&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;/Metric Library/Doors/M_Double-Flush.rfa&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> xmlPath = <span class="maroon">&quot;C:/tmp/ExtractPartAtom.xml&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; app.ExtractPartAtomFromFamilyFile( 
+&nbsp; &nbsp; &nbsp; familyFilePath, xmlPath );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is a screen snapshot of the resulting XML file displayed in the browser, with all except one of the A:part nodes collapsed:</p>
+
+<center>
+<img src="img/ExtractPartAtomXml.png" alt="ExtractPartAtom XML output"/>
+</center>
+
+<p>In Saikat's words: 
+Looking at the exception you have received, I am not sure if it is related to the TransactionMode and RegenerationOption attributes used in your plug-in. 
+In my case, I used the Manual mode for both the attributes. 
+Please try using my code snippet and steps to see if it works well at your end too.
+
+<p>Many thanks to Saikat for this exploration!
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_75.zip -->
+
+<a href="zip/bc_11_75.zip">
+version 2011.0.75.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.
+
+<p>More recently, we have heard that there is currently a problem with this API call on 64 bit systems, so right now this will only work in the 32 bit version.
+As Steve points out below, the issue might be occurring only on certain platforms, e.g. on 64 bit Windows 7 OS running 64-bit Revit Architecture 2011. 
+It has been resolved internally, though, so the next update should have the issue fixed.

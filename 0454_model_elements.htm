@@ -1,0 +1,90 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Model Elements Revisited</h3>
+
+<p>Scott Conover responded with a wealth of ideas to yesterday's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/selecting-model-elements.html">
+model element selection</a> discussion, 
+
+which in turn has gone through numerous previous iterations, so this really seems like an endless theme.
+
+<p>Actually it is not even yesterday's, yet, it is still today's.
+We both wanted to fix it fast.
+
+<p>Here are Scott's comments and suggestions:
+
+<p>First, on the original solution:
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; found
+&nbsp; &nbsp; = collector
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent()
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIsElementTypeFilter</span>( <span class="blue">false</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIsElementTypeFilter</span>( <span class="blue">true</span> ) ) )
+&nbsp; &nbsp; &nbsp; .ToElements();
+</pre>
+
+<p>The WherePasses clause is totally unnecessary.  
+I know this is the 'original' example, but I certainly hope that nobody copies this for further use.
+
+<!--
+[SC1]I dont know if this is necessary for your followup  I was kind of hoping you would edit the original post (at least add a comment around that set of lines indicating it is not useful).
+-->
+
+<p>Your 'first solution' post from 2009 appends filters to each other one at a time.  
+Our new LogicalOrFilters support more than two inputs, so it should actually be updated to make more efficient use of 2011 filtering.
+
+<!--
+[SC2]We could definitely mention it.  Again, is it more useful to go back and edit the original post, or at least put this note there as well?  What is the correct bloggers etiquette for this?  To me, I prefer to view your blog as a resource for searching for useful techniques rather than a sequential time-based set of posts which may grow out-of-date; not sure if this is what you intend.
+-->
+
+<p>Regarding your second solution regarding HasMaterialQuantities &ndash; I guess it may not find all required elements.  
+Furniture, for example, doesn't have material quantities, but it is a physical element in the model.  
+
+<p>Another solution might be:
+
+<ul>
+<li>Start temporary transaction
+<li>Create a default 3D view
+<li>Create FilteredElementCollection on view elements.
+<li>Apply WhereElementIsNotElementType
+<li>Iteration
+<li>Rollback to remove created view
+</ul>
+
+<p>Since it seems that 3D elements are what is wanted here, all elements visible in the new (unfiltered) 3D view are targets.
+
+<p>Finally, the final solution contains a redundancy:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector
+&nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; .WhereElementIsViewIndependent()
+&nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>The redundancy consists in the call to ToElements.
+It executes the filter over the document and returns all found elements in a collection.  
+Foreach over the collector does the same execution a second time.  
+You should either skip the ToElements call (which is what I would do), or declare a local IList<Element> to hold the return of ToElements and run foreach over that.
+
+<!--
+[SC3]This you are welcome to call attention to in this post.  But perhaps it should also have a note in the previous post.  See above.
+-->
+
+<p>Many thanks to Scott for this valuable feedback!
+
+<!-- .NET, 2011, Element Relationships, Filters, Geometry, Performance, Utilities -->

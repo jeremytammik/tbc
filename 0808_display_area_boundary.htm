@@ -1,0 +1,234 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07535477 [Determine if a room resides within an area] 
+C:\a\j\adn\case\sfdc\07535477\src\DisplayBoundary\DisplayBoundary.sln
+
+-->
+
+<h3>Graphically Display Area Boundary Loops</h3>
+
+<p>I recently worked on a case from a developer struggling with area boundary loops and attempting to determine whether they were closed or not by looking at the coordinate values in RevitLookup.
+
+<p>I hold that the average human brain is overtaxed by trying to analyse graphics manually, or rather, cerebrally.
+
+<p>I therefore implemented a sample command DisplayBoundary to display them graphically instead. 
+
+<p>It iterates over the boundary segments of selected areas, or all areas in the model, and creates a model curve to represent each segment. 
+
+<p>After running the command, the model curves can be isolated to display the result graphically.
+
+
+<a name="2"></a>
+
+<h4>Area Boundary Segment Retrieval Options</h4>
+
+<p>The Area.GetBoundarySegments method takes a SpatialElementBoundaryOptions argument, which enables us to specify the two properties StoreFreeBoundaryFaces and SpatialElementBoundaryLocation.
+
+<p>The former indicates whether to include free boundary faces in the result, i.e. portions of spatial element faces that are not coincident with bounding element faces. 
+
+<p>The latter can be set to either Finish, to retrieve the spatial element finish face, or Center, for its centerline.
+
+<p>Since the Revit wall location definition relies heavily on centerlines, the latter setting is preferable in order to obtain closed loops from the boundary segment results.
+
+
+<a name="3"></a>
+
+<h4>Example</h4>
+
+<p>Here is a simple sample area to test this on:</p>
+
+<center>
+<img src="img/display_boundary_area.png" alt="Area element"/>
+</center>
+
+<p>Its serrated edges stem from various openings in the walls of the underlying rooms:
+
+<center>
+<img src="img/display_boundary_rooms_walls_openings.png" alt="Area boundary rooms, walls and openings"/>
+</center>
+
+<p>Selecting this area element and running the DisplayBoundary command generates a model curve for each boundary segment.
+Isolating model lines in the view shows the area outline:</p>
+
+<center>
+<img src="img/display_boundary_lines.png" alt="Model curves displaying area boundary"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Code</h4>
+
+<p>The code to achieve this is astonishingly simple and succinct, although it has not been tested extensively yet:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> set = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = set.Size;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( set
+&nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Area</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Area</span>,<span class="teal">ElementId</span>&gt;( e =&gt; e.Id ) );
+&nbsp;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select some area alements &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; before running his command, or nothing &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;at all to process all of them.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// When instantiating a filtered element </span>
+&nbsp; &nbsp; <span class="green">// collector using preselected elements, </span>
+&nbsp; &nbsp; <span class="green">// you still must apply a filter, even if </span>
+&nbsp; &nbsp; <span class="green">// it has no effect, or the collector will </span>
+&nbsp; &nbsp; <span class="green">// throw an exception when accessing its</span>
+&nbsp; &nbsp; <span class="green">// elements:</span>
+&nbsp;
+&nbsp; &nbsp; col = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc, ids )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Retrieve all area elements from database</span>
+&nbsp;
+&nbsp; &nbsp; col = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Area</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Specify boundary options</span>
+&nbsp;
+&nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; opt.StoreFreeBoundaryFaces = <span class="blue">true</span>;
+&nbsp;
+&nbsp; opt.SpatialElementBoundaryLocation =
+&nbsp; &nbsp; <span class="teal">SpatialElementBoundaryLocation</span>.Center; <span class="green">// loops closed</span>
+&nbsp; &nbsp; <span class="green">//SpatialElementBoundaryLocation.Finish; // loops not closed</span>
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Convert Area Loops To Model Curves&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Filtered element collector is iterable</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Area</span> area <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( area.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> z = area.Level.Elevation;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Plane</span> levelPlane = app.Create.NewPlane( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, z ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SketchPlane</span> sketchPlane 
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewSketchPlane( levelPlane );
+&nbsp;
+&nbsp; &nbsp; &nbsp; sketchPlane.Name = <span class="maroon">&quot;Model Curves for Area &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + area.Id.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops
+&nbsp; &nbsp; &nbsp; &nbsp; = area.GetBoundarySegments( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt; loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> seg <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewModelCurve( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; seg.Curve, sketchPlane );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/DisplayBoundary.zip">DisplayBoundary.zip</a> 
+
+including the complete source code, Visual Studio solution, and add-in manifest for this command.
+
+
+<a name="11"></a>
+
+<h4>Unicode Characters in IFC</h4>
+
+<p>On a completely different topic, here is a recent question that came up:
+
+<p><strong>Question:</strong> How are Chinese characters exported to an IFC file?
+
+<p>I see an entry like this in my output file:
+
+<pre>
+  #53 = IFCPROJECT(
+    '2ZorIEY491exwHFgtoAWmP',#52,
+    '\X2\987976EE7F1653F7\X0\',$,$,
+    '\X2\987976EE540D79F0\X0\',
+    '\X2\987976EE72B66001\X0\',
+    (#42,#47),#35);
+</pre>
+
+<p>I do not recognise this format.
+
+<p>Can you explain, please?
+
+
+<p><strong>Answer:</strong> All strings in IFC files are in Unicode.
+They are encoded according to the rules described in the buildingSMART
+
+<a href="http://www.buildingsmart-tech.org/implementation/get-started/string-encoding/string-encoding-decoding-summary">
+string encoding and decoding summary</a>.
+
+
+<a name="12"></a>
+
+<h4>Create Assemblies Sample</h4>
+
+<p>My colleague 
+
+<a href="http://adndevblog.typepad.com/aec/katsuaki-takamizawa.html">Katsuaki Takamizawa</a>
+
+just published a Revit 2013 port and demonstration of the
+
+<a href="http://adndevblog.typepad.com/aec/2012/08/assemblyparts-samples.html">
+assembly creation and comparison source code sample</a> provided 
+
+by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html#2">
+Revit 2012 API webcast recording</a>.
+
+<p>It implements two external commands:
+
+<ul>
+<li>CreateAssemblies lets you pick elements and creates an assembly instance and a part list in a schedule view.
+<li>Compare Assemblies asks you to select two assembly instances and finds differences such as the number or types of elements. 
+</ul>

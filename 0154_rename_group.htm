@@ -1,0 +1,54 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!--
+  1250992 [Variuos Revit API questions]
+  SPR #157908 [Changing group name via API]
+-->
+
+<h3>Rename a Group</h3>
+
+<p>I have very busy this last week answering cases and preparing training material.
+Lots of interesting issues are cropping up that I would love to blog about, but I can hardly find the time to do so.
+Here is one little item of interest raised by Henrik Bengtsson of 
+
+<a href="http://www.lindab.se">
+Lindab</a>
+
+on renaming a group:</p>
+
+<p><strong>Question:</strong>
+Is there a way to change the name of a group that is created via the API?
+If you use the Document.Create.CreateNewGroup method and provide an ElementSet argument, it returns a Group object. 
+If you then call Group.Name = "Test", it will raise an error saying that this operation is not valid due to the current state of the object.
+
+Is there perhaps some other method of changing the name of the group?</p>
+
+<p>This group issue is of great importance since I am working on creating walls with studs and beams, so called structural framing. 
+I want all these profiles to be connected in some way and this is one method. 
+They both graphically and parametrically belong to each other, since you can use the Group.Members property to find all the different members in the group. 
+Good when you are specifying products.</p>
+
+<p><strong>Answer:</strong>
+We already discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html">
+creation of a group</a>.
+
+Changing the name of a group is not achieved by using the Name property on the group itself, but on the group type, like this:
+
+<pre class="code">
+&nbsp; <span class="teal">Group</span> g = &lt;wherever you got the group from&gt;
+&nbsp; <span class="teal">Symbol</span> groupType = g.ObjectType;
+&nbsp; groupType.Name = <span class="maroon">&quot;New group name&quot;</span>;
+</pre>
+
+<p>There is no real difference between these two properties, even though one can be changed and the other cannot.
+They return the same value and are probably pointing to the same data field somewhere.
+
+<p>The split into Group and GroupType classes was probably made to reuse the typical Revit family structure, similar to the relationship between Wall and WallType or family instance and family symbol. 
+In the case of a group, the distinction between Group and GroupType may seem a bit contrived, but it certainly has valid internal reasons.

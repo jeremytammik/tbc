@@ -1,0 +1,81 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Phil Xia Re: WorksetId case 08023175
+
+-->
+
+<h3>Change Element Workset</h3>
+
+<p>We discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/read-only-workset-api.html">
+reading the workset of an element</a>,
+
+either using the built-in parameter ELEM_PARTITION_PARAM or, more easily, the dedicated document GetWorksetId method.
+
+<p>This is actually another example of the possibility to choose your data access method by using either a dedicated property or a parameter, as we recently explored to achieve
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/changing-viewport-type.html">
+changing the viewport type</a>.
+
+<p>Although the Revit API provides a dedicated property to read an element workset, it does not do so for changing it, which begs the question:
+
+
+<p><strong>Question:</strong> The Element.WorksetId property is read-only.
+
+<p>I would like to change an element's workset to other one, though.
+
+<p>Is this possible?
+
+
+<p><strong>Answer:</strong> You can change the element's workset via the built-in parameter ELEM_PARTITION_PARAM.
+
+<p>Here is a code snippet to show how to retrieve all workset ids and set each one to a given element in turn:
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject( <span class="teal">ObjectType</span>.Element );
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="blue">if</span>( e == <span class="blue">null</span> )
+&nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; <span class="teal">WorksetId</span> wid = e.WorksetId;
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Workset id&quot;</span>, wid.ToString() );
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> wsparam = e.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ELEM_PARTITION_PARAM );
+&nbsp;
+&nbsp; <span class="blue">if</span>( wsparam == <span class="blue">null</span> )
+&nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; <span class="green">// Find all user worksets </span>
+&nbsp;
+&nbsp; <span class="teal">FilteredWorksetCollector</span> worksets
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredWorksetCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfKind( <span class="teal">WorksetKind</span>.UserWorkset );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Change workset id&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Workset</span> ws <span class="blue">in</span> worksets )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; wsparam.Set( ws.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; wid = e.WorksetId;
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;worksetid&quot;</span>, wid.ToString() );
+</pre>
+
+<p>Many thanks to Phil Xia for this hint!</p>
+
+

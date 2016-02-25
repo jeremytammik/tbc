@@ -1,0 +1,246 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1254612 [Insert Sprinkler] -->
+
+<h3>Insert Face-Hosted Sprinkler</h3>
+
+<p>In between the series of background information from Scott's Autodesk University presentation on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+let's have a look at another example that combines a little bit of geometric analysis with other issues.
+This example is from a case handled by Joe Ye and exploring how to insert a face-hosted sprinkler into the model.
+A family instance is used to represent the sprinkler, so we presumably need to make use of one of the overloads of the NewFamilyInstance method. 
+The question is which one and how to supply the appropriate arguments.
+We have looked at a number of related issues in the past:
+
+<ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+Inserting a column</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html">
+Inserting a beam</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/creating-a-slanted-column.html">
+Creating a slanted column</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/creating-a-curved-beam.html">
+Creating a curved beam</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/electrical-settings-and-lighting-fixtures.html#2">
+Creating hosted family instances for lighting fixtures</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">
+Creating nested families</a>.</li>
+
+</ul>
+
+<p>The first two show how to check whether the required family is loaded and optionally load it if not.
+The third discusses where to look in the developer guide for more information on the overloads of the NewFamilyInstance method. 
+The fifth has a certain similarity to this case, but still requires a different solution.
+We can make use of all that information to tackle this current task as well, which requires yet a few more tricky details.
+
+<p><strong>Question:</strong> I am having a problem inserting a face-hosted sprinkler symbol into my model. 
+I've been able to insert other family instances without problem, but this one isn't working for me. 
+
+<p>I tried hosting the sprinkler on a ceiling object and on a face of the ceiling. 
+When trying to host the sprinkler on the ceiling, I tried creating the instance both with and without the ceiling level. 
+Every time it creates the sprinkler it places it at an elevation of zero even though my ceiling and insertion point is over 56'. 
+I also tried moving the elevation of the sprinkler after insertion but this did nothing. 
+Strangely, the XY location is correct. 
+
+<p>I also tried to use a face of the ceiling to host the sprinkler.
+This failed completely with an exception. 
+I tried using the face, the same insertion point, and a reference direction vector of (0, 0, -1) since I assume the sprinkler would point down the Z axis. 
+
+<p>As an added note, I was unable to set the "Elevation" parameter of the Sprinkler after insertion. 
+It says that the operation cannot be done due to the state of the element. 
+
+<p><strong>Answer:</strong> To address the last note first, you mentioned that you cannot change the elevation parameter. 
+Yes, this is as designed, because this parameter is read-only and so cannot be modified. 
+
+<p>Regarding the family instance creation, you need to use a specific overload of the NewFamilyInstance method to create new instance that is attached to the host face, namely:
+
+<pre>
+FamilyInstance NewFamilyInstance(
+  Face face,
+  XYZ location,
+  XYZ referenceDirection,
+  FamilySymbol symbol
+)
+</pre>
+
+<p>The face-hosted sprinkler requires a sketch plane, and all the other overloads of the NewFamilyInstance method cannot retrieve it together with the correct position and host element, so they end up creating an  invalid instance without a correct sketch plane.
+
+<p>To place a sprinkler on the bottom of a ceiling element, we need to locate the ceiling's bottom face and create the sprinkler family instance on that face at a point located in it. 
+In addition, the face that we place the sprinkler on must be associated with a reference, or the placement will not work correctly.
+
+<p>I used the sample code implemented by Joe to create a new Building Coder external command CmdNewSprinkler demonstrating this.
+
+<p>In order to determine an insertion point for the sprinkler on the bottom face of the ceiling, it makes use of the following PointOnFace helper method. 
+It returns an arbitrary point on a planar face, namely the midpoint of the first mesh triangle encountered:
+
+<pre class="code">
+<span class="teal">XYZ</span> PointOnFace( <span class="teal">PlanarFace</span> face )
+{
+&nbsp; <span class="teal">XYZ</span> p = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">Mesh</span> mesh = face.Triangulate();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; mesh.NumTriangles; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MeshTriangle</span> triangle = mesh.get_Triangle( i );
+&nbsp; &nbsp; p += triangle.get_Vertex( 0 );
+&nbsp; &nbsp; p += triangle.get_Vertex( 1 );
+&nbsp; &nbsp; p += triangle.get_Vertex( 2 );
+&nbsp; &nbsp; p *= 0.3333333333333333;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp; <span class="blue">return</span> p;
+}
+</pre>
+
+<p>The Execute method of the CmdNewSprinkler command performs the following tasks:
+
+<ul>
+<li>Check whether the required sprinkler family is loaded and load it if not.
+<li>Retrieve an arbitrary symbol from the sprinkler family, in this case, the first one encountered.
+<li>Prompt the user to select a ceiling element to host the sprinkler and ensure that a valid selection was made.
+<li>Retrieve the ceiling geometry, its solid, and determine the bottom face.
+<li>Use our PointOnFace helper method to determine an arbitrary insertion point on the ceiling bottom  face.
+<li>Call the NewFamilyInstance method.
+</ul>
+
+<p>The trickiest step is the solid retrieval and the determination of the bottom face.
+When retrieving the solid, we need to ensure that the options' ComputeReferences property is set, or the solid faces will not be associated with the required references.
+
+<p>In all previous Building Coder examples, we did not assign true to ComputeReferences, but left it in its default state of false, which presumably improves performance.
+It would be interesting to test this, actually, and benchmark the difference that this option setting might have.
+The setting is required in this case, because the NewFamilyInstance method needs the face reference to create the family instance and associate the sprinkler with the ceiling face.
+
+<p>To find the ceiling's bottom face, we assume that it is horizontal and flat, i.e. planar, so we can use its normal vector pointing straight down to identify it.
+
+<p>Here is the mainline code of the Execute method implementing this:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="green">// retrieve the sprinkler family symbol:</span>
+&nbsp;
+<span class="teal">Filter</span> filter = app.Create.Filter.NewFamilyFilter(
+&nbsp; _name );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; families = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+doc.get_Elements( filter, families );
+<span class="teal">Family</span> family = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> families )
+{
+&nbsp; family = e <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != family )
+&nbsp; &nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == family )
+{
+&nbsp; <span class="blue">if</span>( !doc.LoadFamily( _filename, <span class="blue">out</span> family ) )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Unable to load '&quot;</span> + _filename + <span class="maroon">&quot;'.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+}
+&nbsp;
+<span class="teal">FamilySymbol</span> sprinklerSymbol = <span class="blue">null</span>;
+<span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> fs <span class="blue">in</span> family.Symbols )
+{
+&nbsp; sprinklerSymbol = fs;
+&nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="teal">Debug</span>.Assert( <span class="blue">null</span> != sprinklerSymbol, 
+&nbsp; <span class="maroon">&quot;expected at least one sprinkler symbol&quot;</span>
+&nbsp; + <span class="maroon">&quot; to be defined in family&quot;</span> );
+&nbsp;
+<span class="green">// pick the host ceiling:</span>
+&nbsp;
+<span class="teal">RvtElement</span> ceiling = <span class="teal">Util</span>.SelectSingleElement( 
+&nbsp; doc, <span class="maroon">&quot;ceiling to host sprinkler&quot;</span> );
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == ceiling
+&nbsp; || !ceiling.Category.Id.Value.Equals( 
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Ceilings ) )
+{
+&nbsp; message = <span class="maroon">&quot;No ceiling selected.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// retrieve the bottom face of the ceiling:</span>
+&nbsp;
+<span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+opt.ComputeReferences = <span class="blue">true</span>;
+<span class="teal">GeoElement</span> geo = ceiling.get_Geometry( opt );
+&nbsp;
+<span class="teal">PlanarFace</span> ceilingBottom = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo.Objects )
+{
+&nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = face <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = pf.Normal.Normalized;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsVertical( normal ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0.0 &gt; normal.Z )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ceilingBottom = pf;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">if</span>( <span class="blue">null</span> != ceilingBottom )
+{
+&nbsp; <span class="teal">XYZ</span> p = PointOnFace( ceilingBottom );
+&nbsp;
+&nbsp; <span class="green">// create the sprinkler family instance</span>
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi = doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; ceilingBottom, p, <span class="teal">XYZ</span>.BasisX, sprinklerSymbol );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>To test the new command, we create a simple model with four walls and a ceiling:</p>
+
+<center>
+<img src="img/sprinkler_ceiling.png" alt="Ceiling element to host sprinkler"/>
+</center>
+
+<p>Running the command and selecting the ceiling element inserts the desired sprinkler:</p>
+
+<center>
+<img src="img/sprinkler_instance.png" alt="Newly created sprinkler family instance"/>
+</center>
+
+<p>Here is
+
+<a href="zip/bc11059.zip">
+version 1.1.0.59</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>Many thanks to Joe for handling this case and creating the initial implementation!

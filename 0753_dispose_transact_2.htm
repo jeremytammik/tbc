@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Using Using Automagically Disposes and Rolls Back</h3>
+
+<p>I talked about 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/scope-and-dispose-transactions.html">
+scoping and disposing of transactions</a> last 
+
+week, and received prompt and interesting comments from two competent and experienced Revit add-in developers, Danny Polkinhorn and Guy Robinson (your name has to end in 'y' to be really good &ndash; tongue in cheek).
+
+<p><strong>Danny says:</strong> Should we also use Try...Catch blocks as well? 
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> trans 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; trans.Start();
+&nbsp; &nbsp; &nbsp; <span class="green">//code here</span>
+&nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; trans.RollBack();
+&nbsp; &nbsp; &nbsp; <span class="green">//exception code here</span>
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Do we need to roll back the transaction or does the Using block take care of that?
+
+
+<p><strong>Guy replies:</strong> I'm with Danny here, prefer to gracefully fail so use this format:
+
+<pre class="code">
+&nbsp; <span class="teal">TransactionGroup</span> group;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( group = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; group.Start( <span class="maroon">&quot;Some group&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( group.HasStarted() &amp;&amp; !group.HasEnded() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; group.RollBack();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>As so often in the past, I leave the final verdict to Arno&scaron;t L&ouml;bel, who replies with a clear 'no' to the suggestion of adding an exception handler around the 'using' block, because, as implied by the title, it automatically disposes, rolls back, and even handles exceptions:
+
+
+<p><strong>Answer:</strong> No, there is no need to explicitly roll back a transaction (or sub-transaction, transaction group) declared in a 'using' block. The destructor of the object will take of the rolling back when the object leaves the 'using' block.
+
+<p>However, it is still the responsibility of the programmer to commit the object properly.
+For example, using what Guy wrote:
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> group 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; group.Start( <span class="maroon">&quot;Some group&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// do something here</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// need to commit explicitly to</span>
+&nbsp; &nbsp; <span class="green">// avoid implicit rolling back</span>
+&nbsp;
+&nbsp; &nbsp; group.Commit();&nbsp; 
+&nbsp; }
+</pre>
+
+<p>By the way: I always commit or rollback explicitly if it is under my control. 
+I only rely on the destructor for exceptions. 
+I believe it makes the code easier to comprehend.
+
+<p>The snippet above is equivalent to (but more elegant than) the following:
+
+<pre class="code">
+&nbsp; <span class="teal">TransactionGroup</span> group
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; group.Start( <span class="maroon">&quot;Some group&quot;</span> );
+&nbsp; &nbsp; <span class="green">// do something here</span>
+&nbsp; &nbsp; group.Commit();
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// this needs to be tested to </span>
+&nbsp; &nbsp; <span class="green">// avoid another potential exception</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( group.HasStarted() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; group.RollBack();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// should re-throw if you do </span>
+&nbsp; &nbsp; <span class="green">// not know how to handle</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">throw</span>;&nbsp; 
+&nbsp; }
+</pre>
+
+<p>Adding  a 'using' block around this try-catch (like Guy did) is completely unnecessary and worthless.
+
+<p>Again: If you always use 'using' for all scope object, you code will be more elegant, transparent and safer.

@@ -1,0 +1,146 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1269546 [Documentation for InstanceVoidCutUtils] 
+1267564 [How to create a recess (non cut-through opening) in Revit]
+C:\a\j\adn\case\special\hsb\2012\modeller\src\Modeller\Modeller.sln
+
+-->
+
+<h3>Boolean Operations and InstanceVoidCutUtils</h3>
+
+<p>I mentioned last week that I plan to take a look at Boolean operation in the family creation context.
+Before we do so, however, here is an overview of some of the Boolean operation functionality provided by the Revit API and the use of one of the approaches in the project context.
+
+<p>In the past, the Revit API did not offer many possibilities to perform Boolean operations in the project itself.
+
+<p>The standard approach to perform a Boolean operation within a family is to use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/beam-maker-using-a-void-extrusion-to-cut.html">
+Document.CombineElements</a> method. 
+
+Its use is limited to certain element types.
+
+<p>Another possibility to perform Boolean operation within the family context was provided by the SolidSolidCutUtils class introduced in the Revit 2011 API.
+It use is demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/devcamp-session-on-whats-new.html">
+SolidSolidCut SDK sample</a>, 
+
+which is hardcoded to run in the SolidSolidCut.rfa family sample file.
+As noted in its readme file, this solid-solid cut operation only works when editing a conceptual mass family.
+
+<p>If you needed a large number of similar but different elements in a project, the solution of choice in Revit  2011 seemed to be to create individual families for each such instance and insert each one into the project, but that places a heavy burden on the project.
+
+<p>The Revit 2012 API introduces two new possibilities for performing Boolean operations, provided by the BooleanOperationsUtils and the InstanceVoidCutUtils classes. 
+It also generalises the SolidSolidCutUtils class so that it can be used in the project context as well as in a family.
+
+<p>First of all, here and now, let's take a look at how to use the new InstanceVoidCutUtils functionality:
+
+<p><strong>Question:</strong> Is there any documentation for InstanceVoidCutUtils available? 
+Examples?
+
+<p><strong>Answer:</strong> Just like all other classes, methods and properties provided by the Revit SDK, the Revit API help file RevitAPI.chm provides basic documentation on the InstanceVoidCutUtils class and its properties and methods. 
+As it says there, this class provides utility methods for cutting elements by unattached voids in family instances.
+
+<p>As mentioned above, the Revit API now provides several possibilities to perform Boolean operations in the project model:
+
+<ul>
+<li>BooleanOperationsUtils: this class creates non-element geometry. 
+The generated geometry can be displayed to the user using the AnalysisVisualizationFramework to paint colours on the surfaces created, but it cannot create elements or participate in the saved model in any way.
+The SDK sample GeometryCreation_BooleanOperation in the GeometryAPI subdirectory of the Samples folder demonstrates its use and implements a handy wrapper class for it.
+
+<li>InstanceVoidCutUtils: added in the Revit 2012 API. This a powerful method to cut a database element using an unattached void in a family instance. 
+It should be used sparingly, as any void element introduced at the project level will be fully selectable by the user (and modifiable/deletable/etc.). 
+So it's not really appropriate to use this to cut the ends of beams with square blocks, because the blocks can be picked.  
+It may be more useful for fine tuned work like drilling individual holes in members, if the holes cannot be included as a part of the family definition in the first place.
+
+<li>SolidSolidCutUtils: this class was not documented correctly. It does work in the project environment now in Revit 2012, both in the UI and API.  There are limitations about what elements are supported by this utility, and some exploration may be needed.
+</ul>	
+
+<p>Now, to answer your question on making use of the InstanceVoidCutUtils class: as in most cases with the Revit API, the first step in to determine how it is done manually.
+
+<p>First of all, you need to create a family to encapsulate the unattached voids you want to use for cutting. 
+A good place to start is to study the 
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=13376394">
+Families Guide</a>  (still the Revit 2010 version):
+
+<p>In there, you can for instance look at the section Loadable Families Overview > Creating Loadable Families > Creating a Loadable Family > Creating Family Geometry > Creating Solid (3D) Geometry > Cut Geometry.
+
+<p>Once the manual steps are known, one can explore how to reproduce them programmatically.
+
+<p>Here is a sample void cutter family 
+
+<a href="zip/cutter.zip">
+cutter.zip</a>. 
+
+To use it, you perform steps along the lines of the following pseudo-code:
+
+<pre class="code">
+&nbsp; <span class="teal">Element</span> element;
+&nbsp; <span class="teal">FamilySymbol</span> fs;
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">PlanarFace</span> planarFace = facesToAttach[i] 
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> xyzOrigin = planarFace.Origin;
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> cuttingInstance 
+&nbsp; &nbsp; = _doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; facesToAttach[i], xyzOrigin, vecY, fs );
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> parAngle3 = cuttingInstance
+&nbsp; &nbsp; .get_Parameter( <span class="maroon">&quot;A3&quot;</span> );
+&nbsp;
+&nbsp; Utils.ParameterSet( parAngle3, angles[i] );
+&nbsp;
+&nbsp; <span class="teal">InstanceVoidCutUtils</span>.AddInstanceVoidCut(
+&nbsp; &nbsp; _doc, element, cuttingInstance );
+</pre>
+
+<p>As mentioned above, this approach should not be used for applying a modification systematically to a huge number of family instances, but used sparingly it works fine.
+
+<p>Here is a similar snippet of sample pseudo-code for used to create a recess in a wall:
+
+<pre class="code">
+&nbsp; <span class="teal">FamilySymbol</span> polyRecessFamily;
+&nbsp; <span class="teal">Wall</span> wall;
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> recessElement 
+&nbsp; &nbsp; = _doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; face, pos, <span class="teal">XYZ</span>.Zero, polyRecessFamily );
+&nbsp;
+&nbsp; recessElement.SetParameter( <span class="maroon">&quot;Countersinking&quot;</span>, 
+&nbsp; &nbsp; UnitConversion.ToFeet( recess.CounterSinking ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">InstanceVoidCutUtils</span>.CanBeCutWithVoid( wall ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">InstanceVoidCutUtils</span>.AddInstanceVoidCut( 
+&nbsp; &nbsp; &nbsp; _doc, wall, recessElement );
+&nbsp; }
+</pre>
+
+<p>You need to ensure that the void cutter family has the 'Cut with Void When Loaded' parameter checked:</p>
+
+<center>
+<img src="img/cut_with_void.jpg" alt="Cut with void property"/>
+</center>
+
+<p>If this is not the case, the void is not an "Unattached" void, and it will throw an exception saying 
+
+<p>"The element is not a family instance with an unattached void that can cut.
+Parameter name: cuttingInstance".
+
+<p>I trust this will help understand the options available and help you get started using the InstanceVoidCutUtils.
+
+<p>Next one coming up: use of the Document.CombineElements method to create the window frame joinery using extruded profiles in a programmatically generated window family.

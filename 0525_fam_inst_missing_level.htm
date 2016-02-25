@@ -1,0 +1,119 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Rudolf Honke Re: Theme: Unselectable property / Don't expect elements to be parametrized correctly -->
+
+<h3>Family Instance Missing Level Property</h3>
+
+<p>Here is another contribution by Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+acadGraph CADstudio GmbH</a>.
+
+He says:
+
+<p>"And now for something completely different" ... after all the UI Automation topics:
+
+<p>I often need to collect all items on a specific level, for instance window family instances, and use a method like the following to do so:
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetWindowsByLevel( 
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="teal">Level</span> level )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elementList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Windows );
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FAMILY_LEVEL_PARAM ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idRuleValue = level.Id;
+&nbsp;
+&nbsp; <span class="teal">FilterElementIdRule</span> rule 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>( 
+&nbsp; &nbsp; &nbsp; provider, evaluator, idRuleValue );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; elementList.AddRange( 
+&nbsp; &nbsp; collector.WherePasses( filter ).ToElements() );
+&nbsp;
+&nbsp; <span class="blue">return</span> elementList;
+}
+</pre>
+
+<p>Strangely enough, it may occur that some elements are not found by this method, because their level property has not been correctly set.
+
+<p>Here are the element properties of a window with its level property (Ebene in German) properly set:</p>
+
+<center>
+<img src="img/rh_level_ok.png" alt="Window with Level property properly set"/>
+</center>
+ 
+<p>Other window instances, however, may be lacking this property:</p>
+
+<center>
+<img src="img/rh_level_missing.png" alt="Window with Level property missing"/>
+</center>
+
+<p>If we take a look at the second window instance parameters using the RevitLookup 'snoop built-in enums' functionality, we see that it has no FAMILY_LEVEL_PARAM parameter:</p>
+
+<center>
+<img src="img/rh_level_missing_bips.png" alt="Window lacking FAMILY_LEVEL_PARAM parameter"/>
+</center>
+
+<p>This window instance also has a null value for its Level <strong>property</strong>:</p>
+
+<center>
+<img src="img/rh_level_missing_property.png" alt="Window has null Level property"/>
+</center>
+
+<p>Sometimes, you can set a parameter to affect a property.
+Similarly, you can move or rotate an element to change its location point or curve.
+
+<p>Sometimes a property and the parameter that should relate to this property are inconsistent with each other, but that's another point.
+
+<p>In the element property page, you cannot set the property, because it is not displayed there at all.
+
+<p>Therefore, this is one of the rare occasions where you can achieve something via the API that cannot be done through the user interface. 
+
+<p>In this case, you can use this little workaround:
+
+<ul>
+<li>Retrieve all the levels, e.g. sorted by elevation or by name.
+<li>Display their names in a dialog and provide an opportunity to the user to select the desired one:
+</ul>
+
+<center>
+<img src="img/rh_level_select.png" alt="Level selector"/>
+</center>
+
+<ul>
+<li>Set the built-in parameter value of the family instance lacking the level property to the selected level element id:
+</ul>
+
+<pre class="code">
+&nbsp; windowWithoutLevelParam.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FAMILY_LEVEL_PARAM )
+&nbsp; &nbsp; .Set( levels[levelDialogSelectedIndex].Id );
+</pre>
+
+<p>Once assigned programmatically, the level property also becomes visible to the user:</p>
+
+<center>
+<img src="img/rh_level_property_displayed.png" alt="Window Level property displayed"/>
+</center>
+
+<p>After this adjustment, the GetWindowsByLevel method returns the results it is designed for as expected.
+
+<p>Many thanks to Rudolf for this detailed analysis and workaround!

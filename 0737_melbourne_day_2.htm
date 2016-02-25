@@ -1,0 +1,415 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Melbourne Day Two</h3>
+
+<p>On the second day of the Revit API training here in Melbourne, we addressed a number of further interesting issues, both basic and beyond.
+Our sample code ended up demonstrating the following functionality:
+
+<ul>
+<li>Revit MEP model creation: <a href="#1">place a duct</a>.
+<li>Geometrical analysis: <a href="#2">retrieving unique geometry vertices</a> from a selected element.
+</ul>
+
+<p>Besides that, we looked at 
+
+<a href="#3">extensible storage</a>,
+
+and I compiled an updated version of the 
+
+<a href="#4">RstLink sample for Revit Structure 2012</a>.
+
+<p>I also received interesting comments on a previous post on finding the 
+
+<a href="#5">Revit parent window</a> that 
+
+is worthwhile sharing here.
+
+<!-- <li>Determining <a href="#3">Revit demo mode</a>. -->
+
+<p>After the training, I went for a quick climb with Rob at 
+
+<a href="http://www.hardrock.com.au">
+Hardrock</a>,
+
+marvelling at yet another grading system.
+
+<center>
+<img src="img/hardrock.jpg" alt="Hardrock climbing"/>
+</center>
+
+<p>Here in Australia I went for the easy grades 16 to 18.
+No idea what they compare to in European or American grading systems.
+
+<p>After that, I had a sandwich in the
+
+<a href="http://www.theage.com.au/news/bar-reviews/siglo-bar/2008/05/12/1210444319156.html">
+Siglo</a> roof-top 
+
+bar on 161 Spring Street above 
+
+the 
+
+<a href="http://www.theage.com.au/news/bar-reviews/the-melbourne-supper-club/2006/04/03/1143916451849.html">
+Melbourne Supper Club</a> in
+
+the same house.
+
+These two places share an extremely sympathetic anonymous entrance, a simple brown wooden door with no sign whatsoever.
+If no-one told you they are there, you would never find them.
+
+
+<a name="1"></a>
+
+<h4>Placing a Duct</h4>
+
+<p>One thing we talked about was creating new elements in the model.
+
+<p>As a very simple example, we created the code to place an HVAC duct:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command3</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p, q;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; &nbsp; p = sel.PickPoint( <span class="maroon">&quot;Start point: &quot;</span> );
+&nbsp; &nbsp; &nbsp; q = sel.PickPoint( <span class="maroon">&quot;End point: &quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DuctType</span> ductType
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">DuctType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">DuctType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">DuctType</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ductType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No duct type found.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Duct duct = new Duct(); // OO approach, not supported</span>
+&nbsp; &nbsp; <span class="green">//Duct duct = Duct.Create( doc );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Add Duct&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = doc.Create.NewDuct( p, q, ductType );
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>We also played with creating a mechanical system.
+That needs some fittings a well, because their connectors provide the required duct system type information.
+
+<p>Look at the AutoRoute and AvoidObstruction SDK samples for more details.
+
+
+<a name="2"></a>
+
+<h4>Retrieving Unique Geometry Vertices</h4>
+
+<p>We then explored geometry extraction, and especially the identification of unique points with in it, since this bring up a number of issues regarding units and precision etc.
+
+<p>Here is a simple command that prompts me to select an element and accesses its geometry.
+It processes it as well towards the end; ignore that for the moment:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; e = doc.get_Element( r.ElementId );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo.Objects )
+&nbsp; {
+&nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Unable to access element solid.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; corners = GetCorners( solid );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = corners.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} corners found:&quot;</span>, n );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> corners.Keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( PointString( p ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The next step we looked at is identification of all unique vertices in the geometry.
+For this, we need to somehow implement a fuzzy method to distinguish between points that really are different, but detect that points that are nearly the same should in fact be treated as identical.
+We can achieve this by implementing an XYZ equality comparer, e.g. like this:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">XyzEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">XYZ</span>&gt;
+{
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _sixteenthInchInFeet 
+&nbsp; &nbsp; = 1.0 / ( 16.0 * 12.0 );
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> p.IsAlmostEqualTo( q, 
+&nbsp; &nbsp; &nbsp; _sixteenthInchInFeet );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> PointString( p ).GetHashCode();
+&nbsp; }
+}
+</pre>
+
+<p>As an almost-equal tolerance we are using a rather large value, because Revit uses this pretty rough number in several places itself, e.g. to limit the limit the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">
+minimum line length</a>.
+
+<p>You must be careful to also define a hash code that does not return different values for points that you wish to compare equal, or every single point will be considered different, possibly even when a point is compared with itself.
+In this case we are using our two-decimal string representation to define a hash code, so many points that are considered different by the comparison operator will actually generate the same hash code.
+In a perfect world, the hash code generator would be a bit more appropriately chosen to match the equality comparison precision.
+
+<p>We can easily implement a short and sweet method to extract all the unique corner vertices of the solid geometry by using the vertices themselves as keys in a dictionary based on our equality comparer like this:
+
+<pre class="code">
+<span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>,<span class="blue">int</span>&gt; GetCorners( <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; corners 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt;( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> f.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> ea )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = e.AsCurveFollowingFace( f )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !corners.ContainsKey( p ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; corners[p] = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; ++corners[p];
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> corners;
+}
+</pre>
+
+<p>The dictionary returned includes a count of how many times each vertex was encountered.
+
+<p>This is something very important that I have looked at numerous times in the past.
+I already presented the fundamentals for handling this when looking at 
+
+<!--
+
+134_nested_instance_geo.htm:Here is the definition
+259_crop_view_to_room.htm:We did implement some use
+491_point_in_poly.htm:XyzEqualityComparer class</a>
+502_gaps_in_shell.htm:XyzEqualityComparer helper cl
+556_toposurf_points.htm:&nbsp; &nbsp; = <span class
+620_top_faces_of_wall.htm:CmdNestedInstanceGeo.XyzE
+
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instance geometry</a>, 
+
+which also implements a GetVertices method similar to the above,
+
+and reused it for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/toposurface-interior-and-boundary-points.html">
+toposurface point classification</a> and
+
+accessing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/top-faces-of-wall.html">
+top faces</a> of
+
+a sloped wall.
+
+
+<a name="3"></a>
+
+<h4>Extensible Storage</h4>
+
+<p>Here is the documentation and sample code from my Autodesk University 2011 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9263&jid=1725932">
+class</a> and 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9726&jid=1725932">
+lab</a> on 
+
+this topic, which says it all:
+
+<ul>
+<li><a href="file:///C:/a/doc/revit/au/2011/doc/CP4451_tammik_estorage.pdf">CP4451_tammik_estorage.pdf</a>: handout document
+<li><a href="file:///C:/a/doc/revit/au/2011/doc/CP4451_tammik_estorage.zip">CP4451_tammik_estorage.zip</a>: sample source code
+<li><a href="file:///C:/a/doc/revit/au/2011/doc/CP6760-L_tammik_estorage.pdf">CP6760-L_tammik_estorage.pdf</a>: handout document
+<li><a href="file:///C:/a/doc/revit/au/2011/doc/CP6760-L_tammik_estorage_lab.zip">CP6760-L_tammik_estorage_lab.zip</a> exercises
+</ul>
+
+
+<a name="4"></a>
+
+<h4>Revit Structure Link 2012</h4>
+
+<p>Long overdue, I finally updated the RstLink sample for Revit 2012 and AutoCAD 2012. 
+I provided a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-structure-resources.html">
+brief description of the analytical link sample</a> two 
+
+years ago, and updated the sample last year for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/structural-analysis-links-to-revit-structure.html">
+Revit Structure 2011</a>.
+
+Now here is 
+
+<a href="zip/RstLink2012.zip">RstLink2012.zip</a> containing the entire Visual Studio solution for the following projects:
+
+<ul>
+<li>RstLink: helper DLL shared by both AutoCAD and Revit client.
+<li>RstLinkRevitClient: Revit command implementations: RSLinkImport, RSLinkExport, RsLinkLiveLink.
+<li>RstLinkAcadClient: AutoCAD command implementations: RSImport, RSExport, RSMakeMember.
+<li>RstLinkAcadClientDynProps: Dynamic Revit OPM properties for AutoCAD objects.
+</ul>
+
+<p>In fact, most of these are provided for both C# and VB, so it ends up including the following projects:
+
+<ul>
+<li>RstLinkCs
+<li>RstLinkVb
+<li>RstLinkRevitClientCs
+<li>RstLinkRevitClientVb
+<li>RstLinkAcadClientCs
+<li>RstLinkAcadClientVb
+<li>Miro: a C++ project to generate the RstLinkAcadClientDynProps ARX application
+</ul>
+
+
+
+<a name="5"></a>
+
+<h4>Revit Parent Window</h4>
+
+<p>Finally, to wrap up this information overflow, Victor Chekalin, or Виктор Чекалин, offered a very useful and interesting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html?cid=6a00e553e1689788330163030f0ea6970d#comment-6a00e553e1689788330163030f0ea6970d">
+suggestion</a> for 
+
+a new and easier way to obtain the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+Revit parent window</a>:
+
+<ol>
+<li>Add a reference to the AdWindows assembly, located at the same place as the RevitAPI assembly, and set its Copy Local property to false.
+<li>Get the Revit main window handle using the static property ApplicationWindow of the ComponentManager class in the Autodesk.Windows namespace.
+</ol>
+
+<p>Now, you can use only one Property &ndash; ComponentManager.ApplicationWindow &ndash; instead two methods &ndash; get current process and main window handle.
+
+
+
+<!--
+<a name="3"></a>
+
+<h4>Determine Revit Demo Mode</h4>
+
+<p>Rudolf Honke 
+
+<a href="">
+commented</a> on 
+
+the approach I suggested to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html">
+determine-revit-demo-mode</a> and
+
+proposed using the OptionalFunctionalityUtils IsDWGExportAvailable method instead of using my much more complex try-catch method.
+
+<p>This method is documented to check whether the DWG export functionality is available in the installed version of Revit. 
+The DWG export requires presence of certain modules that are optional and may not be part of the installed Revit. 
+-->
+
+

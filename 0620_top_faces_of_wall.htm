@@ -1,0 +1,662 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1268468 [Wall with sloping top edge] -->
+
+<h3>Top Faces of Sloped Wall</h3>
+
+<p>In the distant past, I discussed retrieving specific floor and wall faces based on their face normal, e.g. the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+bottom face and boundary of a horizontal floor slab</a>, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+exterior face of a vertical wall</a>, and finally the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/bottom-face-of-a-wall.html">
+bottom face of a wall</a>.
+
+<p>But what if the normal is not exactly horizontal or vertical?
+
+<p>For instance, how about retrieving the top face of a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html">
+wall with a sloped profile</a> or the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/create-gable-wall.html">
+gable wall</a> that we just looked at a few days ago?
+
+<p>That can get a bit complicated, and has an infinite number of solutions.
+I explore some of them below, with no guarantee that they are anywhere near optimal.
+In fact, I can guarantee that there are better solutions.
+
+<p>This is prompted by Saikat Bhattacharya, who answered a question on that very issue.
+In his solution, he also makes use of a couple of new Revit 2012 API methods, for which it is a great pleasure to present such a compelling use case.
+
+<ul>
+<li>HostObjectUtils &ndash; HostObject top, bottom, and side faces: 
+The new methods HostObjectUtils.GetTopFaces, GetBottomFaces and GetSideFaces provide shortcuts to locate the faces of a given roof, floor, or wall which act as the exterior or interior boundary of the object's CompoundStructure. Top and bottom faces are applicable to roofs and floors. Side faces are applicable to walls.
+
+<li>GetGeometryObjectFromReference &ndash; Reference properties:
+The Reference class was renovated to be more closely aligned with the native Revit class it wraps.
+GetGeometryObjectFromReference replaces the obsolete GeometryObject property.
+
+<li>GetGeneratingElementIds &ndash; The Element.GetGeneratingElementIds method returns the ids of the elements that generated the input geometry object. The help file provides sample code showing how to use this to find all elements joined or attached to the end faces of a given wall, such as other walls and roofs.
+</ul>
+
+<p><strong>Question:</strong> How can I retrieve the top faces of a non-rectangular wall and determine their slopes?
+
+<p>Walls in Revit can have a sloping bottom surface as well as top. 
+A wall can look almost like anything and it is also possible to add arbitrary openings, which complicate things. 
+It seems tricky to find out the right surfaces. 
+
+<p>I can imagine I have to look at the wall solid faces and their normals.
+
+<p>However, if the wall has openings such as doors and windows, these objects will affect the faces collection as well. 
+Any idea how to proceed in order to ensure that I identify the correct face or faces that really belong to the top of the wall? 
+
+<p><strong>Answer:</strong> From what I understand, you wish to find out the faces which are on the top of the wall. 
+If you are analysing something like a gable wall, you expect to have multiple faces on the top of the wall. 
+
+<p>There are obviously many different ways of approaching this. 
+
+<p>One possible approach is to iterate through each face of the wall and determine its normal vector. 
+Such an approach was used to find the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/bottom-face-of-a-wall.html">
+bottom face of a wall</a>.
+
+You can extend this to calculate the sloped top faces for your gable wall. 
+
+<p>To extract the slope of the top most wall faces, you can start by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+identifying the wall elevation profile</a>.
+
+The approach described accesses each of the faces of a wall and determines the exterior one. 
+On this face, you can access each of the edge loops and determine which edges form the top edges, e.g. by determining the maximum and minimum Z coordinate values using them to calculate the slope.
+
+<p>Another approach could be to access each face of the wall and then go through all of its edges. 
+Using the length of the edge, you can find out the longest edge of a given face. 
+For this longest edge, you can access the start and end point. 
+With these two points for that face, you can use coordinate geometry formula to 
+
+<a href="http://en.wikipedia.org/wiki/Slope">
+calculate the slope of the edge</a>. 
+
+If you happen to know that the wall base and vertical sides are perfectly horizontal and vertical, then the sloped edges all belong to the top of the wall. 
+
+<p>Following are the steps that might help in calculating the top faces if there are multiple door/windows on a wall which might also return top faces (and thus confuse with the wall top faces): 
+
+<ul>
+<li>Start with identifying the wall inner or outer face. 
+<li>Any given wall has various layers which can be extracted from the compound structure of the wall, and the order of these layers are from the exterior face to the interior. So for example, if a wall has material A in exterior face and then Material B in middle layer and Material C in interior layer, the CompoundStructure property of a wall will return the layers in this order and so the last layer in this will be one which is on the interior face. 
+<li>So after we know the material of the interior face of the wall, we can parse through each of the faces of the wall and check which face has which material. When we find a face which has a material that is the same that that of the interior layer, we can know that the face if the interior face. The same approach can be used for finding exterior face too (whichever suits your use case). 
+<li>After we find the inner/outer face of wall, we need to identify the top edges of one of the two faces (interior or exterior). You can either use the maximum z value of either of the end points for the edge to identify it or check if the normal on the adjacent faces is a non-zero X, Y or Z with a positive Z value. You can devise your own approach here too. 
+<li>Finally you need to collect all the faces that neighbour the top edges and fit the criteria.
+</ul>
+
+<p>In Revit 2012, things are much simpler.
+The Revit 2012 API provides a new utility class HostObjectUtils with a method GetSideFaces which can be used to obtain the side face of a wall. 
+
+<p>From then on, you can follow the approach discussed above, i.e. walk the outer contour of edges of the side face.  
+Find the neighbouring faces, and the face normal returned by Face.ComputeNormal has a positive Z component, it is a top face. 
+
+<p>In Revit 2012, you also use the new method GetGeneratingElementIds to find the element ids of the elements that generate the input geometry. 
+
+<p>I wrote the following code to demonstrate this approach. 
+It is not yet complete, since we need to add some methods to determine the outer loop, as mentioned in the comments, but it should provide an idea on how you can proceed. 
+You can test this code first with a simple gable wall with no doors or windows and then extend it by adding logic to detect the outer loop returned from face.EdgeLoops.
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Face</span>&gt; topFaces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> uidoc.Selection.Elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Wall</span> pickedWall = e <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get the side faces</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; sideFaces 
+&nbsp; &nbsp; &nbsp; = <span class="teal">HostObjectUtils</span>.GetSideFaces( pickedWall, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ShellLayerType</span>.Exterior );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the side face</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e2 = doc.GetElement( sideFaces[0] );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = e2.GetGeometryObjectFromReference( 
+&nbsp; &nbsp; &nbsp; sideFaces[0] ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// When there are multiple windows or doors in </span>
+&nbsp; &nbsp; <span class="green">// the wall, we need to find the outer loop </span>
+&nbsp; &nbsp; <span class="green">// that is returned using the face.Edgeloops.</span>
+&nbsp; &nbsp; <span class="green">// For one possible approach to extract the </span>
+&nbsp; &nbsp; <span class="green">// outermost loop, please refer to </span>
+&nbsp; &nbsp; <span class="green">// http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// With the outermost loop, calculate the top faces</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> ea )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// For each edge, get the neighbouring </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// face and check its normal</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 2; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Face</span> neighbourFace = edge.get_Face( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = edge.Tessellate()[0];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( neighbourFace.ComputeNormal(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">UV</span>( p.X, p.Y ) ).Z &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFaces.Add( neighbourFace );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = topFaces.Count;
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Wall Top Faces&quot;</span>, 
+&nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;This wall has {0} top face{1}.&quot;</span>,
+&nbsp; &nbsp; n, (1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span>) ) );
+</pre>
+
+<p>Here is Saikat's detailed explanation of the steps:
+
+<ul>
+<li>Retrieve the wall we are working with and its side faces, in this case the exterior one.
+<li>Assuming the wall has no windows or doors in it, all the edges of the exterior side faces are part of the outer boundary loop.
+<li>In the case of a rectangular wall, this returns four edges: top, bottom, and two vertical side edges.
+<li>With each edge, say top one, access both the adjoining faces.
+<li>For the top edge, one neighbouring face is the top one and other is vertical and should be the same as the exterior face that we started with.
+<li>For each of the faces, check the Z value of its normal on any point on the edge. I used the Tessellate method to get the points on the edge and calculate the normal at the first point of the edge. One could also use the start point of the edge.
+<li>If the Z value is positive, we know that the face is the top face.
+</ul>
+
+<p>This worked fine for all the test models that I applied it to.
+
+<p><strong>Jeremy adds:</strong> Many thanks to Saikat for this research and sample code!
+
+<p>I created a new Building Coder sample command CmdWallTopFaces based on Saikat's code, and before doing so I implemented some support methods in order to easily determine the outermost loop for a wall with openings.
+
+<p>Step one of this process is to implement a simple method to determine the area of an EdgeArray.
+
+<p>Saikat mentioned my implementation to determine the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+outer loop of a 2D polygon</a> using the method GetSignedPolygonArea.
+
+<p>I also already implemented the method 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">
+GetPolygonPlane</a> which 
+
+returns the plane properties of a given 3D polygon placed and oriented arbitrarily in space, i.e. the plane normal, area, and its distance from the origin.
+
+<p>The input polygon for GetPolygonPlane to analyse is provided as a List&lt;XYZ&gt; instance.
+As you see above, the wall face contour loops are returned from the face Edge|Loops property as EdgeArray instances, so I would like to convert an EdgeArray to a List&lt;XYZ&gt; to easily apply GetPolygonPlane to it.
+
+<p>This is an ideal opportunity to implement an extension method, i.e. a method that I can provide to extend the functionality of the Revit API EdgeArray class in a way that makes it indistinguishable from the EdgeArray native member methods.
+I created a new class JtEdgeArrayExtensionMethods in the Util.cs module to host the new extension method implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">JtEdgeArrayExtensionMethods</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a polygon as a list of XYZ points from </span>
+&nbsp; <span class="gray">///</span><span class="green"> an EdgeArray. If any of the edges are curved,</span>
+&nbsp; <span class="gray">///</span><span class="green"> we retrieve the tessellated points, i.e. an </span>
+&nbsp; <span class="gray">///</span><span class="green"> approximation determined by Revit.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; GetPolygon( 
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">EdgeArray</span> ea )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = ea.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygon = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( n );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> ea )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = e.Tessellate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = polygon.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( pts[0]
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .IsAlmostEqualTo( polygon[n-1] ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last edge end point to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;equal next edge start point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; polygon.RemoveAt( n - 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; polygon.AddRange( pts );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; n = polygon.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( polygon[0]
+&nbsp; &nbsp; &nbsp; .IsAlmostEqualTo( polygon[n - 1] ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected first edge start point to &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;equal last edge end point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; polygon.RemoveAt( n - 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> polygon;
+&nbsp; }
+}
+</pre>
+
+<p>With that helper method in place and the existing CmdWallProfileArea.GetPolygonPlane method to determine the area of a 3D polygon, I can easily find the outer loop of a wall which may contain openings like this:
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> normal;
+&nbsp; <span class="blue">double</span> area, dist, maxArea = 0;
+&nbsp; <span class="teal">EdgeArray</span> outerLoop = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> face.EdgeLoops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">CmdWallProfileArea</span>.GetPolygonPlane(
+&nbsp; &nbsp; &nbsp; ea.GetPolygon(), <span class="blue">out</span> normal, <span class="blue">out</span> dist, <span class="blue">out</span> area )
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( area ) &gt; <span class="teal">Math</span>.Abs( maxArea ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; maxArea = area;
+&nbsp; &nbsp; &nbsp; outerLoop = ea;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Now I just need to examine the outer loop to find the wall top faces, and can skip all the others, which are related to openings in the wall:
+
+<pre class="code">
+&nbsp; <span class="green">// With the outermost loop, calculate the top faces</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> outerLoop )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// For each edge, get the neighbouring </span>
+&nbsp; &nbsp; <span class="green">// face and check its normal</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 2; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Face</span> neighbourFace = edge.get_Face( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = edge.Tessellate()[0];
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( neighbourFace.ComputeNormal(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">UV</span>( p.X, p.Y ) ).Z &gt; 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; topFaces.Add( neighbourFace );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>To test it, I ran my sample command on the walls of the basic sample project included in the Revit installation:</p>
+
+<center>
+<img src="img/wall_top_faces_basic_sample_project.png" alt="Basic sample project walls"/>
+</center>
+
+<p>I had to add a few checks to handle exceptional cases.
+After that, the command generates the following result in the Visual Studio debug output window:
+
+<pre>
+4 top faces found on Walls <117652 Generic - 200>
+1 top face found on Walls <117653 Foundation - 305 Concrete>
+3 top faces found on Walls <117654 Generic - 200>
+2 top faces found on Walls <117685 CORR>
+4 top faces found on Walls <117698 CORR>
+No side face found for Walls <117714 Storefront>
+1 top face found on Walls <117787 Interior - Partition>
+1 top face found on Walls <117836 translucent wall>
+1 top face found on Walls <117887 Generic - 200>
+1 top face found on Walls <117945 Interior - Partition>
+2 top faces found on Walls <117963 Interior - Partition>
+2 top faces found on Walls <118356 Interior - Partition>
+1 top face found on Walls <118454 Generic - 200>
+1 top face found on Walls <118547 Interior - Partition>
+1 top face found on Walls <118570 Interior - 165 Partition (1-hr)>
+1 top face found on Walls <118640 Interior - 165 Partition (1-hr)>
+2 top faces found on Walls <123926 CORR>
+No side face found for Walls <123967 Storefront>
+1 top face found on Walls <124284 Interior - Partition>
+1 top face found on Walls <124302 Interior - Partition>
+1 top face found on Walls <124405 Interior - Partition>
+1 top face found on Walls <124670 CORR>
+1 top face found on Walls <127132 Foundation - 305 Concrete>
+Skipped Walls FIREPLACE <127491 FIREPLACE>
+0 top faces found on Walls <127659 Interior - Partition>
+1 top face found on Walls <127660 Interior - Partition>
+1 top face found on Walls <127663 Interior - Partition>
+0 top faces found on Walls <127941 Interior - Partition>
+1 top face found on Walls <128006 Interior - Partition>
+No side face found for Walls <132770 Storefront>
+1 top face found on Walls <135324 Foundation - 305 Concrete>
+1 top face found on Walls <135343 Foundation - 305 Concrete>
+1 top face found on Walls <135362 Foundation - 305 Concrete>
+1 top face found on Walls <135527 Interior - Partition>
+1 top face found on Walls <140108 Interior - Partition>
+2 top faces found on Walls <140130 Interior - Partition>
+1 top face found on Walls <140190 Interior - Partition>
+0 top faces found on Walls <140191 Interior - Partition>
+6 top faces found on Walls <140204 Generic - 200>
+2 top faces found on Walls <144706 Interior - Partition>
+2 top faces found on Walls <144998 CORR>
+1 top face found on Walls <145015 CORR>
+2 top faces found on Walls <145032 CORR>
+1 top face found on Walls <145199 Interior - Partition>
+1 top face found on Walls <150987 Generic - 305>
+3 top faces found on Walls <151006 Generic - 200>
+1 top face found on Walls <151081 Generic - 305>
+</pre>
+
+<p>Anyway, here is the final result reported by this task dialogue message:</p>
+
+<center>
+<img src="img/wall_top_faces_basic_sample_project_result_63.png" alt="Summary of basic sample project wall top faces"/>
+</center>
+
+<p>Some of the results in the list above are rather strange, actually... 
+I explored them a bit further and have no explanation so far for the large number of top faces found on some simple walls.
+For instance, this is the wall '140204 Generic - 200' which is reported to have six top faces in the list above:</p>
+
+<center>
+<img src="img/wall_top_faces_six.png" alt="Simple wall with six top faces"/>
+</center>
+
+<p>The only explanation I can offer for this is that some faces are counted multiple times. 
+One approach to debug this better and try to track down the cause would be to paint the faces like I did for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+exterior face of a wall</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+bottom outer loop of a floor slab</a>.
+
+<p>Another idea that comes to mind is to iterate over the faces instead of the edges.
+At least that will ensure that no face will be examined more than once.
+
+<p>To identify a face neighbouring the outer side loop, I ended up comparing vertices with each other.
+Obviously, like all comparisons of real numbers, that requires us to add a fuzz factor, since real-valued coordinates will almost never be exactly equal.
+
+<p>I already implemented an XYZ equality comparer incorporating such a fuzz factor in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+CmdNestedInstanceGeo.XyzEqualityComparer</a>.
+
+<p>Unfortunately, that equality comparer uses the native Revit API XYZ comparison member method IsAlmostEqualTo, which apparently uses a built-in tolerance that is too fine for our purposes and does not recognise points that we need to identify as equal.
+I therefore had to implement a new comparer class which takes a given tolerance as an input argument to the constructor, and use a tolerance of 1e-6 instead of the default 1e-9 used internally by Revit, as far as I know:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">XyzEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">XYZ</span>&gt;
+{
+&nbsp; <span class="blue">double</span> _eps;
+&nbsp;
+&nbsp; XyzEqualityComparer( <span class="blue">double</span> eps )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 &lt; eps,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a positive tolerance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _eps = eps;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _eps &gt; p.DistanceTo( q );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.PointString( p ).GetHashCode();
+&nbsp; }
+}
+</pre>
+
+<p>That improved things a bit. 
+
+<p>One aspect that is somewhat open to interpretation is how to decide whether a face is a top face or not.
+In some irregularly shaped walls, there may be faces which can be considered either side or top, as you please.
+I ended up using the following criterion, which allows you to specify a minimum slope of the face normal vector:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Minimum slope for a vector to be considered </span>
+&nbsp; <span class="gray">///</span><span class="green"> to be pointing upwards. Slope is simply the</span>
+&nbsp; <span class="gray">///</span><span class="green"> relationship between the vertical and </span>
+&nbsp; <span class="gray">///</span><span class="green"> horizontal components.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _minimumSlope = 0.3;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if the Z coordinate of the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given vector is positive and the slope</span>
+&nbsp; <span class="gray">///</span><span class="green"> is larger than the minimum limit.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> PointsUpwards( <span class="teal">XYZ</span> v )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> horizontalLength = v.X * v.X + v.Y * v.Y;
+&nbsp; &nbsp; <span class="blue">double</span> verticalLength = v.Z * v.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> 0 &lt; v.Z
+&nbsp; &nbsp; &nbsp; &amp;&amp; _minimumSlope
+&nbsp; &nbsp; &nbsp; &nbsp; &lt; verticalLength / horizontalLength;
+&nbsp; }
+</pre>
+
+<p>I also ended up implementing the creation of model curve copies of all the top face edges as well, so that the results can be easily visualised and verified.
+That requires me to open a transaction, which in turn prevents me from using read-only transaction mode, so I encapsulated all the model line creation code within conditional compilation statements like this:
+
+<pre class="code">
+<span class="blue">#if</span> CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">#else</span>
+<span class="gray">&nbsp; [Transaction( TransactionMode.ReadOnly )]</span>
+<span class="blue">#endif</span> <span class="green">// CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES</span>
+</pre>
+
+<p>Here is a simplified model that I generated from the basic sample model and used for final testing:</p>
+
+<center>
+<img src="img/wall_top_faces_basic_sample_project_cleaned_up.png" alt="Basic sample project walls cleaned up"/>
+</center>
+
+<p>The code now determines 49 top faces for the 45 walls, which is correct, as far as I can tell:</p>
+
+<center>
+<img src="img/wall_top_faces_basic_sample_project_result_49.png" alt="Correct summary of basic sample project wall top faces"/>
+</center>
+
+<p>Here are the generated model line copies of the top face edge curves, offset by an inch upwards and isolated in the view:</p>
+
+<center>
+<img src="img/wall_top_faces_model_lines.png" alt="Model line copies of the top face edges"/>
+</center>
+
+<p>The final code is a little bit daunting, partly due of the conditional compilation statements:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="teal">XyzEqualityComparer</span> comparer
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>( 1e-6 );
+&nbsp;
+<span class="blue">#if</span> CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES
+&nbsp;
+&nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ); 
+&nbsp;
+&nbsp; t.Start( <span class="maroon">&quot;Create model curve copies of top face edges&quot;</span> );
+&nbsp;
+<span class="blue">#endif</span> <span class="green">// CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES</span>
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Face</span>&gt; topFaces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt;();
+&nbsp; <span class="blue">int</span> n;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> uidoc.Selection.Elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Wall</span> wall = e <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == wall )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Skipped &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get the side faces</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; sideFaces 
+&nbsp; &nbsp; &nbsp; = <span class="teal">HostObjectUtils</span>.GetSideFaces( wall, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ShellLayerType</span>.Exterior );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access the first side face</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e2 = doc.GetElement( sideFaces[0] );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( e2.Id.Equals( e.Id ), 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected side face element to be the wall itself&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = e2.GetGeometryObjectFromReference( 
+&nbsp; &nbsp; &nbsp; sideFaces[0] ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == face )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;No side face found for &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine the outer loop of the side face</span>
+&nbsp; &nbsp; <span class="green">// by finding the polygon with the largest area</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal;
+&nbsp; &nbsp; <span class="blue">double</span> area, dist, maxArea = 0;
+&nbsp; &nbsp; <span class="teal">EdgeArray</span> outerLoop = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">CmdWallProfileArea</span>.GetPolygonPlane(
+&nbsp; &nbsp; &nbsp; &nbsp; ea.GetPolygon(), <span class="blue">out</span> normal, <span class="blue">out</span> dist, <span class="blue">out</span> area )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( area ) &gt; <span class="teal">Math</span>.Abs( maxArea ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; maxArea = area;
+&nbsp; &nbsp; &nbsp; &nbsp; outerLoop = ea;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; n = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; sideVertices = outerLoop.GetPolygon();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Go over all the faces of the wall and </span>
+&nbsp; &nbsp; <span class="green">// determine which ones fulfill the following </span>
+&nbsp; &nbsp; <span class="green">// two criteria: (i) planar face pointing </span>
+&nbsp; &nbsp; <span class="green">// upwards, and (ii) neighbour of the side</span>
+&nbsp; &nbsp; <span class="green">// face outer loop.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = wall.get_Geometry( opt ).Objects
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Solid</span>&gt;()
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Solid</span>&gt;( sol =&gt; <span class="blue">null</span> != sol );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( f <span class="blue">is</span> <span class="teal">PlanarFace</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; PointsUpwards( ((<span class="teal">PlanarFace</span>)f).Normal ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; faceVertices 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = f.Triangulate().Vertices;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//if( sideVertices.Exists( v </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; =&gt; faceVertices.Contains&lt;XYZ&gt;( v, comparer ) ) )</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; topFaces.Add( f );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; ++n;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> v <span class="blue">in</span> faceVertices )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( sideVertices.Contains&lt;<span class="teal">XYZ</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v, comparer ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFaces.Add( f );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++n;
+&nbsp;
+<span class="blue">#if</span> CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Display face for debugging purposes</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> ea <span class="blue">in</span> f.EdgeLoops )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Curve</span>&gt; curves 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = ea.Cast&lt;<span class="teal">Edge</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Edge</span>, <span class="teal">Curve</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x =&gt; x.AsCurve() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curves )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creator.CreateModelCurve(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve.get_Transformed( _t ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+<span class="blue">#endif</span> <span class="green">// CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} top face{1} found on {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) ) );
+&nbsp; }
+&nbsp;
+<span class="blue">#if</span> CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES
+&nbsp; t.Commit();
+<span class="blue">#endif</span> <span class="green">// CREATE_MODEL_CURVES_FOR_TOP_FACE_EDGES</span>
+&nbsp;
+&nbsp; n = uidoc.Selection.Elements.Size;
+&nbsp;
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;{0} wall{1} selected&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; n = topFaces.Count;
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Wall Top Faces&quot;</span>, 
+&nbsp; &nbsp; <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} with {1} top face{2}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; s, n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Some obvious improvements to this algorithm immediately spring to mind.
+For instance, I could check the list of side face outer loop vertices and eliminate all the ones which lie exactly below some other one. 
+In the simplest and most common case of a rectangular wall, that would eliminate the two bottom vertices and just leave the two top ones, halving their number.
+That is left as an exercise to the reader.
+
+<p>I hope you find this as interesting and satisfying as I do and look forward to hearing about further uses that you find for both the new Revit API methods and my various extensions.
+I also look forward very much to hearing about your more effective solutions to this problem.
+
+<p>Here is 
+
+<a href="zip/bc_12_89.zip">
+version 2012.0.89.0</a> of
+
+The Building Coder samples including the new command CmdWallTopFaces.

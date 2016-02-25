@@ -1,0 +1,113 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit Structure 2011 API</h3>
+
+<p>Since I talked about the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/the-revit-mep-2011-api.html">
+Revit MEP API</a> yesterday, 
+
+I should be fair and mention the Revit Structure API as well, shouldn't I?
+
+<p>Last year, we provided an overview over a number of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-structure-resources.html">
+Revit Structure resources</a>,
+
+including pointers to the structure related webcasts, samples, trainings and Autodesk University classes available in the Revit 2010 timeframe.
+
+<p>Here is a quick tour by Joe Ye of what has changed in the Revit Structure 2011 API as well as new enhancements.
+
+<h4>Changes in the Revit Structure API</h4>
+
+<p>The main change in this version is the reorganization of Revit Structure API classes.  This change has two main aspects: renaming of namespaces and the consolidation of the different analytical model related classes to one single class. You can find the detailed description of the Revit Structure API changes in the topic 'Replacement for AnalyticalModel' in the 'Revit Platform API Changes and Additions.doc' documentation.
+
+<p>Structure related API classes were previously located in the Autodesk.Revit.Elements namespace. They have now been moved to the new Autodesk.Revit.DB.Structure namespace, which makes the relationship of classes and namespace clear.
+
+<p>The following analytical model classes have been consolidated into one single class AnalyticalModel:
+
+<ul>
+<li>AnalyticalModel3D
+<li>AnalyticalModelFloor
+<li>AnalyticalModelFrame
+<li>AnalyticalModelLocation
+<li>AnalyticalModelWall
+</ul>
+
+<p>The new class offers a more streamlined interface and more capabilities to read data and modify analytical model settings.
+
+<p>A couple of new methods are added to the AnalyticalModel class:
+
+<ul>
+<li>Get support priority by AnalyticalModel.GetPriority().
+<li>Get adjustment information both manual and automatic by GetManualAdjustmentMatchedElements() method.
+<li>Get and set the structure analytical offset.
+<li>Get parameter information, including projection information, hard points, approximation, and rigid links.
+</ul>
+
+<p>Other changes that have been made include renaming of classes, properties, methods and enumerations.
+This was done to make them easier to understand and avoid the confusion of having two classes with the same name in different namespaces.
+
+<p>The method to retrieve the analytical model, previously accessible through the Element.AnalyticalModel property, is replaced by Element.GetAnalyticalModel(). The AnalyticalModelProfile class was renamed to AnalyticalModelSweptProfile.
+
+<p>The following enumerated types were available in previous releases of the API:
+
+<ul>
+<li>Autodesk.Revit.Structural.Enums.InstanceUsage
+<li>Autodesk.Revit.Structural.Enums.Material
+<li>Autodesk.Revit.Structural.Enums.WallUsage
+</ul>
+
+<p>They have now been replaced with new enumerations:
+
+<ul>
+<li>Autodesk.Revit.DB.Structure.StructuralInstanceUsage
+<li>Autodesk.Revit.DB.Structure.StructuralMaterialType
+<li>Autodesk.Revit.DB.Structure.StructuralWallUsage
+</ul>
+
+<h4>Enhancements in the Revit Structure API</h4>
+
+<p>There are also some new APIs and classes added to provide more functionality.
+
+<p>AnalyticalConsistencyChecking, AnalyticalSupportChecking and StructuralSettings classes were added.
+We can start analytical consistency checking by calling the AnalyticalConsistencyChecking CheckAnalyticalConsistency method for the specified document, and begin analytical support checking by calling the AnalyticalSupportChecking CheckMemberSupports method.
+
+<p>The StructuralSettings class provides 29 methods to read and write almost all structural settings displayed in the structural settings dialogue.
+
+<p>The rebar related API is greatly enhanced. The following three new methods were introduced to create new types, which replace the previous way to create new types by calling the Duplicate method:
+
+<ul>
+<li>NewRebarBarType()
+<li>NewRebarHookType()
+<li>NewRebarCoverType()
+</ul>
+
+<p>To make it easy to access the properties of RebarBarType, this class exposes nine properties and methods to access corresponding parameters.  Rebar has an enhanced interface, which has extra eleven methods and properties to access its array functionality. These properties were previously only available through parameters. Six properties and methods have been introduced to work with spiral rebar:
+
+<ul>
+<li>Rebar.Height
+<li>Rebar.Pitch
+<li>Rebar.BaseFinishingTurns
+<li>Rebar.TopFinishingTurns
+<li>Rebar.ScaleToBoxForSpiral()
+<li>RebarShapeDefinitionByArc.SetArcTypeSpiral()
+</ul>
+
+<p>The following filter classes were introduced to help quickly retrieve specific structural elements using the new element filtering:
+
+<ul>
+<li>FamilyStructuralMaterialTypeFilter
+<li>StructuralInstanceUsageFilter
+<li>StructuralWallUsageFilter
+<li>StructuralMaterialTypeFilter
+</ul>
+
+<p>The Truss class has more functionality: the AttachTopChord and DetachTopChord methods have been replaced by AttachChord and DetachChord methods. The new methods operate on both top and bottom chords. The new method Truss.DropTruss() was introduced to disassociate all members from the truss and delete the truss.
+
+<p>Some small enhancements and new features are not mentioned here. Once again, 'Revit Platform API Changes and Additions.doc' summarizes those changes.
+Complete information is available from chapter 23 of the Revit 2011 API developer guide.pdf, which is dedicated to the Revit Structure API.
+
+<p>Thank you very much, Joe, for this overview!

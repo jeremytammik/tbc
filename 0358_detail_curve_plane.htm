@@ -1,0 +1,123 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259133 [Curve must be in the plane] -->
+
+<h3>Detail Curve Must Indeed lie in Plane</h3>
+
+<p>The day before yesterday, I mentioned that the geometry curve used to define a detail curve 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/detail-curve-must-be-in-plane.html">
+must lie in the plane</a>
+
+of the view displaying it.
+
+This requirement has always been there, in theory, but it was not strictly enforced in previous versions of the API.
+As mentioned, the NewDetailCurve method now throws an assertion if the curve passed in to it violates this condition, and so does NewModelCurve.
+Two other questions arose in this context, and the second one is the reason for this renewed post on the subject.
+
+<ol>
+<li>How can I determine the plane equation or transformation of the current view or sketch plane in order to transform the curve to it as required?
+<li>Could you please provide a working sample of the NewDetailCurve method actually creating a curve element in Revit 2011?
+</ol>
+
+<p>To obtain the plane equation of the current view, you can simply query the View.SketchPlane property, get the geometry plane from the SketchPlane.Plane property, and ask for its normal and origin.
+
+<p>The second question caused a surprise for me, because it shows how important the new behaviour actually is.
+It unexpectedly highlights a problem with the previous versions of The Building Coder samples which has been slumbering there undiscovered for over half a year.
+
+<p>My initial response was to say: Sure, simply run The Building Coder sample command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/detail-lines.html">
+CmdDetailCurves</a>, which I recently 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+ported to 2011</a>.
+
+<p>Luckily, I tried it out myself before saying so, and to my surprise, it threw the exact same exception: "Curve must be in the plane".
+
+<p>Looking at the sketch plane of the view and the arc curve I am feeding into the method in the debugger, I see that the plane has the normal vector (0,0,1), whereas the arc has 
+
+<pre>
+Normal = {(0.000000000, -0.707106781, 0.707106781)}
+</pre>
+
+<p>So obviously I have been providing a curve that does not lie in the plane all along.
+The reason is that the end point of the arc was inadvertently defined with a non-zero Z coordinate as 
+
+<pre>
+  XYZ end1 = new XYZ( 10, 10, 10 );
+</pre>
+
+<p>I changed the arc definition points to
+
+<pre>
+  XYZ end0 = new XYZ( 0, 0, 0 );
+  XYZ end1 = new XYZ( 10, 0, 0 );
+  XYZ pointOnCurve = new XYZ( 5, 5, 0 );
+</pre>
+
+<p>Once that is done, the exception is no longer thrown and my detail lines are created as expected:</p>
+
+<center>
+<img src="img/detail_curves_2011.png" alt="Planar detail curves in Revit 2011"/>
+</center>
+
+<p>Come to think of it and comparing this image with the one in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/detail-lines.html">
+original post</a>, 
+
+I was always wondering in the back of my mind why the arc looked so crooked, but I did not notice consciously enough to have a more careful look at the time.
+Now I know, and it was simply not planar.
+That is finally discovered by the exception introduced in the Revit 2011 API and I am forced to fix it. 
+That's what comes from copying other people's code, back then.
+
+<p>Here is an updated 
+
+<a href="zip/bc_11_65_1.zip">
+version 2011.0.65.1</a>
+
+of The Building Coder sample code including the fixed implementation of the external command CmdDetailCurves.
+I changed the 
+
+<a href="http://en.wikipedia.org/wiki/Software_versioning">
+version numbering system</a> 
+
+again from the one I 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+described last</a>:
+
+The major version number corresponds to the Revit version, and I may use the minor version number to indicate intermediate updates of the Revit API, if any appear. 
+The build number is currently set to 65 and indicates the number of commands defined, at the moment, at least, leaving the revision number free to be incremented for fixes, which is what I have done in this case.
+
+<p>So now we do have a working sample of producing a detail line using the NewDetailCurve method in Revit 2011.
+
+<p>Another question that arose in the context was the projection of points and other data onto the plane for the purpose of using it to define detail curves.
+
+<h4>Projecting points onto a plane</h4>
+
+<p>The Revit API does provide a method Face.Project to project a specified point onto a face, but unfortunately no analogue method for the plane.
+
+<p>To project a point orthogonally onto a plane, you can simply pick the closest point on the plane to the given point. 
+The closest point on the plane can be determined by calculating the signed distance between the given point and the plane, multiplying the plane normal vector by that factor, and subtracting the resulting vector from the point.
+Here is some C++ code achieving this from my archives:
+
+<pre class="code">
+Point3d Plane::closestPointTo( <span class="blue">const</span> Point3d &amp; p ) <span class="blue">const</span>
+{
+&nbsp; <span class="blue">double</span> d = signedDistanceTo( p );
+&nbsp; <span class="blue">return</span> p - d * m_n;
+}
+</pre>
+
+<p>The signed distance from a point to a plane can be easily determined by calculating the dot product between the point and the plane normal 'm_n' and subtracting the distance of the plane from the origin 'm_d':
+
+<pre class="code">
+<span class="blue">inline</span> <span class="blue">double</span> Plane::signedDistanceTo( <span class="blue">const</span> Point3d &amp; p ) <span class="blue">const</span>
+{
+&nbsp; <span class="blue">return</span> m_n.dotProduct( p.asVector() ) - m_d;
+}
+</pre>

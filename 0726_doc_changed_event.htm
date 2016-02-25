@@ -1,0 +1,103 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06982936 [Missing ActiveDocumentChanged event] Bettina Zimmermann, NTI Cadcenter A/S -->
+
+<h3>Build Your Own Document Changed Event</h3>
+
+<blockquote>
+<p><strong>P.S. (pre scriptum)</strong> As Arno&scaron;t L&ouml;bel very kindly pointed out, I gave this post a rather misleading title.
+
+<p>This post does <strong>not</strong> discuss the Revit API DocumentChanged event, which reacts when elements are modified.
+'Build your own Document Activated event' would actually more closely advertise my intentions, at least to those of you who already familiar with the DocumentChanged event.
+
+<p>Read on to see what it <strong>does</strong> discuss  :-)
+</blockquote>
+
+<p>Welcome to this extra day of the year, the bisestile invented by Julius Caesar and his friends, bis sexto die, the repeated sixth day after the year's end on February 24<sup>th</sup>, sexto die ante Kalendas Martias, the sixth day before the month of March.
+An event occuring every fourth year, except at the turn of each century.
+
+<p>The Revit API also provides a number of events.
+They mostly occur more frequently than the leap year day, but there are still not as many as some would like.
+The ones provided may actually cover a larger number of situations than you initially expect, though.
+Here is an example of making use of the ViewActivated event to react on document changes.
+
+<p><strong>Question:</strong> I can't find an event to notify me when the active document changes in Revit.
+
+<p>For example, if I have two RVT projects open in Revit, I would like an event to trigger when the user switches back and forth between them.
+
+
+<p><strong>Answer:</strong> One brute force approach to this would be subscribing to the Idling event and checking the active document property in your event handler.
+This would be a vastly inefficient overkill, however.
+
+<p>A much more elegant solution is to subscribe to the ViewActivated event instead.
+Since there is only one active view for the session, it also triggers when the active document changes.
+
+<p>I implemented a vastly simplified external application named ViewActivatedOnDocChange providing a proof of concept of this idea and nothing more.
+
+<p>It omits a number of important steps such as unsubscribing from the event at shutdown and managing the event subscription to minimize the impact on performance.
+
+<p>Here is the entire external application implementation:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> ViewDescription( <span class="teal">View</span> v )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;view '{0}' in document '{1}'&quot;</span>,
+&nbsp; &nbsp; v.Name, v.Document.Title );
+}
+&nbsp;
+<span class="blue">void</span> OnViewActivated(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">ViewActivatedEventArgs</span> e )
+{
+&nbsp; <span class="teal">View</span> vPrevious = e.PreviousActiveView;
+&nbsp; <span class="teal">View</span> vCurrent = e.CurrentActiveView;
+&nbsp;
+&nbsp; <span class="blue">string</span> s = ( <span class="blue">null</span> == vPrevious )
+&nbsp; &nbsp; ? <span class="maroon">&quot;no view at all&quot;</span>
+&nbsp; &nbsp; : <span class="maroon">&quot;previous &quot;</span> + ViewDescription( vPrevious );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;Switching from {0} to new {1}.&quot;</span>,
+&nbsp; &nbsp; s, ViewDescription( vCurrent ) ) );
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; a.ViewActivated
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">ViewActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; OnViewActivated );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>This is the output produced in the Visual Studio debug output window by starting up Revit, loading the ViewActivatedOnDocChange add-in, and switching back and forth between a few different documents:
+
+<pre>
+Switching from no view at all to
+  new view 'Level 1' in document 'walls.rvt'.
+
+Switching from previous view 'Level 1'
+  in document 'walls.rvt' to new view
+  'Unnamed' in document 'Project1.rvt'.
+
+Switching from previous view 'Unnamed'
+  in document 'Project1.rvt' to new view
+  'From Parking Area' in document
+  'rac_advanced_sample_project.rvt'.
+</pre>
+
+<p>Here is
+
+<a href="zip/ViewActivatedOnDocChange.zip">
+ViewActivatedOnDocChange.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this external application.

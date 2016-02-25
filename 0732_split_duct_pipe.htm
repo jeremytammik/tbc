@@ -1,0 +1,44 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Split a Duct or Pipe</h3>
+
+<p>Here is another short and sweet answer to a question that keeps popping up regularly:
+
+
+<p><strong>Question:</strong> How can I change the length of a pipe using the Revit MEP API?
+
+<p>I am actually interested in programmatically splitting the pipe, but I cannot see any support for this in the API.
+
+<p>I tried to change the length of the pipe to indirectly cause a split, but the LocationCurve.Length property is read-only, so I cannot simply modify it.
+
+
+<p><strong>Answer:</strong> I touched briefly on the topic of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-api-cases-1.html#2">
+splitting a duct or pipe</a> a
+
+long time ago, back in 2009.
+
+<p>As stated there, there is no built-in ready-made method to split a pipe or duct.
+ 
+<p>You can however create as many new ducts and pipes as you like using the NewDuct and NewPipe methods.
+
+<p>Also, although the LocationCurve.Length property is read-only, you can still modify it by simply assigning a completely new curve to the element Location property itself.
+We already discussed samples of doing so for a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/bevelled-steel-beams.html">
+beam</a> and a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html">
+wall</a>.
+
+The same approach can be used on a pipe as well, and obviously replacing the location curve can also change its length.
+
+<p>Finally, the whole operation of splitting pipes and ducts both by changing their lengths and by creating new elements is demonstrated by the Revit SDK samples, especially the AutoRoute and AvoidObstruction ones: 
+
+<ul>
+<li>AutoRoute: Route a set of ducts and fittings between a base air supply equipment and two terminals. 
+<li>AvoidObstruction: Detect and resolve obstructions between ducts, pipes, and beams.
+</ul>

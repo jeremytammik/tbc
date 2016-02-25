@@ -1,0 +1,180 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1250656 [RvtMgdDbg and non-ADN clients] -->
+
+<h3>RvtMgdDbg</h3>
+
+<p>One of the most important, basic and powerful tools for analysing the Revit database is RvtMgdDbg.
+A 
+
+<a href="http://download.autodesk.com/media/adn/RvtMgdDbg2009_0429_2008.zip">
+2009 version</a>
+
+is publicly available, and a 
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=12264104&linkID=4901650">
+2010 alpha version</a>
+
+is on the ADN web site.
+You can also find both of these just by searching for "RvtMgdDbg" on the ADN web site, if you have access to that.
+I would have described it in detail much earlier, but the public availability was unclear for a while.
+Now that it is clear that it is publicly accessible, I tell you it is a must for every Revit developer to know and use.</p>
+
+<p>The full source code is included.
+Therefore, in case of need, you can always recompile it yourself for any version you please.
+It can also be used for analysis and learning purposes, incorporated into your own application, and updated in case you discover a problem.</p>
+
+<h4>ArxDbg Family</h4>
+
+<p>RvtMgdDbg is similar to the ArxDbg and MgdDbg utilities, well-known in the AutoCAD ObjectARX and .NET API developer communities.
+RvtMgdDbg is written by the same author and his team.
+All of these tools analyse:</p>
+
+<ul>
+<li>The database structure, contents and properties.</li>
+<li>Element properties, methods, data and relationships.</li>
+<li>In AutoCAD, reactors, hard and soft owners and pointers, the DXF data representation, etc.</li>
+<li>In Revit, the element parameters and geometry, etc.</li>
+</ul>
+
+<p>The tools provided in this series include:</p>
+
+<ul>
+<li>ArxDbg, an ObjectARX tool for analysing the AutoCAD database.</li>
+<li>MgdDbg, a managed version of ArxDbg.</li>
+<li>RvtMgdDbg, a Revit API .NET tool to analyse the Revit database.</li>
+</ul>
+
+<p>The class
+
+<a href="http://au.autodesk.com/?nd=class&session_id=2808">
+DE111-3 &ndash; A Closer Look at the Revit Database with the Revit API</a>
+
+by Mikako Harada at Autodesk University in 2007 and 2008 uses RvtMgdDbg to explore and explain the internal structure of the Revit database.
+The class materials include the version for Revit 2009, a sample model, and results of a detailed analysis of the model elements.
+Here is an excerpt from Mikako's class handout describing its various features. 
+Many thanks to Mikako for providing the following valuable material!</p>
+
+<h4>RvtMgdDbg &ndash; 'Snoop' Tools</h4>
+
+<p>RvtMgdDbg is an external application which defines its own menu and a toolbar, and solely written using Revit API. 
+It provides comprehensive tests of the Revit API, sample code and utility classes, scaffolding for quick tests. 
+It is the powerful exploration tool for learning Revit internals.</p>
+
+<p>I have been playing around with RvtMgdDbg for some time. 
+It is truly a great tool and helps our daily life of supporting Revit API. 
+In the following sections, I will point out a few tips about using this tool, which you might find useful later on. 
+This figure shows the main menu of RvtMgdDbg:</p>
+
+<img src="img/de111_3_fig_5_RvtMgdDbg_main_menu.png" alt="RvtMgdDbg main menu"/>
+
+<p>Currently RvtMgdDbg provides the following five commands:</p>
+
+<ul>
+<li>Snoop Db &ndash; this command allows you to view the Elements list under the current active document or ExternalCommandData.Application.ActiveDocument.Elements. It sorts elements by class name and display them in an alphabetical order. For each element selected, it displays its properties. Figure 6 shows the image from a sample usage of his command. Blue lines indicated the names of class as well as derived base classes. Bold letter in the item indicates the availability of the further 'drill down' information. By click it, you can view more information.</li>
+<li>Snoop Current Selection &ndash; this command allows you to view the elements you have selected prior to running this command. The information displayed for each element is same as above.</li>
+<li>Snoop Application &ndash; this command allows you to view the properties of application object.</li>
+<li>Test Framework &ndash; this command consolidates various test commands including ones found in the SDK samples. You can also find more samples here.</li>
+<li>Events &ndash; this command allows you to turn on/off event notifications currently available through Revit API.</li>
+</ul>
+
+<p>Here is an example of snooping around in the Revit database, in this case displaying a list of all database elements with a wall element selected on the left hand side, and its methods and properties in the grid on the right:</p>
+
+<img src="img/de111_3_fig_6_RvtMgdDbg_dialogue.png" alt="RvtMgdDbg main dialogue"/>
+
+<p>All the bold entries in the properties and methods pane can be clicked to open up new windows taking you further and deeper into the data structure and object relationship graph.</p>
+
+<h4>Component Families and Types</h4>
+
+<p>Earlier I mentioned that the class called Family is like a container class. 
+A set of family types is grouped under a family. 
+In Revit UI, you can view it under Families in the project browser. 
+Take a 'M_Keynote Tag' (this is in a metric template), for example, there are three types defined in this family. 
+In the Snoop Db tool, you can locate this under Family tree node. 
+If you check the element named 'M_Keynote Tag', you can find the member types under Symbols property. 
+One thing to note is that the class Family has no category defined. 
+In Revit 2009, you can check 'FamilyCategory' property instead:</p>
+
+<img src="img/de111_3_fig_14_RvtMgdDbg_component_family.png" alt="RvtMgdDbg component family"/>
+
+<h4>System Families and Types</h4>
+
+<p>The above mentioned Family class is available only for component families (although from the UI, it looks as if they are under Family class). 
+For system families, there are normally designated, corresponding classes for each type. 
+For example, the class for wall symbols is WallType. 
+To find out the family name, you can check the property of a wall type and look up its built-in parameter 'ALL_MODEL_FAMILY_NAME':</p>
+
+<img src="img/de111_3_fig_15_RvtMgdDbg_walls.png" alt="Wall system families and types"/>
+
+<p>We will look more at Snoop Parameter anon.
+Additionally, some but not all system family types are also accessible from the document object:</p>
+ 
+<img src="img/de111_3_fig_16_RvtMgdDbg_doc_types.png" alt="Accessing types from the document object"/>
+
+<h4>Accessing View Specific Instances</h4>
+
+<p>One way to access instances is through View.Elements. 
+This gives only the instances specific to a given view. 
+Look under the View class, and then click its Elements property:</p>
+
+<img src="img/de111_3_fig_17_RvtMgdDbg_view.png" alt="Accessing view-specific instances"/>
+
+<p>In Revit 2008, you could select a view from project browser, and still be able to snoop it as a current selection. 
+This functionality was disabled in Revit 2009. I miss it ...</p>
+
+<h4>Parameters</h4>
+
+<p>One last tool I would like to mention is the snoop tool for parameters. 
+Each element has a Parameters property, which closely corresponds to the property values you see in the Element Properties dialog in UI. 
+The parameters you can view here may be built-in or shared parameters, including both visible and invisible ones. 
+To access a specific parameter, you can use the Parameter method by passing in a built-in parameter enum value (note singular form here as opposed to Parameters in plural form). 
+One difficulty in using built-in parameters is that there are more than 2000 of them defined in the Revit API, while only a small portion of these apply to a specific element. 
+Unfortunately, there is no documentation, either. 
+The documentation of built-in parameters is one of most frequent requests. 
+There is no official document for that to date.
+Nevertheless, it has been our experience that occasionally you may find additional information; a family name for a specific wall family type which we mentioned earlier is an example of such a case. 
+In the SnoopObjects dialog, click on Parameters property fields. 
+The Snoop Parameters dialog includes a button labelled 'Built-In Enum Snoop'. 
+From here, you can view the list of 'available' built-in parameters:</p>
+
+<img src="img/de111_3_fig_18_RvtMgdDbg_parameters.png" alt="Built-in parameters snoop tool"/>
+
+<p>Please note that 'available' simply means that its value is not Nothing or null. 
+If does not guarantee that it has meaningful value. 
+Built-in parameters are not an officially supported portion of API. 
+In future we expect it will be replaced by data being properly exposed as a property. 
+
+<h4>Installation</h4>
+
+<p>RvtMgdDbg is an external Revit application, so it needs to be installed like any other such add-in, for instance by adding the relevant lines to Revit.ini.
+It makes use of some bitmaps which it expects in a specific location. 
+You can change the location in the source code as you like and recompile, or simply ignore them, in which case they will not be displayed.
+This does not matter, they do not affect the functionality of the tool.</p>
+
+<p>It does occur that some specific properties on some specific objects throw exceptions. 
+If so, simply start RvtMgdDbg in the Visual Studio debugger, discover where the offending exception is thrown, encapsulate it in an own little try-catch error handler, ignore it and continue, so you can view and work with the rest of the data.
+If you make any fixes, we will be happy to hear about them through ADN. 
+Thank you!</p>
+
+<h4>Summary</h4>
+
+<p>In Revit, all the elements are bundled together as a single list of elements under Document.Elements and are accessible through the document element iterator. 
+The element list contains thousands of elements in an unstructured list. 
+For Revit programmers, a task often becomes to find out a way to identify the object that you are looking for. 
+In this session, we have taken a closer look at the elements list in Revit drawing database. 
+Starting with 'raw' data, we have analyzed it and learned how much is exposed currently. 
+We have attempted to group together among those exposed according to the grouping in UI. 
+We introduced the tool called RvtMgdDbg and showed you how to explore the internals using this tool. 
+Through these exercises, I hope you now have better view of Revit API than before.<p/>  
+
+<h4>Acknowledgement</h4>
+
+<p>Special thanks to Jim Awe and Arjun Ayyar of Advance Development Group of Autodesk. 
+RvtMgdDbg was developed by Jim Awe and his team and originally intended for internal use only. 
+They have been continuously improving the tool, and making it available for the developer community.
+And many thanks again to Mikako for this overview!</p>

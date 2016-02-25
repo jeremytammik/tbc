@@ -1,0 +1,94 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Katsuaki Takamizawa and Scott Conover RE: The return values of Curve.Intersect() 
+
+283_abg04_curves.htm
+
+-->
+
+<h3>Curve.Intersect Return Values</h3>
+
+<p>The first day of the Saudi Arabian Revit API training completed yesterday.
+This training will go on for three days instead of the usual two, so that we have more time to deal with the installation and basics as well as various advanced topics.
+Yesterday we dealt with installation and setup issues, of Revit, Visual Studio, and the Revit SDK with its tools and utilities.
+We started looking at Hello World style samples, i.e. the basic skeletal structure and installation of Revit add-ins, and more basic material remains to be covered.
+
+<p>In lack of a 
+
+<a href="http://www.lonelyplanet.com/saudi-arabia/hejaz/jeddah/sights/beach/beaches">
+beach</a>,
+
+I spent an hour after the training on the sea-side.
+The hotel is on the 
+
+<a href"http://en.wikipedia.org/wiki/Jeddah_Corniche">
+corniche</a> right 
+
+in front of 
+
+<a href="http://en.wikipedia.org/wiki/King_Fahd%27s_Fountain">
+King Fahd's fountain</a>,
+
+so I got to see the sun set through that.
+
+I went out again later on to enjoy the moon, which was full yesterday and is starting to wane now.
+
+<p>Way back in 2009, Scott Conover discussed the Curve.Intersect method when looking at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curves.html">
+curves</a> in
+
+his AU 2009 class on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>. 
+
+<p>Here is a slightly more detailed question by Katsuaki Takamizawa and clarification by Scott on the results returned in the case of overlapping curves:
+
+<p><strong>Question:</strong> Does anyone know the exact meanings of SetComparisonResult.Subset and SetComparisonResult.Superset returned by the Curve.Intersect method?
+
+<p>The API reference explains SetComparisonResult.Subset like this:
+
+<p>1. <cite>The inputs are parallel lines with only one common intersection point...</cite></p>
+ 
+<center>
+<img src="img/curve_intersect_result_1.png" alt="Subset one endpoint"/>
+</center>
+
+<p>Does this mean that the curves are parallel and connected at one of their end points as shown above?
+
+<p>2. <cite>... the curve used to invoke the intersection check is a line entirely within the unbound line passed as argument curve.</cite></p>
+ 
+<center>
+<img src="img/curve_intersect_result_2.png" alt="Subset fully contained"/>
+</center>
+
+<p>Would this be returned by curve.Intersect(curve1, resultArray), if 'curve' is the highlighted curve above? 
+Also, could the two lines be completely overlapped?
+
+<p>SetComparisonResult.Superset is explained like this:
+
+<p>3. <cite>The input curve is entirely within the unbound line used to invoke the intersection check.</cite></p>
+
+<center>
+<img src="img/curve_intersect_result_3.png" alt="Superset fully contained"/>
+</center>
+
+<p>Would this be returned by curve.Intersect(curve1, resultArray), if 'curve1' is the highlighted curve above? 
+And again, could the two lines also be completely overlapped?
+
+<p>I would appreciate if anyone knows about the exact meanings and could confirm them.
+
+<p><strong>Answer:</strong> I think you've got it right:
+
+<ul>
+<li>Subset &ndash; the two curves meet at one endpoint, or the input curve is a bound line which lies within the extents of the invoking curve, the 'this' curve, which is the unbound line.
+<li>Superset &ndash; the reverse of the second condition above, the 'this' curve is a bound line, the input curve is unbound and overlapping.
+</ul>
+
+<p>In either case, according to the documentation, one of the curves must be unbound.  
+So two curves which are bound and which overlap would return Overlap instead, unless they were identical, in which case they return Equal.

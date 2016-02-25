@@ -1,0 +1,137 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>The Revit MEP 2010 API</h3>
+
+<p>We already presented an analysis of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/mep-connectors.html">
+MEP connectors</a>
+
+in Revit 2010, but a general introduction to the MEP-specific API is still missing.
+Or was, until today.
+
+<p><strong>Question:</strong>
+What can I do with the Revit MEP API?
+What's new in Revit MEP 2010?
+Are there any additions or enhancements specifically for the MEP flavour? 
+Any new content?</p>
+
+<p><strong>Answer:</strong>
+The Revit 2010 API has been strongly enhanced with new MEP-specific features.
+The main feature of the RME API is to provide read and write access to the Revit MEP model, including the following HVAC and piping data aspects and main components:
+
+<ul>
+<li>Traverse ducts, pipes, fittings and connectors in a system.
+<li>Add, remove and modify ducts, pipes and other equipment.
+<li>Read and modify system properties.
+<li>Determine whether a system is well-connected.
+</ul>
+
+The new API features are listed in the sub-section 'MEP API for ducts and pipes' in the 'What's New' section of the Revit API help file.
+All of the new MEP-specific API functionality is located in the Autodesk.Revit.MEP namespace.
+To understand the MEP functionality and API, it is useful to first know the hierarchical grouping of objects.
+The main components are the systems, ducts, pipes, fittings and connectors:
+
+<ul>
+<li>System to manage the top level system properties.
+<li>Ducts and pipes to define the main flow elements.
+<li>Fittings to implement bends and branches in the system.
+<li>Connectors to hook up the ducts, pipes and fittings.
+</ul>
+
+<p>The classes MechanicalSystem and PipingSystem provide the following top-level system functionality:
+
+<ul>
+<li>Access to equipment, connectors and system type.
+<li>Access to system properties such as flow and static pressure.
+<li>Analysis of system contents: DuctNetwork or PipeNetwork.
+</ul>
+
+<p>The elements contained within a system are not automatically returned in the flow direction, and the TraverseSystem SDK sample demonstrates how to implement traversal in direction of flow for a given system.
+
+<p>The ducts and pipes are represented by the classes Duct, FlexDuct, Pipe and FlexPipe.
+They provide the following functionality:
+
+<ul>
+<li>Read access to duct properties, types, and geometry.
+<li>Change duct or pipe type.
+<li>Move or layout duct or pipe.
+</ul>
+
+<p>The layout functionality can be driven by two points, one point and a connector, or two connectors.
+
+<p>The fittings are represented by family instances, which are created with dedicated Autodesk.Revit.Creation.Document methods New*Fitting, where * can be replaced by any one of Elbow, Tee, Cross, Takeoff, Transition, UnionFitting.
+The fitting properties can be accessed through the FamilyInstance.MEPModel property.
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/mep-connectors.html">
+MEP connectors</a>
+
+are represented by different classes depending on the context.
+This caused some confusion, which is why this topic has already been discussed in a previous post.
+In a family document, during the connector definition, we use the specialised classes DuctConnector, PipeConnector and ElectricalConnector.
+In the project document, the connectors are represented using the Connector class. 
+The connector features include:
+
+<ul>
+<li>Read duct, pipe, and fitting connector properties such as Flow, Coefficient, Demand.
+<li>Access physical connector properties e.g. Origin, Angle, Height, Width, Radius.
+<li>The family connectors define Flow, Flow Configuration, Coefficients, Loss Method.
+<li>Change connector size and location.
+<li>Connect and disconnect.
+</ul>
+
+<p>For the element creation within a project environment, we have several new methods on the creation document:
+
+<ul>
+<li>New*System to create a new mechanical or piping system.
+<li>NewDuct, NewFlexDuct, NewPipe and NewFlexPipe to create new elements.
+<li>New*Fitting to create new fittings, with * being one of Cross, Elbow, TakeOff, TeeFitting, Transition, Union.
+</ul>
+
+<p>To create the connector definitions within the family context, the FamilyItemFactory class accessed through the Document.FamilyCreate property provides the following new methods:
+
+<ul>
+<li>NewDuctConnector
+<li>NewPipeConnector
+<li>NewElectricalConnector
+</ul>
+
+<p>The Revit SDK includes the following new MEP-specific sample applications to demonstrate the use of the new functionality:
+
+<ul>
+<li><strong>AutoRoute:</strong> Route a set of ducts and fittings between a base air supply equipment and two terminals.
+<li><strong>AvoidObstruction:</strong> Detect and resolve obstructions between ducts, pipes, and beams
+<li><strong>TraverseSystem:</strong> Traverse a well-connected mechanical or piping system in the direction of flow
+<li><strong>CreateAirHandler:</strong> Create an air handler and add connectors
+</ul>
+
+<p>The first three demonstrate new RME API features, the fourth is an MEP-specific family API sample.
+
+<p>These samples were also presented in the recent 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/revit-api-introduction-webcast.html">
+Revit programming webcast</a>.</p>
+
+<p>The MEP contents have also been extended.
+One important new product feature is the interoperability with Inventor to support the MEP workflow. 
+
+<p>Here is a vaguely related question on application compatibility between different flavours of Revit and between the 32 and 64 bit platforms:
+
+<p><strong>Question:</strong>
+Will a Revit plug-in assembly created with the 32-bit Revit MEP 2010 API work on 32-bit Revit Architecture 2010 and in 64-bit Revit MEP or Architecture 2010?
+
+<p><strong>Answer:</strong>
+If the plug-in makes use of MEP-specific functionality through the Revit API in some of its commands, then those commands will only work on Revit MEP. 
+You can query what flavour of Revit your plug-in is currently running on and enable or disable certain functionality accordingly. 
+The vast majority of the Revit API will work unchanged on all flavours. 
+
+<p>Because the .NET framework creates assemblies that are not bound to a specific architecture, your application created in a 32-bit environment should also work unmodified in a 64-bit one. 
+You need to test this, though, to ensure that you have not inadvertently bound it to 32 bits in some way.

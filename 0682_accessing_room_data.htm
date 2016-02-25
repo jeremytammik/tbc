@@ -1,0 +1,160 @@
+<!-- 1272951 [Accessing the Room information] -->
+
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Accessing Room Data</h3>
+
+<p>Happy <a href="http://en.wikipedia.org/wiki/Thanksgiving">Thanksgiving</a> to all you Americans!
+
+<p>For me, Thursday November 24 is hopefully a happy travelling day, arriving in Las Vegas a few days in advance to acclimatize.
+
+<p>Here is a nice little beginner's question that I decided to answer by implementing a new command in The Building Coder samples:
+
+<p><strong>Question:</strong> How can I access the room information in a Revit BIM?
+
+I would like to see a list of all rooms with their position, properties, and boundary polygon.
+
+
+<p><strong>Answer:</strong> A list of rooms can be easily obtained using a filtered element collector.
+
+<p>Unfortunately, there is one small complication when trying to directly use the Room class for filtering. If you try that, the Revit API throws an exception:
+
+<p>"Input type is of an element type that exists in the API, but not in Revit's native object model. Try using Autodesk.Revit.DB.SpatialElement instead, and then postprocessing the results to find the elements of interest."
+
+<p>This situation and how to handle it is described in several blog posts, e.g. on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/filtering-for-a-nonnative-class.html">
+filtering for a non-native class</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/measurepanelarea-update.html">
+MeasurePanelArea update</a>.
+
+<p>I wrote a new Building Coder sample command CmdListAllRooms for you which shows how to retrieve all rooms and list their basic information.
+
+<p>Here is the report it produces in the Visual Studio debug output window when run on the rac_basic_sample_project.rvt provided in the Revit Architecture installation (copy and paste to a text editor to see the truncated lines in full):
+
+<pre>
+Room nr. '1' named 'BEDROOM 1 1' at (0,0,0) with bounding box &lt;null&gt; and area 0 sqf has 0 loops and 0 segments in first loop.
+Room nr. '2' named 'BEDROOM 2 2' at (0,0,0) with bounding box &lt;null&gt; and area 0 sqf has 0 loops and 0 segments in first loop.
+Room nr. '4' named 'BATH 4' at (0,0,0) with bounding box &lt;null&gt; and area 0 sqf has 0 loops and 0 segments in first loop.
+Room nr. '5' named 'BEDROOM 1 5' at (-37.7,13.68,0) with bounding box ((-44.09,6.56,0),(-32.11,20.04,8)) and area 160.523659936209 sqf has 1 loop and 8 segments in first loop.
+Room nr. '6' named 'BEDROOM 2 6' at (-25.19,13.68,0) with bounding box ((-31.72,6.56,0),(-19.61,20.04,8)) and area 162.29204125075 sqf has 1 loop and 9 segments in first loop.
+Room nr. '7' named 'HALL 7' at (-30.33,21.65,0) with bounding box ((-35.47,20.43,0),(-19.42,23.7,8)) and area 52.541410916154 sqf has 1 loop and 6 segments in first loop.
+Room nr. '8' named 'BATH 8' at (-38.52,23.22,0) with bounding box ((-44.09,20.43,0),(-35.86,26.87,8)) and area 52.9879883370874 sqf has 1 loop and 5 segments in first loop.
+Room nr. '9' named 'STORAGE 9' at (-9.09,9.09,0) with bounding box ((-19.22,6.56,0),(0.75,15.04,8)) and area 104.9958666584 sqf has 1 loop and 8 segments in first loop.
+Room nr. '10' named 'LIVING 10' at (0,0,0) with bounding box &lt;null&gt; and area 0 sqf has 0 loops and 0 segments in first loop.
+Room nr. '11' named 'MECH 11' at (-25.47,25.29,0) with bounding box ((-35.47,24.1,0),(-19.61,26.87,8)) and area 44.0105942711896 sqf has 1 loop and 4 segments in first loop.
+Room nr. '12' named 'LIVING ROOM 12' at (-12.69,20.48,0) with bounding box &lt;null&gt; and area 0 sqf has 0 loops and 0 segments in first loop.
+</pre>
+
+<p>It uses the helper method ListRoomData to list the room information for a given element:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> List some properties of a given room to the </span>
+<span class="gray">///</span><span class="green"> Visual Studio debug output window.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> ListRoomData( <span class="teal">Room</span> room )
+{
+&nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; <span class="blue">string</span> nr = room.Number;
+&nbsp; <span class="blue">string</span> name = room.Name;
+&nbsp; <span class="blue">double</span> area = room.Area;
+&nbsp;
+&nbsp; <span class="teal">Location</span> loc = room.Location;
+&nbsp; <span class="teal">LocationPoint</span> lp = loc <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; <span class="teal">XYZ</span> p = ( <span class="blue">null</span> == lp ) ? <span class="teal">XYZ</span>.Zero : lp.Point;
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> bb = room.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; boundary
+&nbsp; &nbsp; = room.GetBoundarySegments( opt );
+&nbsp;
+&nbsp; <span class="blue">int</span> nLoops = boundary.Count;
+&nbsp;
+&nbsp; <span class="blue">int</span> nFirstLoopSegments = 0 &lt; nLoops 
+&nbsp; &nbsp; ? boundary[0].Count 
+&nbsp; &nbsp; : 0;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;Room nr. '{0}' named '{1}' at {2} with &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;bounding box {3} and area {4} sqf has &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{5} loop{6} and {7} segment{8} in first &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;loop.&quot;</span>,
+&nbsp; &nbsp; nr, name, <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; BoundingBoxString2( bb ), area, nLoops,
+&nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( nLoops ), nFirstLoopSegments,
+&nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( nFirstLoopSegments ) ) );
+}
+</pre>
+
+<p>This method is called from the mainline Execute method which retrieves the rooms from the model:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Filtering for Room elements throws an exception:</span>
+&nbsp; <span class="green">// Input type is of an element type that exists in </span>
+&nbsp; <span class="green">// the API, but not in Revit's native object model. </span>
+&nbsp; <span class="green">// Try using Autodesk.Revit.DB.SpatialElement </span>
+&nbsp; <span class="green">// instead, and then postprocessing the results to </span>
+&nbsp; <span class="green">// find the elements of interest.</span>
+&nbsp;
+&nbsp; <span class="green">//FilteredElementCollector a </span>
+&nbsp; <span class="green">//&nbsp; = new FilteredElementCollector( doc )</span>
+&nbsp; <span class="green">//&nbsp; &nbsp; .OfClass( typeof( Room ) );</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">SpatialElement</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Room</span> room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != room )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ListRoomData( room );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is
+
+<a href="zip/bc_12_94.zip">
+version 2012.0.94.0</a> of
+
+The Building Coder samples including the new CmdListAllRooms command.
+
+<p>A couple of other samples should be useful to you in this context as well:
+
+<ul>
+<li>Rooms SDK sample 
+<li>RoomViewer SDK sample 
+<li>The Building Coder sample command CmdRoomWallAdjacency
+</ul>
+
+<p>The Revit SDK sample Rooms demonstrates how to retrieve room information such as Number, Area, Department, etc., add room tags and change room numbers.
+
+<p>The RoomViewer SDK sample demonstrates the access and usage of the room boundary and displays the room boundary geometry in a dedicated viewer.
+
+<p>The Building Coder sample command CmdRoomWallAdjacency shows a more advanced usage of the room boundary information to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+determine room and wall adjacency</a>.
+
+The access to the boundary information has changed since that sample was published, though, so you need to look at a more recent version of The Building Coder samples in order to run it in Revit 2012, for instance the version 2012.0.94.0 provided above.

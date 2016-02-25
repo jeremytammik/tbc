@@ -1,0 +1,108 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Implicit Line Continuation in VB 2010</h3>
+
+<p>An new feature that is of interesting to us VB Revit add-in developers is the
+
+<a href="http://msdn.microsoft.com/en-us/library/865x40k4.aspx">
+implicit line continuation</a> that
+
+was added in Visual Basic 2010.
+
+<p>In prior versions of VB, all statements that continue beyond the end of the line have to be explicitly marked using an underscore '_' character.
+Since some of the Revit API method signatures force rather long lines, this can become a bit overwhelming.
+This is what it might look like in VB 2008:
+
+<pre class="code">
+<span class="green">''' </span><span class="gray">&lt;summary&gt;</span>
+<span class="green">''' Hello World #2 - simplified without full namespace.&nbsp;&nbsp; </span>
+<span class="green">''' </span><span class="gray">&lt;/summary&gt;</span>
+&lt;<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Automatic)&gt; _
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">HelloWorldSimple</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>, _
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">Result</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(<span class="maroon">&quot;My Dialog Title&quot;</span>, <span class="maroon">&quot;Hello World Simple!&quot;</span>)
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>With the new implicit line continuation feature, many of the underscores can be omitted in VB 2010:
+
+<pre class="code">
+&lt;<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Automatic)&gt;
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">HelloWorldSimple</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute(
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>,
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">Result</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(<span class="maroon">&quot;My Dialog Title&quot;</span>, <span class="maroon">&quot;Hello World Simple!&quot;</span>)
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>Note that two of the underscores still remain;
+the implicit line continuation is only available after certain syntax elements, such as after a comma or an opening parenthesis, or before a closing parenthesis.
+
+<p>Here is an interview with Doug Rothaus of the Visual Studio User Education team describing it:</p>
+
+<iframe style="height:288px;width:512px" src="http://channel9.msdn.com/Blogs/kmcgrath/Implicit-Line-Continuation-in-Visual-Basic-2010/player?w=512&h=288" frameBorder="0" scrolling="no" ></iframe>
+
+<p/>
+
+
+<a name="2"></a>
+
+<h4>Updated Visual Basic Add-in Wizard</h4>
+
+<p>Here is an updated VB version of the Visual Studio 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012 add-in wizard</a> making 
+
+use of the implicit line continuation:
+
+<ul>
+<li><a href="zip/TemplateRevitArch2012AddinVbJt_3.zip">TemplateRevitArch2012AddinVbJt_3.zip</a> &ndash; copy to 
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>The only change I made was to remove the line continuation underscores wherever possible.
+
+<p>For the C# version, please refer to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+original post</a>.
+
+
+<a name="3"></a>
+
+<h4>Visual Studio Line Length Guide Line</h4>
+
+<p>Another complementary Visual Studio feature of special interest to all of us who have to limit the line length of our source code due to one reason or another is the 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/06/a-guide-line-for-visual-studio.html">
+guide-line for Visual Studio</a> pointed 
+
+out yesterday by Augusto and Kean.
+
+<p>Since I have the same issue as Kean, having to limit my source code line length strictly to fit into the blog post format, I installed it as described and verified that it works well.

@@ -1,0 +1,57 @@
+<!-- 
+
+1271833 [Unable to find an example of how to use Element.GetChangeTypeParameter]
+
+Scott Conover RE: list of released build versions -- 1271833
+
+-->
+
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Intermediate API Update Releases</h3>
+
+<p>I recently mentioned the availability of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#2">
+Revit 2012 Update Release 2</a> and 
+
+my surprise that some people prefer not to update, which gave rise to a couple of vehement
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#comments">
+comments</a>.
+
+<p>I myself seldom ran into issues with incompatibilities between intermediate releases, but now one affecting the API cropped up:
+
+<p><strong>Question:</strong> Using the IUpdater interface, I can do the following with the Revit 2012 API:
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> paramId = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ROOM_NUMBER );
+&nbsp;
+&nbsp; <span class="teal">UpdaterRegistry</span>.AddTrigger( 
+&nbsp; &nbsp; GetUpdaterId(), elementFilter, 
+&nbsp; &nbsp; <span class="teal">Element</span>.GetChangeTypeParameter( paramId ) );
+</pre>
+
+<p>The above works for Revit 2012.  
+
+<p>In the Revit 2011 API, however, the Element.GetChangeTypeParameter is not overloaded to take the above paramId.  
+Is there an equivalent way of achieving the same thing with the Revit 2011 API?   
+I am unable to find a single example for this in the Revit Help, online, or anywhere.
+
+<p><strong>Answer:</strong> Although this method overload was not provided in the initial release of Revit 2011, it was added by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/revit-2011-web-update-2.html">
+web update 2</a>.
+
+<p>I am not aware of any reason not to update, although some users never do, possibly due to concerns that regressions will halt their current workflow, or just the amount of time it takes to deploy the new version.  
+
+<p>As a developer selling your add-in, you need to be conscious of this.
+If you do require functionality from a later update release in your application, you should make 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/API_Dev_Guide/0001-Introduc1/0028-Applicat28/0029-Applicat29/How_to_use_Application_properties_to_enforce_a_correct_version_for_your_add-in">
+appropriate version checks</a>.
+
+<p>This is also one reason why we avoid significant API additions in intermediate update releases, as it becomes more difficult for developers and users of these applications to manage.

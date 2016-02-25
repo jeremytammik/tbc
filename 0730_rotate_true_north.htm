@@ -1,0 +1,88 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Miroslav Schonauer RE: Rotating the true north -->
+
+<h3>Rotate True North</h3>
+
+<p>We have previously looked at how to handle the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html">
+project location</a> properties 
+
+and more specifically how to handle the effect of a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/unrotate-north.html">
+rotated Project North</a> on
+
+an element azimuth.
+
+<p>Here is a question on the 'opposite' topic, how to set up a project north rotation in the first place:
+
+<p><strong>Question:</strong> Is there any way to rotate the truth north using the Revit API? 
+
+<p>It can be done in the user interface using the Manage &gt; Project Location &gt; Position &gt; Rotate True North command:</p>
+
+<center>
+<img src="img/rotate_true_north_jp.png" alt="Rotate True North in Japanese"/>
+</center>
+
+<p>Here is the English command with its expanded tooltip:</p>
+
+<center>
+<img src="img/rotate_true_north_en.png" alt="Rotate True North in English"/>
+</center>
+
+<p><strong>Answer:</strong> I believe the same effect can be achieved by rotating the <b>Project</b> North which is available in the API.
+
+<p>If this fits the bill, then here are some working code snippets making use of the related classes and methods:
+
+<pre class="code">
+&nbsp; <span class="teal">ProjectLocation</span> plCurrent
+&nbsp; &nbsp; = _doc.ActiveProjectLocation;
+&nbsp;
+&nbsp; <span class="green">// . . . </span>
+&nbsp;
+&nbsp; <span class="teal">ProjectPosition</span> newPosition
+&nbsp; &nbsp; = _app.Create.NewProjectPosition(
+&nbsp; &nbsp; &nbsp; scaleToFT * cs.OriginX,
+&nbsp; &nbsp; &nbsp; scaleToFT * cs.OriginY,
+&nbsp; &nbsp; &nbsp; scaleToFT * cs.OriginZ,
+&nbsp; &nbsp; &nbsp; theRotationYouWant );
+&nbsp;
+&nbsp; plCurrent.set_ProjectPosition(
+&nbsp; &nbsp; ptOrigin, newPosition );
+</pre>
+
+<p>You may have to do this for <b>all</b> project locations.
+A bit of 3D maths and brainwork may be required, but it should be doable.
+
+<p>Many thanks to Katsuaki Takamizawa and Miroslav Schonauer for this discussion and suggestion!
+
+<!--
+
+From: Katsuaki Takamizawa 
+Sent: 09 March 2012 05:30
+To: Jeremy Tammik; Miroslav Schonauer
+Subject: RE: Rotating the true north
+
+Hi Jeremy,
+
+This developer seems to really need the true north rotation. 
+If that is the case, rotating all project north would not be the solution (though I do not know what is really missing by doing it).
+
+Thank you,
+Katsu
+
+Hi Katsu,
+
+Did you mean 'solution (though I do NOT know what is really missing by doing it).' 
+
+If I'm wrong than pls can you summarise what it is - otherwise you may ask developer to explain.
+
+Cheers,
+
+Miro
+
+-->

@@ -1,0 +1,32 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Public Revit 2011 SDK Posting</h3>
+
+<p>The Revit 2011 SDK is now available on the public 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> site.
+
+<p>Here are some of the last-minute changes documented between the beta version and this one:
+
+<h5>Refactored Document properties related to transactions</h5>
+
+<p>Two existing properties have been re-implemented to better complement the changes in the transaction framework:
+
+<ul>
+<li>Document.IsReadOnly indicates that a document is in read-only state, either temporarily or permanently. 
+If it is read-only, new transactions may not be started in that document, and thus the model cannot be modified.
+
+<li>Document.IsModifiable indicates whether a document is currently modifiable or not. 
+A document is not modifiable if either there is no transaction currently open or due to some temporary state lock modification for a certain operation. 
+Taken from another perspective, a transaction may be started only when document is not yet modifiable, and is also not read-only.
+</ul>
+
+<h5>FamilyHostingBehavior</h5>
+
+<p>The FamilyHostingBehavior enumeration represents the type of host a family expects. The value for a particular family can be obtained from the family’s built-in parameter FAMILY_HOSTING_BEHAVIOR.
+
+<h5>FamilyInstance.Host property improved</h5>
+
+<p>The FamilyInstance.Host property will now return the host element of faced-hosted family instances. Previously it returned null.

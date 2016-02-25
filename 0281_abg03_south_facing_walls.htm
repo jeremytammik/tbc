@@ -1,0 +1,191 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  Autodesk University 2009
+  CP222-3 Analyze Geometry of Buildings Using the Autodesk<sup>&reg;</sup> Revit<sup>&reg;</sup> API -- Scott Conover
+
+-->
+
+<h3>South Facing Walls</h3>
+
+<p>This is part 3 of Scott Conover's AU 2009 class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+demonstrating how to find and highlight south facing exterior walls.
+
+<p>The previous post discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curve-parameterisation.html">
+curve parametrisation</a>.
+
+In this step, we use the tangent vector to the wall location curve to find all exterior walls in the model facing south:</p>
+
+<center>
+<img src="img/abg3_south_facing_walls.png" alt="South facing walls"/>
+</center>
+
+<p>The code we discuss is for demonstration purposes on how to use the curve properties.
+This sample demonstrates the analysis required to determine the facing direction of a wall, which has a location curve.
+For the sake of brevity, we will not show all the code here, only relevant snippets.
+The complete solution is available in Scott's AU class materials.
+
+<p>In order to highlight the exterior walls facing south, we need to perform the following steps:
+
+<ul>
+<li>Collect all exterior walls.
+<li>For each wall, determine its facing direction.
+<li>If it is south facing, select it.
+</ul>
+
+<p>These three steps are implemented in the following methods:
+
+<ul>
+<li>CollectExteriorWalls, which finds all exterior walls in the active document and returns an enumerable containing them.
+<li>GetExteriorWallDirection to obtain the outward direction of an exterior wall.
+<li>The mainline code handling the selection and highlighting.
+</ul>
+
+<p>Here is the implementation of CollectExteriorWalls, which also shows how to make use of a LINQ query to filter out the exterior walls and create an IEnumerable collection:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">Wall</span>&gt; CollectExteriorWalls()
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elementsToProcess 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; &nbsp; = Application.Create.Filter;
+&nbsp;
+&nbsp; <span class="teal">TypeFilter</span> wallFilter = cf.NewTypeFilter( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Wall</span> ), <span class="blue">true</span> );
+&nbsp;
+&nbsp; Document.get_Elements( wallFilter, elementsToProcess );
+&nbsp;
+&nbsp; <span class="green">// Use a LINQ query to filter out only exterior walls</span>
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Wall</span>&gt; exteriorWalls 
+&nbsp; &nbsp; = <span class="blue">from</span> wall <span class="blue">in</span> elementsToProcess.Cast&lt;<span class="teal">Wall</span>&gt;()
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> IsExterior( wall.ObjectType )
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> wall;
+&nbsp;
+&nbsp; <span class="blue">return</span> exteriorWalls;
+}
+</pre>
+
+<p>The LINQ query uses a predicate method IsExterior which checks the wall built-in FUNCTION_PARAM parameter value to determine whether a wall is exterior or not:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="blue">bool</span> IsExterior( <span class="teal">Symbol</span> wallType )
+{
+&nbsp; <span class="teal">Parameter</span> wallFunction = wallType.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FUNCTION_PARAM );
+&nbsp;
+&nbsp; <span class="teal">WallFunction</span> value 
+&nbsp; &nbsp; = ( <span class="teal">WallFunction</span> ) wallFunction.AsInteger();
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">WallFunction</span>.Exterior == value;
+}
+</pre>
+
+<p>To determine the wall facing direction, we first we determine the direction of the wall curve itself, differentiating between straight and curved walls. 
+For a straight wall, we call the ComputeDerivatives method on the location curve, which is a straight line, and use its BasisX vector, which is the tangent vector or the first derivative.
+For a curved wall, we simply compute the direction from its start to end point.
+This calculation will yield the same result as ComputeDerivatives for a straight line as well, so this differentiation could actually be skipped.
+
+<p>The direction facing outward is the normal vector of the wall curve direction, which can be obtained by forming the cross product with the Z axis, assuming that the wall is vertical.
+
+<p>We also need to check the wall's Flipped property. If set, the exterior direction is reversed.
+This is the resulting algorithm:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="teal">XYZ</span> GetExteriorWallDirection( <span class="teal">Wall</span> wall )
+{
+&nbsp; <span class="teal">LocationCurve</span> locationCurve 
+&nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> exteriorDirection = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; <span class="blue">if</span>( locationCurve != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Curve</span> curve = locationCurve.Curve;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Write(&quot;Wall line endpoints: &quot;, curve);</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> direction = <span class="teal">XYZ</span>.BasisX;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( curve <span class="blue">is</span> <span class="teal">Line</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Obtains the tangent vector of the wall.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; direction = curve.ComputeDerivatives( 
+&nbsp; &nbsp; &nbsp; &nbsp; 0, <span class="blue">true</span> ).BasisX.Normalized;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// An assumption, for non-linear walls, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// that the &quot;tangent vector&quot; is the direction</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// from the start of the wall to the end.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; direction = ( curve.get_EndPoint( 1 ) 
+&nbsp; &nbsp; &nbsp; &nbsp; - curve.get_EndPoint( 0 ) ).Normalized;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Calculate the normal vector via cross product.</span>
+&nbsp;
+&nbsp; &nbsp; exteriorDirection = <span class="teal">XYZ</span>.BasisZ.Cross( direction );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Flipped walls need to reverse the calculated direction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( wall.Flipped )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; exteriorDirection = -exteriorDirection;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> exteriorDirection;
+}
+</pre>
+
+<p>The south facing walls are defined to be all those whose exterior direction is within a range of -45 degrees to 45 degrees to the south vector, the negative Y axis:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="blue">bool</span> IsSouthFacing( <span class="teal">XYZ</span> direction )
+{
+&nbsp; <span class="blue">double</span> angleToSouth = direction.Angle( 
+&nbsp; &nbsp; -<span class="teal">XYZ</span>.BasisY );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Abs( angleToSouth ) &lt; <span class="teal">Math</span>.PI / 4;
+}
+</pre>
+
+<p>Here is the mainline putting all of this together and adding some code to place the resulting walls in the document selection set, thus causing them to be highlighted on the graphics screen:
+
+<pre class="code">
+<span class="teal">SelElementSet</span> selElements = Document.Selection.Elements;
+&nbsp;
+<span class="teal">IEnumerable</span>&lt;<span class="teal">Wall</span>&gt; walls = CollectExteriorWalls();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+{
+&nbsp; <span class="teal">XYZ</span> exteriorDirection = GetExteriorWallDirection( wall );
+&nbsp;
+&nbsp; <span class="blue">bool</span> isSouthFacing = IsSouthFacing( exteriorDirection );
+&nbsp;
+&nbsp; <span class="blue">if</span>( isSouthFacing )
+&nbsp; {
+&nbsp; &nbsp; selElements.Add( wall );
+&nbsp; }
+}
+&nbsp;
+Document.Selection.Elements = selElements;
+</pre>
+
+<p>The result of running this in a simple sample model is the set of south facing walls highlighted in the figure above.
+
+<!-- <p>In the next installment, we will look at selecting all south facing windows, which are family instances, and handling the project location north setting, which may have redefined the direction of 'south' in the model. -->
+
+<p>The next instalment in this series will discuss the Revit API representation of curves.</p>

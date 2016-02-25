@@ -1,0 +1,83 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Updater Queues Multi-Transaction Operation for Idling</h3>
+
+<p>I recently pointed out that certain operations require
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+multiple transactions</a> to
+  
+complete.
+
+<p>The dynamic model updater framework
+
+<a href="http://thebuildingcoder.typepad.com/blog/dmu">DMU</a>,
+
+on the other hand, takes complete control over the transaction handling, making it impossible to incorporate such a multi-transaction operation.
+
+<p>The updater framework is designed to enable an add-in to incorporate its own additional behaviour into a running transaction to react to changes in the model.
+The advantage is that the entire operation including the custom add-in behaviour is encapsulated in one single transaction.
+This comes at a price, as said: the add-in has no control whatsoever over the transaction management.
+It thus also obviously cannot add additional transactions into the process.</p>
+
+<p>Let me present a powerful and generic workaround to this limitation, suggested by Rudolf Honke.</p>
+
+<p>He ran into this issue when trying to group elements in an updater, for instance for his
+
+<a href="http://www.youtube.com/watch?v=iXA264zZQ28">
+dynamic insulation</a> and dynamic
+
+<a href="http://www.youtube.com/watch?v=rEj_lZ4uBcQ">
+arrangement of elements on a terrain surface</a> tools.
+The dynamic insulation group behaves almost like a custom entity in AutoCAD:</p>
+
+<!-- <iframe width="420" height="315" src="http://www.youtube.com/embed/iXA264zZQ28" frameborder="0" allowfullscreen></iframe> -->
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/SbpkYMzktI4" frameborder="0" allowfullscreen></iframe>
+
+<p>The element arrangement on terrain can be used to place trees, lampposts, and other objects to follow a curve and update automatically to changes in the curve:</p>
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/rEj_lZ4uBcQ" frameborder="0" allowfullscreen></iframe>
+
+<p>The narration for these two videos is in German, by Mr Honke himself.
+The dynamic insulation tool is also available in an English version, but that has not yet been uploaded.</p>
+
+<p>Both of these tools generate and handle groups of elements and react dynamically to later changes of the model.
+
+<p>The reaction makes use of the DMU; there is no other choice.
+However, the entire update operation requires ungrouping, modifying and regrouping of elements and cannot be achieved within the single transaction provided.</p>
+
+<p>Additional transactions in the IUpdater would be required to handle this gracefully.
+
+<p>In lack of this, here is Rudolf's workaround:
+
+<ol>
+<li>In the updater, save a list of elements requiring update.</li>
+<li>Subscribe to the Idling event.</li>
+<li>In the Idling event handler, call the standard add-in command that has no restrictions on its transaction handling.</li>
+<li>In the command, process the queued up elements and clear the list.</li>
+<li>Unsubscribe from Idling.</li>
+</ol>
+
+<p>In the actual implementation, the elements obviously maintain some data about their relationships, so the modification of an element can easily discover which other elements are affected.</p>
+
+<p>Here are a few more details and several reasons why this is necessary:</p>
+
+<ul>
+<li>The insulation tool needs to both delete and create new DetailCurves.
+It also needs to create a new HermiteSpline which is not a DetailCurve at all.
+By the way, accessing its ElementId during the insulation creation process requires a (temporary) DocumentChanged event, which is another topic that we will not explore any deeper here.
+To avoid ForbiddenForDynamicUpdateExceptions, the creation is placed in a completely new transaction.
+<li>The dynamic fence and arranging-items-on-terrain tools require creation of new FamilyInstances, which should be avoided in the IUpdater context, as stated in the Revit API help file RevitAPI.chm.
+<li>The error handling needs to be able to use FailureHandlingOptions, which again means that the add-in has to have full access to the transaction itself.
+</ul>
+ 
+<p>The IUpdater context is fine for just setting parameters, but these tools need more than that, e.g. deleting elements, creating new ones, adding extensible storage data to handle the element connection logic, handling Failures, etc.
+
+<p>I recently ran into a different case where a developer was trying to make use of the InstanceVoidCutUtils class to insert a void on a modified wall within the updater Execute method.
+This caused Revit to display an error message saying "Third party updater Xyz has experienced a problem and its action had to be canceled."
+Removing the one single line triggering the void generation from the updater enables to operation to complete, but the void is still missing, of course.
+That seems to me like a prime use case for Rudolf's approach as well.
+

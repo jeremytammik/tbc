@@ -1,0 +1,206 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1263568 [C++ Plug-in Investigations] 
+C:\a\j\adn\devlab\waltham\pierre
+
+-->
+
+<h3>C++ Revit Add-In</h3>
+
+<p>To my great surprise, I recently discovered that I have never yet published anything at all on implementing a Revit add-in in C++.
+
+<p>That is way overdue, so here goes, a step by step description of setting up a C++ project to implement a Revit 2011 external command add-in.
+
+<p>It is very similar to setting up a C# or VB Revit add-in project, similar to the steps described for a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/debugging-a-rev.html">
+C# or VB Revit add-in</a> for 
+
+Revit 2009 way back in September 2008, and more up-to-date in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html">
+Revit DevTV</a> recordings,
+
+except we specify C++ instead of C# or VB.
+
+<p>Another detailed step by step description for C# is provided in the Revit SDK developer guide "Revit 2011 API Developer Guide.pdf", in the Chapter 2.2 Walkthrough: Hello World.
+
+<p>So here we go doing the same for C++:
+
+<p><strong>1.</strong> In Visual Studio 2008, select File &gt; New &gt; Project... &gt; Visual C++ &gt; Class Library.
+Define the project location and name, e.g. 'HelloRevitCpp' and click OK:</p>
+
+<center>
+<img src="img/cpp01.png" alt="New C++ Visual Studio project"/>
+</center>
+
+<p>This generates a number of files:</p>
+
+<center>
+<img src="img/cpp02.png" alt="New C++ project files"/>
+</center>
+
+<p><strong>2.</strong> Rename the class that we will to use to implement the external command to 'Command', as done in many of the Revit SDK samples. Here is the header file defining the command class implementation:</p>
+
+<pre class="code">
+<span class="green">// HelloRevitCpp.h</span>
+&nbsp;
+<span class="blue">#pragma</span> <span class="blue">once</span>
+&nbsp;
+<span class="blue">using</span> <span class="blue">namespace</span> System;
+&nbsp;
+<span class="blue">namespace</span> HelloRevitCpp {
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">ref</span> <span class="blue">class</span> Command
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// TODO: Add your methods for this class here.</span>
+&nbsp; };
+}
+</pre>
+
+<p><strong>3.</strong> Add references to the Revit API assemblies via Solution Explorer &gt; HelloRevitCpp &gt; Properties &gt; Common Properties &gt; Framework and References:</p>
+
+<center>
+<img src="img/cpp03.png" alt="Adding Revit API assembly references"/>
+</center>
+
+<p>Don't forget to set the Copy Local flag to False, just like for C# and VB!
+
+<p><strong>4.</strong> I prefer not placing any 'using' statements whatsoever in my header files, so I removed the automatically generated 'using namespace System' from HelloRevitCpp.h.
+
+<p>In the header file, I use full namespace prefixes for all referenced objects.
+
+<p>I need to:
+
+<ul>
+<li>Derive the external command implementation from the Revit IExternalCommand interface.
+<li>Add the transaction mode and regeneration option.
+<li>Define the external command Execute method.
+<li>Specify the full namespace prefix for all objects.
+</ul>
+
+<p>The resulting header file ends up looking like this:
+
+<pre class="code">
+<span class="green">// HelloRevitCpp.h</span>
+&nbsp;
+<span class="blue">#pragma</span> <span class="blue">once</span>
+&nbsp;
+<span class="blue">namespace</span> HelloRevitCpp {
+&nbsp;
+&nbsp; [Autodesk::Revit::Attributes::Transaction(
+&nbsp; &nbsp; Autodesk::Revit::Attributes::TransactionMode::Automatic)]
+&nbsp;
+&nbsp; [Autodesk::Revit::Attributes::Regeneration(
+&nbsp; &nbsp; Autodesk::Revit::Attributes::RegenerationOption::Manual)]
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">ref</span> <span class="blue">class</span> Command 
+&nbsp; &nbsp; : Autodesk::Revit::UI::IExternalCommand
+&nbsp; {
+&nbsp; <span class="blue">public</span>:
+&nbsp; &nbsp; <span class="blue">virtual</span> Autodesk::Revit::UI::Result Execute(
+&nbsp; &nbsp; &nbsp; Autodesk::Revit::UI::ExternalCommandData^ commandData, 
+&nbsp; &nbsp; &nbsp; System::String^% message, 
+&nbsp; &nbsp; &nbsp; Autodesk::Revit::DB::ElementSet^ elements);
+&nbsp; };
+}
+</pre>
+
+<p><strong>5.</strong> Implement the external command class.
+
+<p>I do this in the HelloRevitCpp.cpp module.
+Here I include all the using statements to avoid specifying the full namespace prefixes.
+
+<p>The resulting code for a minimal implementation doing absolutely nothing at all looks like this:
+
+<pre class="code">
+<span class="green">// HelloRevitCpp.cpp - this is the main DLL file.</span>
+&nbsp;
+<span class="blue">#include</span> <span class="maroon">&quot;stdafx.h&quot;</span>
+<span class="blue">#include</span> <span class="maroon">&quot;HelloRevitCpp.h&quot;</span>
+&nbsp;
+<span class="blue">using</span> <span class="blue">namespace</span> System;
+<span class="blue">using</span> <span class="blue">namespace</span> Autodesk::Revit::ApplicationServices;
+<span class="blue">using</span> <span class="blue">namespace</span> Autodesk::Revit::Attributes;
+<span class="blue">using</span> <span class="blue">namespace</span> Autodesk::Revit::DB;
+<span class="blue">using</span> <span class="blue">namespace</span> Autodesk::Revit::UI;
+&nbsp;
+<span class="blue">using</span> <span class="blue">namespace</span> HelloRevitCpp;
+&nbsp;
+Result Command::Execute(
+&nbsp; ExternalCommandData^ commandData, 
+&nbsp; String^% message, 
+&nbsp; ElementSet^ elements )
+{
+&nbsp; <span class="blue">return</span> Autodesk::Revit::UI::Result::Succeeded;
+}
+</pre>
+
+<p><strong>6.</strong> To load this into Revit and test it, I need to create an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+add-in manifest</a>. 
+
+Here is an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/network-access-to-add-in-manifest-and-icons.html">
+overview of various add-in manifest topics</a>.
+
+<p>The add-in manifest for my C++ application (with the full path abbreviated) looks like this:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Hello Revit C++<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>My first C++ Revit add-in<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\...\HelloRevitCpp.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>HelloRevitCpp.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>be7f62ce-d5d0-4b3b-9298-327c2c6d22f4<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I need to copy it to the appropriate location for Revit to pick it up, in my case 
+
+<p>C:\Documents and Settings\All Users\Application Data\Autodesk\REVIT\Addins\2011
+
+<pre>
+C:\a\doc\revit\blog\ > copy 
+  C:\a\j\adn\case\bsd\1263568\src\HelloRevitCpp\HelloRevitCpp\HelloRevitCpp.addin 
+  "C:\Documents and Settings\All Users\Application Data\Autodesk\REVIT\Addins\2011"
+    1 file(s) copied.
+</pre>
+
+<p><strong>7.</strong> I set up Revit.exe as the debugging application:</p>
+
+<center>
+<img src="img/cpp04.png" alt="Set up debugging options"/>
+</center>
+
+<p>Now I can simply hit F5 in Visual Studio to start debugging, which launches Revit.
+
+<p>In Revit, I can launch my external command from Add-Ins &gt; External Tools &gt; Hello Revit C++:</p>
+
+<center>
+<img src="img/cpp05.png" alt="Launching the external command"/>
+</center>
+
+<p>Before actually launching the command, I set up a breakpoint in the Visual Studio debugger on the return statement of the Execute command.
+
+<p>When the command is launched, the breakpoint is hit and I can examine the contents of the command data argument passed in to my command:</p>
+
+<center>
+<img src="img/cpp06.png" alt="Examining the command data argument in the debugger"/>
+</center>
+
+<p>That's it for now. Easy-peasy. Hope this helps.
+
+<p>Here is 
+
+<a href="zip/HelloRevitCpp.zip">
+HelloRevitCpp.zip</a> containing the complete source code, Visual Studio solution, and add-in manifest file.

@@ -1,0 +1,200 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Export Walls and Floors to SAT</h3>
+
+<p>Happy New Year 2012 and welcome back to our explorations of the Revit API!
+
+<p>I had a nice winter break, and I hope you did too.
+
+<p>Let us start again by picking up an idea I recently mentioned for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/export-solid-to-acis.html">
+exporting a Revit element to an ACIS SAT file</a>.
+
+Now Ishwar Nagwani presents a sample add-in implementing this idea to export all floor and wall elements to individual SAT files.
+In his words:
+
+<p>Based on Miro's suggestion to create SAT file from individual elements, I wrote a sample to export all wall and floor elements to individual SAT files. 
+For each wall and floor element, all other elements are made temporarily invisible in the current view, and the current view with a single visible wall or floor element is exported to a SAT file.
+The SAT files are saved in the system defined temp folder.
+
+<p>Note: Do not save the Revit file after export, since the document has been marked dirty due to committing transactions.
+
+<p>Here is Ishwar's code, with some slight editing by me.
+It defines three methods:
+
+<ul>
+<li>GetAllModelElements retrieves all model elements, which in this case we define as all non-ElementType elements having a valid category with valid material quantities assigned to it.
+<li>CreateSatFileFor, which temporarily hides all other elements and exports an individual floor or wall to SAT.
+<li>Execute, the external command mainline implementation.
+</ul>
+
+<p>Here is the code for GetAllModelElements to retrieve all visible elements that need to be hidden:
+
+<pre class="code">
+<span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; GetAllModelElements( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.HasMaterialQuantities )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; elements.Add( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> elements;
+}
+</pre>
+
+<p>This is the main worker method CreateSatFileFor:
+
+<pre class="code">
+<span class="blue">void</span> CreateSatFileFor(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; allElements,
+&nbsp; <span class="blue">string</span> filename_prefix )
+{
+&nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; <span class="green">// Keep this element visible and </span>
+&nbsp; <span class="green">// hide all other model elements</span>
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;Hide Elements&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// Create element set other than current wall/floor </span>
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> eset = <span class="blue">new</span> <span class="teal">ElementSet</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> ele <span class="blue">in</span> allElements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e.Id.IntegerValue != ele.Id.IntegerValue )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ele.CanBeHidden( doc.ActiveView ) )
+&nbsp; &nbsp; &nbsp; &nbsp; eset.Insert( ele );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Hide all elements other than current </span>
+&nbsp; <span class="green">// one in current view</span>
+&nbsp;
+&nbsp; doc.ActiveView.Hide( eset );
+&nbsp;
+&nbsp; <span class="green">// Commit the transaction so that </span>
+&nbsp; <span class="green">// visibility is affected</span>
+&nbsp;
+&nbsp; trans.Commit();
+&nbsp;
+&nbsp; <span class="green">// Export the ActiveView containing current </span>
+&nbsp; <span class="green">// element to SAT file</span>
+&nbsp;
+&nbsp; <span class="teal">SATExportOptions</span> satExportOptions
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SATExportOptions</span>();
+&nbsp;
+&nbsp; <span class="teal">ViewSet</span> vset = <span class="blue">new</span> <span class="teal">ViewSet</span>();
+&nbsp; vset.Insert( doc.ActiveView );
+&nbsp;
+&nbsp; <span class="green">// Get the material information</span>
+&nbsp;
+&nbsp; <span class="teal">IEnumerator</span>&lt;<span class="teal">Material</span>&gt; mats =
+&nbsp; &nbsp; e.Materials.Cast&lt;<span class="teal">Material</span>&gt;().GetEnumerator();
+&nbsp;
+&nbsp; <span class="green">// Get the last material, as walls may </span>
+&nbsp; <span class="green">// have multiple materials assigned</span>
+&nbsp;
+&nbsp; <span class="teal">Material</span> mat = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">while</span>( mats.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; mat = mats.Current;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Get temp folder path for saving SAT files</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> folder = System.IO.<span class="teal">Path</span>.GetTempPath();
+&nbsp;
+&nbsp; <span class="blue">string</span> filename = filename_prefix
+&nbsp; &nbsp; + <span class="maroon">&quot;-&quot;</span> + e.Id.ToString()
+&nbsp; &nbsp; + <span class="maroon">&quot;-&quot;</span> + mat.Name
+&nbsp; &nbsp; + <span class="maroon">&quot;-&quot;</span> + mat.Id.ToString()
+&nbsp; &nbsp; + <span class="maroon">&quot;.sat&quot;</span>;
+&nbsp;
+&nbsp; doc.Export( folder, filename, vset,
+&nbsp; &nbsp; satExportOptions );
+&nbsp;
+&nbsp; <span class="green">// After export make all model elements visible</span>
+&nbsp;
+&nbsp; trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;Unhide Elements&quot;</span> );
+&nbsp; doc.ActiveView.Unhide( eset );
+&nbsp; trans.Commit();
+}
+</pre>
+
+<p>Finally, here is the Execute mainline collecting the walls and floors and driving the worked method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Get all elements with material </span>
+&nbsp; &nbsp; <span class="green">// for hiding all except current</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; allElements 
+&nbsp; &nbsp; &nbsp; = GetAllModelElements( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Process all walls</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> col =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Walls );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CreateSatFileFor( wall, allElements, <span class="maroon">&quot;wall&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Process all floors</span>
+&nbsp;
+&nbsp; &nbsp; col = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Floors );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Floor</span> floor <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CreateSatFileFor( floor, allElements, <span class="maroon">&quot;floor&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Error&quot;</span>, <span class="maroon">&quot;Could not create SAT Files&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/ExportToSat.zip">ExportToSat.zip</a> containing 
+
+the complete source code, Visual Studio solution and add-in manifest of this external command.
+
+<p>Many thanks to Ishwar for putting together and sharing this!

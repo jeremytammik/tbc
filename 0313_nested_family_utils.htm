@@ -1,0 +1,408 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1257395 [Family Editor:  Detecting Nested Families] -->
+
+<h3>Nested Family Utility Methods</h3>
+
+<p>Nested families seem to be a recurring topic right now.
+We just recently discussed how to test whether a family instance in a project file is 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/nested-family-instance.html">
+nested inside another</a>,
+
+and before that we addressed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instance geometry</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">
+creating a nested family</a>.
+
+The first place to look for information on using the Revit API in the context of families is the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">
+overview of the family API</a>
+
+with the associated 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html#4">
+labs</a> and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html#5">
+materials and recording</a> of the webcast we presented on the topic.
+
+<p>I received a couple of useful helper methods for exploring and working in the family context from an anonymous contributor whom we can call SOA-boy, since he already contributed some hints on using 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html">
+Service-Oriented Architecture</a>. Here is his description:
+
+<p>Because the normal filtering mechanism apparently doesn't work for detecting nested family definitions or nested family instances within a family document, I wrote some code for iterating over all the elements in the host family document as quickly as possible. 
+The code is intended to be highly reusable. 
+
+<p>Another issue addressed is to get to a nested family's parameter, because you have to call different methods depending on whether or not that parameter is a shared parameter or a family one.
+The code to do that turns out to be simple, just non-intuitive, until you think about it some more.  
+Maybe that's a more familiar approach to programmers of the project editor API, but if you work more in the family editor API, it wasn't intuitive at all.
+Methods are provided for getting a reference to a nested family's parameter, and to allow you to link a nested family's parameter to a FamilyParameter on the host family.
+
+<p>I implemented a new Building Coder sample module CmdNestedFamilies.cs which includes these methods in the class NestedFamilyFunctions. 
+The methods provided include:
+
+<ul>
+<li>GetFilteredNestedFamilyDefinitions: 
+     Returns a list of the nested family files in the given family document whose name 
+     matches the given family file name filter.  Useful for checking to see if a family
+     desired for nesting into the host family document is already nested in.
+<li>GetFilteredNestedFamilyInstances:
+     Returns a list of family instances found in the given family document whose family file
+     name matches the given familyFileNameFilter and whose type name matches the given 
+     typeNameFilter.  If no filter values are provided (or they evaluate to the empty string
+     when trimmed) then all instances will be evaluated.
+<li>GetFamilyParameter:
+     Returns a reference to the FAMILY parameter (as a simple Parameter data type) on the given instance
+     for the parameter with the given name.  Will return the parameter
+     whether it is an instance or type parameter.
+<li>LinkNestedFamilyParameterToHostFamilyParameter:
+     This method takes an instance of a nested family and links a parameter on it to
+     a parameter on the given host family instance.  This allows a change at the host
+     level to automatically be sent down and applied to the nested family instance.
+</ul>
+
+<p>The motivation for the first method is that standard Revit filtering techniques fail when searching for nested families in a family document, so we have no choice but to iterate over all elements in the family.
+While there usually aren't that many elements at the family level, nonetheless this method has been built for speed.
+It returns collection of family file definitions nested into the given family document.
+
+<p>The methods are packaged in a utility class NestedFamilyFunctions.
+It also includes two helper methods FilterMatches and ValidateFamilyDocument:
+
+<ul>
+<li>FilterMatches:
+     Returns whether or not the nameToCheck matches the given filter.
+     This is done with a simple Contains check, so wildcards won't work.
+<li>ValidateFamilyDocument:
+     This method will validate the provided Revit Document to make sure the reference 
+     exists and is for a FAMILY document.  It will throw an ArgumentNullException
+     if nothing is sent, and will throw an ArgumentOutOfRangeException if the document
+     provided isn't a family document (e.g. is a project document)
+</ul>
+
+<p>Here is the NestedFamilyFunctions source code, including some comments describing what is going on and why.
+Following good SOA practices, the methods verify that the incoming data can be worked with.
+Since some lines are too long to display here in this post, you may have to either copy and paste to an editor or download the full source code to see them in full length:
+
+<pre class="code">
+<span class="blue">#region</span> Public Methods
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt; 
+&nbsp; GetFilteredNestedFamilyDefinitions( 
+&nbsp; &nbsp; <span class="blue">string</span> familyFileNameFilter,
+&nbsp; &nbsp; <span class="teal">Document</span> familyDocument,
+&nbsp; &nbsp; <span class="blue">bool</span> caseSensitiveFiltering )
+{
+&nbsp; ValidateFamilyDocument( familyDocument );
+&nbsp;
+&nbsp; <span class="green">// The filter can be null, the filter matching function checks for that.</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt; oResult = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = familyDocument.Elements;
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> oElement = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( ( oElement <span class="blue">is</span> <span class="teal">Family</span> ) 
+&nbsp; &nbsp; &nbsp; &amp;&amp; FilterMatches( oElement.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; familyFileNameFilter, caseSensitiveFiltering ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; oResult.Add( oElement <span class="blue">as</span> <span class="teal">Family</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> oResult;
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt; 
+&nbsp; GetFilteredNestedFamilyInstances( 
+&nbsp; &nbsp; <span class="blue">string</span> familyFileNameFilter,
+&nbsp; &nbsp; <span class="blue">string</span> typeNameFilter,
+&nbsp; &nbsp; <span class="teal">Document</span> familyDocument,
+&nbsp; &nbsp; <span class="blue">bool</span> caseSensitiveFiltering )
+{
+&nbsp; ValidateFamilyDocument( familyDocument );
+&nbsp;
+&nbsp; <span class="green">// The filters can be null</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt; oResult 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Family</span> oNestedFamilyFileCandidate;
+&nbsp; <span class="teal">FamilyInstance</span> oFamilyInstanceCandidate;
+&nbsp; <span class="teal">FamilySymbol</span> oFamilySymbolCandidate;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt; oMatchingNestedFamilies 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt; oAllFamilyInstances 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilyInstance</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">bool</span> bFamilyFileNameFilterExists = <span class="blue">true</span>;
+&nbsp; <span class="blue">bool</span> bTypeNameFilterExists = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="green">// Set up some fast-to-test boolean values, which will be </span>
+&nbsp; <span class="green">// used for short-circuit Boolean evaluation later.</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( familyFileNameFilter ) )
+&nbsp; {
+&nbsp; &nbsp; bFamilyFileNameFilterExists = <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( typeNameFilter ) )
+&nbsp; {
+&nbsp; &nbsp; bTypeNameFilterExists = <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Unfortunately detecting nested families in a family document requires iterating</span>
+&nbsp; <span class="green">// over all the elements in the document, because the built-in filtering mechanism</span>
+&nbsp; <span class="green">// doesn't work for this case.&nbsp; However, families typically don't have nearly as many</span>
+&nbsp; <span class="green">// elements as a whole project, so the performance hit shouldn't be too bad.</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Still, the fastest performance should come by iterating over all elements in the given</span>
+&nbsp; <span class="green">// family document exactly once, keeping subsets of the family instances found for </span>
+&nbsp; <span class="green">// later testing against the nested family file matches found.</span>
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> oElementIterator 
+&nbsp; &nbsp; = familyDocument.Elements;
+&nbsp;
+&nbsp; <span class="blue">while</span>( oElementIterator.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// See if this is a family file nested into the current family document.</span>
+&nbsp; &nbsp; oNestedFamilyFileCandidate 
+&nbsp; &nbsp; &nbsp; = oElementIterator.Current <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( oNestedFamilyFileCandidate != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Must ask the &quot;Element&quot; version for it's name, because the Family object's </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// name is always the empty string.</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !bFamilyFileNameFilterExists 
+&nbsp; &nbsp; &nbsp; &nbsp; || FilterMatches( oNestedFamilyFileCandidate.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyFileNameFilter, caseSensitiveFiltering ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This is a nested family file, and either no valid family file name filter was</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// given, or the name of this family file matches the filter.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; oMatchingNestedFamilies.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; oNestedFamilyFileCandidate );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// This element is not a nested family file definition, see if it's a </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// nested family instance.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; oFamilyInstanceCandidate 
+&nbsp; &nbsp; &nbsp; &nbsp; = oElementIterator.Current <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( oFamilyInstanceCandidate != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Just add the family instance to our &quot;all&quot; collection for later testing</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// because we may not have yet found all the matching nested family file </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// definitions.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; oAllFamilyInstances.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; oFamilyInstanceCandidate );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; } <span class="green">// End iterating over all the elements in the family document exactly once</span>
+&nbsp;
+&nbsp;
+&nbsp; <span class="green">// See if any matching nested family file definitions were found.&nbsp; Only do any</span>
+&nbsp; <span class="green">// more work if at least one was found.</span>
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> oMatchingNestedFamilyFile 
+&nbsp; &nbsp; <span class="blue">in</span> oMatchingNestedFamilies )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Count backwards through the all family instances list.&nbsp; As we find </span>
+&nbsp; &nbsp; <span class="green">// matches on this iteration through the matching nested families, we can</span>
+&nbsp; &nbsp; <span class="green">// delete them from the candidates list to reduce the number of family </span>
+&nbsp; &nbsp; <span class="green">// instance candidates to test for later matching nested family files to be tested </span>
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> iCounter = oAllFamilyInstances.Count - 1; 
+&nbsp; &nbsp; &nbsp; iCounter &gt;= 0; iCounter-- )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; oFamilyInstanceCandidate 
+&nbsp; &nbsp; &nbsp; &nbsp; = oAllFamilyInstances[iCounter];
+&nbsp;
+&nbsp; &nbsp; &nbsp; oFamilySymbolCandidate 
+&nbsp; &nbsp; &nbsp; &nbsp; = oFamilyInstanceCandidate.ObjectType 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( oFamilySymbolCandidate.Family.UniqueId 
+&nbsp; &nbsp; &nbsp; &nbsp; == oMatchingNestedFamilyFile.UniqueId )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Only add this family instance to the results if there was no type name</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// filter, or this family instance's type matches the given filter.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !bTypeNameFilterExists
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || FilterMatches( oFamilyInstanceCandidate.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; typeNameFilter, caseSensitiveFiltering ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; oResult.Add( oFamilyInstanceCandidate );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// No point in testing this one again, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// since we know its family definition</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// has already been processed.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; oAllFamilyInstances.RemoveAt( iCounter );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; } <span class="green">// Next family instance candidate</span>
+&nbsp;
+&nbsp; } <span class="green">// End of for each matching nested family file definition found</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> oResult;
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">Parameter</span> GetFamilyParameter( 
+&nbsp; <span class="teal">FamilyInstance</span> nestedFamilyInstance,
+&nbsp; <span class="blue">string</span> parameterName )
+{
+&nbsp; <span class="blue">if</span>( nestedFamilyInstance == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;nestedFamilyInstance&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( parameterName ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;parameterName&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> oResult = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">//See if the parameter is an Instance parameter</span>
+&nbsp; oResult = nestedFamilyInstance.get_Parameter( 
+&nbsp; &nbsp; parameterName );
+&nbsp;
+&nbsp; <span class="green">// No?&nbsp; See if it's a Type parameter</span>
+&nbsp; <span class="blue">if</span>( oResult == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; oResult = nestedFamilyInstance.Symbol.get_Parameter( 
+&nbsp; &nbsp; &nbsp; parameterName );
+&nbsp; }
+&nbsp; <span class="blue">return</span> oResult;
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> 
+&nbsp; LinkNestedFamilyParameterToHostFamilyParameter(
+&nbsp; &nbsp; <span class="teal">Document</span> hostFamilyDocument,
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> nestedFamilyInstance,
+&nbsp; &nbsp; <span class="blue">string</span> nestedFamilyParameterName,
+&nbsp; &nbsp; <span class="blue">string</span> hostFamilyParameterNameToLink )
+{
+&nbsp; ValidateFamilyDocument( hostFamilyDocument );
+&nbsp;
+&nbsp; <span class="blue">if</span>( nestedFamilyInstance == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;nestedFamilyInstance&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( nestedFamilyParameterName ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;nestedFamilyParameterName&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( hostFamilyParameterNameToLink ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;hostFamilyParameterNameToLink&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> oNestedFamilyParameter 
+&nbsp; &nbsp; = GetFamilyParameter( nestedFamilyInstance, 
+&nbsp; &nbsp; &nbsp; nestedFamilyParameterName );
+&nbsp;
+&nbsp; <span class="blue">if</span>( oNestedFamilyParameter == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;Parameter '&quot;</span> 
+&nbsp; &nbsp; &nbsp; + nestedFamilyParameterName 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' was not found on the nested family '&quot;</span> 
+&nbsp; &nbsp; &nbsp; + nestedFamilyInstance.Symbol.Name + <span class="maroon">&quot;'&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FamilyParameter</span> oHostFamilyParameter 
+&nbsp; &nbsp; = hostFamilyDocument.FamilyManager.get_Parameter( 
+&nbsp; &nbsp; &nbsp; hostFamilyParameterNameToLink );
+&nbsp;
+&nbsp; <span class="blue">if</span>( oHostFamilyParameter == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;Parameter '&quot;</span> 
+&nbsp; &nbsp; &nbsp; + hostFamilyParameterNameToLink 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' was not found on the host family.&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; hostFamilyDocument.FamilyManager
+&nbsp; &nbsp; .AssociateElementParameterToFamilyParameter( 
+&nbsp; &nbsp; &nbsp; oNestedFamilyParameter, oHostFamilyParameter );
+}
+<span class="blue">#endregion</span> Public Methods
+&nbsp;
+<span class="blue">#region</span> Private / Helper Methods
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">bool</span> FilterMatches( 
+&nbsp; <span class="blue">string</span> nameToCheck,
+&nbsp; <span class="blue">string</span> filter,
+&nbsp; <span class="blue">bool</span> caseSensitiveComparison )
+{
+&nbsp; <span class="blue">bool</span> bResult = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( nameToCheck ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// No name given, so the call must fail.</span>
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( filter ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// No filter given, so the given name passes the test</span>
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( !caseSensitiveComparison )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Since the String.Contains function only does case-sensitive checks,</span>
+&nbsp; &nbsp; <span class="green">// cheat with our copies of the values which we'll use for the comparison.</span>
+&nbsp; &nbsp; nameToCheck = nameToCheck.ToUpper();
+&nbsp; &nbsp; filter = filter.ToUpper();
+&nbsp; }
+&nbsp;
+&nbsp; bResult = nameToCheck.Contains( filter );
+&nbsp;
+&nbsp; <span class="blue">return</span> bResult;
+}
+&nbsp;
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> ValidateFamilyDocument( 
+&nbsp; <span class="teal">Document</span> document )
+{
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == document )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;document&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( !document.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentOutOfRangeException</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The document provided is not a Family Document.&quot;</span> );
+&nbsp; }
+}
+<span class="blue">#endregion</span> Private / Helper Methods
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11063.zip">
+version 1.1.0.63</a>
+
+of the complete Building Coder source code and Visual Studio solution including the new external command CmdNestedFamilies and the NestedFamilyFunctions utility class.</p>
+
+<p>Many thanks to SOA-boy for this contribution!

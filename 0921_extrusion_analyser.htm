@@ -1,0 +1,516 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Extrusion Analyser and Plan View Boundaries</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I looked at using the ExtrusionAnalyzer to create a plan view boundary profile for the furniture and equipment family instances and implemented a utility method
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+SortCurvesContiguous</a> to
+
+sort and re-orient the curves it returns into a closed contiguous loop.
+
+<p>I did not yet display the code driving the extrusion analyser, though, or discuss my experiences with that.</p>
+
+<p>Those are the topics of today's post:</p>
+
+<ul>
+<li><a href="#2">Using the ExtrusionAnalyzer class</a></li>
+<li><a href="#3">Handling ExtrusionAnalyzer failures</a></li>
+<li><a href="#4">Testing the ExporterIFCUtils ValidateCurveLoops method</a></li>
+<li><a href="#5">First conclusion and capitulation</a></li>
+<li><a href="#6">Reimplementation with a Boolean union</a></li>
+<li><a href="#7">Conclusion, next steps and download</a></li>
+<li><a href="#8">New Revit Add-ins</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Using the ExtrusionAnalyzer Class</h4>
+
+<p>Using the extrusion analyser is simple:</p>
+
+<p><strong>1.</strong> Retrieve and traverse the element geometry:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all plan view boundary loops from </span>
+<span class="gray">///</span><span class="green"> all solids of given element.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">JtLoops</span> GetPlanViewBoundaryLoopsMultiple(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="blue">ref</span> <span class="blue">int</span> nFailures )
+{
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; = e.Document.Application.Create;
+&nbsp;
+&nbsp; <span class="teal">JtLoops</span> loops = <span class="blue">new</span> <span class="teal">JtLoops</span>( 1 );
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; AddLoops( creapp, loops, obj, <span class="blue">ref</span> nFailures );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> loops;
+}
+</pre>
+
+<p><strong>2.</strong> For each solid, instantiate an ExtrusionAnalyzer, retrieve and process its resulting output curves:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Add all plan view boundary loops from </span>
+<span class="gray">///</span><span class="green"> given solid to the list of loops.</span>
+<span class="gray">///</span><span class="green"> The creation application argument is used to</span>
+<span class="gray">///</span><span class="green"> reverse the extrusion analyser output curves</span>
+<span class="gray">///</span><span class="green"> in case they are badly oriented.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Number of loops added</span><span class="gray">&lt;/returns&gt;</span>
+<span class="blue">int</span> AddLoops(
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp,
+&nbsp; <span class="teal">JtLoops</span> loops,
+&nbsp; <span class="teal">GeometryObject</span> obj )
+{
+&nbsp; <span class="blue">int</span> nAdded = 0;
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; extrusionAnalyzer = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = extrusionAnalyzer
+&nbsp; &nbsp; &nbsp; .GetExtrusionBase();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> a <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nEdges = a.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; curves
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;( nEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="blue">null</span>; <span class="green">// loop start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p; <span class="green">// edge start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="blue">null</span>; <span class="green">// edge end point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = e.AsCurve();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; curves.Add( curve );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveUtils</span>.SortCurvesContiguous(
+&nbsp; &nbsp; &nbsp; &nbsp; creapp, curves, _debug_output );
+&nbsp;
+&nbsp; &nbsp; &nbsp; q = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">JtLoop</span> loop = <span class="blue">new</span> <span class="teal">JtLoop</span>( nEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curves )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Todo: handle non-linear curve.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Especially: if two long lines have a </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// short arc in between them, skip the arc</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and extend both lines.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; loop.Add( <span class="blue">new</span> <span class="teal">Point2dInt</span>( p ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == q
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || q.IsAlmostEqualTo( p, 1e-05 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == q ? 0 : p.DistanceTo( q ))&nbsp; ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p0 = p; <span class="green">// save loop start point</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( p0, 1e-05 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p0.DistanceTo( q ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; loops.Add( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++nAdded;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> nAdded;
+}
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Handling ExtrusionAnalyzer Failures</h4>
+
+<p>The desk solids are processed perfectly well by the extrusion analyser, but two of the chair solids produce failures.
+This is the standard Revit content 'Furniture Chair - Office' returning invalid solids.</p>
+
+<p>Since I don't (yet?) know how to detect beforehand whether a solid will cause a failure or not, the only option I see is to encapsulate the extrusion analyser implementation in an exception handler.
+I also added code to report how many failures occur:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; extrusionAnalyzer = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; {
+&nbsp; &nbsp; ++nExtrusionAnalysisFailures;
+&nbsp; &nbsp; <span class="blue">return</span> nAdded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Face</span> face = extrusionAnalyzer
+&nbsp; &nbsp; .GetExtrusionBase();
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Testing the ExporterIFCUtils ValidateCurveLoops Method</h4>
+
+<p>Rudolf Honke added a very valid
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html#comment-6a00e553e168978833017c384939c3970b">
+suggestion</a> to
+
+my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+SortCurvesContiguous implementation</a>: <i>You may have a look at ExporterIFCUtils.ValidateCurveLoops method. RevitApi.chm says:
+
+"Does validity checks on a list of curve loops to ensure that they are all co-planar, closed, and properly oriented."
+
+I have never tested this method, but perhaps it prevents you from inventing the wheel another time...</i></p>
+
+<p>I like that suggestion a lot and am interested to find out how useful this method might be.
+
+<p>It takes a list of curve loops and returns a new list of curve loops "properly oriented, if possible. If not, the return contains no loops."</p>
+
+<p>I added code to test this method, passing in to it the output produced by the extrusion analyser:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Test ValidateCurveLoops</span>
+&nbsp;
+&nbsp; <span class="teal">CurveLoop</span> loopIfc = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Curve</span> curve = e.AsCurve();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; curves.Add( curve );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Throws an exception saying &quot;This curve </span>
+&nbsp; &nbsp; <span class="green">// will make the loop not contiguous. </span>
+&nbsp; &nbsp; <span class="green">// Parameter name: pCurve&quot;</span>
+&nbsp;
+&nbsp; &nbsp; loopIfc.Append( curve );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// We never reach this point:</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; loopsIfc
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp;
+&nbsp; loopsIfc.Add( loopIfc );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; loopsIfcOut = <span class="teal">ExporterIFCUtils</span>
+&nbsp; &nbsp; .ValidateCurveLoops( loopsIfc, <span class="teal">XYZ</span>.BasisZ );
+</pre>
+
+<p>Unfortunately, the CurveLoop Append method throws an exception saying "This curve will make the loop not contiguous. Parameter name: pCurve".
+
+<p>It obviously expects contiguous curves to be passed in and can therefore not be used to re-orient curves if they are oriented the wrong way.
+
+<p>So much for that suggestion.
+You got my hopes up there, Rudolf, but no luck this time.</p>
+
+
+<a name="5"></a>
+
+<h4>First Conclusion and Capitulation</h4>
+
+<p>My first (erroneous) conclusion for the extrusion analyser was simple: the output I receive for a plan view is much too complex for my use.
+
+<p>I was expecting it to return the simplest possible contour to represent the shadow cast by the solid passed in.
+The results include lots of extraneous loops that do not contribute to the shadow of the object.</p>
+
+<p>Oops.</p>
+
+<p>Since I am passing in the multiple solids from the desk and the chair to the extrusion analyser one by one, individually, it is obviously returning a plan view boundary outline for each one of the solids, individually, as well.</p>
+
+<p>At first glance I thought that this result is much too complicated for me to handle, since all I want is one single boundary for the whole object.</p>
+
+<p>For a moment, I gave up on the whole idea of using the extrusion analyser and decided to switch to a 2D plan view instead, and ask for the view-specific family instance representation in that view. For the desk, that would simply give me the desired rectangular outline.</p>
+
+<p>Capitulation.</p>
+
+<p>Then I switched on my brain for a second again and realised the obvious fact that individual solids will generate individual outlines.</p>
+
+<p>I decided to give the extrusion analyser another go, unite all the solids into one single one, then pass that in to a single call of the extrusion analyser.</p>
+
+
+<a name="6"></a>
+
+<h4>Reimplementation with a Boolean Union</h4>
+
+<p>'Gesagt, getan', as the Germans say, 'No sooner said than done', 'a word and a blow'.</p>
+
+<p>I united all the desk solids, passed the resulting union in to the extrusion analyser, and it produces a single closed loop.</p>
+
+<p>I united all the chair solids, passed the resulting union in to the extrusion analyser, and it produces one single failure.</p>
+
+<p>Oh no!</p>
+
+<p>The individual chair solids causing a failure when passed in individually also cause a failure when united with the unproblematic ones.
+
+<p>Next idea:</p>
+
+<ul>
+<li>Extract the family instance solids from the geometry one by one.</li>
+<li>Test each solid by passing it in to the extrusion analyser on its own.</li>
+<li>If it causes a failure, discard it.</li>
+<li>If it does not, unite it with the others.</li>
+<li>Pass in the union of all non-failing solids to the extrusion analyser.</li>
+<li>Retrieve the resulting curves.</li>
+<li>Sort and re-orient the curves to form a contiguous closed loop.</li>
+<li>Convert the closed loop data to my integer-based 2D format.</li>
+</ul>
+
+<p>Here is the final code for achieving this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all plan view boundary loops from </span>
+<span class="gray">///</span><span class="green"> all solids of given element united together.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">JtLoops</span> GetPlanViewBoundaryLoops(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="blue">ref</span> <span class="blue">int</span> nFailures )
+{
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; = e.Document.Application.Create;
+&nbsp;
+&nbsp; <span class="teal">JtLoops</span> loops = <span class="blue">new</span> <span class="teal">JtLoops</span>( 1 );
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> union = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Some solids, e.g. in the standard </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// content 'Furniture Chair - Office' </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// cause an extrusion analyser failure,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// so skip adding those.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solid = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nFailures;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == union )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; union = solid;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; union = <span class="teal">BooleanOperationsUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ExecuteBooleanOperation( union, solid,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BooleanOperationsType</span>.Union );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; AddLoops( creapp, loops, union, <span class="blue">ref</span> nFailures );
+&nbsp; }
+&nbsp; <span class="blue">return</span> loops;
+}
+</pre>
+
+<p>This is the current result for my simple sample model (copy the text to see the truncated lines in full):</p>
+
+<pre>
+Room Rooms &lt;212639 Room 1&gt; has 2 loops:
+  0: (2753,3087), (-4446,3087), (-4446,587), (-746,587), (-746,-1212), (2753,-1212)
+  1: (298,-112), (298,587), (1698,587), (1698,-112)
+FamilyInstance Furniture Desk <212646 1525 x 762mm> has 1 loop:
+  0: (664,2561), (664,1761), (2227,1761), (2227,2561), (2056,2561), (2056,2580), (1954,2580), (1954,2561), (937,2561), (937,2580), (836,2580), (836,2561)
+FamilyInstance Furniture Desk <212801 1525 x 762mm> has 1 loop:
+  0: (-1200,2561), (-1200,1761), (362,1761), (362,2561), (191,2561), (191,2580), (89,2580), (89,2561), (-927,2561), (-927,2580), (-1028,2580), (-1028,2561)
+FamilyInstance Furniture Desk <213000 1525 x 762mm> has 1 loop:
+  0: (-4135,2561), (-4135,1761), (-2572,1761), (-2572,2561), (-2743,2561), (-2743,2580), (-2845,2580), (-2845,2561), (-3862,2561), (-3862,2580), (-3963,2580), (-3963,2561)
+FamilyInstance Furniture Chair - Office <214027 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214027 Office Chair> has 1 loop:
+  0: (-3581,1142), (-3581,1162), (-3561,1162), (-3561,1502), (-3581,1502), (-3581,1542), (-3561,1542), (-3561,1577), (-3021,1577), (-3021,1542), (-3001,1542), (-3001,1502), (-3021,1502), (-3021,1162), (-3001,1162), (-3001,1142), (-3021,1142), (-3021,1108), (-3561,1108), (-3561,1142)
+FamilyInstance Furniture Chair - Office <214138 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214138 Office Chair> has 1 loop:
+  0: (-636,1142), (-636,1162), (-616,1162), (-616,1502), (-636,1502), (-636,1542), (-616,1542), (-616,1577), (-76,1577), (-76,1542), (-56,1542), (-56,1502), (-76,1502), (-76,1162), (-56,1162), (-56,1142), (-76,1142), (-76,1108), (-616,1108), (-616,1142)
+FamilyInstance Furniture Chair - Office <214409 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214409 Office Chair> has 1 loop:
+  0: (1263,1142), (1263,1162), (1283,1162), (1283,1502), (1263,1502), (1263,1542), (1283,1542), (1283,1577), (1823,1577), (1823,1542), (1843,1542), (1843,1502), (1823,1502), (1823,1162), (1843,1162), (1843,1142), (1823,1142), (1823,1108), (1283,1108), (1283,1142)
+</pre>
+
+<p>I have not really checked the validity of these loops yet.</p>
+
+<p>The chairs have arcs in them, so maybe they have to be as complex as they appear.</p>
+
+<p>The desk should actually be just one single simple rectangle, so maybe there is a possibility to clean up its loop, e.g. reduce the 12 vertices to just four, e.g. by identifying collinear segments or something.</p>
+
+<p>I'll look at that in more detail anon.</p>
+
+<p>As you can see, this is all very experimental work in progress.</p>
+
+<p>I hope you can get some use out of it anyway, and am excited to see where this will lead me.</p>
+
+
+<a name="7"></a>
+
+<h4>Conclusion, Next Steps and Download</h4>
+
+<p>It works so far, and I will still have hope of using this for my final project implementation.</p>
+
+<p>The next step is to test the validity of the loops I retrieve.
+As said, the end goal is:</p>
+
+<ul>
+<li>Upload the boundary loop and other data to the cloud.</li>
+<li>Visualise and manipulate the loops in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/2d-svg-editing-on-mobile-device-with-rapha%C3%ABl.html">
+room layout editor</a>.</li>
+</ul>
+
+<p>Alternatively, I could first implement a visualisation tool in .NET for local use and testing.
+I have had that on my list for a long time anyway.</p>
+
+<p>Anyway, here is
+
+<a href="zip/GetFurnitureLoops.zip">GetFurnitureLoops.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.
+
+
+
+<a name="8"></a>
+
+<h4>New Revit Add-ins</h4>
+
+<p>Before closing, here are some new Revit add-ins pointed out by developers that have been active here on the blog:</p>
+
+<p>Israel Rodriguez of <a href="http://icuby.com.br">icubY</a> released his
+
+<a href="http://myboxfree.com">mYbox</a> add-in
+
+providing an easy way to integrate families that are on our portal directly inside Revit, AutoCAD and SketchUp, and includes a WPF client using the Revit API to instantiate the families
+
+(<a href="http://www.youtube.com/channel/UCngdwrPsKGkJgXVOrAlzPig/videos">video</a>).
+
+The content is mainly in Brazilian Portuguese.
+
+<p>Fernando Malard of
+
+<a href="http://ofcdesk.com">ofcdesk</a>
+
+points out his
+
+<a href="http://www2.ofcdesk.com/tools">ofctools</a>,
+
+providing advanced maintenance commands to optimise and streamline work, e.g. creating, editing or deleting large numbers of elements.

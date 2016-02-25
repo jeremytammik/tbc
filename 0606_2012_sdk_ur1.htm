@@ -1,0 +1,87 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Updated SDK for Revit 2012 Update Release 1</h3>
+
+<p>The 
+
+<a href="http://revitclinic.typepad.com/my_weblog/2011/06/revit-2012-web-update-1-available.html">
+Revit 2012 Update Release 1 or UR1 is now available</a>, 
+
+and the SDK has been updated as well.
+
+<p>Here are the main SDK update features:
+
+<ul>
+<li>Revit API documentation updates.
+<li>Minor yet important REX API documentation updates in the getting started guides.
+<li>A test model which was missing from the CompoundStructure SDK sample, mentioned in its readme file. <!-- http://srd.autodesk.com/srdapp/ReportForm.asp?number=205268  Fixed -->
+<li>Updates to the AnalysisVisualizationFramework, AddinUtilitySample, ExternalCommandRegistration, and Ribbon samples.
+</ul>
+
+<p>Here are the steps I undertook to install the new version of the SDK and samples, and a detailed list of the differences I encountered:
+
+<ol>
+<li>Renamed my existing SDK installation directory from SDK to SDK_rtm for 'release to manufacture', i.e. the first 2012 version released.
+<li>Unpacked Revit2012SDK1.exe to the new SDK directory.
+<li>Compared the two directories to find the differences: windiff SDK_rtm SDK.
+<ul>
+<li>The help file, developer guide and "Revit Platform API Changes and Additions.docx" were updated.
+<li>Two new header files CodecFileReader.h and IndexerPlugin.h were added to the Point Cloud Indexing API folder
+<li>The RevitLookup solution has been updated from Visual Studio 2008 to 2010, which is good. Unfortunately, it references the Revit API assemblies from Revit 2012 MEP beta 2, which is bad. I updated the references to point to Revit Architecture 2012 instead and recompiled.
+<li>Some source files in Snoop\CollectorExts have been updated: CollectorExtElement.cs, CollectorExtMEP.cs and CollectorExtMisc.cs. I have a further enhancement for the latter, which fixes the listing of container types in extensible storage and is currently available <a href="zip/CollectorExtMisc.cs">here and here only</a>.
+<li>The REX SDK documentation in 'Read Me First.pdf' and 'Design Guidelines for Extensions SDK.pdf' has been updated, and a new file 'Development Guidelines for Extensions SDK.pdf' added.
+<li>In the samples solution SDKSamples2012.sln, the two missing sample projects ExternalCommandRegistration and RevitAddInUtilitySample have been added.
+<li>The MultithreadedCalculation idling call-back handler UpdateWhileIdling was fixed to accommodate the <a href="http://thebuildingcoder.typepad.com/blog/2011/05/cascaded-events-and-renaming-the-active-document.html#2">change in the Idling event handler sender argument</a>.
+<li>A sample model CompoundStructure.rvt has been added for the CompoundStructure sample.
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html#samples">ExternalCommand2011 SDK sample</a> was renamed to ExternalCommand.
+</ul>
+<li>Opened SDKSamples2012.sln and recompiled all the samples. This requires either all three flavours of Revit to be installed in their default locations, or the use of RevitAPIDllsPathUpdater.exe, or some other trick to ensure that all the projects' Revit API assembly references are valid.
+<li>Updated the paths in RvtSamples.txt to match my system, i.e. globally replaced "Z:\SDK2012\Samples\" by "C:\a\lib\revit\2012\SDK\Samples\".
+<li>Set up one of the projects as a start-up project and specified it to start Revit.exe and load a specific simple project file to test.
+<li>Hit F5 to start debugging and verify that all is in order, especially that RevitLookup and RvtSamples load and execute all right.
+<li>This produces an error from RvtSamples saying that the CompoundStructure.dll assembly  cannot found. 
+For some reason, I have to go back to the solution and recompile that one separately again, all on its own. 
+<li>Once that is done, it all works and no warnings are produced.
+I have seen this strange behaviour before...
+</ol>
+
+<p>All in all, no huge changes, actually, and they all make sense  :-)
+
+<p>If you are interested, here are the <a href="zip/revit_2012_ur1_sdk_jt.zip">files that differ</a> on my system after I have cleaned up and integrated everything, e.g. the differences that I wish to retain. 
+They include a very few minimal trivial fixes, and some more significant modifications to RvtSamples, which are for my personal use when testing.
+
+<h4>eTransmit for Revit</h4>
+
+<p>Another newly released piece of useful Revit functionality:
+
+<a href="http://labs.autodesk.com/utilities/revit_etransmit/">eTransmit for Revit</a>.
+
+<p>Easily share building information models using this Revit add-in application technology preview.
+With eTransmit for Revit, you can:
+
+<ul>
+<li>Copy and detach a Revit model and associated files to a single folder for internet transmission. This removes the typical error messages when you copy central files using the operating system.
+<li>Locate dependent files automatically and include them in the transmittal folder, reducing the possibility of error. All dependent files are automatically converted to use relative paths to ensure that the dependent files can be located by the model.
+<li>Choose to include related dependent files such as linked Revit models, CAD files, DWF markups, decal images, and external keynote files. You can transmit any Revit (.rvt) model that has been upgraded to Revit Release 2012.
+<li>Transmit models that are using file-based worksharing or server-based worksharing. eTransmit for Revit will also work with non-workshared Revit models.
+</ul>
+
+<p>Common uses for eTransmit:
+
+<ul>
+<li>Internal archiving
+<li>Sending deliverables to clients
+<li>Model exchange between consultants/partners
+<li>Model cleanup
+<li>Sharing models between disciplines
+</ul>
+
+<p>It's <a href="http://labs.autodesk.com/utilities/revit_etransmit/">live on Labs</a>.
+
+<p><strong>Addendum:</strong> Here is a snapshot of my current 
+
+<a href="zip/RvtSamples_2011-08-09.txt">RvtSamples.txt</a> today, 
+
+August 9 2011, in answer to Rui Liu's comment below.

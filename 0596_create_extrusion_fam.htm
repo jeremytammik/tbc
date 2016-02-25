@@ -1,0 +1,348 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- C:\a\j\adn\case\special\bocad\src\Stiffener\Stiffener.sln -->
+
+<h3>Creating and Inserting an Extrusion Family</h3>
+
+<p>Today is the 
+
+<a href="http://en.wikipedia.org/wiki/Pentecost">
+Pentecost</a> or
+
+<a href="http://en.wikipedia.org/wiki/Whit_Monday">
+Whit Monday</a> holiday
+
+in Neuch&acirc;tel, which gave me some time to explore an interesting and important issue in a bit more depth.
+
+<p>Several developers recently asked about creating families programmatically, so here is a first simple example to demonstrate this.
+It creates a new structural stiffener family as an extrusion of a profile based on a list of XYZ points and inserts an instance of it into the current document.
+Here are the required steps one by one:
+
+<ol>
+<li><a href="#1">Create an extrusion element from a profile based on a list of XYZ points</a>.
+<li><a href="#2">Create a new structural stiffener family using the extrusion element</a>.
+<li><a href="#3">Insert an instance of the new family into the current document</a>.
+</ol>
+
+<a name="1"></a>
+
+<h4>1. Creating an Extrusion for a Profile</h4>
+
+<p>The extrusion profile is defined by a list of XYZ points, in millimetres.
+In this example, we just use a very trivial rectangular shape.
+The thickness is also given in millimetres:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> n = 4;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; _countour = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 0 , -75 , 0 ),
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 508, -75 , 0 ), 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 508, 75 , 0 ),
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 75 , 0 )
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _thicknessMm = 20.0; 
+</pre>
+
+<p>Since all the input data is given in millimetres, and the extrusion has to be defined in the internal 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">Revit database unit</a> for 
+
+length, which is 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">feet</a>, 
+
+we need a conversion method for that, e.g.:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Conversion factor from millimetre to foot</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _mm_to_foot = 1 / 304.8;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a given length to feet</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">double</span> MmToFoot( <span class="blue">double</span> length_in_mm )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _mm_to_foot * length_in_mm;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a given point defined in millimetre units to feet</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">XYZ</span> MmToFootPoint( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> p.Multiply( _mm_to_foot );
+&nbsp; }
+</pre>
+
+<p>In order to create an extrusion from the contour data, we need a sketch plane and a CurveArrArray instance.
+The curve array array contains a list of loops, since the extrusion may require an outer loop and optional inner loops representing cavities.
+
+<p>Here is a helper method to create  CurveArray from our XYZ point list:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a given list of XYZ points </span>
+&nbsp; <span class="gray">///</span><span class="green"> to a CurveArray instance. </span>
+&nbsp; <span class="gray">///</span><span class="green"> The points are defined in millimetres, </span>
+&nbsp; <span class="gray">///</span><span class="green"> the returned CurveArray in feet.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">CurveArray</span> CreateProfile( 
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts, 
+&nbsp; &nbsp; <span class="teal">CreationApplication</span> creapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> profile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = _countour.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> j = (0 == i) ? n - 1 : i - 1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; profile.Append( creapp.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; MmToFootPoint( pts[j] ), 
+&nbsp; &nbsp; &nbsp; &nbsp; MmToFootPoint( pts[i] ) ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> profile;
+&nbsp; }
+</pre>
+
+In this case, the method is designed to work in a family based on the structural stiffener family template, which contains a sketch plane in the XY plane named "Ref. Level" that we can work with.
+Actually, it redundantly contains three of them, and we can simply pick the first one.
+One way to select the existing sketch plane if we know the exact structure of the document we are working with is to explicitly use a hard coded element id for it:
+
+<pre class="code">
+&nbsp; <span class="teal">SketchPlane</span> sketch = doc.get_Element( 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 501 ) ) <span class="blue">as</span> <span class="teal">SketchPlane</span>;
+</pre>
+
+<p>That has the advantage of not being language dependent, but makes us completely dependent on the internal database structure of the family template file instead.
+A slightly more flexible approach is to search for the element by name using a helper function such as this:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the first element found of the </span>
+&nbsp; <span class="gray">///</span><span class="green"> specific target type with the given name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Element</span> FindElement(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Type</span> targetType,
+&nbsp; &nbsp; <span class="blue">string</span> targetName )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( targetType )
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Element</span>&gt;( e =&gt; e.Name.Equals( targetName ) );
+&nbsp; }
+</pre>
+
+<p>This method is making use of <a href="http://thebuildingcoder.typepad.com/blog/2009/07/language-integrated-query-linq.html">LINQ</a>.
+A more efficient approach would use a filtered element collector based on a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html">parameter</a>  
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">filter</a> to 
+
+check the name instead.
+The advantage of that approach is that the filtering then happens on the internal Revit side, before the retrieved element data is passed out from Revit to the managed .NET environment.
+In our case, there are not many sketch planes in the document to examine, so the overhead is negligible.
+
+<p>Using this method to find the sketch plane, and with the curve array and thickness in hand, the call to create the extrusion element in a family document can be set up like this:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create an extrusion from a given thickness </span>
+&nbsp; <span class="gray">///</span><span class="green"> and list of XYZ points defined in millimetres</span>
+&nbsp; <span class="gray">///</span><span class="green"> in the given family document, which&nbsp; must </span>
+&nbsp; <span class="gray">///</span><span class="green"> contain a sketch plane named &quot;Ref. Level&quot;.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Extrusion</span> CreateExtrusion( 
+&nbsp; &nbsp; <span class="teal">Document</span> doc, 
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts, 
+&nbsp; &nbsp; <span class="blue">double</span> thickness )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyItemFactory</span> factory = doc.FamilyCreate;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CreationApplication</span> creapp = doc.Application.Create;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> sketch = FindElement( doc, 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">SketchPlane</span> ), <span class="maroon">&quot;Ref. Level&quot;</span> ) 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">SketchPlane</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveArrArray</span> curveArrArray = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp;
+&nbsp; &nbsp; curveArrArray.Append( CreateProfile( pts, creapp ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> extrusionHeight = MmToFoot( thickness );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> factory.NewExtrusion( <span class="blue">true</span>, 
+&nbsp; &nbsp; &nbsp; curveArrArray, sketch, extrusionHeight );
+&nbsp; }
+</pre>
+
+<p>Next, let us see how to create a new family document in the background to make use of this method.
+
+
+<a name="2"></a>
+
+<h4>2. Creating an Extrusion Family</h4>
+
+<p>Creating a new family to contain our extrusion is a simple process:
+
+<ul>
+<li>Open the appropriate family template file.
+<li>Create the extrusion.
+<li>Save and close the file.
+</ul>
+
+<p>In theory, it should be possible to avoid the last step of saving the newly generated family document to a disk file, since it is possible to load the generated family document into a project environment straight from memory.
+Unfortunately, I was unable to get this to work, because the call to 'fdoc.LoadFamily( doc )' caused a "serious error".
+Saving the family to a disk file and using 'doc.LoadFamily( filename, out family )' instead works, though.
+
+<p>It would also not be necessary to require a different file to be open to start with, but if it is not, it is impossible to close the family document.
+It has to be closed, though, in order to use the new Revit 2012 API OpenAndActivateDocument method on it, in case we want to see the results of our new family definition in the family environment instead of looking at an insertion in the project environment.
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> templateFileName = <span class="teal">Path</span>.Combine( _path,
+&nbsp; &nbsp; _family_template_name + _family_template_ext );
+&nbsp;
+&nbsp; <span class="teal">Document</span> fdoc = app.NewFamilyDocument( 
+&nbsp; &nbsp; templateFileName );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == fdoc )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Cannot create family document.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( fdoc,
+&nbsp; &nbsp; <span class="maroon">&quot;Create structural stiffener family&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; CreateExtrusion( fdoc, _countour, _thicknessMm );
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="green">// save our new family background document</span>
+&nbsp; <span class="green">// and reopen it in the Revit user interface:</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> filename = <span class="teal">Path</span>.Combine( 
+&nbsp; &nbsp; <span class="teal">Path</span>.GetTempPath(), _family_name + _rfa_ext );
+&nbsp;
+&nbsp; <span class="teal">SaveAsOptions</span> opt = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>();
+&nbsp; opt.OverwriteExistingFile = <span class="blue">true</span>;
+&nbsp;
+&nbsp; fdoc.SaveAs( filename, opt );
+&nbsp;
+&nbsp; <span class="green">// cannot close the newly generated family file</span>
+&nbsp; <span class="green">// if it is the only open document; that throws </span>
+&nbsp; <span class="green">// an exception saying &quot;The active document may </span>
+&nbsp; <span class="green">// not be closed from the API.&quot;</span>
+&nbsp;
+&nbsp; fdoc.Close( <span class="blue">false</span> );
+</pre>
+
+<p>Now that the family has been created and save to a file, we can either add a call to open it programmatically in the foreground to view it using 'uiapp.OpenAndActivateDocument( filename )', or, assuming that we have an open active project document in the Revit user interface, immediately insert an instance of it.
+In this case, let's go for the latter.
+
+
+<a name="3"></a>
+
+<h4>3. Inserting an Instance of the New Family</h4>
+
+<p>Inserting a new family instance is something that we already covered numerous times in the past.
+The last contribution on 
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/placing-a-line-based-detail-item-instance.html">
+placing a line based detail item instance</a> points 
+
+to some previous posts on this topic.
+
+<p>Here is an example of how we can place an instance of our newly created stiffener family into the current project at a selected point.
+We make use of one of the simplest overloads of the NewFamilyInstance method taking just a point, the family symbol, and a structural type argument.
+
+<p>Before inserting the instance, we need to ensure that the family is in fact loaded at all.
+
+<p>Before loading the family, we need to check whether it has already been loaded.
+This may happen, for instance, if the command is run multiple times.
+
+<p>Once loaded, we extract the family symbol from its container family, prompt the user for an insertion point, and create the new instance:
+
+<ul>
+<li>Start a transaction.
+<li>Retrieve all families.
+<li>Check whether the one we need has been loaded already.
+<li>If not, load it.
+<li>Extract its one and only symbol.
+<li>Insert an instance of it.
+</ul>
+
+<p>Here is the code to achieve these steps:
+
+<pre class="code">
+&nbsp; t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; <span class="maroon">&quot;Insert structural stiffener family instance&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="green">// load the family ... but check whether </span>
+&nbsp; <span class="green">// it was already loaded first</span>
+&nbsp;
+&nbsp; <span class="teal">Family</span> family = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = a.Count&lt;<span class="teal">Element</span>&gt;( 
+&nbsp; &nbsp; e =&gt; e.Name.Equals( _family_name ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; family = a.First&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( _family_name ) ) 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// calling this without a prior call </span>
+&nbsp; &nbsp; <span class="green">// to SaveAs causes a &quot;serious error&quot;:</span>
+&nbsp; &nbsp; <span class="green">//family = fdoc.LoadFamily( doc ); </span>
+&nbsp;
+&nbsp; &nbsp; doc.LoadFamily( filename, <span class="blue">out</span> family );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> symbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; {
+&nbsp; &nbsp; symbol = s;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// our family only contains one</span>
+&nbsp; &nbsp; <span class="green">// symbol, so pick it and leave</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; <span class="maroon">&quot;Please pick a point for family instance insertion&quot;</span> );
+
+&nbsp; <span class="teal">StructuralType</span> st = <span class="teal">StructuralType</span>.UnknownFraming;
+
+&nbsp; doc.Create.NewFamilyInstance( p, symbol, st );
+
+&nbsp; t.Commit();
+</pre>
+
+<p>The steps presented above answer a whole bunch of questions and should provide a good starting point for your own further explorations.
+
+<p>Here is <a href="zip/Stiffener02.zip">Stifferener.zip</a> containing the complete source code and Visual Studio solution of the external command implementing them.
+
+<p>Another very common question in this area is how to perform Boolean operations, both in the family and project context.
+That is a topic that I would like to take a look at in the near future, expanding on the example presented here.

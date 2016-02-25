@@ -1,0 +1,192 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07592882 [Selection] -->
+
+<h3>Sphere Creation for AVF and Filtering</h3>
+
+<p>I created my first sphere in the Revit API  :-)
+
+<p>I was slightly surprised that it was harder than expected.
+The Revit 2012 API introduced the GeometryCreationUtilities class for creating solids.
+It provides no simple sphere primitive, however.
+It does provide the following five methods, as described in the What's New listing for the Revit 2012 API:
+
+
+<a name="2"></a>
+
+<h4>GeometryCreationUtilities</h4>
+
+<p>The new utility class GeometryCreationUtilities offers the ability to create solid geometry from input curves:
+
+<ul>
+<li>CreateBlendGeometry
+<li>CreateExtrusionGeometry
+<li>CreateRevolvedGeometry
+<li>CreateSweptGeometry
+<li>CreateSweptBlendGeometry
+</ul>
+
+<p>The resulting geometry is not added to the document as a part of any element. 
+However, you may use the created solid, and its constituent faces and edges, in several ways:
+
+<ul>
+<li>As the input face(s) to the methods in the Analysis Visualization Framework AVF, e.g. SpatialFieldManager.AddSpatialFieldPrimitive.
+<li>As the input solid to finding 3D elements by intersection.
+<li>As one or more of the inputs to a Boolean operation.
+<li>As a part of a geometric calculation using, for example, Face.Project, Face.Intersect, or other Face, Solid, and Edge geometry methods.
+</ul>
+
+<p>The resulting solids created thus reside only in memory, cannot be added to the Revit database and not saved.
+So what good are they?
+
+<p>As said, you can use them for display purposes via the Analysis Visualization Framework 
+
+<a href="http://thebuildingcoder.typepad.com/blog/avf">
+AVF</a>,
+
+or to limit filtered element collection to a localised space, as input to an ElementIntersectsSolidFilter filter.
+I haven't presented any samples using this filter so far, and I promise to do so soon in a follow-up post.
+
+<p>Scott Conover showed some interesting uses in his AU and DevDays presentations on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/devdays-2010-online-with-revit-2012-api-news.html#3">
+Revit 2012 geometry API enhancements</a>, 
+
+and I picked that up to show how to use AVF to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/using-avf-to-display-intersections-and-highlight-rooms.html">
+display room volumes</a>.
+
+<p>Before getting to that, though, let's just create a spherical solid in the first place.
+
+
+<a name="3"></a>
+
+<h4>Creating a Sphere</h4>
+
+<p>One way to create a spherical solid using the GeometryCreationUtilities methods listed above is by using the CreateRevolvedGeometry method.
+I can create a face loop representing a half circle, e.g. a 180 degree arc with a line between its endpoints, and then rotate that 360 degrees around the line, which also defines the axis of revolution.
+
+<p>A so-called frame needs to be specified for the solid creation. 
+To enable creation of a sphere in any location, I wish to pass in the sphere centre point and radius as arguments.
+I can use the centre point to define the frame location.
+I initially thought that the face loop is defined at the global origin, and the frame automatically translates it into place, but that led to the following exception being thrown, saying that the "loops must lie on the right side of the Z axis (where X >= 0)":</p>
+
+<center>
+<img src="img/sphere_creation_exception.png" alt="Sphere creation exception"/>
+</center>
+
+<p>I fixed that by translating my loop definition to the same centre point as the frame, and end up with the following implementation:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and return a solid sphere with</span>
+&nbsp; <span class="gray">///</span><span class="green"> a given radius and centre point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">Solid</span> CreateSphereAt(
+&nbsp; &nbsp; <span class="teal">CreationApp</span> creapp,
+&nbsp; &nbsp; <span class="teal">XYZ</span> centre,
+&nbsp; &nbsp; <span class="blue">double</span> radius )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Use the standard global coordinate system </span>
+&nbsp; &nbsp; <span class="green">// as a frame, translated to the sphere centre.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Frame</span> frame = <span class="blue">new</span> <span class="teal">Frame</span>( centre,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create a vertical half-circle loop;</span>
+&nbsp; &nbsp; <span class="green">// this must be in the frame location.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc = creapp.NewArc( 
+&nbsp; &nbsp; &nbsp; centre - radius * <span class="teal">XYZ</span>.BasisZ,
+&nbsp; &nbsp; &nbsp; centre + radius * <span class="teal">XYZ</span>.BasisZ,
+&nbsp; &nbsp; &nbsp; centre + radius * <span class="teal">XYZ</span>.BasisX );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = creapp.NewLineBound(
+&nbsp; &nbsp; &nbsp; arc.get_EndPoint( 1 ),
+&nbsp; &nbsp; &nbsp; arc.get_EndPoint( 0 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveLoop</span> halfCircle = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp; &nbsp; halfCircle.Append( arc );
+&nbsp; &nbsp; halfCircle.Append( line );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp; &nbsp; loops.Add( halfCircle );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; &nbsp; .CreateRevolvedGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; frame, loops, 0, 2 * <span class="teal">Math</span>.PI );
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Displaying a Solid Using AVF</h4>
+
+<p>One of the uses of the transient solids created by the geometry creation utility class is for geometrical filtered element collection. 
+Before we get to that, however, lets simply display a couple of spheres using the analysis visualisation framework AVF.
+
+<p>I copied and posted code from the samples mentioned above to create an AVF display style, get or create a SpatialFieldManager, and set up an analysis result schema. 
+All this functionality is finally accessed by a simple call to the PaintSolid method.
+
+<p>Here is my external command Execute mainline implementation putting it all together:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">CreationApp</span> creapp = app.Create;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> s1 = <span class="teal">Command</span>.CreateSphereAt( 
+&nbsp; &nbsp; &nbsp; creapp, <span class="teal">XYZ</span>.Zero, 1.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> s2 = <span class="teal">Command</span>.CreateSphereAt( 
+&nbsp; &nbsp; &nbsp; creapp, <span class="blue">new</span> <span class="teal">XYZ</span>( 44.051020645, 
+&nbsp; &nbsp; &nbsp; &nbsp; 80.747278319, 9.842519685 ), 1.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> s3 = <span class="teal">Command</span>.CreateSphereAt(
+&nbsp; &nbsp; &nbsp; creapp, 5 * <span class="teal">XYZ</span>.BasisX, 3.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> s4 = <span class="teal">Command</span>.CreateSphereAt(
+&nbsp; &nbsp; &nbsp; creapp, 10 * <span class="teal">XYZ</span>.BasisY, 5.0 );
+&nbsp;
+&nbsp; &nbsp; PaintSolid( doc, s1, 1.0 );
+&nbsp; &nbsp; PaintSolid( doc, s2, 2.0 );
+&nbsp; &nbsp; PaintSolid( doc, s3, 3.0 );
+&nbsp; &nbsp; PaintSolid( doc, s4, 4.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Some of the resulting spheres look like this in Revit:
+
+<center>
+<img src="img/sphere_avf.png" alt="Spheres displayed using AVF" width="400"/>
+</center>
+
+<p>Next things I am thinking of doing are using a sphere to define a localised geometrical filtered element collector, and also making use of Kean's 
+
+<a href="http://en.wikipedia.org/wiki/Apollonian_gasket">
+Apollonian gasket</a> and
+
+<a href="http://en.wikipedia.org/wiki/Apollonian_sphere_packing">
+sphere packing</a>
+
+<a href="http://apollonian.cloudapp.net">
+web service</a> to 
+
+fill a sphere with solid spheres 
+
+(<a href="http://through-the-interface.typepad.com/through_the_interface/2012/06/cloud-mobile-series-summary.html">project overview</a>).
+
+The latter may not be all that useful in the BIM domain, but fun.

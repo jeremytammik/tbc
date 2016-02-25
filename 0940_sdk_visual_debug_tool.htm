@@ -1,0 +1,117 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+Rudolf Honke 
+AW: Visual debugging 2014
+-->
+
+<h3>Revit 2014 SDK and Visual Debugging Tools</h3>
+
+<p>Two hot topics for today, especially the first:</p>
+
+<ul>
+<li><a href="#2">Updated Revit 2014 SDK</a></li>
+<li><a href="#3">Visual debugging tools</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Updated Revit 2014 SDK</h4>
+
+<p>An updated Revit 2014 SDK is live on the ADN Open
+
+<a href="http://www.autodesk.com/developrevit">Revit developer page</a> now:</p>
+
+<center>
+<a href="http://www.autodesk.com/developrevit" style="text-align:center; font-size:large; font-weight:bold; color:orange; text-decoration:blink;">www.autodesk.com/developrevit</a>
+</center>
+
+<p>This version includes RevitLookup and the AddInManager!</p>
+
+<a name="3"></a>
+
+<h4>Visual Debugging Tools</h4>
+
+<p>Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+Mensch und Maschine acadGraph GmbH</a> discovered
+
+a glitch in the definition of the room solids in one of the standard sample RVT project files.</p>
+
+<p><strong>Rudi says:</strong> When testing VRML exporter with Revit 2014, I noticed that the brand new rac_sample_project.rvt has some inconsistencies.
+
+<p>I export the ClosedShells of the rooms into VRML format to display then in my browser.
+On the left side you see overlapping room volumes from 'Hall' and 'Entry Hall':</p>
+
+<center>
+<img src="img/visual_debugging_1.png" alt="Overlapping room volumes" width="300"/>
+</center>
+
+<p>'Kitchen and dining' has an upper edge that needs to be cut off:</p>
+
+<center>
+<img src="img/visual_debugging_2.png" alt="Upper edge sticks out" width="300"/>
+</center>
+
+<p>'Hall' has two ears protruding into the sky:</p>
+
+<center>
+<img src="img/visual_debugging_3.png" alt="Hall with ears" width="300"/>
+</center>
+
+<p>I noticed this when debugging the funny results my application was producing.</p>
+
+<p>Since it is not the code, I concluded it must be the input that was corrupted…</p>
+
+<p>Without a visual tool like this, it is quite hard to evaluate what's wrong.</p>
+
+<p><strong>Jeremy adds:</strong> You can also observe this using the Export &gt; gbXML command:</p>
+
+<center>
+<img src="img/visual_debugging_4.png" alt="Overlapping room volumes" width="300"/>
+</center>
+
+<p>'Kitchen and dining' has an upper edge that needs to be cut off:</p>
+
+<center>
+<img src="img/visual_debugging_5.png" alt="Upper edge sticks out" width="300"/>
+</center>
+
+<p>'Hall' has two ears protruding into the sky:</p>
+
+<center>
+<img src="img/visual_debugging_6.png" alt="Hall with ears" width="300"/>
+</center>
+
+<p>Furthermore, the Revit 2014 program folder contains a utility named <b>gbXML2dwfx.exe</b>.
+
+<p>If you drag and drop a gbXML file onto this it will create a DWFx file that can be viewed in
+
+<a href="http://usa.autodesk.com/design-review">
+Autodesk Design Review</a>,
+
+the free 2D and 3D DWF viewer, which provides more functionality than many VRML viewers.</p>
+
+<p><strong>Response:</strong> Interesting.
+GbXML2Dwfx.exe appears to be new in Revit 2014.
+
+<p>Regarding the geometry, it is important to note that you cannot rely on geometrical integrity of your Revit Elements.
+
+<p>I faced this problem previously, not only with rooms but also with walls.
+
+<p>Every cut-off and every Boolean operation makes the geometry more complex, and rounding errors may occur.
+
+<p>This totally confirms the GiGo principle of
+
+<a href="http://en.wikipedia.org/wiki/Garbage_in,_garbage_out">
+Garbage in, garbage out</a>,
+
+slightly less helpful than
+
+<a href="http://en.wikipedia.org/wiki/FIFO">
+FiFo</a>...
+

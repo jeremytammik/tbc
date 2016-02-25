@@ -1,0 +1,179 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+C:\a\doc\revit\blog\zip\VCButtonsWithVideoToolTip.zip
+
+http://thebuildingcoder.typepad.com/blog/2012/06/retrieve-embedded-resource-image.html?cid=6a00e553e168978833016767281031970b#comment-6a00e553e168978833016767281031970b
+
+-->
+
+<h3>Video Animated Ribbon Item Tooltip</h3>
+
+<p>We already discussed a number of interesting things you can do with the Revit ribbon and user interface, many inspired by Rudolf Honke's exploration of uses of the .NET 
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a> functionality.
+
+<p>Here is a related contribution by Victor Chekalin, or Виктор Чекалин, fleshed out from his answer to Rudolf's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/retrieve-embedded-resource-image.html?cid=6a00e553e168978833016767281031970b#comment-6a00e553e168978833016767281031970b">
+question on animating a ribbon item tooltip</a>, discussing the retrieval of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/retrieve-embedded-resource-image.html">
+embedded resource images</a>:
+
+<p>It is possible to add your own video to a Revit ribbon button tool tip, and I've found a way to achieve this.</p>
+
+<center>
+<img src="img/VCButtonsWithVideoToolTip.png" alt="Video running in a Revit ribbon item tool tip"/>
+</center>
+
+<p>This can be achieved using the undocumented AdWindows.dll and UIFramework.dll assemblies located in the Revit program folder.
+<p>They provide many interesting classes, as Rudolf Honke already pointed out in his examples using 
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a>.
+
+<p>There is a RibbonToolTip class in the AdWindows.dll assembly. 
+The class provides a property named ExpandedVideo. 
+The next step is to find a class which can contain ToolTip property. 
+This class is Autodesk.Windows.RibbonItem.
+
+<p>So, the idea is to find the correct RibbonItem in the ribbon control and set RibbonToolTip to it.
+
+<p>But here there is the trouble. 
+We can create a PushButton on a Panel using Application.CreatePanel().AddItem(RevitItem) to obtain a Autodesk.Revit.UI.RibbonItem. 
+But we need Autodesk.Windows.RibbonItem.
+
+<p>There are several ways.
+
+<p>The first one &ndash; use RevitControl class and iterate all tabs, panels and buttons and find button by name.
+
+<p>We can get RevitControl instance using static property RibbonControl UIFramework.RevitRibbonControl class.
+
+<p>RibbonControl contains exactly Autodesk.Windows.RibbonItem items not a Autodesk.Revit.UI.RibbonItem. 
+It's look like we need.
+
+<p>Here is the <a href="http://pastebin.com/aXZ6u2nL">code</a> implementing this:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> Autodesk.Windows.<span class="teal">RibbonItem</span> GetRibbonItem( 
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> item )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">RibbonControl</span> ribbonControl 
+&nbsp; &nbsp; &nbsp; = <span class="teal">RevitRibbonControl</span>.RibbonControl;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> tab <span class="blue">in</span> ribbonControl.Tabs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> panel <span class="blue">in</span> tab.Panels )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> ribbonItem 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> panel.Source.Items )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonItem.AutomationName
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == item.Name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> ribbonItem <span class="blue">as</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonItem</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>But there is a second way. 
+The Autodesk.Revit.UI.RibbonItem class has an internal method getRibbonItem which returns Autodesk.Windows.RibbonItem. Interesting. 
+Try to use this method. 
+The reflection helps us.
+
+<p>Here is the <a href="http://pastebin.com/52hVR61d">code</a>:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> Autodesk.Windows.<span class="teal">RibbonItem</span> GetRibbonItem( 
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> item )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Type</span> itemType = item.GetType();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> mi = itemType.GetMethod( <span class="maroon">&quot;getRibbonItem&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">BindingFlags</span>.NonPublic | <span class="teal">BindingFlags</span>.Instance );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> windowRibbonItem = mi.Invoke( item, <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> windowRibbonItem 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> Autodesk.Windows.<span class="teal">RibbonItem</span>;
+&nbsp; }
+</pre>
+
+<p>So, after we get a Autodesk.Windows.RibbonItem we can set RibbonToolTip to it.
+
+<p>For example <a href="http://pastebin.com/XtpKjLYq">like this</a>:
+
+<pre class="code">
+&nbsp; RibbonToolTip toolTip1 = <span class="blue">new</span> RibbonToolTip()
+&nbsp; {
+&nbsp; &nbsp; Title = <span class="maroon">&quot;This is important button1&quot;</span>,
+&nbsp; &nbsp; ExpandedContent = 
+<span class="maroon">@&quot;Here you can see swf video from local file. </span>
+<span class="maroon">The file path is C:/Program Files</span>
+<span class="maroon">/Autodesk/Revit Structure 2013/Program/videos</span>
+<span class="maroon">/GUID-053F3A19-7EFF-48D5-A0FA-AF0C2CC4BD9D-low.swf&quot;</span>,&nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp; &nbsp; ExpandedVideo = <span class="blue">new</span> <span class="teal">Uri</span>( <span class="maroon">&quot;C:/Program Files&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;/Autodesk/Revit Structure 2013/Program/videos&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;/GUID-053F3A19-7EFF-48D5-A0FA&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;-AF0C2CC4BD9D-low.swf&quot;</span> ),
+&nbsp; &nbsp; ExpandedImage = <span class="teal">BitmapSourceConverter</span>
+&nbsp; &nbsp; &nbsp; .ConvertFromImage( <span class="teal">Resources</span>.logoITC_16 )
+&nbsp; };
+</pre>
+
+<p>PROFIT!!!
+
+<p>Also there is a third way to get a Autodesk.Windows.RibbonItem. 
+Create a tab, panel and button directly via RevitControl class. 
+But I didn't find how to set IExtenalCommand to a button.
+
+<p>RevitToolTip.ExpandedVideo supports SWF video. 
+Also I tried a GIF image. 
+The image was shown but didn't animate. 
+Also I tried to set Internet URL. 
+On my computer it doesn't work. 
+Maybe it doesn't work via proxy, or maybe access is denied on video in the internet. 
+Please try and tell me.
+
+<p>To wrap this up, here is the 
+
+<a href="zip/VCButtonsWithVideoToolTip3.zip">
+full source code</a> of 
+
+my solution with test projects displaying video tool tip buttons for both Revit 2012 and 2013.
+
+<p>You may need to re-reference the Revit assemblies to compile them. 
+
+<p>The first button loads a video from Revit Structure 201X\Program\videos. 
+If you have not installed RST you won't see the video on the first button. 
+The second button loads a video from the internet, and the third button loads one from the embedded resources. 
+So everyone should be able to see the video on the Button3.
+
+<p>Hope this information is useful for you.
+
+<p>Many thanks to Victor for exploring and explaining this exciting possibility!
+
+<a name="2"></a>
+
+<h4>Adjusting Beam Cutback</h4>
+
+<p>By the way, here is a yet another topic that I wanted to address for a long time, and now Mikako beat me to it: the FamilyInstance ExtensionUtility property allows you to control the joining, cutback and extension behaviour of beams, columns, girders etc.
+
+Mikako shows how in her discussion and real-world sample on 
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/adjusting-cutback-programmatically-.html">
+adjusting cutback programmatically</a>.</p>
+
+<center>
+<img src="img/extensionutility.png" alt="Girders with cutback and miter joins"/>
+</center>

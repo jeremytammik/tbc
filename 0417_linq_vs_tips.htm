@@ -1,0 +1,260 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Linq Methods and Visual Studio Tips</h3>
+
+<p>Yesterday I completed the Revit API training in Munich, and here are some more interesting tips and tricks that I learned there besides the one I wrote about last on how to set up
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/debugging-in-visual-studio-2010-express.html">
+debugging using Visual Studio 2010 Express</a>:
+
+<ul>
+
+<li>
+Using Intellisense to 
+<a href="#1">
+subscribe to an event</a> and generate the 
+<a href="#1">
+event handler stub implementation</a>.
+
+<li>
+Using Intellisense to 
+<a href="#2">
+generate a using statement with Ctrl + '.'</a>.
+
+<li>
+Linq provides a
+<a href="#3">
+Contains method for an array</a>.
+
+<!--
+<li>
+Using the Linq 
+<a href="#4">
+Aggregate method</a> on a filtered element collector.
+-->
+
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Automatically Subscribing to an Event and Generating the Event Handler Code</h4>
+
+<p>Before describing the new tricks that I learned, let me explain something that I actually knew before and have made quite a lot of use of in my own coding as well as previous trainings: how to use Intellisense to set up a Revit event handler with a minimum of keystrokes and potential errors.
+
+<p>As an example, I will subscribe to the Idling event and implement the event handler stub using exactly seven keystrokes.
+
+<p>Here is some minimal initial code of a newly created external command to use as a starting point:
+
+<pre class="code">
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">namespace</span> RevitAddin
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+&nbsp; [<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Commands</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> a = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<!-- <p>First of all, let's show some other Intellisense functionality, before we get around to highlighting the tip suggested by Alexander. -->
+
+<p>At this point, I wish to subscribe to the UIApplication Idling event.
+I type 'a' followed by '.' and scroll to the Idling entry suggested by the Visual Studio Intellisense:</p>
+
+<center>
+<img src="img/vs_tips_01.png" alt="Visual Studio Intellisense lists UIApplication members"/>
+</center>
+
+<p>After selecting that  by pressing &lt;Tab&gt;, I type '+=' to subscribe to the event, and Intellisense automatically suggest the appropriate handler to attach:</p>
+
+<center>
+<img src="img/vs_tips_02.png" alt="Visual Studio Intellisense suggests pressing &lt;Tab&gt; to create code to attach event handler"/>
+</center>
+
+<p>At this point, I can simply press &lt;Tab&gt; to add the code to subscribe to the event.
+However, I have not yet implemented the handler for it.
+That is perfectly appropriate, since Intellisense can it for me automatically.
+First, here is the result of pressing &lt;Tab&gt; once, with some code generated and a tooltip sugesting that I press &lt;Tab&gt; again to create an event handler skeleton method:</p>
+
+<center>
+<img src="img/vs_tips_03.png" alt="Visual Studio Intellisense suggests pressing &lt;Tab&gt; again to create event handler stub implementation"/>
+</center>
+
+<p>The final result of this operation with some line breaks added to avoid overly long lines looks like this:
+
+<pre class="code">
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">namespace</span> RevitAddin
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+&nbsp; [<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Commands</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> a = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; &nbsp; a.Idling 
+&nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> System.<span class="teal">EventHandler</span>&lt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.UI.Events.<span class="teal">IdlingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a_Idling );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">void</span> a_Idling( 
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.UI.Events.<span class="teal">IdlingEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> System.<span class="teal">NotImplementedException</span>();
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here are the seven keystrokes I made to subscribe to the event and add the handler stub method: 'a', '.', &lt;Tab&gt;, '+', '=', &lt;Tab&gt;, &lt;Tab&gt;.
+
+<a name="2"></a>
+
+<h4>Generating a using Statement with Ctrl + '.'</h4>
+
+
+<p>Here is a tip from Alexander Buschmann of 
+
+<a href="http://www.idat.de">
+IDAT Gmbh</a> to
+
+automatically generate using statements for namespaces that we would like to use.
+
+<p>Previously, when I created a new Revit project, I manually added the references to the Revit API assemblies RevitAPI.dll and RevitAPIUI.dll.
+
+<p>Part of that manual and error prone labour can be easily avoided making use of Augusto's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Revit add-in templates</a>.
+
+Even so, when I was still doing some typing work to add using statements for additional namespaces to the project module.
+For instance, in the situation described above, I would normally want to make the automatically generated event handling code more succinct and readable by removing the explicit namespace prefix 'Autodesk.Revit.UI.Events.' from IdlingEventArgs and adding a 'using' statement for that namespace at the head of the module instead.
+That would involve some copy and paste work, jumping to the top of the file, editing, and navigating back to where I started from.
+
+<p>Alexander now pointed out that if you place the cursor over type the name of a class in the Visual Studio IDE and hit Ctrl + '.', Visual Studio will automatically scan all the project references to determine the namespace providing the class definition and offer to either add the namespace prefix to fully qualify the class name, or add the appropriate using statement for it to the head of the file.
+
+<p>One of the advantages of the latter is that there is no longer any need to jump to the top of the module, type 'using' and add the namespace, and then navigate back to where you came from.
+
+<p>A very neat trick indeed that I was immediately able to use repeatedly during the rest of the training, once Alexander had pointed it out to me.
+
+<p>I can make use of that functionality in the situation above like this:
+
+<ul>
+<li>Delete the namespace prefix from the event handler IdlingEventArgs argument. 
+Note that the class name colour changes from teal to black, since it is now undefined, lacking the namespace prefix and the required using statement.
+<li>Place the cursor over the now undefined IdlingEventArgs class name.
+<li>Press Ctrl + '.'.
+</ul>
+
+<p>At this point, the Visual Studio IDE displays the following Intellisense menu options prompting me to choose whether to fully qualify the class name or add the appropriate using statement for it:</p>
+
+<center>
+<img src="img/vs_tips_04.png" alt="Visual Studio Intellisense suggests adding a namespace prefix or a using statement"/>
+</center>
+
+<p>Pressing &lt;Tab&gt; at this point adds the using statement at the head of the module with no need to jump there and navigate back again.
+
+
+
+
+<a name="3"></a>
+
+<h4>Linq Defines Array.Contains</h4>
+
+<p>At a certain point in the sample code that we were developing together, I wanted to check whether the category of a selected element was contained in a specific list.
+The use case was the implementation of a Revit API selection filter which restricts the interactive selection process to certain structural elements.
+
+<p>To check this, I implemented a list of integer values from the built-in categories I was interested in and instantiated a List&lt;int&gt; from them in order to make use of its Contains method.
+Here is the entire implementation of the selection filter using this approach:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Selection filter allowing only structural elements.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">StructuralSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">static</span> <span class="blue">int</span>[] _categories = <span class="blue">new</span> <span class="blue">int</span>[] {
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralFoundation,
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralFraming
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; _list 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;( _categories );
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &amp;&amp; _list.Contains( 
+&nbsp; &nbsp; &nbsp; &nbsp; e.Category.Id.IntegerValue );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>In this situation, Alexander provided another useful tip by pointing out that the Linq namespace provides a Contains extension method directly for the native array type.
+By adding a 'using System.Linq' statement, we can eliminate the intermediate list helper and use Contains directly on the array instead:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">StructuralSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">static</span> <span class="blue">int</span>[] _categories = <span class="blue">new</span> <span class="blue">int</span>[] {
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralFoundation,
+&nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_StructuralFraming
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &amp;&amp; _categories.Contains( 
+&nbsp; &nbsp; &nbsp; &nbsp; e.Category.Id.IntegerValue );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<!--
+
+<a name="4"></a>
+
+<h4>Using the Linq Aggregate Method on a Filtered Element Collector</h4>
+-->
+
+<p>Many thanks to Alexander for these useful tips!

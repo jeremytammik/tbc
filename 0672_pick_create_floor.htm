@@ -1,0 +1,210 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Pick Corners and Create Floor</h3>
+
+<p>I presented an example demonstrating
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/floor-creation.html">
+floor creation</a> and
+
+pointed out that
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/activate-a-3d-view.html">
+setting a view</a> using 
+
+the ActiveView property cannot be achieved within a transaction.
+
+<p>Ishwar Nagwani, Technical Consultant in our Bangalore organisation, contributed a sample command to create a new a floor which demonstrates both of these aspects in conjunction with the interactive PickBox method to determine the floor corners.
+
+<p>It makes use of the FindElement method, which we have seen in various incarnations to select an element of a given type with a specified name:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Helper function to find an element of </span>
+<span class="gray">///</span><span class="green"> the given type and the name. </span>
+<span class="gray">///</span><span class="green"> For example, use this to find a Reference </span>
+<span class="gray">///</span><span class="green"> or Level with the given name.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Element</span> findElement( 
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="teal">Type</span> targetType, 
+&nbsp; <span class="blue">string</span> targetName )
+{
+&nbsp; <span class="green">// Get the elements of the given type</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( targetType );
+&nbsp;
+&nbsp; <span class="green">// Return first one with the given name</span>
+&nbsp;
+&nbsp; <span class="teal">Element</span> targetElement = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e.Name.Equals( targetName ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; targetElement = e;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> targetElement;
+}
+</pre>
+
+<p>By the way, here is another more succinct implementation to achieve the same thing using generics.
+I first implemented it using the generic First method, which has the disadvantage of throwing an exception if no element matching the requirements is found.
+Luckily, right after the first publication of this, Jon Smith pointed out in a comment below that it can easily be remedied by using FirstOrDefault instead, in which case the implementation is nice and short with no disadvantages at all:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return the first element found of the </span>
+<span class="gray">///</span><span class="green"> specific target type with the given name.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Element</span> FindElement(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">Type</span> targetType,
+&nbsp; <span class="blue">string</span> targetName )
+{
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( targetType )
+&nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">Element</span>&gt;( 
+&nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( targetName ) );
+}
+</pre>
+
+<p>That method is used in the mainline Execute method of the external command to select a level and a plan view to create the floor on, before switching to that view in order to pick the floor corner points:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> External command to create a floor element </span>
+<span class="gray">///</span><span class="green"> by selecting two points in plan view.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Result</span> rc = <span class="teal">Result</span>.Failed;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Get the level for floor</span>
+&nbsp;
+&nbsp; <span class="teal">Level</span> floorLevel = findElement( 
+&nbsp; &nbsp; doc, <span class="blue">typeof</span>( <span class="teal">Level</span> ), <span class="maroon">&quot;Level 1&quot;</span> ) <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+&nbsp; <span class="green">// Get the plan view</span>
+&nbsp;
+&nbsp; <span class="teal">View</span> planView = findElement( 
+&nbsp; &nbsp; doc, <span class="blue">typeof</span>( <span class="teal">View</span> ), <span class="maroon">&quot;Level 1&quot;</span> ) <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp;
+&nbsp; <span class="green">// Set the active view to plan</span>
+&nbsp;
+&nbsp; uidoc.ActiveView = planView;
+&nbsp;
+&nbsp; <span class="green">// Create the floor in transaction</span>
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> tr = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">TransactionStatus</span>.Started 
+&nbsp; &nbsp; == tr.Start( <span class="maroon">&quot;Create Floor&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; PickCreateFloor( uiapp, floorLevel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tr.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tr.RollBack();
+&nbsp;
+&nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>Once the level has been selected and the view has been set, the PickCreateFloor method is called to select the floor type to use, prompt the user to pick two corner points, use those to create the floor profile, and generate the floor element based on that:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _floorTypeName = <span class="maroon">&quot;Generic - 12\&quot;&quot;</span>;
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create a rectangular floor on the given level,</span>
+<span class="gray">///</span><span class="green"> asking the user to interactively specify its </span>
+<span class="gray">///</span><span class="green"> corner points.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Floor</span> PickCreateFloor( 
+&nbsp; <span class="teal">UIApplication</span> uiapp, 
+&nbsp; <span class="teal">Level</span> level )
+{
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> appCreation 
+&nbsp; &nbsp; = uiapp.Application.Create;
+&nbsp;
+&nbsp; <span class="green">// Get a floor type for floor creation,</span>
+&nbsp; <span class="green">// e.g. Generic - 12&quot;</span>
+&nbsp;
+&nbsp; <span class="teal">FloorType</span> floorType = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FloorType</span> ft <span class="blue">in</span> doc.FloorTypes )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( ft.Name.Equals( _floorTypeName ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; floorType = ft;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">PickedBox</span> box = uidoc.Selection.PickBox(
+&nbsp; &nbsp; &nbsp; <span class="teal">PickBoxStyle</span>.Directional,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Click and drag to define two corners of a floor&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// Get the two user selected points on screen</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> first = box.Min;
+&nbsp; <span class="teal">XYZ</span> third = box.Max;
+&nbsp;
+&nbsp; <span class="green">// Build a floor profile for the floor creation</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> second = <span class="blue">new</span> <span class="teal">XYZ</span>( third.X, first.Y, 0 );
+&nbsp; <span class="teal">XYZ</span> fourth = <span class="blue">new</span> <span class="teal">XYZ</span>( first.X, third.Y, 0 );
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> profile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; profile.Append( appCreation.NewLineBound( first, second ) );
+&nbsp; profile.Append( appCreation.NewLineBound( second, third ) );
+&nbsp; profile.Append( appCreation.NewLineBound( third, fourth ) );
+&nbsp; profile.Append( appCreation.NewLineBound( fourth, first ) );
+&nbsp;
+&nbsp; <span class="green">// The normal vector must be perpendicular </span>
+&nbsp; <span class="green">// to the profile</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> normal = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; <span class="blue">return</span> doc.Create.NewFloor( 
+&nbsp; &nbsp; profile, floorType, level, <span class="blue">true</span>, normal );
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/PickCreateFloor.zip">
+PickCreateFloor.zip</a> including 
+
+the complete source code and Visual Studio solution of this command.
+
+<p>Many thanks to Ishwar for sharing this!

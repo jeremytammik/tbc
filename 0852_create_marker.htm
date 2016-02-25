@@ -1,0 +1,67 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Daren Thomas Re: How to display a reference point in the model (for debugging purposes)
+
+-->
+
+<h3>Display a Geometry Debugging Point in the Model</h3>
+
+<p>Here are some pointers from a conversation I had with Daren Thomas on how to display a reference point in the model for debugging purposes that may be on general interest.
+
+<p><strong>Question:</strong> I am playing around with the FindReferencesWithContextByDirection method and would like to display the references found as coloured blobs or something in the model.
+
+<p>How can I achieve this, please?
+
+<p>This question could also be simplified into: how to create an easily visible dot at a 3D point in the model?
+
+<p>Can such a "dot" exist on its own or must it be drawn onto a face? How?
+
+<p>I never really got into actually <b>creating</b> geometry in Revit.
+
+<!-- However, it seems to me that I could use NewCurveByPoints (specifying ReferencePoints) to achieve my goal in a family document. -->
+
+<p><strong>Answer</strong> by Daren: I figured it out on my own now:
+
+<p>I can create a SketchPlane and draw a ModelCurve on it.
+
+<p>Given two points a and b, this 
+
+<a href="http://code.google.com/p/revitpythonshell">
+RevitPythonShell</a>
+
+code will create a green line between them in the 3D view:
+
+<pre class="code">
+  transaction = Transaction(doc)
+  transaction.Start('draw a line')
+  c = XYZ(0, 0, 0)
+  v0 = XYZ(a.X - b.X, a.Y - b.Y, a.Z - b.Z)
+  v1 = XYZ(a.X - c.X, a.Y - c.Y, a.Z - c.Z)
+  plane = Plane(v0.CrossProduct(v1), a)
+  sketchPlane = doc.Create.NewSketchPlane(plane)
+  line = doc.Application.Create.NewLineBound(a, b)
+  doc.Create.NewModelCurve(line, sketchPlane)
+  transaction.Commit()
+</pre>
+
+<p><strong>Answer</strong> by Jeremy: Yes, model lines is probably the simplest way to go.
+
+<p>You need model curves in 3D, and can use detail curves in a 2D view.
+
+<p>The Creator class included in The Building Code samples includes several usage examples implemented in C#.
+It was used to graphically highlight geometry in numerous previous posts, and last updated to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/slab-boundary-revisited.html">
+display the boundaries of a slab</a>.
+
+<p>All it does is package what you describe above nicely, though.
+
+<p>For more complex geometry and transient display, you can also use the analysis visualisation framework AVF.
+It could be used to draw a full 3D sphere as a marker, if you prefer, as I showed when displaying
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/apollonian-packing-of-spheres-via-web-service-and-avf.html">
+Apollonian spheres using AVF</a>.

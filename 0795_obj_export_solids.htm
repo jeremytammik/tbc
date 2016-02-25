@@ -1,0 +1,273 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>OBJ Model Exporter with Multiple Solid Support</h3>
+
+<p>Yesterday, I thought that I had completed my basic 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-colours.html">
+working OBJ exporter</a> implementation 
+
+including colour support.
+
+<p>Rudolf Honke of 
+
+<a href="http://www.acadgraph.de">
+Mensch und Maschine acadGraph GmbH</a> rapidly 
+
+pointed out two important flaws, though.
+
+<p>Before discussing the ensuing OBJ exporter update, here is another little colour related item of Rudolf's:
+
+
+<a name="2"></a>
+
+<h4>Colour Conversion</h4>
+
+<p>Regarding colours, I have another hint.
+
+<p>When assigning a colour to a TextNoteType 'tnt', the required value is an integer.
+
+<p>It can be calculated as follows using a Windows colour input parameter, e.g. Color.Wheat:
+
+<pre class="code">
+<span class="blue">int</span> GetRevitTextColorFromSystemColor( 
+&nbsp; System.Drawing.<span class="teal">Color</span> color )
+{
+&nbsp; <span class="blue">return</span> ( ( (<span class="blue">int</span>) color.R ) * (<span class="blue">int</span>) <span class="teal">Math</span>.Pow( 2, 0 ) 
+&nbsp; &nbsp; + ( (<span class="blue">int</span>) color.G ) * (<span class="blue">int</span>) <span class="teal">Math</span>.Pow( 2, 8 ) 
+&nbsp; &nbsp; + ( (<span class="blue">int</span>) color.B ) * (<span class="blue">int</span>) <span class="teal">Math</span>.Pow( 2, 16 ) );
+}
+</pre>
+
+<p>Here is an example of how it can be used:
+
+<pre class="code">
+&nbsp; <span class="green">// Set Revit text colour from system colour</span>
+&nbsp;
+&nbsp; <span class="blue">int</span> color = GetRevitTextColorFromSystemColor( 
+&nbsp; &nbsp; System.Drawing.<span class="teal">Color</span>.Wheat );
+&nbsp;
+&nbsp; tnt.get_Parameter( <span class="teal">BuiltInParameter</span>.LINE_COLOR )
+&nbsp; &nbsp; .Set( color );
+</pre>
+
+<p>This is of course a completely different issue than the OBJ exporter and its colour support, but for completeness sake...
+
+
+<a name="3"></a>
+
+<h4>Element with Multiple Solids</h4>
+
+<p>The first flaw reported by Rudolf was an error in the colour handling that was easy to fix.
+I went in and updated the sample output image and source code zip file in yesterday's post with the corrected code right away.
+
+<p>Secondly, the basic sample model that I used for testing includes one interesting element that has caused issues in various geometry analysis scenarios several times in the past, the fireplace:
+
+<center>
+<img src="img/obj_export_fireplace.png" alt="Basic sample model fireplace"/>
+</center>
+
+<p>My exporter simply grabs the first non-empty solid it can find, which happens to be the 
+
+<a href="http://en.wikipedia.org/wiki/Cuboid">cuboid</a> mantelpiece.
+
+All the rest of the fireplace is lost, including its chimney and even a section of the wall, leaving a hole in the outer shell of the house.
+
+<p>Exploring the fireplace element geometry in RevitLookup via Add-Ins &gt; Revit Lookup &gt; Snoop Current Selection... &gt; FamilyInstance &gt; Fireplace &gt; Geometry &gt; Objects &gt; GeometryInstance &gt; Symbol geometry &gt; Objects, I see that it contains four different solids:
+
+<center>
+<img src="img/obj_export_fireplace_solids.png" alt="Basic sample model fireplace solids"/>
+</center>
+
+<p>They have the following volumes, areas and number of faces:
+
+<ul>
+<li>220, 304, 11 planar
+<li>15.8, 60, 6 planar + 8 cylindrical
+<li>3.37, 32, 6 planar
+<li>0, 0, 0
+</ul>
+
+<p>As always when dealing with lengths, areas and volumes in built-in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/units">
+Revit database units</a>, 
+
+the area and volume is given in square and cubic feet, respectively.
+
+<p>Starting at the end, the fourth solid is empty and can be ignored.
+The third is presumably the mantelpiece, the only element my initial exporter implementation handled.
+The second is presumably the round chimney, and the first the actual fireplace itself, encompassing the burning chamber and missing wall section.
+
+<p>The exporter mainline that I presented last week was based on the idea of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html#7">
+retrieving a maximum of one single solid per building element</a>.
+
+That assumption simply does not hold for this case.
+
+
+<a name="4"></a>
+
+<h4>Exporting Elements with Multiple Solids</h4>
+
+<p>I therefore replaced the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html#7">
+GetSolid method</a> by
+
+two new methods ExportSolids and ExportSolid, built to export any number of solids per element:
+
+<pre class="code">
+<span class="blue">bool</span> ExportSolid( 
+&nbsp; <span class="teal">IJtFaceEmitter</span> emitter,
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">Solid</span> solid,
+&nbsp; <span class="teal">Color</span> color )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Material</span> m = doc.GetElement(
+&nbsp; &nbsp; &nbsp; face.MaterialElementId ) <span class="blue">as</span> <span class="teal">Material</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Color</span> c = ( <span class="blue">null</span> == m ) ? color : m.Color;
+&nbsp;
+&nbsp; &nbsp; emitter.EmitFace( face, 
+&nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == c) ? _default_color : c );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Export all non-empty solids found for </span>
+<span class="gray">///</span><span class="green"> the given element. Family instances may have </span>
+<span class="gray">///</span><span class="green"> their own non-empty solids, in which case </span>
+<span class="gray">///</span><span class="green"> those are used, otherwise the symbol geometry.</span>
+<span class="gray">///</span><span class="green"> The symbol geometry could keep track of the </span>
+<span class="gray">///</span><span class="green"> instance transform to map it to the actual </span>
+<span class="gray">///</span><span class="green"> project location. Instead, we ask for </span>
+<span class="gray">///</span><span class="green"> transformed geometry to be returned, so the </span>
+<span class="gray">///</span><span class="green"> resulting solids are already in place.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">int</span> ExportSolids( 
+&nbsp; <span class="teal">IJtFaceEmitter</span> emitter,
+&nbsp; <span class="teal">Element</span> e, 
+&nbsp; <span class="teal">Options</span> opt,
+&nbsp; <span class="teal">Color</span> color )
+{
+&nbsp; <span class="blue">int</span> nSolids = 0;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ExportSolid( emitter, doc, solid, color ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ++nSolids;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == nSolids &amp;&amp; <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ExportSolid( emitter, doc, solid, color ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nSolids;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> nSolids;
+}
+</pre>
+
+<p>With the new methods in place, the multiple solids of the single-element fireplace are properly handled.
+The output element count reported now says:</p>
+
+<center>
+<img src="img/obj_export_fireplace_msg.png" alt="Fireplace exported element counts"/>
+</center>
+
+<p>The resulting OBJ output file is significantly more interesting and realistic:</p>
+
+<center>
+<img src="img/obj_export_fireplace_obj.png" alt="Fireplace OBJ model"/>
+</center>
+
+<p>Exporting the entire basic sample model obviously now also produces a different element count:</p>
+
+<center>
+<img src="img/obj_export_basic_model_solids_msg.png" alt="Output element count with multiple solid support"/>
+</center>
+
+<p>The difference to yesterday's counts is enormous, actually, indicating that there were several erroneous areas in the previous export, hopefully resolved by today's various improvements.
+
+<p>The model is looking better and better  :-)</p>
+
+<center>
+<img src="img/obj_export_basic_model_solids_obj.png" alt="OBJ output file with multiple solid support"/>
+</center>
+
+<p>Well, actually, yes, a lot better, because we now see the windows, but also not better at all, because we can't see through them into the house any longer.
+
+<p>Apparently the windows were previously not being exported properly.
+Probably just the window and door frames were exported, and not the glass.
+
+<p>Now the glass is included, and I have (intentionally) not yet done anything to support transparency, creating a dull result and making it impossible to look into the house.
+
+<p>The need to support transparency was actually one of the first things Rudolf pointed out in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html?cid=6a00e553e168978833017742c3ff3f970d#comment-6a00e553e168978833017742c3ff3f970d">
+comment</a> on
+
+the original
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html?cid=6a00e553e168978833017742c3ff3f970d#comment-6a00e553e168978833017742c3ff3f970d">
+exporter considerations</a>,
+
+and now I see how right he was.
+
+<p>Well, here is 
+
+<a href="zip/ObjExport2.zip">
+ObjExport2.zip</a> including
+
+the entire source code, Visual Studio solution and add-in manifest for the updated OBJ exporter version 2 including support for multiple solids per element.
+
+<p>Many thanks to Rudolf for his many suggestions for improvements and prompting me to create this updated version.
+
+<p>I'll have a look at transparency next, and am still looking forward to the exploration of cloud and mobile support for this...
+
+<!--
+<h4>Mingling Triangles and Colours</h4>
+-->
+

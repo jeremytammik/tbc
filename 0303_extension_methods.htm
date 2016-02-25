@@ -1,0 +1,267 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Daren Thomas Re: Wird Revit 2011 eine Zuordnung von Räumen und Böden / Dächern ermöglichen?
+
+-->
+
+<h3>GetPolygon Extension Methods</h3>
+
+<p>Here is a question from Daren Thomas of ETH, the technical university of Z&uuml;rich, that has been sitting around in my inbox for quite a while.
+Daren works in the group
+
+<a href="http://www.gt.arch.ethz.ch">Professur f&uuml;r Geb&auml;udetechnik, Institut f&uuml;r Hochbautechnik</a>.
+
+One area of their research is detailed building energy analysis, and one piece of basic utility functionality required for this analysis are
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+Boolean operations</a> on
+
+the polygonal areas of rooms on different levels.
+
+<p><strong>Question:</strong> We are developing a plug-in for Revit Architecture to perform energy calculations in a building model.
+To do so, we need to read the model with its rooms and the relationships between all their surfaces such as walls, floors, ceilings etc.
+
+<p>We are still working on establishing the relationships between the rooms on one hand and floors and roofs or ceilings on the other.
+Specifically, we would like to determine the intersections areas on a floor of the rooms below and above it.
+You mentioned the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+General Polygon Clipper GPC</a> library,
+
+and that looks like a good starting point, although it does require an additional library with the associated administrative overhead and licensing complications.
+
+<p>Can we use the Revit API determine the room boundaries above and below, like we can for the walls on the sides?
+
+<p><strong>Answer:</strong> Look at the Revit SDK sample
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/roomsroofs-sdk.html">
+RoofsRooms</a>,
+
+and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/crop-3d-view-to-room.html">
+ClosedShell</a> property
+
+on the Room class.
+
+You can also make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/analytical-support-tolerance.html">
+FindReferencesByDirection</a> method.
+
+We suggested some further ideas when looking at the related problems of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+room and wall adjacency</a>,
+
+their
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacent-area.html">
+adjacent areas</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/space-adjacency.html">
+space adjacency</a>.
+
+<p><strong>Response:</strong> Currently we are following the GPC route.
+The library is really fast.
+According to our profiling results, most of the time is being spent in other stuff, unrelated to the polygon clipping.
+I expect to attack the problem from the "Revit-API-only" angle sometime next month, when license issues get more complicated &ndash; at the moment, we need to release a version quickly for students.
+A commercial version is not planned until later.
+
+<p>I will keep you informed if we try the "Revit-API-only" angle and my experiences with it.
+One point that doesn't seem clear after looking at RoofsRooms and GeomUtil.cs is how to find the intersecting area &ndash; this is something the GPC library makes very easy.
+
+<p>The basic algorithm works as follows:
+
+<pre class="code">
+for floor in document:
+  for roomAbove in rooms_with_same_level_as_floor:
+    aboveIntersection = intersect
+      floor.GetPolygon() with roomBelow.GetPolygon()
+
+    if aboveIntersection is not empty:
+      for roomBelow in rooms_with_level_just_below_floor:
+        belowIntersection = intersect
+          aboveIntersection with roomBelow.GetPolygon()
+
+        aboveIntersection = difference of
+          aboveIntersection and belowIntersection
+
+        if belowIntersection is not empty:
+          => roomAbove and roomBelow share
+            belowIntersection of floor
+
+      if aboveIntersection is not empty:
+        => roomAbove has the remaining bits of
+          aboveIntersection of floor all to itself
+</pre>
+
+<p>Note: this algorithm has not been optimized for performance yet, but profiling indicates so far, that it is not a bottleneck and thus negligible for the moment.
+
+<p>I'm not quite sure if the exact C# code is of interest to you, as it works on an abstract building model that is not Revit specific.
+I wouldn't mind sharing some nifty stuff with
+
+<a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx">
+Extension Methods</a> &ndash;
+
+a new technology in C# 3.0 that I find especially useful for working with plug-in APIs, as subclassing cannot be used to add functionality to types:
+
+<pre class="code">
+<span class="blue">internal</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">RevitFloorExtensions</span>
+{
+&nbsp; <span class="blue">internal</span> <span class="blue">static</span> <span class="teal">Polygon</span> GetPolygon(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Floor</span> floor )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// code copied from here:</span>
+&nbsp; &nbsp; <span class="green">// http://thebuildingcoder.typepad.com/blog/2009/02/</span>
+&nbsp; &nbsp; <span class="green">// boolean-operations-for-2d-polygons.html</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> geomOptions
+&nbsp; &nbsp; &nbsp; = floor.Document.Application
+&nbsp; &nbsp; &nbsp; &nbsp; .Create.NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = floor.get_Geometry( geomOptions );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> vertices = <span class="blue">new</span> List();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> obj <span class="blue">in</span> elem.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Face</span> face = solid.Faces.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">EdgeArray</span> loop = face.EdgeLoops.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> edgePts = edge.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = edgePts.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = edgePts.get_Item( i );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertices.Add( <span class="blue">new</span> <span class="teal">Vertex</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.X * Constant.FeetToMeter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.Y * Constant.FeetToMeter ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">var</span> vertexList = <span class="blue">new</span> <span class="teal">VertexList</span>{
+&nbsp; &nbsp; &nbsp; NofVertices = vertices.Count,
+&nbsp; &nbsp; &nbsp; Vertex = vertices.ToArray() };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> result = <span class="blue">new</span> <span class="teal">Polygon</span>();
+&nbsp; &nbsp; result.AddContour( vertexList, <span class="blue">false</span> );
+&nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; }
+}
+</pre>
+
+<p>The above code allows me to go floor.GetPolygon() &ndash; just syntactic sugar, but practical nonetheless.
+
+<p>Here is an equivalent method for rooms:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieves a polygon describing the room boundaries.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">Polygon</span> GetPolygon( <span class="blue">this</span> <span class="teal">Room</span> room )
+{
+&nbsp; <span class="blue">var</span> result = <span class="blue">new</span> <span class="teal">Polygon</span>();
+&nbsp; <span class="blue">var</span> vertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Vertex</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegmentArray</span> bsa <span class="blue">in</span> room.Boundary )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> bs <span class="blue">in</span> bsa )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> revitWall = bs.Element <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( revitWall == <span class="blue">null</span> ) <span class="blue">continue</span>; <span class="green">// ignore non-walls here</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> X = bs.Curve.get_EndPoint( 0 ).X
+&nbsp; &nbsp; &nbsp; &nbsp; * Constant.FeetToMeter;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> Y = bs.Curve.get_EndPoint( 0 ).Y
+&nbsp; &nbsp; &nbsp; &nbsp; * Constant.FeetToMeter;
+&nbsp;
+&nbsp; &nbsp; &nbsp; vertices.Add( <span class="blue">new</span> <span class="teal">Vertex</span>( X, Y ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">var</span> vertexList = <span class="blue">new</span> <span class="teal">VertexList</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; NofVertices = vertices.Count,
+&nbsp; &nbsp; &nbsp; Vertex = vertices.ToArray()
+&nbsp; &nbsp; };
+&nbsp; &nbsp; result.AddContour( vertexList, <span class="blue">false</span> );
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p>Using these, reading the area of a polygon intersection can be done like this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Calculates the area of a polygon. See:</span>
+<span class="gray">///</span><span class="green"> http://mathworld.wolfram.com/PolygonArea.html</span>
+<span class="gray">///</span><span class="green"> A GpcWrapper polygon is made up of one or more </span>
+<span class="gray">///</span><span class="green"> contours.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">internal</span> <span class="blue">static</span> <span class="blue">double</span> CalculateArea(
+&nbsp; <span class="blue">this</span> <span class="teal">Polygon</span> polygon )
+{
+&nbsp; <span class="blue">double</span> area = 0.0;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; polygon.NofContours; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( polygon.ContourIsHole[i] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; area -= <span class="teal">Math</span>.Abs(
+&nbsp; &nbsp; &nbsp; &nbsp; polygon.Contour[i].CalculateArea() );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; area += <span class="teal">Math</span>.Abs(
+&nbsp; &nbsp; &nbsp; &nbsp; polygon.Contour[i].CalculateArea() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> area;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Calculates the area of a polygon. See:</span>
+<span class="gray">///</span><span class="green"> http://mathworld.wolfram.com/PolygonArea.html</span>
+<span class="gray">///</span><span class="green"> A GpcWrapper contour is what would generally </span>
+<span class="gray">///</span><span class="green"> be called a polygon.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">internal</span> <span class="blue">static</span> <span class="blue">double</span> CalculateArea(
+&nbsp; <span class="blue">this</span> <span class="teal">VertexList</span> contour )
+{
+&nbsp; <span class="blue">double</span> accumulator = 0.0;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; contour.NofVertices; i++ )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> x1 = contour.Vertex[i].X;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> x2 = contour.Vertex[( i + 1 )
+&nbsp; &nbsp; &nbsp; % contour.NofVertices].X; <span class="green">// wrap around</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> y1 = contour.Vertex[i].Y;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> y2 = contour.Vertex[( i + 1 )
+&nbsp; &nbsp; &nbsp; % contour.NofVertices].Y; <span class="green">// wrap around</span>
+&nbsp;
+&nbsp; &nbsp; accumulator += x1 * y2;
+&nbsp; &nbsp; accumulator -= x2 * y1;
+&nbsp; }
+&nbsp; <span class="blue">return</span> accumulator / 2;
+}
+</pre>
+
+<p>This allows me to perform operations like the ones required in the pseudocode listed above, such as 'belowIntersection.CalculateArea()' &ndash; it is especially this functionality that I believe will be rather tricky to implement in the pure Revit API.
+
+<h4>Holidays</h4>
+
+<p>I am going on vacation to Andalusia tomorrow for the next ten days, so I will probably not be posting any more until March.
+I wish you all a wonderful time and hope that you will have many pleasant, exciting and illuminating Revit API adventures while I take some time off from them.

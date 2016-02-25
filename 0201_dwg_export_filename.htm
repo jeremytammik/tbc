@@ -1,0 +1,127 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1252478 [Defining filename in dwg eksport from Revit]
+
+-->
+
+<h3>DWG Export Filename</h3>
+
+<p>Here is a question handled by Joe Ye that I thought might be of general interest.</p>
+
+<p>It makes use of the Revit SDK sample ImportExport converted to VB.NET.
+We mentioned the issue of converting Revit SDK samples from C# to VB in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/vb-samples-and-other-questions.html#2">
+one post</a>,
+
+and Adam Nagy later presented a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/porting-from-c-to-vbnet.html">
+more complete port</a>. 
+
+<p><strong>Question:</strong>
+I am making an application to export Revit views to DWG files.
+I used the ImportExport sample converted to VB.NET as a basis.
+I am having trouble defining filenames other than the built-in solution. 
+The syntax for defining the DWG filename for a given view seems to be:</p>
+
+<pre>
+[FileName] & " - " & [ViewType] & " - " & [ViewName] 
+</pre>
+
+<p>The filename can be changed, but the other substrings seem to be hardcoded, or at least I can't find where they are defined. 
+I would like the FileName and ViewType substrings to be optional and maybe replaced by some other project defined prefix. 
+Is this possible through the API?</p>
+
+<p>If not, a workaround could be to rename the DWG files afterwards, but I hope to avoid that.</p>
+ 
+<p><strong>Answer:</strong>
+In this case, you are using one of the overloads of the Export method taking four arguments, the fourth of which specifies the type of export required. 
+The first three are folder, name, and views:</p>
+
+<ul>
+<li>folder: the output folder into which the files will be exported.
+<li>name: either the name of a single file or a prefix for a set of files. If null or empty, automatic naming will be used.
+<li>views: a selection of views to be exported. If null or empty, only the active view will be exported.
+</ul>
+
+<p>As the documentation says, the exported DWG file name is in fact generated using a hardcoded algorithm inside Revit if the view set contains more than one single element.
+
+<p>If only one view is specified, then the filename string constructed from three substrings provided by specific variables is used. 
+It is defined in the module ExportData.vb, in the Initialize function:</p>
+
+<pre class="code">
+<span class="blue">Private</span> <span class="blue">Sub</span> Initialize()
+&nbsp; <span class="green">' The directory into which the file will be exported </span>
+&nbsp; <span class="blue">Dim</span> dllFilePath <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; = Assembly.GetExecutingAssembly().Location
+&nbsp;
+&nbsp; m_exportFolder = Path.GetDirectoryName(dllFilePath)
+&nbsp;
+&nbsp; <span class="green">' The file name to be used by export </span>
+&nbsp; <span class="blue">Dim</span> docTitle <span class="blue">As</span> <span class="blue">String</span> = m_activeDoc.Title
+&nbsp;
+&nbsp; <span class="blue">Dim</span> v <span class="blue">As</span> View = m_activeDoc.ActiveView
+&nbsp;
+&nbsp; <span class="blue">Dim</span> viewName <span class="blue">As</span> <span class="blue">String</span> = v.Name
+&nbsp; <span class="blue">Dim</span> viewType <span class="blue">As</span> <span class="blue">String</span> = v.ViewType.ToString()
+&nbsp;
+&nbsp; m_exportFileName = docTitle _
+&nbsp; &nbsp; + <span class="maroon">&quot;-&quot;</span> + viewType _
+&nbsp; &nbsp; + <span class="maroon">&quot;-&quot;</span> + viewName _
+&nbsp; &nbsp; + <span class="maroon">&quot;.&quot;</span> + getExtension().ToString()
+&nbsp;
+&nbsp; <span class="green">' Whether current active view is 3D view </span>
+&nbsp;
+&nbsp; <span class="blue">If</span> v.ViewType = Enums.ViewType.ThreeD <span class="blue">Then</span>
+&nbsp; &nbsp; m_is3DView = <span class="blue">True</span>
+&nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; m_is3DView = <span class="blue">False</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre> 
+
+<p>Therefore, you can easily make FileName and ViewType optional or replace them by some other prefix. 
+Simply change the string values in the definition of m_exportFileName as you please, for instance like this:</p>
+
+<pre class="code">
+m_exportFileName = docTitle + "-" + “aaaa” + “.” + getExtension().ToString
+</pre> 
+
+<p>Note that changes to the specified filename have no effect if more than one view is given in the third argument to the Export method.
+
+<!-- <p>If nore than on view is passed in, changes to the string values have no effect, and docTitle + ViewType + ViewName are always used. -->
+
+If the third argument includes more than one view, Revit will automatically name each exported DWG file using a hard-coded rule including the second argument to the Export method as a prefix. 
+If the third argument includes just one single view, then the file name passed in is used. 
+So the workaround to use your own naming rule is to export only one view at a time.
+In case of multiple views, you can export them one by one in a loop. 
+
+<!-- 
+
+<p>I just discovered that it works if you select current view only. 
+Not if you select multiple views/sheets. 
+In our application I have removed the the current view option. 
+
+<p>If only the current view is exported, there is one view in the third argument of Export() method. 
+So it can use the name we specified through the second argument. 
+
+-->
+
+<p>This information obviously also applies to the other overloads of the Export method taking a ViewSet argument, including export to:
+
+<ul>
+<li>DGN
+<li>DWF2D
+<li>DWF3D
+<li>DWFX2D
+<li>DWFX3D
+<li>DWG
+<li>FBX
+</ul>
+
+<p>Thank you very much Joe for this answer!

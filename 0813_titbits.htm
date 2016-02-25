@@ -1,0 +1,151 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Titbits of the Week</h3>
+
+<p>Here are a couple of things to round off this warm week (a least here) that I think might be of interest to us all:
+
+<ul>
+<li><a href="#2">Identical document GUIDs</a>
+<li><a href="#3">Journal file path</a>
+<li><a href="#4">Opening a background document</a>
+<li><a href="#5">Creating a perspective view</a>
+</ul>
+
+
+<a name="2"></a>
+
+<!-- Miroslav Schonauer Re: How do you access a model's GUID or UniqueId using the Revit API? -->
+
+<h4>Identical Document GUIDs</h4>
+
+<p>Every Revit document now has a GUID, which can be retrieved from the UniqueId property on the ProjectInformation singleton class.
+
+<p>It would be very useful if that could be used to reliably and uniquely distinguish and identify documents.
+
+<p><strong>Question:</strong> Unfortunately, under certain circumstances, different documents sometimes have the same GUID.
+
+<p>How can that be?
+
+<p><strong>Answer:</strong> Here are some possible treatments of the documents that could cause this:
+
+<ul>
+<li>They were 'saved as'.
+<li>They were created from the same template.
+<li>They were copied as RVT files using the underlying operating system functionality.
+</ul>
+
+<p>This is actually pretty obvious, when you think of it, and as-designed. 
+The same behaviour is exhibited by any conceivable unique id.
+
+<p>This is not really a Revit API problem, either. 
+The behaviour would be the same with any other file type.
+
+<p>If you need to identify documents uniquely, one possible thing to do is to add a hidden shared parameter or some extensible storage data to the project info element and store a custom GUID there yourself.
+Even in this case, the same problem will occur unless you are in complete control of each and every document to start with. 
+
+<p>If you require a document management solution, you can have a look at 
+
+<a href="http://www.autodesk.com/vault">
+Vault</a>  :-)
+
+
+<a name="3"></a>
+
+<!-- Dante van Wettum Re: Journal folder in API -->
+
+<h4>Journal File Path</h4>
+
+<p><strong>Question:</strong> Is there a way in the API to retrieve the path to the journals folder?
+
+<p>This is the default location for Revit Structure:
+
+<ul>
+<li>C:\Users\USERNAME\AppData\Local\Autodesk\Revit\Autodesk Revit Structure 2013\Journals
+</ul>
+
+<p>Note that this is not the location in the same folder hierarchy as the Revit executable Revit.exe file.
+
+<p>I would like to create a tool that handles deletion of old journal files, to recover the wasted space.
+
+<p><strong>Answer:</strong> I ended up using this for now:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( RevitProduct product <span class="blue">in</span> 
+&nbsp; &nbsp; RevitProductUtility
+&nbsp; &nbsp; .GetAllInstalledRevitProducts() )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( product.Version == RevitVersion.Revit2013 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = product.Product.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">&quot;Revit&quot;</span>, <span class="maroon">&quot;&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; s.Length ) 
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot; &quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}\\Autodesk\\Revit\\&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Autodesk Revit {1}2013\\Journals\\&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Environment</span>.GetFolderPath(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Environment</span>.<span class="teal">SpecialFolder</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .LocalApplicationData ),
+&nbsp; &nbsp; &nbsp; &nbsp; s );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<!-- <p>This has not been tested with Revit MEP or the design suite. -->
+
+<p>You can use standard .NET functionality to check whether a path exists, e.g. File.Exists and Directory.Exists from the System.IO namespace.
+
+
+
+
+
+<a name="4"></a>
+
+<!-- Martin Schmid, Steven Mycynek RE: Reading from a 'side' Database -->
+
+<h4>Opening a Background Document</h4>
+
+<p><strong>Question:</strong> Is it possible to open a 'background' document, also known as a 'side database'?
+
+<p>For example, consider the following scenario:
+
+<ol>
+<li>Have a model open, e.g. A.rvt.
+<li>Open a second model, e.g. B.rvt, with no views open. As far as the user is concerned, there is no sign of the second model being open.
+<li>Read information from B.rvt, and do something interesting with the information in A.rvt.
+<li>Maybe even modify B.rvt?
+</ol>
+
+<p>A simple example might do something like determine from B.rvt that it contains an instance of a certain family F. 
+If F does not exist in A.rvt, it would load it in, essentially copying it from B.rvt, without the user ever seeing or knowing that B.rvt had been opened.
+
+<p><strong>Answer:</strong> Sure, this can easily be achieved.
+
+<p>Simply use Application.OpenDocumentFile, as opposed to UIApplication.OpenAndActivateDocument. 
+
+<p>The former method will open the document at the DB-level without creating a UI document frame, which is just what you want.   
+You could then call Document.LoadFamily to copy the family.  
+Just be sure to close the DB document when you are done.
+
+
+
+
+<a name="5"></a>
+
+<!-- Miroslav Schonauer, Steven Mycynek RE: View3D: Create as or change to *Perspective*? -->
+
+<h4>Creating a Perspective View</h4>
+
+<p><strong>Question:</strong> Is it possible to programmatically create a <b>perspective</b> View3D?
+
+<p><strong>Answer:</strong> Sure.
+Use the static View3D.CreatePerspective method.
+

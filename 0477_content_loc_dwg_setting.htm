@@ -1,0 +1,97 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1263317 [How to fetch DWG Settings option.]
+1263240 [Content location in Revit]
+
+-->
+
+<h3>Reading DWG Settings and Content Location from INI File</h3>
+
+<p>Autumn is here in full now, grey and wet outside. 
+The beautiful yellow leaves are turning brown and soggy.  
+We had a wonderful sunny weekend, though, and I lay on the grass in the sunshine watching the distant mountains yesterday...
+
+<p>In a completely different vein, today is the final day for submitting the Autodesk University material!
+I'm still not completely done...
+
+<p>Meanwhile, here are two quick cases handled by Joe Ye quite a while back which both ended up resorting to reading data from the Revit INI file:
+
+<ul>
+<li><a href="#1">DWG settings</a>.
+<li><a href="#2">Content location</a>.
+</ul>
+
+<a name="1"></a>
+<h4>DWG Settings</h4>
+
+<p><strong>Question:</strong> I am exporting a Revit model to DWG and IFC format. 
+Before exporting, I need to fetch the settings option. 
+Is it possible to fetch the Revit DWG and IFC export settings option thru API? 
+
+<p><strong>Answer:</strong> Revit doesn’t expose any API to retrieve the DWG or IFC export setting options.
+However, the current option file name being used is saved in Revit.ini file.
+For example, here are the setting option filenames stored in my version of RAC 2011:
+
+<pre>
+ExportLayersNameDWG=..\..\..\..
+  \ProgramData\Autodesk\RAC 2011
+  \exportlayers-dwg-CP83.txt
+
+ExportToClassIFC=..\..\..\..
+  \ProgramData\Autodesk\RAC 2011
+  \exportlayers-ifc-IAI.txt
+
+ExportLayersNameDGN=..\..\..\..
+  \ProgramData\Autodesk\RAC 2011
+  \exportlayers-dgn-BS1192.txt
+</pre>
+
+<p>As the names indicate, ExportLayersNameDWG is for DWG, ExportToClassIFC for IFC, and ExportLayersNameDGN for the DGN export settings.
+
+<p>The Revit.ini file is always located in the same folder as the executable Revit.exe itself. 
+If Revit was installed using the default path settings, this folder is C:\Program Files\Autodesk\Revit Architecture 2011\Program.
+
+<p>You can read the settings using the standard .NET file content reading API.
+
+<a name="2"></a>
+<h4>Content Location</h4>
+
+<p><strong>Question:</strong> I am wondering if there are is way for me to find out where the content (families etc.) is placed on computers with any Revit 2011 version? 
+
+<p>When I looked for the installation location of the Revit application, there were six different registry keys that I could look for, depending on the version (Architecture, 
+Structure, MEP) and 32/64 bit.
+
+<p>I am interested in installing my families to the correct location, in the same place as the other content. 
+
+<p><strong>Answer:</strong> The family library path can be retrieved from the Revit.ini configuration file in each product’s Program folder.
+Here are the settings providing the family library path (they are all in one single long line in the Revit.ini file):
+
+<h5>RAC2011</h5>
+
+<pre>
+DataLibraryLocations
+  =Imperial Library=C:\ProgramData
+    \Autodesk\RAC 2011\Imperial Library
+  ,Imperial Detail Library=C:\ProgramData
+    \Autodesk\RAC 2011\Imperial Library
+    \Detail Components
+</pre>
+
+<h5>RST2011</h5>
+
+<pre>
+DataLibraryLocations
+  =Imperial Library=C:\ProgramData
+    \Autodesk\RST 2011\Imperial Library
+  ,Imperial Detail Library=C:\ProgramData
+    \Autodesk\RST 2011\Imperial Library
+    \Detail Components
+</pre>
+
+<p>Retrieving the family library path from the Revit.ini configuration file should be independent of the Revit flavour and the 32 or 64 bit OS version.
+
+<p>Many thanks to Joe for these suggestions.

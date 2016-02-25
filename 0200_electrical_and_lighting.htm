@@ -1,0 +1,192 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+  1251610 [Reading/writing Electrical Settings > Distribution Systems]
+  C:\a\j\adn\case\bsd\1251610\1251610.txt
+
+  1251592 [Lighting Fixture]
+  C:\a\j\adn\case\bsd\1251592\1251592.txt
+
+-->
+
+<h3>Electrical Settings and Lighting Fixtures</h3>
+
+<p>Here are two recent questions on
+
+<a href="#1">
+electrical settings of distribution systems</a>
+
+and
+
+<a href="#2">
+family instances for lighting fixtures</a>
+
+handled by Saikat Bhattacharya and Joe Ye, respectively.</p>
+
+<p>By the way, this is a special occasion, namely the 200<sup>th</sup> post to The Building Coder.
+I will resist the temptation to declare this as a birthday post like I did 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/utilizing-revit-api-resources.html">
+post number 100</a>,
+
+because the first real annual birthday of The Building Coder is coming up quite soon now anyway, and we don't want to exaggerate, do we?</p>
+
+<a name="1"></a>
+
+<h4>Reading and Writing the Electrical Settings of Distribution Systems</h4>
+
+<p><strong>Question:</strong>
+Is there any way to use the Revit API to read and write the data under Electrical Settings, e.g. the Distribution System rows?</p>
+
+<p><strong>Answer:</strong>
+To do a quick check, I used the RvtMgdDbg tool and found out that the active document contains a DistributionSysType container which lists all the distribution systems available from the user interface.
+Here are the electrical settings displayed in the user interface:</p>
+
+<center>
+<img src="img/electrical_settings.jpg" alt="Electrical Settings"/>
+</center>
+
+<p>Here, we have selected the DistributionSysType instance using
+
+RvtMgdDbg
+
+to show the same information as the user interface as accessed through the API:</p>
+
+<center>
+<img src="img/electrical_settings2.jpg" alt="DistributionSysType in RvtMgdDbg"/>
+</center>
+
+<p>Thus, the DistributionSysType class might be what you looking for.</p>
+
+<a name="2"></a>
+
+<h4>Creating Hosted Family Instances for Lighting Fixtures</h4>
+
+<p><strong>Question:</strong>
+I am loading a batch of lighting fixtures using .NET but I am having some issues.
+
+I programmatically set the host to be the ceiling by using parameters showing that the host is the ceiling when the fixture is loaded.
+However, the properties of the resulting fixture do not reflect this.
+
+Also, the fixture created cannot be copied.
+
+In sum, the properties of the fixtures are not the same as the properties of a fixture created manually and inserted by Revit itself.
+
+I used the following code to load the fixture:
+
+<pre>
+FamilyInstance inst
+  = doc.Create.NewFamilyInstance(
+    location, symbol, ceil,
+    StructuralType.NonStructural );
+</pre>
+
+<p>In this call, location is the location of the fixture.
+I set its Z coordinate to zero in order to inherit the host elevation, but this does not work.
+Symbol is the family symbol to be inserted, and ceil the selected host ceiling.</p>
+
+<p><strong>Answer:</strong>
+I reproduced the issue.
+Using your method, I found the created light fixture is located above the ceiling, although the Z elevation is the same.
+The host property is null, as is the parameter value of HOST_ID_PARAM.
+So I think the issue is caused by the level setting.</p>
+
+I changed the code to use another override of NewFamilyInstance, which takes the level as an argument:
+
+<pre>
+Document.NewFamilyInstance(
+  XYZ,
+  FamilySymbol,
+  Element,
+  Level,
+  StructuralType )
+</pre>
+
+<p>The lighting fixture now has a valid host property. Here is the updated code for the Execute method of the external command:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="green">// get a lighting fixture family symbol:</span>
+&nbsp;
+<span class="teal">Filter</span> f1 = cf.NewTypeFilter(
+&nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+<span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_LightingFixtures );
+&nbsp;
+<span class="teal">Filter</span> f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; symbols = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+doc.get_Elements( f, symbols );
+&nbsp;
+<span class="teal">FamilySymbol</span> sym = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> elem <span class="blue">in</span> symbols )
+{
+&nbsp; sym = elem <span class="blue">as</span> <span class="teal">FamilySymbol</span>; <span class="green">// get the first one.</span>
+&nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == sym )
+{
+&nbsp; message = <span class="maroon">&quot;No lighting fixture symbol found.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// pick the ceiling:</span>
+&nbsp;
+doc.Selection.StatusbarTip
+&nbsp; = <span class="maroon">&quot;Please select ceiling to host lighting fixture&quot;</span>;
+&nbsp;
+doc.Selection.PickOne();
+&nbsp;
+<span class="teal">Element</span> ceiling = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> elem <span class="blue">in</span> doc.Selection.Elements )
+{
+&nbsp; ceiling = elem <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="green">// get the level 1:</span>
+&nbsp;
+<span class="teal">ElementIterator</span> it = doc.get_Elements(
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+&nbsp;
+<span class="teal">Level</span> level = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">while</span>( it.MoveNext() )
+{
+&nbsp; level = it.Current <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( level.Name.Equals( <span class="maroon">&quot;Level 1&quot;</span> ) )
+&nbsp; &nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == level )
+{
+&nbsp; message = <span class="maroon">&quot;Level 1 not found.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// create the family instance:</span>
+&nbsp;
+<span class="teal">XYZ</span> p = app.Create.NewXYZ( -43, 28, 0 );
+&nbsp;
+<span class="teal">FamilyInstance</span> instLight
+&nbsp; = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; p, sym, ceiling, level,
+&nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>Thank you very much Joe and Saikat for these answers!

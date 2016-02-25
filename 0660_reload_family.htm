@@ -1,0 +1,41 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1271540 [loading families] -->
+
+<h3>Reloading a Family Again</h3>
+
+<p>We recently listed a whole set of questions that might arise when 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html">
+reloading a family</a>.
+
+Here is some additional clarification by Saikat Bhattacharya on this topic that may still not be obvious:
+
+<p><strong>Question:</strong> I implemented an external command that loads a family and all its symbols.
+The first time I run it in a new project the family is loaded correctly.
+When I rerun it a second time to reload the family, the command returns a null reference for it. 
+I can understand this behaviour since the family is already loaded in the project. 
+But shouldn't the API throw an exception for me to know that it is already loaded? 
+
+<p><strong>Answer:</strong> The behaviour you describe is correct and expected. 
+In case you wish to find out if a family has already been loaded, you can retrieve all the loaded families and check if the one you wish to load is already present or not. 
+If it is already loaded, you can avoid loading it again. 
+We looked at an example of implementing this for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/creating-and-inserting-an-extrusion-family.html">
+creating and inserting an extrusion family</a>.
+
+<p><strong>Question:</strong> I also tried to use the options provided by the IFamilyLoadOptions interface.
+In this case, my command still behaves exactly as before: it works perfectly when loading the family into a blank project, but returns a null reference to the family when it is already present and I try to reload it, just as if I was not using the FamilyLoadOptions at all. 
+Shouldn't the fact that I return true from my implementation of the IFamilyLoadOptions OnFamilyFound method allow me to load the same family multiple times, each time replacing the previous version?
+
+<p><strong>Answer:</strong> The behaviour you describe is again as expected. 
+The IFamilyLoadOptions interface will only allow a family to be reloaded if it has been modified. 
+
+<p>If a given family is not loaded, the implementation of this interface is never triggered, and the OnFamilyFound method will not be called. 
+
+<p>If the family is already loaded and unchanged, this function will not to do anything, so the IFamilyLoadOptions methods will not be called, just as you describe.
+
+<p>Many thanks to Saikat for the explanation!

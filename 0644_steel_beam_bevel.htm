@@ -1,0 +1,251 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06668640 [Cutting beams with reference planes] -->
+
+<h3>Bevelled Steel Beams</h3>
+
+<p>I recently mentioned a couple of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">
+options for performing Boolean operations</a>.
+
+Here is another question which initially seemed related to that, from Simon Jones of Autodesk UK, on creating a 
+
+<a href="http://en.wikipedia.org/wiki/Miter_joint">
+mitre joint</a> between 
+
+steel beams, i.e. 
+
+<a href="http://en.wikipedia.org/wiki/Bevel">
+bevelling</a> the 
+
+two parts to be joined.
+It turns out to have a satisfyingly simple and automatic answer with no need for any explicit Boolean operations after all.
+
+<p>Simon returned to a technical role in consulting after a period as Technical Sales Manager of Autodesk UK.
+Even in his non-technical role, he always remained very interested and productive in technical aspects as well, for instance creating the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/uk-electrical-schedule-sample.html">
+UK Electrical Schedule Sample</a> before
+
+the introduction of the electrical panel schedule API in Revit 2011.
+
+<p><strong>Question:</strong> Through the user interface, it is possible to cut back the end of a beam at an angle using the Cut tool and selecting a reference plane.
+
+<p>Within the API I see there is a SolidSolidCutUtils class but I can't find anything to cut a solid using a reference plane.
+
+<p>Is this possible in the Revit Structure 2011 API? 
+Or is there any other way of trimming back a beam?
+
+<p>What I actually wish to achieve is to enable a better workflow for creating steel staircases in RST2011.
+
+<p>One solution I'm considering is automating the creation of a structural frame to represent the stair stringers, treads and landing. Something that can be done manually but not very efficiently!
+
+<p>I saw the SolidSolidCut utility but didn't think this could help me as I want to edit beams within a project.
+
+<p><strong>Answer:</strong> As I mentioned, there are a number of ways of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">
+performing Boolean operations</a> in 
+
+the Revit API.
+
+All of the options performing a Boolean operation in the project environment place a significant burden on the project, so the optimal approach is definitely to apply the cut in the family context, especially if it is something like a standard operation to shorten or add an angle to all the beam ends.
+
+
+<p><strong>Response:</strong> It actually worked out much easier than I was expecting.
+If the beam endpoints touch, Revit cleans them up on its own accord:</p>
+
+<center>
+<img src="img/beam_cleanup.png" alt="Automatic beam cleanup in Revit Structure"/>
+</center>
+
+<p><strong>Answer:</strong> I used Simon's sample code to create a new external command CmdSteelStairBeams for The Building Coder samples.
+
+<p>Simon encapsulated the beam creation functionality in an own prototyping class named SteelStairs.
+It defines the following helper method CreateBeam to implement the beam creation:
+
+<pre class="code">
+<span class="teal">FamilyInstance</span> CreateBeam( 
+&nbsp; <span class="teal">FamilySymbol</span> familySymbol,
+&nbsp; <span class="teal">Level</span> level,
+&nbsp; <span class="teal">XYZ</span> startPt, 
+&nbsp; <span class="teal">XYZ</span> endPt )
+{
+&nbsp; <span class="teal">StructuralType</span> structuralType 
+&nbsp; &nbsp; = <span class="teal">StructuralType</span>.Beam;
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = _doc.Application.Create.NewLineBound( 
+&nbsp; &nbsp; startPt, endPt );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> beam = _doc.Create
+&nbsp; &nbsp; .NewFamilyInstance( startPt, familySymbol, 
+&nbsp; &nbsp; &nbsp; level, structuralType );
+&nbsp;
+&nbsp; <span class="teal">LocationCurve</span> beamCurve 
+&nbsp; &nbsp; = beam.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != beamCurve )
+&nbsp; {
+&nbsp; &nbsp; beamCurve.Curve = line;
+&nbsp; }
+&nbsp; <span class="blue">return</span> beam;
+}
+</pre>
+
+<p>This helper method is called by the main Run method to create a series of three connected steel beams between four hard-wired 3D points in the XZ plane, with Y equal to zero:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> Run()
+{
+&nbsp; <span class="teal">View</span> view = _doc.ActiveView;
+&nbsp;
+&nbsp; <span class="teal">Level</span> level = view.GenLevel;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == level )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;No level associated with view&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> pt1 = <span class="teal">Util</span>.MmToFoot( <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 1000 ) );
+&nbsp; <span class="teal">XYZ</span> pt2 = <span class="teal">Util</span>.MmToFoot( <span class="blue">new</span> <span class="teal">XYZ</span>( 1000, 0, 1000 ) );
+&nbsp; <span class="teal">XYZ</span> pt3 = <span class="teal">Util</span>.MmToFoot( <span class="blue">new</span> <span class="teal">XYZ</span>( 2000, 0, 2500 ) );
+&nbsp; <span class="teal">XYZ</span> pt4 = <span class="teal">Util</span>.MmToFoot( <span class="blue">new</span> <span class="teal">XYZ</span>( 3000, 0, 2500 ) );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> familySymbol = <span class="teal">Util</span>.FindFamilySymbol(
+&nbsp; &nbsp; _doc,
+&nbsp; &nbsp; <span class="teal">CmdSteelStairBeams</span>.FamilyName,
+&nbsp; &nbsp; <span class="teal">CmdSteelStairBeams</span>.SymbolName );
+&nbsp;
+&nbsp; <span class="blue">if</span>( familySymbol == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;Beam Family not found&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; CreateBeam( familySymbol, level, pt1, pt2 );
+&nbsp; CreateBeam( familySymbol, level, pt2, pt3 );
+&nbsp; CreateBeam( familySymbol, level, pt3, pt4 );
+}
+</pre>
+
+<p>The class constructor does nothing more than initialise the one and only class data member for the current document:
+
+<pre class="code">
+<span class="teal">Document</span> _doc;
+&nbsp;
+<span class="blue">public</span> SteelStairs( <span class="teal">Document</span> doc )
+{
+&nbsp; _doc = doc;
+}
+</pre>
+
+<p>The SteelStairs helper class is driven by the following external command mainline Execute method, which mainly fusses about to manage a transaction and ensure that the appropriate rectangular hollow section steel beam family and symbol is loaded.
+The family and symbol names to use depend on the exact flavour of Revit content that you have installed.
+The rectangular hollow section steel beam family is provided in both the architectural and structural libraries.
+In my case, I am loading it from the architectural content.
+
+<p>I hope you enjoy my use of the generic Any template method to check whether a family of the specified name has already been loaded.
+By the way, I just noticed a flaw in my logic: while I ensure that the family is available, I do not check for the specific symbol as well.
+This command will fail if some other symbols have been loaded, but not the one required.
+I leave that as an exercise to the reader to clear up, though.
+
+<p>Once the beam symbol is loaded, all that is needed is to call the SteelStairs constructor and Run method:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdSteelStairBeams</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> FamilyName
+&nbsp; &nbsp; = <span class="maroon">&quot;RHS-Rectangular Hollow Section&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> SymbolName
+&nbsp; &nbsp; = <span class="maroon">&quot;160x80x4RHS&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _extension
+&nbsp; &nbsp; = <span class="maroon">&quot;.rfa&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _directory
+&nbsp; &nbsp; = <span class="maroon">&quot;C:/ProgramData/Autodesk/RAC 2012/Libraries&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;/US Metric/Structural/Framing/Steel/&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _family_path
+&nbsp; &nbsp; = _directory + FamilyName + _extension;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create Steel Stair Beams&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Check whether the required family is loaded:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If the family is not already loaded, do so:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !collector.Any&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( FamilyName ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !doc.LoadFamilySymbol(
+&nbsp; &nbsp; &nbsp; &nbsp; _family_path, SymbolName, <span class="blue">out</span> symbol ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to load '{0}' from '{1}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SymbolName, _family_path );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Create a couple of connected beams:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SteelStairs</span> s = <span class="blue">new</span> <span class="teal">SteelStairs</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s.Run();
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>This is the result of running this command in Revit Architecture instead of Revit Structure:</p>
+
+<center>
+<img src="img/beam_cleanup2.png" alt="Automatic beam cleanup in Revit Archicture"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/bc_12_91.zip">
+version 2012.0.90.0</a> of
+
+The Building Coder samples including the new command CmdSteelStairBeams.

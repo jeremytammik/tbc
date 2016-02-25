@@ -1,0 +1,75 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Tue 2010-07-20 23:30 Jinsol Kim RE: [Revit2011] Type Properties parameter -->
+
+<h3>Get Element Type</h3>
+
+<p>In the Revit 2011 API, the Symbol class was been renamed to ElementType and some other changes were made to clarify the usage of element types in Revit, which were previously referred to as both types and symbols.
+Some remnants of the previous naming conventions still exists, such as the FamilySymbol class and the FamilyInstance.Symbol property, but the long-term intention is to move toward calling these things element types instead of symbols.
+
+<p>This renaming and restructuring has causes some confusion here and there in porting existing applications, giving rise to questions such as the following:
+
+<p><strong>Question:</strong> I have been updating my Revit 2010 API code to the 2011 version and realized that the Element.ObjectType property no longer exists.
+
+<p>I want to retrieve the AssemblyCode value from the element type properties in the Revit project.
+Here is the old code for the Revit 2010 API:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> assembly_code
+&nbsp; &nbsp; = e.ObjectType.get_Parameter(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.UNIFORMAT_CODE )
+&nbsp; &nbsp; &nbsp; .AsString();
+</pre>
+
+<p>How can I rewrite this code for Revit 2011?
+
+<p><strong>Answer:</strong> The first place to look in cases like this is the What's New section of the Revit API help file RevitAPI.chm, which includes the following section:
+
+<span style="color:darkblue">
+
+<h4>Replacement for Symbol and properties that access types</h4>
+
+<p>The Symbol class has been renamed to ElementType.
+
+<p>The properties that access types from Elements have been replaced:
+
+<ul>
+<li>Old property: Element.ObjectType
+<ul>
+<li>New interfaces: Element.GetTypeId(), Element.ChangeTypeId()
+<li>Notes: ChangeTypeId() returns the id of a new element; in rare cases, changing the element type will result in deletion of the current element. Static versions which operate on sets of elements are also supplied.
+</ul>
+<li>Old property: Element.SimilarObjectTypes
+<ul>
+<li>New interfaces: Element.GetValidTypes()
+</ul>
+</ul>
+
+</span>
+
+<p>So you can simply use GetTypeId and then open the associated ElementType object to access the parameter.
+
+<p>Some samples of using these new methods are given in the discussions on
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/get-type-id-and-preview-image.html">Getting the type id</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/determine-sheet-size.html">Determining sheet size</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">RevitWebcam</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/set-tag-type.html">Setting a tag type</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/populating-a-data-grid-view.html">Populating a data grid view</a>
+</ul>
+
+<p>The code that you show above can thus be rewritten as follows for the Revit 2011 API:
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> id = e.GetTypeId();
+&nbsp;
+&nbsp; <span class="teal">ElementType</span> type = m_doc.get_Element( id )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ElementType</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> AssemblyCode = type.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.UNIFORMAT_CODE )
+&nbsp; &nbsp; &nbsp; .AsString();
+</pre>

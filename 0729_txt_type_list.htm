@@ -1,0 +1,46 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Chuck Dodson FW: I cannot load this family -->
+
+<h3>A TXT File may be a Type List</h3>
+
+<p>Here is a short note on a little issue to be aware of by Chuck Dodson of
+
+<a href="http://www.sgadesigngroup.com">
+SGA Design Group</a>:
+
+<p><strong>Question:</strong> I am stuck trying to figure out the meaning of this error message:</p>
+
+<center>
+<img src="img/txt_type_list_err.png" alt="TXT type list error message"/>
+</center>
+
+<p>I am creating a family in code.
+I get the same problem if I create it manually.
+
+<p>Do you have any idea what the message is saying?
+
+<p>Looking online, I find comments about Shared Parameter file corruption, but I'm not using any.
+
+<p>The odd thing is, if I rename the family, it loads fine.  
+I can drag it from explorer; fine.  
+I can load it from the open family file; fine.  
+But if I use the Load Family button, I get the message, although it does actually load.
+
+<p>Any ideas?
+
+<p><strong>Answer:</strong> I solved this.  
+
+<p>I was writing a text file (.txt) in the same folder that my families were being created in.  
+For some reason, Revit assumes it is a shared parameter file.  
+
+<p>I changed the filename extension of the ASCII files I was writing to DEF instead of TXT and the problem is solved.  
+
+<p>The '(' in the message above is a reference to a parenthesis starting on the first line of the text file.
+
+Thought you might want to know.
+
+<p>Jeremy adds: yes, I did know, in fact, and so do most family developers, but possibly a number of API newbies do not, so I am sure that this is information worth publishing and sharing. 
+Thank you very much for that, Chuck!

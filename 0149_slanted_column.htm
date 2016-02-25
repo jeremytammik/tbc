@@ -1,0 +1,112 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Creating a Slanted Column</h3>
+
+<!-- 1249302 [How to create a slanted column throught the API] -->
+
+<p>We already discussed the creation of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html">
+beam</a>
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+column instances </a>
+
+in previous posts.
+In that post on the beam insertion, we explore setting arbitrary start and end points, but the column is left in its default vertical alignment.
+Here is a question specifically targeted at the creation of slanted structural columns handled recently by our DevTech AEC workgroup leader Mikako Harada:</p>
+
+<p><strong>Question:</strong>
+I cannot find any help to explain how to create a slanted column through the API. 
+Please explain the process required, i.e.</p>
+
+<ul>
+<li>Which NewFamilyInstance method should I use? 
+<li>Will the parameter be automatically set to Slanted, or will I need to force it after creating the object. 
+<li>If I need to change an existing vertical column to slanted, how do I do that? 
+<li>Can I change the location from a point to a line?
+</ul>
+
+<p><strong>Answer:</strong>
+The first place to look for information about the various overloads of NewFamilyInstance and related methods in the Revit API is the developer guide included with the Revit SDK:</p>
+
+<ul>
+<li>Filename Revit 2010 API Developer Guide.pdf.
+<li>Section 10.3.5: Creating FamilyInstance Objects.
+<li>Table 28: Options for creating instance with NewFamilyInstance().
+<li>Table 29: Options for creating instances with other methods.
+</ul>
+
+<p>The developer guide does not explain how to insert a slanted column, however.
+For that, you have two options: the easiest way to go is to use the NewFamilyInstance overload taking the four arguments Curve, FamilySymbol, Level, and StructuralType. 
+This will allow you to directly create a slanted column. 
+It will place a column with a SlantedOrVerticalColumnType equal to CT_EndPoint.</p>
+
+<p>The other approach is explicit, appears more complex, illustrates what is going on behind the scenes, and also demonstrates which parameters and properties need to be modified to create a slanted column:</p>
+
+<p>You can use the same method to create both vertical and slanted columns.
+Once the column has been created, you can change its 'Slanted Column Type' property using the built-in parameter SLANTED_COLUMN_TYPE_PARAM. 
+You can set it to SlantedOrVerticalColumnType CT_EndPoint, CT_Angle, or CT_Vertical. 
+Once you set the column to a slanted type, the location property becomes a curve, which you can use to set its start and end points.
+Here is a snippet of sample code to achieve these steps:</p>
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp;&nbsp;&nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> ExternalCommandData, _
+&nbsp;&nbsp;&nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp;&nbsp;&nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> ElementSet) _
+<span class="blue">As</span> IExternalCommand.Result _
+<span class="blue">Implements</span> IExternalCommand.Execute
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> Application = commandData.Application
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> Document = app.ActiveDocument
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="green">'' you may want to use your own function </span>
+&nbsp;&nbsp;&nbsp; <span class="green">'' to find these values in your context. </span>
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> beamType <span class="blue">As</span> FamilySymbol = findSymbol(app)
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> topLevel <span class="blue">As</span> Level = findLevel(app)
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> startPoint <span class="blue">As</span> <span class="blue">New</span> XYZ(0.0, 0.0, 0.0)
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> endPoint <span class="blue">As</span> <span class="blue">New</span> XYZ(100.0, 100.0, 100.0)
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> structuralType <span class="blue">As</span> StructuralType = StructuralType.Column
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="green">'' create a coluemn as normal.</span>
+&nbsp;&nbsp;&nbsp; <span class="green">'' at this point, column is vertical. </span>
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> strElem <span class="blue">As</span> FamilyInstance = doc.Create.NewFamilyInstance( _
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; startPoint, beamType, topLevel, structuralType)
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="green">'' set the property to a slanted column </span>
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> param <span class="blue">As</span> Parameter = strElem.Parameter( _
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; BuiltInParameter.SLANTED_COLUMN_TYPE_PARAM)
+&nbsp;
+&nbsp;&nbsp;&nbsp; param.Set(SlantedOrVerticalColumnType.CT_EndPoint)
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="green">'' after setting to a slanted column,</span>
+&nbsp;&nbsp;&nbsp; <span class="green">'' location should be a curve. </span>
+&nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> strElemCurve <span class="blue">As</span> LocationCurve = strElem.Location
+
+&nbsp;&nbsp;&nbsp; <span class="green">'' set the start and end point of a curve. </span>
+&nbsp;&nbsp;&nbsp; <span class="blue">If</span> <span class="blue">Not</span> (strElemCurve <span class="blue">Is</span> <span class="blue">Nothing</span>) <span class="blue">Then</span>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="blue">Dim</span> line <span class="blue">As</span> Line = app.Create.NewLineBound( _
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; startPoint, endPoint)
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; strElemCurve.Curve = line
+&nbsp;&nbsp;&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp;&nbsp;&nbsp; <span class="blue">Return</span> IExternalCommand.Result.Succeeded
+&nbsp;
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>To modify an existing vertical column, you can modify the 'Slanted Column Type' property and then set the two end points in a similar fashion.</p>
+
+<p>Many thanks to Mikako for providing this explanation!</p>
+

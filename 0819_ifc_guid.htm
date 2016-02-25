@@ -1,0 +1,222 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+IFC GUID - API Off Topic - Revit Quasar
+
+http://beta.autodesk.com/r/?21589c006e0842cb81ae97a39c014c79
+
+-->
+
+<h3>IFC GUID Generation and Uniqueness</h3>
+
+<p>We looked at IFC GUIDs a couple of times already, e.g. to discuss the relationship between
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/uniqueid-dwf-and-ifc-guid.html">
+UniqueId, DWF and IFC GUID</a>,
+
+the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html">
+ExportUtils.GetExportId method</a>, 
+
+and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html">
+IFC GUID representation algorithm</a>.
+
+<p>The Revit 2012 API introduced the ExporterIFCUtils class for customizing IFC export, and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-ifc-exporter-released-as-open-source.html#2">
+IFC exporter was released as open source</a>.
+
+<p>In Revit 2013, the IFC export implementation switched to a more generic toolkit, many of the APIs introduced in Revit 2012 were removed and replaced, and new interfaces introduced that allow more flexibility in the data which is written to the IFC file. 
+
+<p>Here is some clarification on some of the methods associated with IFC GUIDs:
+
+<!-- okat (olli) wrote: -->
+
+<p><strong>Question:</strong> Can you please tell me how these ExporterIFCUtils functions should work:
+
+<ul>
+<li>CreateGUID
+<li>CreateGUID(Element)
+<li>CreateAlternateGUID(Element)
+<li>CreateSubElementGUID(Element, int)
+</ul>
+
+<p>I was hoping that at least one of them would generate a consistent GUID, but it seems that they are different in every run. 
+How can I generate a consistent IFC GUID for a given element?
+
+<!--
+Thanks!
+
+avelez (angel) wrote:
+-->
+
+<p><strong>Answer:</strong> The one and only really unique id maintained by Revit and guaranteed to be unique and stable for elements across worksharing environments is the UniqueId, which is a combination of a GUID and the history signature identifying the history of a workshared file.
+
+<p>That said, the IFC GUID is also unique across sessions.  
+This is one of the requirements of IFC.  
+If I export a wall in one session via IFC, close the session, reopen the document, and reexport, the GUID remains the same for that wall, and should be different from any other wall's GUID.
+
+<p>The method CreateGUID with no arguments however does indeed create a random GUID every time.  
+
+<p>The other routines are intended to be stable.
+
+<p>For a given Element with an Element Id in a Document, the two methods CreateGUID(Element) and CreateAlternateGUID(Element) should create two consistent GUIDs.
+
+<p>For a given Element with an Element Id and an index (the int) in a Document, the method CreateSubElementGUID(Element, int) should create a consistent GUID, based on the GUID created with CreateGUID above.
+
+<!-- 
+
+Can you provide an example where these routines aren't working as stated above?
+
+arnostlobel wrote:
+
+<p>On the other hand, the GUID you obtain from IFC (or DWF, for that matter) is not a unique Id (between Revit runs) and it is not expected to be mapped back to Revit elements once an IFC (or DWF) file has been exported. 
+The GUID is only guaranteed to be unique between different exported documents, to make it possible to cross-reference elements across IFC (DWF) documents.
+
+-->
+
+<p>For more information, please refer to the description of the ExportUtils.GetExportId method.
+
+
+
+<!-- okat wrote: -->
+
+<p><strong>Response:</strong> That makes sense. 
+Unfortunately, the GUID is different in every run for me.
+
+<!--
+<p>I submitted a new problem report Quasar SPR:0555 where attached a Revit & VS project (add-in) to demonstrate the issue. There's just a air terminal which is used to generate the GUID.
+
+<p>Using Revit's internal IFC export, GUIDs seems to be consistent as far I have noticed... 
+
+<p>Hmmm...this is starting to be quite strange and frustrating...what I'm doing wrong?
+-->
+
+<p>The CreateProjectLevelGUID method also returns a different GUID in every run. 
+I guess it should also be consistent, shouldn't it? 
+
+<!-- avelez wrote: -->
+
+<p><strong>Answer:</strong> After some investigation we now understand the source of the issue.  
+The GUID generation routines have an internal cache that prevents duplicate GUIDs from being generated.  
+In IFC, these functions are called once per element, and then a call to the ExporterIFCUtils.EndExportInternal method clears this cache for the next IFC export.  
+Please note that the first time you call these routines, they have consistent values from previous sessions. 
+<p>For now, there are two workarounds:
+
+<ol>
+<li>Only call the functions once per session, and store their values.
+<li>Call ExporterIFCUtils.EndExportInternal to reset the internal cache.
+</ol>
+
+<p>I would recommend #1 over #2, as the EndExportInternal call does more than just clear the cache, and may have unintended consequences.
+
+<!-- okat wrote: -->
+
+<p><strong>Response:</strong> Thank you very much for your explanation. 
+It makes perfectly sense now.
+
+<p>The workarounds you mention may solve this but have some drawbacks:
+
+<ul>
+<li>I can't use the EndExportInternal method because I'm not using the Revit IFC API and therefore I don't have access to an ExporterIFC object.
+<li>I don't want to start building my own cache, because it would not be 100% water proof, and who knows how much memory it would eventually consume with really huge projects.
+</ul>
+
+<p>Fortunately, there's a third workaround which I decided to implement. 
+I combined the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html">
+IFC GUID representation algorithm</a> showing 
+
+how to construct an IFC GUID from a 'normal GUID' with the ExportUtils.GetExportId functionality, which produces a consistent GUID between runs.
+
+<p>Can you see any problems in this approach? 
+
+<!-- avelez wrote: -->
+
+<p><strong>Answer:</strong> A couple of comments:
+
+<p>First of all, the approach you ended up using is the one that I was going to suggest (or close enough!)  
+You should indeed go for that.  
+
+<p>Secondly, just to clear up one point, the Revit IFC API is part of the Revit API &ndash; if you have the Revit API, you also have the Revit IFC API.  
+
+<!--
+
+That said, you are correct that it isn't a good idea to misuse the API!
+
+Here are some other observations:
+
+This information was also useful to solve the following question:
+
+07171219 [Export to IFC - GUID generation logic]
+
+C:\a\j\adn\case\sfdc\07171219\ifc_guid.pdf
+
+-->
+
+<p><strong>Question:</strong> In another case, we are exporting models from Revit Architecture to IFC and observe that the GUIDs of some entities are not consistent, e.g. of IFCRelationship, IFCTypeObject and IFCPropertySetDefinition.
+
+<p>We are not making any changes to the model, just exporting it twice.
+Still, the exported IFC files contain different GUIDs generated for those entity types.  
+
+<p>The GUID for geometric entities like IFCDOOR, IFCWalllStantdardCase etc. do not change.  
+
+<p>What might be causing this behaviour?
+
+
+<p><strong>Answer:</strong> The algorithm for generating a consistent IfcGUID depends on the IFC entity in question having a constant and predictable relationship to a Revit element.  For something like an IFCDOOR, there is a one-to-one relationship between that and a Revit door element, so we can guarantee a consistent IfcGUID.  
+
+For things like relationships, we either 
+
+<ol>
+<li>Don't have a way to make this 1-1 relationship, 
+<li>Don't have enough bits to make a GUID that is unique, or 
+<li>Haven't come up with or implemented the algorithm yet.
+</ol>
+
+<!-- SPR 167219 covers some of these cases, and they cover the three options above. -->
+
+<p>For example, for IFCRELSPACEBOUNDARY, how do you uniquely define one or more connections between a room and a nearby wall? 
+This is an example of case 1.
+
+<p>For IFCPROPERTYSET, there is a mechanism in place for some elements that allows for a consistent GUID, so this is partially done and partially case 3.
+
+<p>IFCDOORSTYLE should be handled reliably.
+ 
+<!-- If the user can state which cases are particularly important and why, we can prioritize those cases, if it is possible at all. -->
+
+As with most things in IFC, it is a combination of being able to do it and having time to do it.
+
+<!--
+
+<p>Besides, there was also some discussions on the IFC GUIDs in the Revit Beta forums which I am attaching with this email for your reference, as well.
+
+<pre class="code">
+</pre>
+
+<p><strong>Question:</strong> 
+
+<p><strong>Answer:</strong> 
+
+<ul>
+<li>
+</ul>
+
+<a name="2"></a>
+
+<h4></h4>
+
+<pre class="code">
+</pre>
+
+<a href="">
+</a>
+
+-->

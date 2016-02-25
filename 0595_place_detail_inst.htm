@@ -1,0 +1,120 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1269592 [Placing a detail item] -->
+
+<h3>Placing a Line Based Detail Item Instance</h3>
+
+<p>We already talked in depth about
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/place-detail-instance.html">
+placing a detail family instance</a> and
+
+the difficulties in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/newfamilyinstance-overloads.html">
+selecting the right overload of the NewFamilyInstance method</a> for
+
+that, a topic also discussed in the developer guide section 12.3.5 Creating FamilyInstance Objects, and its tables 34 and 35.
+As we already stated in that post, the exploration continues...
+
+<p>Here is an interesting update to the issue by Frode T&oslash;rresdal of
+
+<a href="http://www.nois.no">
+Norconsult Informasjonssystemer</a>,
+
+which also highlights a new overload added in the Revit 2012 API:
+
+<p><strong>Question:</strong> I am trying to place a detail item over an existing 3D element (in this case it's a Rebar Bar family).
+I try to place the detail item with the NewFamilyInstance method and then move it to the min value of the existing 3D element's boundary box.
+The code looks something like this:
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> p = <span class="teal">XYZ</span>.Zero;
+&nbsp; <span class="teal">FamilySymbol</span> symbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> newDetailItem = doc.Create
+&nbsp; &nbsp; .NewFamilyInstance( p, symbol, commandData.View );
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> boundingBox = rebar3D
+&nbsp; &nbsp; .get_BoundingBox( commandData.View );
+&nbsp;
+&nbsp; newDetailItem.Location.Move( boundingBox.Min );
+</pre>
+
+<p>The detail item is line based.
+
+<p>What I'm trying to do is to make a function where the user selects a 3D reinforcement item.
+Then my function hides this item and places a simplified 2D symbol over the extent of the 3D item in the active plan view.
+
+<p>I can do this manually in Revit by placing my detail item along one side of the 3D element to set the width, and then adjusting a parameter in the detail item to set the height.
+
+<p>Using the API, I can adjust the parameter to get the right height, but I cannot place the detail item correctly.
+I might be missing a coordinate transformation because my item is placed in the same place no matter what 3D element I select in the view.
+
+<p>To summarize what I'm trying to do:
+
+<ul>
+<li>Place a line based detail element at the min value of the bounding box of a selected 3D element in plan view.
+<li>Extend the line based element so that the length is equal to one of the sides of the bounding box of the selected 3D element in a plan view.
+</ul>
+
+<p>I hope this makes sense. I'm rather new to the Revit API and might be missing something obvious.
+
+<p><strong>Solution:</strong> While creating a test case I think I solved the problem.
+
+<p>I found a new overload of the NewFamilyInstance method in Revit 2012 that takes Line, FamilySymbol and View input arguments.
+This seems to work for my line based detail item.
+Using the override with a point as the first parameter only works with point based detail items.
+
+<p>Many thanks to Frode for this discovery!
+
+<p>That leads me to look in more detail at the new overloads of the NewFamilyInstance method.
+
+
+<a name="2"></a>
+
+<h4>New overloads of the NewFamilyInstance method in the Revit 2012 API</h4>
+
+<p>The nine overloads of the NewFamilyInstance method provided by the Revit 2011 API take the following lists of input arguments:
+
+<ul>
+<li>XYZ, FamilySymbol, StructuralType
+<li>XYZ, FamilySymbol, View
+<li>XYZ, FamilySymbol, Level, StructuralType
+<li>XYZ, FamilySymbol, Element, StructuralType
+<li>XYZ, FamilySymbol, Element, Level, StructuralType
+<li>XYZ, FamilySymbol, XYZ, Element, StructuralType
+<li>Curve, FamilySymbol, Level, StructuralType
+<li>Face, XYZ, XYZ, FamilySymbol
+<li>Face, Line, FamilySymbol
+</ul>
+
+<p>The Revit 2012 API provides twelve overloads:
+
+<ul>
+<li>XYZ, FamilySymbol, StructuralType
+<li>XYZ, FamilySymbol, View
+<li>XYZ, FamilySymbol, Level, StructuralType
+<li>XYZ, FamilySymbol, Element, StructuralType
+<li>XYZ, FamilySymbol, Element, Level, StructuralType
+<li>XYZ, FamilySymbol, XYZ, Element, StructuralType
+<li>Curve, FamilySymbol, Level, StructuralType
+<li>Face, XYZ, XYZ, FamilySymbol
+<li>Face, Line, FamilySymbol
+<li>Line, FamilySymbol, View
+<li>Reference, XYZ, XYZ, FamilySymbol
+<li>Reference, Line, FamilySymbol
+</ul>
+
+<p>The three last ones are new, respectively intended for:
+
+<ul>
+<li>Adding a line based detail family instance into the Revit document, using a line and a view where the instance should be placed.
+<li>Inserting a new instance of a family onto a face referenced by the input Reference instance, using a location, reference direction, and a type/symbol.
+<li>Inserting a new instance of a family onto a face referenced by the input Reference instance, using a line on that face for its position, and a type/symbol.
+</ul>
+
+<p>As the issues arising in this area indicate, the topic of adding a new family instance can be complex and sometimes requires a bit of research to find the right approach in each case.
+I hope this helps a little.

@@ -1,0 +1,700 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Migrating the Building Coder Samples to Revit 2012</h3>
+
+<p>This is the third migration of the The Building Coder samples, after moving from Revit 2009 to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">
+Revit 2010</a> and then to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+Revit 2011</a>.
+
+<p>The move from 2010 to 2011 was a tougher round with many changes.
+This time around, from 2011 to 2012, it is quite easy and straightforward again.
+
+<p>For details on what needs modifying, as always, please refer to the Revit 2012 SDK documentation and especially the chapter 'What's New' in the Revit 2012 API help file RevitAPI.chm.
+
+<p>I spent a couple of hours migrating The Building Coder samples.
+The time is rather long because there are a large number of commands, over eighty.
+It was shortened somewhat because I had some experience from previously migrating lots of other ADN sample code for the Revit API trainings 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/khan-academy.html">
+in</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/curveintersect-return-values.html">
+Jeddah</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/erformant-hardware.html">
+Verona</a>.
+
+<p>Without further ado, let me here present the new
+
+<a href="zip/bc_12_87.zip">
+Revit 2012 version 2012.0.87.0</a>
+
+of The Building Coder sample code.
+For comparison purposes, here is an updated
+
+<a href="zip/bc_11_87_1.zip">
+last Revit 2011 version 2011.0.87.2</a>.
+
+In the latter, I already updated some administrative global stuff, so that it can be used to easily determine what the really relevant differences between the 2011 and 2012 versions are.
+Actually, I also removed the regeneration attribute, so this version will not run in Revit 2011 &ndash; it is really for comparison purposes only.
+
+I hope you are aware of the Unix
+
+<a href="http://en.wikipedia.org/wiki/Diff">
+diff</a>,
+
+Visual Studio
+
+<a href="http://en.wikipedia.org/wiki/WinDiff">
+Windiff</a>,
+
+and numerous other tools for comparing files and directory structures that can be used for this purpose.
+
+<p>One systematic difference that affects every single file in the same way is the removal of the regeneration attribute.
+It was obligatory in Revit 2011, and is voluntary but useless in Revit 2012 API, since the only supported regeneration mode is now manual.
+
+<p>Here is the list of different files produced by Windiff after updating the regeneration attribute in both versions:
+
+<pre>
+  properties\assemblyinfo.cs
+  cmdcollectorperformance.cs	
+  cmdcolumnround.cs	
+  cmddimensionwallsfindrefs.cs	
+  cmdeditfloor.cs	
+  cmdgetsketchelements.cs	
+  cmdimportsinfamilies.cs	
+  cmdlibrarypaths.cs	
+  cmdmirror.cs	
+  cmdnewlightingfixture.cs	
+  cmdnewspotelevation.cs	
+  cmdnewwalllayer.cs	
+  cmdroomwalladjacency.cs	
+  cmdsettagtype.cs	
+  cmdspaceadjacency.cs	
+  cmdtransformedcoords.cs	
+  cmdwalllayers.cs	
+  cmdwalllayervolumes.cs	
+  util.cs
+</pre>
+
+<p>This is how the differences are displayed in Windiff, with deleted lines displayed in red and added ones in yellow:</p>
+
+<center>
+<img src="img/windiff_11_12.png" alt="Windiff displaying file differences" width="400"/>
+</center>
+
+<p>In the 2012 version of the code, I commented out the 2011-specific lines of code and added a '// 2011' comment suffix to them.
+The 2012 version of the lines are also marked, with a '// 2012' comment suffix.
+
+<p>I suggest downloading and unpacking the two versions in two neighbouring directories and running Windiff on them yourself to examine the changes in detail.
+
+<p>Here is a full 
+
+<a href="zip/log_migrate_2011_2012.htm">
+log of the migration steps</a>.
+
+<p>I fixed all errors and most of the warnings, but 12 still remain.
+I consider these acceptable for the moment, and will leave things as they are for now. 
+I have tested a very few of the migrated commands.
+Most are still untested in Revit 2012.
+
+<p>Good luck in your own porting efforts!
+
+
+<h4>Version Number</h4>
+
+<p>I am maintaining the version numbering system introduced for Revit 2011: major.minor.build.revision.
+I bumped the major revision to 2012 to make the link to Revit 2012 obvious.
+I may use the minor revision to indicate intermediate updates of the Revit API, if any appear.
+The build number is currently set to 87 and indicates the number of commands defined, more or less.
+
+<h4>RvtSamples</h4>
+
+<p>As before, I continue to use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+RvtSamples SDK sample</a> to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+load and launch all The Building Coder samples</a>, 
+
+as well as all the other ADN samples that I work with, just like I did for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">
+Revit</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/installing-the-revit-2010-sdk.html">
+2010</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/porting-the-building-coder-samples-to-revit-2011.html">
+2011</a>.
+
+The BcSamples.txt include file read by RvtSamples is included in the zip file and provides all the details required.
+For more information, you can also refer to the RvtSamples documentation.
+
+
+<!--
+
+<a name="2"></a>
+
+<h4>Installing CopySourceAsHtml in Visual Studio 2010</h4>
+
+<p>I use 
+
+<a href="http://copysourceashtml.codeplex.com">
+CopySourceAsHtml</a> to
+
+copy and paste colour coded source code to the blog posts.
+
+This utility is available for Visual Studio 2003, 2005 and 2008, but not for 2010.
+
+<p>Luckily, 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/03/finally-working-with-visual-studio-2010.html">
+Kean Walmsley recently pointed</a> to an article on 
+
+<a href="http://blogs.microsoft.co.il/blogs/applisec/archive/2010/02/25/copyashtml-in-visual-studio-2010.aspx">
+enabling CopySourceAsHtml in Visual Studio 2010</a>.
+
+Just like Kean, I was able to follow the steps described and get it working without problems.
+
+<p>By the way, Kean's article lists a couple of other useful Visual Studio utilities as well, for navigating large source code modules and driving multi-target (old) C++ compiler versions.
+
+
+<a name="3"></a>
+
+<h4>Updated Revit SDK on Developer Center</h4>
+
+<p>Please note that rumour has it that the Revit SDK posted on the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> is
+
+more up-to-date than the one included in the Revit product currently shipping.
+
+Always check the developer center for the most up-to-date version.
+
+The differences are not huge, but various typos and other little details have been fixed.
+
+-->
+
+<!--
+
+<a name="4"></a>
+
+<h4>Revit 2011 to Revit 2012 Migration Log File</h4>
+
+<p>Here is a decremental list of the errors and warnings as I migrated The Building Coder samples from Revit 2011 to the Revit 2012 API.
+
+<p>By 'decremental', I mean that the list shrinks step by step as I eliminate the errors and warnings one by one.
+
+<p>The following warning and error messages are too long to display in the blog post format.
+To see the truncated lines in full, you can copy and paste them to a text editor.
+
+<h5>1. Removed regeneration option globally, since only manual is supported now</h5>
+
+<p>21 errors, 35 warnings:
+
+<pre>
+Error	1	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	39	27	BuildingCoder
+Error	2	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	42	24	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	5	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Error	6	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	48	27	BuildingCoder
+Error	7	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	50	11	BuildingCoder
+Error	8	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	51	25	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Error	10	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'DeckProfile' and no extension method 'DeckProfile' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	62	20	BuildingCoder
+Error	11	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'DeckProfile' and no extension method 'DeckProfile' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	62	43	BuildingCoder
+Warning	12	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Error	15	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Material' and no extension method 'Material' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	65	20	BuildingCoder
+Error	16	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Material' and no extension method 'Material' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	65	40	BuildingCoder
+Error	17	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Thickness' and no extension method 'Thickness' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	66	20	BuildingCoder
+Error	18	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Thickness' and no extension method 'Thickness' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	66	41	BuildingCoder
+Error	19	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Variable' and no extension method 'Variable' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	67	20	BuildingCoder
+Error	20	'Autodesk.Revit.DB.CompoundStructureLayer' does not contain a definition for 'Variable' and no extension method 'Variable' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructureLayer' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewWallLayer.cs	67	40	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Error	26	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	85	14	BuildingCoder
+Error	27	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	87	7	BuildingCoder
+Error	28	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	88	21	BuildingCoder
+Error	29	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	91	27	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Error	31	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	93	9	BuildingCoder
+Error	32	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	94	23	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	36	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	37	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	38	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	39	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Error	40	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	183	10	BuildingCoder
+Warning	41	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	42	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	43	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Error	44	'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	217	24	BuildingCoder
+Warning	45	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	46	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	47	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	48	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	49	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	50	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	51	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	52	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	53	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	54	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+Warning	55	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: '"This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead."'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	56	'Autodesk.Revit.DB.Reference.Element' is obsolete: '"Property will be removed. Use Document.GetElement(Reference) instead"'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+</pre>
+
+<h5>2. Completely rewrote CmdNewWallLayer &ndash; needs testing!</h5>
+
+<p>8 errors, 35 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	6	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Error	14	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	85	14	BuildingCoder
+Error	15	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	87	7	BuildingCoder
+Error	16	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayerVolumes.cs	88	21	BuildingCoder
+Error	17	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	91	27	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Error	19	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	93	9	BuildingCoder
+Error	20	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	94	23	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Error	28	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	183	10	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Error	32	'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	217	24	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	36	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	37	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	38	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	39	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	40	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	41	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	42	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	43	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>3. Fixed access to compound layer structure in CmdWallLayerVolumes</h5>
+
+<p>5 errors, 35 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	6	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Error	14	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	91	27	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Error	16	The type or namespace name 'CompoundStructureLayerArray' could not be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	93	9	BuildingCoder
+Error	17	'Autodesk.Revit.DB.CompoundStructure' does not contain a definition for 'Layers' and no extension method 'Layers' accepting a first argument of type 'Autodesk.Revit.DB.CompoundStructure' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdWallLayers.cs	94	23	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Error	25	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	183	10	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Error	29	'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	217	24	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	32	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	36	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	37	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	38	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	39	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	40	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>4. Fixed access to compound layer structure in CmdWallLayers</h5>
+
+<p>2 errors, 35 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	6	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Error	22	'Autodesk.Revit.DB.WallType' does not contain a definition for 'CompoundStructure' and no extension method 'CompoundStructure' accepting a first argument of type 'Autodesk.Revit.DB.WallType' could be found (are you missing a using directive or an assembly reference?)	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	183	10	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Error	26	'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	217	24	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	32	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	36	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	37	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>5. Fixed access to compound layer structure in CmdSetTagType</h5>
+
+<p>1 error, 35 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	6	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	32	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+Error	36	'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs	217	24	BuildingCoder
+</pre>
+
+<h5>6. In CmdSetTagType, fixed error "'Autodesk.Revit.DB.TagOrientation' does not contain a definition for 'TAG_HORIZONTAL'"</h5>
+
+<p>0 errors, 35 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Architecture.Room.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdRoomWallAdjacency.cs	39	11	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	6	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	32	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	35	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>fixed CmdRoomWallAdjacency to use Room.GetBoundarySegments instead of obsolete Room.Boundary</h5>
+
+<p>34 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	43	7	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	3	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	5	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	189	9	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	209	9	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	233	9	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Document.Mirror(Autodesk.Revit.DB.ElementSet, Autodesk.Revit.DB.Line)' is obsolete: 'This Mirror method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdMirror.cs	265	9	BuildingCoder
+Warning	30	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	31	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	32	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	33	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	34	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>7. Fixed CmdMirror and CmdMirrorListAdded to use ElementTransformUtils.MirrorElements instead of obsolete doc.Mirror</h5>
+
+<p>29 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetSketchElements.cs	43	22	BuildingCoder
+Warning	2	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	4	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	78	13	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	79	14	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewLightingFixture.cs	79	25	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	82	21	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdColumnRound.cs	123	20	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	137	21	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	233	14	BuildingCoder
+Warning	22	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdCollectorPerformance.cs	237	9	BuildingCoder
+Warning	23	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	24	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	256	21	BuildingCoder
+Warning	25	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	266	32	BuildingCoder
+Warning	26	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	283	17	BuildingCoder
+Warning	27	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	293	19	BuildingCoder
+Warning	28	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	296	34	BuildingCoder
+Warning	29	'Autodesk.Revit.DB.Reference.Element' is obsolete: 'Property will be removed. Use Document.GetElement(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\Util.cs	408	33	BuildingCoder
+</pre>
+
+<h5>8. Fixed all occurrences of 'Autodesk.Revit.DB.Reference.Element' is obsolete: Property will be removed. Use Document.GetElement(Reference) instead</h5>
+
+<p>21 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	44	29	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	3	'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: 'Use GetLibraryPaths() and SetLibraryPaths() instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdLibraryPaths.cs	63	7	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	86	14	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	89	21	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	239	14	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	277	32	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	294	17	BuildingCoder
+Warning	20	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	304	19	BuildingCoder
+Warning	21	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	307	34	BuildingCoder
+</pre>
+
+<h5>9. Fixed all occurrences of 'Autodesk.Revit.ApplicationServices.Application.LibraryPaths' is obsolete: Use GetLibraryPaths() and SetLibraryPaths() instead</h5>
+
+<p>19 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: 'This property is no longer needed because Mullion now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs	54	15	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	86	14	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	89	21	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	239	14	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	277	32	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	294	17	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	304	19	BuildingCoder
+Warning	19	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	307	34	BuildingCoder
+</pre>
+
+<h5>10. Fixed 'Autodesk.Revit.DB.Mullion.AsFamilyInstance' is obsolete: This property is no longer needed because Mullion now derives from FamilyInstance</h5>
+
+<p>Note that the mullion now has both a location point, as it is a family instance, and a location curve as well. 
+Lucky mullion!
+
+<p>18 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	86	14	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	89	21	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	92	39	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: 'This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	139	25	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdImportsInFamilies.cs	201	17	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	239	14	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	15	'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: 'Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	277	32	BuildingCoder
+Warning	16	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	294	17	BuildingCoder
+Warning	17	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	304	19	BuildingCoder
+Warning	18	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	307	34	BuildingCoder
+</pre>
+
+<h5>Fixes 11-13</h5>
+
+<ol start="11">
+<li>Fixed 'Autodesk.Revit.DB.AnnotationSymbol.AsFamilyInstance' is obsolete: This property is no longer needed because AnnotationSymbol now derives from FamilyInstance.
+<li>Fixed 'Autodesk.Revit.DB.Reference.GeometryObject' is obsolete: Property will be removed. Use Element.GetGeometryObjectFromReference(Reference) instead.
+<li>Fixed 'Autodesk.Revit.DB.Element.ObjectType' is obsolete: 'Use Element.GetTypeId() and Element.ChangeTypeId() instead.
+</ol>
+
+<p>14 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	86	14	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	89	21	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: 'This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdSpaceAdjacency.cs	134	11	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: 'This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils. '	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdEditFloor.cs	250	11	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: '"This method will be removed, use FindReferencesWithContextByDirection()."'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	239	14	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: '"Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())"'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	295	17	BuildingCoder
+Warning	13	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: '"Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())"'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	305	19	BuildingCoder
+Warning	14	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: '"Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())"'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	308	34	BuildingCoder
+</pre>
+
+<h5>Fixes 14-15</h5>
+
+<ol start="14">
+<li>Fixed 'Autodesk.Revit.DB.Document.Move(Autodesk.Revit.DB.Element, Autodesk.Revit.DB.XYZ)' is obsolete: This Move method has been obsoleted. Use one of the replace methods in ElementTransformUtils.
+<li>Fixed 'Autodesk.Revit.DB.Mechanical.Space.Boundary' is obsolete: This property is obsolete, use GetBoundarySegments(SpatialElementBoundaryOptions) instead.
+</ol>
+
+<p>12 warnings:
+
+<pre>
+Warning	1	'Autodesk.Revit.DB.MaterialOther' is obsolete: 'This class is deprecated and will be excluded in a future release. Use the Material class instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	63	17	BuildingCoder
+Warning	2	'Autodesk.Revit.DB.Materials.AddOther(string)' is obsolete: 'This method is deprecated and will be excluded in a future release. Use Material.Create instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	64	21	BuildingCoder
+Warning	3	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	69	11	BuildingCoder
+Warning	4	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	86	14	BuildingCoder
+Warning	5	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdNewSpotElevation.cs	89	21	BuildingCoder
+Warning	6	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	104	24	BuildingCoder
+Warning	7	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	140	26	BuildingCoder
+Warning	8	'Autodesk.Revit.DB.Face.MaterialElement' is obsolete: 'Property will be removed. Use Face.MaterialElementId instead.'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdGetMaterials.cs	155	28	BuildingCoder
+Warning	9	'Autodesk.Revit.DB.Document.FindReferencesByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method will be removed, use FindReferencesWithContextByDirection().'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	239	14	BuildingCoder
+Warning	10	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	295	17	BuildingCoder
+Warning	11	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	305	19	BuildingCoder
+Warning	12	'Autodesk.Revit.DB.Reference.ProximityParameter' is obsolete: 'Property will be removed. Use ReferenceByContext.ProximityParameter instead (after obtaining ReferenceWithContext from Document.FindReferencesWithContextByDirection())'	C:\a\lib\revit\2012\bc\BuildingCoder\BuildingCoder\CmdDimensionWallsFindRefs.cs	308	34	BuildingCoder
+</pre>
+
+<p>These twelve warnings are left as they are for the time being and hopefully cause no harm.
+
+-->

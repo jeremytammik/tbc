@@ -1,0 +1,137 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>UIView and Windows Device Coordinates</h3>
+
+<p>As I pointed out in the discussion of the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a> features,
+
+the add-in integration enhancements include a new View API, and it provides a new UIView class.
+
+<p>The UIView class represents a view window, enables you to pan, zoom and determine its size for tiling etc., and may be useful for switchback functionality from other visualization environments, for example.
+
+<p>I am very surprised that I have not heard anything more from the developer community about this class yet, nor received any cases querying it and its behaviour.
+
+<p>Maybe the entire humanity falls into just one of two classes: those who missed it entirely, and those who noticed and made use of it without any problem whatsoever.
+
+<p>Anyway, after waiting for a couple of months now and still hearing nothing about it from anyone else, I decided to try it out myself, and I must say I belong to the second group.
+
+<p>The UIView class provides only three methods of interest to us:
+
+<ul>
+<li>GetWindowRectangle returning the rectangle containing the coordinates of the view's drawing area, in Windows coordinates. 
+<li>GetZoomCorners returning the corners of the view's rectangle, in Revit model coordinates. 
+<li>ZoomAndCenterRectangle, which zooms and centres the view to a specified rectangle. 
+</ul>
+
+<p>The reason I find this so utterly exciting is that this is the first time in the history of mankind that we have any official possibility at all to correlate between Windows and Revit coordinates, opening unlimited new interaction possibilities.
+For instance, how about displaying your own tooltip during the Idling event?
+
+<p>I created a little external command WinCoords which exercises all three of these methods.
+
+<p>By the way, the only way that I saw to access a UIView instance was using the UIDocument GetOpenUIViews method, which returns a list of all of them.
+
+<p>Since each UIView has a property ViewId, we can easily pick the one corresponding to the document active view.
+
+<p>Here is my command implementation, which 
+
+<ul>
+<li>Gets the active view.
+<li>Gets all UIView instances.
+<li>Determines the UIView for the active view.
+<li>Queries and reports its Windows and Revit coordinates.
+<li>Calculates new Revit coordinates to zoom in by 10%.
+<li>Calls ZoomAndCenterRectangle to do so.
+</ul>
+
+<p>Short and sweet, and a read-only command, of course:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp; <span class="teal">UIView</span> uiview = <span class="blue">null</span>;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">UIView</span>&gt; uiviews = uidoc.GetOpenUIViews();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">UIView</span> uv <span class="blue">in</span> uiviews )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( uv.ViewId.Equals( view.Id ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uiview = uv;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Rectangle</span> rect = uiview.GetWindowRectangle();
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; corners = uiview.GetZoomCorners();
+&nbsp; <span class="teal">XYZ</span> p = corners[0];
+&nbsp; <span class="teal">XYZ</span> q = corners[1];
+&nbsp;
+&nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; <span class="maroon">&quot;UIView Windows rectangle: {0}; &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;zoom corners: {1}-{2}; &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;click Close to zoom in by 10%.&quot;</span>, 
+&nbsp; &nbsp; RectangleString( rect ), 
+&nbsp; &nbsp; PointString( p ), PointString( q ) );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;WinCoords&quot;</span>, msg );
+&nbsp;
+&nbsp; <span class="green">// Calculate new zoom corners to </span>
+&nbsp; <span class="green">// zoom in by 10%, i.e. the two corners</span>
+&nbsp; <span class="green">// end up at 0.45 of their previous</span>
+&nbsp; <span class="green">// distance to the centre point.</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp; <span class="teal">XYZ</span> center = p + 0.5 * v;
+&nbsp; v *= 0.45;
+&nbsp; p = center - v;
+&nbsp; q = center + v;
+&nbsp;
+&nbsp; uiview.ZoomAndCenterRectangle( p, q );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>This is the task dialogue reporting the results in the 3D view of the rac_basic_sample_project.rvt:
+
+<center>
+<img src="img/WinCoords.png" alt="WinCoords"/>
+</center>
+
+<p>After clicking 'Close', the view is zoomed in  by 10 percent, as expected.
+
+<p>Since Windows coordinates have the Y direction reversed to normal systems, the rectangle display string is generated like this:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a string representing the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given Rectangle instance size, in</span>
+&nbsp; <span class="gray">///</span><span class="green"> the order left+top, right+bottom.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Windows coordinates reverse the Y </span>
+&nbsp; <span class="gray">///</span><span class="green"> direction!</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> RectangleString( <span class="teal">Rectangle</span> r )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1})-({2},{3})&quot;</span>,
+&nbsp; &nbsp; &nbsp; r.Left, r.Top, r.Right, r.Bottom );
+&nbsp; }
+</pre>
+
+<p>Here is my little 
+
+<a href="zip/WinCoords.zip">
+WinCoords sample</a> including
+
+the entire source code, Visual Studio solution and add-in manifest for this command.
+
+<p>I hope you find this useful and am excited to see what you come up with making use of this.

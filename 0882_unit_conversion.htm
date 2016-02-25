@@ -1,0 +1,124 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Harry Mattison Re: Unit Conversion utility
+
+-->
+
+<h3>Unit Conversion Utility Update</h3>
+
+<p>Here is a Revit 2013 update of the Revit 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">
+unit conversion utility</a>,
+
+originally posted and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">
+described for Revit 2010</a>, by
+
+<a href="http://boostyourbim.wordpress.com">
+Harry Mattison</a>.
+
+<p>In his own words:</p>
+
+<p>I was looking at the great
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">
+unit conversion utility</a> and
+
+created a
+
+<a href="zip/UnitConversions2013.zip">
+new version upgraded to use the Revit 2013 API</a>
+
+that I thought you readers might enjoy.
+
+<p>I ran into one issue that required a code enhancement to catch an exception thrown by many parameters, such as HVAC_Temperature, HVAC_Slope, etc.
+
+<p>The rest of the code handles error conditions nicely, so I was surprised to see these uncaught exceptions.
+
+<p>I solved it by adding a try/catch statement around the existing call to AddParameter in frmUnitConversions.cs:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _Parameter )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create a new parameter</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _Parameter
+&nbsp; &nbsp; &nbsp; &nbsp; = _DbDocument.FamilyManager.AddParameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterTypeToCreate.ToString(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.INVALID,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterTypeToCreate,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">false</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Error&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot create parameter '&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + parameterTypeToCreate.ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' with parameter type '&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + parameterTypeToCreate
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' because of exception\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.Message.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I think I figured out what is causing this and thought it would be interesting to share with your blog readers:
+
+<p>I am creating family parameters from a shared parameter file.
+Some parameters have types that are not supported in the version of Revit that I am currently using, which is Revit Architecture.
+
+<p>I created this function to detect the situation:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> canGetFormatOptions(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">FamilyParameter</span> familyParameter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UnitType</span> parameterUnitType
+&nbsp; &nbsp; &nbsp; &nbsp; = ConvertParameterTypeToUnitType(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyParameter.Definition.ParameterType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.ProjectUnit.get_FormatOptions(
+&nbsp; &nbsp; &nbsp; &nbsp; parameterUnitType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I use it like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( !canGetFormatOptions(
+&nbsp; &nbsp; famDoc, familyParameter ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Error&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot set parameter value.\nUnit Type &quot;</span>
+&nbsp; &nbsp; &nbsp; + ConvertParameterTypeToUnitType(
+&nbsp; &nbsp; &nbsp; &nbsp; familyParameter.Definition.ParameterType )
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; is not supported in Revit &quot;</span>
+&nbsp; &nbsp; &nbsp; + famDoc.Application.Product.ToString() );
+&nbsp; }
+</pre>
+
+<p>Take care.
+
+<p>The updated code is provided above.</p>
+
+<p>Many thanks to Harry for this update with his enhancement and analysis!</p>

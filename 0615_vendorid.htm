@@ -1,0 +1,91 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1270879 [Regarding [CaseNo:06593234] Incorporate outside external command but getting VendorID message] -->
+
+<h3>VendorId, DevTV, and My First Plugin</h3>
+
+<p>Here is a simple issue from a discussion with Stephen LeCompte of
+
+<a href="http://www.fkp.com">FKP Architects, Inc.</a> that 
+
+several other people people also recently ran into:
+
+<p><strong>Question:</strong> I followed the steps provided in 'DevTV: Introduction to Revit 2011 Programming - Part I' and incorporated them in my Revit Architecture 2012 64-bit version, but there is a problem.   
+When I start up Revit 2012 it displays the following error message saying 'Failed to initialize the add-in "RevitNETAddin3.addin" because the add-in registration is missing the required value of VendorId node. The VendorId note identify the vendor of the add-in application. For Revit to run the add-in, you must register the node defined in the manifest "RevitNETAddin3.addin" file.'
+
+<center>
+<img src="img/VendorIdErrorMsg.png" alt="VendorId error message"/>
+</center>
+
+
+<p>The DevTV video says nothing at all about the need to add a VendorId node.
+I researched what this VendorId is through Google and found the page on 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/API_Dev_Guide/0000-API_Deve0/0001-Introduc1/0018-Add-In_I18/0022-Add-in_R22">
+Add-in Registration</a>
+
+in the Revit API WikiHelp.
+
+<p>It states I have to register a developer symbol, which I did.
+
+<p>Even after doing so, I still get the same error message from Revit.   
+
+<p>How can I solve this, please?
+
+
+
+<p><strong>Answer:</strong> The issue is a lot less complex than it sounds, actually.
+
+<p>It is a good thing for you that you registered your developer symbol, but that does not make any difference to the loading behaviour of the Revit add-in. 
+For the loading, it is only important that the VendorId tag is present in the add-in manifest file, regardless of its contents. 
+The manifest file RevitNETAddin3.addin that you attached looks perfectly correct to me. 
+
+<p>If you are still seeing the error message above, then the only explanation I can think of is that you have not copied the updated version of the manifest file to the location where Revit is searching for it. 
+I would suggest doing a global search for this file across your entire system and eliminating all unwanted duplicates. 
+
+
+<p><strong>Response:</strong> I found the solution!
+
+<p>The problem was due to me using a tag named VendorID, and not VendorId with a lower-case 'd'.
+
+<p>Now I've adjusted my Revit template and the places where the .addin and .dll get created to avoid confusion in the future.  
+Everything is working great and ready to create some new plug-ins.
+
+<p>Suggestion: The latest Revit DevTV video-Part does not mention or show the <VendorId> tags, so it is a little confusing when people try with Revit 2012.  
+Could you add a comment to the download page to warn people of that difference?
+
+
+<p><strong>Answer:</strong> Yes, as you discovered the hard way, <a href="http://www.w3schools.com/xml/xml_syntax.asp">XML tags are case sensitive</a>.
+Sorry for not noticing that error in your sample manifest file.
+
+<p>Therefore, VendorID was not accepted, and VendorId needs to be specified exactly so. 
+
+<p>I am very glad your Revit template works now. 
+Are you aware of the one I use?
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">Visual Studio add-in wizards for Revit 2012</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/implicit-line-continuation-in-vb-2010.html#2">Updated VB wizard</a> using Visual Studio 2010 line continuation feature.
+</ul>
+
+<p>You are completely correct, the DevTV videos were created using Revit 2011, and do not mention the new VendorId tags required in Revit 2012. 
+Yes, that feature is new in Revit 2012. It is highlighted in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+Revit 2012 API news</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html#2">
+webcast recording</a>.
+
+<p>I do not believe that we will be updating the DevTV training video for Revit 2012, since the differences are small, but I completely agree that this one difference is a real stumbling block and should be prominently highlighted in the download page.
+
+<p>On the other hand, I would actually expect people to have a look at the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a> and the 
+
+<a href="http://www.autodesk.com/myfirstrevitplugin">My first Revit plug-in</a> first of all, nowadays.
+
+That is based on Revit 2012 and thus includes an explanation of the add-in manifest file VendorId tag.
+

@@ -1,0 +1,228 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>More Questions</h3>
+
+<p>Here are some more of the questions that were raised lately, including some cases handled by my colleagues Joe Ye and Saikat Bhattacharya:</p>
+
+<ul>
+
+<li>Can I define my own user or API family type parameters that provide a list of options to the user and are displayed in a drop-down list, like 'Level' or 'Phase Created', or through a dialogue, like 'Assembly Code'?</li>
+
+<li>I am trying to use a built-in parameter by calling the Parameter method on a family type object, but it produces an error saying 'Parameter' is not a member of 'Autodesk.Revit.Symbols.FloorType'.
+What is wrong?</li>
+
+<li>Is it possible to change a design option to primary in the Revit API, for instance using the Element.DesignOption property?</li>
+
+<li>Is it possible to find all elements associated with a specific design option?</li>
+
+<li>How can I change the colour of one individual element instance through the API?</li>
+
+<li>How can I change the colour of a face using the API? Can I change colour of one and only one face?</li>
+
+<li>Is it possible to use event handling or some other method to add steps when a user clicks on Save As? We would like to make sure a few things are done before the Save As command executes.</li>
+
+</ul>
+
+
+<h4>Drop-down list for parameter values</h4>
+
+<p><strong>Question:</strong>
+Can I define my own user or API family type parameters that provide a list of options to the user and are displayed in a drop-down list, like 'Level' or 'Phase Created', or through a dialogue, like 'Assembly Code'?</p>
+
+<p><strong>Answer:</strong>
+Nope, unfortunately not. As a workaround, you can always define your own user interface to set your parameters, and not make use of the default Revit one.</p>
+
+
+<h4>Parameter get method</h4>
+
+<p><strong>Question:</strong>
+I am trying to use built-in parameters like this:
+
+<pre>
+famName = ft.Parameter(
+  BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM ).AsString
+</pre>
+
+This produces an error saying
+
+<pre>
+'Parameter' is not a member of 'Autodesk.Revit.Symbols.FloorType'.
+</pre>
+
+What is wrong?</li>
+
+<p><strong>Answer:</strong>
+The official name of the API method to obtain the parameter is indeed Parameter.
+However, some internal compilation mechanism has converted it to get_Parameter.
+If you look at the true methods available, for instance by using the Visual Studio Intellisense or the object browser, you will see the true names listed.</p>
+
+
+<h4>Change design option to primary</h4>
+
+<p><strong>Question:</strong>
+Is it possible to change a design option to primary in the Revit API, for instance using the Element.DesignOption property?</p>
+
+<p><strong>Answer:</strong>
+No, unfortunately it is not possible to change the design option via the API.
+Design options enable the user to add alternative designs within the same project.
+Each element can either be in a design option or not at all, in which case it is considered to be part of the main model and have no design alternatives.
+The Element.DesignOption property is read-only.
+There is a parameter 'Design Option' for this property to store the design option, and this parameter is read-only as well.
+For elements that already were assigned a design option property, the design option cannot even be changed through the user interface.
+If the design option value is ‘Main Model’, then it can still be changed through the user interface.</p>
+
+<h4>Finding elements associated with a design option</h4>
+
+<p><strong>Question:</strong>
+Is it possible to find all elements associated with a specific design option?</p>
+
+<p><strong>Answer:</strong>
+Yes, one can use the parameter filter to quickly find all elements associated with a specified design option.
+Here is an example to find all walls with the ‘Main Model’ design option:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">CreationFilter</span> cf = app.Create.Filter;
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f1 = cf.NewParameterFilter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.DESIGN_OPTION_PARAM,
+&nbsp; &nbsp; <span class="teal">CriteriaFilterType</span>.Equal, <span class="maroon">"Main Model"</span> );
+&nbsp;
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp; <span class="teal">Filter</span> f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; doc.get_Elements( f, a );
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg( <span class="maroon">"There are "</span>
+&nbsp; &nbsp; + a.Count.ToString()
+&nbsp; &nbsp; + <span class="maroon">" main model wall elements"</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="change_colour_of_one_instance"></a>
+
+<h4>Change colour of one instance</h4>
+
+<p><strong>Question:</strong>
+How can I change the colour of one individual element instance through the API?</p>
+
+<p><strong>Answer:</strong>
+There is no direct API to change the colour of individual elements.
+One workaround is to assign a different material which has a different material colour to the family instance symbol.
+To get the colour of the material assigned to a family symbol, you can use the following traversal path:</p>
+
+<pre>
+FamilyInstance famIns
+  = elem as FamilyInstance;
+
+ElementId matId
+  = famIns.Symbol.get_Parameter("Material").AsElementId();
+
+Material mat = doc.get_Element( ref matId ) as Material;
+
+System.Drawing.Color color
+  = System.Drawing.Color.FromArgb(
+    mat.Color.Red, mat.Color.Green,
+    mat.Color.Blue );
+</pre>
+
+<p>Assigning a different material with different material colour to family instance symbol will change the colour of all instances of that family.
+To change just one single instance you will have to create a new type for it.
+This can be done as follows:</p>
+
+<ul>
+<li>Create a duplicate of the existing type.
+<li>Assign a different material colour to the newly created type.
+<li>Assign this type to the object that you want to colour differently.
+</ul>
+
+<p>Here is the result of a quick test with three columns. For each column, the type was changed by duplicating the first one and assigning a new material colour to the copy:</p>
+
+<img src="img/three_columns_with_different_colours.gif" alt="Three columns with different colours"/>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-api-cases-1.html#3">
+Continued...</a>
+
+<h4>Changing the colour of a face</h4>
+
+<p><strong>Question:</strong>
+How can I change the colour of a face using the API? Can I change colour of one and only one face?</p>
+
+<p><strong>Answer:</strong>
+The Face object MaterialElement property is read-only, and this is the only property of a face that refers to colour or material in any way, so you cannot change either colour or material of an individual face directly.</p>
+
+<p>Actually, you should be aware of the fact that Face class is a member of the Autodesk.Revit.Geometry namespace. All classes in this namespace are used to provide views into the Revit database, but not to define the database elements themselves. Therefore, even if there was a way to modify the colour of an individual face, it would have no effect on the Revit model.</p>
+
+<p>To persistently modify the colour of individual faces within the Revit model, you can use the face split operation provided by the Face Splitter tool in the user interface.</p>
+
+<p>Please be aware that there is currently no API access to determine the colour or material of split faces.</p>
+
+
+<h4>Use event handling on Save As</h4>
+
+<p><strong>Question:</strong>
+Is it possible to use event handling or some other method to add steps when a user clicks on Save As? We would like to make sure a few things are done before the Save As command executes.</p>
+
+<p><strong>Answer:</strong>
+The Revit API help file RevitAPI.chm mentions the DocumentSaveAsEventHandler delegate which is a handler for the event that is fired before the current document is saved as a file with different file name.
+This should be what you are looking for.
+The SDK samples include the RoomSchedule sample which shows how to register handlers for some events, including the document save as event. The main line is:</p>
+
+<pre>
+doc.OnSaveAs += new
+  DocumentSaveAsEventHandler( OnDocumentSave );
+</pre>
+
+<h4>More details on my break</h4>
+
+<p>Some colleagues asked for more details of my experiences during my break, and whether I took any pictures.
+I did not, I was not carrying a camera and thought that there are probably loads of photos of all the places I visited available online.
+Here are some of the nicest and main places I went to, with links to online pictures of some of them:</p>
+
+<ul>
+<li>
+<!-- <a href="http://en.wikipedia.org/wiki/Naples,_Italy"> -->
+Napoli or Naples.</li>
+
+<li>Ischia, a beautiful island that I totally fell in love with.</li>
+<li>Palermo.</li>
+<li>The
+<a href="http://www.paradoxplace.com/Perspectives/Sicily%20&%20S%20Italy/Montages/Sicily/Palermo/Monreale%20Cathedral.htm">
+cathedral of Monreale</a>.</li>
+
+<li>Cefalu.</li>
+<li>
+<a href="http://www.swisseduc.ch/stromboli/volcano/photos/index-de.html">
+Stromboli</a>, an island volcano ... I spent the night on top of it and watched the regular eruptions.</li>
+
+<li>Cathania.</li>
+<li>Etna, a volcano, where I walked in snow over the lava fields for several kilometres ... I did not see the erupting part due to clouds, though.</li>
+<li>The Amalfian coast, with the
+
+<a href="http://www.fotoeweb.it/sorrentina/Sentiero%20degli%20Dei.htm">
+Sentiero degli Dei</a>,
+
+or Path of the Gods, the most beautiful path I ever walked 
+
+(<a href="http://www.youtube.com/watch?v=OoYb7P4ioZs">photo video</a>).</li>
+
+</ul>
+
+<p>It was a really wonderful trip, I met wonderful people, and I will definitely be returning to southern Italy again.</p>

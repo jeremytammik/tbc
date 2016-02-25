@@ -1,0 +1,97 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262716 [Filter Element from Phase] -->
+
+<h3>Filter for View and Phase</h3>
+
+<p>Here is yet another entry in our endlessly growing collection of filtering examples, highlighting yet another hitherto unexplored aspect, combining a view filter with a parameter filter for a specific phase.
+
+<p><strong>Question:</strong> I need to retrieve all elements in a specific view that have same phase, created but not demolished.
+How can I achieve that, please? 
+
+<p><strong>Answer:</strong> To get all elements in a specified view, you can use the overload of the FilteredElementCollector constructor taking a view element id as a second argument.
+Quoting the Revit API help file RevitAPI.chm, it 'constructs a new FilteredElementCollector that will search and filter the visible elements in a view'.
+
+<p>Since 'Phase Created' is a parameter, you can then use the ElementParameterFilter class to filter out elements having the specific phase.
+Combining the two filters will provide your target element set. 
+
+<p>Here is some sample code demonstrating this:
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">RegenerationAttribute</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Test&quot;</span> );
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// use the view filter</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; doc, doc.ActiveView.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// use the parameter filter.</span>
+&nbsp; &nbsp; <span class="green">// get the phase id &quot;New construction&quot;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> idPhase = GetPhaseId( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;New Construction&quot;</span>, doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterValueProvider</span> provider 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ( <span class="blue">int</span> ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.PHASE_CREATED ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericEquals</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterElementIdRule</span> rule 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; provider, evaluator, idPhase );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> parafilter 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; &nbsp; collector.WherePasses( parafilter );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Element Count&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;There are &quot;</span> + collector.Count().ToString() 
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; elements in the current view created&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; with phase New Construction&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">ElementId</span> GetPhaseId( 
+&nbsp; &nbsp; <span class="blue">string</span> phaseName, 
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Phase</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> phases = <span class="blue">from</span> <span class="teal">Phase</span> phase <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="blue">where</span> phase.Name.Equals( phaseName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="blue">select</span> phase;
+&nbsp;
+&nbsp; &nbsp; id = phases.First().Id;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> id;
+&nbsp; }
+}
+</pre>

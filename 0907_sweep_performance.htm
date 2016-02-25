@@ -1,0 +1,205 @@
+﻿<html>
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+<body>
+
+<!--
+
+SPR #235930 [stray regeneration in sweep generation]
+
+David Tan, 谭得浩
+Hu Zhao, /cy虎虎虎/cy
+
+From: 谭得浩
+Date: Tuesday, March 12, 2013 06:16
+Subject: FW: Automatic Regeneration After Many Sweeps Created
+
+Hi Jeremy,
+
+I have forwarded your email to Hu (in CC list).
+
+I only have 1 tip: I'm not Hu's professor. I'm a programmer who have been working on Revit since 3 years ago. I worked with Hu and his professor when he was studying in China :)
+
+Hello Zhao Hu,
+
+I'm sure you're the right guy to say if it's OK or not :)
+
+Best Regards,
+David Tan
+
+From: /cy虎虎虎/cy
+Date: Tuesday, March 12, 2013 09:27
+Subject: Reply: Automatic Regeneration After Many Sweeps Created
+
+Hi Jeremy and David,
+
+Thank you for the inform!
+
+I think it's OK!
+
+Best,
+
+Hu
+
+-->
+
+<h3>Sweep Family Performance Enhancement</h3>
+
+<p>Now I am back at work again, enjoying the queries coming in from developers, postponing other important things such as my own long-term class and presentation preparations etc.
+Addicted to helping, that's me.</p>
+
+<p>Anyway, here is a piece of doubly good news, in that the developers mentioned below did a good job of helping themselves, in addition to achieving a radical speed improvement from 40 hours down to 3 minutes, i.e. just 0.125% of the original time,  to programmatically generate some Revit families.</p>
+
+<p><strong>Question:</strong> The problem was initially reported by
+
+<a href="http://www.facebook.com/hu.zhao.3">
+Hu Zhao</a> in a recent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/mp3-manipulation-using-python-mutagen-and-ffmpeg.html?cid=6a00e553e168978833017d410ee261970c#comment-6a00e553e168978833017d410ee261970c">
+comment</a>:</p>
+
+<blockquote>
+<p>I have 80,000 elements to generate, now I use sweep; do you know which is faster of sweep and extrusion?
+Which can offer a better performance for the computer?
+
+<p>It took 40 hours for the sweep operations.
+
+<p>Is it possible to accelerate this?
+
+<p>In Rhino script, only 10 minutes is enough for this operation.
+</blockquote>
+
+<p>Hu's colleague and Revit API blogger
+
+<a href="http://blog.csdn.net/flower4wine">
+David Tan</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html?cid=6a00e553e168978833017c36e43308970b#comment-6a00e553e168978833017c36e43308970b">
+clarifies</a>:
+
+</p>
+
+<blockquote>
+<p>Zhao's scenario is to create about 80,000 sweeps in Revit in one shot.
+Per his test, it will take about 20 hours, while his workmate can achieve it in Rhino within 10 minutes.
+Zhao expects that Revit could do faster.
+
+<p>As Zhao's test was done in an open family document (with UIDocument), I tried to use in-memory document but it still take about 18 hours to draw all 80K sweeps.
+
+<p>Zhao noticed that although all the drawing work is done in a single transaction, it seems that Revit tries to regenerate the document after there are sweeps created already automatically.
+We did set the RegenerationOption to be Manual.
+We say it because we saw Revit progress bar in the bottom-left corner indicates it.
+
+<p>Our questions:
+
+<ol>
+<li>Can we prohibit Revit's automatic regeneration?</li>
+<li>More straightly, do we have any approach to get the job done faster?</li>
+</ol>
+
+<p>Thanks a lot! And Happy Chinese Snake Year!
+</blockquote>
+
+
+
+<p><strong>Answer:</strong> There may be a stray regeneration happening in sweep creation.
+
+<p>If you can demonstrate that (with a sample that creates something less than 80,000 sweeps, please :-), please provide a reproducible case for further analysis.
+
+<p>It is also worth asking what the use case is for 80,000 sweeps in one family.
+Are you possibly modelling things so detailed that that a building model with multiple instances of this will have performance problems?
+
+<p>Maybe you could add an image of what you are creating to motivate the development team by helping them understand.
+
+
+<p><strong>Response:</strong> Here is an image showing what we are trying to achieve:</p>
+
+<center>
+<img src="img/sweep_performance_roof.jpeg" alt="Roof with sweeps" width="600"/>
+</center>
+
+<p>Each sweep corresponds to a single wooden roof in the image.
+
+<p>Here is also
+
+<a href="zip/sweep_performance_david.zip">
+Hu Zhao's source code</a>.
+
+We used an in-memory document and added a StopWatch to measure the time consumed.
+
+<p>The source code implements an external command in Program.cs.
+It will pop up a window and let you select a XML file, which contains creation data of all the sweeps.
+You can find the XML file along with the .sln file.
+To make things simple, I only put 2000+ sweeps creation data in the XML file.
+
+<p>Finally I want to share the good news from Hu Zhao.
+He resolved the performance problem by splitting all sweeps into 24 families and then combining them together.
+It only takes 3 minutes now.
+Of course, the cost is the reduced granularity; the model now no longer has individual roofs with embedded family instances.
+But as he is OK with it, we can say we have found the solution.
+
+<p>Hu added the following
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/mp3-manipulation-using-python-mutagen-and-ffmpeg.html?cid=6a00e553e168978833017ee88d66c1970d#comment-6a00e553e168978833017ee88d66c1970d">
+more detailed project description</a>:</p>
+
+<p>I am now working in a project plan team for the design of Arch_Tec_Lab in ETH Zürich
+
+(<a href="http://www.youtube.com/watch?v=tzKfXra9o54">youtube link</a>).
+
+<p>The parametric roof is generated in Rhino by my colleague, and the wooden beams will be assembled by robotic arms.
+
+<p>Before I joined this team, they imported the roof (including roof wooden structure) in DWG format, which did not display correctly in some plan and section views.
+In 3D view, it led to Revit crash because of too many triangle meshes in this imported format.
+
+<p>So I wrote a plugin to import the wooden beams (around 80k) of the roof.
+
+<p>We choose XML to exchange the position information, and I choose sweep instead of extrusion to generate each beam.
+
+<p>For now, the roof structure is divided into 7 parts of XML, which generates 7 families.
+It took me about 20 hours by using 3 dell precision computers.
+
+<p>Because the roof will be modified several times in the following days, I am now searching for a way to reduce the generation time.
+
+<p>I found that the speed of sweep is slower when the amount increased, and the regeneration that I cannot avoid is especially slow when the amount is above 1500.
+
+<p>Yesterday I found a way to accelerate the generation greatly.
+
+<p>I did like this: divided each 1 part  into 24 pieces sections with the mark in XML, then generate each section into single family, and then combine them into a major family.
+These actions are all made by the plugin.
+
+<p>This is much more quicker.
+
+<p>Let me introduce our project once again.
+
+<p>The Arch_Tec_Lab is a role model project of department of Architecture, ETH Zürich.
+The team includes most important professors in the Institute of Technology in Architecture.
+The project aims to realize the BIM control in the life circle.
+Now we are using Revit to an extremely detail, and we enjoy the cloud rendering in Autodesk 360, except we wish it would also support animation rendering.
+Now we are working on the construction drawings in Revit.
+
+<p>In Switzerland, few architects use Autodesk products, because of the majority of the MAC users.
+But we want build a model for the architects and the students in department.
+
+<p>Many thanks to David and Hu for their research and sharing this remarkable performance enhancement!
+
+<p><strong>Addendum:</strong> For completeness' sake, here is the
+
+<a href"zip/sweep_performance_david_slow.txt">slow source code</a> and the
+
+<a href"zip/sweep_performance_david_big_fast.rar">complete fast solution</a>.
+
+<p>Hu clarifies: the code we posted yesterday is the slow version.
+The 'slow source code' shows how it works.
+The 'complete fast solution' is the quicker version.
+
+<p>There are 8 parts to generate.
+I finished all the work above in 20 hours using 3 computers, and now I can generate the smallest part in 3 minutes.
+Actually, the bigger part took about 6 hours by the slow method, and now takes about 50 minutes.
+
+<p>The time depends on how many parts I separate.
+I never test all the 80000 sweeps in one run, maybe it will cost one month ~:D &ndash; because the speed runs slower when time goes.
+
+</body>
+</html>

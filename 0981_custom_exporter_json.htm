@@ -1,0 +1,1062 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>ADN Mesh Data Custom Exporter to JSON</h3>
+
+<p>I mentioned my idea of implementing a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#7">
+custom exporter to JSON</a> to drive
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a>'s online
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/06/3d-webgl-viewer-with-javascript-and-threejs.html">
+3D WebGL viewer</a>.</p>
+
+<p>Well, here it is.</p>
+
+
+<a name="muttenhorn"></a>
+
+<h4>Muttenhorn</h4>
+
+<p>Before getting to that, though, let me briefly mention that I went on a nice mountain with my friend Martin last Saturday, over the Gross Muttenhorn on the south side of the Furka pass.</p>
+
+<p>A glacier named Muttgletscher lies over its north-western flanks, and we crossed that on our ascent up to the west ridge.
+From the summit we continued down the east ridge to descend between the three lakes next to the Stotzigen Firsten:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-06_muttenhorn/p1020836_blue_lake_stotzigen_firsten.jpg" alt="A lake at Stotzigen Firsten by Muttenhorn" width="250"/>
+</center>
+
+<p>Here are some
+
+<a href="https://www.facebook.com/media/set/?set=a.10200914722843221.1073741825.1019863650&type=1">
+more pictures</a> if
+
+you be so inclined.</p>
+
+<h4>Gwen and Dave's Getaway</h4>
+
+<p>Another little non-Revit pointer is to the
+
+<a href="http://area.autodesk.com/contest/winners">Gwen and Dave's Getaway</a> animated
+
+short film contest.
+I really like the two top prize winners,
+
+<a href="http://area.autodesk.com/contest/videos/sky-fishing#content">
+Sky Fishing</a> by Austin Reddington and
+
+<a href="http://area.autodesk.com/contest/videos/peace-and-quiet#content">Peace and Quiet</a> by
+Khye Kading; well worth just a few minutes of your time.</p>
+
+<p>Now, back to business.</p>
+
+
+<a name="1"></a>
+
+<h4>ADN Mesh Data Custom Exporter</h4>
+
+<p>I was originally expecting to be done in just a few hours, but this turned out to be a full one day plus night project that kept me happily busy until four o'clock this morning, touching on numerous topics and challenges both named and unnamed, some of which are:</p>
+
+<ul>
+<li><a href="#2">ADN mesh data format</a></li>
+<li><a href="#3">Tetrahedron sample JSON data</a></li>
+<li><a href="#4">Little house and curved wall in JSON</a></li>
+<li><a href="#5">Custom exporter implementation and components</a></li>
+<li><a href="#6">Centroid and volume</a></li>
+<li><a href="#7">Export context implementation</a></li>
+<li><a href="#8">ADN mesh data class</a></li>
+<li><a href="#9">JSON serialisation</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>ADN Mesh Data Format</h4>
+
+<p>Before we can implement our custom exporter, we need a definition of the JSON format to generate.
+I analysed the files provided by Philippe and described the result in my
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/06/3d-webgl-viewer-with-javascript-and-threejs.html?cid=6a0167607c2431970b0192abb7b8d8970d#comment-6a0167607c2431970b0192abb7b8d8970d">
+comment</a> on his post:
+
+I see the FacetCount, VertexCount, VertexCoords, VertexIndices, Normals, NormalIndices, Center, Color and Id properties define in the JSON file.
+Exactly how are these defined, and are some of them optional?
+
+<p>Philippe replies: the AdnMeshData class definition specifies the data format:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">AdnMeshData</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> AdnMeshData()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> FacetCount
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> VertexCount
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span>[] VertexCoords
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span>[] VertexIndices
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span>[] Normals
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span>[] NormalIndices
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span>[] Center
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span>[] Color
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Id
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">set</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>All remaining issues are clarified by this little Q&A:</p>
+
+<ul>
+<li>Are only triangles supported?
+ &nbsp;&ndash;&nbsp; Yes, only triangles, that’s what Inventor provides.</li>
+
+<li>Are any of the properties optional?
+ &nbsp;&ndash;&nbsp; FacetCount and VertexCount are optional.</li>
+
+<li>What happens if you simply omit the normals?
+Will they be automatically calculated from the triangle definitions?
+ &nbsp;&ndash;&nbsp; As it is now it won’t work.
+Those are the normals at the vertices, not at the faces, this info is important to webgl rendering to compute the lights in a realistic way.
+This is what makes the model looks good even if it has been triangulated.</li>
+
+<li>What about the facet and vertex count?
+They could be automatically deduced from the lists provided.
+ &nbsp;&ndash;&nbsp; Yep, in the webgl viewer those properties aren’t used actually.</li>
+</ul>
+
+<p>That should be enough to get us up and running.</p>
+
+
+<a name="3"></a>
+
+<h4>Tetrahedron Sample JSON Data</h4>
+
+<p>After I completed my very first stab at the implementation and dragged the resulting JSON output file onto Philippe's web viewer, nothing was displayed.</p>
+
+<p>By the way, I am making of this
+
+<a href="zip/webgl-viewer-5.zip">offline version</a> that
+
+he provided for testing.</p>
+
+<p>The reason turned out to be some misunderstanding about the triangle vertex order in the JSON input file.</p>
+
+<p>To ensure I could understand what was going on and how the vertices need to be sorted, I implemented a little JSON file by hand defining a tetrahedron between the four points (0,0,0), (10,0,0), (0,10,0) and (0,0,10):</p>
+
+<pre>
+[
+{
+ "FacetCount":4,
+ "VertexCount":4,
+ "VertexCoords":[0,0,0, 10,0,0, 0,10,0, 0,0,10],
+ "VertexIndices":[0,2,1, 0,1,3, 0,3,2, 1,2,3],
+ "Normals":[0,0,-1, 0,-1,0, -1,0,0, 1,1,1],
+ "NormalIndices":[0,0,0, 1,1,1, 2,2,2, 3,3,3],
+ "Center":[3,3,3],
+ "Color":[-2139062017],
+ "Id":"tetrahedron"
+}
+]
+</pre>
+
+<p>Here is what it looks like in the web viewer:</p>
+
+<center>
+<img src="img/webgl_tetrahedron.png" alt="WebGL viewer showing tetrahedron" width="250"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Little House and Curved Wall in JSON</h4>
+
+<p>Once I had that sorted, I proceeded to debug the display of one single wall, and progressed to the little house generated by the ADN training labs.</p>
+
+<p>In Revit, it looks like this in perspective view:</p>
+
+<center>
+<img src="img/little_house_perspective_view.png" alt="Little house in perspective view" width="200"/>
+</center>
+
+<p>The WebGL rendering of the JSON export looks like this:</p>
+
+<center>
+<img src="img/webgl_little_house.png" alt="Little house in WebGL" width="200"/>
+</center>
+
+<p>Finally, here is a rather strange sample BIM from Philippe,
+
+<a href="zip/CurvedWall.rvt">CurvedWall.rvt</a>,
+
+its old JSON representation
+
+<a href="zip/CurvedWall.json">CurvedWall.json</a>,
+
+generated using the Revit 2013 generator based on the ElementViewer SDK sample, and the new version
+
+<a href="zip/CurvedWallJt.json">CurvedWallJt.json</a> generated
+
+by this custom exporter, looking like this in the WebGL viewer:</p>
+
+<center>
+<img src="img/CurvedWall.png" alt="Curved wall model in WebGL" width="200"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Custom Exporter Implementation and Components</h4>
+
+<p>I ended up reusing a number of components from previous projects for this little endeavour.</p>
+
+<p>Here is
+
+<a href="zip/CustomExporterAdnMeshJson.zip">
+CustomExporterAdnMeshJson.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for the ADN mesh data custom exporter external command add-in.</p>
+
+<p>It consists of the following modules:</p>
+
+<ul>
+<li>AdnMeshData.cs &ndash; The data format specifying one solid for the WebGL viewer, defining its centre, colour, id, triangular facets, their vertex coordinates, indices and normals as discussed above.</li>
+
+<li>CentroidVolume.cs &ndash; Calculate and store the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html">
+centroid and volume</a> from a set of triangular facets.</li>
+
+<li>Command.cs &ndash; ADN mesh data custom exporter external command mainline.</li>
+
+<li>ExportContextAdnMesh.cs &ndash; Custom exporter IExportContext implementation to capture ADN mesh data.</li>
+
+<li>NormalLookupXyz.cs &ndash; A facet normal vector lookup class to avoid duplicate normal vector definitions, similar to the vertex lookup mentioned below.</li>
+
+<li>PointInt.cs &ndash; An integer-based 3D point class, supporting the vertex lookup, storing the vertices in integer number millimetres for the sake of efficiency, readability, and to avoid all rounding issues.</li>
+
+<li>Util.cs &ndash; Utility methods.</li>
+
+<li>VertexLookupInt.cs &ndash; A vertex lookup class to avoid duplicate vertex definitions, reused from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#6">
+OBJ exporter</a>.</li>
+</ul>
+
+<p>Which ones should we discuss in greater depth?</p>
+
+<p>I will skip the integer-based point and lookup classes, since I have already belaboured them repeatedly in the past.</p>
+
+
+<a name="6"></a>
+
+<h4>Centroid and Volume</h4>
+
+<p>The ADN mesh data format requires a centre point.</p>
+
+<p>The custom exporter is fed faces, and does not have a built-in mechanism to identify solids.</p>
+
+<p>Therefore, the determination of a centre point needs to be based on the facets we receive instead.</p>
+
+<p>Happily, I already discussed how to determine
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html">
+centroid and volume</a> using
+
+an algorithm that calculates and stores these properties from a set of triangular facets.</li>
+
+<p>I cleaned up the previous implementation to make its use more obvious, and it now looks like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">CentroidVolume</span>
+{
+&nbsp; <span class="teal">XYZ</span> _centroid;
+&nbsp; <span class="blue">double</span> _volume;
+&nbsp;
+&nbsp; <span class="blue">public</span> CentroidVolume()
+&nbsp; {
+&nbsp; &nbsp; Init();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Init()
+&nbsp; {
+&nbsp; &nbsp; _centroid = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; _volume = 0.0;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddTriangle( <span class="teal">XYZ</span>[] p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> vol
+&nbsp; &nbsp; &nbsp; = p[0].X * ( p[1].Y * p[2].Z - p[2].Y * p[1].Z )
+&nbsp; &nbsp; &nbsp; + p[0].Y * ( p[1].Z * p[2].X - p[2].Z * p[1].X )
+&nbsp; &nbsp; &nbsp; + p[0].Z * ( p[1].X * p[2].Y - p[2].X * p[1].Y );
+&nbsp;
+&nbsp; &nbsp; _centroid += vol * ( p[0] + p[1] + p[2] );
+&nbsp; &nbsp; _volume += vol;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set centroid coordinates and volume </span>
+&nbsp; <span class="gray">///</span><span class="green"> to their final values when completed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Complete()
+&nbsp; {
+&nbsp; &nbsp; _centroid /= 4 * _volume;
+&nbsp; &nbsp; _volume /= 6;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> Centroid
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _centroid;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> Volume
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _volume;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">override</span> <span class="blue">public</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.RealString( _volume ) + <span class="maroon">&quot;@&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.PointString( _centroid );
+&nbsp; }
+}
+</pre>
+
+<p>In my current test implementation, I just close the calculation when an element ends.</p>
+
+<p>This should probably be improved to terminate every time the material changes, to handle cases like windows with several different components using different materials.</p>
+
+<p>Actually, you can see that the windows in the screen snapshots above are not perfectly rendered due to this.</p>
+
+
+<a name="7"></a>
+
+<h4>Export Context Implementation</h4>
+
+<p>By far the most complex module is the export context implementation.</p>
+
+<p>The IExportContext interface specifies the following methods:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> Finish();
+&nbsp; <span class="blue">bool</span> IsCanceled();
+&nbsp; <span class="blue">void</span> OnDaylightPortal( <span class="teal">DaylightPortalNode</span> node );
+&nbsp; <span class="teal">RenderNodeAction</span> OnElementBegin( <span class="teal">ElementId</span> elementId );
+&nbsp; <span class="blue">void</span> OnElementEnd( <span class="teal">ElementId</span> elementId );
+&nbsp; <span class="teal">RenderNodeAction</span> OnFaceBegin( <span class="teal">FaceNode</span> node );
+&nbsp; <span class="blue">void</span> OnFaceEnd( <span class="teal">FaceNode</span> node );
+&nbsp; <span class="teal">RenderNodeAction</span> OnInstanceBegin( <span class="teal">InstanceNode</span> node );
+&nbsp; <span class="blue">void</span> OnInstanceEnd( <span class="teal">InstanceNode</span> node );
+&nbsp; <span class="blue">void</span> OnLight( <span class="teal">LightNode</span> node );
+&nbsp; <span class="teal">RenderNodeAction</span> OnLinkBegin( <span class="teal">LinkNode</span> node );
+&nbsp; <span class="blue">void</span> OnLinkEnd( <span class="teal">LinkNode</span> node );
+&nbsp; <span class="blue">void</span> OnMaterial( <span class="teal">MaterialNode</span> node );
+&nbsp; <span class="blue">void</span> OnPolymesh( <span class="teal">PolymeshTopology</span> node );
+&nbsp; <span class="blue">void</span> OnRPC( <span class="teal">RPCNode</span> node );
+&nbsp; <span class="teal">RenderNodeAction</span> OnViewBegin( <span class="teal">ViewNode</span> node );
+&nbsp; <span class="blue">void</span> OnViewEnd( <span class="teal">ElementId</span> elementId );
+&nbsp; <span class="blue">bool</span> Start();
+</pre>
+
+<p>A very few of them can be left unimplemented, at least in my simple test project, but most need attention.
+I left the NotImplementedException statements in the unimplemented ones, so that I am notified if they are called.</p>
+
+<p>I implemented some rudimentary logging to see in which order the methods are called in the debug output window.</p>
+
+<p>A number of the methods provide support for cancelling the rendering process and need to return true or RenderNodeAction.Proceed for it to continue.</p>
+
+<p>Family instances and links need to push their transformations onto a stack, and all vertices received need to be transformed appropriately.</p>
+
+<!--
+<p>I still have doubts about the counter-clockwise orientation of triangle vertices, and you can see the traces of that in the StoreTriangle method, where I swapped the access to the second and third vertex.
+That enabled me to see the image of the little house shown above, but some faces are still not displaying properly.</p>
+
+<p>That aspect should still be considered work in progress.</p>
+-->
+
+<p>Here is the complete implementation of the ADN mesh data export context in its current state:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">ExportContextAdnMesh</span> : <span class="teal">IExportContext</span>
+{
+&nbsp; <span class="teal">Document</span> _doc;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Stack of transformations for </span>
+&nbsp; <span class="gray">///</span><span class="green"> link and instance elements.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Stack</span>&lt;<span class="teal">Transform</span>&gt; _transformationStack
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Stack</span>&lt;<span class="teal">Transform</span>&gt;();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List of triangle vertices.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">VertexLookupInt</span> _vertices = <span class="blue">new</span> <span class="teal">VertexLookupInt</span>();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List of triangles, defined as </span>
+&nbsp; <span class="gray">///</span><span class="green"> triples of vertex indices.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; _triangles = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List of normal vectors, defined by an index </span>
+&nbsp; <span class="gray">///</span><span class="green"> into the normal lookup for each triangle vertex.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; _normalIndices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">NormalLookupXyz</span> _normals = <span class="blue">new</span> <span class="teal">NormalLookupXyz</span>();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Calculate centre of gravity of current element.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">CentroidVolume</span> _centroid_volume
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">CentroidVolume</span>();
+&nbsp;
+&nbsp; <span class="teal">Color</span> _color;
+&nbsp; <span class="blue">double</span> _transparency;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">AdnMeshData</span>&gt; _data;
+&nbsp;
+&nbsp; <span class="blue">public</span> ExportContextAdnMesh( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; _doc = doc;
+&nbsp; &nbsp; _data = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">AdnMeshData</span>&gt;();
+&nbsp; &nbsp; _transformationStack.Push( <span class="teal">Transform</span>.Identity );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">AdnMeshData</span>[] MeshData
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _data.ToArray();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Transform</span> CurrentTransform
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _transformationStack.Peek();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store a triangle, adding new vertices for it</span>
+&nbsp; <span class="gray">///</span><span class="green"> to our vertex lookup dictionary if needed and</span>
+&nbsp; <span class="gray">///</span><span class="green"> accumulating its volume and centroid contribution.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> StoreTriangle(
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; vertices,
+&nbsp; &nbsp; <span class="teal">PolymeshFacet</span> triangle,
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Retrieve the three triangle vertices</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> currentTransform = CurrentTransform;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] p = <span class="blue">new</span> <span class="teal">XYZ</span>[] {
+&nbsp; &nbsp; &nbsp; currentTransform.OfPoint( vertices[triangle.V1] ),
+&nbsp; &nbsp; &nbsp; currentTransform.OfPoint( vertices[triangle.V2] ),
+&nbsp; &nbsp; &nbsp; currentTransform.OfPoint( vertices[triangle.V3] )
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Ensure the three are ordered counter-clockwise</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = p[1] - p[0];
+&nbsp; &nbsp; <span class="teal">XYZ</span> w = p[2] - p[0];
+
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">Util</span>.IsRightHanded( v, w, normal ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected counter-clockwise vertex order&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Centroid and volume calculation</span>
+&nbsp;
+&nbsp; &nbsp; _centroid_volume.AddTriangle( p );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Store vertex, facet and normals</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 3; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PointInt</span> q = <span class="blue">new</span> <span class="teal">PointInt</span>( p[i] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _triangles.Add( _vertices.AddVertex( q ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _normalIndices.Add( _normals.AddNormal(
+&nbsp; &nbsp; &nbsp; &nbsp; currentTransform.OfVector( normal ) ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Finish()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Finish&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsCanceled()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnDaylightPortal(
+&nbsp; &nbsp; <span class="teal">DaylightPortalNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">RenderNodeAction</span> OnElementBegin(
+&nbsp; &nbsp; <span class="teal">ElementId</span> elementId )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = elementId.IntegerValue.ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ElementBegin id &quot;</span> + s );
+&nbsp;
+&nbsp; &nbsp; _vertices.Clear();
+&nbsp; &nbsp; _triangles.Clear();
+&nbsp; &nbsp; _normals.Clear();
+&nbsp; &nbsp; _normalIndices.Clear();
+&nbsp; &nbsp; _centroid_volume.Init();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">RenderNodeAction</span>.Proceed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnElementEnd( <span class="teal">ElementId</span> elementId )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ElementEnd&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Set centroid coordinates to their final value</span>
+&nbsp;
+&nbsp; &nbsp; _centroid_volume.Complete();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> metadataId = _doc.GetElement(
+&nbsp; &nbsp; &nbsp; elementId ).UniqueId;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">AdnMeshData</span> meshData = <span class="blue">new</span> <span class="teal">AdnMeshData</span>(
+&nbsp; &nbsp; &nbsp; _vertices, _triangles, _normals, _normalIndices,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PointInt</span>( _centroid_volume.Centroid ),
+&nbsp; &nbsp; &nbsp; _color, _transparency, metadataId );
+&nbsp;
+&nbsp; &nbsp; _data.Add( meshData );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">RenderNodeAction</span> OnFaceBegin( <span class="teal">FaceNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnFaceEnd( <span class="teal">FaceNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">RenderNodeAction</span> OnInstanceBegin(
+&nbsp; &nbsp; <span class="teal">InstanceNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = _doc.GetElement(
+&nbsp; &nbsp; &nbsp; node.GetSymbolId() ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != symbol,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid family symbol&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;InstanceBegin &quot;</span>
+&nbsp; &nbsp; &nbsp; + symbol.Category.Name + <span class="maroon">&quot; : &quot;</span>
+&nbsp; &nbsp; &nbsp; + symbol.Family.Name + <span class="maroon">&quot; : &quot;</span>
+&nbsp; &nbsp; &nbsp; + symbol.Name );
+&nbsp;
+&nbsp; &nbsp; _transformationStack.Push( CurrentTransform
+&nbsp; &nbsp; &nbsp; .Multiply( node.GetTransform() ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">RenderNodeAction</span>.Proceed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnInstanceEnd( <span class="teal">InstanceNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;InstanceEnd&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _transformationStack.Pop();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnLight( <span class="teal">LightNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">RenderNodeAction</span> OnLinkBegin( <span class="teal">LinkNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; _transformationStack.Push( CurrentTransform
+&nbsp; &nbsp; &nbsp; .Multiply( node.GetTransform() ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnLinkEnd( <span class="teal">LinkNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; _transformationStack.Pop();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnMaterial( <span class="teal">MaterialNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Color</span> c = node.Color;
+&nbsp; &nbsp; <span class="blue">double</span> t = node.Transparency;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1},{2})&quot;</span>,
+&nbsp; &nbsp; &nbsp; c.Red, c.Green, c.Blue );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Colour &quot;</span> + s + <span class="maroon">&quot;, transparency &quot;</span>
+&nbsp; &nbsp; &nbsp; + t.ToString( <span class="maroon">&quot;0.##&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; _color = c;
+&nbsp; &nbsp; _transparency = t;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnPolymesh( <span class="teal">PolymeshTopology</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> nPts = node.NumberOfPoints;
+&nbsp; &nbsp; <span class="blue">int</span> nFacets = node.NumberOfFacets;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DistributionOfNormals</span> distrib
+&nbsp; &nbsp; &nbsp; = node.DistributionOfNormals;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Polymesh {0} vertices {1} facets&quot;</span>,
+&nbsp; &nbsp; &nbsp; nPts, nFacets ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> iFacet = 0;
+&nbsp; &nbsp; <span class="blue">int</span> iPoint = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; vertices = node.GetPoints();
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; normals = node.GetNormals();
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PolymeshFacet</span> triangle <span class="blue">in</span> node.GetFacets() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Just grab one normal per facet; ignore the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// three normals per point if they differ.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DistributionOfNormals</span>.OnePerFace == distrib )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = node.GetNormal( 0 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">DistributionOfNormals</span>.OnEachFacet
+&nbsp; &nbsp; &nbsp; &nbsp; == distrib )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = node.GetNormal( iFacet++ );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">DistributionOfNormals</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AtEachPoint == distrib, <span class="maroon">&quot;what else?&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; normal = node.GetNormal( iPoint++ )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + node.GetNormal( iPoint++ )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + node.GetNormal( iPoint++ );
+&nbsp; &nbsp; &nbsp; &nbsp; normal /= 3.0;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; StoreTriangle( vertices, triangle, normal );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnRPC( <span class="teal">RPCNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">RenderNodeAction</span> OnViewBegin( <span class="teal">ViewNode</span> node )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">View3D</span> view = _doc.GetElement( node.ViewId )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">View3D</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != view,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid 3D view&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ViewBegin &quot;</span> + view.Name );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">RenderNodeAction</span>.Proceed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnViewEnd( <span class="teal">ElementId</span> elementId )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ViewEnd&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> Start()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Start&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>The rendering generates a list of AdnMeshData instances.</p>
+
+<p>Each one of them contains the data required to render one solid.</p>
+
+
+<a name="8"></a>
+
+<h4>ADN Mesh Data Class</h4>
+
+<p>Here are the methods used to structure and store the ADN mesh data:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">AdnMeshData</span>
+{
+&nbsp; <span class="blue">int</span> FacetCount { <span class="blue">get</span>; <span class="blue">set</span>; } <span class="green">// optional</span>
+&nbsp; <span class="blue">int</span> VertexCount { <span class="blue">get</span>; <span class="blue">set</span>; } <span class="green">// optional</span>
+&nbsp; <span class="blue">int</span>[] VertexCoords { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">int</span>[] VertexIndices { <span class="blue">get</span>; <span class="blue">set</span>; } <span class="green">// triangles</span>
+&nbsp; <span class="blue">double</span>[] Normals { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">int</span>[] NormalIndices { <span class="blue">get</span>; <span class="blue">set</span>; } <span class="green">// not optional, one normal per vertex</span>
+&nbsp; <span class="blue">int</span>[] Center { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">int</span> Color { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">string</span> Id { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Apply this factor to all point data when </span>
+&nbsp; <span class="gray">///</span><span class="green"> saving to JSON to accomodate the expected</span>
+&nbsp; <span class="gray">///</span><span class="green"> scaling.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _export_factor = 0.002;
+&nbsp;
+&nbsp; <span class="blue">public</span> AdnMeshData(
+&nbsp; &nbsp; <span class="teal">VertexLookupInt</span> vertices,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; vertexIndices,
+&nbsp; &nbsp; <span class="teal">NormalLookupXyz</span> normals,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; normalIndices,
+&nbsp; &nbsp; <span class="teal">PointInt</span> center,
+&nbsp; &nbsp; <span class="teal">Color</span> color,
+&nbsp; &nbsp; <span class="blue">double</span> transparency,
+&nbsp; &nbsp; <span class="blue">string</span> id )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = vertexIndices.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 == (n % 3),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected triples of 3D point vertex indices&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( normalIndices.Count == n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a normal for each vertex&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; FacetCount = n / 3;
+&nbsp;
+&nbsp; &nbsp; n = vertices.Count;
+&nbsp; &nbsp; VertexCount = n;
+&nbsp; &nbsp; VertexCoords = <span class="blue">new</span> <span class="blue">int</span>[n * 3];
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PointInt</span> p <span class="blue">in</span> vertices.Keys )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; VertexCoords[i++] = p.X;
+&nbsp; &nbsp; &nbsp; VertexCoords[i++] = p.Y;
+&nbsp; &nbsp; &nbsp; VertexCoords[i++] = p.Z;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; VertexIndices = vertexIndices.ToArray();
+&nbsp;
+&nbsp; &nbsp; n = normals.Count;
+&nbsp; &nbsp; Normals = <span class="blue">new</span> <span class="blue">double</span>[n * 3];
+&nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> v <span class="blue">in</span> normals.Keys )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Normals[i++] = v.X;
+&nbsp; &nbsp; &nbsp; Normals[i++] = v.Y;
+&nbsp; &nbsp; &nbsp; Normals[i++] = v.Z;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; NormalIndices = normalIndices.ToArray();
+&nbsp;
+&nbsp; &nbsp; Center = <span class="blue">new</span> <span class="blue">int</span>[3];
+&nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; Center[i++] = center.X;
+&nbsp; &nbsp; Center[i++] = center.Y;
+&nbsp; &nbsp; Center[i] = center.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">byte</span> alpha = (<span class="blue">byte</span>) (
+&nbsp; &nbsp; &nbsp; ( 100 - transparency ) * 2.55555555 );
+&nbsp;
+&nbsp; &nbsp; Color = ConvertClr(
+&nbsp; &nbsp; &nbsp; color.Red, color.Green, color.Blue, alpha );
+&nbsp;
+&nbsp; &nbsp; Id = id;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert colour and transparency to </span>
+&nbsp; <span class="gray">///</span><span class="green"> the required integer format.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> ConvertClr( <span class="blue">byte</span> r, <span class="blue">byte</span> g, <span class="blue">byte</span> b, <span class="blue">byte</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ( r &lt;&lt; 24 ) + ( g &lt;&lt; 16 ) + ( b &lt;&lt; 8 ) + a;
+&nbsp; }
+</pre>
+
+<p>That completes the input side of this class.</p>
+
+<p>It is followed by the output:</p>
+
+
+<a name="9"></a>
+
+<h4>JSON Serialisation</h4>
+
+<p>Once the ADN mesh data has been assembled, I want to export it to a JSON file to pass into Philippe's viewer.</p>
+
+<p>I did think of using a JSON serialisation library.
+The .NET framework provides two different ones:</p>
+
+<ul>
+<li>System.Web.Script.Serialization.JavaScriptSerializer</li>
+<li>System.Runtime.Serialization.Json.DataContractJsonSerializer</li>
+</ul>
+
+<p>In addition, numerous other libraries are available.</p>
+
+<p>I read a nice short discussion on their various advantages and disadvantages, resulting in the author rolling his own
+
+<a href="http://procbits.com/2011/08/11/fridaythe13th-the-best-json-parser-for-silverlight-and-net">
+FridayThe13th library</a>.</p>
+
+<p>That prompted me to simply implement the serialisation myself inline in a member method of the AdnMeshData class like this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">string</span> ToJson()
+{
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format
+&nbsp; &nbsp; ( <span class="maroon">&quot;\n \&quot;FacetCount\&quot;:{0},&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;VertexCount\&quot;:{1},&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;VertexCoords\&quot;:[{2}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;VertexIndices\&quot;:[{3}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;Normals\&quot;:[{4}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;NormalIndices\&quot;:[{5}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;Center\&quot;:[{6}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;Color\&quot;:[{7}],&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\n \&quot;Id\&quot;:\&quot;{8}\&quot;&quot;</span>,
+&nbsp; &nbsp; FacetCount,
+&nbsp; &nbsp; VertexCount,
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, VertexCoords.Select&lt;<span class="blue">int</span>, <span class="blue">string</span>&gt;( i =&gt; ( _export_factor * i ).ToString( <span class="maroon">&quot;0.#&quot;</span> ) ).ToArray() ),
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, VertexIndices.Select&lt;<span class="blue">int</span>, <span class="blue">string</span>&gt;( i =&gt; i.ToString() ).ToArray() ),
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, Normals.Select&lt;<span class="blue">double</span>, <span class="blue">string</span>&gt;( a =&gt; a.ToString( <span class="maroon">&quot;0.####&quot;</span> ) ).ToArray() ),
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, NormalIndices.Select&lt;<span class="blue">int</span>, <span class="blue">string</span>&gt;( i =&gt; i.ToString() ) ),
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, Center.Select&lt;<span class="blue">int</span>, <span class="blue">string</span>&gt;( i =&gt; ( _export_factor * i ).ToString( <span class="maroon">&quot;0.#&quot;</span> ) ) ),
+&nbsp; &nbsp; Color,
+&nbsp; &nbsp; Id );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="maroon">&quot;\n{&quot;</span> + s + <span class="maroon">&quot;\n}&quot;</span>;
+}
+</pre>
+
+<p>Notice the last minute scaling applied via the _export_factor to generate a model in a suitable size for Philippe's viewer  :-)</p>
+
+
+<a name="10"></a>
+
+<h4>Driving the Process and Streaming to File</h4>
+
+<p>The command mainline checks for a valid 3D view in a valid project document, then drives the exporter and retrieves its mesh data instances to serialise the data to JSON like this:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// This command requires an active document</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == uidoc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command in an active project document.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view = doc.ActiveView <span class="blue">as</span> <span class="teal">View3D</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command in a 3D view.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Instantiate our custom context</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExportContextAdnMesh</span> context
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExportContextAdnMesh</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Instantiate a custom exporter with it</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">CustomExporter</span> exporter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">CustomExporter</span>( doc, context ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Tell the exporter whether we need face info.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// If not, it is better to exclude them, since </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// processing faces takes significant time and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// memory. In any case, tessellated polymeshes</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// can be exported (and will be sent to the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// context). Excluding faces just excludes the calls, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// not the actual processing of face tessellation. </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Meshes of the faces will still be received by </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the context.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; exporter.IncludeFaces = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; exporter.Export( view );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Save ADN mesh data in JSON format</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">StreamWriter</span> s = <span class="blue">new</span> <span class="teal">StreamWriter</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;C:/tmp/test.json&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; s.Write( <span class="maroon">&quot;[&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AdnMeshData</span> d <span class="blue">in</span> context.MeshData )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; i ) { s.Write( <span class="maroon">','</span> ); }
+&nbsp;
+&nbsp; &nbsp; &nbsp; s.Write( d.ToJson() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; s.Write( <span class="maroon">&quot;\n]\n&quot;</span> );
+&nbsp; &nbsp; s.Close();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The complete code and solution is available for
+
+<a href="#5">download</a> above.</p>
+
+<!-- <p>As said, some issues remain to be resolved, probably due to the triangle vertex ordering.</p> -->
+
+<p>The only remaining open issue with this right now that I am aware of is how to generate different ADN mesh data instances for different materials, e.g. separate output for a window pane and its frame.</p>
+
+<p>So now we have three different and pretty diverse custom exporters to experiment with.</p>
+
+<p>I am looking forward to hearing what experiences you have with the custom exporter framework.</p>
+
+<!--
+
+<p>The ADN mesh format is solid based, whereas the custom exporter is face based.</p>
+
+<p>I need to implement something to grok when one solid is finished and the next begins.</p>
+
+<p>This makes a difference for an element such as a window, with a transparent pane and an opaque frame.</p>
+
+<p>For this, I could implement a reaction to a material change, and close out the current solid when that happens.</p>
+
+<a name="4"></a>
+
+<h4></h4>
+
+<pre class="code">
+</pre>
+
+-->
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Revit ADN Mesh Data Custom Exporter to JSON</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</p>
+
+<p>I implemented a new Revit 2014
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#1">
+custom exporter to JSON</a> generating the ADN mesh data to drive
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a>'s online
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/06/3d-webgl-viewer-with-javascript-and-threejs.html">
+3D WebGL viewer</a>.</p>
+
+<p>This is obviously mainly of interest to Revit API aficionados, though some of the topics covered are completely generic cloud and mobile issues as well:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#2">ADN mesh data format</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#3">Tetrahedron sample JSON data</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#4">Little house and curved wall in JSON</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#5">Custom exporter implementation and components</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#6">Centroid and volume</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#7">Export context implementation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#8">ADN mesh data class</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#9">JSON serialisation</a></li>
+</ul>
+
+<p>The post also mentions my most recent mountain hike to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html#muttenhorn">
+Muttenhorn</a>   :-)</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-06_muttenhorn/p1020836_blue_lake_stotzigen_firsten.jpg" alt="A lake at Stotzigen Firsten by Muttenhorn" width="250"/>
+</center>

@@ -1,0 +1,193 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+  1267916 [Link Revit file]
+  1268705 [Open Revit Project With All References Unloaded]
+  1268998 [Revit API - External References / Links - Remove/Unlink]
+  1269450 [Listing of linked RVT and DWG files]
+
+-->
+
+<h3>List Linked Files and TransmissionData</h3>
+
+<p>Today is the day of our 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html">
+Revit 2012 API webcast</a>, in just six hours' time!
+
+In case you missed it so far, I assume that there is still time for a 
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?id=10417086&siteID=123112&cname=Revit%20API,%20Webcast,%20May%2019%202011,%20201123">
+last minute registration</a>.
+
+<p>I mentioned that one of the new features in the Revit 2012 API is the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html#1267916">
+access to linked file information</a> and
+
+the TransmissionData class which stores information about all of the external file references in a document. 
+The TransmissionData for a Revit project can be read without fully opening the document in the user interface.
+
+<p>Now the following simple question on this cropped up which prompted me to explore this in a little further depth:
+
+<p><strong>Question:</strong> Is it possible to list all linked files with their paths Revit API?
+
+<p><strong>Answer:</strong> Yes, it definitely is, and the Revit 2012 API makes it very easy to do so.
+
+<p>The overview of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html#1267916">
+access to linked file information</a> lists
+
+the TransmissionData class mentioned above.
+Its description in the Revit API help file RevitAPI.chm states:
+
+<p style="color:darkblue">A class representing information on all external file references in a document. 
+
+<p style="color:darkblue">TransmissionData stores information on both the previous state and requested state of an external file reference. This means that it stores the load state and path of the reference from the most recent time this TransmissionData's document was opened. It also stores load state and path information for what Revit should do the next time the document is opened. 
+
+<p style="color:darkblue">As such, TransmissionData can be used to perform operations on external file references without having to open the entire associated Revit document. The methods ReadTransmissionData and WriteTransmissionData can be used to obtain information about external references, or to change that information. For example, calling WriteTransmissionData with a TransmissionData object which has had all references set to LinkedFileStatus.Unloaded would cause no references to be loaded upon next opening the document.
+
+<p>This enables the implementation of code to list all the links of a given Revit document.
+Here is a method ListLinks which exercises the new TransmissionData class to achieve exactly that:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> List all DWG, RVT and other links of a given document.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> ListLinks( <span class="teal">ModelPath</span> location )
+{
+&nbsp; <span class="blue">string</span> path = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; .ConvertModelPathToUserVisiblePath( location );
+&nbsp;
+&nbsp; <span class="blue">string</span> content = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;The document at '{0}' &quot;</span>,
+&nbsp; &nbsp; path );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; links = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// access transmission data in the given Revit file</span>
+&nbsp;
+&nbsp; <span class="teal">TransmissionData</span> transData = <span class="teal">TransmissionData</span>
+&nbsp; &nbsp; .ReadTransmissionData( location );
+&nbsp;
+&nbsp; <span class="blue">if</span>( transData == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; content += <span class="maroon">&quot;does not have any transmission data&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// collect all (immediate) external references in the model</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; externalReferences
+&nbsp; &nbsp; &nbsp; = transData.GetAllExternalFileReferenceIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = externalReferences.Count;
+&nbsp;
+&nbsp; &nbsp; content += <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;has {0} external reference{1}{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, PluralSuffix( n ), DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; links = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;( n );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// find every reference that is a link</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> refId <span class="blue">in</span> externalReferences )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalFileReference</span> extRef
+&nbsp; &nbsp; &nbsp; &nbsp; = transData.GetLastSavedReferenceData( refId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; links.Add( <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; extRef.ExternalFileReferenceType,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ModelPathUtils</span>.ConvertModelPathToUserVisiblePath( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; extRef.GetPath() ) ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Print( content );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span> dlg = <span class="blue">new</span> <span class="teal">TaskDialog</span>( <span class="maroon">&quot;List Links&quot;</span> );
+&nbsp;
+&nbsp; dlg.MainInstruction = content;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != links &amp;&amp; 0 &lt; links.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Join( <span class="maroon">&quot;&nbsp; \r\n&quot;</span>, 
+&nbsp; &nbsp; &nbsp; links.ToArray() );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( s );
+&nbsp;
+&nbsp; &nbsp; dlg.MainContent = s;
+&nbsp; }
+&nbsp; dlg.Show();
+}
+</pre>
+
+<p>It takes a ModelPath argument to determine the document to analyse.
+The ModelPath can be instantiated from a normal file pathname using the ModelPathUtils class methods, for instance like this using the current active document in the Execute method of an external command:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">View</span> view = commandData.View;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command in an active document.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = view.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelPath</span> modelPath = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; .ConvertUserVisiblePathToModelPath(
+&nbsp; &nbsp; &nbsp; &nbsp; doc.PathName );
+&nbsp;
+&nbsp; &nbsp; ListLinks( modelPath );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is the output it generates in a simple sample model:
+
+<center>
+<img src="img/list_links.png" alt="List links output"/>
+</center>
+
+<p>The output is also listed as text in the Visual Studio debug output window:
+
+<pre>
+The document at 'C:\tmp\linked_file2.rvt' has 3 external references:
+  KeynoteTable RevitKeynotes_Metric.txt
+  RevitLink walls.rvt
+  CADLink TestHouse.dwg
+</pre>
+
+<p>Here is 
+
+<a href="zip/ListLinks.zip">ListLinks.zip</a> 
+
+containing the entire Visual Studio solution implementing this command.
+
+<p>There is obviously still room for improvement to this. 
+Currently it is hardwired to analyse the active document.
+It would probably be useful to be able to select one or more other documents.
+
+<p>Here are some simple ideas for a useful end user utility to list all links in user selected Revit files which could be easily implemented:
+
+<ul>
+<li>Select one or more Revit documents.
+<li>Run ListLinks on them.
+<li>Display the results in a modeless dialogue and terminate the command.
+<li>Add a 'save to text file' button to the form.
+</ul>
+
+<p>Please let me know if you are interested in an improved version implementing some of these, and we'll see whether I ever get around to doing it.

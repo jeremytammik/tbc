@@ -1,0 +1,416 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1249668 [Current view center in Model coordinates]
+1254168 [Setting crop box of 3d view]
+1259686 [Coordinates of center of screen in 3DView]
+1260076 [Getting the location of a view on a sheet.]
+1262968 [Placing views on a sheet]
+
+-->
+
+<h3>View Location on Sheet</h3>
+
+<p>I returned from a beautiful little mountain hike to the lake, pass and mountain of
+
+<a href="http://en.wikipedia.org/wiki/Piz_Lunghin">
+Piz Lunghin</a>.</p>
+
+<center>
+<!-- file:///C:/j/photo/jeremy/2010/2010-09-22_lunghin/p9204277_jeremy_on_lunghin.jpg -->
+<img src="file:////j/photo/jeremy/2010/2010-09-22_lunghin/p9204277_jeremy_on_lunghin.jpg" alt="Jeremy on Piz Lunghin" width="200"/>
+</center>
+
+<p>One very special aspect of this place is that it is Europe's one and only triple watershed, with rivers flowing all the way to the North Sea, Black Sea and Mediterranean.
+Another special aspect of my hike was spending the night outside on the mountain, with a wonderful clear sky and the almost full moon in sub-zero temperatures (Celsius).
+
+<p>Returning once again to the Revit API, the SDK sample AllViews collects all views in the model, asks the user to interactively select some of them, and places those on a sheet.
+
+<p>Even so, the exact definition and calculation of the view coordinates and location of the view on the sheet remains somewhat obscure.
+Here are some helful results in this area.
+They do not answer every possible question in full completeness, so we still have some work to do exploring this area, but hopefully they will be useful already in this incomplete form.
+
+<p>We recently had one
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/viewports-and-sheets.html?cid=6a00e553e1689788330134863f0fed970c#comment-6a00e553e1689788330134863f0fed970c">
+question</a> from
+
+Thomas Fink of
+
+<a href="http://www.sofistik.de">
+SOFiSTiK</a> on
+
+this, and here is another recent question on that topic with some interesting research performed by my colleague Joe Ye.
+I am reproducing the rather long discussion in full, to show that the issue is not trivial and the solution is not yet completely perfect:
+
+<p><strong>Question:</strong> Given a certain view placed on a sheet, I am trying to retrieve the location of the view on the sheet using:
+
+<pre class="code">
+&nbsp; <span class="teal">Location</span> loc = <span class="teal">Element</span>.Location;
+</pre>
+
+This is not giving me what I need, which is the UV or XYZ location of the view placed on the sheet.
+
+<p><strong>Answer:</strong> You can use the Element BoundingBox property to retrieve the Max and Min points of a viewport in the sheet.
+From these, you can calculate the middle point of the Max and Min point.
+The middle point is the viewport's centre point in sheet.
+
+<p>Here is some code showing to determine the centre point of a view in a sheet view.
+To quickly test the solution, it currently uses a hardcoded element id 157165 for the viewport in the sheet view; please change that to suit your model and needs.
+In addition, please pass in the sheet object as an argument in the call to Element.get_BoundingBox.
+In this sample, we just set the sheet view to be the active view:
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">RegenerationAttribute</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">GetViewPosition</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>( 157165 );
+&nbsp; &nbsp; <span class="teal">Element</span> elem = doc.get_Element( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bounding
+&nbsp; &nbsp; &nbsp; = elem.get_BoundingBox( doc.ActiveView );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sMsg = <span class="maroon">&quot;The Max and Min points are: \n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; sMsg += bounding.Max.X.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;, &quot;</span> + bounding.Max.Y.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;, &quot;</span> + bounding.Max.Z.ToString() + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; sMsg += bounding.Min.X.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;, &quot;</span> + bounding.Min.Y.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;, &quot;</span> + bounding.Min.Z.ToString() + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> xyzPosition
+&nbsp; &nbsp; &nbsp; = ( bounding.Max + bounding.Min ) / 2.0;
+&nbsp;
+&nbsp; &nbsp; sMsg += <span class="maroon">&quot;view position in current sheet is:\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + xyzPosition.X.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;,&quot;</span> + xyzPosition.Y.ToString()
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;,&quot;</span> + xyzPosition.Z.ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( sMsg );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p><strong>Response:</strong> I need to programmatically copy a legend view from one sheet to another.
+For this, I need to get the location of the view from the original sheet and reuse this location when adding new views to the other sheets.
+
+<p>For this purpose, I am using the following code:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> chosenSheet <span class="blue">in</span> SelectedSheets )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> xyzLocation
+&nbsp; &nbsp; &nbsp; = selectedView.get_BoundingBox(
+&nbsp; &nbsp; &nbsp; &nbsp; m_Doc.ActiveView );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> xyzPosition = ( xyzLocation.Max
+&nbsp; &nbsp; &nbsp; + xyzLocation.Min ) / 2.0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> scale = correspondingView.Scale;
+&nbsp;
+&nbsp; &nbsp; chosenSheet.AddView( correspondingView,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">UV</span>( xyzPosition.X, xyzPosition.Y ) );
+&nbsp; }
+</pre>
+
+<p>Here I am using the following variables:
+
+<ul>
+<li>chosenSheet is the sheet where the legend will be copied.
+<li>selectedView is the selected Viewport to be copied.
+<li>correspondingView is the view to be copied.
+</ul>
+
+<p>Unfortunately, the views are not copied to the same location.
+
+<p><strong>Answer:</strong> I created a simple project and added several view sheets.
+I picked the Level 1 viewport and tried to run this code, but this caused an error message saying 'Added view is already on another sheet and cannot be displayed on two sheets'.
+
+<p><strong>Response:</strong> This is because you are trying to copy a "plan" view that is already placed on a sheet and place it on another sheet.
+Try running this code on a legend view placed on a sheet.
+
+<p><strong>Answer:</strong> The point used to insert the view on the view sheet is mapping the (0,0,0) point of the source view.
+When you retrieve the centre point coordinates of the viewport, they do not match the (0,0,0) point of the source view.
+So you need to calculate the source view's original point coordinates in the view sheet from the viewpoint's centre point coordinates.
+
+<p><strong>Response:</strong> I understand that I need to get the centre of the view in the ViewSheet in order to be able to calculate the shift.
+How can I obtain the coordinates of the centre of the view relative to the view sheet?
+<p><strong>Answer:</strong> The View class has a very important property Outline.
+The Outline property will return the Max and Min point of the closest bounding box, which includes all elements in this view.
+The value in this Max and Min the result of the legend view's real Max and Min coordinates subdivided by the view scale.
+For more information about Outline property, please refer to the Revit SDK developer guide 'Revit 2011 API Developer Guide.pdf'.
+
+<p>Approximately, the outline Max point is mapping the same Max point of the viewport in view sheet.
+So we can calculate the source view's origin coordinates in the host view sheet using the following code:
+
+<pre class="code">
+&nbsp; <span class="teal">BoundingBoxXYZ</span> xyzLocation
+&nbsp; &nbsp; = SelectedView.get_BoundingBox(
+&nbsp; &nbsp; &nbsp; m_Doc.ActiveView );
+&nbsp;
+&nbsp; <span class="green">// get the outline max and min </span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> ptMaxOutline = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; CorrespondingView.Outline.Max.U,
+&nbsp; &nbsp; CorrespondingView.Outline.Max.V,
+&nbsp; &nbsp; 0 );
+&nbsp;
+&nbsp; <span class="green">// get the view's origin point's </span>
+&nbsp; <span class="green">// coordinates in current view sheet. </span>
+&nbsp;
+&nbsp; <span class="teal">UV</span> ptSourceViewOriginInSheet = <span class="blue">new</span> <span class="teal">UV</span>(
+&nbsp; &nbsp; xyzLocation.Max.X - ptMaxOutline.X,
+&nbsp; &nbsp; xyzLocation.Max.Y - ptMaxOutline.Y );
+</pre>
+
+<p>Here is the complete code of the Execute method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SelElementSet</span> selection = uidoc.Selection.Elements;
+&nbsp; &nbsp; <span class="blue">if</span>( selection.Size == 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; MessageBox.Show( <span class="maroon">&quot;Please Select a view to be copied.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;View Coordinates&quot;</span>, MessageBoxButtons.OK,
+&nbsp; &nbsp; &nbsp; MessageBoxIcon.Error );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Get all Sheets </span>
+&nbsp; &nbsp; &nbsp; List AllSheets = GetAllSheets( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get all Views in the model. </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Find all views in the document by using category filter </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementCategoryFilter</span> filter
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Views );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span> AllViews = collector.WherePasses( filter )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> SelectedView <span class="blue">in</span> selection )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( SelectedView.Category.Name == <span class="maroon">&quot;Viewports&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">String</span> ViewName = SelectedView.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;View Name&quot;</span> ).AsString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">View</span> CorrespondingView = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; AllViews.Count; i++ )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( AllViews[i].Name == ViewName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CorrespondingView = AllViews[i] <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> xyzLocation
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = SelectedView.get_BoundingBox(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get the outline max and min </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> ptMaxOutline = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CorrespondingView.Outline.Max.U,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CorrespondingView.Outline.Max.V, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get the view's origin point's coordinates </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// in current view sheet. </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> ptSourceViewOriginInSheet = <span class="blue">new</span> <span class="teal">UV</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xyzLocation.Max.X - ptMaxOutline.X,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xyzLocation.Max.Y - ptMaxOutline.Y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// for each chosen to be exported </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get the views on it. </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> ChosenSheet <span class="blue">in</span> AllSheets )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ChosenSheet.AddView( CorrespondingView,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ptSourceViewOriginInSheet );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; MessageBox.Show( ex.Message );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+
+<p><strong>Response:</strong> Using this code, the location of the view on the sheet is still inaccurate.
+If I use this code to duplicate a view legend placed on a sheet in the same location, the legend view still appears to be shifted while duplicated on the same sheet, as shown in the following figures.
+Here is a view of the entire sheet:</p>
+
+<center>
+<img src="img/view_loc_on_sheet1.png" alt="View locations offset on sheet"/>
+</center>
+
+<p>Here is a more detailed picture of the offset between the original and copied views:</p>
+
+<center>
+<img src="img/view_loc_on_sheet2.png" alt="View locations offset"/>
+</center>
+
+
+
+<p><strong>Answer:</strong> The reason for this might be that the Revit API returns the Viewport BoundingBox property value with an offset to its original outline property.
+The BoundingBox property is not completely accurate, so the result to calculate the legend view's origin in the sheet view cannot be so either.
+As far as I can tell, the offset of the Max point of the viewport's BoundingBox is enlarged 0.01 in both X and Y direction.
+We can take this scaling into account.
+
+<p>Here is some updated code with an adjustment added.
+You might need to further adjust the offset value according to different situations.
+The offset value of 0.01 is not obtained from source code, but from my empirical testing results:
+
+<pre class="code">
+<span class="blue">foreach</span>( <span class="teal">Element</span> SelectedView <span class="blue">in</span> selection )
+{
+&nbsp; <span class="blue">if</span>( SelectedView.Category.Name == <span class="maroon">&quot;Viewports&quot;</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> ViewName = SelectedView.get_Parameter(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;View Name&quot;</span> ).AsString();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> CorrespondingView = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; AllViews.Count; i++ )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( AllViews[i].Name == ViewName )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; CorrespondingView = AllViews[i] <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> xyzLocation
+&nbsp; &nbsp; &nbsp; = SelectedView.get_BoundingBox(
+&nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the outline max and min,</span>
+&nbsp; &nbsp; <span class="green">// offset in each direction of max point of </span>
+&nbsp; &nbsp; <span class="green">// bounding box than the outline box.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dMaxOffset = 0.01;&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> ptMaxOutline = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; CorrespondingView.Outline.Max.U,
+&nbsp; &nbsp; &nbsp; CorrespondingView.Outline.Max.V, 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UV</span> ptSourceViewOriginInSheet = <span class="blue">new</span> <span class="teal">UV</span>(
+&nbsp; &nbsp; &nbsp; xyzLocation.Max.X - dMaxOffset - ptMaxOutline.X,
+&nbsp; &nbsp; &nbsp; xyzLocation.Max.Y - dMaxOffset - ptMaxOutline.Y );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// for each chosen to be exported get the views on it</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> ChosenSheet <span class="blue">in</span> AllSheets )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ChosenSheet.AddView( CorrespondingView,
+&nbsp; &nbsp; &nbsp; &nbsp; ptSourceViewOriginInSheet );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Thank you very much, Joe, for this thorough exploration!
+
+<p>Here is another quick question and answer that might be of use in this context:
+
+<h4>Centre Point of View</h4>
+
+<p><strong>Question:</strong> I need a way to get the XYZ of the centre of a view and the XYZ of the centre of a sheet. Can I achieve this using one of the Outline, CropBox or BoundingBox properties?
+
+<p><strong>Answer:</strong> It depends on what exactly you mean by 'centre of view'.
+I can imagine that it might be any one of the following:
+
+<ul>
+<li>The visible centre of a view:
+If we pan the view, the centre coordinates change.
+There is currently no API exposed to get the visible centre of a view, and we do have an open wish list item to obtain this information.
+<li>The centre point of the crop box:
+We can retrieve the BoundingBoxXYZ of the view through the CropBox property.
+Then the centre can be determined by Max and Min of the crop box.
+<li>The coordinate centre:
+the coordinate centre point is returned by the View.Origin property.
+</ul>
+
+<p>For an example of defining a completely different set of view coordinates, we also once looked at
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/crop-3d-view-to-room.html">
+cropping a 3D view to a specific element</a>.
+
+<!--
+
+From: Saikat Bhattacharya
+Sent: Thursday, September 23, 2010 6:03 AM
+Subject: coordinates and dim when printing using Visible portion of window
+
+Hi Harry and Phil:
+
+An ADN partner wants to find out if, using the API, we can extract the coordinates, dimensions and zoom factor values of the visible portion of a current view/sheet when we select the *Visible portion of current window* in the print dialog. My initial search tells me that it might not be possible. It seems only the Autodesk.Revit.DB.PrintRange is controlling the print range and internally the coordinates and dimension are being passed on (and not exposed through the print manager).
+
+Thanks
+Saikat
+
+From: Harry Mattison
+Sent: Thursday, September 23, 2010 12:35
+
+Hi Saikat,
+
+That is not possible. Here are a few existing requests on this subject, though you may want to file a new one for anything in your issue that they don't include.
+
+Harry
+
+SPR #169494 [API Request: get the center point coordinates of view]
+SPR #163958 [Get the location of ViewPort in ViewSheet by API]
+SPR #145414 [API request: The API to Get and Set the Zoom factor for view is needed]
+
+Hallo Jeremy,
+
+jetzt hatte ich endlich die Zeit mich wieder mit dem Problem zu beschäftigen. Nachdem ich Deinen Code auf meinem deutschen Revit zum Laufen gebracht habe kann ich sagen, dass er mir sehr weiter geholfen hat. Ich weiss nun, wie wir unseren Export von Revit Plänen nach SOFiCAD organisieren werden. Die DWG-Export-Funktion in Revit reicht nämlich nicht aus, um meine Vorstellungen zu realisieren. (Aber das war ja vor 23 Jahren mit Autocad auch nicht anders)
+
+Vielen Dank und sorry wegen der langen Sendepause.
+
+Mit freundlichen Grüßen - with kind regards
+
+Thomas Fink
+
+-->

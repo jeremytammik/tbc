@@ -1,0 +1,103 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1270987 [Retrieving lines within a FamilyInstance] -->
+
+<h3>Retrieving Lines Within a Family Instance</h3>
+
+<p>Here is a basic query on how to obtain geometrical objects from a family instance answered by my colleague Saikat Bhattacharya.
+We have looked at more complex geometry retrieval in the past, so let's look at this simple case now:
+
+
+<p><strong>Question:</strong> I am examining an instance of a family created from a Generic Model containing a parametric sketch.
+I loaded such a family into my project and inserted an instance of it.
+The idea is to use the parametric sketch to create different walls in the project.
+If I snoop the resulting FamilyInstance inserted from the loaded family, I can see the lines in the collection FamilyInstance &gt; FamilySymbol &gt; Objects &gt; Lines.
+I cannot find the proper path to access this data through my own code, however.
+What can I do to access the sketch lines programmatically?
+
+I tried the following:
+
+<ul>
+<li>myFamilyInstance.Symbol.GetGeometryObjectFromReference(Reference ref)
+<br>Here, I don't understand the purpose of the Reference element.
+
+<li>myFamilyInstance.Symbol.get_Geometry(Options opt)
+<br>Here, I don't know what I should pass in as option.
+</ul>
+
+<p>Finally, I'm not sure I'm doing the right thing.
+What I want to do in the end is to pass in the lines contained in the FamilyInstance element to wall creation method to define new walls based on the generic model geometry.
+
+
+
+<p><strong>Answer:</strong> You were close.
+Here is a code snippet in which I retrieve the lines you are looking for and simply print out their length:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> Execute(
+&nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>,
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) _
+&nbsp; <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; <span class="blue">Dim</span> uiapp <span class="blue">As</span> <span class="teal">Application</span> _
+&nbsp; &nbsp; = commandData.Application
+&nbsp;
+&nbsp; <span class="blue">Dim</span> activeDoc <span class="blue">As</span> <span class="teal">Document</span> _
+&nbsp; &nbsp; = uiapp.ActiveUIDocument.Document
+&nbsp;
+&nbsp; <span class="blue">Dim</span> opts <span class="blue">As</span> <span class="teal">Options</span> _
+&nbsp; &nbsp; = activeDoc.Application.Create.NewGeometryOptions()
+&nbsp;
+&nbsp; <span class="blue">Dim</span> elem <span class="blue">As</span> <span class="teal">Element</span>
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> elem <span class="blue">In</span> activeDoc.Selection.Elements
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> famInst <span class="blue">As</span> <span class="teal">FamilyInstance</span> _
+&nbsp; &nbsp; &nbsp; = <span class="blue">CType</span>(elem, <span class="teal">FamilyInstance</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> geoEle <span class="blue">As</span> <span class="teal">GeometryElement</span> _
+&nbsp; &nbsp; &nbsp; = famInst.Geometry(opts)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> geoInstance <span class="blue">As</span> <span class="teal">GeometryInstance</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> geoInstance <span class="blue">In</span> geoEle.Objects
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> symbIns <span class="blue">As</span> <span class="teal">GeometryObject</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> symbIns <span class="blue">In</span> geoInstance.
+&nbsp; &nbsp; &nbsp; &nbsp; SymbolGeometry.Objects
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> (symbIns) <span class="blue">Is</span> <span class="teal">Line</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> line <span class="blue">As</span> <span class="teal">Line</span> = symbIns
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Line Length&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.ApproximateLength.ToString())
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+<span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+</pre>
+
+<p>When querying an element for its geometry, you do indeed need to pass in an instance of the Options class, which is described in greater detail in the developer guide document "Revit 2012 API Developer Guide.pdf".
+
+<p>The geometry options include the Options.View property, which specifies the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/section-view-geometry.html">
+view used for geometry extraction</a>. 
+
+If a view-specific version of an element exists, it will be extracted in the retrieval of geometry. 
+Also, the detail level of the geometry will be taken from the view's detail level. 
+
+
+<p>If you prefer the code in C# rather than VB, you can convert it using one of the many free online translators such as
+
+<a href="http://www.developerfusion.com/tools/convert/vb-to-csharp">
+developerFusion</a>
+

@@ -1,0 +1,78 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262864 [place 2D detail family in active view] -->
+
+<h3>Place Detail Instance</h3>
+
+<p>Here is a little note on a problem regarding the placement of a detail family instance in the active view that has appeared several times lately, and its solution by Robert Pleysier of 
+
+<a href="http://www.alfadevelopment.nl">
+ALFA Development</a>:
+
+<p>I want to place a detail family instance in a section view.
+In my initial attempts, the call to NewFamilyInstance was placing the instance in the wrong view.
+After using RevitLookup, we found that the instance was actually hosted in the section view.
+We began experimenting with the other NewFamilyInstance options and finally found the following option which solved our problem:
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; docViews = util.GetElemOfType( 
+&nbsp; &nbsp; doc, <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+&nbsp;
+&nbsp; <span class="teal">View</span> v1 = getView( docViews, <span class="maroon">&quot;Exterior&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fin = factory.NewFamilyInstance(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, famSymbol, v1.SketchPlane, 
+&nbsp; &nbsp; StructuralType.NonStructural );
+</pre>
+
+<p>This code is using the following helper method to find a view by name:
+
+<pre class="code">
+<span class="teal">View</span> getView( <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; views, <span class="blue">string</span> name )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> views )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( v.ViewName == name )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> v;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>This approach is making use of the overload of NewFamilyInstance taking the following arguments:
+
+<ul>
+<li>XYZ location
+<li>FamilySymbol symbol
+<li>Element host
+<li>StructuralType structuralType
+</ul>
+
+<p>So the sketch plane of the view is actually being regarded as the host of the detail instance.
+I find this pretty interesting.
+
+<p><strong>Important Note:</strong> Here is an important note from Scott Conover, Revit API Software Development Manager, on the suggestion above:
+
+<span style="color:darkblue">
+
+<p>In Revit 2011, NewFamilyInstance(XYZ, FamilySymbol, View) is the overload designed for the use case.
+
+<p>I'm surprised the other one works.
+
+</span>
+
+<p>I am just in the process of exploring another case dealing with a similar issue, and will post again with a more complete solution for this issue as soon as it is fully clarified and tested.
+
+<p><strong>Response:</strong> Robert responds to Scott's suggestion and says:
+
+<span style="color:darkblue">
+
+<p>We tried the method recommended by Scott Conover in the latest Revit 2011 but we did not succeed. After placing a detail family instance in a view like elevation or section, the detail family was placed in the plan view.
+
+</span>
+
+<p>The exploration continues...

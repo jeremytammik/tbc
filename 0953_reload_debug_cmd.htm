@@ -1,0 +1,379 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+
+-->
+
+<h3>Reloading and Debugging External Commands on the Fly</h3>
+
+<p>After publishing the little sample code snippet yesterday showing how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/load-your-own-external-command-on-the-fly.html">
+load and reload an external Revit command</a> from
+
+a byte stream to avoid locking the .NET assembly DLL, I realised that this can be combined rather nicely with my own
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/external-command-lister-and-adding-ribbon-commands.html">
+external command lister</a>.
+
+<p>The combination of these two enables loading, debugging, reloading and re-debugging any simple external command on the fly, which has been a subject of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/reload-add-in-for-debug-without-restart.html">
+regular discussion in the past</a>.</p>
+
+<p>By 'simple', I mean commands that do not have external dependencies or special loading requirements that make it difficult to load them lacking additional information beyond the .NET assembly path name.</p>
+
+<p>The external command lister initially used the Assembly.LoadFrom method to load the .NET assembly, which locks the DLL.</p>
+
+<p>Replacing this by reading the byte stream from the DLL and passing the result into Assembly.Load instead avoids that lock.</p>
+
+<p>Adding a method to instantiate an external command implementation object and invoke its Execute method enables execution and debugging of an arbitrary external command.</p>
+
+<p>Here is a live five-minute demonstration to show exactly what I mean:</p>
+
+
+<!--
+
+http://youtu.be/hnDlCnvxksc
+
+Revit API: load, debug, reload and re-debug an external command
+
+For more details, please refer to The Building Coder, May 29, 2013.
+
+http://thebuildingcoder.typepad.com
+
+Reloading and Debugging External Commands on the Fly
+
+http://thebuildingcoder.typepad.com/blog/2013/05/reloading-and-debugging-external-commands-on-the-fly.html
+
+Jeremy Tammik,Revit API,The Building Coder,Programming,.NET,C#
+
+-->
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/hnDlCnvxksc" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>To achieve this, I basically just added two methods to the existing code:</p>
+
+<ul>
+<li><a href="#2">ExternalCommandLister.Launch</a></li>
+<li><a href="#3">Command.OnDoubleClick</a></li>
+</ul>
+
+<p>If you are impatient, uninterested or already know it all yourself, please go ahead and jump straight down to the
+
+<a href="#4">summary and download</a> section.</p>
+
+
+<a name="2"></a>
+
+<h4>ExternalCommandLister Enhancements</h4>
+
+<p>I extended the ExternalCommandLister class by adding a Launch method taking the fully specified class name of the external command implementation.</p>
+
+<p>I also modified the constructor to load the add-in assembly from a byte stream instead of directly from the .NET assembly file to avoid the DLL locking issue preventing subsequent reloading.</p>
+
+<p>The Launch method requires the current instance of the ExternalCommandData to pass in to the external command it invokes, and the assembly we create needs to be kept available as well, so I added two new member variables for these.</p>
+
+<p>It also checks the Result code returned by the invocation and reports that together with an optional error message in case of failure.</p>
+
+<p>Here is the complete updated class implementation:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">ExternalCommandLister</span>
+{
+&nbsp; <span class="blue">string</span> _assembly_filename;
+&nbsp; <span class="blue">string</span>[] _external_commmand_class_names;
+&nbsp; <span class="teal">ExternalCommandData</span> _commandData;
+&nbsp; <span class="teal">Assembly</span> _asm;
+&nbsp;
+&nbsp; <span class="blue">public</span> ExternalCommandLister(
+&nbsp; &nbsp; <span class="blue">string</span> assembly_filename,
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData )
+&nbsp; {
+&nbsp; &nbsp; _assembly_filename = assembly_filename;
+&nbsp; &nbsp; _external_commmand_class_names = <span class="blue">null</span>;
+&nbsp; &nbsp; _commandData = commandData;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( assembly_filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentOutOfRangeException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;assembly_filename&quot;</span>, <span class="maroon">&quot;file not found&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// No need to load the Revit API assemblies, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// because we are ourselves a Revit API add-in </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// inside of Revit, so they are guaranteed to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// be present.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly revit = Assembly.LoadFrom( &quot;C:/Program Files/Autodesk/Revit Architecture 2014/RevitAPI.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//string root = &quot;C:/Program Files/Autodesk Revit Architecture 2014/&quot;;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly adWindows = Assembly.LoadFrom( root + &quot;AdWindows.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly uiFramework = Assembly.LoadFrom( root + &quot;UIFramework.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly revit = Assembly.LoadFrom( root + &quot;RevitAPI.dll&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Load the selected assembly into </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the current application domain:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly asm = Assembly.LoadFrom(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; assembly_filename );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Load the selected assembly into the current </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// application domain via byte array to avoid</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// locking the DLL:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">byte</span> [] assemblyBytes = <span class="teal">File</span>.ReadAllBytes(
+&nbsp; &nbsp; &nbsp; &nbsp; _assembly_filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _asm = <span class="teal">Assembly</span>.Load( assemblyBytes );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _asm )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to load assembly '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; assembly_filename ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Type</span>&gt; types = _asm.GetTypes()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Type</span>&gt;( t =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span> != t.GetInterface(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;IExternalCommand&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _external_commmand_class_names = types
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Type</span>, <span class="blue">string</span>&gt;( t =&gt; t.FullName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToArray();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Exception '{0}' processing assembly '{1}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; ex.Message, assembly_filename ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> AssemblyFilename
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Path</span>.GetFileName( _assembly_filename );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span>[] CommandClassnames
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _external_commmand_class_names;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Launch( <span class="blue">string</span> command_name )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; _external_commmand_class_names.Contains(
+&nbsp; &nbsp; &nbsp; &nbsp; command_name ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid command name&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Type</span> typ = _asm.GetType( command_name );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">object</span> cmd = _asm.CreateInstance( typ.FullName );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> message = <span class="blue">null</span>;
+&nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">ElementSet</span> elements = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">object</span> [] args = <span class="blue">new</span> <span class="blue">object</span>[] {
+&nbsp; &nbsp; &nbsp; _commandData, message, elements };
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BindingFlags</span> flags = (<span class="teal">BindingFlags</span>)
+&nbsp; &nbsp; &nbsp; ( (<span class="blue">int</span>) <span class="teal">BindingFlags</span>.Default
+&nbsp; &nbsp; &nbsp; | (<span class="blue">int</span>) <span class="teal">BindingFlags</span>.InvokeMethod );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Result</span> r = (<span class="teal">Result</span>) typ.InvokeMember( <span class="maroon">&quot;Execute&quot;</span>,
+&nbsp; &nbsp; &nbsp; flags, <span class="blue">null</span>, cmd, args );
+&nbsp;
+&nbsp; &nbsp; message = args[1] <span class="blue">as</span> <span class="blue">string</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = (<span class="blue">null</span> == message) ? 0 : message.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} returned {1}{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; command_name, r,
+&nbsp; &nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;: &quot;</span> ),
+&nbsp; &nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;&quot;</span> : message ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> r;
+&nbsp; }
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Command Class Enhancements</h4>
+
+<p>The external command implementation class obviously also needs to be extended in order to enable call the Launch method.</p>
+
+<p>The initial version prompts the user to select an assembly to parse and lists the external command implementation classes it detects in a multi-line text box.</p>
+
+<p>I initially thought of adding a context menu to the text box to enable launching a selected command.</p>
+
+<p>However, it turned out to be easier to implement handling of a double click event instead.</p>
+
+<p>The double click event handler detects the current line and extracts the full external command implementation class name from that to pass to the Launch method:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define the initial .NET assembly folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _assembly_folder_name
+&nbsp; &nbsp; = <span class="maroon">&quot;C:\\ProgramData\\Autodesk\\Revit\\Addins\\2014&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Select a .NET assembly file in the given folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;folder&quot;&gt;</span><span class="green">Initial folder.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filename&quot;&gt;</span><span class="green">Selected filename on success.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Return true if a file was successfully selected.</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> FileSelect(
+&nbsp; &nbsp; <span class="blue">string</span> folder,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">OpenFileDialog</span> dlg = <span class="blue">new</span> <span class="teal">OpenFileDialog</span>();
+&nbsp; &nbsp; dlg.Title = <span class="maroon">&quot;Select .NET Assembly or Cancel to Exit&quot;</span>;
+&nbsp; &nbsp; dlg.CheckFileExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.CheckPathExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.InitialDirectory = folder;
+&nbsp; &nbsp; dlg.Filter = <span class="maroon">&quot;.NET Assembly DLL Files (*.dll)|*.dll&quot;</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> rc = ( <span class="teal">DialogResult</span>.OK == dlg.ShowDialog() );
+&nbsp; &nbsp; filename = dlg.FileName;
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDoubleClick( <span class="blue">object</span> sender, <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0}: {1}&quot;</span>, sender, e );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TextBox</span> tb = sender <span class="blue">as</span> <span class="teal">TextBox</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != tb )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> text = tb.Text;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = tb.GetFirstCharIndexOfCurrentLine();
+&nbsp; &nbsp; &nbsp; text = text.Substring( i );
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = text.IndexOf( <span class="maroon">'\n'</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt;= n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; text = text.Substring( 0, n );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; text.Trim();
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( text );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; text.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandLister</span> lister = tb.Tag
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ExternalCommandLister</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; lister.Launch( text );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> DisplayExternalCommands(
+&nbsp; &nbsp; <span class="blue">string</span> filename,
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> owner,
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ExternalCommandLister</span> lister
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExternalCommandLister</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; filename, commandData );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] a = lister.CommandClassnames;
+&nbsp; &nbsp; <span class="blue">int</span> n = a.Length;
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">Form</span> form
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>();
+&nbsp;
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 400, 150 );
+&nbsp;
+&nbsp; &nbsp; form.Text = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} defines {1} external command{2} - double click to launch&quot;</span>,
+&nbsp; &nbsp; &nbsp; lister.AssemblyFilename, n,
+&nbsp; &nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; form.FormBorderStyle
+&nbsp; &nbsp; &nbsp; = <span class="teal">FormBorderStyle</span>.SizableToolWindow;
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">TextBox</span> tb
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">TextBox</span>();
+&nbsp;
+&nbsp; &nbsp; tb.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; tb.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; tb.Multiline = <span class="blue">true</span>;
+&nbsp; &nbsp; tb.TabIndex = 0;
+&nbsp; &nbsp; tb.WordWrap = <span class="blue">false</span>;
+&nbsp; &nbsp; tb.ReadOnly = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; tb.Text = <span class="blue">string</span>.Join( <span class="maroon">&quot;\r\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; lister.CommandClassnames );
+&nbsp;
+&nbsp; &nbsp; tb.Tag = lister;
+&nbsp;
+&nbsp; &nbsp; tb.DoubleClick += <span class="blue">new</span> <span class="teal">EventHandler</span>(
+&nbsp; &nbsp; &nbsp; OnDoubleClick );
+&nbsp;
+&nbsp; &nbsp; form.Controls.Add( tb );
+&nbsp;
+&nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( FileSelect(
+&nbsp; &nbsp; &nbsp; _assembly_folder_name,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; DisplayExternalCommands( filename,
+&nbsp; &nbsp; &nbsp; &nbsp; revit_window, commandData );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Summary and Download</h4>
+
+<p>One very neat benefit of this approach is that it almost completely replaces the functionality provided by RvtSamples, in that any simple external command can be immediately launched and debugged.
+It is obviously also much more flexible, 100% totally flexible, in fact.
+I cannot think of any way to make it more so.</p>
+
+<p>The only remaining advantage of RvtSamples is basically its very inflexibility, the fact that it provides a neat user interface with a static overview of all available samples, plus optional additional add-ins that you specify yourself using include files or by editing and adding new entries to RvtSamples.txt itself.
+You thus see what you have at your disposal, whereas the flexible new loader requires to to know it in advance yourself.</p>
+
+<p>Come to think of it, this is probably exactly what the AddInManager does as well to enable reloading and re-debugging of already loaded add-ins without restarting Revit and regenerating the RVT project file.</p>
+
+<p>Here is <a href="zip/JtExternalCommandLister2.zip">JtExternalCommandLister2.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the updated version 2014.0.0.2 of this external command.</p>
+
+<p>I hope you find this useful, instructive and inspiring.</p>

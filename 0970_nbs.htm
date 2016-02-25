@@ -1,0 +1,201 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Stephen Hamil 
+RE: An update to the NBS-Revit plug-in (v2.0)
+
+-->
+
+<h3>Behind the Scenes of the NBS Revit Add-in</h3>
+
+<p>Here is a guest post by Stephen Hamil of
+
+<a href="http://www.ribaenterprises.com">RIBA Enterprises</a>,
+
+director of
+
+<a href="http://www.thenbs.com">NBS</a>,
+
+the national standard specification company in the UK, owned by the
+
+<a href="http://www.architecture.com">
+Royal Institute of British Architects</a>.
+
+<p>They just released the
+
+<a href="http://constructioncode.blogspot.co.uk/2013/06/7-great-new-features-in-nbs-for.html">
+new version of their Revit plug-in</a> that
+
+integrates the Revit design model with the NBS specification model, technical guidance and National BIM Library objects.</p>
+
+<p>Below, Chris and Calum from the NBS software development team give a little insight into some of the API functionality they used when developing this software:</p>
+
+<ul>
+<li><a href="#2">Drag-and-drop support from the National BIM Library</a></li>
+<li><a href="#3">Controlling Revit from modeless dialogues</a></li>
+<li><a href="#4">Porting to 2014</a></li>
+<li><a href="#5">Docking panel prototype</a></li>
+<li><a href="#6">Further Information</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Drag-and-drop Support from the National BIM Library</h4>
+
+<center>
+<!-- <img src="img/nbs_01-DragAndDrop.gif" alt="Drag-and-drop support from the National BIM Library" width="400"/> -->
+<img src="img/nbs_01A-DragAndDrop.jpg.jpeg" alt="Drag-and-drop support from the National BIM Library" width="400"/>
+</center>
+
+<p>We make use of the IDropHandler interface from the API to allow us to drag drop from the National BIM Library NBL.
+<p>That enables us to overwrite the default behaviour of Revit when the user drops a family on a project file.
+<p>We start the process by making a call from the web browser to its owning user control:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Method called from the web browser</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">void</span> ClickDrag(
+&nbsp; &nbsp; <span class="blue">string</span> downloadLink,
+&nbsp; &nbsp; <span class="blue">string</span> strFamilyName )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">this</span>.nbsUser.hasLoggedInNBL )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; dragInfo = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;() {
+&nbsp; &nbsp; &nbsp; &nbsp; downloadLink, strFamilyName };
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Kick off the drag drop event which Revit </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// will pick up and custom code will check </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// if family already entered</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span>.DoDragDrop( dragInfo,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> dropHandler( <span class="blue">this</span> ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span>.SignInToFloatPanel();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Controlling Revit from Modeless Dialogues</h4>
+
+<center>
+<img src="img/nbs_02-ModelessDialog.gif" alt="Controlling Revit from modeless dialogues" width="400"/>
+</center>
+
+<p>We use the Idling event to call into the Revit API from modeless dialogs to modify the database without causing damage.
+
+<p>We have a list of commands to run with an array of objects as their parameters and then run this chunk of code to process them in the Idling event handler:
+
+<pre class="code">
+&nbsp; <span class="green">// If we have commands to process</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( CommandsToProcess.Count &gt; 0 )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uiDoc = UIApp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get the first command in the list to process</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; CommandToRun command = CommandsToProcess.First();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get the delegate that we want to run</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Delegate</span> FunctionDelegate = command.FunctionToRun;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Make sure we have the lastest UIDocument</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; command.ListOfParameters.Insert( 0, uiDoc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get it's parameters</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span>[] Parameters = command.ListOfParameters.ToArray();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Invoke our function</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; FunctionDelegate.DynamicInvoke( Parameters );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorLogger.LogError( <span class="maroon">&quot;Error processing command: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.ToString() );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Always Pop the first in the queue</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; CommandsToProcess.RemoveAt( 0 );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Porting to 2014</h4>
+
+<p>We encountered a problem when developing the plugin to work with 2014, due to the Document class method get_Element changing to GetElement.
+
+<p>This was easily handled by the way we structure the plugin and have each version inheriting from the previous;  we start off with a generic interface:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitRibbon</span> : IRevitRibbon
+</pre>
+
+<p>For Revit 2013 and 2014, we inherit the previous RevitRibbon class:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitRibbon</span> : Revit2012.RevitRibbon
+
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitRibbon</span> : Revit2013.RevitRibbon
+</pre>
+
+<p>This allows us to simply override the one function calling the get_Element method, solving the problem without causing any damage to our existing implementations for Revit 2012 and 2013.
+
+
+<a name="5"></a>
+
+<h4>Docking Panel Prototype</h4>
+
+<p>For the Revit 2014 users, we did also look into replacing the modeless dialog by a docking panel, which is a really cool new feature.
+
+<p>Unfortunately, though, we ran out of time for this release.
+However, we’ll look at this again for version 2.1.
+
+<p>Here is a screen snapshot of it working in a prototype:</p>
+
+<center>
+<img src="img/nbs_03-DockingWindow.gif" alt="Docking window" width="400"/>
+</center>
+
+<a name="6"></a>
+
+<h4>Further Information</h4>
+
+<p>A lot of work was put into this and it looks pretty good, really linking the design model in Revit with the specification model in NBS.
+
+<p>Here is some further information on:
+
+<ul>
+<li>
+<a href="http://constructioncode.blogspot.co.uk/2013/06/7-great-new-features-in-nbs-for.html">
+The main seven features of the new NBS plug-in</a>.</li>
+
+<li>The UK free-to-use library of
+
+<a href="http://www.nationalbimlibrary.com">
+NBS BIM components</a>.</li>
+</ul>
+
+<p>Thank you, Stephen, for providing this background information.</p>

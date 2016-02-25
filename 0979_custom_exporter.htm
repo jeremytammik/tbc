@@ -1,0 +1,284 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+08013392 [Hidden elements in linked files]
+08465651 [How to get material texture path on IExportContext?]
+
+-->
+
+<h3>Graphics Pipeline Custom Exporter</h3>
+
+<p>One important
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#2">
+Revit 2014 API highlight</a> is
+
+the new custom exporter framework providing direct API access to the rendering output pipeline, including geometry and material properties.</p>
+
+<p>The
+
+<i><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New</a></i> section
+
+of the Revit API help file describes it in more detail like this:</p>
+
+<span style="color: darkblue">
+<h4>Custom Export</h4>
+<p>The Custom Export API provides access to the rendering output pipeline through which Revit sends a processed model (its graphics 3D representation) to an output device.
+In the case of Custom Export, the "device" is represented by a context object that could be any kind of a device, even a file &ndash; the most common case, actually.
+A client of Custom Export provides a context and invokes rendering of a model, upon which Revit starts processing the model and sends graphic data out via methods of the context.
+The data describes&nbsp;the model exactly as it would have appeared in Revit when the model is rendered.
+The data includes all geometry and material properties.</p>
+<p>The following classes have been exposed:</p>
+<h5>CustomExporter</h5>
+<p>A class that allows exporting 3D views via a custom export context.
+The Export method of this class triggers the standard rendering process in Revit, but instead of displaying the result on screen or printer, the output is channeled through the given custom context that handles processing the geometric as well as non-geometric information.</p>
+<h5>IExportContext</h5>
+<p>An interface of which interface is used in a custom export of a Revit model.
+The instance of this class is passed in as a parameter of a CustomExporter.
+The methods are then called by Revit at times of exporting entities of the model.</p>
+<h5>Render Node Classes</h5>
+<p>Classes of which instance are sent to an export context during a custom export.</p>
+<ul>
+<li>RenderNode &ndash; base class for all output nodes</li>
+<li>ViewNode &ndash; represents a View</li>
+<li>GroupNode &ndash; base class for family and link instances</li>
+<li>InstanceNode &ndash; represents an instance of a family</li>
+<li>LinkNode &ndash; represents an external link</li>
+<li>ContentNode &ndash; base class from RPC, Light, and Daylight nodes</li>
+<li>RPCNode &ndash; represents an RPC object</li>
+<li>DaylightPortalNode &ndash; represents a daylight portal</li>
+<li>LightNode &ndash; represents a light</li>
+<li>MaterialNode &ndash; represents a material change</li>
+</ul>
+<h5>CameraInfo</h5>
+<p>A class that describes information about projection mapping of a 3D view to a rendered image.
+An instance of this class can be obtained via a property of ViewNode.</p>
+</span>
+
+
+<a name="2"></a>
+
+<h4>Usage Outline</h4>
+
+<p>Here is minimal code snippet outlining the main components' interaction:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Instantiate custom context</span>
+&nbsp;
+&nbsp; <span class="teal">MyExportContext</span> context = <span class="blue">new</span> <span class="teal">MyExportContext</span>(
+&nbsp; &nbsp; document );
+&nbsp;
+&nbsp; <span class="green">// Instantiate custom exporter</span>
+&nbsp;
+&nbsp; <span class="teal">CustomExporter</span> exporter = <span class="blue">new</span> <span class="teal">CustomExporter</span>(
+&nbsp; &nbsp; document, context );
+&nbsp;
+&nbsp; <span class="green">// Specify exporter settings</span>
+&nbsp;
+&nbsp; exporter.IncludeFaces = <span class="blue">false</span>;
+&nbsp;
+&nbsp; exporter.ShouldStopOnError = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="green">// Launch export process</span>
+&nbsp;
+&nbsp; exporter.Export( view3D );
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Example Exporters</h4>
+
+<p>I would like to present several different examples and ideas for making use of this functionality:</p>
+
+<ul>
+<li><a href="#4">Custom Exporter to XML</a></li>
+<li><a href="#5">Custom Exporter to Collada</a></li>
+<li><a href="#6">Custom Exporter to OBJ</a></li>
+<li><a href="#7">Custom Exporter to JSON</a></li>
+</ul>
+
+<p>The first two of these are discussed below; the latter two are currently just ideas for future projects.</p>
+
+
+<a name="4"></a>
+
+<h4>Custom Exporter to XML</h4>
+
+<p>Arno&scaron;t L&ouml;bel provided a sample add-in demonstrating and exercising just about all possible aspects of the custom exporter functionality.</p>
+
+<p>It initially presents a user interface in which the different available options can be manually selected for testing purposes:</p>
+
+<center>
+<img src="img/CustomExporterXml.png" alt="Custom exporter options" width="500"/>
+</center>
+
+<p>On validating the dialogue, the custom export is started and the data it receives is logged to an XML file.</p>
+
+<p>I adapted Arno&scaron;t's original code slightly to ensure that spaces in the asset names and properties are replaced by underscore characters in order to define valid XML tags.</p>
+
+<p>Here is
+
+<a href="zip/rac_basic_sample_project.xml">rac_basic_sample_project.xml</a> containing
+
+the XML output generated from the {3D} view of the standard Revit architectural basic sample project with that replacement in place, so you can see directly for yourself what the exact output generated by this system looks like.
+Actually, maybe you cannot, because it is a rather unwieldy 41 MB in size.
+Here is
+
+<a href="zip/family_api_kitchen.xml">family_api_kitchen.xml</a> instead, just over 4 MB, making it a bit more manageable, generated from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html#30">
+family API kitchen sample model</a>.</p>
+
+<p>I can see you are raring to go and explore this for yourself, so without further ado I hereby present
+
+<a href="zip/CustomExporterXml.zip">
+CustomExporterXml.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for the XML custom exporter external command add-in.</p>
+
+<p>Since the goal of this XML exporter sample is to present and test all possible custom exporter functionality, it is rather more complex than an average simple exporter, e.g. the following one to the Collada file format.</p>
+
+<p>Thank you, Arno&scaron;t, for providing this powerful full-fledged exploration and testing tool!</p>
+
+
+<a name="5"></a>
+
+<h4>Custom Exporter to Collada</h4>
+
+<p>A much simpler custom exporter example than the full-featured export to XML described above is this real-world
+
+<a href="http://lumion3d.com/lumion-exporter-for-autodesk-revit">Revit Collada exporter</a> by
+
+Artur Brzegowy of
+
+<!-- <a href="http://www.vaal-triangle.com">Vaal Triangle Systems Pvt. Ltd</a> -->
+
+<a href="http://www.lumion3d.com">Act-3D B.V.</a> supporting
+
+export to the
+
+<a href="https://collada.org">
+Collada</a> model
+
+visualisation format.</p>
+
+<p>The external command mainline is very simple, basically just matching the outline presented above.</p>
+
+<p>All the work resides in the custom exporter implementation and its numerous methods:</p>
+
+<center>
+<img src="img/CustomExporterCollada_methods.png" alt="Collada custom exporter methods" width="300"/>
+</center>
+
+<!--
+<pre class="code">
+&nbsp; <span class="teal">MyExportContext</span> context = <span class="blue">new</span> <span class="teal">MyExportContext</span>(
+&nbsp; &nbsp; document );
+&nbsp;
+&nbsp; <span class="green">// Create an instance of a custom exporter by </span>
+&nbsp; <span class="green">// giving it a document and the context.</span>
+&nbsp;
+&nbsp; <span class="teal">CustomExporter</span> exporter = <span class="blue">new</span> <span class="teal">CustomExporter</span>(
+&nbsp; &nbsp; document, context );
+&nbsp;
+&nbsp; <span class="green">// Note: Excluding faces just excludes the calls, </span>
+&nbsp; <span class="green">// not the actual processing of face tessellation. </span>
+&nbsp; <span class="green">// Meshes of the faces will still be received by </span>
+&nbsp; <span class="green">// the context.</span>
+&nbsp;
+&nbsp; exporter.IncludeFaces = <span class="blue">false</span>;
+&nbsp;
+&nbsp; exporter.ShouldStopOnError = <span class="blue">false</span>;
+&nbsp;
+&nbsp; exporter.Export( view3D );
+</pre>
+-->
+
+<p>Here is
+
+<a href="zip/CustomExporterCollada.zip">
+CustomExporterCollada.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for the Collada custom exporter external command add-in.</p>
+
+<p>Many thanks to Artur for sharing this!</p>
+
+
+<a name="6"></a>
+
+<h4>Custom Exporter to OBJ</h4>
+
+<p>Another custom exporter candidate that I might return to later would be a replacement for my OBJ exporter for Revit 2013.
+
+<p>That implementation and its detailed description show the complications required to determine and traverse all the solids of all relevant model elements and export their graphics prior to the custom exporter API.
+Additional work was required to determine their colour and other properties:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html">OBJ model export considerations</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html">Take one</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-colours.html">Colours</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-multiple-solid-support.html">Multiple solid support</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">Transparency support</a></li>
+</ul>
+
+<p>Almost of all of that complexity is now provided for free by the custom exporter API.</p>
+
+<p>Yet another example of the significant simplification provided by the custom exporter is the handling of
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/Is-element-hidden-in-linked-file/td-p/3754418">
+hidden elements from a linked file in the host view</a>.
+
+For instance, the API provides no external method to whether a specific wall in a linked file is hidden in the host 3D view.
+The custom export support in 2014, however, will respect this and not pass elements which are hidden, whether locally, in links, or any of the other 40 or so possible ways to hide an element.
+Of course, this support is only available for 3D views and 3D exports, and restricted to Revit 2014 and later.
+
+
+<a name="7"></a>
+
+<h4>Custom Exporter to JSON</h4>
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a> recently
+
+presented an online
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/06/3d-webgl-viewer-with-javascript-and-threejs.html">
+3D WebGL viewer</a> for
+
+both mobile and desktop devices implemented using JavaScript,
+
+<a href="http://en.wikipedia.org/wiki/WebGL">WebGL</a> and the
+
+<a href="http://threejs.org">
+threejs</a> library.
+
+<p>It displays graphics stored in the same custom JSON format that Philippe already defined for his initial
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/02/creating-a-cloud-based-viewer-part-x.html">
+cloud based viewer</a> and
+
+<!--
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2013/03/liberate-your-apps-presentation-and-demo-recording.html">
+ADN DevDays cloud and mobile demonstration</a>,
+-->
+
+for which
+
+<a href="http://adndevblog.typepad.com/aec/adam-nagy.html">Adam Nagy</a> in
+
+turn implemented a
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-1.html">
+Revit 2013 exporter</a>.</p>
+
+<p>I would love to create a Revit exporter for this format based on the new custom exporter API, for fun and comparison.</p>
+
+<p>As you can see, this framework provides powerful new functionality with many important applications.</p>
+
+<p>I am looking forward to hearing what you make use of it for.</p>

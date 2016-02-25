@@ -1,0 +1,124 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 05911610 [Synchronize with central through API?] -->
+
+<h3>Synchronize with Central</h3>
+
+<p>Developers have often asked how to programmatically synchronise with central, which is currently not supported by the Revit API.
+
+<p>I discussed this issue once again recently with Erik Eriksson of
+
+<a href="http://www.white.se">
+White Arkitketer AB</a>,
+
+and he tested and verified that yet another risky workaround can be used to achieve this, as always 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#3">
+at your own peril</a>.
+
+<p><strong>Question:</strong> I have a worksharing project in which I am trying to open a file, make changes, synchronize the changes to the central file and then close the file. 
+I can complete all the tasks needed except synchronization part. 
+Is that not possible through the API? 
+I haven't found anything regarding this in the API manuals for Revit 2011 and 2012.
+
+<p>Is there a workaround for this? 
+Our project is a very complex hospital of 370 000 m2 and we have 17 different project files. 
+Making changes to these through the API would be a really powerful tool for us and we must be able to synchronize the changes to the central file quickly since there are 90 people working in these 17 files.
+
+<p>Any thoughts are welcome. 
+I've tried opening the central files, making changes, saving these and closing. 
+But that doesn't relinquish the elements changed.
+
+<p>I looked at your two year old post on auto-confirming a save dialogue by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+subscribing to the DialogboxShowingEvent</a>. 
+
+<p>Could this also be used to auto-confirm the synchronize with central dialog box that I can bring up using the API?
+
+<p><strong>Answer:</strong> There are several different possible ways to suppress unwanted dialogues programmatically in Revit, both using the Revit and the Windows API:
+
+<p>The old method that was already available in Revit 2010 was to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+use the DialogBoxShowing event</a>, as you discovered, which can be used to dismiss a dialogue programmatically.
+
+<p>The Revit 2011 API also includes a comprehensive 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+failure processing API</a> which 
+
+can used to do much more than reacting to the DialogBoxShowing event.
+
+
+<p>If all else fails and you just want to get rid of the dialogue box by any means, you can also use the Windows API to detect when it is displayed and dismiss it using my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">
+dialogue clicker application</a>.
+
+<p>In all three cases, you have to invest some research of your own to discover (in the debugger) what exact conditions you can use to reliably determine that the dialogue that is popping up really is the one you are interested in. 
+The approaches for that are described in the blog posts. 
+
+<p>To optimise performance and minimise the impact and complexity, you might also want to set up your event handlers so that they are only active for a limited period of time, when you are expecting the unwanted dialogue to be displayed, and then remove them again after dismissing it.
+
+<p><strong>Response:</strong> Success!
+
+<!--
+<p>Tänkte bara uppdatera dig om mitt ärende med att utföra en "synchronize with central" via ett externt commando i APIt.
+
+<p>Jag äntligen lyckats! Jag snubblade på lösningen på din blogg. Även om du då beskrev hur man skulle kunna stänga det aktiva dokumenet genom att använda SendKeys-klassen i en separat tråd.
+
+<p>I princip så kör jag detta och lyckas trigga igång en synchronisering:
+
+<p>Frågan är nu bara vad du tror om det? 
+Eftersom man egentligen bara använder "UI-funktionalitet" så borde det väl vara ganska säkert?
+
+<p>Allt är väl mer eller mindre relativt osäkert när man "lurar" APIt såhär?
+-->
+
+I used your solution to close the active document by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">
+executing a SendKeys call</a> in 
+
+a separate thread.
+
+<p>In principle I am doing the same thing and triggering the synchronisation using
+
+
+<pre class="code">
+  SendKeys.SendWait("{F10}");
+  SendKeys.SendWait("3");
+  SendKeys.SendWait("{ENTER}");
+</pre>
+
+<p>The question is: what do you think about this?
+
+<p>I am only using the official UI functionality, and it should work irrespectively of whether a user or my SendKeys calls are driving it, shouldn't it?
+
+<p><strong>Answer:</strong> Well, you should definitely pay close attention to the warnings of Arno&scaron;t L&ouml;bel, voiced in various blog posts, including the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#3">
+disclaimer</a> on
+
+the very post you found, and yet again in all clarity in his class on this topic at Autodesk University 2011,
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9879&jid=1763185">
+<b>CP5381</b></a>, 
+
+on asynchronous interactions and managing modeless UI, which would be well worth a blog post all on its own, at least.
+
+<p>Maybe using 
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a> instead 
+
+might possibly be a slightly safer bet, since I heard rumours that the addressee of the SendKeys messages may sometimes get confused.
+
+<p><strong>Response:</strong> Yes, indeed.
+In order to make this as safe as possible, I execute it during an idling event to make sure that the document really is ready. 
+I also subscribe to the DocumentSynchronizedWithCentral to make sure that the document was synchronized. 
+
+<p>I attended Arno&scaron;t's class during AU so I am very cautious with non-supported API-calls.

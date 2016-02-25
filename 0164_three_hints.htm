@@ -1,0 +1,84 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Three Coding and Performance Hints</h3>
+
+<p>We received three interesting and important coding and performance hints from 
+
+<a href="http://www.piotrzurek.net">
+Piotr</a>
+
+and 
+
+<a href="http://redbolts.com">
+Guy Robinson</a>
+
+on the post on Linq yesterday.
+I find them too important to leave them dozing away in the comment section, so here is their promotion to post status:</p>
+
+<ol>
+<li>Use 
+
+<a href="http://msdn.microsoft.com/en-us/library/bb384054.aspx">
+auto-implemented properties</a>
+
+to simplify the helper class code.</li>
+
+<li>Use ParametersMap instead of looping over all element parameters.</li>
+<li>The .NET Framework 3.5 SP1 is significantly improved over .NET 3.5.</li>
+</ol>
+
+<p>As Piotr pointed out, auto-implemented properties are a nice new feature that has been available since .NET 3.0.
+It saves some typing and significantly simplifies and shortens the helper class definition.</p>
+
+<p>Guy underlined that Joel's speed increases probably are a result of using proxy objects rather than Linq. 
+Proxies are useful for data binding as well, though, so they get used more often than not, and Linq is pretty cool.
+Also, using .NET3.5SP1 is much better than .NET3.5. It includes a number of important fixes, and WPF is faster with SP1.</p>
+
+<p>Guy also points out that looping over all the element parameters of each element is very costly, so you will get a nice additional speed improvement and a simpler class again for large datasets by using the ParametersMap in the constructor, rather than looping through all parameters.</p>
+
+<p>Jeremy adds that you should please be aware that using the parameter name strings as keys in the parameter lookup has the disadvantage of making the code language dependent. If possible, that should be avoided, and built-in parameter enumeration values or GUIDs should be used instead.
+I should think that is faster still, though maybe only marginally.
+
+<p>This is what the helper class definition looks like after applying the first two recommendations:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">InstanceData</span>
+{
+<span class="blue">#region</span> Properties
+<span class="blue">public</span> <span class="teal">Element</span> Instance { <span class="blue">get</span>; <span class="blue">set</span>; }
+<span class="blue">public</span> <span class="teal">String</span> Param1 { <span class="blue">get</span>; <span class="blue">set</span>; }
+<span class="blue">public</span> <span class="blue">bool</span> Param2 { <span class="blue">get</span>; <span class="blue">set</span>; }
+<span class="blue">public</span> <span class="blue">int</span> Param3 { <span class="blue">get</span>; <span class="blue">set</span>; }
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">#region</span> Constructors
+<span class="blue">public</span> InstanceData( <span class="teal">Element</span> instance )
+{
+&nbsp; Instance = instance;
+&nbsp;
+&nbsp; <span class="teal">ParameterMap</span> m = Instance.ParametersMap;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> p = m.get_Item( <span class="maroon">&quot;Param1&quot;</span> );
+&nbsp; Param1 = ( p == <span class="blue">null</span> ) ? <span class="blue">string</span>.Empty : p.AsString();
+&nbsp;
+&nbsp; p = m.get_Item( <span class="maroon">&quot;Param2&quot;</span> );
+&nbsp; Param2 = ( p == <span class="blue">null</span> ) ? <span class="blue">false</span> : ( 0 != p.AsInteger() );
+&nbsp;
+&nbsp; p = m.get_Item( <span class="maroon">&quot;Param3&quot;</span> );
+&nbsp; Param3 = ( p == <span class="blue">null</span> ) ? 0 : p.AsInteger();
+}
+<span class="blue">#endregion</span>
+}
+</pre>
+
+<p>Many thanks again to Joel for the original article and to Piotr and Guy for the valuable hints!</p>
+
+<p>I still wonder whether using ParametersMap is faster than simply using Parameters. 
+Another interesting thing to look at some day would be a benchmark comparing various different parameter access methods.
+One of these days, when we have lots of time ...</p>

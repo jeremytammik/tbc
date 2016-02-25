@@ -1,0 +1,150 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06868127 [Place an unplaced room fails if the room has once been placed] -->
+
+<h3>Meetings, Football, and RevitRubyShell</h3>
+
+<p>The whole EMEA DevTech team is meeting in Neuch&acirc;tel prior to the coming weekend's
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/07/thinking-about-au-2012-and-vacation.html">
+annual Autodesk football tournament</a> taking place here.
+
+I won't be able to play myself, unfortunately, for the first time in many years, since I had a prior appointment with friends to climb the 
+<a href="http://en.wikipedia.org/wiki/Spitzhorn">Spitzhorn</a> mountain this very weekend.
+
+<p>We also held a virtual meeting with Stephen Preston from the US, who is now our world-wide DevTech manager.
+Here we are in virtual union, from left to right, Gary Wassell, Marat Mirgaleev, Vladimir Ananyev, Stephen (virtually), Jeremy, Adam Nagy and Philippe Leefsma:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-07-05_ne_emea_team_meeting/IMG_9873_virtual_meeting_2.JPG" alt="Virtual meeting with Stephen" width="800"/>
+</center>
+
+<p>Meanwhile, I finally got around to taking a quick look at a completely new exciting topic:
+
+<a name="2"></a>
+
+<h4>RevitRubyShell</h4>
+
+<p>I 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/revit-python-shell.html">
+repeatedly</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/dynamically-load-and-debug-plugins.html">
+pointed out</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/access-to-curtain-grid-panels.html">
+the power</a> of 
+
+being able to interact directly with the Revit API using Daren Thomas' 
+
+<a href="http://code.google.com/p/revitpythonshell">Revit Python shell</a>,
+
+originally implemented for Revit 2010, then for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/python-shell-in-revit-and-vasari.html">
+Vasari</a>,
+
+and updated for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/python-shell-for-revit-2012-and-vasari-21.html">
+Revit 2012 and Vasari 2.1</a> last autumn.
+
+<p>Here is another interactive interactive Revit programming environment by 
+
+<a href="http://www.hclausen.net">H&aring;kon Clausen</a> of 
+
+<a href="http://www.nosyko.no">
+Nosyko AS</a>.
+
+<p>His RevitRubyShell is based on the interpreted language 
+
+<a href="http://www.ruby-lang.org">Ruby programming language</a>, 
+
+which is more modern than 
+
+<a href="http://www.python.org">Python</a> and
+
+inherently object oriented.
+
+<p>According to the introductory blurb on its home page, Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. 
+It has an elegant syntax that is natural to read and easy to write.
+
+<p>Kean Walmsley also had a look at it in its IronRuby incarnation for use in 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/ruby">
+programming AutoCAD</a>.
+
+He presents a first overview and introduction to Ruby in his initial post on 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/04/using-ironruby-inside-autocad.html">
+using IronRuby with AutoCAD</a>.
+
+<p>Here is the 
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+Ruby Shell source code</a>.
+
+<!--
+
+<a href="http://www.hclausen.net/RevitRubyShell/RevitRubyShellInstaller.application">
+an installer</a> which
+
+should be opened IE and will install the add-in directly.
+
+-->
+
+<p>Håkon says: I hope you will find this useful. 
+I use it a lot for rapid prototyping and testing when programming against the Revit API.
+
+<!--
+
+<p>I discussed the interactive Revit programming possibility offered by Daren Thomas' 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/revit-python-shell.html">
+Revit Python shell</a> a
+
+couple of times, originally for Revit 2010, then for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/python-shell-in-revit-and-vasari.html">
+Vasari</a>,
+
+and for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/python-shell-for-revit-2012-and-vasari-21.html">
+Revit 2012 and Vasari 2.1</a>.
+
+It has been updated again since then, obviously, and is used a lot by the Vasari guys.
+
+
+<p>Now there is another interactive Revit programming environment available as well:
+
+<p><a href="http://www.hclausen.net">H&aring;kon Clausen</a> implemented and released an interactive Revit programming console
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+RevitRubyShell</a> based 
+
+-->
+
+<p>It sports the simplest installation I have ever seen for any Revit add-in whatsoever, the absolutely ultimate one-click
+
+<a href="http://www.hclausen.net/RevitRubyShell/setup.exe">
+RevitRubyShell installer</a>,
+
+which should be opened IE and will install the add-in directly, setting up an external application creating its own simple single-button panel:</p>
+
+<center>
+<img src="img/ruby_panel.png" alt="RevitRubyShell add-in panel"/>
+</center>
+
+<p>Clicking the button launches the Revit Ruby shell including a snippet of sample code that can be immediately executed by pressing the blue 'Run' arrow button:</p>
+
+<center>
+<img src="img/ruby_console.png" alt="RevitRubyShell console"/>
+</center>
+
+<p>Well worth looking at, and might prove a huge programming productivity booster.
+
+<p>Many thanks to H&aring;kon for developing and sharing this!

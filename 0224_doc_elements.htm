@@ -1,0 +1,86 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253614 [DWGFamilyCreation] -->
+
+<h3>Document Elements</h3>
+
+<p>We have already used the Document.Elements property a couple of hundred times in previous posts to this blog, so this explanation is rather belated, but addresses a question that does keep on popping up from time to time anyway:
+
+<p><strong>Question:</strong> How can I access the Document.Elements property in C#?
+
+<p>The Revit help document lists the property named Document.Elements, stating that it is an overloaded property providing access to a set of elements from the document. The overloads are listed as
+
+<ul>
+<li>Elements: Provides access to all elements within the document. 
+<li>Elements( Filter ): Provides access to all elements which satisfy specified filter. 
+<li>Elements( Type ): Provides access to all elements of specified type. 
+<li>Elements( Filter, ElementArray ): Collects all elements which satisfy specified filter. 
+<li>Elements( Filter, ICollection of Element ): Collects all elements which satisfy specified filter. 
+<li>Elements( Type, ElementArray ): Collects all elements which satisfy specified type. 
+<li>Elements( Type, ICollection of Element ): Collects all elements which satisfy specified type. 
+</ul>
+
+<p>However, when I try to access these properties in C#, the Visual Studio compiler reports an error and says that they do not exist.
+How can I access these properties in C#?
+
+<p><strong>Answer:</strong> You can look at the C# source code generated automatically by the definition of the Document class by Visual Studio, by positioning the cursor over the Document type and pressing F12.
+This shows a completely different list of overloads:
+
+<ul>
+<li>public ElementIterator Elements;
+<li>public ElementIterator get_Elements( Filter );
+<li>public ElementIterator get_Elements( Type );
+<li>public int get_Elements( Filter, ElementArray );
+<li>public int get_Elements( Filter, ICollection<Element> );
+<li>public int get_Elements( Type, ElementArray );
+<li>public int get_Elements( Type, ICollection<Element> );
+</ul>
+
+<p>As you can see, only the Elements property with no filter or type argument is available using the name given in the help file. 
+The other Document.Elements members are considered to be methods, not properties, and have therefore been automatically decorated with the accessor prefix "get_".
+To call them, you need to prepend "get_" and obviously also provide the required arguments.
+
+<p><strong>Question:</strong> How can I access the Document.Elements property in VB?
+
+<p>I have converted some C# sample the code to VB but have an error with a function in the line 
+
+<pre class="code">
+  m_doc.getElements(viewFilter, views) 
+</pre>
+
+<p>The error states that .GetElements is not a member of Autodesk.Revit.Document, although I have defined m_doc as an Autodesk.Revit.Document.
+
+<p><strong>Answer:</strong> You can use the Visual Studio Intellisense functionality or the object browser to determine the real name of the method you are trying to invoke in whatever language you prefer to use. 
+
+<p>The method or property you are accessing is called Elements in the Revit API help. In C#, it is accessed using the call
+
+<pre class="code">
+  m_doc.get_Elements(viewFilter, views);
+</pre>
+
+<p>In VB, you have to drop the "get_" prefix, so the call is
+
+<pre class="code">
+  m_doc.Elements(viewFilter, views)
+</pre>
+
+<p><strong>Reply:</strong> Thanks for the response. 
+I did try with Elements, but this causes an error saying "property access must assign to the property or use its value", as it is returning an Integer. 
+This problem goes away if I use
+
+<pre class="code">
+  Dim i as Integer = m_doc.getElements(viewFilter, views)
+</pre>
+
+<p>What are we using the return value from this line for anyway?
+
+<p><strong>Answer:</strong> Oops, yes, right you are.
+The return value of these properties is the number of elements matching the specified criteria.
+
+<p>In VB, this is a read-only property, and the VB syntax requires you to make use of it as such.
+This means that you must read the value returned by the property, regardless of whether you make use of it or not.
+
+<p>Maybe this is part of the reason why these members are considered methods instead of properties in C#. 
+In C#, you are not forced to read the return value, but you can, if you like.

@@ -1,0 +1,258 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07592882 [Selection] -->
+
+<h3>Filter for Touching Beams Using Solid Intersection</h3>
+
+<p>I discussed how I created my first 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html">
+sphere in the Revit API</a> and
+
+displayed it using the analysis visualisation framework 
+
+<a href="http://thebuildingcoder.typepad.com/blog/avf">
+AVF</a>.
+
+Now let's make more serious use of it.
+
+<p>As I mentioned, the transient solids created by the geometry creation utility class can be used to set up geometrical proximity filters.
+
+<p>This exploration was prompted by the following query:
+
+<p><strong>Question:</strong> I would like to programmatically retrieve all touching beams, regardless of whether they are officially connected or not.
+
+<p>The user should pick one single beam, and all other beams touching it should be selected, recursively.
+
+<p>How can I achieve this, please?
+
+<p><strong>Answer:</strong> First let's look at the case you are not interested in :-)
+
+<p>If the beams are properly connected, you can use the LocationCurve ElementsAtJoin property to determine the connected beams at each end of the first, manually selected one, and iterate through the connection elements as demonstrated by the TraverseSystem SDK sample for duct systems using the MEP connector manager.
+
+<p>If the beams are not properly connected, but just touching, as you say, you can use the ElementIntersectsSolidFilter instead. 
+Such as filter detects elements within a given geometrical space defined by solid, which may come from the BIM model or be transient, i.e. generated in memory on the fly.
+
+<p>To recursively iterate through the beam system requires creating a new solid and a new filter for each beam you find, since each solid has its own location in space.
+If you are interested in beams touching anywhere, you could create an extruded shape matching the beam shape and detect all other beams that intersect it or come close to it anywhere at all along the length of the beam.
+If you are only interested in beams touching at the end points, you could set up a simple sphere at each end of the beam.
+
+<p>This process could be repeated recursively for all touching beams encountered.
+Of course you would have to skip beams that you have already found, or you would run into an infinite loop.
+
+<p>Here is the algorithm I am thinking of:
+
+<ul>
+<li>Maintain three lists of beams:
+<ul>
+<li>The beams already visited.
+<li>The current ones being analysed.
+<li>The neighbours of the current ones.
+</ul>
+<li>Select a starting beam, making it the current one.
+<li>While the set of current beams is non-empty, repeat the following:
+<ul>
+<li>Add the current to the list of visited beams.
+<li>Clear the list of neighbours.
+<li>For each of the current beams, add all beams touching it to the list of neighbours.
+<li>Make the neighbours found in the previous step the new set of current beams.
+</ul>
+</ul>
+
+<p>Finding all touching neighbours for a given beam is implement in the method AddConnectedElements, which sets up a sphere at each end of the beam, creates a proximity detector based on it using an ElementIntersectsSolidFilter, and adds all beams retrieved by that, excluding the beams already visited and neighbours already found.
+
+<p>I already presented the sphere creation method
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html#3">
+CreateSphereAt</a>.
+
+<p>Here is the AddConnectedElements method and its helper method AddElementsIntersectingSphereAt to detect touching elements:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine all neighbouring elements connected</span>
+&nbsp; <span class="gray">///</span><span class="green"> to the current element 'e', skipping all </span>
+&nbsp; <span class="gray">///</span><span class="green"> previously visited ones.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> AddElementsIntersectingSphereAt(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; neighbours,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; visited,
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> sphere = CreateSphereAt(
+&nbsp; &nbsp; &nbsp; doc.Application.Create, p, _sphere_radius );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementIntersectsSolidFilter</span> intersectSphere
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>( sphere );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsCurveDriven() <span class="green">// we work with the location curve</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( _bic )
+&nbsp; &nbsp; &nbsp; &nbsp; .Excluding( visited.Union&lt;<span class="teal">ElementId</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; neighbours ).ToList&lt;<span class="teal">ElementId</span>&gt;() )
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( intersectSphere );
+&nbsp;
+&nbsp; &nbsp; neighbours.AddRange( collector.ToElementIds() );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine all neighbouring elements close to </span>
+&nbsp; <span class="gray">///</span><span class="green"> the two ends of the current element 'e', </span>
+&nbsp; <span class="gray">///</span><span class="green"> skipping all previously visited ones.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> AddConnectedElements(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; neighbours,
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; visited )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Location</span> loc = e.Location;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;current element {0} has location {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; ElementDescription( e ),
+&nbsp; &nbsp; &nbsp; <span class="blue">null</span> == loc ? <span class="maroon">&quot;&lt;null&gt;&quot;</span> : loc.GetType().Name ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = loc <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != lc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> c = lc.Curve;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = c.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = c.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; AddElementsIntersectingSphereAt(
+&nbsp; &nbsp; &nbsp; &nbsp; neighbours, p, visited, doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; AddElementsIntersectingSphereAt(
+&nbsp; &nbsp; &nbsp; &nbsp; neighbours, q, visited, doc );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The lists of neighbours and visited elements are implemented as collections of ElementId instead of Element instances, since I do not trust the .NET comparison methods to work properly on Elements. 
+Also, this aligns nicely with the Exclude method on the filtered element collector, which takes a collection of element ids as an argument.
+
+<p>I initially tried calling Exclude twice with separate calls for the lists of already visited elements and neighbours, both of which should be eliminated. 
+In the first call, though, the list of neighbours is always empty. Providing an empty list to the Exclude method throws an exception. 
+I could have called the Exclude method conditionally, checking first that the list of neighbours is non-empty. 
+However, I found it more succinct to combine the two lists into a single one for the call.
+
+<p>With the AddConnectedElements method in place, the algorithm described above translates to the following C# implementation of the external command Execute mainline method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">CreationApp</span> creapp = app.Create;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; <span class="teal">Reference</span> r = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select a beam&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Starting element</span>
+&nbsp;
+&nbsp; <span class="teal">Element</span> start = doc.GetElement( r );
+&nbsp;
+&nbsp; <span class="green">// The current elements whose neighbours </span>
+&nbsp; <span class="green">// we are seeking</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; current = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; current.Add( start.Id );
+&nbsp;
+&nbsp; <span class="green">// List of elements already visited</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; visited = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// Continue as long as new connected </span>
+&nbsp; <span class="green">// elements are found</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; neighbours = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">while</span>( 0 &lt; current.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Remember where we have been, add this to </span>
+&nbsp; &nbsp; <span class="green">// the result so far, and do not revisit these</span>
+&nbsp;
+&nbsp; &nbsp; visited.AddRange( current );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We found no new neighbours yet</span>
+&nbsp;
+&nbsp; &nbsp; neighbours.Clear();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Search current elements for new connected </span>
+&nbsp; &nbsp; <span class="green">// elements not already visited</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> current )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; AddConnectedElements(
+&nbsp; &nbsp; &nbsp; &nbsp; neighbours, e, visited );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Done with the current elements, and the</span>
+&nbsp; &nbsp; <span class="green">// newly found become the next current ones</span>
+&nbsp;
+&nbsp; &nbsp; current.Clear();
+&nbsp; &nbsp; current.AddRange( neighbours );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> visited )
+&nbsp; {
+&nbsp; &nbsp; uidoc.Selection.Elements.Add(
+&nbsp; &nbsp; &nbsp; doc.GetElement( id ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Pretty neat, huh?
+
+<p>And pretty readable, I think?
+
+<p>Here is a sample model with several sets of touching but not officially connected beams: two sets of two beams each on the right-hand side of the room in the middle, and a bunch of more beams all touching along the left, top and bottom. Some of them are longer than others and stretch across several columns:</p>
+
+<center>
+<img src="img/touching_beams_3.png" alt="System of non-connected but touching beams"/>
+</center>
+
+<p>After running the command and picking any single one of the beams on the left, the connected elements are all selected and therefore highlighted in blue, whereas the unconnected ones on the right remain unhighlighted:</p>
+
+<center>
+<img src="img/touching_beams_4.png" alt="Touching beams detected and selected"/>
+</center>
+
+<p>Note that this approach is useful for any curve based element, so it could also be adapted to find all touching walls, ducts, pipes, and many other object types.
+
+<p>Here is 
+
+<a href="zip/SelectTouchingBeams.zip">SelectTouchingBeams.zip</a> containing
+
+the source code, Visual Studio solution and add-in manifest of the 'Select Touching Beams' command.
+It also includes the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html#4">
+Display Sphere</a> command that I discussed in the previous post.

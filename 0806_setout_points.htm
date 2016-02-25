@@ -1,0 +1,667 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+setout points Paul Hellawell 
+C:\a\doc\revit\blog\src\SetoutPoints\zip\Get concrete corners.docx
+C:\a\doc\revit\blog\src\SetoutPoints\src\SetoutPoints\SetoutPoints.sln
+
+-->
+
+<h3>Structural Concrete Setout Point Add-in</h3>
+
+<p>I am back from my vacation now, having spent a wonderful relaxing time doing all kinds of things not related to the Revit API or computers at all, such as talking, walking, singing, playing music, painting, swimming, meditating, climbing, caving, canoeing and sharing time with friends...
+
+<p>Meanwhile, a whole bunch of interesting issues to share with you have been piling up, new ones keep pouring in, and I still have some long-standing pending posts to get around to as well.
+
+<!-- <p>After wading through all the stuff piled up during my absence, it is now my pleasure to finally resume blogging as well. -->
+
+<p>One important utility that I have been wanting to publish for months now is for the automatic placement and management of structural concrete setout points which I implemented together with Paul Hellawell of
+
+<a href="http://www.ghd.com">
+GHD</a> at
+
+the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">
+Melbourne DevLab</a>
+
+back in March, thus also finally answering
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html?cid=6a00e553e168978833017742ce536f970d#comment-6a00e553e168978833017742ce536f970d">
+Ishfak's request</a> for
+
+the full Revit 2013 source code to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">
+retrieve real world concrete coordinates</a>.
+
+
+<p>It is a full-blown end-user-capable little application for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html/#3">
+automatic creation of setout points</a> for
+
+on-site location and construction of structural elements.
+
+<p>One of the most fascinating aspects of the implementation for me was the amount of choices that we were forced to make between implementing something ourselves programmatically versus discovering the proper way to use built-in Revit functionality to do it automatically for us instead with no work at all on our part.
+
+<p>For instance, we originally defined one single setout point marker type, and started implementing API functionality to select the main points and change their colour.
+
+<p>Happily, we soon found a much simpler solution which requires no programming at all: simply define two separate family types for the minor and major setout point markers with different colours, and let the user select which one to use through the standard Revit user interface.
+Several other equally important design decisions cropped up, demonstrating the importance of knowing the product well, which Paul luckily does.
+
+<p>They really highlighted the fact how important it is to know the user interface and best standard practices in depth before embarking on a serious programming project, however simple it may seem.
+
+<p>Let's start at the beginning, and reiterate the motivation for this undertaking:
+
+<p>Almost every construction professional has experienced the following kind of situation at some time in their career:
+
+<p>A large complex structure is constructed off-site.
+When assembled on site, it does not fit exactly.
+The workers continue nonetheless and force it into place.
+The error is discovered later and corrected using brute force and post adaption.
+Overall cost of exercise: days or weeks of delay and painful cost overruns.
+
+<p>This leads to the following important prophylactic task:
+
+<p><b>The Challenge:</b> Provide a way to find the real world coordinates of the corners of potential elements to be set out in the field, automatically extracting relevant setout points from the model.
+In this example, we are dealing with concrete structural elements.
+Ideally, we would like to display these points in a Revit schedule, so that they can be formatted and placed on a drawing sheet.
+We would like to then define which of the points should be used as main setout points and list them in a schedule, preferably numbered sequentially for readability.
+
+<p><b>In Practice:</b> Retrieved all the concrete corner point data via the API is not hard, and I presented the solution to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">
+retrieve real world concrete coordinates</a>
+
+separately in the following three steps:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#2">
+Filtering for structural concrete elements</a>.
+
+<li>Retrieving their corners, i.e. geometry traversal to
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#3">
+retrieve unique vertices</a>.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#4">Converting from Revit model to real-world coordinates</a>.
+</ul>
+
+<p>However, transferring this information  directly into a schedule proved to be impossible.
+Instead we created a family definition containing shared parameters to hold the data required for scheduling.
+We then place instances of the family at the points extracted from the geometry.
+Through the API it is now possible to populate the parameters with the X, Y, Z coordinates extracted from the geometry, and add these values to the extracted project location, to convert them to real world coordinates.
+
+<p>Initially, we defined a setout point family with one single type in it.
+This did not enable the ability to select which points to schedule as main setout points.
+For this, we created two different family types, SetoutPoint_Major and SetoutPoint_Minor.
+This allows two separate schedules to be created, one capturing all the points, the other only points defined as major points for use on a drawing sheet for setout.
+
+<p>The schedule listing all points is useful, e.g. for export to a CSV file and subsequent import into a surveying device such as a
+
+<a href="http://www.trimble.com">
+Trimble</a>,
+
+allowing site set-out directly from the model.
+
+
+<p>The setout point tool extracts the X, Y, Z coordinates of all concrete edges.
+The generated points can then be interactively marked as Major points (setout point) and renumbered sequentially to provide a schedule of key setout points.
+The remaining point are schedules as well, e.g. to be saved as a comma delimitated file CSV file to be sent to surveying equipment for site setout.
+
+
+<a name="1"></a>
+
+<h4>Usage</h4>
+
+<p>Ensure your project contains some elements whose structural material is set to concrete or precast concrete.
+
+<p>You can then click the Get Concrete Corners tool:</p>
+
+<center>
+<img src="img/setout_points_1.png" alt="Mark all concrete element geometry vertices"/>
+</center>
+
+<p>The tool automatically analyses al the concrete structural elements' geometry and placed setout point family instances representing a 3D pointer on all the concrete element corner vertices:
+
+<center>
+<img src="img/setout_points_2.png" alt="Minor setout point"/>
+</center>
+
+<p>The family is defined using the Generic Model family template.
+The green indicators represent general setout points.
+You can select the ones you want to change to main setout points, also known as major or key, by simply selecting them and swapping their type to SetoutPoint_Major:</p>
+
+<center>
+<img src="img/setout_points_3.png" alt="Major setout point family type"/>
+</center>
+
+<p>Major setout points are displayed in red instead of green:</p>
+
+<center>
+<img src="img/setout_points_4.png" alt="Major setout point instance"/>
+
+</center>
+
+<p>The sample project provided defines two schedules.
+One of them is populated with all setout points, marking every corner of every piece of concrete:</p>
+
+<center>
+<img src="img/setout_points_5.png" alt="Major setout point schedule in project browser"/>
+</center>
+
+<p>The second schedule lists only the selected main or major setout points and their coordinates:</p>
+
+<center>
+<img src="img/setout_points_6.png" alt="Major setout point schedule"/>
+</center>
+
+<p>Once you have all your key setout points defined, a separate 'Renumber setout Points' external command renumbers them sequentially and adds a SOP (Set Out Point) prefix to their number to differentiate them from the minor points.
+
+<p>The renumbered schedule can now be used on a drawing sheet.
+
+<p>Many thanks to Paul for our initiating this project, his deep Revit knowledge and experience, all the support he provided during the Melbourne Revit API training, and the great evening we had together in Melbourne after the training!
+
+
+<a name="2"></a>
+
+<h4>Implementation Details</h4>
+
+<p>I already pointed to the discussion of the main technical underpinnings for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">
+retrieval of the concrete corners</a> above, i.e.
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#2">Filtering for structural concrete elements</a>.
+<li>Retrieving their corners, i.e. geometry traversal to <a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#3">retrieve unique vertices</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#4">Converting from Revit model to real-world coordinates</a>.
+</ul>
+
+<p>Now let's look at some of the aspects of putting this functionality to use and wrapping it into a full-blown end-user application:
+
+<ul>
+<li><a href="#3">External application and CmdData class</a>
+<li><a href="#4">Shared parameters</a>
+<li><a href="#5">Importance of product usage experience, content and best practices</a>
+<li><a href="#6">Marking all geometry vertices</a>
+<li><a href="#7">Major setout point renumbering</a>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>External Application and CmdData Class</h4>
+
+<p>The application defines two commands:
+
+<ul>
+<li><a href="#6">CmdGeomVertices</a>: filter for all relevant concrete structural elements, analyse their geometry, create the setout point markers, and populate their shared parameters to be reflected in the predefined schedules.
+<li><a href="#7">CmdRenumber</a>: renumber the main or major setout points consecutively.
+</ul>
+
+<p>They are presented in a custom ribbon panel defined by an external application.
+
+<p>In order to encapsulate all the information required to populate the ribbon panel push buttons, I define the following CmdData class defining the external command implementation class name, description and tool tip text:
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">CmdData</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> CmdData(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> name,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> text,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> tip )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Name = name;
+&nbsp; &nbsp; &nbsp; Text = text;
+&nbsp; &nbsp; &nbsp; Tip = tip;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Text { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Tip { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+<p>The two instances can be populated like this:
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">CmdData</span>[] data = <span class="blue">new</span> <span class="teal">CmdData</span>[] {
+&nbsp;
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CmdData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;GeomVertices&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Mark Concrete Corners&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Place a setout point marker on every concrete corner.&quot;</span> ),
+&nbsp;
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CmdData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Renumber&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Renumber major&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Renumber major setout points&quot;</span> )
+&nbsp; };
+</pre>
+
+<p>The external application OnStartup method making use of this ends up very simple:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; .GetExecutingAssembly().Location;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create ribbon panel</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> p = a.CreateRibbonPanel( Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create buttons</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">PushButtonData</span>&gt; buttonData
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">PushButtonData</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; data.Length );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CmdData</span> cd <span class="blue">in</span> data )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> pbd = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; cd.Name, cd.Text, path,
+&nbsp; &nbsp; &nbsp; &nbsp; _class_name_prefix + cd.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; pbd.ToolTip = cd.Tip;
+&nbsp;
+&nbsp; &nbsp; &nbsp; buttonData.Add( pbd );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; p.AddStackedItems( buttonData[0],
+&nbsp; &nbsp; &nbsp; buttonData[1] );
+
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Lacking icons, my panel does not look quite as impressive as Paul's one shown above, but it does the job:
+
+<center>
+<img src="img/setout_points_panel_stacked.png" alt="Setout points ribbon panel"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Shared Parameters</h4>
+
+<p>As mentioned above, the functionality to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">
+retrieve the concrete corners</a> geometry
+
+data has already been described in previous posts.
+
+<p>The question is how to handle this information in order to make it available to the user, populate schedules, etc.
+We ended up inserting family instances marking all concrete corners as minor setout points, and populating shared parameters on each to encapsulate the required data specifying the host element and its point coordinates.
+Here is the shared parameter file, slightly simplified for readability:
+
+<pre>
+# This is a Revit shared parameter file.
+# Do not edit manually.
+*META VERSION MINVERSION
+META 2 1
+*GROUP ID NAME
+GROUP  1 SetOut
+*PARAM GUID NAME             DATATYPE ... GROUP VISIBLE
+PARAM  .... Key_Setout_Point YESNO        1     1
+PARAM  .... Host_Type        TEXT         1     1
+PARAM  .... Host_Id          INTEGER      1     1
+PARAM  .... X                LENGTH       1     1
+PARAM  .... Y                LENGTH       1     1
+PARAM  .... Z                LENGTH       1     1
+PARAM  .... Point_Number     TEXT         1     1
+</pre>
+
+<p>Shared parameter access is implemented using their GUIDs throughout the code.
+
+
+<a name="5"></a>
+
+<h4>Importance of Product Usage Experience, Content and Best Practices</h4>
+
+<p>We initially defined a parameter in the setout point family to distinguish between minor and major points, and started working on a separate user interface to toggle between the two and change the family instance colour depending on its current setting.
+
+<p>At a certain point, we discovered that it was vastly simpler to define two separate types within the family instead and use the standard Revit user interface to toggle between those.
+
+<p>It is so important for every add-in developer to know the standard Revit possibilities and best-practice workflows.
+
+<p>That can save huge amounts of unnecessary programming effort, sometimes wasted to fight against the product and its standard paradigms instead of making optimal use of it.
+
+
+<a name="6"></a>
+
+<h4>Marking All Geometry Vertices</h4>
+
+<p>As said, most of the underlying functionality to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">
+retrieve the concrete corner</a> geometry
+
+was already presented and discussed.
+
+<p>One additional helper method GetFamilySymbols loads the setout point family, if it is not already present, and retrieves the major and minor setout point symbols:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">FamilySymbol</span> [] GetFamilySymbols(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">bool</span> loadIt )
+{
+&nbsp; <span class="teal">FamilySymbol</span> [] symbols = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Family</span> family
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( FamilyName ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp;
+&nbsp; <span class="green">// If the family is not already loaded, do so:</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == family &amp;&amp; loadIt )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Load the setout point family</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Load Setout Point Family&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( doc.LoadFamily( _family_path,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">out</span> family ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.RollBack();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != family )
+&nbsp; {
+&nbsp; &nbsp; symbols = <span class="blue">new</span> <span class="teal">FamilySymbol</span>[2];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; symbols[i++] = s;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; symbols[0].Name.EndsWith( <span class="maroon">&quot;Major&quot;</span> ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected major (key) setout point first&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; symbols[1].Name.EndsWith( <span class="maroon">&quot;Minor&quot;</span> ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected minor setout point second&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">return</span> symbols;
+}
+</pre>
+
+<p>Then, finally, here is the external command mainline pulling it all together, i.e.
+
+<ul>
+<li>Determine project location transformation to real world coordinates.
+<li>Load or retrieve setout point family symbols.
+<li>Retrieve the relevant structural concrete elements.
+<li>Retrieve element geometry.
+<li>Place a setout point marker family instance on each geometry vertex.
+<li>Check to see whether the required shared parameters have been bound.
+</ul>
+
+<p>Setout points are numbered starting at one each time the command is run with no decoration or prefix.
+
+<p>Here is Execute method implementation performing these tasks:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Transform</span> projectLocationTransform
+&nbsp; &nbsp; = GetProjectLocationTransform( doc );
+&nbsp;
+&nbsp; <span class="green">// Load or retrieve setout point family symbols:</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> [] symbols
+&nbsp; &nbsp; = GetFamilySymbols( doc, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == symbols )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to load setout point family from '{1}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; _family_path );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = GetStructuralElements( doc );
+&nbsp;
+&nbsp; <span class="green">// Retrieve element geometry and place a</span>
+&nbsp; <span class="green">// setout point on each geometry corner.</span>
+&nbsp;
+&nbsp; <span class="green">// Setout points are numbered starting at </span>
+&nbsp; <span class="green">// one each time the command is run with</span>
+&nbsp; <span class="green">// no decoration or prefix whatsoever.</span>
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Place Setout Points&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// On the very first attempt only, run an error </span>
+&nbsp; &nbsp; <span class="green">// check to see whether the required shared </span>
+&nbsp; &nbsp; <span class="green">// parameters have actually been bound:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> first = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = GetSolid( e, opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> desc = ElementDescription( e );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to access element solid for element {0}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; desc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt; corners
+&nbsp; &nbsp; &nbsp; &nbsp; = GetCorners( solid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = corners.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0}: {1} corners found:&quot;</span>, desc, n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> corners.Keys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ++_point_number;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0}: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _point_number, PointString( p ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewFamilyInstance( p,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbols[1], <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Add shared parameter data immediately </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// after creating the new family instance.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The shared parameters are indeed added </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// immediately by Revit, so we can access and</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// populate them.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// No need to commit the transaction that </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// added the family instance to give Revit </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// a chance to add the shared parameters to </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// it, nor to regenerate the document, we </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// can write the shared parameter values </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// right away.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( first )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> q = fi.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _parameter_x );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == q )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The required shared parameters &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;X, Y, Z, Host_Id, Host_Type and &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Point_Number are missing.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.RollBack();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Transform insertion point by applying</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// project location transformation.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> r2 = projectLocationTransform.OfPoint( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_host_type ).Set(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetHostType( e ).ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_host_id ).Set(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Id.IntegerValue );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_point_nr ).Set(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _point_number.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_x ).Set( r2.X );
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_y ).Set( r2.Y );
+&nbsp; &nbsp; &nbsp; &nbsp; fi.get_Parameter( _parameter_z ).Set( r2.Z );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>That's about it... one more little thing:
+
+
+<a name="7"></a>
+
+<h4>Major Setout Point Renumbering</h4>
+
+<p>Such irrational creatures, these human beings.
+
+<p>Users apparently insist on consecutive numbering of items they deal with.
+
+<p>We therefore implemented a second command named CmdRenumber to renumber the major points.
+
+<p>They are basically renumbered randomly, since all major points are selected using a filtered element collector.
+We iterate over the result, assign a consecutive number to each instance, and store it in the Point_Number text-valued shared parameter with a "SOP " prefix string _sop_prefix.
+
+<p>The key setout points are family instances with the generic model category and the major setout point type.
+
+<p>The external command Execute implementation thus ends up looking like this:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span>[] symbols
+&nbsp; &nbsp; = <span class="teal">CmdGeomVertices</span>.GetFamilySymbols(
+&nbsp; &nbsp; &nbsp; doc, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == symbols )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Setout Points&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Setout point family not loaded, &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;so no setout points present.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FamilyInstanceFilter</span> instanceFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FamilyInstanceFilter</span>( doc, symbols[0].Id );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_GenericModel )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( instanceFilter );
+&nbsp;
+&nbsp; <span class="teal">Guid</span> guid = <span class="teal">CmdGeomVertices</span>._parameter_point_nr;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Renumber Setout Points&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp; &nbsp; <span class="blue">string</span> s;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> p <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = _sop_prefix + ( ++i ).ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; p.get_Parameter( guid ).Set( s );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>For all further details, please refer to the one and only really trustworthy reference, the full source code.
+
+<p>Here is
+
+<a href="zip/SetoutPoints.zip">SetoutPoints.zip</a>
+
+including the complete source code, Visual Studio solution, add-in manifest and setout point marker family.
+
+<p>For easier testing, here is also a
+
+<a href="src/SetoutPoints/test/rst_basic_sample_project_with_location.rvt">sample project</a> based
+
+on the standard rst_basic_sample_project.rvt with a non-standard project location and the setout point schedules added.
+
+<p><strong>Addendum:</strong> I
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/concrete-setout-points-for-revit-structure-2015.html">
+migrated this to Revit 2015</a> and
+
+created the
+
+<a href="https://github.com/jeremytammik/SetoutPoints">
+SetoutPoints GitHub repository</a> for it.</p>
+
+<!--
+
+<hr>
+
+<a href="">
+</a>
+
+<a name=""></a>
+
+<h4></h4>
+
+<pre class="code">
+</pre>
+
+<p>Test shared parameter availability
+
+-->

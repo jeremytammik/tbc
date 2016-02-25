@@ -1,0 +1,137 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+http://through-the-interface.typepad.com/through_the_interface/2011/03/making-autocad-less-noisy-when-debugging.html?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+typepad%2Fwalmsleyk%2Fthrough_the_interface+%28Through+the+Interface%29
+
+C:\Program Files\Autodesk\Revit MEP 2011\Program\Revit.exe.config
+
+-->
+
+<h3>Reducing Revit Debug Verbosity</h3>
+
+<p>Many people have complained about the amount of noise caused by the ribbon in the Visual Studio debug output window.
+
+<p>Kean Walmsley just pointed out that you can easily 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/03/making-autocad-less-noisy-when-debugging.html">
+make AutoCAD less noisy when debugging</a> by 
+
+adding a couple of lines to the <i>acad.exe.config</i> file, which lives in the same folder as the <i>acad.exe</i> you are debugging, such as <i>C:\Program Files\Autodesk\AutoCAD 2011</i>, to ask the WPF binding trace provider to lower the volume.
+
+<p>Since Revit uses the same internal ribbon principles as AutoCAD, I thought this might help for Revit as well.
+
+<p>Adding the lines suggested by Kean to my Revit MEP 2011 config file <i>Revit.exe.config</i> in the Program subfolder of the Revit MEP installation directory, by default <i>C:\Program Files\Autodesk\Revit MEP 2011\Program</i>, does indeed achieve a similar effect.
+
+<p>Here is my updated <i>Revit.exe.config</i> with the added lines in bold (to see the truncated lines in full, copy to a text editor):
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">configuration</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">configSections</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">section</span><span class="blue"> </span><span class="red">name</span><span class="blue">=</span>&quot;<span class="blue">uri</span>&quot;<span class="blue"> </span><span class="red">type</span><span class="blue">=</span>&quot;<span class="blue">System.Configuration.UriSection, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">configSections</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">system.net</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">settings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">servicePointManager</span><span class="blue"> </span><span class="red">expect100Continue</span><span class="blue">=</span>&quot;<span class="blue">false</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">settings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">system.net</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">runtime</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">generatePublisherEvidence</span><span class="blue"> </span><span class="red">enabled</span><span class="blue">=</span>&quot;<span class="blue">false</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">runtime</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">uri</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">idn</span><span class="blue"> </span><span class="red">enabled</span><span class="blue">=</span>&quot;<span class="blue">All</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">iriParsing</span><span class="blue"> </span><span class="red">enabled</span><span class="blue">=</span>&quot;<span class="blue">true</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">uri</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">system.serviceModel</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">bindings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">basicHttpBinding</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">binding</span><span class="blue"> </span><span class="red">name</span><span class="blue">=</span>&quot;<span class="blue">BasicHttpBinding_IThorService</span>&quot;<span class="blue"> </span><span class="red">closeTimeout</span><span class="blue">=</span>&quot;<span class="blue">00:01:00</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">openTimeout</span><span class="blue">=</span>&quot;<span class="blue">00:01:00</span>&quot;<span class="blue"> </span><span class="red">receiveTimeout</span><span class="blue">=</span>&quot;<span class="blue">00:10:00</span>&quot;<span class="blue"> </span><span class="red">sendTimeout</span><span class="blue">=</span>&quot;<span class="blue">00:01:00</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">allowCookies</span><span class="blue">=</span>&quot;<span class="blue">false</span>&quot;<span class="blue"> </span><span class="red">bypassProxyOnLocal</span><span class="blue">=</span>&quot;<span class="blue">false</span>&quot;<span class="blue"> </span><span class="red">hostNameComparisonMode</span><span class="blue">=</span>&quot;<span class="blue">StrongWildcard</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">maxBufferSize</span><span class="blue">=</span>&quot;<span class="blue">1572864</span>&quot;<span class="blue"> </span><span class="red">maxBufferPoolSize</span><span class="blue">=</span>&quot;<span class="blue">524288</span>&quot;<span class="blue"> </span><span class="red">maxReceivedMessageSize</span><span class="blue">=</span>&quot;<span class="blue">1572864</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">messageEncoding</span><span class="blue">=</span>&quot;<span class="blue">Text</span>&quot;<span class="blue"> </span><span class="red">textEncoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">transferMode</span><span class="blue">=</span>&quot;<span class="blue">Buffered</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">useDefaultWebProxy</span><span class="blue">=</span>&quot;<span class="blue">true</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">readerQuotas</span><span class="blue"> </span><span class="red">maxDepth</span><span class="blue">=</span>&quot;<span class="blue">32</span>&quot;<span class="blue"> </span><span class="red">maxStringContentLength</span><span class="blue">=</span>&quot;<span class="blue">8192</span>&quot;<span class="blue"> </span><span class="red">maxArrayLength</span><span class="blue">=</span>&quot;<span class="blue">1572864</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">maxBytesPerRead</span><span class="blue">=</span>&quot;<span class="blue">4096</span>&quot;<span class="blue"> </span><span class="red">maxNameTableCharCount</span><span class="blue">=</span>&quot;<span class="blue">16384</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">security</span><span class="blue"> </span><span class="red">mode</span><span class="blue">=</span>&quot;<span class="blue">Transport</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">transport</span><span class="blue"> </span><span class="red">clientCredentialType</span><span class="blue">=</span>&quot;<span class="blue">None</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">security</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">binding</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">basicHttpBinding</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">bindings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">client</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">endpoint</span><span class="blue"> </span><span class="red">address</span><span class="blue">=</span>&quot;<span class="blue">https://climateserver.autodesk.com/ThorService.svc</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">binding</span><span class="blue">=</span>&quot;<span class="blue">basicHttpBinding</span>&quot;<span class="blue"> </span><span class="red">bindingConfiguration</span><span class="blue">=</span>&quot;<span class="blue">BasicHttpBinding_IThorService</span>&quot;
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="red">contract</span><span class="blue">=</span>&quot;<span class="blue">ThorReference.IThorService</span>&quot;<span class="blue"> </span><span class="red">name</span><span class="blue">=</span>&quot;<span class="blue">BasicHttpBinding_IThorService</span>&quot;<span class="blue"> /&gt;&nbsp; &nbsp; &nbsp;&nbsp; </span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">client</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">system.serviceModel</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">appSettings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">Provider</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">https://climateserver.autodesk.com/ThorService.svc</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">consumerKey</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">sampleconsumer</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">consumerSecret</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">samplesecret</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">appSettings</span><span class="blue">&gt;</span>
+
+<span class="blue">&nbsp; &lt;!--</span><span class="green"> added by jeremy, cf. http://through-the-interface.typepad.com/through_the_interface/2011/03/making-autocad-less-noisy-when-debugging.html?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+typepad%2Fwalmsleyk%2Fthrough_the_interface+%28Through+the+Interface%29 </span><span class="blue">--&gt;</span>
+<b>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">system.diagnostics</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">sources</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">source</span><span class="blue"> </span><span class="red">name</span><span class="blue">=</span>&quot;<span class="blue">System.Windows.Data</span>&quot;<span class="blue"> </span><span class="red">switchName</span><span class="blue">=</span>&quot;<span class="blue">SourceSwitch</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">listeners</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">remove</span><span class="blue"> </span><span class="red">name</span><span class="blue">=</span>&quot;<span class="blue">Default</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">listeners</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;/</span><span class="maroon">source</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">sources</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">system.diagnostics</span><span class="blue">&gt;</span>
+</b>
+<span class="blue">&lt;/</span><span class="maroon">configuration</span><span class="blue">&gt;</span>
+</pre>
+
+<p>It obviously works fine for Revit as well. 
+Here are two text files containing the debug output 
+
+<a href="zip/debug_verbosity_default.txt">
+before</a> and 
+
+<a href="zip/debug_verbosity_quieter.txt">
+after</a> reducing verbosity, with the following line, word and character counts produced by the 
+
+<a href="http://en.wikipedia.org/wiki/Wc_%28Unix%29">
+wc, the Unix word count command</a>:
+
+<pre class="code">
+  174  4019 50362 debug_verbosity_default.txt
+   56   630 11583 debug_verbosity_quieter.txt
+</pre>
+
+<p>The line and byte count is reduced to less than a third, and the word count to less than a sixth!
+
+<p>I immediately added these lines to my RAC and RST config files as well  :-)
+
+<p>Many thanks to Kean for this useful discovery!
+
+<h4>Room Renumbering Feedback</h4>
+
+<p>Adam Nagy received some very positive feedback on his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/room-renumbering-plugin-of-the-month.html">
+recently mentioned</a>
+
+<a href="http://labs.blogs.com/its_alive_in_the_lab/2011/02/march-adn-plugin-of-the-month-roomreumbering-for-revit-now-available.html">
+Room Renumbering tool</a>, 
+
+the first ever Revit plugin of the month:
+
+<ul>
+<li>Great little plugin. <!-- <i>Chris Heinaranta</i> -->
+<li>Nice tool, Room Renumbering. <!-- <i>Bert van der Hoeven</i> -->
+<li>Glad to see Revit apps showing up here! I can see this not only being quite useful as is, but merely the beginning of a lot of future possibilities. <!-- <i>DaveP</i> -->
+<li>Any help would be great as I go crazy renumbering & this would be a great pluggin I hoped.
+<li>Thank you very much, I can see why you guy's are the best... Revit Rocks... <i> <!-- John Todd Flannery --> (after Adam quickly pointed out what might be causing installation problems)</i>
+<li>The tool is really user friendly unlike the Element Positioning subscription tool...
+Great work guys! Been waiting a long time for this one. <!-- <i>Bill Knittle</i> -->
+</ul>
+
+<p>Based on the feedback and wishes received so far, Adam is already thinking about some possible enhancements...

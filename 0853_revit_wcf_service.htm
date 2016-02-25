@@ -1,0 +1,344 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07743948 [OLE Automation]
+
+-->
+
+<h3>Drive Revit through a WCF Service</h3>
+
+<p>Today, a special titbit for you:
+
+<p>How can I access Revit functionality from an external process?
+
+<!--
+<p>In this case, and in the rest of this discussion, external application signifies a real stand-alone external application, not a Revit API class derived from the IExternalApplication interface.
+
+<p>Sorry for the unavoidable confusion.
+
+<p>Actually, maybe I should call it an external process instead.
+-->
+
+<p>As we have underlined many times in the past, the Revit API does not support any kind of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous access</a>.
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling event</a>,
+
+however, provides a possibility to work around this limitation.
+
+<p>Daren Thomas, the author or
+
+<a href="http://code.google.com/p/revitpythonshell">
+RevitPythonShell</a>,
+
+even presented a neat and clean
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-api-access.html">
+pattern for semi asynchronous Idling API access</a>.
+
+<p>Now Victor Chekalin, aka Виктор Чекалин, presents another very neat sample providing such an access.
+He says:
+
+<p>I have an idea how to access Revit from an external application.
+
+<p>The only official way to achieve this is through the Idling event and external events, of course.
+
+<p>The main idea:
+
+<ul>
+<li>Inside Revit I create a service which receives queries from a stand-alone external process.
+
+<li>The service receives a command from the external process and pushes it to the command pool.
+
+<li>The Idling event handler looks at the command pool; if a command is waiting in the pool, it will be executed
+
+in the Idling event handler.
+</ul>
+
+<p>There is no risk.
+All commands are executed in the one and only Revit thread.
+
+<p>Here is the scheme of work:
+
+<center>
+<img src="img/RevitExternalAccess_workflow_2.png" alt="Revit external access WCF service workflow"/>
+</center>
+
+<p>In this implementation, I am using a WCF service.
+It would be equally possible to use any other technology or framework to handle the inter-application communication.
+
+<p>Everything you need to know about creating and using a WCF service is described in the 
+
+<a href="http://msdn.microsoft.com/en-us/library/ms734712.aspx">WCF Getting Started Tutorial</a>.
+
+<p>I created a simple demonstration project to test this idea.
+It implements the following  minimal service demonstrating that we can access the Revit API, both to query it for information and execute and action that modifies the current BIM:
+
+<pre class="code">
+<span class="blue">namespace</span> RevitExternalAccessDemo
+{
+&nbsp; [<span class="teal">ServiceContract</span>]
+&nbsp; <span class="blue">public</span> <span class="blue">interface</span> <span class="teal">IRevitExternalService</span>
+&nbsp; {
+&nbsp; &nbsp; [<span class="teal">OperationContract</span>]
+&nbsp; &nbsp; <span class="blue">string</span> GetCurrentDocumentPath();
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">OperationContract</span>]
+&nbsp; &nbsp; <span class="blue">bool</span> CreateWall( <span class="teal">XYZ</span> startPoint, <span class="teal">XYZ</span> endPoint );
+&nbsp; }
+}
+</pre>
+
+<p>It further requires:
+
+<ul>
+<li>An external application to manage the Idling event subscription.
+<li>An implementation of the service defined above.
+<li>Two helper classes:
+<ul>
+<li>One to contain the queued up tasks and handle locking issues.
+<li>The other to redefine an own representation of the Revit API XYZ point class.
+</ul>
+</ul>
+
+<p>Here is a 
+
+<a href ="http://www.youtube.com/embed/uFHoUC6Met0">
+short video</a> showing how it works:</p>
+
+<!-- <iframe width="480" height="274" src="http://www.youtube.com/embed/uFHoUC6Met0" frameborder="0" allowfullscreen></iframe> -->
+<!-- <iframe width="420" height="315" src="http://www.youtube.com/embed/uw6EPmexmEU?rel=0" frameborder="0" allowfullscreen></iframe> -->
+
+<iframe width="480" height="360" src="http://www.youtube.com/embed/uFHoUC6Met0?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<p>I am happy to make the project available for everyone in its current state.
+
+<p>The source code is available on
+
+<a href="https://github.com/chekalin-v/RevitExternalAccessDemo">
+Github</a>, 
+
+both directly and as a Github
+
+<a href="https://github.com/chekalin-v/RevitExternalAccessDemo/zipball/master">
+zip archive file</a>.
+
+<p>It is just a demo and provided as is.
+
+<p>To launch it on your computer, you must run Revit as administrator, because this is required by the WCF service.
+
+<p>Remember, Revit must be idling to launch a command from the external application.
+
+<p>In this kind of situation, calling the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/idling-enhancements-and-external-events.html#2">
+SetRaiseWithoutDelay</a> method
+
+is of utmost importance.
+Without the call, the demo pauses.
+Even with it, some delay exists, and the CPU load grows to over 25% even if no operations are active in Revit.
+
+<p>A better solution exists &ndash; follow Arno&scaron;t L&ouml;bel suggestion: subscribe to the Idling event only when you really need it, and unsubscribe immediately afterwards, as soon as possible.
+
+<p>Obviously, we need to handle Idling only when we have a request queued up from the WCF service.
+The idea would be to subscribe to the Idling event when we receive a request from the WCF Service and unsubscribe when it has been processed.
+
+<p>Unfortunately, I have not yet implemented this idea in the code presented here.
+
+<p>Here are some sample code snippets from the current implementation.
+
+<p>First, here is the main external application implementation including:
+
+<ul>
+<li>OnStartup, which creates the WCF service and subscribes to the Idling event.
+<li>OnIdling, the Idling event handler, which dequeues and executes the next task.
+<li>OnShutdown, unsubscribing and cleaning up.
+</ul>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">private</span> <span class="blue">const</span> <span class="blue">string</span> serviceUrl =
+&nbsp; &nbsp; <span class="maroon">&quot;http://localhost:56789/RevitExternalService&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">ServiceHost</span> serviceHost;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.Idling += OnIdling;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Uri</span> uri = <span class="blue">new</span> <span class="teal">Uri</span>( serviceUrl );
+&nbsp;
+&nbsp; &nbsp; serviceHost = <span class="blue">new</span> <span class="teal">ServiceHost</span>( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">RevitExternalService</span> ), uri );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; serviceHost.AddServiceEndpoint( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">IRevitExternalService</span> ), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WSHttpBinding</span>(), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RevitExternalService&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ServiceMetadataBehavior</span> smb 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ServiceMetadataBehavior</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; smb.HttpGetEnabled = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; serviceHost.Description.Behaviors.Add( smb );
+&nbsp;
+&nbsp; &nbsp; &nbsp; serviceHost.Open();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.ControlledApplication.WriteJournalComment( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Could not start WCF service.\r\n&quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.ToString(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> OnIdling( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">IdlingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> uiApp = sender <span class="blue">as</span> <span class="teal">UIApplication</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;OnIdling: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Be careful! This loads the CPU:</span>
+&nbsp;
+&nbsp; &nbsp; e.SetRaiseWithoutDelay();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">TaskContainer</span>.Instance.HasTaskToPerform )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Start execute task: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> task = <span class="teal">TaskContainer</span>.Instance.DequeueTask();
+&nbsp;
+&nbsp; &nbsp; &nbsp; task( uiApp );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Ending execute task: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uiApp.Application.WriteJournalComment(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RevitExternalService. An error occured &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;while executing the OnIdling event:\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.ToString(), <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( ex );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.Idling -= OnIdling;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( serviceHost != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; serviceHost.Close();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Secondly, here is part of the RevitExternalService definition including one of its method implementations:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">RevitExternalService</span> : <span class="teal">IRevitExternalService</span>
+{
+&nbsp; <span class="blue">private</span> <span class="blue">string</span> currentDocumentPath;
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">readonly</span> <span class="blue">object</span> _locker 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="blue">object</span>();
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">const</span> <span class="blue">int</span> WAIT_TIMEOUT = 10000; <span class="green">// 10 seconds timeout</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetCurrentDocumentPath()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Push task to the container: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">lock</span>( _locker )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskContainer</span>.Instance.EnqueueTask( GetDocumentPath );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Wait when the task is completed</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Monitor</span>.Wait( _locker, WAIT_TIMEOUT );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Finish task: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> currentDocumentPath;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> GetDocumentPath( 
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; currentDocumentPath 
+&nbsp; &nbsp; &nbsp; &nbsp; = uiapp.ActiveUIDocument.Document.PathName;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Always release locker in finally block</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to ensure to unlock locker object.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">lock</span>( _locker )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Monitor</span>.Pulse( _locker );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; public</span> <span class="blue">bool</span> CreateWall( 
+&nbsp; &nbsp; <span class="teal">XYZ</span> startPoint, 
+&nbsp; &nbsp; <span class="teal">XYZ</span> endPoint )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .
+&nbsp; }
+}
+</pre>
+
+<p>For completeness' sake, here is also 
+
+<a href="zip/VCRevitExternalAccessDemo.zip">
+VCRevitExternalAccessDemo.zip</a> containing
+
+my personal version of the code, mainly for my own convenience  :-)
+
+<p>Many thanks to Victor for very clear and efficient sample implementation!
+
+<p>By the way, don't miss the additional neat little feature demonstrated by the sample code above, the use of the Application WriteJournalComment method to add a comment to the Revit journal file.
+
+
+<a name="2"></a>
+
+<h4>Programmatic Creation of a Structural Engineering Plan</h4>
+
+<p>Saikat Bhattacharya discusses the details and provides sample code to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/creation-of-engineeringplan-using-revit-api.html">
+create a new Revit EngineeringPlan view</a> using
+
+the static ViewPlan.Create method and a ViewFamily.StructuralPlan ViewFamilyType.

@@ -1,0 +1,117 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262436 [Document Macro and Ribbon panel] -->
+
+<h3>Network Access to Add-In Manifest and Icons</h3>
+
+<p>We already discussed quite a few aspects of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+add-in manifest files</a>, 
+
+including:
+
+<!--
+331_revit_2011_guids.htm
+336_addinutility.htm
+354_guidizer.htm
+360_p2c.htm
+369_addinutility_32_64_bit.htm
+373_addin_visibility_mode.htm
+378_multi_flavour_apps.htm
+390_client_versus_addin_id.htm
+-->
+
+<ul>
+<li>A simple example of creating one for my first Revit 2011 plug-in, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">
+pipe to conduit converter</a>.
+
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">
+RevitAddInUtility</a> which 
+
+can be used to read and write add-in manifest files.
+
+<li>My <a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+Guidize utility</a> which
+
+can populate the add-in manifest ClientId GUID.
+
+<li>A <a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+Guidize update</a> which 
+
+also handles the AddInId tag.
+
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2010/05/addin-visibility-mode.html">
+visibility mode</a> which 
+
+controls which in which Revit editor contexts an external command add-in appears.
+
+<li>How to handle <a href="http://thebuildingcoder.typepad.com/blog/2010/06/addin-applications-for-multiple-revit-products.html">
+external applications for multiple flavours</a> of Revit.
+
+</ul>
+
+<p>Here is a new question on the location of the add-in manifest files:
+
+<p><strong>Question:</strong> Is there a way to make Revit look for add-in manifest files in any other locations than the All Users and current user's AppData folders? 
+I have a client that would like to place them on a server rather than distribute them across many machines.
+
+<p><strong>Answer:</strong> As you say, add-in manifest files are automatically picked up and processed by Revit simply by placing them in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#1">
+specific folders</a> in
+
+the local file system.
+Placing these files elsewhere on a network may be difficult due to .NET permissions and security issues.
+Here are some considerations which may apply:
+ 
+<span style="color:darkblue">
+
+<p>Due to inherent security settings in the Microsoft .NET Framework, .NET applications cannot access registry settings or the file system without permission when applications (.dlls) are loaded from a network location.  
+To grant permission to run such applications from a network (to simplify distribution/update of .dll files), .NET Framework policies must be set on the users' machines.  
+The following statements (1) enable such permissions, (2) list the permissions to verify the setting, and (3) remove the permissions.  Refer to Microsoft .NET Framework documentation for further information:
+ 
+<ol>
+<li>C:\Windows\Microsoft.NET\Framework\v2.0.50727\caspol.exe -addgroup 1.2 -url \\someserver\someshare\somefolder\* FullTrust
+<li>C:\Windows\Microsoft.NET\Framework\v2.0.50727\caspol.exe -listgroups
+<li>C:\Windows\Microsoft.NET\Framework\v2.0.50727\caspol.exe -remgroup 1.2.3
+</ol>
+
+</span>
+
+<p>Revit itself does not provide any option in Revit to modify the add-in manifest location. 
+You don't mention which OS the customer is using, but I would expect that the most likely route for a solution would be some sort of network drive mapping or file copying approach to copy/link the files from the server to the standard location on each machine.
+
+<p>Here is another issue concerning ribbon image resources that may have a related cause, which also includes a pointer to more up-to-date information on the .NET framework security settings:
+
+<h4>Loading Ribbon Images from a Network Drive</h4>
+
+<p><strong>Question:</strong> Is the creation of a ribbon panel with some UI widgets on it by an external application stored on a network drive possible?
+We would like to also store the associated DLLs and icon images on the network.
+That would make the application easier to maintain and update.
+Even though all the necessary permissions have been set, as far as we can tell, Revit throws a SecurityException when we try to load the application.
+We have confirmed that the permissions to the folder and files are open to everyone.
+The same application works fine when it is all installed on the local hard drive.
+
+<p>Is there a limitation when using network shares? 
+
+<p>It seems the error is associated with making the .PNG file into a bitmap for the ribbon panel. 
+Even with this error being raised the rest of the code still works as expected, one just does not have the icon in the ribbon panel.
+Is there a way to easily deploy this application companywide?
+
+<p><strong>Answer:</strong> I suspect this is not a Revit issue, but rather related to the .NET framework, similarly to above. 
+Likely a .NET Framework security policy issue not related to user/file/folder read/write access settings.
+When trying to load an AutoCAD.NET application from a network drive, I ran into a similar issue and found that the .NET framework considerations listed above were causing it.
+
+<p>Here is some more recent information on the
+
+<a href="http://brandonpotter.wordpress.com/2010/01/23/code-access-security-policy-caspol-exe-gui-utility">
+code access security policy (caspol.exe) GUI utility</a>,
+
+which includes the following note on when one might need to modify the policy: 'I want to run some .NET apps off a network share, and the machine I'm using doesn't have .NET 3.5 SP1.'
+
+<p>From that statement, one might possibly also infer that a simple upgrade of the .NET framework may help?

@@ -1,0 +1,188 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1269672 [Transform with dwg link geometry] -->
+
+<h3>Get Transformed Family Instance Geometry</h3>
+
+<p>One of the new methods added to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+Revit 2012 API</a>
+
+is the GeometryElement GetTransformed method, which returns a transformed copy of the geometry in this element, and can also be used to obtain the geometry of a family instance in its model space coordinates.
+
+<p>This led to the following interesting question by Olli Kattelus of 
+
+<!-- <a href="http://www.progman.fi/en/contact-information/about-us">Progman Oy</a> -->
+
+<a href="http://magicad.com/node/40">Progman Oy</a>:
+
+<p><strong>Question:</strong> First of all a salute for new features of Revit 2012 API and the improved handling of geometry. 
+The API now gives variety of tools to handle geometry i.e. in linked models. 
+Great!
+
+<p>I have faced a little bit strange behaviour and I would like to know what the reason is.
+
+<p>It is related to the linked DWG and the coordinate transformation. 
+If I apply transform to the DWG link geometry instance, it somehow applies a double transformation to the geometry returned.
+
+<p>I am using the following helper method to make the call to GetTransformed:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="teal">Mesh</span> fetchSomeMesh( 
+&nbsp; <span class="teal">GeometryElement</span> gElem, 
+&nbsp; <span class="teal">Transform</span> transform )
+{
+&nbsp; <span class="green">// Apply transformation and seek for Meshes</span>
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> transformed 
+&nbsp; &nbsp; = gElem.GetTransformed( transform );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> transformed.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Mesh</span> gMesh = obj <span class="blue">as</span> <span class="teal">Mesh</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != gMesh )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> gMesh;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Loop and seek for geometry instances</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> gElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> gInstance 
+&nbsp; &nbsp; &nbsp; = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != gInstance )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// If it's GeometryInstance, combine </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// transformations and go recursive</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> combinedTransform = gInstance
+&nbsp; &nbsp; &nbsp; &nbsp; .Transform.Multiply( transform );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> fetchSomeMesh( 
+&nbsp; &nbsp; &nbsp; &nbsp; gInstance.SymbolGeometry, 
+&nbsp; &nbsp; &nbsp; &nbsp; combinedTransform );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>The helper method is called and the first resulting vertex printed out like this:
+
+<pre class="code">
+<span class="blue">void</span> checkLinkedDwg( <span class="teal">Element</span> linked )
+{
+&nbsp; <span class="teal">Instance</span> inst = linked <span class="blue">as</span> <span class="teal">Instance</span>;
+&nbsp; <span class="teal">Transform</span> transform = inst.GetTransform();
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; opt.View = _doc.ActiveView;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> gElem = inst.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point without Transformation: &quot;</span> 
+&nbsp; &nbsp; + fetchSomeMesh( gElem ).Vertices[0].ToString() );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> vertex = fetchSomeMesh( gElem, transform ).Vertices[0];
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point when Transformed: &quot;</span> + vertex.ToString() );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point when Transformed + inverse: &quot;</span> 
+&nbsp; &nbsp; + transform.Inverse.OfPoint( vertex ).ToString() );
+}
+</pre>
+
+
+
+<p><strong>Answer:</strong> I ported your original managed C++ version to C# and tested it, and I see the following results executing it on a sample model:
+
+<pre>
+Point without Transformation: (0.0, 0.0, 0.0)
+Point when Transformed: (2379.1, 1307.1, 0.0)
+Point when Transformed + inverse: (1203.5, 662.6, 0.0)
+</pre>
+
+<p>It does indeed look as if the transform is applied twice in the second row, and the inverse transformation removes one of the two translations that were applied.
+
+<p>Looking at your code and guessing the internals of the GetTransformed method, I had a hunch that you need not pass in the transformation to it at all. 
+That is an optional extra. 
+The original transformation applied to the family instance itself is already built in to the method call. 
+So I implemented a new and simpler version of your fetchSomeMesh method called fetchSomeMeshTransformed which takes no transform argument at all, and simply always passes in the identity transform:
+
+<pre class="code">
+<span class="blue">protected</span> <span class="teal">Mesh</span> fetchSomeMeshTransformed( 
+&nbsp; <span class="teal">GeometryElement</span> gElem )
+{
+&nbsp; <span class="green">// Apply transformation and seek for Meshes</span>
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> transformed 
+&nbsp; &nbsp; = gElem.GetTransformed( <span class="teal">Transform</span>.Identity );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> transformed.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Mesh</span> gMesh = obj <span class="blue">as</span> <span class="teal">Mesh</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != gMesh )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> gMesh;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Loop and seek for geometry instances</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> gElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> gInstance 
+&nbsp; &nbsp; &nbsp; = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != gInstance )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> fetchSomeMeshTransformed( 
+&nbsp; &nbsp; &nbsp; &nbsp; gInstance.SymbolGeometry );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>I added another row of output to the testing call:
+
+<pre class="code">
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point without Transformation: &quot;</span> 
+&nbsp; &nbsp; + fetchSomeMesh( gElem ).Vertices[0].ToString() );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> vertex = fetchSomeMesh( gElem, transform ).Vertices[0];
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point when Transformed: &quot;</span> + vertex.ToString() );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point when Transformed + inverse: &quot;</span> 
+&nbsp; &nbsp; + transform.Inverse.OfPoint( vertex ).ToString() );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Point with ID Transformation: &quot;</span> 
+&nbsp; &nbsp; + fetchSomeMeshTransformed( gElem ).Vertices[0].ToString() );
+&nbsp;
+</pre>
+
+<p>Lo and behold, the sample now produces the following new and correct result in the fourth row:
+
+<pre>
+Point without Transformation: (0.0, 0.0, 0.0)
+Point when Transformed: (2379.1, 1307.1, 0.0)
+Point when Transformed + inverse: (1203.5, 662.6, 0.0)
+Point with ID Transformation: (1203.5, 662.6, 0.0)
+</pre>
+
+<p>In other words, and to be completely clear about this, the transform argument to the GetTransformed method can be used to define an additional transformation of the element geometry, and is concatenated with the transformation already applied to the symbol geometry to place it appropriately for a given instance.
+
+<p>If you just need the element geometry at its current location in the model, you can pass in an identity transform.
+
+<p>For completeness' sake, here is the source code and Visual Studio solution for the original managed C++ version 
+
+<a href="zip/transform2.zip">transform2.zip</a>,
+
+and the C# port 
+
+<a href="zip/Transform3.zip">Transform3.zip</a>.

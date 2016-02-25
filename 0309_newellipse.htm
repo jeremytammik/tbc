@@ -1,0 +1,95 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1257292 [Revit Ellipse Issue] -->
+
+<h3>NewEllipse Parameters</h3>
+
+<p>Here I am back at work again. 
+I see I have a large number of backed up comments to answer, and lots of other interesting new information to discuss.
+One recent case handled by my colleague Joe Ye discovered an issue with the API documentation of the NewEllipse method that is worth pointing out:
+
+<p><strong>Question:</strong> I am having an issue converting ellipses from AutoCAD into Revit. 
+I have the geometry of the ellipse converted correctly, but there are some issues with the length of partial ellipses. 
+I have checked my calculations and conversions, and to me they seem to be correct. 
+I am wondering whether there may be something wrong with the Application.Create.NewEllipse method. 
+Please let me know whether there is an issue with the Revit API in this area.
+
+<p><strong>Answer:</strong> I have a good message for you. 
+The issue is not caused by the NewEllipse method itself, but from its description in the API documentation. 
+The last two arguments are not the start and end angle, but represent the start and end parameter values of the partial ellipse. 
+
+<p>Given the start and end angles, however, we may not know the start and end point parameter values before creating the ellipse.
+To solve this, one can first create a complete ellipse, then determine the start and end point parameters by geometrical analysis, and finally reset the start and end parameter values using the Ellipse.MakeBound method.
+
+<p>Here is a code snippet showing how to create an elliptical arc geometry object using this approach:</p>
+
+<pre class="code">
+<span class="teal">Ellipse</span> CreateEllipse( <span class="teal">Application</span> app )
+{
+&nbsp; <span class="teal">XYZ</span> center = <span class="teal">XYZ</span>.Zero;
+&nbsp;
+&nbsp; <span class="blue">double</span> radX = 30;
+&nbsp; <span class="blue">double</span> radY = 50;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> xVec = <span class="teal">XYZ</span>.BasisX;
+&nbsp; <span class="teal">XYZ</span> yVec = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; <span class="blue">double</span> param0 = 0.0;
+&nbsp; <span class="blue">double</span> param1 = 2 * <span class="teal">Math</span>.PI;
+&nbsp;
+&nbsp; <span class="teal">Ellipse</span> e = app.Create.NewEllipse( center,
+&nbsp; &nbsp; radX, radY, xVec, yVec, param0, param1 );
+&nbsp;
+&nbsp; <span class="green">// Create a line from ellipse center in </span>
+&nbsp; <span class="green">// direction of target angle:</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> targetAngle = <span class="teal">Math</span>.PI / 3.0;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> direction = <span class="blue">new</span> <span class="teal">XYZ</span>( 
+&nbsp; &nbsp; <span class="teal">Math</span>.Cos( targetAngle ), 
+&nbsp; &nbsp; <span class="teal">Math</span>.Sin( targetAngle ), 
+&nbsp; &nbsp; 0 );
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = app.Create.NewLineUnbound( 
+&nbsp; &nbsp; center, direction );
+&nbsp;
+&nbsp; <span class="green">// Find intersection between line and ellipse:</span>
+&nbsp;
+&nbsp; <span class="teal">IntersectionResultArray</span> results;
+&nbsp; e.Intersect( line, <span class="blue">out</span> results );
+&nbsp;
+&nbsp; <span class="green">// Find the shortest intersection segment:</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">IntersectionResult</span> result <span class="blue">in</span> results )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> p = result.UVPoint.U;
+&nbsp; &nbsp; <span class="blue">if</span>( p &lt; param1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; param1 = p;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Apply parameter to the ellipse:</span>
+&nbsp;
+&nbsp; e.MakeBound( param0, param1 );
+&nbsp;
+&nbsp; <span class="blue">return</span> e;
+} 
+</pre> 
+
+<p>The API documentation will be updated soon.
+
+<p><strong>Response:</strong> I updated my code and it now works using the StartParameter and EndParameter obtained directly from the AutoCAD Ellipse entity. 
+The calculations are basically the same as the angles and the results are correct now.
+Getting the parameter value directly from AutoCAD saves some coding and improves performance. 
+
+<p>Here is
+
+<a href="zip/bc11062.zip">
+version 1.1.0.62</a>
+
+of the complete Building Coder source code and Visual Studio solution including a new external command CmdEllipticalArc implementing this method.</p>
+
+<p>Many thanks to Joe for this solution!

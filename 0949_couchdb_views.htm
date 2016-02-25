@@ -1,0 +1,432 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+<!-- <script src="google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+kanso install
+
+kanso push http://localhost:5984/roomedit
+
+kanso upload data/room_model_8.json http://localhost:5984/roomedit
+kanso upload data/room_model_9.json http://localhost:5984/roomedit
+
+http://localhost:5984/_utils
+
+http://localhost:5984/roomedit/_design/roomedit/index.html
+
+-->
+
+<h3>CouchDB Implementation and GitHub Repository</h3>
+
+<p>I more or less completed the research for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#2">
+cloud-based round-trip 2D Revit model editing project</a>.
+
+<p>I'll describe some parts of that, and also address</p>
+
+<ul>
+<li><a href="#2">Three aspects of life and programming</a></li>
+<li><a href="#3">Room editor navigation</a></li>
+<li><a href="#4">Nested asynchronous database call-back functions</a></li>
+<li><a href="#5">Roomedit &ndash; my first GitHub project</a></li>
+<li><a href="#6">Debugging JavaScript with Firebug</a></li>
+<li><a href="#7a">Screen snapshots on mobile devices</a></li>
+<li><a href="#7">Open source components used by Autodesk</a></li>
+<li><a href="#8">Retrieve slabs above specific walls</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Lazy, Simple and Perfect</h4>
+
+<p>You will like the first slide of my upcoming tech summit presentation.</p>
+
+<p>I start off with a couple of quotes on three fundamental aspects of software engineering and life in general:</p>
+
+<center>
+<img src="img/quotes_on_three_aspects_slide.png" alt="Quotes on three fundamental aspects of software engineering and life"/>
+</center>
+
+<ul>
+<li>Lazy</li>
+<ul>
+<li>... develop the three great virtues of a programmer:
+<a href="http://c2.com/cgi/wiki?LazinessImpatienceHubris">
+laziness, impatience, and hubris</a> &ndash; <i>Larry Wall</i></li>
+</ul>
+<li>Simple</li>
+<ul>
+<li>Simplicity is the ultimate sophistication &ndash; <i>Leonardo da Vinci</i></li>
+<li>There is no greatness where there is no simplicity &ndash; <i>Leo Tolstoy</i></li>
+<li>KISS</li>
+</ul>
+<li>Perfect</li>
+<ul>
+<li>Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away &ndash; <i>Antoine de Saint-Exupéry</i></li>
+</ul>
+</ul>
+
+<p>Basically, I demonstrate how easy it is to implement simple model navigation and 2D graphical editing using server-side scripting so that it works on all mobile devices.</p>
+
+<p>So it is all about keeping it simple and easy.</p>
+
+
+<a name="3"></a>
+
+<h4>Room Editor Navigation</h4>
+
+<p>The last instalment on this topic included a two-minute minimal demo recording illustrating its use and started describing the simplest aspect of the implementation, the server-side generated index.html
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#5">
+home page</a> that
+
+lists all models and prompts to select one of them.
+
+<p>From there, one navigates through the hierarchy of model &gt; level &gt; room &gt; furniture and equipment.
+The latter finally reference the symbol objects that determine their geometry.</p>
+
+<p>Now lets move on to the more interesting parts where the inter-related objects need to execute more complex queries to establish their relationships.
+I still have not covered the juicy part of rendering the SVG model, and the even juicier part of interacting with it, editing it, and updating the database with the changes made, either.</p>
+
+<p>As said, the navigation logic is pretty trivial:</p>
+
+<ul>
+<li>Home page: list all models and prompt to select one of them.</li>
+<li>Model selected: list all levels in model and prompt to select one of them.</li>
+<li>Level selected: list all rooms on the level and prompt to select one of them.</li>
+<li>Room selected: display the room boundary and the furniture and equipment instances graphically and enable editing their location and rotation.</li>
+</ul>
+
+<p>Basically, the entire implementation is all squeezed into one single overgrown index.html file.</p>
+
+<p>Moving on from the home page to the second simplest part of it, we have selected a specific model and list all the levels it contains.</p>
+
+<p>This navigation takes place by invoking the same index.html URL and adding a modelId parameter to it.</p>
+
+<p>This parameter is picked up and used to query the database for all levels in the specified model.</p>
+
+<p>To retrieve only the required ones, I use a CouchDB view mapping model id keys to level documents like this:</p>
+
+<pre class="prettyprint">
+  map_model_to_level = {
+    map: function (doc) {
+      if( 'level' == doc.type ) {
+        emit(doc.modelId, doc);
+      }
+    }
+  };
+</pre>
+
+<p>I can specify a key to CouchDB when querying this view, i.e. make a REST API call with a parameter like this:</p>
+
+<pre>
+  .../roomedit/_design/roomedit/_views?key=12345
+</pre>
+
+<p>This will retrieve only those level documents from the database whose modelId value matches the given key.</p>
+
+<p>Here is the part of index.html handling that interaction:</p>
+
+<pre class="prettyprint">
+. . .
+
+else if ( paramdict.hasOwnProperty( 'modelid' ) ) {
+
+  //======================================================
+  // display a menu of all levels in selected model
+  //======================================================
+
+  var mid = paramdict['modelid'];
+  db.getDoc( mid,
+    function(err,resp) {
+      if (err) {
+        return alert(JSON.stringify(err));
+      }
+      var modeldoc = resp;
+      db.getView('roomedit',
+        'map_model_to_level',
+        { key: JSON.stringify(mid) },
+
+        function (err, data) {
+          if (err) {
+            return alert(err);
+          }
+          var n = data.rows.length;
+          for (var i = 0; i < n; ++i) {
+            var doc = data.rows[i].value;
+            if( doc.modelId != mid ) {
+              alert( 'model ids differ: doc '
+                + doc.modelId + ", url " + mid );
+            }
+            var s = url + '?levelid=' + doc._id;
+            $('&lt;li/&gt;')
+              .append($('&lt;a&gt;').attr('href',s).text(doc.name))
+              .appendTo('#navigatorlist');
+          }
+          var p = $('&lt;p/&gt;').appendTo('#content');
+          p.append( $('&lt;a/&gt;').text('Home').attr('href',url) );
+          p.append( document.createTextNode( three_spaces ) );
+          p.append( $('&lt;a/&gt;').text('Back').attr('href',url) );
+
+          $('&lt;p/&gt;')
+            .text( 'Please select a level in the list below.' )
+            .appendTo('#content');
+
+          var table = $('&lt;table/&gt;').appendTo('#content');
+          table.append( '&lt;tr&gt;&lt;td&gt;' + 'Model:'
+            + '&lt;/td&gt;&lt;td&gt;' + modeldoc.name + '&lt;/td&gt;&lt;/tr&gt;' );
+
+          var prompt = n.toString() + ' level'
+            + pluralSuffix( n ) + ' in model ';
+
+          var p = $('&lt;p/&gt;').text( prompt ).appendTo('#content');
+          p.append( $('&lt;i/&gt;').text( modeldoc.name ) );
+          p.append( document.createTextNode( dotOrColon( n ) ) );
+        }
+      );
+    }
+  );
+}
+</pre>
+
+<p>As I already mentioned, this is populating an super simple HTML skeleton containing the following nodes:</p>
+
+<pre class="prettyprint">
+  &lt;h1&gt;Room Editor&lt;/h1&gt;
+
+  &lt;div id="content"&gt;&lt;/div&gt;
+
+  &lt;ul id="navigatorlist"&gt;&lt;/ul&gt;
+</pre>
+
+<p>Here is the result in a model named 'Roombook' containing a single level 'Fondations':</p>
+
+<center>
+<img src="img/roomedit_list_levels.png" alt="Room editor list of levels"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Nested Asynchronous Database Call-back Functions</h4>
+
+<p>One challenge for me in the room editor CouchDB implementation was understanding how the asynchronous database call-back functions work, and how I can nest them to retrieve all the results I need.</p>
+
+<p>In the case above, the situation is still very simple: I need to perform two database queries:
+
+<ul>
+<li>Query a specific document, the model, using the db.getDoc function.</li>
+<li>Query all the levels it contains, which are returned by the map_model_to_level view with the model id key, using the getView function.</li>
+</ul>
+
+<p>Both the getDoc and getView functions take an asynchronous call-back function as an argument.</p>
+
+<p>I found out the hard way that I can nest these within each other to ensure that I have all up-to-date results before I display my page.</p>
+
+<p>This gets a bit more hairy as the number of queries and thus the number of nested functions grows...</p>
+
+
+<a name="5"></a>
+
+<h4>Roomedit &ndash; My First GitHub Project</h4>
+
+<p>Anyway, I have it all happily running now, and published the
+
+<a href="https://github.com/jeremytammik/roomedit.git">
+roomedit CouchDB application</a> implementing
+
+this as my first ever GitHub project.
+
+
+
+
+
+<a name="6"></a>
+
+<h4>Debugging JavaScript with FireFox FireBug</h4>
+
+<p>Everybody makes errors.
+In my HTML and JavaScript code, these sometimes caused my index.html not to display anything at all.</p>
+
+<p>Often this was due to some trivial JavaScript typo that would have been really hard to chase down.</p>
+
+<p>Enter Firebug, thank God.
+
+<p>This is a great tool that I have started to rely on greatly to help me out of tight corners.
+
+<p>The Firebug debugging console is integrated in FireFox and includes support for examining and debugging all kinds of aspects of a web page.</p>
+
+<p>You can open the Firebug console on any web page through Tools &gt; Web Developer &gt; Firebug &gt; Open Firebug.
+That displays a new panel at the bottom of the browser with tabs for</p>
+
+<ul>
+<li>Console</li>
+<li>HTML</li>
+<li>CSS</li>
+<li>Script</li>
+<li>DOM</li>
+<li>Net</li>
+<li>Cookies</li>
+</ul>
+
+<p>I use Console and Script, mostly.</p>
+
+<p>The former displays the location of a JavaScript error and jumps to it when loading the file.
+It also lists the URLs visited and stuff like that, which is very useful for analysing the REST API calls being made.</p>
+
+<p>The script tab provides a JavaScript debugger allowing you to set breakpoints and analyse variable values etc.</p>
+
+<p>There are lots of tutorials and documentation available on this feature, such as these ones on
+
+<a href="http://www.w3resource.com/web-development-tools/firebug-tutorials.php">
+Firebug</a> and
+
+<a href="http://www.developerfusion.com/article/139949/debugging-javascript-with-firebug">
+JavaScript debugging</a>,
+
+so I will not trouble you any further with my description.
+
+<p>To tell the truth, though, I never looked at any of them.</p>
+
+<p>The thing just worked for me, is incredibly valuable, and I am grateful.</p>
+
+
+<a name="7a"></a>
+
+<h4>Screen Snapshots on Mobile Devices</h4>
+
+<p>Here is a quick guide how to create a screen snapshot on various types of mobile devices:</p>
+
+<ul>
+<li>iPhone &ndash; Press the Sleep/Wake and Home buttons together; the screen will fade temporarily, signalling that the screen shot was saved in your Camera Roll:
+
+<center>
+<img src="img/screen_snapshot_iphone.jpg" alt="Screen snapshot on iPhone"/>
+</center>
+
+</li>
+
+<li>Android &ndash;  Press the Power and Home buttons together, or hold down the Lock/Power and Volume Down buttons together:
+
+<center>
+<img src="img/screen_snapshot_android.jpg" alt="Screen snapshot on Android"/>
+</center>
+
+</li>
+
+<li>Windows 8 &ndash; Press the Lock/Power and Home/Windows buttons together:
+
+<center>
+<img src="img/screen_snapshot_win8.jpg" alt="Screen snapshot on Windows 8"/>
+</center>
+
+</li>
+</ul>
+
+
+<a name="7"></a>
+
+<h4>Open Source Components used by Autodesk</h4>
+
+<p>A colleague pointed out this
+
+<a href="http://www.autodesk.com/lgplsource">open source repository</a> containing
+
+all open source components used in AutoCAD, Map 3D and other Autodesk products.</p>
+
+<p>I was actually surprised how short the list is.
+Anyway, it might be useful to know about.</p>
+
+
+<!-- 08393839 [Wall - Slab relation] -->
+
+<a name="8"></a>
+
+<h4>Retrieve Slabs Above Certain Walls</h4>
+
+<p>Let's wrap this up with a standard Revit API question:
+
+<p><strong>Question:</strong> I want to determine the slab above the walls of a particular room.
+
+<p>How can retrieve those using the Revit API, please?
+
+<p><strong>Answer:</strong> As so often in Revit, there are a number of different possibilities, and it depends in part upon how the building has been modelled.
+
+<p>In a structural model, you may be able to query the analytical support data. I have no idea whether this information is included there, but my naive assumption would be that this should be possible.
+
+<p>Much more generally, you can analyse and query the geometry in a number of different ways.
+
+<p>The two possibilities that immediately spring to mind are:
+
+<ul>
+<li>Use the ray casting functionality provided by the Document FindReferencesWithContextByDirection method and the ReferenceIntersector wrapper class.</li>
+<li>Use the geometric proximity functionality provided by some element filters, e.g.</li>
+</ul>
+
+<p>The discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html#2">
+determining the columns supporting a beam</a> demonstrates
+
+several different variations of the latter.
+Earlier blog posts include examples of the former as well.
+
+<p><strong>Response:</strong> I was able to use the functionality for finding the supporting columns for beams from your link to solve my issue as well.
+
+<p>In my case, beam.GetGeneratingElementIds returns the desired supported floors.
+
+<p>I also tested using an ElementIntersectsSolidFilter to retrieve all walls that intersect the floor using the floor solid geometry object:
+
+<pre class="code">
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp; <span class="teal">ElementFilter</span> slabIntersectFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>( solid );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> walls
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( slabIntersectFilter );
+</pre>
+
+<p>This also solved my issue.
+It can be the alternative when beams are not there.</p>
+
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>Debugging Asynchronous CouchDB Callbacks &amp; Snapshots</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</i></p>
+
+<p>I more or less completed the research for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#2">
+cloud-based round-trip 2D Revit model editing project</a>.
+
+<p>Here are the main items in my discussion of that and one or two other cloud and mobile related topics:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#2">Three aspects of life and programming</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#3">Room editor navigation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#4">Nested asynchronous database call-back functions</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#5">Roomedit &ndash; my first GitHub project</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#6">Debugging JavaScript with Firebug</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#7a">Screen snapshots on mobile devices</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html#7">Open source components used by Autodesk</a></li>
+</ul>

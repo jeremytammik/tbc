@@ -1,0 +1,274 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07666381 [Sign In Help]
+
+-->
+
+<h3>Slab Boundary Revisited</h3>
+
+<p>After 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/wall-footing-relationship-revisited.html">
+yesterday's rejuvenation</a> of
+
+the old wall footing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+host reference relationship detection</a>,
+
+today raises another old question prompting me to update and retest The Building Coder samples yet again:
+
+
+<p><strong>Question:</strong> How can I obtain the boundary of a floor slab using the Revit API, please?
+
+
+<p><strong>Answer:</strong> I implemented a CmdSlabBoundary external command to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+determine the slab boundary</a> back
+
+in the dawn of time, in 2008, in one of the first posts on this blog.
+
+<p>It determines the boundary edges of a floor slab, including holes, and creates a set of model curves along the bottom edges of the slab to highlight them.
+
+<p>Since then it has just been flat ported every year from one version to the next.
+
+<p>To ensure that it still works, I updated it slightly and tested in Revit 2013.
+All I did this time around was to change the transaction mode from automatic to manual, since 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/read-only-and-automatic-transaction-modes.html">
+automatic transaction mode is considered obsolete</a> nowadays.
+
+<p>Here is the updated implementation:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdSlabBoundary</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Offset the generated boundary polygon loop</span>
+&nbsp; <span class="gray">///</span><span class="green"> model lines downwards to separate them from</span>
+&nbsp; <span class="gray">///</span><span class="green"> the slab edge.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _offset = 0.1;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine the boundary polygons of the lowest</span>
+&nbsp; <span class="gray">///</span><span class="green"> horizontal planar face of the given solid.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;polygons&quot;&gt;</span><span class="green">Return polygonal boundary</span>
+&nbsp; <span class="gray">///</span><span class="green"> loops of lowest horizontal face, i.e. profile of</span>
+&nbsp; <span class="gray">///</span><span class="green"> circumference and holes</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;solid&quot;&gt;</span><span class="green">Input solid</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">False if no horizontal planar face was</span>
+&nbsp; <span class="gray">///</span><span class="green"> found, else true</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> GetBoundary(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons,
+&nbsp; &nbsp; <span class="teal">Solid</span> solid )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> lowest = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf &amp;&amp; <span class="teal">Util</span>.IsHorizontal( pf ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( <span class="blue">null</span> == lowest )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || ( pf.Origin.Z &lt; lowest.Origin.Z ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lowest = pf;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != lowest )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p, q = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> first;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp; &nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> loops = lowest.EdgeLoops;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; vertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp; &nbsp; &nbsp; &nbsp; first = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; points = e.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p = points[0];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !first )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( p.IsAlmostEqualTo( q ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected subsequent start point&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; to equal previous end point&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = points.Count;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; q = points[n - 1];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = points[i];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v -= _offset * <span class="teal">XYZ</span>.BasisZ;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertices.Add( v );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; q -= _offset * <span class="teal">XYZ</span>.BasisZ;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( vertices[0] ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last end point to equal&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; first start point&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; polygons.Add( vertices );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != lowest;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return all floor slab boundary loop polygons</span>
+&nbsp; <span class="gray">///</span><span class="green"> for the given floors, offset downwards from the</span>
+&nbsp; <span class="gray">///</span><span class="green"> bottom floor faces by a certain amount.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; GetFloorBoundaryPolygons(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; floors,
+&nbsp; &nbsp; <span class="teal">Options</span> opt )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Floor</span> floor <span class="blue">in</span> floors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = floor.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//GeometryObjectArray objects = geo.Objects; // 2012</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//foreach( GeometryObject obj in objects ) // 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo ) <span class="green">// 2013</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetBoundary( polygons, solid );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> polygons;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve selected floors, or all floors, if nothing is selected:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; floors = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; &nbsp; floors, uidoc, <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;Please select some floor elements.&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;No floor elements found.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = app.Application.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons
+&nbsp; &nbsp; &nbsp; = GetFloorBoundaryPolygons( floors, opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = polygons.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} boundary loop{1} found.&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Draw Slab Boundaries&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; creator.DrawPolygons( polygons );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>I ran this command on a minimal sample model containing just one floor slab with a couple of holes in it.
+That produces the following result, in which I modified the model lines graphics display to distinguish them better &ndash; don't know why the model ellipse is not picking up the dotted line as well as the straight segments &ndash; maybe the tessellation is chopping it up too finely:</p>
+
+<center>
+<img src="img/floor_slab_boundaries.png" alt="Floor slab boundaries"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/bc_13_99_4.zip">version 2013.0.99.4</a> of 
+
+The Building Coder samples including the updated CmdSlabBoundary external command.
+
+
+<a name="2"></a>
+
+<h4>Programmatically Invoke Snoop Objects Dialogue</h4>
+
+<p>Yesterday I discovered an pretty cool post by Daren Thomas, the father of 
+
+<a href="http://code.google.com/p/revitpythonshell">
+RevitPythonShell</a>, 
+
+describing how you can 
+
+<a href="http://darenatwork.blogspot.de/2011/08/using-snoop-objects-dialog-from.html">
+programmatically invoke the RevitLookup Snoop Objects dialogue</a>.
+
+<p>His code is in Python, though the concepts are equally valid in and port perfectly to any other .NET language as well.
+
+<p>Definitely worth taking a look at!
+
+
+<a name="3"></a>
+
+<h4>HTCPCP &ndash; Hyper Text Coffee Pot Control Protocol</h4>
+
+<p>Another little item that you absolutely must be aware of in the cloud and mobile arena is the 
+
+<a href="http://tools.ietf.org/html/rfc2324">
+Hyper Text Coffee Pot Control Protocol standard HTCPCP</a>.
+
+It is worthwhile noting the date of publication, also  :-)
+
+
+<a name="4"></a>
+
+<h4>Closing Revit by Posting WM_CLOSE to its Main Window Handle</h4>
+
+<p>Before closing this post, one last Revit API related note on closing Revit itself...
+
+<p>Shutting down and exiting the Revit session is not supported by the official Revit API.
+
+<p>I discussed 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">
+closing the active document</a> and
+
+why not to do so. 
+The same caveats obviosuly apply to shutting down the Revit session itself.
+
+<p>Still, Augusto Goncalves now presents a neat little solution to obtain the Revit main window handle and 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/close-revit-from-the-api.html">
+close down Revit</a> by
+
+using SendMessage to post a WM_CLOSE request to it.

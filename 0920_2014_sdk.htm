@@ -1,0 +1,204 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit 2014 Pre-release API and SDK</h3>
+
+<p>Below, we look at how ADN members can obtain the Revit 2014 pre-release SDK, address migration issues, and one or two interesting new aspects of the API.</p>
+
+<p>First however, a few words on yesterdays post touting the idea of a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/cloud-based-restaurant-seating-arrangement-and-cleaning.html">
+cloud-based restaurant seating arrangement and cleaning</a> application.
+
+As you probably noticed, the main new ideas I discussed there were in honour of
+
+<a href="http://en.wikipedia.org/wiki/April_Fools%27_Day">April fool's Day</a>.
+
+<p>Many of my colleagues joined in with other similar hoax blog posts.
+<a href="http://adndevblog.typepad.com/autocad/stephen-preston.html">Stephen Preston</a> presents an
+
+<a href="http://adndevblog.typepad.com/autocad/2013/04/april-1st-1.html">April fool's Day blog post overview</a> listing
+
+them all.</p>
+
+<img src="file:///j/photo/jeremy/2013/2013-03-06_ischia/p1000504_water_box.jpg" alt="Scalable water box" width="120"/>
+
+<p>I hope you enjoy them.
+They might even provide you with a useful real-world idea or two  :-)
+
+<p>As always, think outside the box!</p>
+
+<p>Back to more serious business, the Revit API, and the Revit 2014 pre-release.</p>
+
+
+<a name="1"></a>
+
+<h4>The Revit 2014 Pre-release SDK</h4>
+
+<p>As you can guess, ADN member have already been working with Revit 2014 and its API to get their products ready for the new release.</p>
+
+<p>Here are a couple of questions and interesting observations that came up and are still coming in:</p>
+
+<ul>
+<li><a href="#2">Where is the Revit 2014 SDK?</a></li>
+<li><a href="#3">Do we need to rewrite our apps?</a></li>
+<li><a href="#4">Add to an existing command</a></li>
+<li><a href="#5">Full circle creation</a></li>
+</ul>
+
+
+
+<!-- 08227326 [Revit MEP 2014 SDK?] -->
+
+<a name="2"></a>
+
+<h4>Where is the Revit 2014 SDK?</h4>
+
+<p><strong>Question:</strong> Is there an SDK available for Revit MEP 2014?
+
+<p>The <a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> still only lists the 2013 SDK...</p>
+
+
+<p><strong>Answer:</strong> ADN members can obtain the Revit 2014 SDK from the ADN web site.
+It is included in the preview version of Revit:
+
+<ul>
+<li><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=472012">Autodesk Developer Network</a> &gt; Login</li>
+<li>Downloads by Product  <a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&id=5017413&linkID=4901650">Autodesk Revit</a></li>
+<li>Autodesk Revit Architecture 2014 available in <a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=21376501&linkID=4901650">English</a></li>
+<li><a href="http://otwdownloads.autodesk.com/SWDLDNET3/2014/REVIT/DLM/Autodesk_Revit_Architecture_2014_English_Win_32-64bit_dlm.sfx.exe">Autodesk Revit Architecture 2014 English Win 32-64bit</a> (exe - 2.59 Gb)</li>
+</ul>
+
+<p>The installer extracts its content to a temporary installation folder, which by default is located in C:\Autodesk.
+
+<p>Within this folder, you can navigate to the Utilities\SDK subfolder, which contains the installer:
+
+<ul>
+<li>C:\Autodesk
+<li>&nbsp;\Autodesk_Revit_Architecture_2014_English_Win_32-64bit_dlm
+<li>&nbsp;\Utilities
+<li>&nbsp;\SDK
+<li>&nbsp;&gt; 03/09/2013  12:27 AM  201,066,482 RevitSDK.exe
+</ul>
+
+<p>This executable extracts and installs the Revit SDK, which is identical for all flavours of Revit including MEP.
+
+<p>Please note that this is a pre-release version of the SDK.
+There definitely will be changes and additions made before the final release, so plan on updating it as soon as we get there.
+As always, the final version will obviously be posted to the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a> as
+
+soon as possible.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Do we need to rewrite our apps?</h4>
+
+<p><strong>Question:</strong> Sorry if my question is stupid, I am not a programmer and it is hard for me by myself to get to the problem details.</p>
+
+<p>Our programmer reports that our apps do not function under the Revit 2014.
+I understand it happens because many methods were replaced with new calls.
+Does it mean that we should rewrite our apps and replace old methods with new ones?
+Is there a way to upgrade apps automatically?</p>
+
+
+<p><strong>Answer:</strong> Thanks for posting this question.
+Revit does not provide any tools to automatically upgrade lower version code to higher version.
+However, Revit does provide plenty of information on how to upgrade the code yourself.
+Here is the procedure:</p>
+
+<ul>
+<li>Open the lower version code in Visual Studio.</li>
+<li>Add the Revit 2014 API references.</li>
+<li>In the output window, each error includes a detailed instruction on how to change the code to the higher version.</li>
+<li>Follow these steps one by one.</li>
+<li>Compile the project.</li>
+</ul>
+
+<p>That is easy to follow.
+Actually, the migration of an add-in from Revit 2013 to 2014 is much easier and faster than in the past few releases.
+
+<p>For more information, please look at the numerous examples in The Building Coder
+
+<a href="http://thebuildingcoder.typepad.com/blog/migration">migration</a> category.</p>
+
+<p>Good luck!</p>
+
+<!--
+SPR #233394 [API wish: edit parameter on instance in group without affecting other instances or ungrouping]
+Bettina M. Zimmermann - NTI CADcenter A/S 
+
+<a name="3"></a>
+
+<h4>Edit parameters on a Family Instance in a Group</h4>
+
+--- Description ---
+
+this functionality is already provided by the MARK parameter.
+
+it was visible in the Revit Equinox Alpha 1 version, in the Parameter Properties dialogue, feature description "Allow Parameters to Vary Between Groups".
+
+it would be perfectly ok if this was only available for TEXT storage type.
+
+here is a usage example: a door has a parameter indicating left or right hung. assuming a right hung door in a group, and copy the group to create another group instance and mirror it. the door in the second group will be left hung, but the parameter will still say right hung. if you edit the parameter in the second group to left hung, the first group will also be affected, and then that will be wrong. certain parameters behave differently, e.g. the MARK. there, you can simply type in a new value on the instance, and it will not affect other instances. it can be edited without ungroup and regroup. this obviously also applies to other elements such as windows.
+
+Requested by Bettina Zimmermann, NTI CADcenter, at the December 2012 DevDays.
+
+Is there any chance that we will get this functionality in Revit 2014, as it was hinted at in the alpha release? Thank you!
+
+--- Comments ---
+
+I'm confused - this functionality was added in Alpha and is still in Beta. I confirmed it can support the Text parameter type. Is there something missing?
+12/20/2012 9:31:36 AM
+
+This is newly added to Revit 2014 and the 2014 API.
+2/7/2013 11:32:07 PM
+-->
+
+
+<a name="4"></a>
+
+<h4>Add to an Existing Command</h4>
+
+<p><strong>Question:</strong> I read your post about disabling commands through the API and it’s sort of along the lines of what I’m trying to do.
+I’m looking to capture a specific CommandId ID_SETTINGS_REVISIONS, run it, and, when the command finishes, run a custom add-in.
+I don’t want to replace the command, just add some custom background content at the end of it.</p>
+
+<p>Is that possible?</p>
+
+<p><strong>Answer:</strong> In 2013, all you can do is replace the existing command completely with your own implementation.</p>
+
+<p>In 2014, you can also launch an existing Revit command.</p>
+
+<p>Combining these two functionalities should enable what you wish.</p>
+
+
+<a name="5"></a>
+
+<h4>Full Circle Creation</h4>
+
+<p>The Revit 2014 API enables the creation of a real full circle.
+That was is not possible in Revit 2013.
+There, we had to resort to creating two separate 180-degree arcs.</p>
+
+
+
+<!--
+
+<a name=""></a>
+
+<h4></h4>
+
+<p><strong>Question:</strong> Sorry if my question is stupid, I am not a programmer and it is hard for me by myself to get to the problem details.</p>
+
+<p><strong>Answer:</strong>
+
+-->
+
+<p>That was just a starter.
+Lots more to come!</p>

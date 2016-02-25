@@ -1,0 +1,162 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html?cid=6a00e553e168978833017ee738862f970d#comment-6a00e553e168978833017ee738862f970d
+
+-->
+
+<h3>Determine Revit Demo Mode Revisited</h3>
+
+<!--
+<p>Today is an education day again, and I should really be exploring cloud and mobile issues.
+Somehow I have such a huge back
+-->
+
+<p>Almost a year back, we talked about how to determine whether the current running Revit application is a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html">
+demo version</a> or not.
+
+<p>The initial suggestion was to test this by trying to execute real functionality modifying the model and then save it.
+That obviously incurs significant overhead and may cause other problems as well.</p>
+
+<p>Rudolf Honke suggested simply reading and evaluating the Revit main window title text instead.</p>
+
+<p>Now Madmed created and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html?cid=6a00e553e168978833017ee738862f970d#comment-6a00e553e168978833017ee738862f970d">
+posted</a> an
+
+implementation of Rudolf's idea.
+I took the opportunity of both adding that as a new command CmdDemoCheck to The Building Coder samples and simultaneously incrementing all the year number references in the source code comments from 2012 to 2013, so that that trivial yearly update step is over and done with.</p>
+
+<p>Another obvious step to be performed is the elimination of all warning messages when compiling the code, since they indicate obsolete API usage that needs to be cleaned up.
+Stay tuned for that anon.</p>
+
+<p>Rudolf suggested checking whether the main window caption contains the words "VIEWER" and "MODE".
+This is language dependent, of course, and would be "MODUS" in the German Revit, for instance.
+He provided a link to
+
+<a href="http://www.pinvoke.net/default.aspx/user32.getwindowtext">
+C# and VB GetWindowText implementations</a> and
+
+pointed out that this approach works in a zero-document scenario and will fail if the current document is named something like "VIEWER-MODE".
+That problem could be worked around by more intelligent parsing of the string to extract the document name, for instance, before searching for the demo mode trigger string.</p>
+
+<p>To begin with, here is Madmed's implementation:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span>,
+&nbsp; &nbsp; CharSet = <span class="teal">CharSet</span>.Auto )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> GetWindowText(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd,
+&nbsp; &nbsp; <span class="teal">StringBuilder</span> lpString,
+&nbsp; &nbsp; <span class="blue">int</span> nMaxCount );
+&nbsp;
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span>,
+&nbsp; &nbsp; CharSet = <span class="teal">CharSet</span>.Auto )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> GetWindowTextLength(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">StringBuilder</span> GetStatusTextMadmed(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> mainWindow )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">StringBuilder</span> s = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp; &nbsp; <span class="blue">if</span>( mainWindow != <span class="teal">IntPtr</span>.Zero )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> length = GetWindowTextLength( mainWindow );
+&nbsp; &nbsp; &nbsp; <span class="teal">StringBuilder</span> sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>( length + 1 );
+&nbsp; &nbsp; &nbsp; GetWindowText( mainWindow, sb, sb.Capacity );
+&nbsp; &nbsp; &nbsp; sb.Replace( <span class="maroon">&quot;Autodesk Revit Architecture 2013 - &quot;</span>, <span class="maroon">&quot;&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> sb;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp; }
+</pre>
+
+<p>He suggests using it like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IntPtr</span> revitHandle = System.Diagnostics.<span class="teal">Process</span>
+&nbsp; &nbsp; .GetCurrentProcess().MainWindowHandle;
+&nbsp;
+&nbsp; <span class="teal">StringBuilder</span> sb = GetStatusText(revitHandle);
+&nbsp;
+&nbsp; <span class="blue">bool</span> isDemo = sb.ToString()[0] != <span class="maroon">'['</span>
+</pre>
+
+<p>When trying that out on my system, I noticed that I my Revit window title does not include the "Architecture" sub-string, since I am running the one-box version.</p>
+
+<p>I also thought that it might be handy and cleaner to start off by implementing a method which simply returns the entire Revit main window caption string unmodified, for the caller to use freely in any desired fashion.
+I ended up with the following implementation:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> GetWindowText( <span class="teal">IntPtr</span> mainWindow )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">IntPtr</span>.Zero == mainWindow )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Expected valid window handle.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">int</span> len = GetWindowTextLength( mainWindow );
+&nbsp; &nbsp; <span class="teal">StringBuilder</span> sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>( len + 1 );
+&nbsp; &nbsp; GetWindowText( mainWindow, sb, sb.Capacity );
+&nbsp; &nbsp; <span class="blue">return</span> sb.ToString();
+&nbsp; }
+</pre>
+
+<p>That returns "Autodesk Revit 2013 - Not For Resale Version - [Floor Plan: Level 1 - rac_empty.rvt]" on my system.</p>
+
+<p>The sample command making use of this currently looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> revitHandle = System.Diagnostics.<span class="teal">Process</span>
+&nbsp; &nbsp; &nbsp; .GetCurrentProcess().MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = GetWindowText( revitHandle );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// My system returns:</span>
+&nbsp; &nbsp; <span class="green">// &quot;Autodesk Revit 2013 - Not For Resale Version </span>
+&nbsp; &nbsp; <span class="green">// - [Floor Plan: Level 1 - rac_empty.rvt]&quot;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> isDemo = s.Contains( <span class="maroon">&quot;VIEWER&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Demo Version Check&quot;</span>,
+&nbsp; &nbsp; &nbsp; ( isDemo ? <span class="maroon">&quot;Demo&quot;</span> : <span class="maroon">&quot;Production&quot;</span>)
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; version.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Here is
+
+<a href="zip/bc_13_100_0.zip">version 2013.0.100.0</a> of
+
+The Building Coder samples with incremented year numbers throughout and including the new CmdDemoCheck command.
+
+<p>Many thanks to Rudolf for his helpful ideas and to Madmed for prompting me to pick this up again.</p>
+
+<a name="2"></a>
+
+<h4>Retain or Update External Command GUID</h4>
+
+<p>Here are some thoughts by my colleague Joe Ye on whether to retain or update an external command GUID:</p>
+
+<p>It is acceptable to keep the GUID unchanged for different versions of your Revit add-in.
+If you release several different versions for the same Revit version, e.g. 2013, you obviously have to make sure that only one add-in manifest file to load it is found.
+
+<p>If you prefer, it is also okay to define a different GUID for each version of your add-in.
+In that case, please note that an external command with the same name from two different versions can be loaded simultaneously.
+
+<p>If the add-in creates its own Ribbon items, trying to create the same items twice over will also cause an error, since ribbon item names are unique.
+
+<p>Thank you, Joe, for these hints.</p>

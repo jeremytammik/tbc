@@ -1,0 +1,196 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07272599 [Problem with Level/FloorPlan creation in Revit 2013 (One-Box)] -->
+
+<h3>Create Structural Plan View</h3>
+
+<p>Today is the last day of the last week before the 
+
+<a href="http://www.cvent.com/events/devcamp-2012/event-summary-56817a3b57614f8eb59ea05fcd59bc32.aspx">
+AEC DevCamp</a>
+
+in Waltham.
+Here are the complete
+
+<a href="https://custom.cvent.com/FDBB345248B94F40BFFFCEF2FBE054E4/files/645f182b028d480281ebdda12bae6576.pdf">
+session list and descriptions</a>.
+
+I have to submit my material today.
+Before doing so, one last post on a pure API topic.
+
+<p>I mentioned that Revit 2013 introduced a new 
+
+<!-- 740_revit_2013_api.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+view API</a> and
+
+now includes the possibility to create 
+
+<!-- 761_access_schedule_data.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/developer-center-and-sdk-update.html#22">
+schedules</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/change-section-view-type-and-hide-cut-line.html">
+section views</a>.
+
+
+<p>Here is a question that came up regarding the new view creation and Onebox and leads to a couple of interesting migration points:
+
+<p><strong>Question:</strong> I have a plug-in developed for Revit Structure which is currently working on the versions 2009 to 2012. 
+
+<p>Part of the plug-in involves creation of levels and a corresponding floor plan for each.
+
+<p>I now ran into the following problem in Revit 2013 Onebox: after creating all Levels with their respective floor plans, they are displayed in the wrong subnode of the Views tree in the Project Browser. 
+The default Level 'Level 1' is shown under the 'Structural Plans' node, and the newly created floor plans are located under 'Floor Plans' instead.
+
+<p>In spite of the unexpected result in the GUI, all levels are actually created and all floor plans correctly assigned.
+
+<p>I also noticed that the NewViewPlan method to create floor plans is marked obsolete in the 2013 API, so I tried using the new ViewPlan.Create method instead.
+The result is the same using both methods.
+
+<p>Here is the code using both of these methods:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create FloorPlan for Level using NewViewPlan</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="teal">Level</span> CreateLevel2012( 
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="blue">double</span> elevation, 
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> createdoc 
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="teal">Level</span> level = createdoc.NewLevel( elevation );
+&nbsp; level.Name = name;
+&nbsp; <span class="teal">ElementId</span> nid = level.Id;
+&nbsp;
+&nbsp; createdoc.NewViewPlan( name, level, 
+&nbsp; &nbsp; <span class="teal">ViewPlanType</span>.FloorPlan );
+&nbsp;
+&nbsp; <span class="blue">return</span> level;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create FloorPlan for Level using ViewPlan.Create</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="teal">Level</span> CreateLevel2013(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">double</span> elevation,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="teal">Level</span> level = doc.Create.NewLevel( elevation );
+&nbsp; level.Name = name;
+&nbsp; <span class="teal">ElementId</span> nid = level.Id;
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ViewFamilyType</span>&gt; viewFamilyTypes
+&nbsp; &nbsp; = <span class="blue">from</span> elem <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewFamilyType</span> ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">let</span> type = elem <span class="blue">as</span> <span class="teal">ViewFamilyType</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> type.ViewFamily == <span class="teal">ViewFamily</span>.FloorPlan
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> type;
+&nbsp;
+&nbsp; <span class="teal">ViewPlan</span> floorPlan = <span class="teal">ViewPlan</span>.Create( doc, 
+&nbsp; &nbsp; viewFamilyTypes.First().Id, nid );
+&nbsp;
+&nbsp; <span class="blue">return</span> level;
+}
+</pre>
+
+
+
+<p><strong>Answer:</strong> I created a sample application to test the structural plan creation in Revit 2013 Onebox. 
+It initially displayed the newly created floor plans under the 'Floor Plan' node, just as you describe.
+I wondered whether the behaviour might depend on whether you run this in a structural or architectural project, how the template file is set up, and what discipline is assigned to the view, but that does not seem to make any difference, as I soon found out.
+
+<p>I started up a new structural project in Revit Onebox and ran the command there, and note that the new level also appears in the Floor Plans node.
+
+<p>I next used RevitLookup to examine the default views listed in the Structural Plans node in more detail, using Add-Ins > Revit Lookup > Snoop DB... > ViewPlan > Level 1 70032.
+
+<p>One thing I immediately note is that the ViewFamilyType of the default Level 1 in the structural project is Structural Plan 53969, and not 'Floor Plan' like the one you are referencing in your code:</p>
+
+<center>
+<img src="img/view_structural_plan_object_type.png" alt="Structural plan view family type"/>
+</center>
+
+<p>I therefore modified the creation code to use ViewFamily.StructuralPlan instead of ViewFamily.FloorPlan. 
+There is no need to set the view discipline, since that happens anyway automatically.
+
+<p>With that in place, the newly created views now show up in the right place in the project browser:</p>
+
+<center>
+<img src="img/view_structural_plan.png" alt="Structural plan in project browser"/>
+</center>
+
+
+<p>Here is the complete code that I ended up with:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Floor Plan&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> createdoc
+&nbsp; &nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> name = <span class="maroon">&quot;Findus&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create Level</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> elevation = 10;
+&nbsp; &nbsp; <span class="teal">Level</span> level = createdoc.NewLevel( elevation );
+&nbsp; &nbsp; level.Name = name;
+&nbsp; &nbsp; <span class="teal">ElementId</span> nid = level.Id;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> use_obsolete_code = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( use_obsolete_code )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Create FloorPlan for the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Level using NewViewPlan</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; createdoc.NewViewPlan( name, level,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ViewPlanType</span>.FloorPlan );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Create FloorPlan for the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Level using ViewPlan.Create</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewFamilyType</span> vft
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewFamilyType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">ViewFamilyType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">ViewFamilyType</span>&gt;( x =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ViewFamily</span>.StructuralPlan == x.ViewFamily );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewPlan</span> floorPlan = <span class="teal">ViewPlan</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, vft.Id, nid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//floorPlan.Discipline </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; = ViewDiscipline.Structural;</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>I hope you appreciate that you have a lot more control over the view creation using the new method rather than the old one.
+There is a heaps more functionality in the new Revit 2013 view API that we have not touched on yet...
+
+<p>Here is 
+
+<a href="zip/CreateStructuralPlan.zip">
+CreateStructuralPlan.zip</a> 
+
+including the entire Visual Studio solution, source code and add-in manifest.
+

@@ -1,0 +1,235 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Selecting a Face in a Linked File</h3>
+
+<p>Here is a chance to look at an interesting method that we never discussed yet, ConvertToStableRepresentation, and the hidden information that it provides access to.
+It does what it says, converting a Reference to a stable string representation.
+
+
+<a name="1"></a>
+
+<h4>Reference and Stable Representation</h4>
+
+<p>A reference provides a possibility to identify a piece of geometry, even though geometry is transient, not persistent, memory only, generated on the fly.
+Still, we sometimes need to identify a piece of it and remember which piece it was.
+For instance, to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-by-iterating-faces.html">
+dimension the distance</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-using-findreferencesbydirection.html">
+between two parallel walls</a>, 
+
+we need to identify which wall face we are measuring from.
+This can be achieved using references.
+
+<p>A stable representation can be used to preserve and restore a reference later in the same Revit session or even in a different session in the same document. 
+The ParseFromStableRepresentation method is used to restore the reference. 
+The representation is based on the internal Revit structure and is not intended to be parsed by anyone else except ParseFromStableRepresentation.
+
+<p>Here is a rather unexpected use of this method and the undocumented internals of the stable string representation:
+
+
+<a name="2"></a>
+
+<h4>Face Selection in Linked File</h4>
+
+<p>Some Revit API functionality is limited to the current project and will not work for linked files.
+Currently, this most heavily affects the geometric analysis, and methods like FindReferencesWithContextByDirection and its new optimised and simplified Revit 2013 wrapper class ReferenceIntersector.
+
+<p>Another affected area is the interactive element selection, which led to the following 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/revit-2013-product-guids-and-guid-algorithm.html?cid=6a00e553e1689788330168ea336953970c#comment-6a00e553e1689788330168ea336953970c">
+question</a> by 
+
+<a href="mailto:vlouzeau@gmail.com">
+Valentin Louzeau</a>:
+
+
+<p><strong>Question:</strong> I'm working on a plugin and asking the user to select a face, but it does not work in linked files. 
+I found something using ObjectType.PointOnElement for selection but it doesn't seem to work for my needs. 
+Is there an easy way to do that or do you already have a solution?
+
+<p><strong>Answer:</strong> Nope, sorry, there is no easy way to work on a face in a linked file, and I am not aware of any solution for this.
+
+<p><strong>Response:</strong> I found a solution using the method ConvertToStableRepresentation on the Reference class.
+
+<p>This string contains the ref document unique ID, its name, and the ID of the picked element in this document. 
+You can get its position in the ref doc and if you insert origin to origin, the element has the same position in the two documents.
+
+<p>Here is an example of a stable representation for a reference to a picked face on a wall in a linked file:
+
+<ul>
+<li>"7c25d827-3c9c-4cca-b3a0-dd28ee09a289-0002e3a1:0:RVTLINK/7c25d827-3c9c-4cca-b3a0-dd28ee09a289-0002e3a0:161224:5:SURFACE"
+</ul>
+
+<p>From this, the wall element id "161224" can be extracted.
+
+<p>Here is some code in which I tested making use of this:
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">SelectFaceInLinkedFile</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> Plan = SelectFace( uiapp );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">PlanarFace</span> SelectFace( 
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get all ref doc. </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Document</span>&gt; doc2 
+&nbsp; &nbsp; &nbsp; = GetLinkedDocuments( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the ref of a selected plane</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uiapp.ActiveUIDocument.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> pickedRef = sel.PickObject( 
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.PointOnElement, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select a Face&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = doc.GetElement( 
+&nbsp; &nbsp; &nbsp; pickedRef.ElementId );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the true position picked </span>
+&nbsp; &nbsp; <span class="green">// in the active document</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pos = pickedRef.GlobalPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the ID of the element containing the </span>
+&nbsp; &nbsp; <span class="green">// face you picked in the active document </span>
+&nbsp; &nbsp; <span class="green">// and in its host document</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = pickedRef
+&nbsp; &nbsp; &nbsp; .ConvertToStableRepresentation( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] tab_str = s.Split( <span class="maroon">':'</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> id = tab_str[tab_str.Length - 3];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> ID;
+&nbsp; &nbsp; <span class="teal">Int32</span>.TryParse( id, <span class="blue">out</span> ID );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Type</span> et = elem.GetType();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">typeof</span>( <span class="teal">RevitLinkType</span> ) == et
+&nbsp; &nbsp; &nbsp; || <span class="blue">typeof</span>( <span class="teal">RevitLinkInstance</span> ) == et
+&nbsp; &nbsp; &nbsp; || <span class="blue">typeof</span>( <span class="teal">Instance</span> ) == et )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Document</span> d <span class="blue">in</span> doc2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elem.Name.Contains( d.Title ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> element = d.GetElement( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ID ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Options</span> ops = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ops.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// write the name of the element and the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// number of solids in this only for </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// control to show the possibilities</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( element.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.get_Geometry( ops )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Objects.Size.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryObject</span> obj 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = element.get_Geometry( ops )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Objects.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// test all surfaces of solids in the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// element and return the one containing </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the picked point as a planarface to </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// build my sketchplan</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj2 <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.get_Geometry( ops ).Objects )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( obj2.GetType() == <span class="blue">typeof</span>( <span class="teal">Solid</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid2 = obj2 <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face2 <span class="blue">in</span> solid2.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face2.Project( pos )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .XYZPoint.DistanceTo( pos ) == 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> face2 <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">NullReferenceException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// this part is not mine, i found it on the internet, </span>
+&nbsp; <span class="green">// i don't anderstand all the code</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">ExternalFileReference</span>&gt; 
+&nbsp; &nbsp; GetLinkedFileReferences( <span class="teal">Document</span> _document )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( 
+&nbsp; &nbsp; &nbsp; _document );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> linkedElements = collector
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">RevitLinkType</span> ) )
+&nbsp; &nbsp; &nbsp; .Select( x =&gt; x.GetExternalFileReference() )
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> linkedElements;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">Document</span>&gt; 
+&nbsp; &nbsp; GetLinkedDocuments( <span class="teal">Document</span> _document )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> linkedfiles = GetLinkedFileReferences( 
+&nbsp; &nbsp; &nbsp; _document );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> linkedFileNames = linkedfiles
+&nbsp; &nbsp; &nbsp; .Select( x =&gt; <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .ConvertModelPathToUserVisiblePath( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x.GetAbsolutePath() ) ).ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> _document.Application.Documents
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Document</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where( doc =&gt; linkedFileNames.Any( 
+&nbsp; &nbsp; &nbsp; &nbsp; fileName =&gt; doc.PathName.Equals( fileName ) ) );
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/SelectFaceInLinkedFile.zip">
+SelectFaceInLinkedFile.zip</a> containing 
+
+Valentin's sample code and Visual Studio solution.
+
+<p>Many thanks to Valentin for the novel use of this method and its undocumented embedded information.
+
+<p>This is obviously all undocumented internal stuff that is not guaranteed to work at all in any way, and actually is guaranteed to change at some point in the future (as everything must change) with no prior warning whatsoever, so use at your own risk or just ponder and enjoy.
+

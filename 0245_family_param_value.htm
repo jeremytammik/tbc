@@ -1,0 +1,198 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1254754 [Get Value of Family Parameters] -->
+
+<h3>Family Parameter Value</h3>
+
+<p>Pramod asked an interesting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html#comment-6a00e553e1689788330120a6a4cd6f970c">
+question</a> on 
+
+obtaining the values of family parameters in a family document which led me to explore this topic and discover a little more complexity than I was originally expecting:
+
+<p><strong>Question:</strong> We are using the API of Revit Architecture 2010. 
+We want to get all Parameters and their values from the Family document. 
+We are referring to the AutoParameter example from the Revit SDK. 
+With the help of this example, we are able to get parameters of Family, but didn't get any property or method for getting Value of those parameters. 
+So please give any code example for getting values of the Family Parameters.
+
+<p><strong>Answer:</strong> I dug around a bit to provide an answer for you, and was surprised at the result.
+I had not previously noticed the additional level of indirection required to access a family parameter value.
+
+<p>Before we start working on reading family parameter values, let me mention that the addParameters method in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-family-creation-api-labs.html">
+Revit Family API labs</a>
+
+provides a sample demonstrating how to create family parameters and set their values.
+
+<p>The family has two main aspects, the geometry and the parameter data. Some of the parameters can be used to drive the geometry, so the two areas are interlinked. The data is stored in parameters, and the family contains a set of predefined types which already have predefined values for certain parameters. The family parameter has a pointer to its definition which specifies the name and data type, just like a project parameter. However, it does not have a parameter value, because the values are specific to the family types. Instead, each family type has its own value for each of the family parameters.
+
+<p>One of the main objects in the family document is its family manager, which manages its family types and parameters. A family parameter looks a lot like a normal Revit parameter on a BIM element instance, and has many of the same properties such as the Definition property which defines the parameter name and data type. The big difference between a family and a non-family parameter is that the latter has a value and the former does not.
+
+<p>In a project document, a parameter has a pointer to the parameter definition which defines its name and data type and other properties, and the main data item of the individual parameter is its own personal parameter value. A family parameter has one additional level of complexity and indirection, since the family parameter values are defined individually for each of the family types.
+
+<p>When you retrieve a value for a parameter from a family type, you have to supply the family parameter instance to specify which parameter value to retrieve. 
+
+<p>I created a new Building Coder sample command named CmdFamilyParamValue to demonstrate how to read the values of family parameters.
+
+<p>First of all, it ensures that we are running in a family document:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="blue">if</span>( !doc.IsFamilyDocument )
+{
+&nbsp; message =
+&nbsp; &nbsp; <span class="maroon">&quot;Please run this command in a family document.&quot;</span>;
+}
+<span class="blue">else</span>
+</pre>
+
+<p>In order to retrieve a parameter value from a family type, we need to provide a pointer to the family parameter instances that we are interested in, so we start off by creating a dictionary containing all the family parameters and mapping their names to the corresponding object instances:
+
+<pre class="code">
+<span class="teal">FamilyManager</span> mgr = doc.FamilyManager;
+&nbsp;
+<span class="blue">int</span> n = mgr.Parameters.Size;
+&nbsp;
+<span class="teal">Debug</span>.Print(
+&nbsp; <span class="maroon">&quot;\nFamily {0} has {1} parameter{2}.&quot;</span>,
+&nbsp; doc.Title, n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">FamilyParameter</span>&gt; fps
+&nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">FamilyParameter</span>&gt;( n );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">FamilyParameter</span> fp <span class="blue">in</span> mgr.Parameters )
+{
+&nbsp; <span class="blue">string</span> name = fp.Definition.Name;
+&nbsp; fps.Add( name, fp );
+}
+<span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;( fps.Keys );
+keys.Sort();
+</pre>
+
+<p>I create a sorted list of the parameter names, so that the final result will be sorted and thus more readable.
+
+<p>Before we move on to the iteration over the family types and determining the family parameter values for each, here is a helper method to retrieve and format the family parameter value as a string.
+I noticed that a string-valued parameter value can only be retrieved using AsString, and AsValueString returns an empty string for it, so I implemented a switch statement and an optimal specialised access and display for each storage type:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> FamilyParamValueString( 
+&nbsp; <span class="teal">FamilyType</span> t, 
+&nbsp; <span class="teal">FamilyParameter</span> fp, 
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">string</span> value = t.AsValueString( fp );
+&nbsp; <span class="blue">switch</span>( fp.StorageType )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Double:
+&nbsp; &nbsp; &nbsp; value = <span class="teal">Util</span>.RealString(
+&nbsp; &nbsp; &nbsp; &nbsp; ( <span class="blue">double</span> ) t.AsDouble( fp ) )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; (double)&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.ElementId:
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = t.AsElementId( fp );
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( <span class="blue">ref</span> id );
+&nbsp; &nbsp; &nbsp; value = id.Value.ToString() + <span class="maroon">&quot; (&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.ElementDescription( e ) + <span class="maroon">&quot;)&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Integer:
+&nbsp; &nbsp; &nbsp; value = t.AsInteger( fp ).ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; (int)&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.String:
+&nbsp; &nbsp; &nbsp; value = <span class="maroon">&quot;'&quot;</span> + t.AsString( fp )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' (string)&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp; <span class="blue">return</span> value;
+}
+</pre>
+
+<p>With the helper method in hand, we can iterate over the family types and display their family parameter values.
+We use HasValue to determine whether a type has a value for each parameter, retrieve its value, and display the result:
+
+<pre class="code">
+n = mgr.Types.Size;
+&nbsp;
+<span class="teal">Debug</span>.Print(
+&nbsp; <span class="maroon">&quot;Family {0} has {1} type{2}{3}&quot;</span>,
+&nbsp; doc.Title,
+&nbsp; n,
+&nbsp; <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">FamilyType</span> t <span class="blue">in</span> mgr.Types )
+{
+&nbsp; <span class="blue">string</span> name = t.Name;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; {0}:&quot;</span>, name );
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> key <span class="blue">in</span> keys )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyParameter</span> fp = fps[key];
+&nbsp; &nbsp; <span class="blue">if</span>( t.HasValue( fp ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> value 
+&nbsp; &nbsp; &nbsp; &nbsp; = FamilyParamValueString( t, fp, doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; {0} = {1}&quot;</span>, key, value );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is the result of opening a new family document based on the Metric Column template, 
+running the Family API lab 4 command to create a simple column family and some types, and then listing the family parameter values using CmdFamilyParamValues:
+
+<pre>
+Family Family1 has 13 parameters.
+Family Family1 has 5 types:
+   :
+    ColumnFinish = -1 (<null>)
+    Depth = 1.97 (double)
+    Td = 0.49 (double)
+    Tw = 0.49 (double)
+    Width = 1.97 (double)
+  1000x300:
+    ColumnFinish = -1 (<null>)
+    Depth = 0.98 (double)
+    Td = 0.25 (double)
+    Tw = 0.82 (double)
+    Width = 3.28 (double)
+  600x900:
+    ColumnFinish = -1 (<null>)
+    Depth = 2.95 (double)
+    Td = 0.74 (double)
+    Tw = 0.49 (double)
+    Width = 1.97 (double)
+  Glass:
+    ColumnFinish = 574 (Materials <574 Glass>)
+    Depth = 1.97 (double)
+    Td = 0.49 (double)
+    Tw = 0.49 (double)
+    Width = 1.97 (double)
+  600x600:
+    ColumnFinish = -1 (<null>)
+    Depth = 1.97 (double)
+    Td = 0.49 (double)
+    Tw = 0.49 (double)
+    Width = 1.97 (double)
+</pre>
+
+<p>Apparently, it includes one unnamed type as well as the four that our sample created intentionally.
+
+<p>I hope this clarifies the structure and usage of family parameters and possibly provides a useful additional little utility for your tool kit.
+
+<p>Here is
+
+<a href="zip/bc11053.zip">
+version 1.1.0.53</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+

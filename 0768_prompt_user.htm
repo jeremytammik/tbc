@@ -1,0 +1,70 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07239630 [Setting selected element from modeless dialog] 
+165_prompt_user.htm
+460_prompt_user.htm
+
+-->
+
+<h3>Prompt User to Avoid Modeless Interaction</h3>
+
+<p>Once again on the topic of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous interaction</a> with 
+
+Revit, which is not supported by the Revit API, and often worked around using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/idling-enhancements-and-external-events.html">
+external events</a>...
+
+<p>As I recently pointed out, no Revit API methods at all can be called outside a valid Revit API context, not even the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/drag-and-drop-api.html#4">
+DoDragDrop method</a> or
+
+Application.IsQuiescent property.
+
+<p>I already presented two convincing examples in the past of how you could work around a lack of direct API access by interacting intelligently with the user instead:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/prompt-the-user-for-pinning-and-ifc-export.html">
+Prompt the User for Pinning and IFC Export</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/power-to-the-user-and-application.html">
+Power to the User (and Application)</a>
+</ul>
+
+<p>In the first, lack of certain API functionality was worked around by prompting the user to execute an action instead.
+
+<p>In the second, an action was detected that could not be undone programmatically, but a warning can easily be displayed allowing the user to undo if she so desires.
+
+<p>Here is an example by Paul Vella of Autodesk Consulting in Melbourne, Australia, of how you can easily and safely avoid a potentially complex and risky modeless interaction by providing an adequate user interface instead:
+
+<p><strong>Question:</strong> I have a command that identifies a list of elements from the Revit model, and displays them in a modeless dialog to the user. The dialog is modeless so that the user can interact with the model, but I also want the user to be able to change the current selection (and zoom to that item) by selecting items from my dialog.
+
+<p>The zoom to part works, and the selection appears to change, but the properties panel does not update correctly.
+
+<p>Apparently the issue is that the Revit command has ended once the dialog has been displayed, and therefore my selection code runs outside of a command and lacks a valid Revit API context.
+
+<p>Is it possible to programmatically create a command context or otherwise to get my selection code to work, and have the properties panel update correctly?
+
+<p>One idea I had was to have a separate command button to do the selection, and call this programmatically from my form. But I could not work out how to programmatically click a PushButton on the ribbon.
+
+
+<p><strong>Answer:</strong> Nope, I am sorry to say it is not possible to create a command context in the way you describe, nor does the Revit API provide any way to programmatically simulate a ribbon push button click.
+
+<p>The only way I know to safely achieve what you are aiming for is to make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/idling-enhancements-and-external-events.html">
+Idling event or the new external event framework</a>.
+
+
+<p><strong>Response:</strong> The solution I went with was to create a new button on the ribbon entitled 'Zoom to Sync Error'. 
+When clicked, this button determines the currently selected item in the modeless form, which is accessible through a singleton instance.

@@ -1,0 +1,245 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255142 [Dimension Types] -->
+
+<h3>Distinguish Different Dimension Types</h3>
+
+<p>I am back in Europe again after spending most of the weekend travelling, similarly to 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/12/asynchronous-messages-in-f-and-autocad.html">
+Kean</a> but 
+
+in the opposite direction.
+In his last post, Kean summarised some interesting views on the 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/12/the-evolution-of-autodesk-university.html">
+evolution of Autodesk University</a>.
+
+<p>Returning to the Revit API, here is a nice can-do solution presenting a workaround created by my colleague Joe Ye of Autodesk and Henrik Bengtsson of 
+
+<a href="http://www.lindab.se">
+Lindab</a> on 
+
+how to distinguish between the different kinds of dimension types.
+
+<p><strong>Question:</strong> I am creating a drafting view with dimensions and I have a small problem.
+The function listed below works all right, but I had to hard code the dimension type name to look for.
+The if statement comparing the type name with the hardcoded string "Arrow - 2.5mm Arial" should not be needed.
+
+<p>This is what the code should do:
+
+<ol>
+<li>Loop through the existing dimension types.
+If the one I am looking for is found, return it directly.
+The first time this function is called in a new document, it should not find anything.
+
+<li>The second loop should simply pick the first one, and then exit the loop.
+Unfortunately when the first item in the loop is used, I cannot set Dimension.DimensionType.
+That is done outside this routine.
+
+<li>Duplicate the type picked in step 2, update its parameters appropriately, and return it.
+</ol>
+
+<p>In some way or another, there must be different dimension types included in the Document.DimensionTypes collection.
+When I grab the first one, it is unfortunately of the wrong type.
+How can I find a correct type to duplicate?
+
+<p>I think that I use Linear Dimension Type, but there seem to be others as well.
+
+<p>I have looped though the parameters but I cannot find any that would tell me the dimension type.
+I see one named Linear_Dim_type, but it returns 1 in all cases, so that is no help.
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> GetDimensionType( _
+&nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> Document, _
+&nbsp; <span class="blue">ByVal</span> name <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByVal</span> size <span class="blue">As</span> <span class="blue">Double</span>) _
+<span class="blue">As</span> Symbols.DimensionType
+&nbsp;
+&nbsp; <span class="blue">Dim</span> dt <span class="blue">As</span> Symbols.DimensionType = <span class="blue">Nothing</span>
+&nbsp;
+&nbsp; <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> itm <span class="blue">As</span> Symbols.DimensionType <span class="blue">In</span> doc.DimensionTypes
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> itm.Name = name <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; dt = itm
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> dt
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> dt <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> tmpdt <span class="blue">As</span> Symbols.DimensionType = <span class="blue">Nothing</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> itm <span class="blue">As</span> Symbols.DimensionType <span class="blue">In</span> doc.DimensionTypes
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> itm.Name = <span class="maroon">&quot;Arrow - 2.5mm Arial&quot;</span> <span class="blue">Then</span> <span class="green">' hardcoded string</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmpdt = itm
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; dt = tmpdt.Duplicate(name)
+&nbsp;
+&nbsp; &nbsp; &nbsp; dt.Parameter( _
+&nbsp; &nbsp; &nbsp; &nbsp; Parameters.BuiltInParameter.TEXT_SIZE) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Set(mmTofoot(size))
+&nbsp; &nbsp; &nbsp; dt.Parameter( _
+&nbsp; &nbsp; &nbsp; &nbsp; Parameters.BuiltInParameter.TEXT_DIST_TO_LINE) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Set(mmTofoot(1))
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; <span class="blue">Return</span> dt
+&nbsp;
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>Here is a snippet of code showing how I call this routine:
+
+<pre class="code">
+<span class="blue">Dim</span> ref1 <span class="blue">As</span> <span class="blue">New</span> Reference
+<span class="blue">Dim</span> ref2 <span class="blue">As</span> <span class="blue">New</span> Reference
+<span class="blue">Dim</span> refArray <span class="blue">As</span> <span class="blue">New</span> ReferenceArray
+refArray.Append(ref1)
+refArray.Append(ref2)
+
+<span class="blue">Dim</span> dimensionLine <span class="blue">As</span> Line _
+&nbsp; = app.Create.NewLine(refP1, refP2, <span class="blue">True</span>)
+&nbsp;
+<span class="blue">Dim</span> dimension <span class="blue">As</span> Dimension _
+&nbsp; = doc.Create.NewDimension(view, dimensionLine, refArray)
+&nbsp;
+<span class="green">' this fails if the wrong type is returned:</span>
+dimension.DimensionType _
+&nbsp; = GetDimensionType(doc, <span class="maroon">&quot;Lindab-2.0&quot;</span>, 2.0)
+</pre>
+
+<p><strong>Answer:</strong> There are three kinds of dimension types
+
+<ul>
+<li>Angular
+<li>Linear
+<li>Radial
+</ul>
+
+<p>I agree that you probably trying to assign a wrong type of dimension style to the dimension.
+
+<p>So the question is how to distinguish them correctly.
+
+<p>I just investigated the properties and parameters of dimension style elements.
+I do not see any single value that would enable me to distinguish any one of these from the other two.
+Since Revit can distinguish them internally, I assume it has some additional data that we do not see in the API.
+
+<p>However, the three kinds of styles have different collections of parameters, and these can be used to distinguish them.
+
+<p>For example, the 'Dimension String Type' parameter only occurs on a Linear style.
+Therefore, if we can read a valid parameter value for this parameter, we know that it is a linear dimension style:</p>
+
+<center>
+<img src="img/dim_style_linear.png" alt="Linear dimension style element properties"/>
+</center>
+
+<p>To distinguish between the other two styles, I found that the 'Centerline Style', 'Centerline Pattern', 'Centerline Tick Mark' and 'Interior Tick Mark' parameters only occur on an angular style:</p>
+
+<center>
+<img src="img/dim_style_angular.png" alt="Angular dimension style element properties"/>
+</center>
+
+<p>A radial dimension style does not have these:</p>
+
+<center>
+<img src="img/dim_style_radial.png" alt="Radial dimension style element properties"/>
+</center>
+
+<p><strong>Response:</strong> I checked the return values of these parameters and unfortunately they all seem to exist. 
+what I mean is that all dimension types have these... 
+I was hoping that some of them would return 'Nothing'.
+
+<p><strong>Answer:</strong> If you access these parameters directly by calling Element.get_Parameter with a string name or built-in parameter argument, this might not work as expected.
+A specific parameter, for example Linear_Dim_Type, may well be invisible for Angular and Radial types, but it may still exist.
+
+<p>Please retrieve the parameters by iterating the ParameterSet returned by DimensionType.Parameters. 
+This collection will only return the parameters visible in the Properties Dialog. 
+In this way we can discover if the specific target parameter is valid in this ParameterSet. 
+Use the same method to detect if specific parameters exist in the remaining two dimension types.
+
+<p><strong>Response:</strong> Here is a final version of the code. 
+It works for me in my project.
+That does not guarantee that it will work in another environment.
+So please just use this as a basic idea and test it in your context:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> GetDimensionType( _
+&nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> Document, _
+&nbsp; <span class="blue">ByVal</span> name <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByVal</span> size <span class="blue">As</span> <span class="blue">Double</span>) _
+<span class="blue">As</span> Symbols.DimensionType
+&nbsp;
+&nbsp; <span class="blue">Dim</span> dt <span class="blue">As</span> Symbols.DimensionType = <span class="blue">Nothing</span>
+&nbsp; <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> itm <span class="blue">As</span> Symbols.DimensionType <span class="blue">In</span> doc.DimensionTypes
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> itm.Name = name <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; dt = itm
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> dt
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; <span class="blue">If</span> dt <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> tmpdt <span class="blue">As</span> Symbols.DimensionType = <span class="blue">Nothing</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> itm <span class="blue">As</span> Symbols.DimensionType <span class="blue">In</span> doc.DimensionTypes
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> tmpdt <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> p <span class="blue">As</span> Parameter <span class="blue">In</span> itm.Parameters
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> id <span class="blue">As</span> Parameters.InternalDefinition = p.Definition
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> id.BuiltInParameter = Parameters.BuiltInParameter.LINEAR_DIM_TYPE <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tmpdt = itm
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; dt = tmpdt.Duplicate(name)
+&nbsp;
+&nbsp; &nbsp; &nbsp; dt.Parameter( _
+&nbsp; &nbsp; &nbsp; &nbsp; Parameters.BuiltInParameter.TEXT_SIZE) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Set(mmTofoot(size))
+&nbsp;
+&nbsp; &nbsp; &nbsp; dt.Parameter( _
+&nbsp; &nbsp; &nbsp; &nbsp; Parameters.BuiltInParameter.TEXT_DIST_TO_LINE) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Set(mmTofoot(1))
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; <span class="blue">Return</span> dt
+&nbsp;
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>If the lines above are truncated in your browser, simply copy and paste them to an editor.

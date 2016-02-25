@@ -1,0 +1,264 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Compiling the Revit 2014 SDK</h3>
+
+<p>Here are some notes on the small issues I encountered compiling the Revit 2014 SDK:</p>
+
+<ul>
+<li><a href="#2">Compile and install RevitLookup</a></li>
+<li><a href="#3">Set up the Revit API assembly paths</a></li>
+<li><a href="#4">First compilation run causes expected errors</a></li>
+<li><a href="#5">Set up the RevitAddInUtility assembly path</a></li>
+<li><a href="#6">PointCurveCreation Office reference</a></li>
+<li><a href="#7">CancelSave RevitAddInUtility Reference</a></li>
+<li><a href="#8">Set up the RvtSamples application</a></li>
+<li><a href="#9">Fix errors in RvtSamples.txt</a></li>
+<li><a href="#10">Download RvtSamples and RevitLookup</a></li>
+</ul>
+
+<p>I already described this same process during the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/developer-center-and-sdk-update.html#2">
+Revit 2013</a> timeframe.
+
+Let's see if anything changed, or, better still, improved.</p>
+
+
+<a name="2"></a>
+
+<h4>Compile and Install RevitLookup</h4>
+
+<p>My first step is always to compile, install and test RevitLookup.</p>
+
+<p>This went completely smoothly, so I have nothing to report on that.</p>
+
+<p>Please see <a href="#9">below</a> for a link to the version I compiled.</p>
+
+
+<a name="3"></a>
+
+<h4>Set up the Revit API Assembly Paths</h4>
+
+<p>Before the introduction of Revit Onebox, I used to make copies of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/developer-center-and-sdk-update.html#12">
+Revit API assemblies for the different flavours</a>.</p>
+
+<p>With the advent of Onebox, I opted for the simpler solution of using the Revit API DLLs path updater RevitAPIDllsPathUpdater.exe.
+Simply launch it, enter the sample location and DLL folder, and let it do its job.
+In my case, I entered the following paths:</p>
+
+<ul>
+<li>C:\a\lib\revit\2014\SDK\Samples\RevitAPIDllsPathUpdater.exe</li>
+<ul>
+<li>Sample location: C:\a\lib\revit\2014\SDK\Samples</li>
+<li>DLL folder: C:\Program Files\Autodesk\Revit Architecture 2014</li>
+</ul>
+</ul>
+
+<p>It completes and reports that it "Replaced 169 files, skipped 0 files."</p>
+
+
+
+<a name="4"></a>
+
+<h4>First Compilation Run Causes Expected Errors</h4>
+
+<p>With the correct assembly paths in place, it is time to open the Visual Studio solution SDKSamples2014.sln and compile the samples.</p>
+
+<p>The first run reports
+
+<a href="zip/sdk_samples_2014_01.txt">Rebuild All: 166 succeeded, 3 failed, 0 skipped</a>.</p>
+
+<p>This no surprise, because there are some expected errors.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Set up the RevitAddInUtility Assembly Path</h4>
+
+<p>The first error is caused by the RevitAddInUtilitySample and says: "The type or namespace name 'Autodesk' could not be found (are you missing a using directive or an assembly reference?)"</p>
+
+<p>The RevitAddInUtilitySample references the RevitAddInUtility assembly.
+It is also located in the Revit API assembly path, but RevitAPIDllsPathUpdater.exe does not take it into account, so you have to open that project and set the assembly path manually instead:</p>
+
+<center>
+<img src="img/sdk_samples_2014_01.png" alt="RevitAddInUtilitySample API reference"/>
+</center>
+
+<p>In my case, the correct reference path to it is C:\Program Files\Autodesk\Revit Architecture 2014\RevitAddInUtility.dll.</p>
+
+
+<a name="6"></a>
+
+<h4>PointCurveCreation Office Reference</h4>
+
+<p>The Massing PointCurveCreation sample references Microsoft.Office.Interop.Excel in order to interact with spreadsheets.</p>
+
+<p>I have not set up Office on my virtual machine, so that caused an error saying "The type or namespace name 'Office' does not exist in the namespace 'Microsoft' (are you missing an assembly reference?)"</p>
+
+<!--
+<p>Happily, some other Autodesk products apparently require it as well, and I found a copy of it in 'C:\Program Files\Common Files\Autodesk Shared\Extensions 2014\Framework\Interop\Microsoft.Office\Microsoft.Office.Interop.Excel.dll'.</p>
+
+<p>For some strange reason, this also forced me to reference Microsoft.CSharp.</p>
+-->
+
+<p>For a quick ad hoc solution to this, I simply unloaded this one project for the time being. </p>
+
+
+<a name="7"></a>
+
+<h4>CancelSave RevitAddInUtility Reference</h4>
+
+<p>The next problem occurs in the Events CancelSave sample: "The type or namespace name 'RevitAddIns' does not exist in the namespace 'Autodesk' (are you missing an assembly reference?)"</p>
+
+<p>Same resolution as <a href="#5">above</a>, set the RevitAddInUtility assembly path.</p>
+
+<p>Wow!</p>
+
+<p>That was it!</p>
+
+<p>No more errors, just 345 warnings saying 'There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64", "AMD64". This mismatch may cause runtime failures. Please consider changing the targeted processor architecture of your project through the Configuration Manager so as to align the processor architectures between your project and references, or take a dependency on references with a processor architecture that matches the targeted processor architecture of your project'.</p>
+
+<p>I assume you can ignore those.</p>
+
+<p>This was a smoother compilation than ever before.</p>
+
+
+<a name="8"></a>
+
+<h4>Set up the RvtSamples Application</h4>
+
+<p>I always install RvtSamples to load all the other SDK samples if I ever want to test something in one of them.</p>
+
+<p>It saves you from installing them one by one, which might prove a lengthy process, there being well over a hundred of them.</p>
+
+<p>To do so, I first add two files to the RvtSamples project, its add-in manifest and its text file listing all the samples to load:</p>
+
+<center>
+<img src="img/sdk_samples_2014_02.png" alt="Add manifest and sample list to RvtSamples project"/>
+</center>
+
+<p>In the text file, I replace the samples path by my real installation folder, globally replacing "Z:\SDK2013\Samples\" by "C:\a\lib\revit\2014\SDK\Samples\".</p>
+
+<p>At the end, I add placeholders for my two include files, for the Autodesk Developer Network ADN and The Building Coder sample collections:</p>
+
+<pre>
+##include C:\a\lib\revit\2014\adn\src\AdnSamples.txt
+#include C:\a\lib\revit\2014\bc\BcSamples.txt
+</pre>
+
+<p>The ADN samples are commented out, because we have not completed their migration yet.</p>
+
+<p>I already
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/migrating-the-building-coder-samples-to-revit-2014.html">
+migrated The Building Coder samples to Revit 2014</a>,
+
+though, so that include file is already active.</p>
+
+<p>I need to add the RvtSamples assembly path to its add-in manifest and install that in the Revit Add-Ins folder, and we are set to go.</p>
+
+
+
+
+<a name="9"></a>
+
+<h4>Fix errors in RvtSamples.txt</h4>
+
+<p>As usual, the list of samples to load specified by RvtSamples.txt is not perfectly set up.
+Here are some of the add-ins causing errors on my system:</p>
+
+<ul>
+<li>RotateFramingObjects</li>
+<li>ProjectUnit (missing)</li>
+<li>GenericModelCreation</li>
+<li>ElementViewer</li>
+<li>PointCurveCreation (my fault)</li>
+<li>TraverseSystem</li>
+<li>CreateShared</li>
+<li>BarDescriptions (missing)</li>
+<li>StructuralLayerFunction</li>
+</ul>
+
+<p>ProjectUnit is missing, presumably because the unit API changed in Revit 2014 and the sample has been removed.
+It is still listed in RvtSamples.txt, and should be removed there as well.</p>
+
+<p>Most of the others are caused by VB.NET samples listed in their 'bin' subfolder, whereas their assembly DLL really lives in 'bin/Debug', at least on my system, and vice versa, in the case of CreateShared.</p>
+
+<p>After my first clean-up pass, the following still cause problems:</p>
+
+<ul>
+<li>GenericModelCreation</li>
+<li>PointCurveCreation (my fault)</li>
+<li>TraverseSystem</li>
+<li>CreateShared</li>
+<li>BarDescriptions (missing)</li>
+<li>StructuralLayerFunction</li>
+</ul>
+
+<p>Again, these are almost all VB.NET samples.
+Something strange going on with those.</p>
+
+<p>There is a testing switch you can set in the RvtSamples source code, actually:</p>
+
+<pre>
+  bool testClassName = true;
+</pre>
+
+<p>Setting it to true turns up more errors:</p>
+
+<ul>
+<li>DeleteObject</li>
+<li>HelloRevit</li>
+<li>RotateFramingObjects</li>
+<li>MaterialProperties</li>
+<li>SlabProperties</li>
+<li>CreateBeamsColumnsBraces</li>
+<li>StructuralLayerFunction</li>
+</ul>
+
+<p>I fixed some of these, but not all.</p>
+
+<p>Anyway, I'll stop fixing this for today, though, because I have other things to do as well.</p>
+
+<p>RvtSamples loads now and most of the samples are available:</p>
+
+<center>
+<img src="img/2014_rvtsamples.png" alt="RvtSamples in Revit 2014"/>
+</center>
+
+
+
+<a name="10"></a>
+
+<h4>Download RvtSamples and RevitLookup</h4>
+
+<p>Here is my current version of
+
+<a href="zip/2014_RvtSamples.zip">RvtSamples</a>,
+
+and also of
+
+<a href="zip/2014_RevitLookup.zip">RevitLookup</a>,
+
+which was missing from some intermediate versions of the SDK samples.
+
+<p>The RvtSamples package includes both the original and my modified add-in manifest and RvtSamples.txt sample list.
+You can compere them to see the changes I applied, and add analogous changes of your own for any other samples that you wish to activate.</p>
+
+<p>I hope this is of use to you.</p>
+
+<p>This article was picked for TenLinks Daily by <a href="http://www.caddigest.com/current.htm">www.caddigest.com</a>.</p>
+
+<center>
+<img src="img/CADdigest_selection.jpeg" alt="CADdigest"/>
+</center>
+
+<p>Actually, taking a closer look at the CAD digest listing, I currently count 53 of The Building Coder articles listed there.
+I was not aware of that before.
+Surprise, surprise  :-)</p>

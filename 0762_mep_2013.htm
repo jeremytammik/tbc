@@ -1,0 +1,90 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit 2013 MEP API and External Services</h3>
+
+<p>I mentioned a few 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#3">
+MEP-specific enhancements</a> in 
+
+the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a>.
+
+To recap, the enhancements include:
+
+<!--
+
+New MEP properties and calculation functionality enhance the analysis and simulation functionality
+
+In Revit MEP 2012, you can only define one single default elbow, tee, etc., which is rather limiting. In Revit 2013, however, numerous different setting for different materials and sizes are supported. One of the major MEP API additions provides access to the routing preferences, as demonstrated by the new Routing Preference Analysis SDK sample. Enhancements include programmatic selection of pipe sizes, materials, fitting types, calculation of pipe and duct friction factors, better handling of duct and pipe sections with the new MEPSection base class, handling of viscosity and density at specified temperatures, read and write access to spare circuit values, and retrieval of the localized user-visible display strings for enumeration values.
+
+New physical properties include a new class ThermalProperties, an additional structural material element, structural and thermal material assets that can be shared, and the ability to indicate if thermal information is included in the gbXML export. 
+
+A Light and Light Group API provides new classes to get and set photometric data, including initial color and intensity, loss factor, color filter and dimming color.
+
+The new ReferenceIntersector class mentioned above provides simplified and more performant ray-cast selection of elements using a given point and direction, similar to the existing FindReferencesWithContextByDirection method, with additional support for filtering the output, e.g. to collect elements, meshes, edges, curves, and faces. 
+
+Arnost Lobel Re: external service examples?
+Yes, the framework is there in 2013 and is fully functional.
+But there are no in-house external services yet for which external servers could be written.
+And that is the reason we will not have any examples until 2014.
+
+-->
+
+<ul>
+<li>Access to routing preferences, selection of pipe sizes, materials, fitting types, and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#3">
+RoutingPreferenceTools SDK sample</a> demonstrating its use
+
+<li>Pipe and duct friction factors
+<li>MEPSection base class for duct and pipe sections 
+<li>Viscosity and density at specified temperatures, new FluidType and enhanced FluidTemperature classes
+<li>Read and write access to panel schedule spare circuit values
+<li>Access to localized user-visible display strings for enumeration values via new LabelUtils.GetLabelFor overloads
+<li>ConnectorProfileType and PartType enumeration changes
+<li>ConnectorElement changes in the family environment, and new static creation methods replacing the obsolete ones on the FamilyItemFactory class.
+<li>A new ThermalProperties class, thermal material assets, thermal information in gbXML
+<li>New calculation functionality and the <a href="#3">external services framework</a>
+<li>MEP piping, system routing and centre line functionality
+<li>A new Light and Light Group API
+<li>ReferenceIntersector class
+</ul>
+
+<p>For more information on these and many other Revit API enhancements, please refer to the What's New section of the Revit API help file RevitAPI.chm.
+
+<p>Here are some additional notes on the external services framework:
+
+
+<a name="3"></a>
+
+<h4>External Services Framework</h4>
+
+<p>The new External Services framework wraps external service functionality, enabling certain services such as analysis or calculations to be encapsulated and replaced, providing a basis for future MEP calculations and structural code checking. 
+The following excerpt from the Revit API help file RevitAPI.chm description of the new ExternalService class provides a pretty good idea of its use:
+
+<p>This is a base class from which SingleServerService and MultiServerService classes are inherited. 
+It implements all basic methods, and the inherited classes add more specific methods. 
+Use this base class to get information about a service and its servers, and the inherited classes to set or get active servers. 
+Functionality:
+
+<ul>
+<li>Add and remove a server to and from a service
+<li>Query information about a service
+<li>Access servers currently registered for a service
+<li>Get and set active server (or servers) for a service
+</ul>
+
+<p>Although the framework is in place and fully functional in Revit 2013, no in-house external services making use of external servers have yet been implemented.
+For this reason, no examples of this framework have yet been provided.
+
+<p>The next thing I intend to do regarding Revit MEP is migrate my trusty old AdnRme sample and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/mep-sample-code-for-revit-2012.html">
+MEP sample code for Revit 2012</a> to
+
+Revit 2013.

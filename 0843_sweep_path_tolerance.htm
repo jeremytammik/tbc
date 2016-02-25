@@ -1,0 +1,344 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07543519 [Need Criteria for viable PickPath-based Sweep Creation] 
+
+-->
+
+<h3>Sweep PickPath Tolerance Criteria</h3>
+
+<p>Here is a rather specialised and hitherto undocumented topic of great importance to anyone trying to model precise complex swept geometry.
+
+<p>The issues below arose exploring the tolerance requirements of the 'Pick Path' options in the Revit UI, which map to the ReferenceArray  and Reference input to the two FamilyItemFactory API calls for generating this kind of geometry:
+
+<pre>
+Sweep NewSweep(
+  bool isSolid,
+  ReferenceArray path,
+  SweepProfile profile,
+  int profileLocationCurveIndex,
+  ProfilePlaneLocation profilePlaneLocation );
+
+SweptBlend NewSweptBlend(
+  bool isSolid,
+  Reference path,
+  SweepProfile bottomProfile,
+  SweepProfile topProfile );
+</pre>
+
+<p>It required quite a bit of research to resolve, both by the Revit development team and most of all by 
+
+<a href="mailto:bill@marincad.com">Bill Adkison</a> of 
+
+MarinCAD Custom Software Engineering, who is using this to create detailed furniture families like this:</p>
+
+<center>
+<img src="img/bill_furniture_family.png" alt="Furniture family with sweeps" width="400"/>
+</center>
+
+<p>Bill ran into a number of issues creating these very precise and detailed sweeps.
+
+<p>Here is an example of some of the ensuing discussions and results:
+
+
+<p><strong>Question:</strong> I have problems with sweeps created via PickPath. 
+
+<p>I am creating many successful pickpath sweeps. 
+However, in some cases, pickpath sweeps are failing with a MemoryAccessViolation. 
+
+<p>One example has two model lines which can each be selected to create a PickPath sweep, but when both are selected together, the sweep fails. 
+I have confirmed that their endpoints meet up. 
+One curve is a Hermite spline, the other a line. 
+When I convert the spline to a set of line segments connecting the fit points, it works. 
+What is the problem with connecting these two curves into a common sweep pattern? 
+They fail interactively as well as via API.
+This is still basically a programming problem, because I need to know the criteria for when attaching splines and arcs will work.
+
+In another case of failure, a model line and a model arc of short radius: 0.34 inches, and included arc of .61 radians, so the ultimate arc length is .224 inches, well above the 1/32" Revit precision threshold.
+You can sweep these curves independently, but they do not sweep when picked together. 
+In the debugger, their endpoints line up.
+
+
+<p><strong>Answer:</strong> There is a small gap between the line and arc in the model that causes the problems for that sweep path. 
+Such gaps should be avoided.
+
+<p>Other conditions to watch out for are curves that are nearly tangent, but not quite tangent, or arcs with very large radii that are nearly indistinguishable from lines.
+
+<p>Here are some internal observations which may help give an idea of what is going on:
+
+<p>1. CollectPath3dCurveGRefs complains about the gap between the line and arc in the model. The gap has size about 9.8e-6, but that function uses DOUBLE_EPS (= 1.0e-9) as a point-to-point tolerance. It issues a DBG_WARN but returns ERR_SUCCESS when it finds a gap.
+
+<p>The unit tangents of the line and arc at the point where they (nearly) meet differ by about 0.002 in the z-coordinate (and somewhat less than that in the y-coordinate).
+Apparently, Revit can bridge huge angles in lines, while being rather intolerant of even small angles in other areas.
+
+<p>CreateSweptSolid calls fixGapsInSweepPath, which calls trimCurvesToNbrs, but the latter function uses sqrt(0.1)*DOUBLE_EPS as a point-to-point tolerance, so it considers the gap to need "repair". It attempts to intersect the line and the arc, but that ultimately calls circXLine2d, which uses DOUBLE_EPS as a tolerance, so that function does not find an intersection. TrimCurvesToNbrs therefore does not modify the path (i.e., it does not "fix" the gap). It does check that the result is continuous to within a certain tolerance, but it uses the vertex tolerance for that check, and this gap is smaller than the vertex tolerance (which is about 0.0005).
+
+<p>CreateSweptSolid ultimately fails because getCornerTurningTrf fails when finding the corner-turning transform from the line to the arc, because vecAlmostEqual(cornerPnt1, cornerPnt2) is false. This essentially uses DOUBLE_EPS as a point-to-point tolerance. I confirmed that avoiding that rejection in the debugger allows the swept solid to be constructed successfully. Nevertheless, such gap and lack of tangency should be avoided whenever possible.
+
+<p>2. In the model, the line and the Hermite spline are not accurately tangent. Their tangent vectors at the point where the curves meet differ by about 0.01 in one of the coordinates; they meet at an angle of about 0.017 radians (= 1.02 degrees). While computing the mitre surface between the line and the spline, getMiterCurve then calls pathSegsAreNearlyTangent, but that uses a tolerance of one degree, so this case doesn't even meet the criterion for being nearly tangent. getMiterCurve then fails at the check for parallel normVec = (0.49, -0.85, 0.13) and planeNorm = (-0.86, -0.5, 0.0) (approximately).
+
+<p>PlaneNorm is the normal vector of the plane of the sweep path, as computed by getMiterCurve, while normVec was passed down from createSweepAlongCurve, where it was computed by a call to getRadii, which gets it directly from the sweep frame passed to createSweptSolid.
+
+<p>3. Please make the line accurately tangent to the spline in the example. 
+They meet at an angle slightly greater than one degree.
+
+<p>Of course, making the line accurately tangent to the spline is a difficult numerical problem, and will involve modifying both curves, which are in different planes, which will also have to be modified.
+Alternatively, one could recognize the situation and either break the sweep, or go back to all line segments.
+
+<p>4. Please make analytic computations (i.e., those involving lines, arcs, planes, and other simple curves or surfaces as accurate as possible for double-precision floating-point computations. 
+In such cases, values that would ideally be equal should be considerably less than 1.0e-9. 
+In general, Revit expects points that are ideally coincident to have a distance considerably less than about 1/160". 
+In some cases, though, Revit code demands a tighter tolerance. 
+Curves that are ideally tangent should have an angle at most 0.1 degrees.
+
+<p>The failure to create a sweep for the line/spline path in the sample with a circular profile of radius about 0.4329 might be fixed by making the line tangent to the spline.
+
+
+<p>5. There seem to be a number of hardcoded almost vertical and almost unit vectors in your code.
+
+<p>Revit definitely does not like slightly off-axis lines and planes.
+
+<p>It will certainly help stability if you can replace all vectors like the following one by the almost identical ones aligned with the cardinal axes:
+
+<pre class="code">
+  XYZ normalizedMajorAxis 
+    = new XYZ( 1.0,
+      -0.00000000000024924835886401896,
+      0.0000000000000012680828609390458 );
+</pre>
+
+<p>Specifying very slightly off-axis data is just asking for trouble.  
+Do you really need to model anything that absolutely has to be so slightly off-axis?  
+Is rounding an option for the input data you provide?
+This is not hard, once you are aware of the issue.
+
+
+
+<p><strong>Response:</strong> 1. Details such as the point-to-point tolerance is exactly the kind of information I am looking for. 
+
+<p>The gap in my data is a somewhat bigger than I expected, so I will write code to re-close them after my Revit computations are finished.
+
+<p>Does the fact that the tangents differ by this amount matter, i.e. cause the failure? 
+Sweep handles 90-degree corners for line segments. 
+Do non-lines have to have matching tangents? 
+If so, that is great to know, as well as utterly unobvious.
+I can take evasive action if the tangents must match.
+
+<p>What is 'the vertex tolerance' exactly, in contrast to 'point to point'? 
+For use by sweeps or path validation after the basic point to point? 
+Is it used for Angles? 
+Should I just be concerned with the DOUBLE_EPS distance for this problem? 
+
+<p>2. So you require tangency for connecting PickPath segments that aren't lines? 
+That is good to know.
+As noted earlier, because PickPath works with corners between lines, I assumed there was no tangent requirement for connecting elements, nor did I see any in the documentation. 
+So to clarify the rules: must connecting PickPath elements have shared tangents at their connection point, UNLESS they are bound line segments? 
+Here is the current list of possibilities:
+
+<ul>
+<li>Line &ndash; Line: no tangency requirements.
+<li>Line &ndash; Spline: tangency required.
+<li>Line &ndash; Arc: tangent required or no?
+<li>Spline &ndash; Arc: ?
+<li>Spline &ndash; Spline: ?
+<li>Spline &ndash; Arc: ?
+</ul>
+
+<p>If tangency requirements are a problem, I will correct them if possible, or revert to line segments.
+
+<p>I updated my logic to detect gaps and tangential inequality at connection points of 
+
+multi-curve PickPaths, leading to the key logic summarised in the following code:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit angle tolerance: 1 degree</span>
+&nbsp; <span class="gray">///</span><span class="green"> has been shown to be stable.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> kRevitAngleTolerance = <span class="teal">Math</span>.PI / 180.0;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> curCurveStartPt = <span class="blue">null</span>; <span class="green">// from current curve</span>
+&nbsp; <span class="teal">XYZ</span> prevCurveEndPt = <span class="blue">null</span>; <span class="green">// from previous curve or null</span>
+&nbsp; <span class="teal">XYZ</span> shiftVector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Use DOUBLE_EPS tolerance in IsAlmostEqualTo </span>
+&nbsp; <span class="green">// for legitimate endpoint proximity.</span>
+&nbsp;
+&nbsp; <span class="blue">bool</span> shiftCurve = ( prevCurveEndPt != <span class="blue">null</span> ) 
+&nbsp; &nbsp; &amp;&amp; !curCurveStartPt.IsAlmostEqualTo( 
+&nbsp; &nbsp; &nbsp; prevCurveEndPt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( shiftCurve )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// This case very rarely triggers.</span>
+&nbsp;
+&nbsp; &nbsp; shiftVector = curCurveStartPt.Subtract( 
+&nbsp; &nbsp; &nbsp; prevCurveEndPt );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> nextCurveStartTan = <span class="blue">null</span>; <span class="green">// from next curve or null</span>
+&nbsp; <span class="blue">bool</span> nextCurveIsLine = <span class="blue">null</span>; <span class="green">// from next curve, if any</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> curCurveEndTan = <span class="blue">null</span>; <span class="green">// from current curve</span>
+&nbsp; <span class="blue">bool</span> curCurveIsLine = <span class="blue">null</span>; <span class="green">// from current curve</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> epsTanAngle = nextCurveStartTan.AngleTo( 
+&nbsp; &nbsp; curCurveEndTan );
+&nbsp;
+&nbsp; <span class="green">// Use cited tolerance of 1 degree between </span>
+&nbsp; <span class="green">// connecting endpoint tangent vectors. </span>
+&nbsp; <span class="green">// I actually experimented with up to 5 degrees, </span>
+&nbsp; <span class="green">// and although I observed cases of tangent </span>
+&nbsp; <span class="green">// differences of at least 2.6 degrees to</span>
+&nbsp; <span class="green">// successfully sweep, sometimes it works and </span>
+&nbsp; <span class="green">// sometimes it excepts.</span>
+&nbsp; <span class="green">// 1 degree has held up well so far; </span>
+&nbsp; <span class="green">// I have no known failures with it.</span>
+&nbsp; <span class="green">// But the result is annoying notches in Revit </span>
+&nbsp; <span class="green">// in places where AutoCAD sweeps can handle </span>
+&nbsp; <span class="green">// the same curves automatically.</span>
+&nbsp;
+&nbsp; <span class="blue">bool</span> writeSweepNow = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( ( nextCurveStartTan != <span class="blue">null</span> )
+&nbsp; &nbsp; <span class="green">// connecting lines have unequal </span>
+&nbsp; &nbsp; <span class="green">// tangents but work in Revit.</span>
+&nbsp; &nbsp; &amp;&amp; ( !curCurveIsLine || !nextCurveIsLine ) 
+&nbsp; &nbsp; &amp;&amp; ( epsTanAngle &gt; kRevitAngleTolerance ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Break off sweep and start a new one;</span>
+&nbsp; &nbsp; <span class="green">// when tangent angles exceed this, </span>
+&nbsp; &nbsp; <span class="green">// the sweep can except.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Final code to tweak current curve tangents </span>
+&nbsp; &nbsp; <span class="green">// would go here; this is a big project in itself.</span>
+&nbsp;
+&nbsp; &nbsp; writeSweepNow = <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// if (shiftCurve)</span>
+&nbsp;
+&nbsp; <span class="green">// Current curve is re-read, with shift in </span>
+&nbsp; <span class="green">// location set in shiftVector.</span>
+&nbsp; <span class="green">// Append current curve to model and record its </span>
+&nbsp; <span class="green">// references in current curve reference array.</span>
+&nbsp;
+&nbsp; <span class="green">// if (writeSweepNow)</span>
+&nbsp;
+&nbsp; <span class="green">// Sweep is written with current curve, and new </span>
+&nbsp; <span class="green">// Sweep begins with the next curve.</span>
+&nbsp; <span class="green">// Loop until all curves are accumulated, </span>
+&nbsp; <span class="green">// then write final sweep.</span>
+</pre>
+
+<p>This eliminates all the failures due to connecting multiple curves in PickPath sweep creation. 
+
+
+<a name="2"></a>
+
+<h4>MEP Calculations</h4>
+
+<p>A second question was raised on another rather specialised calculation topic:
+
+<p><strong>Question:</strong> Can you point to any documents describing the Revit MEP calculation methodology?
+
+<p><strong>Answer:</strong> The MEP calculations are described in the 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00001-Revit_He0/3251-Referenc3251">
+Revit WikiHelp Reference</a>.
+
+<p>You can also look at Martin Schmid's Autodesk University 2010 classes 
+
+<a href="http://au.autodesk.com/?nd=event_class&jid=610976&session_id=7208">
+ME330-3 Calculations in Revit MEP</a>,
+
+primarily focused on duct and pipe, and
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=7645&jid=623937">
+ME231-2 Categorically, Demand It on Your Schedule: You Con-Du-It in Revit MEP</a>,
+
+with a focus on electrical calculation.
+
+The former includes a video recording.
+
+
+<a name="3"></a>
+
+<h4>The Hub Class</h4>
+
+<p>Saikat Bhattacharya published an article taking a look at the Revit API Hub class, never before mentioned here.
+It lives in the Autodesk.Revit.DB.Structure namespace and is derived from the base Element class.
+It represents a connection between two or more Revit Elements, avoiding the need to connect them with each other directly.
+They each refer to the hub, which manages all the connectivity information for them.
+Its interface is pretty minimal; the only members not inherited from Element appear to be:
+
+<ul>
+<li>GetHubConnectorManager to retrieve the hub ConnectorManager.
+<li>HasOrigin to indicate whether the hub has a specific location in 3D space.
+<li>GetOrigin to retrieve the hub 3D position, if it has one.
+</ul>
+
+<p>Saikat presents a sample code snippet showing how to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/accessing-element-ids-of-elements-connected-to-a-hub.html">
+access the elements connected to a given hub</a>.
+
+
+<a name="4"></a>
+
+<h4>Leaving the Unshaved</h4>
+
+<p>I shaved again, after a couple of weeks of abstinence.
+Here is a last parting shot before leaving the unshaved masses, and afterwards:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-10-13_kiental/img_0765_0794_jeremy_unshaved_shaved.jpg" alt="Jeremy unshaved and shaved" width="400"/>
+</center>
+
+<p>Note the prow of a boat sticking out of the wall in the left-hand picture... where was this photo taken, please?
+
+<!--
+
+describes a 
+
+06988653 [Constructing a Sweep along a 3D path in Revit via API in a Furniture Family]
+
+bill_ACAD_Sweep_of_3D_Path.jpg
+bill_Revit_Series_of_SweptBlend_among_segments_in_3D_Space.jpg
+bill_Revit_Single_Sweep_along_3D_Path_in_Furniture_Family.jpg
+
+NewSweep
+
+  C:\a\j\adn\case\sfdc\06988653\06988653.txt(3):Bill AdkisonMarinCAD
+  C:\a\j\adn\case\sfdc\07350332\07350332.txt(3):Bill AdkisonMarinCAD
+  C:\a\j\adn\case\sfdc\07543519\07543519.txt(3):Bill AdkisonAconex - North America - Inc.
+
+http://feedproxy.google.com/~r/AecDevblog/~3/yYX4OQvpeso/accessing-element-ids-of-elements-connected-to-a-hub.html
+
+http://adndevblog.typepad.com/aec/2012/10/accessing-element-ids-of-elements-connected-to-a-hub.html
+
+http://feedproxy.google.com/~r/AecDevblog/~3/weoqTs-Kmaw/deleting-a-collection-of-elementsfamilies-alternative-correct-approaches.html
+
+http://adndevblog.typepad.com/aec/2012/10/deleting-a-collection-of-elementsfamilies-alternative-correct-approaches.html
+
+<p>Here is an example of a 
+
+<a href="">
+</a>
+
+<a name="2"></a>
+
+<h4></h4>
+
+<pre class="code">
+...code...
+</pre>
+
+<ul>
+<li>
+</ul>
+
+-->

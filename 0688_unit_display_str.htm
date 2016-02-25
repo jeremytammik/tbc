@@ -1,0 +1,495 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- 1272810 [string or double to AsValueString]
+  SPR215464 [API wish: convert DisplayString to double value]
+
+Victor ChekalinVV
+
+656_unofficial_param.htm
+
+-->
+
+<h3>Unit Conversion and Display String Formatting</h3>
+
+<p>AU went very well for me, and I think this was the one I liked most of all so far, to my own surprise.
+Now I am already at the next conference in Moscow, from where I continue to Tel Aviv tomorrow.
+December is always my monster travelling month, and I never get to prepare for Christmas or enjoy the dark and cosy celebration of
+
+<a href="http://en.wikipedia.org/wiki/Advent">
+Advent</a>.
+
+But I really did have fun and enjoy AU in Las Vegas.
+
+<p>Sunday morning my colleague Marat Mirgaleev invited me to join him in his weekly volleyball game, which was a wonderful break from the conference presentation preparation.
+Marat is also a member of the ADN DevTech team and spelled Марат Миргалеев in Cyrillic.
+Another Autodesk colleague who also joined was Rustam Ibragimov, Рустам Ибрагимов.
+Here are Rustam, Marat, I and our all-time star, the volleyball herself:</p>
+
+<center>
+<img src="img/rustam_marat_jeremy_volleyball.jpg" alt="Rustam, Marat, Jeremy and the volleyball" width="400"/>
+</center>
+
+<p>Here we are now in the Autodesk Moscow office:</p>
+
+<center>
+<img src="img/devday_moscow_2011-12-05_8311.jpg" alt="DevDay conference in Moscow" width="400"/>
+</center>
+
+<p>Fittingly enough, here is a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html?cid=6a00e553e1689788330154379044c3970c#comment-6a00e553e1689788330154379044c3970c">
+question</a> from
+
+Russia, by Victor Chekalin, or Виктор Чекалин in Cyrillic, on formatting a floating point number as a display string using the current project units.
+This issue has cropped up several times recently, and various  solutions based on the same principle have been suggested, among others by Joe Offord of
+
+<a href="http://www.enclos.com">
+Enclos</a>,
+
+who already shared insights on accessing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">
+curtain wall geometry</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/speed-up-selection.html">
+speeding up the interactive selection process</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/mirroring-in-a-new-family-and-changing-active-view.html">
+mirroring in a new family and changing the active view</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/planar-face-transform.html">
+constructing a planar face transform</a>.
+
+<p>All of the solutions to this problem I have seen revolve around stuffing in the value to format into an unused parameter picked up from some arbitrary database element and then calling the AsValueString method on it.
+The Parameter class provides this functionality, but unfortunately the API does not include any stand-alone access to it.
+
+
+Here is Victor's initial query:
+
+<p><strong>Question:</strong> I need to convert a numeric value to a corresponding display string honouring the current Revit ProjectUnit setting. I cannot find how to do it in the Revit help and began search the answer in your amazing site. I found the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">
+Unit Conversion</a> tool
+
+and thought it would fulfil my need, but I was wrong :(
+
+<p>Looking at the Unit Converter code, I discovered that retrieving scale factor to internal units is not easy and you used some trick to get it: you change ProjectUnit, write "1" to family parameter, read value from this parameter, change ProjectUnit back. It works but is really hard and is not an official way.
+
+<p><strong>Answer:</strong> Try something like this on some otherwise unused length parameter 'p':
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> value <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;=2' + 4'/3&quot;</span>
+&nbsp; <span class="blue">Dim</span> t <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc, <span class="maroon">&quot;Format Length&quot;</span>)
+&nbsp; t.Start()
+&nbsp; p.SetValueString(value)
+&nbsp; value = p.AsValueString
+&nbsp; t.RollBack()
+&nbsp; <span class="blue">Return</span> value
+</pre>
+
+<p>In fact, Joe provided the following helper methods based on this idea implemented in VB:
+
+<ul>
+<li>StringValueString &ndash; Converts a string to AsValueString equivalent.
+<li>DblValueString &ndash; Converts a double to AsValueString equivalent.
+<li>ValueStringDbl &ndash; Converts a ValueString to a double.
+</ul>
+
+<p>All three of these methods create and then roll back a temporary transaction to perform their task.
+
+<p>Here is the full implementation of the first of these, StringValueString:
+
+<pre class="code">
+&nbsp; <span class="blue">Public</span> <span class="blue">Shared</span> <span class="blue">Function</span> StringValueString( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> <span class="teal">Document</span>, _
+&nbsp; &nbsp; <span class="blue">ByVal</span> value <span class="blue">As</span> <span class="blue">String</span>) <span class="blue">As</span> <span class="blue">String</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">' Locate the arbitrary Length parameter</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> p <span class="blue">As</span> <span class="teal">Parameter</span> _
+&nbsp; &nbsp; &nbsp; = doc.ProjectInformation.Parameter( _
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter Name&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> p <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Revit&quot;</span>, _
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Missing Project Parameter: Parameter Name&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> value
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> tr <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc)
+&nbsp; &nbsp; tr.Start(<span class="maroon">&quot;Format Length&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; p.SetValueString(value)
+&nbsp; &nbsp; &nbsp; value = p.AsValueString
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; tr.RollBack()
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> value
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>For the second, DblValueString, simply replace the input argument by a floating-point value 'ByVal value As Double' and the two lines to perform the actual conversion by
+
+<pre class="code">
+    p.Set(value)
+    sValueString = p.AsValueString
+</pre>
+
+<p>Finally, for the third, ValueStringDbl, the input argument 'value' is again a string and the conversion to the floating-point return value is performed by
+
+<pre class="code">
+    p.SetValueString(value)
+    dValue = p.AsDouble
+</pre>
+
+<p><strong>Response:</strong> Thanks for the answer.
+
+<p>I wrote some simple extension methods for the Revit API Parameter class to get value in project units and in meters value.
+Now it works with Length, Volume and Area (now I don't need any more).
+It would take much time to add support for all unit conversions.
+
+<p>Here is the entire implementation of my
+
+<a href="http://pastebin.com/ULHxU95E">
+ParameterUnitConverter class</a>.
+
+It defines the following methods and data:
+
+<ul>
+<li>AsProjectUnitTypeDouble &ndash; Parameter extension method to retrieve double value parameter in ProjectUnits.
+<li>AsMetersValue &ndash; Parameter extension method to retrieve double value of parameter in meters unit, i.e. length in meters, area in square meters and volume in cubic meters.
+<li>ConvertParameterTypeToUnitType &ndash; static method to return the corresponding UnitType for a given ParameterType.
+<li>_map_parameter_type_to_unit_type &ndash; a dictionary mapping ParameterType enumeration values to the corresponding UnitType ones.
+</ul>
+
+<p>Here is the complete implementation of this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">ParameterUnitConverter</span>
+{
+&nbsp; <span class="blue">private</span> <span class="blue">const</span> <span class="blue">double</span> METERS_IN_FEET = 0.3048;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> AsProjectUnitTypeDouble(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Parameter</span> param )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( param.StorageType != <span class="teal">StorageType</span>.Double )
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter does not have double value&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> imperialValue = param.AsDouble();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> document = param.Element.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UnitType</span> ut = ConvertParameterTypeToUnitType(
+&nbsp; &nbsp; &nbsp; param.Definition.ParameterType );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FormatOptions</span> fo = document.ProjectUnit
+&nbsp; &nbsp; &nbsp; .get_FormatOptions( ut );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span> dut = fo.Units;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Unit Converter</span>
+&nbsp; &nbsp; <span class="green">// http://www.asknumbers.com</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">switch</span>( dut )
+&nbsp; &nbsp; {
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Length
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_METERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * METERS_IN_FEET; <span class="green">//feet</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CENTIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * METERS_IN_FEET * 100;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_DECIMAL_FEET:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_DECIMAL_INCHES:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 12;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_FEET_FRACTIONAL_INCHES:
+&nbsp; &nbsp; &nbsp; &nbsp; NotSupported( dut );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_FRACTIONAL_INCHES:
+&nbsp; &nbsp; &nbsp; &nbsp; NotSupported( dut );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_METERS_CENTIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * METERS_IN_FEET; <span class="green">//feet</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_MILLIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * METERS_IN_FEET * 1000;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span> <span class="green">// Length</span>
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Area
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_SQUARE_FEET:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_ACRES:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 1 / 43560.039;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_HECTARES:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 1 / 107639.104;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_SQUARE_CENTIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET * 100, 2 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_SQUARE_INCHES:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( 12, 2 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_SQUARE_METERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET, 2 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_SQUARE_MILLIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET * 1000, 2 );
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span> <span class="green">// Area</span>
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Volume
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_FEET:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_CENTIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET * 100, 3 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_INCHES:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( 12, 3 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_METERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET, 3 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_MILLIMETERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow( METERS_IN_FEET * 1000, 3 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_CUBIC_YARDS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 1 / <span class="teal">Math</span>.Pow( 3, 3 );
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_GALLONS_US:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 7.5;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">DisplayUnitType</span>.DUT_LITERS:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * 28.31684;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span> <span class="green">// Volume</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; NotSupported( dut );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>();
+&nbsp; }
+
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> AsMetersValue(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Parameter</span> param )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( param.StorageType != <span class="teal">StorageType</span>.Double )
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter does not have double value&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> imperialValue = param.AsDouble();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UnitType</span> ut = ConvertParameterTypeToUnitType(
+&nbsp; &nbsp; &nbsp; param.Definition.ParameterType );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">switch</span>( ut )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">UnitType</span>.UT_Length:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * METERS_IN_FEET;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">UnitType</span>.UT_Area:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; METERS_IN_FEET, 2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">UnitType</span>.UT_Volume:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> imperialValue * <span class="teal">Math</span>.Pow(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; METERS_IN_FEET, 3 );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">UnitType</span>
+&nbsp; &nbsp; ConvertParameterTypeToUnitType(
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span> parameterType )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( _map_parameter_type_to_unit_type.ContainsKey(
+&nbsp; &nbsp; &nbsp; parameterType ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _map_parameter_type_to_unit_type[
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType];
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// If we made it this far, there's </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// no entry in the dictionary.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot convert ParameterType '&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + parameterType.ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;' to a UnitType.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ParameterType</span>, <span class="teal">UnitType</span>&gt;
+&nbsp; &nbsp; _map_parameter_type_to_unit_type
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ParameterType</span>, <span class="teal">UnitType</span>&gt;()
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// This data could come from a file, </span>
+&nbsp; &nbsp; <span class="green">// or (better yet) from Revit itself...</span>
+&nbsp;
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Angle, <span class="teal">UnitType</span>.UT_Angle},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Area, <span class="teal">UnitType</span>.UT_Area},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.AreaForce, <span class="teal">UnitType</span>.UT_AreaForce},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.AreaForcePerLength, <span class="teal">UnitType</span>.UT_AreaForcePerLength},
+&nbsp; &nbsp; <span class="green">//map.Add(UnitType.UT_AreaForceScale, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ColorTemperature, <span class="teal">UnitType</span>.UT_Color_Temperature},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Currency, <span class="teal">UnitType</span>.UT_Currency},
+&nbsp; &nbsp; <span class="green">//map.Add(UnitType.UT_DecSheetLength, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalApparentPower, <span class="teal">UnitType</span>.UT_Electrical_Apparent_Power},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalCurrent, <span class="teal">UnitType</span>.UT_Electrical_Current},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalEfficacy, <span class="teal">UnitType</span>.UT_Electrical_Efficacy},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalFrequency, <span class="teal">UnitType</span>.UT_Electrical_Frequency},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalIlluminance, <span class="teal">UnitType</span>.UT_Electrical_Illuminance},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalLuminance, <span class="teal">UnitType</span>.UT_Electrical_Luminance},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalLuminousFlux, <span class="teal">UnitType</span>.UT_Electrical_Luminous_Flux},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalLuminousIntensity, <span class="teal">UnitType</span>.UT_Electrical_Luminous_Intensity},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalPotential, <span class="teal">UnitType</span>.UT_Electrical_Potential},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalPower, <span class="teal">UnitType</span>.UT_Electrical_Power},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalPowerDensity, <span class="teal">UnitType</span>.UT_Electrical_Power_Density},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ElectricalWattage, <span class="teal">UnitType</span>.UT_Electrical_Wattage},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Force, <span class="teal">UnitType</span>.UT_Force},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ForceLengthPerAngle, <span class="teal">UnitType</span>.UT_ForceLengthPerAngle},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.ForcePerLength, <span class="teal">UnitType</span>.UT_ForcePerLength},
+&nbsp; &nbsp; <span class="green">//map.Add(UnitType.UT_ForceScale, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAirflow, <span class="teal">UnitType</span>.UT_HVAC_Airflow},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAirflowDensity, <span class="teal">UnitType</span>.UT_HVAC_Airflow_Density},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAirflowDividedByCoolingLoad, <span class="teal">UnitType</span>.UT_HVAC_Airflow_Divided_By_Cooling_Load},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAirflowDividedByVolume, <span class="teal">UnitType</span>.UT_HVAC_Airflow_Divided_By_Volume},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAreaDividedByCoolingLoad, <span class="teal">UnitType</span>.UT_HVAC_Area_Divided_By_Cooling_Load},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACAreaDividedByHeatingLoad, <span class="teal">UnitType</span>.UT_HVAC_Area_Divided_By_Heating_Load},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACCoefficientOfHeatTransfer, <span class="teal">UnitType</span>.UT_HVAC_CoefficientOfHeatTransfer},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACCoolingLoad, <span class="teal">UnitType</span>.UT_HVAC_Cooling_Load},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACCoolingLoadDividedByArea, <span class="teal">UnitType</span>.UT_HVAC_Cooling_Load_Divided_By_Area},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACCoolingLoadDividedByVolume, <span class="teal">UnitType</span>.UT_HVAC_Cooling_Load_Divided_By_Volume},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACCrossSection, <span class="teal">UnitType</span>.UT_HVAC_CrossSection},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACDensity, <span class="teal">UnitType</span>.UT_HVAC_Density},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACDuctSize, <span class="teal">UnitType</span>.UT_HVAC_DuctSize},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACEnergy, <span class="teal">UnitType</span>.UT_HVAC_Energy},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACFactor, <span class="teal">UnitType</span>.UT_HVAC_Factor},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACFriction, <span class="teal">UnitType</span>.UT_HVAC_Friction},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACHeatGain, <span class="teal">UnitType</span>.UT_HVAC_HeatGain},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACHeatingLoad, <span class="teal">UnitType</span>.UT_HVAC_Heating_Load},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACHeatingLoadDividedByArea, <span class="teal">UnitType</span>.UT_HVAC_Heating_Load_Divided_By_Area},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACHeatingLoadDividedByVolume, <span class="teal">UnitType</span>.UT_HVAC_Heating_Load_Divided_By_Volume},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACPower, <span class="teal">UnitType</span>.UT_HVAC_Power},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACPowerDensity, <span class="teal">UnitType</span>.UT_HVAC_Power_Density},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACPressure, <span class="teal">UnitType</span>.UT_HVAC_Pressure},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACRoughness, <span class="teal">UnitType</span>.UT_HVAC_Roughness},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACSlope, <span class="teal">UnitType</span>.UT_HVAC_Slope},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACTemperature, <span class="teal">UnitType</span>.UT_HVAC_Temperature},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACVelocity, <span class="teal">UnitType</span>.UT_HVAC_Velocity},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.HVACViscosity, <span class="teal">UnitType</span>.UT_HVAC_Viscosity},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Length, <span class="teal">UnitType</span>.UT_Length},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.LinearForce, <span class="teal">UnitType</span>.UT_LinearForce},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.LinearForceLengthPerAngle, <span class="teal">UnitType</span>.UT_LinearForceLengthPerAngle},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.LinearForcePerLength, <span class="teal">UnitType</span>.UT_LinearForcePerLength},
+&nbsp; &nbsp; <span class="green">// map.Add(UnitType.UT_LinearForceScale, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.LinearMoment, <span class="teal">UnitType</span>.UT_LinearMoment},
+&nbsp; &nbsp; <span class="green">// map.Add(UnitType.UT_LinearMomentScale, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Moment, <span class="teal">UnitType</span>.UT_Moment},
+&nbsp; &nbsp; <span class="gray">///</span><span class="green">map.Add(UnitType.UT_MomentScale, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Number, <span class="teal">UnitType</span>.UT_Number},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipeSize, <span class="teal">UnitType</span>.UT_PipeSize},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingDensity, <span class="teal">UnitType</span>.UT_Piping_Density},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingFlow, <span class="teal">UnitType</span>.UT_Piping_Flow},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingFriction, <span class="teal">UnitType</span>.UT_Piping_Friction},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingPressure, <span class="teal">UnitType</span>.UT_Piping_Pressure},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingRoughness, <span class="teal">UnitType</span>.UT_Piping_Roughness},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingSlope, <span class="teal">UnitType</span>.UT_Piping_Slope},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingTemperature, <span class="teal">UnitType</span>.UT_Piping_Temperature},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingVelocity, <span class="teal">UnitType</span>.UT_Piping_Velocity},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingViscosity, <span class="teal">UnitType</span>.UT_Piping_Viscosity},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.PipingVolume, <span class="teal">UnitType</span>.UT_Piping_Volume},
+&nbsp; &nbsp; <span class="green">//map.Add(UnitType.UT_SheetLength, ParameterType.???);</span>
+&nbsp; &nbsp; <span class="green">//map.Add(UnitType.UT_SiteAngle, ParameterType.???);</span>
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Slope, <span class="teal">UnitType</span>.UT_Slope},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Stress, <span class="teal">UnitType</span>.UT_Stress},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.TemperalExp, <span class="teal">UnitType</span>.UT_TemperalExp},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.UnitWeight, <span class="teal">UnitType</span>.UT_UnitWeight},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.Volume, <span class="teal">UnitType</span>.UT_Volume},
+&nbsp; &nbsp; {<span class="teal">ParameterType</span>.WireSize, <span class="teal">UnitType</span>.UT_WireSize},
+&nbsp; };
+}
+</pre>
+
+<p>I used some functions from the Unit converter.
+
+Here is an external command
+
+<a href="http://pastebin.com/Pu26SPAN">
+sample to test it</a> by
+
+iterating over and applying it to all floating point valued parameters on a selected element.
+
+<p>Hope you'll find this useful.
+
+<p>Many thanks to Joe and Victor for putting together and sharing these nice solutions!
+
+<p>I added the ParameterUnitConverter class to The Building Coder samples and defined a new external command CmdParameterUnitConverter based on Victor's code to test it.
+Here is
+
+<a href="zip/bc_12_96.zip">
+version 2012.0.96.0</a> of
+
+The Building Coder samples including the new utility class and command.
+
+<p>This is the output generated by the command in the Visual Studio debug output window on selecting a wall element in the rac_basic_sample_project.rvt sample model:
+
+<pre>
+Parameter name: Top Extension Distance
+  Parameter value (imperial): 0
+  Parameter unit value: 0
+  Parameter AsValueString: 0.0
+
+Parameter name: Length
+  Parameter value (imperial): 45.5
+  Parameter unit value: 13868.4
+  Parameter AsValueString: 13868.4
+
+Parameter name: Base Extension Distance
+  Parameter value (imperial): 0
+  Parameter unit value: 0
+  Parameter AsValueString: 0.0
+
+Parameter name: Top Offset
+  Parameter value (imperial): 0
+  Parameter unit value: 0
+  Parameter AsValueString: 0.0
+
+Parameter name: Volume
+  Parameter value (imperial): 455.9586023831
+  Parameter unit value: 12.911309795985
+  Parameter AsValueString: 12.911 m³
+
+Parameter name: Unconnected Height
+  Parameter value (imperial): 18.0446194225722
+  Parameter unit value: 5500
+  Parameter AsValueString: 5500.0
+
+Parameter name: Base Offset
+  Parameter value (imperial): 0
+  Parameter unit value: 0
+  Parameter AsValueString: 0.0
+
+Parameter name: Area
+  Parameter value (imperial): 694.880910031848
+  Parameter unit value: 64.5565489799251
+  Parameter AsValueString: 64.557 m²
+</pre>
+
+<p>Here, the parameter value labelled 'imperial' is the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">
+internal Revit database unit</a>, e.g.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">
+feet for length</a>.
+
+Please note that not all internal database units are imperial.
+In fact, only length is measured in feet, and thus also area and volume.
+Other internal units are
+
+<a href="http://en.wikipedia.org/wiki/International_System_of_Units">SI-based</a>.

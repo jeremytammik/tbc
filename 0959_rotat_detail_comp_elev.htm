@@ -1,0 +1,418 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Miroslav Schonauer 
+RE: [CRITICAL] RE: Wrong Rotation property for Detail Components in Elevation Views?
+
+-->
+
+<h3>Correct Detail Component Rotation in Elevation View</h3>
+
+<p>My colleague Miroslav Schonauer of Autodesk Consulting ran into and solved a critical issue to fix the unexpected values reported by the Rotation property on detail components in elevation views.
+
+<p>Here are the steps describing the problem and happy resolution in detail, followed by a quick note on my tech summit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#2">
+cloud-based round-trip 2D Revit model editing project</a>:</p>
+
+<ul>
+<li><a href="#2">Detail component rotation problem 1</a></li>
+<li><a href="#3">Detail component rotation problem 2</a></li>
+<li><a href="#4">Workaround description</a></li>
+<li><a href="#5">Workaround implementation</a></li>
+<li><a href="#6">Live recording and plans</a></li>
+</ul>
+
+<p>I was so busy wrapping up the Tech Summit and having internal meetings with colleagues here in the Autodesk Waltham and Manchester offices that I never got around to posting anything in the last two days
+It is nice to finally take some time and get some fresh information out to you again.</p>
+
+<p>Here is Miro's problem description and solution:</p>
+
+<a name="2"></a>
+
+<h4>Problem Description 1</h4>
+
+<p>I’ve been banging my head against this problem in Revit 2012 that I can reproduce in 2014 as well, both via UI and API.
+Basically, the Rotation property of LocationPoint for Detail Components in Elevation Views seems to be wrong.
+It all seems fine in Plan Views, by the way.</p>
+
+<p>For example, if one creates an instance of a 225mm Steel Purlin Detail Item from Arch.Template (top one below), the rotation should be 0, but RevitLookup shows it as 90 degrees.
+I rotated it by 30 degrees in UI, visually all worked as expected, but the property then reports 93.84 (middle one below, also snapshot provided of RevitLookup) instead of 30.
+Finally, the bottom instance is rotated by 90 degrees, but the reported value is 120.</p>
+
+<center>
+<img src="img/detail_comp_rot_1.png" alt="Detail component rotation" width="600"/>
+</center>
+
+<p>How can I correct the reported value, please?
+
+<p>By experimenting a bit, I’ve concluded that the values reported seem to correspond to the following wrong mapping (in degrees):</p>
+
+<table border="0" align="center">
+<tr><td style="text-align: right;">  0</td><td>&nbsp;&rarr;&nbsp;</td><td>90</td></tr>
+<tr><td style="text-align: right;"> 30</td><td>&nbsp;&rarr;&nbsp;</td><td>93.8409</td></tr>
+<tr><td style="text-align: right;"> 45</td><td>&nbsp;&rarr;&nbsp;</td><td>98.4210</td></tr>
+<tr><td style="text-align: right;"> 60</td><td>&nbsp;&rarr;&nbsp;</td><td>104.4775</td></tr>
+<tr><td style="text-align: right;"> 90</td><td>&nbsp;&rarr;&nbsp;</td><td>120</td></tr>
+<tr><td style="text-align: right;">120</td><td>&nbsp;&rarr;&nbsp;</td><td>138.5903</td></tr>
+<tr><td style="text-align: right;">135</td><td>&nbsp;&rarr;&nbsp;</td><td>148.6002</td></tr>
+<tr><td style="text-align: right;">150</td><td>&nbsp;&rarr;&nbsp;</td><td>158.9094</td></tr>
+<tr><td style="text-align: right;">180</td><td>&nbsp;&rarr;&nbsp;</td><td>180     </td></tr>
+</table>
+
+<p>By the way, mimicking the actual rotation action in API works fine, just as in UI, e.g. this behaves as expected:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyInstance</span> fiDetComp = <span class="blue">null</span>;
+
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = doc.get_Element(
+&nbsp; &nbsp; &nbsp; idSymbol ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; fiDetComp = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; data.Origin, fs, data.ParentView );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Rotate it if needed</span>
+
+&nbsp; &nbsp; <span class="blue">if</span>( Math.Abs( data.Rotation ) &gt; 0.0001 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> axis = app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; data.Origin, data.Origin
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + data.ParentView.ViewDirection );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; fiDetComp.Id, axis, data.Rotation );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>This produces the correct result, but the Rotation property still reports the wrong value afterwards.</p>
+
+
+<a name="3"></a>
+
+<h4>Problem Description 2</h4>
+
+<p>I just hit another manifestation of this issue that unfortunately may be a showstopper for the project I am working on.
+
+<p>I cannot believe nobody hit this issue in the last 5-6 years/releases since adding Details Families to the Views (i.e. NewFamilyInstance Method (XYZ, FamilySymbol, View) ) has been supported in API.</p>
+
+<p>It is very easy to reproduce and understand using pure Revit 2014 UI and RevitLookup.</p>
+
+<p>I created a very simple Detail Family from 'Metric Detail Component.rft' template as follows:</p>
+
+<center>
+<img src="img/detail_comp_rot_2.png" alt="Detail component rotation" width="600"/>
+</center>
+
+<p>I inserted the same Family Type four times in each of South/North/East/West Views <b>without</b> rotating the instance (i.e. as-is from 'Create Instance' right-click). Each of these family instances looks correct in each view, but the Rotation part of the Location Point, which I would expect to be 0.0 for each case, reports strange results, i.e. 90 degrees for South, 120 for East/West and 180 for North. Just check each of the Arrows in each of the Sheet Views (using 'Activate View' one by one):</p>
+
+<center>
+<img src="img/detail_comp_rot_3.png" alt="Detail component rotation" width="600"/>
+</center>
+
+<p>The problem is now obviously that when I create family instances programmatically, using something like the following with data.Rotation = 0.0, the results are not as expected, i.e. the instances are weirdly rotated:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyInstance</span> fiDetComp = <span class="blue">null</span>;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = doc.get_Element(
+&nbsp; &nbsp; &nbsp; idSymbol ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; fiDetComp = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; data.Origin, fs, data.ParentView );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Rotate it if needed</span>
+&nbsp; &nbsp; <span class="blue">if</span>( Math.Abs( data.Rotation ) &gt; 0.0001 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> axis = app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; data.Origin, data.Origin
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + data.ParentView.ViewDirection );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; fiDetComp.Id, axis, data.Rotation );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The bottom line is: how can I programmatically know which angle to use in place of data.Rotation in the above code to reliably obtain the expected results? If I use 0.0 as logical to place the component 'unrotated', the result is not as-expected and, even worse, not the same (i.e. rotation is wrong in different manners) in different elevations depending on the view direction of each elevation.</p>
+
+
+<a name="4"></a>
+
+<h4>Workaround Description</h4>
+
+<p>It seems clear that the Rotation property is not set up properly to deal with items placed outside of the XY plane.</p>
+<p>Revit should indeed not be presenting a calculated rotation angle without the corresponding calculated rotation axis that this number comes from.</p>
+
+<p>The fact that sometimes the instance is rotated on placement, but not always, seems to be a second issue to be aware of.</p>
+
+<p>However, more relevantly, here is some good news: you can get what you need working with the result obtained from the FamilyInstance.GetTransform method and computing rotation angles from that.</p>
+
+<p>Here are the routines to help, GetRotationAngleOfInstance and RotateInstance.
+<p>GetRotationAngleOfInstance calculates the rotation angle by comparing the transform with the transform generated from the X/Y/Z of the view.
+<p>RotateInstance rotates the instance using the view direction &ndash; it is hardcoded in this example for testing purposes.
+You can use the rotation angle difference you calculate and it should work:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> GetRotationAngleOfInstance()
+{
+&nbsp; <span class="teal">UIDocument</span> uiDoc = <span class="blue">this</span>.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> selection = uiDoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> selection.GetElementIds() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = uiDoc.Document.GetElement(
+&nbsp; &nbsp; &nbsp; id ) <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> trf = fi.GetTransform();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> viewDirection = uiDoc.ActiveView.ViewDirection;
+&nbsp; &nbsp; <span class="teal">XYZ</span> rightDirection = uiDoc.ActiveView.RightDirection;
+&nbsp; &nbsp; <span class="teal">XYZ</span> upDirection = uiDoc.ActiveView.UpDirection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Trf&quot;</span>, String.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;X{0} Y{1} Z{2}\nX{3} Y{4} Z{5}&quot;</span>,
+&nbsp; &nbsp; &nbsp; trf.BasisX, trf.BasisY, trf.BasisZ,
+&nbsp; &nbsp; &nbsp; rightDirection, upDirection, viewDirection ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Rotation Angle&quot;</span>,
+&nbsp; &nbsp; &nbsp; trf.BasisX.AngleOnPlaneTo( rightDirection,
+&nbsp; &nbsp; &nbsp; &nbsp; viewDirection ) * 180 / Math.PI );
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">void</span> RotateInstance()
+{
+&nbsp; <span class="teal">UIDocument</span> uiDoc = <span class="blue">this</span>.ActiveUIDocument;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> selection = uiDoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> selection.GetElementIds() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = uiDoc.Document.GetElement(
+&nbsp; &nbsp; &nbsp; id ) <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; uiDoc.Document, <span class="maroon">&quot;Rotate me&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = fi.Location <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> location = lp.Point;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> direction = uiDoc.ActiveView.ViewDirection;
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( location,
+&nbsp; &nbsp; &nbsp; &nbsp; location - direction );
+&nbsp; &nbsp; &nbsp; lp.Rotate( line, Math.PI / 2.0 );
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<a name="5"></a>
+
+<h4>Workaround Implementation</h4>
+
+<p>I can report that the workaround works very well.
+
+<p>I added one minor adjustment, changing:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( location,
+&nbsp; &nbsp; location - direction );
+</pre>
+
+<p>I replaced it by this instead:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( location,
+&nbsp; &nbsp; location + direction );
+</pre>
+
+<p>For convenience, we can also directly use this property:</p>
+
+<pre class="code">
+&nbsp; fi.HandOrientation;
+</pre>
+
+<p>That can replace the following two lines of code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Transform</span> trf = fi.GetTransform();
+&nbsp;
+&nbsp; trf.BasisX;
+</pre>
+
+<p>Here is my implementation code.
+Some variables/custom classes come from the specific cached context I have set up.
+Their meaning should be clear from the comments added to them:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Loop all cached data</span>
+&nbsp; <span class="green">// NOTE: DetailFaceData is a custom class </span>
+&nbsp; <span class="green">// caching all relevant data about the </span>
+&nbsp; <span class="green">// View / Origin and Rotation</span>
+&nbsp; <span class="green">// to insert each Detail Components into/at.</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( DetailFaceData data <span class="blue">in</span> lstDFD )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Get Symbol ID.</span>
+&nbsp; &nbsp; <span class="green">// This is the id of the Detail Component </span>
+&nbsp; &nbsp; <span class="green">// FamilySymbol to be inserted</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> idSymbol = GetSymbolId();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Insert Symbol</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> idDetComp
+&nbsp; &nbsp; &nbsp; = <span class="teal">ElementId</span>.InvalidElementId;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// 1) Insert with default rotation (should </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// be 0.0, but due to some issues not so - </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// see later)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">SubTransaction</span> tr
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tr.Start();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; idSymbol ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fiDetComp = doc.Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewFamilyInstance( data.Origin, fs,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.ParentView );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; idDetComp = fiDetComp.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; tr.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 2) Rotate it if needed</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// IMPORTANT NOTE: The commented 5 lines of </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// code below should be sufficient and fine,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// but there that rotation is NOT correct </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// for non-planar views :-(.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// E.g., if using 0 as the rotation, the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// instance IS weirdly rotated. Luckily, the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// .Rotate method itself still works fine, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// so the workaround is to first use the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Transform or HandOrientation to &quot;measure </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the wrongness&quot; and only then to .Rotate </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// it to the desired angle.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//if (Math.Abs(data.Rotation) &gt; 0.0001)</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; Line axis = app.Create.NewLineBound(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; &nbsp; data.Origin, data.Origin </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; &nbsp; &nbsp; + data.ParentView.ViewDirection);</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; ElementTransformUtils.RotateElement(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; &nbsp; doc, fiDetComp. Id, axis, data.Rotation);</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 2.1) Use Instance's Transform (or </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// directly HandOrientation) and View Axes </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to measure which angle (random for non-</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// plan views) Revit has created in step 1)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">SubTransaction</span> tr
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tr.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fiDetComp = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; idDetComp ) <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> viewDirection = data.ParentView.ViewDirection;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> rightDirection = data.ParentView.RightDirection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> rotActual = fiDetComp.HandOrientation
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AngleOnPlaneTo( rightDirection,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; viewDirection );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> rotDelta = data.Rotation - rotActual;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 2.2) Use .Rotate to fix the problem</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( Math.Abs( rotDelta ) &gt; 0.0001 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Either works fine:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Option 1:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> axis = app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Origin, data.Origin
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + data.ParentView.ViewDirection );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, fiDetComp.Id, axis, rotDelta );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//// Option 2:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//LocationPoint lp = fiDetComp.Location as LocationPoint;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//XYZ location = lp.Point;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//XYZ direction = data.ParentView.ViewDirection;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Line axis2 = _App.Create.NewLineBound(location, location + direction);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//lp.Rotate(axis2, rotDelta);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; tr.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Exception ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// log or handle this</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Very many thanks to Miro for researching this and sharing the solution.</p>
+
+<p>I hope this is of use to others also.</p>
+
+<p>By the way, note that this is the first time ever that Miro provided C# code instead of VB.</p>
+
+<p>What's up, Miro?  :-)</p>
+
+
+<a name="6"></a>
+
+<h4>Live Recording and Plans</h4>
+
+<p>As I already repeated all too often, I presented my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#2">
+cloud-based round-trip 2D Revit model editing project</a> at
+
+the Autodesk internal tech summit.</p>
+
+<p>I recorded the session and posted the 30-minute
+
+<a href="http://thebuildingcoder.typepad.com/room_editor_live/index.html">live recording</a> including
+
+an additional ten minutes of Q&A at the end.
+
+<p>The 30-minute
+
+<a href="http://thebuildingcoder.typepad.com/room_editor_preview/index.html">preview recording</a> that
+
+I already posted also remains available, and the content is somewhat different, in case you want the
+
+<a href="http://en.wikipedia.org/wiki/Full_monty_%28phrase%29">full monty</a>.</p>
+
+<p>Work on this project has not finished yet, of course.</p>
+
+<p>I added a significant number of new features to the Revit add-in that I have not yet discussed.</p>
+
+<p>My plan is to migrate the add-in from Revit 2013 to 2014, post it to GitHub and discuss the new features soon.</p>
+
+<p>Furthermore, the technology implemented has proven effective and reliable so far, and far simpler than any other approach I have seen to achieve similar results, so I should explore where else I can take this.</p>
+
+<p>If you have any suggestions or wishes, please let me know.
+I might implement whatever you ask for.</p>

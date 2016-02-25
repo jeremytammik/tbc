@@ -1,0 +1,334 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit Structure 2012 API</h3>
+
+<p>Sangsen recently submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/set-preview-image.html?cid=6a00e553e16897883301538e695543970b#comment-6a00e553e16897883301538e695543970b
+">
+couple</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html?cid=6a00e553e16897883301538e97d1a4970b#comment-6a00e553e16897883301538e97d1a4970b">of</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html?cid=6a00e553e168978833014e889b37e1970d#comment-6a00e553e168978833014e889b37e1970d">comments</a> which
+
+made it clear that a short overview of the new features of the Revit Structure 2012 API is overdue
+(see <a href="#2">below</a> for the <a href="#2">Q & A</a>).
+
+<p>Here is a description written by Joe Ye for our Spring 2011 ADN AEC newsletter:
+
+<h4>Autodesk Revit Structure 2012 API Migration Tips</h4>
+
+<p>This article discusses changes made to the Revit Structure 2012 API.
+We will quickly go over the list of items which have been changed, and look at the changes around rebar API in more detail.
+
+<h4>Overview of Revit Structure 2012 API Changes</h4>
+
+<p>The following is the list of changes made to the Revit Structure 2012 API:
+
+<ul>
+
+<li>Analytical model &ndash; analytical model class is now a subclass of Element. As a consequence of this change, when you create a new structural element, you will need to call Documentation.Regenerate() method before accessing its analytical model; i.e., the analytical model needs to be created first. Methods to access properties of an analytical model stay the same.
+
+<li>AnalyticalModelSelector &ndash; two constructors that take an index as an argument has been removed. You should use the version that accepts the curve directly.
+
+<li>SlabFoundationType &ndash; the enumeration value SlabFoundationType.Slab is now renamed as SlabOneWay. An additional option, SlabTwoWay has been added.
+
+<li>Track changes UI &ndash; Track change UI has been removed. If you wish to offer a similar functionality, you can implement a similar or more sophisticated functionality using transactions, events and updaters, aligning the Undo mechanism that the end user is familiar with.
+
+<li>NewBeamSystem() &ndash; this method accepts either sketch planes or the level.
+
+<li>NewTruss() &ndash; this method requires sketch plane as an argument.
+
+<li>Rebars and rebar shapes - syntaxes for creating rebar and rebar shape have been changed. The changes results in a simplified API, which is aligned to the UI.
+
+</ul>
+
+<p>Below, we discuss rebar changes.
+
+
+<h4>Migrating Rebar API Codes</h4>
+
+<p>If you have a code that creates a rebar shape in Revit Structure 2011, you will need to migrate it to use it in Revit Structure 2012.
+Here are the main changes in the steps to create a rebar shape:
+
+<p>In 2011,
+
+<ol>
+<li>Create a RebarShape inside the Document.
+<li>Create a RebarShapeDefinition inside the RebarShape.
+<li>Add data to the RebarShapeDefinition.
+<li>Commit the RebarShape.
+</ol>
+
+
+<p>In 2012,
+
+<ol>
+<li>Create a RebarShapeDefinition. It refers to the Document, but is not inside the document.
+<li>Add data to the RebarShapeDefinition.
+<li>Create a RebarShape inside the Document based on the RebarShapeDefinition. Only now the document is modified.
+</ol>
+
+
+<p>In addition, the following methods are replaced by new ones:
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewRebarShape method <br>&gt;
+RebarShape.Create(Document, RebarShapeDefinition, ... )
+
+<li>RebarShape.NewDefinitionBySegments method <br>&gt;
+RebarShapeDefinitionBySegments constructor
+
+<li>RebarShape.NewDefinitionByArc method <br>&gt;
+RebarShapeDefinitionByArc constructors
+</ul>
+
+
+<h4>Example: Migrating the RST Labs Code</h4>
+
+<p>Now, let's take a look at how to apply these changes to the rebar shape code, using our RST training labs code as an example. Here is the code for 2011, omitting some parameter definitions for simplicity:
+
+<pre class="code">
+<span class="green">//&nbsp; RstLab 4.1 code in Revit Structure 2011</span>
+&nbsp;
+[<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Manual)]
+[<span class="teal">Regeneration</span>(<span class="teal">RegenerationOption</span>.Manual)]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RstLab4_1_CreateSimpleRebarShape</span> : <span class="teal">IExternalCommand</span>
+{
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; <span class="teal">ElementSet</span> elements)
+{
+&nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; <span class="teal">Application</span> app = uiApp.Application;
+&nbsp; <span class="teal">Document</span> doc = uiApp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Lab4_2&quot;</span> );
+&nbsp; trans.Start();
+&nbsp;
+&nbsp; <span class="green">// Create a newrebarshape.</span>
+&nbsp;
+&nbsp; <span class="teal">RebarShape</span> oRebarShape = doc.Create.NewRebarShape();
+&nbsp;
+&nbsp; oRebarShape.Name = <span class="teal">RstUtils</span>.msRebarShapeName;
+&nbsp;
+&nbsp; <span class="teal">RebarShapeDefinitionBySegments</span> shapeDef 
+&nbsp; &nbsp; = oRebarShape.NewDefinitionBySegments( 5 );
+&nbsp;
+&nbsp; <span class="green">// Add parameters with default value.</span>
+&nbsp; <span class="green">// GetOrCreateSharedParameter() is a helper function.</span>
+&nbsp;
+&nbsp; <span class="teal">ExternalDefinition</span> def 
+&nbsp; &nbsp; = GetOrCreateSharedParameter(<span class="maroon">&quot;A&quot;</span>);
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> pA = shapeDef.AddParameter(def, 280);
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; shapeDef.AddConstraintParallelToSegment( 
+&nbsp; &nbsp; 0, pA, <span class="blue">false</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; oRebarShape.set_HookAngle(0, 180);
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; shapeDef.Commit();
+&nbsp; trans.Commit();
+&nbsp; shapeDef.CheckDefaultParameterValues( 0, 0 );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Several lines above require changes in 2012.
+
+<p>First, remove the lines with Create.NewRebarShape(). We will add code of creating rebar shape later on via new method later:
+
+<pre class="code">
+&nbsp; <span class="teal">RebarShape</span> oRebarShape
+&nbsp; &nbsp; = doc.Create.NewRebarShape(); <span class="green">// Remove these lines</span>
+&nbsp;
+&nbsp; oRebarShape.Name = <span class="teal">RstUtils</span>.msRebarShapeName;
+</pre>
+
+<p>Replace the code creating RebarShapeDefinitionBySegments instance to use the constructor:
+
+<pre class="code">
+&nbsp; <span class="teal">RebarShapeDefinitionBySegments</span> shapeDef
+&nbsp; &nbsp; = oRebarShape.NewDefinitionBySegments( 5 ); <span class="green">// 2011</span>
+</pre>
+
+<p>with this:
+
+<pre class="code">
+&nbsp; <span class="teal">RebarShapeDefinitionBySegments</span> shapeDef
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">RebarShapeDefinitionBySegments</span>( doc, 5 ); <span class="green">// 2012</span>
+</pre>
+
+<p>The steps to create each shape segment are unchanged. However, in 2012, methods used to define rebar segment only accept ElementId as an argument instead of External Definition in 2011. Methods in RebarShapeParameters class provide a utility method to retrieve an element id of an external definition. We need to get the corresponding element id, and replace the reference to the parameter value (e.g., 'pA') with its corresponding ElementId variable (e.g., 'idA') in AddParameter() method a shape definition. For instance, original code like this:
+
+<pre class="code">
+&nbsp; <span class="green">//&nbsp; Add parameters with default value in 2011.</span>
+&nbsp;
+&nbsp; <span class="teal">ExternalDefinition</span> def = GetOrCreateSharedParameter( <span class="maroon">&quot;A&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> pA = shapeDef.AddParameter( def, 280 );
+</pre>
+
+<p>Will be modified like this:
+
+<pre class="code">
+&nbsp; <span class="green">//&nbsp; Add parameters with default value in 2012.</span>
+&nbsp;
+&nbsp; <span class="teal">ExternalDefinition</span> def = GetOrCreateSharedParameter( <span class="maroon">&quot;A&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idA = <span class="teal">RebarShapeParameters</span>
+&nbsp; &nbsp; .GetOrCreateElementIdForExternalDefinition( doc, def );
+&nbsp;
+&nbsp; shapeDef.AddParameter( idA, 280 );
+</pre>
+
+<p>The RebarShape class provides a static method to create a RebarShape instance in 2012. 
+This method accommodates parameters to define the rebar shape's hook and hook angle. 
+The methods to set hook properties are removed. 
+Put all the rebar shape properties in the call to the Create method. 
+After you have defined the rebar segment, add the following line to create the rebar shape:
+
+<pre class="code">
+&nbsp; <span class="teal">RebarShape</span> oRebarShape
+&nbsp; &nbsp; = <span class="teal">RebarShape</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; shapeDef, <span class="blue">null</span>, <span class="teal">RebarStyle</span>.Standard,
+&nbsp; &nbsp; &nbsp; <span class="teal">StirrupTieAttachmentType</span>.InteriorFace,
+&nbsp; &nbsp; &nbsp; 180, <span class="teal">RebarHookOrientation</span>.Left,
+&nbsp; &nbsp; &nbsp; 180, <span class="teal">RebarHookOrientation</span>.Left,
+&nbsp; &nbsp; &nbsp; 0 );
+</pre>
+
+<p>The RebarShapeDefinitionBySegments.Commit method is removed in Revit 2012.
+You can simply delete it:
+
+<pre class="code">
+&nbsp; shapeDef.Commit(); <span class="green">// take out this line</span>
+</pre>
+
+<p>That's it! Here is the final code in 2012, again keeping only one parameter to emphasize the changes we made:
+
+<pre class="code">
+<span class="green">//&nbsp; RstLab 4.1 code in 2012</span>
+<span class="green">//</span>
+[Transaction(<span class="teal">TransactionMode</span>.Manual)]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RstLab4_1_CreateRebarShape</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiApp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uiApp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>(doc, <span class="maroon">&quot;Lab4_1&quot;</span>);
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RebarShapeDefinitionBySegments</span> shapeDef 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">RebarShapeDefinitionBySegments</span>(doc, 5);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add parameters with default value.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// GetOrCreateSharedParameter() is a helper function.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExternalDefinition</span> def = GetOrCreateSharedParameter(<span class="maroon">&quot;A&quot;</span>);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> idA = <span class="teal">RebarShapeParameters</span>
+&nbsp; &nbsp; &nbsp; .GetOrCreateElementIdForExternalDefinition(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, def);
+&nbsp;
+&nbsp; &nbsp; shapeDef.AddParameter(idA, 280);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add constraints</span>
+&nbsp;
+&nbsp; &nbsp; shapeDef.AddConstraintParallelToSegment(0, idA, <span class="blue">false</span>, <span class="blue">false</span>);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create a newrebarshape.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RebarShape</span> oRebarShape = <span class="teal">RebarShape</span>
+&nbsp; &nbsp; &nbsp; .Create( doc, shapeDef, <span class="blue">null</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RebarStyle</span>.Standard,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StirrupTieAttachmentType</span>.InteriorFace,
+&nbsp; &nbsp; &nbsp; &nbsp; 180, <span class="teal">RebarHookOrientation</span>.Left,
+&nbsp; &nbsp; &nbsp; &nbsp; 180, <span class="teal">RebarHookOrientation</span>.Left,
+&nbsp; &nbsp; &nbsp; &nbsp; 0 );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; shapeDef.CheckDefaultParameterValues(0, 0);
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>All the API changes are documented in the 'Revit Platform API Changes and Additions.docx' and the 'What's New' section of the Revit API help file RevitAPI.chm provided with the Revit 2012 SDK. 
+Please refer to those for more information about the usage of individual classes and methods.
+
+<p>Many thanks to Joe for this overview!
+
+<p>Some of the Revit Structure API changes were also discussed in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html#2">Revit 2012 API webcast</a> and the associated materials.
+
+
+<a name="2"></a>
+
+<h4>Sangsen's Questions</h4>
+
+<p>Last but not least, Joe also took the time to answer Sangsen's questions:
+
+<ul>
+<li><b><a href="http://thebuildingcoder.typepad.com/blog/2011/05/set-preview-image.html?cid=6a00e553e16897883301538e695543970b#comment-6a00e553e16897883301538e695543970b">Q:</a></b>
+In Revit Structure 2012, BoundaryConditions.HostElement returns analytical model instead of family instance. 
+Can you help me how to obtain the host element family instance?
+
+<p><b><a href="http://thebuildingcoder.typepad.com/blog/2011/05/set-preview-image.html?cid=6a00e553e168978833014e894193b5970d#comment-6a00e553e168978833014e894193b5970d">A:</a></b>
+After getting the analytical model from the BoundaryConditions instance, you can call the AnalyticalModel.GetElementId method to retrieve the id of the Host element family instance.
+
+<li><b><a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html?cid=6a00e553e16897883301538e97d1a4970b#comment-6a00e553e16897883301538e97d1a4970b">Q:</a></b>
+Please explain the details about Analytical Changes option in Analytical Alignment property.
+
+<p><b><a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html?cid=6a00e553e1689788330154332192dc970c#comment-6a00e553e1689788330154332192dc970c">A:</a></b>
+The big change to the analytical model in RST 2012 is the split of analytical model and its host physical model. 
+The latter are now standalone elements.
+
+<p>Accordingly, the change of analytical model in Revit 2012 is that the AnalyticalModel class is derived from the Element class instead of the IDisposable interface. 
+This means in Revit 2012, each AnalyticalModel instance is persistent and database resident. 
+Previously, AnalyticalModel instances lived in transient memory only.
+
+<p>This affects the way to get the analytical model object. 
+Now we can retrieve them using the element filtering mechanism via FilteredElementCollecotr. 
+Previously the analytical model could only be retrieved from the host element.
+
+<p>With regard to the functionality of the AnalyticalModel class, new methods about alignment operation were introduced:
+GetAlignmentMethod, HasAlighment and SetAlignmentMethod.
+
+<p>The alignment option should work for a 2011 model opened in RST 2012.
+
+<li><b><a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html?cid=6a00e553e168978833014e889b37e1970d#comment-6a00e553e168978833014e889b37e1970d">Q:</a></b>
+In Revit 2012, how can I access an entity with its Analytical model details. Please post changes to the analytical model class.
+
+<p><b><a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html?cid=6a00e553e168978833014e89419b39970d#comment-6a00e553e168978833014e89419b39970d">A:</a></b>
+The host physical component of a given analytical model can be obtained by the AnalyticalModel.GetElementId method. 
+It returns the element id of the physical component.
+
+</ul>
+
+<p>Thank you very much again, Joe!
+

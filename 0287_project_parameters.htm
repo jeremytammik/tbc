@@ -1,0 +1,42 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256392 [Getting all project parameters in a project] -->
+
+<h3>Retrieving Project Parameters</h3>
+
+<p>In between the series of background information from Scott's Autodesk University presentation on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+let's have a quick look at a completely different question, on retrieving all shared parameters from a Revit project.
+Other posts related to shared parameters are listed at the end of our discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/adding-a-column-to-rdblink-export.html">
+RDBLink Export</a>.
+
+<p>The following solution comes from a case handled by Saikat Bhattacharya.
+
+<p><strong>Question:</strong> How can I programmatically retrieve the set of project parameters added to a given Revit project?
+
+<p><strong>Answer:</strong> Shared parameters are bound to certain categories.
+You can access all the bound parameter definitions from the BindingMap returned from the Document.ParameterBindings property. 
+Each project parameter shown in the Settings &gt; Project Parameters dialogue represents an entry in this mapping. 
+To see more on how this works, you can refer to the VB.NET BrowseBindings SDK sample residing in the SDK samples folder.
+It illustrates the usage of the ParameterBindings property by retrieving the ParameterBindingsMap and looping through all entries in the map to display all parameter definitions and bindings in a tree view.
+
+<p>Here are the project parameters as displayed in the user interface:</p>
+
+<center>
+<img src="img/project_parameters.jpg" alt="Project parameters"/>
+</center>
+
+<p>This is the display generated for the same project through the Revit API by the BrowseBindings SDK sample:</p>
+
+<center>
+<img src="img/browse_bindings.jpg" alt="BrowseBindings SDK sample"/>
+</center>
+
+<p>Many thanks to Saikat for handling this case!</p>

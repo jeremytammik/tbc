@@ -1,0 +1,629 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>PowerPoint Slide Deck Text Extractor Ppt2txt</h3>
+
+<p>Here is another longish post that is not directly related to the Revit API, but rather Microsoft Office programming, more specifically PowerPoint.
+However, the sample material I present at the end is very directly related to Revit programming, so rest assured that all is well and hopefully interesting.
+
+<p>Contents:
+
+<ol>
+<li><a href="#1">Slide deck and handout document</a>
+<li><a href="#2">Slide deck comparison and text extraction</a>
+<li><a href="#3">Alternative comparison method</a>
+<li><a href="#4">Ppt2txt usage</a>
+<li><a href="#5">Ppt2txt implementation</a>
+<li><a href="#6">Ppt2txt download</a>
+<li><a href="#7">Formatting in Word</a>
+<li><a href="#8">Sample run</a>
+</ol>
+
+
+
+<a name="1"></a>
+
+<h4>Slide Deck and Handout Document</h4>
+
+<p>The 
+
+<a href="http://au.autodesk.com">
+Autodesk University</a> 
+
+class materials will be due one of these days</a>.
+The 
+
+<a href="http://auspeaker.wordpress.com/2012/10/12/class-handouts-and-other-materials-when-are-they-due">
+deadline</a> is 
+
+not exactly looming yet, but definitely and inexorably creeping up.
+
+<p>I still need to finish off the handout for my class
+
+<a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4107">
+CP4107</a> on 
+
+the new Revit 2013 UI API functionality, probably the most exciting one of my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/au-registration-and-adn-open.html">three AU sessions</a>.
+
+<p>I have the sample code for it assembled, both from the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#2">
+DevCamp presentation</a> in 
+
+June and the brand new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html">
+UIView, Windows coordinates, ReferenceIntersector and tooltip</a> discussion.
+
+<p>Normally, I think the handout should be finished before I start creating the slide deck.
+I think the recommended steps for preparing a class should look like this:
+
+<ol>
+<li>Gather experience.
+<li>Know what you have to share.
+<li>Create compelling illustrative samples.
+<li>Summarise the presentation content in a handout document.
+<li>Create a slide deck to illustrate.
+</ol>
+
+<p>For some reason, however, I sometimes find myself with an existing slide deck in hand, and no handout document yet created.
+
+<p>In that case, I often use the slide deck to create a skeleton handout document by exporting the pure text content of the slide deck and converting that to a document and outline.
+
+<p>In this case, of course, I am aided and abetted in doing this dirty deed by the fact that I already have the finished slide deck from the precursor session at DevCamp.
+
+
+<a name="2"></a>
+
+<h4>Slide Deck Comparison and Text Extraction</h4>
+
+<p>Another important reason for extracting pure text content from a slide deck is for comparison purposes.
+
+<p>Working on presentations, especially as a group project, I regularly want to find out exactly what changed between one version and another of a given set of PowerPoint slides.
+
+<p>Differences in graphics are often easy to spot, but small changes in the text may also be really important and harder to identify.
+
+<p>Given the pure text content, it is trivial to find and pinpoint them using text comparison tools such as Unix 
+
+<a href="http://en.wikipedia.org/wiki/Diff">
+diff</a> and
+
+Visual Studio
+
+<a href="http://en.wikipedia.org/wiki/WinDiff">
+Windiff</a>, of course.
+
+<p>Enter ppt2txt, my very own PowerPoint slide deck text extractor.
+
+<p>I implemented it back in 2007 and have been using it happily ever since.
+
+<!--
+<p>I started it up again recently and added some small enhancements during my preparations for 
+
+<a href="http://au.autodesk.com">
+Autodesk University 2012</a>,
+
+for which the class
+
+<a href="http://auspeaker.wordpress.com/2012/10/12/class-handouts-and-other-materials-when-are-they-due">
+handouts will be due</a> in a few weeks.
+-->
+
+<p>The thought of sharing it with you guys crossed my mind, so here it is.
+
+
+
+<a name="3"></a>
+
+<h4>Alternative Comparison Method</h4>
+
+<p>My colleague <!--Vladimir Ananyev--> Marat Mirgaleev mentioned another way to compare similar slide decks without extracting the text.
+
+<p>The PowerPoint slide deck 
+
+<a href="http://en.wikipedia.org/wiki/Microsoft_PowerPoint#File_formats">
+PPTX format</a> is 
+
+one of the 
+
+<a href="http://en.wikipedia.org/wiki/Microsoft_Office_XML_formats">
+Microsoft Office Open XML formats</a>,
+
+which basically consist of a ZIP compressed archive containing a bunch of XML files and folders.
+
+<p>One of the subfolders contains the slides.
+Within that folder, each individual slide is represented by a separate XML file.
+A simple slide by slide comparison of the deck can be performed by comparing the date associated with each one.
+
+<p>Anyway, back to my Ppt2txt text extractor.
+
+<a name="4"></a>
+
+<h4>Ppt2txt Usage</h4>
+
+<p>Usage is simple: you feed it a PPT file, it extracts all the text on all the slides and spits it out in a pure ASCII text file.
+
+<p>By default, the output file path is determined from the input PPT, just replacing the extension.
+You can use the '-f' option to specify a different output filename or '-' to redirect the output to stdout.
+
+<p>By default, a prefix string 'Title: ' is added in front of each slide title, making it easy to identify and e.g. search and replace the paragraph style of all titles in one fell swoop.
+If you prefer no such prefix, use the '-t' option to suppress it.
+
+<p>Here is the usage message explaining this a bit more succinctly (copy to a text editor to see the truncated lines in full):
+
+<pre>
+ppt2txt 2.0 * PowerPoint Slide Deck Text Extractor
+  (C) 2007-2012 Jeremy Tammik Autodesk Inc.
+usage:  ppt2txt [-f textfilename] [-t] pptfilename
+  -t: skip adding prefix 'Title: ' to each slide title
+  -f: write output to textfilename.txt
+      default: pptfilename.txt
+      -f-: stdout
+</pre>
+
+<a name="5"></a>
+
+<h4>Ppt2txt Implementation</h4>
+
+<p>Here is the code implementing this:
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.IO;
+<span class="blue">using</span> Microsoft.Office.Core;
+<span class="blue">using</span> Ppt = Microsoft.Office.Interop.PowerPoint;
+<span class="blue">using</span> <span class="teal">PptType</span> = Microsoft.Office.Interop.PowerPoint.<span class="teal">PpPlaceholderType</span>;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> ppt2txt
+{
+&nbsp; <span class="blue">class</span> <span class="teal">Program</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Usage prompt.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span>[] _usage = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ppt2txt 2.0 * Powerpoint Slide Deck Text Extractor&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; (C) 2007-2012 Jeremy Tammik Autodesk Inc.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;usage:&nbsp; ppt2txt [-f textfilename] [-t] pptfilename&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; -t: skip adding prefix 'Title: ' to each slide title&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; -f: write output to textfilename.txt&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; default: pptfilename.txt&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; -f-: stdout&quot;</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constant representing 'True' in Powerpoint API.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">const</span> <span class="teal">MsoTriState</span> _t = <span class="teal">MsoTriState</span>.msoTrue;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Windows carriage return + linefeed combination.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _crlf = <span class="maroon">&quot;\r\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Prepend a linefeed to every </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> non-empty input string.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span> PrependLinefeed( <span class="blue">string</span> s )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0 == s.Length ? <span class="blue">string</span>.Empty : _crlf + s;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Append a new paragraph p to the given text s</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> with a linefeed separator in between if s is</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> not empty.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span> AppendParagraph( <span class="blue">string</span> s, <span class="blue">string</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; s.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s += _crlf;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> s + p;
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Escape unpleasant Powerpoint characters
+&nbsp; &nbsp; <span class="green">//static Encoding _ascii = Encoding.ASCII;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Remove unpleasant non-ascii characters </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> that crop up in powerpoint.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span> normalise_string( <span class="blue">string</span> s )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">&quot;&#8230;&quot;</span>, <span class="maroon">&quot;...&quot;</span> );
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'&#8211;'</span>, <span class="maroon">'-'</span> );
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'&#8216;'</span>, <span class="maroon">'\''</span> ); <span class="green">// backward apostrophe from powerpoint</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'&#8217;'</span>, <span class="maroon">'\''</span> ); <span class="green">// forward apostrophe from powerpoint</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'&#160;'</span>, <span class="maroon">' '</span> ); <span class="green">// strange space char from powerpoint</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// quote:</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u0060'</span>, <span class="maroon">'\''</span> ); <span class="green">// grave accent&nbsp;&nbsp; </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u00b4'</span>, <span class="maroon">'\''</span> ); <span class="green">// acute accent&nbsp;&nbsp; </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2018'</span>, <span class="maroon">'\''</span> ); <span class="green">// left single quotation mark&nbsp; &nbsp; &nbsp; </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2019'</span>, <span class="maroon">'\''</span> ); <span class="green">// right single quotation mark </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u201C'</span>, <span class="maroon">'&quot;'</span> );&nbsp; <span class="green">// left double quotation mark&nbsp; &nbsp; &nbsp; </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u201D'</span>, <span class="maroon">'&quot;'</span> );&nbsp; <span class="green">// right double quotation mark&nbsp;&nbsp; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// space:</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\x0b'</span>, <span class="maroon">'\n'</span> ); <span class="green">// vertical tab</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u0020'</span>, <span class="maroon">' '</span> ); <span class="green">// space basic latin</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u00a0'</span>, <span class="maroon">' '</span> ); <span class="green">// no-break space latin-1 supplement</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u1680'</span>, <span class="maroon">' '</span> ); <span class="green">// ogham space mark ogham</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u180e'</span>, <span class="maroon">' '</span> ); <span class="green">// mongolian vowel separator mongolian</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2000'</span>, <span class="maroon">' '</span> ); <span class="green">// en quad general punctuation</span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2001'</span>, <span class="maroon">' '</span> ); <span class="green">// em quad </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2002'</span>, <span class="maroon">' '</span> ); <span class="green">// en space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2003'</span>, <span class="maroon">' '</span> ); <span class="green">// em space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2004'</span>, <span class="maroon">' '</span> ); <span class="green">// three-per-em space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2005'</span>, <span class="maroon">' '</span> ); <span class="green">// four-per-em space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2006'</span>, <span class="maroon">' '</span> ); <span class="green">// six-per-em space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2007'</span>, <span class="maroon">' '</span> ); <span class="green">// figure space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2008'</span>, <span class="maroon">' '</span> ); <span class="green">// punctuation space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u2009'</span>, <span class="maroon">' '</span> ); <span class="green">// thin space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u200a'</span>, <span class="maroon">' '</span> ); <span class="green">// hair space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u202f'</span>, <span class="maroon">' '</span> ); <span class="green">// narrow no-break space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u205f'</span>, <span class="maroon">' '</span> ); <span class="green">// medium mathematical space </span>
+&nbsp; &nbsp; &nbsp; s = s.Replace( <span class="maroon">'\u3000'</span>, <span class="maroon">' '</span> ); <span class="green">// ideographic space</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//using System.Globalization;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//using System.Text;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//System.Globalization.UnicodeCategory.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//s = s.Replace( &quot;&quot;, &quot;--&gt;&quot; ); // right arrow</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//s = s.Replace( '', '\'' ); // backquote Unicode characters</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//return Encoding.ASCII.GetBytes( s ).ToString();</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//return _ascii.GetString( _ascii.GetBytes( s ) );</span>
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Escape unpleasant Powerpoint characters</span>
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get all the text from a given Ppt </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> shape, delimited by _crlf.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span> GetShapeText( Ppt.<span class="teal">Shape</span> shape )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _t == shape.HasTextFrame
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; _t == shape.TextFrame.HasText )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s = shape.TextFrame.TextRange.Text.Trim();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>[] a = s.Split(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">'\r'</span>, <span class="maroon">'\n'</span> } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> s2 <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += PrependLinefeed( s2.Trim() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; s = s.Trim();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == s.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">int</span> Main( <span class="blue">string</span>[] args )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Command line argument values.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename_in = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename_out = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> title_prefix = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Process command line arguments.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = args.Length;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( i &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> a = args[i];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="maroon">'-'</span> == a[0] )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="maroon">'t'</span> == a[1] )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; title_prefix = !title_prefix;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="maroon">'f'</span> == a[1] )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_out = a.Substring( 2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == filename_out.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( i &gt;= n )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;-f option lacks output filename&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_out = args[i];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;invalid option '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == filename_in )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in = a;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( filename_in ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">File</span>.Exists( filename_in + <span class="maroon">&quot;.ppt&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in = filename_in + <span class="maroon">&quot;.ppt&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">File</span>.Exists(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in + <span class="maroon">&quot;.pptx&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in = filename_in + <span class="maroon">&quot;.pptx&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( filename_in ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;unable to open input file '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;invalid argument '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == filename_in
+&nbsp; &nbsp; &nbsp; &nbsp; || !<span class="teal">File</span>.Exists( filename_in ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> s <span class="blue">in</span> _usage )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine( s );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> 1;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine full input and output filenames.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; filename_in = <span class="teal">Path</span>.GetFullPath( filename_in );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> ext = <span class="maroon">&quot;txt&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == filename_out.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; filename_out = <span class="teal">Path</span>.ChangeExtension(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in, ext );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( !filename_out.Equals( <span class="maroon">&quot;-&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; filename_out = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Path</span>.GetDirectoryName( filename_in ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_out + <span class="maroon">&quot;.&quot;</span> + ext );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Open output file and process ppt input.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamWriter</span> sw
+&nbsp; &nbsp; &nbsp; &nbsp; = filename_out.Equals( <span class="maroon">&quot;-&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="blue">new</span> <span class="teal">StreamWriter</span>( <span class="teal">Console</span>.OpenStandardOutput() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span class="blue">new</span> <span class="teal">StreamWriter</span>( filename_out ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sw )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Console</span>.Error.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;unable to write to output file '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_out ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s, title, subtitle, body, notes;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Ppt.<span class="teal">Application</span> app = <span class="blue">new</span> Ppt.<span class="teal">Application</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.Visible = _t;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Ppt.<span class="teal">_Presentation</span> p = app.Presentations.Open(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename_in, _t, _t, _t );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( Ppt.<span class="teal">_Slide</span> slide <span class="blue">in</span> p.Slides )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; title = subtitle = body = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( Ppt.<span class="teal">Shape</span> shape <span class="blue">in</span> slide.Shapes )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = GetShapeText( shape );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != s )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">MsoShapeType</span>.msoPlaceholder
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == shape.Type )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( shape.PlaceholderFormat.Type )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">PptType</span>.ppPlaceholderTitle:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">PptType</span>.ppPlaceholderCenterTitle:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; title = AppendParagraph(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; title, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">PptType</span>.ppPlaceholderSubtitle:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subtitle = AppendParagraph(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subtitle, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">PptType</span>.ppPlaceholderBody:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>: <span class="green">// e.g., ppPlaceholderObject</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; body = AppendParagraph(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; body, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; body = AppendParagraph(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; body, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve notes text.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; notes = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( Ppt.<span class="teal">Shape</span> shape
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> slide.NotesPage.Shapes )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = GetShapeText( shape );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != s )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( slide.SlideIndex.ToString() != s )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; notes = AppendParagraph(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; notes, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Write output for current slide.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; ( title.Length + subtitle.Length
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + body.Length + notes.Length ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = ( ( 0 == title.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? ( _crlf + <span class="maroon">&quot;Slide &quot;</span> + slide.SlideIndex.ToString() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ( _crlf + ( title_prefix ? <span class="maroon">&quot;Title: &quot;</span> : <span class="maroon">&quot;&quot;</span> ) + title ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + PrependLinefeed( subtitle )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + PrependLinefeed( body )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + PrependLinefeed( notes );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sw.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; normalise_string(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s.Replace( <span class="maroon">&quot;\n&quot;</span>, _crlf ) ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.Close();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sw.Close();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>I reformatted it to minimise the number of truncated overlong lines.
+Look at the source download below or copy to a text editor to see all the lines in full.
+
+
+<a name="6"></a>
+
+<h4>Ppt2txt Download</h4>
+
+<p>Here is 
+
+<a href="zip/ppt2txt_2.zip">ppt2txt_2.zip</a> containing 
+
+the full source code and Visual Studio solution for this utility.
+
+<p>I hope you find it as useful as I do.
+
+<p>Comments and suggestions for improvement are appreciated, as always.
+
+
+
+<a name="7"></a>
+
+<h4>Formatting in Word</h4>
+
+<p>One of the ppt2txt options I mentioned above was to turn off the 'Title: ' prefix.
+
+<p>The question is why to implement and turn it on in the first place.
+
+<p>Well, it prefixes each slide heading with a string saying 'Title: '.
+
+<p>Assuming none of my existing text already contains that exact string, I can then search and replace it globally.
+
+<p>In Word, I can event use search and replace to set a specific paragraph style by selecting Home &gt; Replace &gt; Find what: Title: &gt; Replace with: &gt; More&gt;&gt; &gt; Format &gt; Style... &gt; Heading 3 &gt; Replace All:</p>
+
+<center>
+<img src="img/ppt2txt_word_replace_style.png" alt="Replace title prefix by paragraph style" width="400"/>
+</center>
+
+<p>Next, I replace the same search string by an empty string with no formatting to remove all the prefixes.
+
+<p>I also replace duplicate paragraph end markers by single ones using the search string "^p^p" and the replacement "^p".
+
+
+
+<a name="8"></a>
+
+<h4>Sample Run</h4>
+
+<p>Here is the draft material that I am working on for my AU class
+
+<a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4107">
+CP4107</a> on 
+
+the Revit 2013 UI API, including source pptx, intermediate txt, target docx and pdf renderings:
+
+<ul>
+<li><a href="CP4107_revit_2013_ui_api.pptx">PPTX</a> PowerPoint slide deck.
+<li><a href="CP4107_revit_2013_ui_api_ppt.pdf">PDF</a> rendering of the slide deck.
+<li><a href="CP4107_revit_2013_ui_api.txt">TXT</a> pure extracted text.
+<li><a href="CP4107_revit_2013_ui_api.txt">DOCX</a> resulting skeleton handout document.
+<li><a href="CP4107_revit_2013_ui_api.pdf">PDF</a> rendering of the handout.
+</ul>
+
+<p>The handout document already contained some boilerplate text at the beginning and end before inserting the slide deck text.
+I replaced the 'Title: ' prefixes first by the Heading 3 paragraph style and then by empty strings to remove them.
+I removed all duplicate paragraph markers.
+That's it.
+
+<p>The PDF renderings of the slide deck and handout document were generated using 
+
+<a href="http://www.pdfprinter.at/en">eDocPrintPro</a>.
+
+<p>My next step is obvious: add some artificial intelligence with domain knowledge, linguistic skills and good taste to create a completely finished handout fully automatically.
+
+<p>Enjoy, please.
+
+<!--
+<p>Pass on the AU bloggers.
+
+<a href="">
+</a>
+-->

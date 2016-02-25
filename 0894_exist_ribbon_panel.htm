@@ -1,0 +1,205 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Eduardo Teixeira Re: How to add a button to an existing Revit Panel
+
+-->
+
+<h3>Add a Button to Existing Ribbon Panel</h3>
+
+<p>Here is an interesting user interface contribution from Eduardo Teixeira of Autodesk:
+
+<p><strong>Question:</strong> I am building a Revit add-in using the Revit API.
+
+<p>I would like to add a button for it to an existing out-of-the-box Revit ribbon panel using the Revit API in C#.</p>
+
+<p>I could not find any documentation that shows how to do that.</p>
+
+<p>Is it possible at all?</p>
+
+<p><strong>Answer:</strong> Yes, this can be done.
+I am not certain whether it is officially supported, though.
+You will have to explore on your own a bit.
+
+<p>The official API is limited.
+You can however also use functionality from the .NET
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a> library
+
+and from the AdWindows.dll .NET assembly included with Revit, similar to the one provided with AutoCAD.
+
+<p>Here are some previous discussion exploring related issues that might help:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/pimp-my-autocad-or-revit-ribbon.html">Pimp my ribbon</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html">Roll a toggle button</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">Enable button in zero document state</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/adding-noncommands-to-the-revit-ribbon.html">Add non-command button to the ribbon</a></li>
+</ul>
+
+<p><strong>Response:</strong> Thanks for the tip.
+The article that really helped me was the first one you list.
+I was able to add a button to the existing out-of-the-box Energy Analysis panel under the Analyze tab.
+
+<p>There are just two simple steps required achieve the desired result:</p>
+
+<p>To add a custom button to the Analyze tab in the Revit Energy Analysis ribbon panel:</p>
+
+<ol>
+<li><a href="#2">Add a reference</a> to the AdWindows.dll .NET assembly provided with Revit.</li>
+<li>Add the two snippets of source code listed below to the external application implementation:
+<ol type="a">
+<li>In OnStartup, <a href="#3">create and add the button</a>.</li>
+<li><a href="#4">Handle the UIElementActivated event</a>.</li>
+</ol>
+</ol>
+
+
+<a name="2"></a>
+
+<h4>Adding the References</h4>
+
+<p>Add a reference to the AdWindows.dll .NET assembly provided with Revit.</p>
+<p>Don't forget to set the copy local flag to false on that.</p>
+<p>This will also require references to the .NET WindowsBase and PresentationFramework assemblies, which in turn require PresentationCore and System.Xaml.</p>
+
+
+<a name="3"></a>
+
+<h4>Creating and Adding the Button</h4>
+
+<p>In OnStartup, localise the existing tab and panel, instantiate a new ribbon button, add it to the tab, and subscribe to the UIElementActivated event.
+
+<p>Here is a simplified version of Eduardo's code set up to run on Jeremy's system and open the browser to display The Building Coder home page:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; adWin.<span class="teal">RibbonControl</span> ribbon
+&nbsp; &nbsp; = adWin.<span class="teal">ComponentManager</span>.Ribbon;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonTab</span> tab <span class="blue">in</span> ribbon.Tabs )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( tab.Id == <span class="maroon">&quot;Analyze&quot;</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonPanel</span> panel
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> tab.Panels )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( panel.Source.Id == <span class="maroon">&quot;cea_shr&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonButton</span> button
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> adWin.<span class="teal">RibbonButton</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.Name = <span class="maroon">&quot;TbcButtonName&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//button.Image = image;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//button.LargeImage = image;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.Id = <span class="maroon">&quot;ID_TBC_BUTTON&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.AllowInStatusBar = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.AllowInToolBar = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.GroupLocation = Autodesk.Private
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Windows.<span class="teal">RibbonItemGroupLocation</span>.Middle;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.IsEnabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.IsToolTipEnabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.IsVisible = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.ShowImage = <span class="blue">false</span>; <span class="green">//&nbsp; true;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.ShowText = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.ShowToolTipOnDisabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.Text = <span class="maroon">&quot;The Building Coder&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.ToolTip = <span class="maroon">&quot;Open The Building &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Coder blog on the Revit API&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.MinHeight = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.MinWidth = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.Size = adWin.<span class="teal">RibbonItemSize</span>.Large;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.ResizeStyle = adWin
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">RibbonItemResizeStyles</span>.HideText;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.IsCheckable = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.Orientation = System.Windows
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Controls.<span class="teal">Orientation</span>.Vertical;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; button.KeyTip = <span class="maroon">&quot;TBC&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWin.<span class="teal">ComponentManager</span>.UIElementActivated
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWin.<span class="teal">UIElementActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ComponentManager_UIElementActivated );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; panel.Source.Items.Add( button );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>As you can see, I am triggering the reaction to the button click by subscribing to the UIElementActivated event.
+Not sure if this is the correct way of doing it, but it works.
+
+
+<a name="4"></a>
+
+<h4>Handling the Event</h4>
+
+<p>In the event handler, check that the custom button was actually clicked and act on that, e.g. opening the browser at a specified URL.</p>
+
+<pre class="code">
+<span class="blue">void</span> ComponentManager_UIElementActivated(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; adWin.<span class="teal">UIElementActivatedEventArgs</span> e )
+{
+&nbsp; <span class="blue">if</span>( e != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; e.Item != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; e.Item.Id != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; e.Item.Id == <span class="maroon">&quot;ID_TBC_BUTTON&quot;</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Perform the button action</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Local file</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> path = System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; .GetExecutingAssembly().Location;
+&nbsp;
+&nbsp; &nbsp; path = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; <span class="teal">Path</span>.GetDirectoryName( path ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;test.html&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Internet URL</span>
+&nbsp;
+&nbsp; &nbsp; path = <span class="maroon">&quot;http://thebuildingcoder.typepad.com&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Process</span>.Start( path );
+&nbsp; }
+}
+</pre>
+
+<p>Note that this requires no interaction with the Revit database, so there is no need to worry about a valid API context or transactions or any of that stuff.</p>
+
+<p>Many thanks to Eduardo for sharing this!</p>
+
+
+<a name="5"></a>
+
+<h4>Sample Run</h4>
+
+<p>Jeremy adds: for your convenience, here is
+
+<a href="zip/AddButton.zip">AddButton.zip</a> containing
+
+the source code, Visual Studio solution and add-in manifest for my version of this external application.
+
+<p>On my system, however, the button appears in the expected location but is disabled, so no action is triggered:</p>
+
+<center>
+
+<img src="img/AddButton.png" alt="Custom button in existing panel" title="Custom button in existing panel"/>
+
+</center>
+
+<p>I am not sure why that happens.
+Maybe Eduardo or somebody else can help resolve this.</p>

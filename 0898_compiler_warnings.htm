@@ -1,0 +1,187 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Eliminating Compiler Warnings and Deprecated Calls</h3>
+
+<p>I am revisiting this topic again, which we last looked at a year ago, to clean up our usage of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/eliminating-compiler-warnings-and-deprecated-calls.html">
+deprecated methods in the Revit 2012 API</a>.
+
+<p>In that discussion, I also pointed back to previous versions and other related issues.</p>
+
+<p>Here are the warnings about obsolete usage currently produced when compiling The Building Coder samples
+
+<a href="zip/bc_13_100_1.zip">version 2013.0.100.1</a> against the Revit 2013 API &ndash; copy to a text editor or view source to see the truncated lines in full:</p>
+
+<pre>
+C:\bc\BuildingCoder\BuildingCoder\CmdTransformedCoords.cs(67,41): warning CS0618: 'Autodesk.Revit.DB.GeometryElement.Objects' is obsolete: 'This property will be obsolete from 2013; Call GetEnumerator() instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdNestedInstanceGeo.cs(119,32): warning CS0618: 'Autodesk.Revit.DB.GeometryElement.Objects' is obsolete: 'This property will be obsolete from 2013; Call GetEnumerator() instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdLinkedFiles.cs(103,41): warning CS0618: 'Autodesk.Revit.DB.GeometryElement.Objects' is obsolete: 'This property will be obsolete from 2013; Call GetEnumerator() instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdSetTagType.cs(171,19): warning CS0618: 'Autodesk.Revit.Creation.Document.NewWall(Autodesk.Revit.DB.Curve, Autodesk.Revit.DB.Level, bool)' is obsolete: 'This method is obsolete in Revit 2013. Please call a static creation method of Wall class instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdCreateGableWall.cs(89,19): warning CS0618: 'Autodesk.Revit.Creation.Document.NewWall(Autodesk.Revit.DB.CurveArray, Autodesk.Revit.DB.WallType, Autodesk.Revit.DB.Level, bool, Autodesk.Revit.DB.XYZ)' is obsolete: 'This method is obsolete in Revit 2013. Please call a static creation method of Wall class instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdPlanTopology.cs(103,26): warning CS0618: 'Autodesk.Revit.DB.PlanTopology.Rooms' is obsolete: 'This property is obsolete in Revit 2013.  Call GetRoomIds() instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdPressKeys.cs(222,19): warning CS0618: 'Autodesk.Revit.Creation.Document.NewWall(Autodesk.Revit.DB.Curve, Autodesk.Revit.DB.WallType, Autodesk.Revit.DB.Level, double, double, bool, bool)' is obsolete: 'This method is obsolete in Revit 2013. Please call a static creation method of Wall class instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdSlopedWall.cs(65,19): warning CS0618: 'Autodesk.Revit.Creation.Document.NewWall(Autodesk.Revit.DB.CurveArray, bool)' is obsolete: 'This method is obsolete in Revit 2013. Please call a static creation method of Wall class instead.'
+C:\bc\BuildingCoder\BuildingCoder\CmdSlopedWall.cs(140,19): warning CS0618: 'Autodesk.Revit.Creation.Document.NewWall(Autodesk.Revit.DB.CurveArray, Autodesk.Revit.DB.WallType, Autodesk.Revit.DB.Level, bool, Autodesk.Revit.DB.XYZ)' is obsolete: 'This method is obsolete in Revit 2013. Please call a static creation method of Wall class instead.'
+
+Compile complete -- 0 errors, 9 warnings
+</pre>
+
+<p>Basically, there are just three different warnings:</p>
+
+<ul>
+<li>The GeometryElement.Objects property is obsolete; <a href="#2">GeometryElement itself is now enumerable</a>, so you can iterate directly over the instance instead of querying its obsolete property.
+<li>The creation document NewWall method is obsolete, and replaced by <a href="#3">static creation methods on the Wall class</a>.
+<li>The PlanTopology.Rooms property is obsolete, and can be replaced using the <a href="#4">GetRoomIds method</a>.
+</ul>
+
+<p>Let's tackle those right here and now to future-proof this guy.
+
+
+<a name="2"></a>
+
+<h4>Enumerable GeometryElement</h4>
+
+<p>The first one is caused by accessing the GeometryElement.Objects property like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">GeometryObjectArray</span> objects = geoElem.Objects;
+&nbsp;
+&nbsp; n = objects.Size;
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+</pre>
+
+<p>The GeometryElement is now itself iterable, so the foreach loop can be implemented on geoElem itself directly, eliminating the need for the intermediate objects variable.</p>
+
+<p>The number of geometry objects is only used in an informational message and can be determine through the generic templated LINQ Count method:</p>
+
+<pre class="code">
+&nbsp; n = geoElem.Count&lt;<span class="teal">GeometryObject</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geoElem )
+</pre>
+
+<p>The next two warnings are eliminated in the same way.</p>
+
+
+<a name="3"></a>
+
+<h4>Static Creation Methods on Wall Class</h4>
+
+<p>We then get to the call using the creation document NewWall method:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Wall</span> wall = createDoc.NewWall(
+&nbsp; &nbsp; line, levelBottom, <span class="blue">false</span> );
+</pre>
+
+<p>This is simply replaced by a call to the new Wall class static Create method taking the same arguments plus the document:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Wall</span> wall = <span class="teal">Wall</span>.Create(
+&nbsp; &nbsp; doc, line, levelBottom.Id, <span class="blue">false</span> );
+</pre>
+
+<p>The second occurence of this method in CmdCreateGableWall defines a profile for the wall.
+It was passed in using a CurveArray instance in 2012:
+
+<pre class="code">
+&nbsp; <span class="green">// Create wall profile</span>
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> profile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> q = pts[pts.Length - 1];
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> pts )
+&nbsp; {
+&nbsp; &nbsp; profile.Append( appCreation.NewLineBound(
+&nbsp; &nbsp; &nbsp; q, p ) );
+&nbsp;
+&nbsp; &nbsp; q = p;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">Wall</span> wall = doc.Create.NewWall(
+&nbsp; &nbsp; profile, wallType, level, <span class="blue">true</span>, normal );
+</pre>
+
+<p>The Revit 2013 API eliminates the need for the custom collection class and uses a standard .NET List instead:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; profile = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;(
+&nbsp; &nbsp; pts.Length );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> q = pts[pts.Length - 1];
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> pts )
+&nbsp; {
+&nbsp; &nbsp; profile.Add( appCreation.NewLineBound(
+&nbsp; &nbsp; &nbsp; q, p ) );
+&nbsp; &nbsp; q = p;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="teal">Wall</span> wall = <span class="teal">Wall</span>.Create(
+&nbsp; &nbsp; doc, profile, wallType.Id, level.Id, <span class="blue">true</span>, normal );
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>PlanTopology GetRoomIds Method</h4>
+
+<p>The PlanTopology Rooms property is obsolete and should be replaced by GetRoomIds, e.g. in the following old code in CmdPlanTopology:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> r <span class="blue">in</span> pt.Rooms )
+&nbsp; {
+&nbsp; &nbsp; output += <span class="maroon">&quot;\n&nbsp; &quot;</span> + r.Name + <span class="maroon">&quot; : &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.RealString( r.Area ) + <span class="maroon">&quot; sqf&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>Here is a possible reimplementation of that:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> pt.GetRoomIds() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Room</span> r = doc.GetElement( id ) <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp;
+&nbsp; &nbsp; output += <span class="maroon">&quot;\n&nbsp; &quot;</span> + r.Name + <span class="maroon">&quot; : &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.RealString( r.Area ) + <span class="maroon">&quot; sqf&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>The rest of the warnings are pointing out more calls to the obsolete NewWall method, that I converted similarly to above.</p>
+
+<p>Here is
+
+<a href="zip/bc_13_100_2.zip">
+version 2013.0.100.2</a> of
+
+The Building Coder samples all deprecated API calls eliminated.
+
+<p>It also includes Victor's little
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/accessing-room-data.html?cid=6a00e553e168978833017c3690489f970b#comment-6a00e553e168978833017c3690489f970b">
+update to the room retrieval</a> sample.</p>
+
+<p>All obsolete lines are marked with comments saying '// 2012', and their replacements are marked '// 2013'.
+If you wish to analyse the exact differences, you can simply compare the code of this version with the
+
+<span class="asset  asset-generic at-xid-6a00e553e168978833017d400b77ed970c"><a href="http://thebuildingcoder.typepad.com/files/bc_13_100_1-1.zip">version 2013.0.100.1</a></span> implementing
+
+the updated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/determine-revit-demo-mode-and-serial-number.html">
+CmdDemoCheck command and serial number detection</a>.

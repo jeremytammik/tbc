@@ -1,0 +1,146 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Filter for Family Instances in a Room</h3>
+
+<p>I wish you a
+
+<a href="http://en.wikipedia.org/wiki/Good_Friday">Good Friday</a>.</p>
+
+<img src="img/Christ_Carrying_the_Cross_1580.jpg" alt="El Greco's Jesus Carrying the Cross, 1580" width="200"/>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I need to determine the boundary loop polygons to represent the furniture and equipment family instances for manipulation on the mobile device.
+
+<p>Before I can start extracting their geometry, I need to access the objects themselves, i.e. determine which family instances are contained in the selected room.</p>
+
+<p>As always, we use a filtered element collector to access the Revit database elements.</p>
+
+<p>I try to apply as many quick filters as possible first, and then potentially refine the results adding slow filters and possibly even additional tests in .NET using LINQ or explicit coding.</p>
+
+<p>In this case, I came up with the following sequence of filter tests which seems to fit my needs:</p>
+
+<ul>
+<li>Not ElementType</li>
+<li>View independent</li>
+<li>Family instance</li>
+<li>Bounding box intersects outline of the room's bounding box</li>
+</ul>
+
+<p>The first two may or may not be superfluous, actually, but they do no harm either.</p>
+
+<p>For the last test, I query the room bounding box, convert it to an Outline, and use that to set up a BoundingBoxIntersectsFilter.
+It might be possible to implement something stricter than this, or use a BoundingBoxContainsPointFilter instead.</p>
+
+<p>Currently, the category and other properties are not checked at all.
+Once I know more exactly what kind of family instances I need, I would add those.</p>
+
+<p>All of these are quick filters.</p>
+
+<p>Since the room bounding box may be much larger than the room itself, for instance for an irregularly shaped or long, narrow, diagonal one, I definitely need to post-process the results with a more precise containment test.
+It could be purely geometric, e.g. using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/point-in-polygon-containment-algorithm.html">
+point in polygon containment algorithm</a> as
+
+in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/room-in-area-predicate-via-point-in-polygon-test.html">
+room in area predicate</a>,
+
+or based on other data.</p>
+
+<p>I chose to implement this by checking the family instance Room property.
+This test could probably also be moved into a filter, e.g. a parameter filter, which would significantly improve its efficiency by avoiding marshaling the data from internal Revit to the external .NET space before checking and potentially rejecting it.
+See below for further considerations on using this property.</p>
+
+<p>The method currently looks like this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return the element ids of all furniture and </span>
+<span class="gray">///</span><span class="green"> equipment family instances contained in the </span>
+<span class="gray">///</span><span class="green"> given room.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetFurniture( <span class="teal">Room</span> room )
+{
+&nbsp; <span class="teal">BoundingBoxXYZ</span> bb = room.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; <span class="teal">Outline</span> outline = <span class="blue">new</span> <span class="teal">Outline</span>( bb.Min, bb.Max );
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxIntersectsFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BoundingBoxIntersectsFilter</span>( outline );
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = room.Document;
+&nbsp;
+&nbsp; <span class="green">// Todo: add category filters and other</span>
+&nbsp; <span class="green">// properties to narrow down the results</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent()
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">int</span> roomid = room.Id.IntegerValue;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> fi <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( fi.Room.Id.IntegerValue.Equals( roomid ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.Add( fi );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> a;
+}
+</pre>
+
+
+<a name="2"></a>
+
+<h4>Family Instance Room Property Considerations</h4>
+
+<p>For the final test whether the family instance lies inside the selected room, I simply use the FamilyInstance.Room property.</p>
+
+<p>I am aware that there may be some
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/unreliable-room-properties.html">
+issues with the Room property</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/phase-dependent-room-properties.html">
+its phase dependency</a>,
+
+and Patrick Rosendahl implemented a more reliable
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/family-instance-room-phase.html">
+DetermineRoom method</a> to
+
+find a containing room for a given element under all circumstances.
+In a complex model, I might have to add such enhancements to my approach.
+
+
+
+<a name="3"></a>
+
+<h4>Considerations Processing a Complete Model</h4>
+
+<p>Another issue is that the filter I present above searches for the family instances on a room by room basis.</p>
+
+<p>This is fine as long as I am just looking at one single room.</p>
+
+<p>If I wished to process all rooms of an entire large model, I would definitely approach this completely differently.
+For instance, I might select all family instances of interest in the entire model, determine the containing room for each one of them, and then
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+invert that relationship</a> to
+
+obtain a list of instances for each room.</p>

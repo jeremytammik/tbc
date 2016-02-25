@@ -1,0 +1,369 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Gregory Mertens Re: revit api - foreign language -->
+
+<h3>Language Independent Subcategory Creation</h3>
+
+<p>Here is a snapshot of a lengthy conversation that I have been leading with Gregory Mertens of
+
+<a href="http://www.mertens3d.com">
+mertens3d.com</a> for 
+
+a while, starting out with a language independence issue and touching on other topics such as category and subcategory creation, use of built-in parameters, use of debug assertions and exception handling.
+
+<p>We looked at a couple of category related issues in the past:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">Category comparison</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/get-and-set-family-category-and-parameters.html">Family categories</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/adding-a-category-to-a-parameter-binding.html">Categories and parameter bindings</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/system-versus-user-family-category.html">System versus user defined categories</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/categories.html">Complete list of categories</a>
+</ul>
+
+<p>We have not yet looked at any examples of creating subcategories.
+Top level categories cannot be created, by the way.
+
+<p>Here is an example of creating subcategories, eliminating a language dependence in the process, and some thoughts on this, raised by Gregory:
+
+<p><strong>Question:</strong> I am using the following code to create new line subcategories
+(to see the truncated lines of VB code in full, please copy to a text editor):
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Sub</span> createNewLineSubCategory( _
+&nbsp; <span class="blue">ByRef</span> newSubCatName <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByRef</span> thisSubColor <span class="blue">As</span> Autodesk.Revit.DB.Color)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> oneCat <span class="blue">As</span> Autodesk.Revit.DB.Category
+&nbsp;
+&nbsp; <span class="blue">Dim</span> mySubCat <span class="blue">As</span> Autodesk.Revit.DB.Category
+&nbsp;
+&nbsp; <span class="blue">Dim</span> docTransaction <span class="blue">As</span> <span class="blue">New</span> Autodesk.Revit.DB.Transaction(ptr2Doc)
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> oneCat <span class="blue">In</span> ptr2Doc.Settings.Categories
+&nbsp; &nbsp; <span class="blue">If</span> oneCat.Name = <span class="maroon">&quot;Lines&quot;</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">'we need to cruise through each subcategory and make sure it doesn't</span>
+&nbsp; &nbsp; &nbsp; <span class="green">'already exist</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">' Dim allSubCategories As Autodesk.Revit.DB.CategoryNameMap = oneCat.SubCategories</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">' Dim oneSubCategory As Autodesk.Revit.DB.Category</span>
+&nbsp; &nbsp; &nbsp; <span class="green">'we know it doens't exist, because we tested for it prior to this routine</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; docTransaction.SetName(<span class="maroon">&quot;allSubCategories&quot;</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; docTransaction.Start()
+&nbsp; &nbsp; &nbsp; &nbsp; mySubCat = ptr2Doc.Settings.Categories.NewSubcategory(oneCat, newSubCatName)
+&nbsp; &nbsp; &nbsp; &nbsp; mySubCat.LineColor = thisSubColor
+&nbsp; &nbsp; &nbsp; &nbsp; docTransaction.Commit()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; &nbsp; &nbsp; MsgBox(ex.ToString)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">Next</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>It works great when run on an English installation of Revit.
+
+<p>However, it doesn't work when I run it on an Italian install.
+It looks like what is "Lines" to English users is "Linee" (2 e's) to Italian.
+
+<p>I suspect that I'm not coding this correctly.
+Surely I am not supposed to have a separate check for each language.
+
+<p>Could you comment on the correct way to code so that all language versions of Revit work correctly (at least relative to this issue)?
+
+<p><strong>Answer:</strong> To put it briefly,
+
+<ol>
+<li>Do not use the language dependent string comparison oneCat.Name = "Lines".
+<li>Find out what the built-in category is instead  ... OST_Lines?
+<li>Do not iterate over the entire collection of categories, use get_Item instead: Categories.Item Property (BuiltInCategory).
+<li>Send me your final code once you have solved this, please.
+</ol>
+
+<p><strong>Response:</strong> Thanks for the very quick and helpful response.
+
+<p>Here is some new code that works:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Sub</span> createNewLineSubCategory( _
+&nbsp; <span class="blue">ByRef</span> newSubCatName <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByRef</span> newSubCatColor <span class="blue">As</span> Autodesk.Revit.DB.Color)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> lineCat <span class="blue">As</span> Autodesk.Revit.DB.Category
+&nbsp;
+&nbsp; <span class="blue">Dim</span> lineSubCat <span class="blue">As</span> Autodesk.Revit.DB.Category
+&nbsp;
+&nbsp; <span class="blue">Dim</span> docTransaction <span class="blue">As</span> <span class="blue">New</span> Autodesk.Revit.DB.Transaction(ptr2Doc)
+&nbsp;
+&nbsp; lineCat = ptr2Doc.Settings.Categories.Item(BuiltInCategory.OST_Lines)
+&nbsp;
+&nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; docTransaction.SetName(<span class="maroon">&quot;hatch22 - Create SubCategory&quot;</span>)
+&nbsp; &nbsp; docTransaction.Start()
+&nbsp; &nbsp; lineSubCat = ptr2Doc.Settings.Categories.NewSubcategory(lineCat, newSubCatName)
+&nbsp; &nbsp; lineSubCat.LineColor = newSubCatColor
+&nbsp; &nbsp; docTransaction.Commit()
+&nbsp;
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; MsgBox(ex.ToString)
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>That (of course) led to other issues:
+I had to look through the rest of my code to see if there were any other places where I was using language dependant comparisons.
+One of them I solved like this:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Sub</span> changeLineStyleGeneric( _
+&nbsp; <span class="blue">ByVal</span> thisElement <span class="blue">As</span> Autodesk.Revit.DB.Element, _
+&nbsp; <span class="blue">ByRef</span> newLineStyleID <span class="blue">As</span> Autodesk.Revit.DB.ElementId)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> param <span class="blue">As</span> Parameter
+&nbsp; <span class="blue">Dim</span> parameters <span class="blue">As</span> ParameterSet
+&nbsp;
+&nbsp; <span class="blue">If</span> <span class="blue">Not</span> IsNothing(newLineStyleID) <span class="blue">Then</span>
+&nbsp; &nbsp; parameters = thisElement.Parameters
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> param <span class="blue">In</span> parameters
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> param.Definition.ParameterGroup = BuiltInParameterGroup.PG_GRAPHICS _
+&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="blue">And</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Not</span> param.AsElementId.IntegerValue = -1 <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; param.Set(newLineStyleID)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; MsgBox(ex.ToString)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>Here is how I determined the right parameter, without searching for the language dependent string "linestyle":
+
+<pre class="code">
+&nbsp; <span class="blue">If</span> param.Definition.ParameterGroup = BuiltInParameterGroup.PG_GRAPHICS _
+&nbsp; &nbsp; <span class="blue">And</span> <span class="blue">Not</span> param.AsElementId.IntegerValue = -1 <span class="blue">Then</span>
+</pre>
+
+<p>The portion above doesn't feel very clean to me.
+Thoughts?
+
+<p>I don't feel confident that my routine won't come across some other (undesired) parameter that has no ID and is in PG_GRAPHICS.
+Am I somehow guaranteed that my test will come up with one and only one parameter (for that test)?
+(I suppose one thing I should do is research what it means to be 'PG_GRAPHICS').
+
+<p>I came up with the test while debugging.
+At first I was only testing for PG_GRAPHICS.
+It turned out that sometimes this caused errors (not all the time).
+I traced down the error and discovered that there were some parameters that met the PG_GRAPHICS test, but did not have an element ID (they were = -1).
+
+<p>What bothers me is that I don't know that other (possibly future) parameters won't pass both tests.
+Does that make sense?
+It seems to me there should be an absolute way to know if I've come across a parameter that holds the line style.
+
+<p>Oh ... it just occurred to me.
+Maybe I could check.
+Maybe after getting the ID  parameter that I suspect points to a line style parameter I could inspect that ID's element and verify that it is in fact a line style.
+It seems odd that Revit would work that way internally though.
+This does seem a bit inefficient, though.
+
+<p>I just don't know what I don't know here.
+
+<p>It does work, though, so far.
+
+<p><strong>Answer:</strong> All I can suggest is to add lots of
+
+<a href="http://en.wikipedia.org/wiki/Assertion_%28computing%29">
+assertions</a> using
+
+the System.Diagnostics namespace and the Debug.Assert method, and run the code on lots of large and varied test cases.
+
+<p><strong>Response:</strong> When I started this program (which is based on code I wrote some 15 years ago for AutoCAD), I looked around on the web and was surprised that I couldn't find any other apps (other than hatchkit) that did this.
+I would have done it anyway, just for the learning experience, and I'm glad I did.
+Wow... there's nothing like reality.
+
+<p>So here's what I'm doing now.
+I feel more comfortable with it and it seems to work.
+Still testing though:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Sub</span> changeLineStyleGeneric( _
+&nbsp; <span class="blue">ByVal</span> thisCurveElement <span class="blue">As</span> CurveElement, _
+&nbsp; <span class="blue">ByRef</span> newLineStyleID <span class="blue">As</span> ElementId)
+
+&nbsp; <span class="blue">Dim</span> param <span class="blue">As</span> Parameter
+&nbsp; <span class="blue">Dim</span> parameters <span class="blue">As</span> ParameterSet
+
+&nbsp; <span class="blue">If</span> <span class="blue">Not</span> IsNothing(newLineStyleID) <span class="blue">Then</span>
+&nbsp; &nbsp; parameters = thisCurveElement.Parameters
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> param <span class="blue">In</span> parameters
+
+&nbsp; &nbsp; &nbsp; <span class="green">' a different approach:</span>
+&nbsp; &nbsp; &nbsp; <span class="green">' to make sure we have the correct parameter, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">' make sure its value is the same as the known </span>
+&nbsp; &nbsp; &nbsp; <span class="green">' linestyle ID</span>
+
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> param.AsElementId = _
+&nbsp; &nbsp; &nbsp; &nbsp; thisCurveElement.LineStyle.Id <span class="blue">Then</span>
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; param.Set(newLineStyleID)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; MsgBox(ex.ToString)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>I changed my subs input parameter from Autodesk.Revit.DB.Element to Autodesk.Revit.DB.CurveElement.
+This allows me to access thisCurveElement.LineStyle.Id which I then compare to the parameter value.
+If they are equal, then I am confident that I have the correct parameter and I can assign my new linestyle ID to that parameter.
+
+<p>I looked to see if I could set thisCurveElement.LineStyle.ID directly, but it's read-only.
+I didn't see any other method for assigning the ID.
+
+<p>I also tried playing around with "BuiltInParameter.BUILDING_CURVE_GSTYLE" but couldn't get anywhere with that.
+
+<p>Makes sense?
+
+<p><strong>Answer:</strong> Have you checked the curve element parameters using the built-in parameter checker or RevitLookup snoop enum parameters?
+
+<p>As said, you should be able to determine what built-in parameter to use instead of looping through all of the parameters.
+
+<p>I did, in fact, and it looks like "BuiltInParameter.BUILDING_CURVE_GSTYLE"  may indeed be what you are looking for.
+
+<p>Although, on second thoughts, there are several others as well, which all refer to the line style element id.
+In your loop you set all of them, not just one.
+Maybe it is necessary to set more than one of them, which is why your loop works and just setting "BuiltInParameter.BUILDING_CURVE_GSTYLE" does not.
+Here they all are for one detail curve I looked at, all have an ElementId storage type, are read-write, and refer to the GraphicsStyle 'Medium Lines' 185:
+
+<ul>
+<li>BUILDING_CURVE_GSTYLE: Line Style
+<li>BUILDING_CURVE_GSTYLE_PLUS_INVISIBLE: Subcategory
+<li>FAMILY_CURVE_GSTYLE_FOR_2010_MASS: Subcategory
+<li>FAMILY_CURVE_GSTYLE_PLUS_INVISIBLE: Subcategory
+<li>FAMILY_CURVE_GSTYLE_PLUS_INVISIBLE_PLUS_STICK_SYM: Subcategory
+<li>FAMILY_CURVE_GSTYLE_PLUS_INVISIBLE_MINUS_ANALYTICAL: Subcategory
+<li>FAMILY_CURVE_GSTYLE_PLUS_INVISIBLE_PLUS_STICK_SYM_MINUS_ANALYTICAL: Subcategory
+</ul>
+
+<p>I would eliminate the try-catch inside the loop, because that should only be used when it is absolutely unavoidable.
+
+<p>You could add a debug assertion to check that the value of the LineStyle.Id property really does equal the newly set one after changing it.
+
+<p><strong>Response:</strong> Continued thanks.
+Regarding the built-in parameter, I was not quite sure how to use it, so I did a search for "BuiltInParameter" in the "Revit 2011 API" chm.
+The first item listed had the following sample code:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> FindWithBuiltinParameterID( _
+&nbsp; <span class="blue">ByVal</span> wall <span class="blue">As</span> Wall) <span class="blue">As</span> Parameter
+&nbsp;
+&nbsp; <span class="green">' Use the WALL_BASE_OFFSET paramametId</span>
+&nbsp; <span class="green">' to get the base offset parameter of the wall.</span>
+
+&nbsp; <span class="blue">Dim</span> paraIndex <span class="blue">As</span> BuiltInParameter _
+&nbsp; &nbsp; = BuiltInParameter.WALL_BASE_OFFSET
+&nbsp;
+&nbsp; <span class="blue">Dim</span> parameter <span class="blue">As</span> Parameter _
+&nbsp; &nbsp; = wall.Parameter(paraIndex)
+&nbsp;
+&nbsp; <span class="blue">Return</span> parameter
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>This translates easily to my case below:
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Sub</span> ChangeLineStyleGeneric( _
+&nbsp; <span class="blue">ByVal</span> thisCurveElement <span class="blue">As</span> CurveElement, _
+&nbsp; <span class="blue">ByRef</span> newLineStyleID <span class="blue">As</span> ElementId)
+&nbsp;
+&nbsp; <span class="blue">If</span> <span class="blue">Not</span> IsNothing(newLineStyleID) <span class="blue">Then</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> paraIndex <span class="blue">As</span> BuiltInParameter _
+&nbsp; &nbsp; &nbsp; = BuiltInParameter.BUILDING_CURVE_GSTYLE
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> parameter <span class="blue">As</span> Parameter _
+&nbsp; &nbsp; &nbsp; = thisCurveElement.Parameter(paraIndex)
+&nbsp;
+&nbsp; &nbsp; parameter.Set(newLineStyleID)
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>This seems to work.
+
+<p>Regarding the try/catch statement:
+
+<ol>
+<li>Why should that be avoided?
+<li>Is it ok to wrap the whole routine in one?
+It is used on page 25 of the Revit 2011 API Developer Guide.pdf.
+</ol>
+
+<p>Regarding the parameter checker and snoop, I played  around a little.
+I had not noticed the "Built-in Enums Snoop..." button previously.
+
+<p>Wow... so much to learn!
+
+<p>Does " BuiltInParamsChecker.vb" provide me with any information that "Revit Lookup" does not?
+
+<p><strong>Answer:</strong>
+
+<ul>
+<li>Yes, indeed, the developer guide is an invaluable resource and should always be kept close at hand!
+<li>Every exception handler is resource intensive and will significantly slow down execution and consume resources.
+An exception handler should be designed to handle unexpected, exceptional cases only.
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">Exceptions should be exceptional</a>.
+Therefore, it is normally sufficient to implement a single top-level handler at the level of the application mainline, e.g. in the external command Execute method.
+<li>The built-in parameter checker provides some addition functionality such as listing the built-in enumeration value, display name, data storage type, database value, string value etc. separately in independent columns and allowing you to sort on any of them.
+That can make it much easier to find something you are looking for, especially in elements with numerous parameters attached.
+</ul>
+
+<p>The discussion and learning continues...
+
+<p>Wait, that's not all!
+Here is the complete utility that we are discussing:
+
+<h4>Hatch22 &ndash; a Revit Hatch Utility</h4>
+
+<p>Here is a free
+
+<a href="http://mertens3d.com/revit-2011-addin-portal/hatch22">
+hatch utility</a> catchily named
+
+<a href="http://mertens3d.com/revit-2011-addin-portal/hatch22">
+Hatch22</a> that
+
+Gregory is currently working on.
+
+I love Catch 22 by Joseph Heller, by the way!
+
+<!--
+<p>Gregory says: I loved the book too.
+I still remember reading it in college.
+I can picture myself sitting on the couch, laughing out loud and then coming to the part where ____ gets cut in half by the low flying airplane.
+I remember how unexpected that was and how much more powerful it was because of the humour that preceded it.
+In case you don't know, he wrote a follow up book ("Closing Time") with many of the same characters.
+It takes place years later. ...didn't interest me as much.
+-->

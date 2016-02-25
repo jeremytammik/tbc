@@ -1,0 +1,220 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07151410 [Shared Parameter add category] -->
+
+<h3>Adding a Category to a Shared Parameter</h3>
+
+<p>Today is the first day of the Munich Revit API training.
+While I am getting ready for that, and as a break from the new-fangled 2013 related stuff, here is an important question and and answer with a useful utility method by Miroslav Schonauer for handling shared parameters:
+
+
+<p><strong>Question:</strong> I am using VB.NET to iterate through a set of families within a project, add shared parameters to types, and defining the category to apply the parameter to the family using the following code:
+
+<pre class="code">
+&nbsp; 'create a category set with the Element category in it
+
+&nbsp; Dim categories As Autodesk.Revit.DB.CategorySet
+
+&nbsp; categories = app.Create.NewCategorySet
+
+&nbsp; Dim LCategory As Autodesk.Revit.DB.Category
+
+&nbsp; LCategory = doc.Settings.Categories.Item( _
+&nbsp; &nbsp; iCategory.Name.ToString)
+
+&nbsp; categories.Insert(LCategory)
+
+&nbsp; 'create a new Type binding for the Symbol categories
+
+&nbsp; Dim TypeBinding As Autodesk.Revit.DB.TypeBinding
+
+&nbsp; TypeBinding = app.Create.NewTypeBinding(categories)
+
+&nbsp; 'Bind the parameter
+
+&nbsp; doc.ParameterBindings.Insert( _
+&nbsp; &nbsp; sharedParameterDefinition, TypeBinding)
+</pre>
+
+<p>This works fine for the first family with a specific category, such as say Furniture; all furniture families then have the parameter applied and updated.
+
+<p>When I try and apply the same parameter to another family from another category, e.g. Special Equipment, I get no error, but the code fails to apply to the parameter.
+
+<p>How do I add more categories of the families to the parameter?
+
+
+<p><strong>Answer:</strong> Just make a collection of all the categories that you wish to bind your shared parameter to, put them all into the same CategorySet, and make one single call to NewTypeBinding with the entire set containing all the categories in one go.
+
+
+<p><strong>Response:</strong> The problem is that I do not know the categories when I first create the shared parameter, and these may change at any point in the future. 
+The add-in is reading data from an external source and then creating and updating all parameters and values on the fly.
+
+<p>Can I retrieve the existing categories that apply to a parameter, add my new category to the CategorySet, and then create a NewTypeBinding, or can you only add the categories at initial creation?
+
+
+<p><strong>Answer:</strong> You can add additional categories later on as well.
+Here is some code which does what you need, and much more besides:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> BindSharedParamResult BindSharedParam(
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="teal">Category</span> cat, 
+&nbsp; <span class="blue">string</span> paramName, 
+&nbsp; <span class="blue">string</span> grpName,
+&nbsp; <span class="teal">ParameterType</span> paramType, 
+&nbsp; <span class="blue">bool</span> visible, 
+&nbsp; <span class="blue">bool</span> instanceBinding )
+{
+&nbsp; <span class="blue">try</span> <span class="green">// generic</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// This is needed already here to </span>
+&nbsp; &nbsp; <span class="green">// store old ones for re-inserting</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CategorySet</span> catSet = app.Create.NewCategorySet();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Loop all Binding Definitions</span>
+&nbsp; &nbsp; <span class="green">// IMPORTANT NOTE: Categories.Size is ALWAYS 1 !?</span>
+&nbsp; &nbsp; <span class="green">// For multiple categories, there is really one </span>
+&nbsp; &nbsp; <span class="green">// pair per each category, even though the </span>
+&nbsp; &nbsp; <span class="green">// Definitions are the same...</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DefinitionBindingMapIterator</span> iter 
+&nbsp; &nbsp; &nbsp; = doc.ParameterBindings.ForwardIterator();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( iter.MoveNext() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Definition</span> def = iter.Key;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementBinding</span> elemBind 
+&nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">ElementBinding</span>) iter.Current;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Got param name match</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( paramName.Equals( def.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StringComparison</span>.CurrentCultureIgnoreCase ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check for category match - Size is always 1!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elemBind.Categories.Contains( cat ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check Param Type</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( paramType != def.ParameterType ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eWrongParamType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check Binding Type</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( instanceBinding )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elemBind.GetType() != <span class="blue">typeof</span>( <span class="teal">InstanceBinding</span> ) ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eWrongBindingType;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elemBind.GetType() != <span class="blue">typeof</span>( <span class="teal">TypeBinding</span> ) ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eWrongBindingType;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check Visibility - cannot (not exposed)</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If here, everything is fine, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ie already defined correctly</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eAlreadyBound;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If here, no category match, hence must </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// store &quot;other&quot; cats for re-inserting</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Category</span> catOld 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> elemBind.Categories ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; catSet.Insert( catOld ); <span class="green">// 1 only, but no index...</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If here, there is no Binding Definition for </span>
+&nbsp; &nbsp; <span class="green">// it, so make sure Param defined and then bind it!</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DefinitionFile</span> defFile 
+&nbsp; &nbsp; &nbsp; = GetOrCreateSharedParamsFile( app );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DefinitionGroup</span> defGrp 
+&nbsp; &nbsp; &nbsp; = GetOrCreateSharedParamsGroup( 
+&nbsp; &nbsp; &nbsp; &nbsp; defFile, grpName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Definition</span> definition 
+&nbsp; &nbsp; &nbsp; = GetOrCreateSharedParamDefinition( 
+&nbsp; &nbsp; &nbsp; &nbsp; defGrp, paramType, paramName, visible );
+&nbsp;
+&nbsp; &nbsp; catSet.Insert( cat );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">InstanceBinding</span> bind = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( instanceBinding )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; bind = app.Create.NewInstanceBinding( 
+&nbsp; &nbsp; &nbsp; &nbsp; catSet );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; bind = app.Create.NewTypeBinding( catSet );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// There is another strange API &quot;feature&quot;. </span>
+&nbsp; &nbsp; <span class="green">// If param has EVER been bound in a project </span>
+&nbsp; &nbsp; <span class="green">// (in above iter pairs or even if not there </span>
+&nbsp; &nbsp; <span class="green">// but once deleted), Insert always fails!? </span>
+&nbsp; &nbsp; <span class="green">// Must use .ReInsert in that case.</span>
+&nbsp; &nbsp; <span class="green">// See also similar findings on this topic in: </span>
+&nbsp; &nbsp; <span class="green">// http://thebuildingcoder.typepad.com/blog/2009/09/adding-a-category-to-a-parameter-binding.html </span>
+&nbsp; &nbsp; <span class="green">// - the code-idiom below may be more generic:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( doc.ParameterBindings.Insert( 
+&nbsp; &nbsp; &nbsp; definition, bind ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eSuccessfullyBound;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( doc.ParameterBindings.ReInsert( 
+&nbsp; &nbsp; &nbsp; &nbsp; definition, bind ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eSuccessfullyBound;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eFailed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; MessageBox.Show( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error in Binding Shared Param: {0}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; ex.Message ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> BindSharedParamResult.eFailed;
+&nbsp; }
+}
+</pre>
+
+<p>It is pretty old and includes a few interesting notes in the comments.
+It has continued working fine over many releases now.
+
+<p>For completeness' sake, here is the 
+
+<a href="zip/HelperParams.cs">
+entire HelperParams.cs C# module</a>.
+
+<p><strong>Response:</strong> That resolved my problem and everything is working great.
+
+<p>The problem was that I was using the doc.ParameterBindings.Insert method.
+Since the binding already exists, I have to use the ReInsert method instead.
+
+<p>Ok, now I am off to give this API training.
+Wish me luck!

@@ -1,0 +1,114 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1252755 [Adding new categories to existing Parameter Binding] -->
+
+<h3>Adding a Category to a Parameter Binding</h3>
+
+<p>Here is another interesting question raised and answered by Henrik Bengtsson of
+
+<a href="http://www.lindab.se">
+Lindab</a>.
+
+It is another example of how you sometimes need to dig in rather deeply into Revit to update certain internal information stored in the Revit application or document object, a little bit similar to but also a bit more complex than the discussion on how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/library-paths.html">
+modify the application options library paths</a>.</p>
+
+<p>Before getting into Henrik's issue, here is some background information on the classes involved in defining the parameter binding.
+The Binding class is a base class used to manage this kind of relationship.
+This is what the Revit API documentation has to say about this class:</p>
+
+<p style="color:darkblue">There are currently two types of bindings available, instance and type binding.
+The key difference between the two is that the instance bound parameters appear on all instances of the elements in those categories.
+Changing the parameter on one does not affect the other instances of the parameter.
+The Type bound parameters appear only on the type object and is shared by all the instances that use that type.
+Changing the type bound parameter affects all instances of the elements that use that type.
+Note that a definition can only be bound to an instance or a type and not both.</p>
+
+<p>The API defines a derived class named ElementBinding as a base class for all types of binding that attach to an element, and two further classes InstanceBinding and TypeBinding derived from that.
+
+<p>The ElementBinding class has a property named Categories returning a CategorySet class instance which allows us to retrieve or modify the categories to which a parameter definition will be bound.
+Unfortunately, simply adding a new category to this collection does not have the desired effect of updating the categories bound to a parameter in the Revit document.
+Here is Henrik's original question:
+
+<p><strong>Question:</strong> I have a set of existing parameter bindings which each bind a parameter definition to one or more categories.
+I now wish to implement a method to add a new category to an existing binding.
+Something like this, which retrieves an external parameter definition from my shared parameters file and then checks whether it is connected to all the different required categories.
+If not, I loop through my desired categories and add the missing ones:</p>
+
+<pre>
+Dim extDef an ExternalBinding
+
+Dim b As InstanceBinding _
+  = doc.ParameterBindings.Item(extDef)
+
+For Each c As Category In categorySet
+  If Not b.Categories.Contains(c) Then
+    b.Categories.Insert(c)
+  End If
+Next
+</pre>
+
+<p>From the external definition, I obtain the instance binding object.
+I then try to add new categories to that.
+It works fine programmatically, but has no effect on the Project Parameters displayed in the Revit user interface.</p>
+
+<p>After a rather convoluted communication process, a couple of misunderstandings, a period of rest for Henrik to enjoy a well-earned holiday in Spain, various demonstration projects and lots of research, here is Henrik's final solution:</p>
+
+<p><strong>Answer:</strong> Here is part of the routine which checks and adds required parameters, including four statements marked 'HB'.
+If a given external definition for a specific shared parameter has not yet been added to the document for a given element binding, it does so.
+Otherwise, it retrieves the existing element binding and checks whether all required categories are present in it.
+If not, they are added.
+If the 'HB' lines are commented out, this is not reflected in the project.
+Uncommenting the lines marked 'HB' causes the ReInsert method to be called after modifying the binding's category collection.
+This is apparently the only way to force the update to have an effect on the project document:
+
+<pre class="code">
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> extDef <span class="blue">As</span> ExternalDefinition <span class="blue">In</span> Binding.ParametersCol
+
+&nbsp; &nbsp; <span class="blue">If</span> doc.ParameterBindings.Contains(extDef) <span class="blue">Then</span>
+
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> Added <span class="blue">As</span> <span class="blue">Boolean</span> = <span class="blue">False</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> b <span class="blue">As</span> ElementBinding = doc.ParameterBindings.Item(extDef)
+
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> c <span class="blue">As</span> Category <span class="blue">In</span> categorySet
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> b.Categories.Contains(c) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.Categories.Insert(c)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <b><span class="green">'Added = True&nbsp; ' HB</span></b>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+
+<b>&nbsp; &nbsp; &nbsp; <span class="green">'If Added = True Then&nbsp; ' HB</span>
+&nbsp; &nbsp; &nbsp; <span class="green">'  doc.ParameterBindings.ReInsert(extDef, b)&nbsp; ' HB</span>
+&nbsp; &nbsp; &nbsp; <span class="green">'End If&nbsp; ' HB</span></b>
+
+&nbsp; &nbsp; <span class="blue">Else</span>
+
+&nbsp; &nbsp; &nbsp; doc.ParameterBindings.Insert(extDef, elementBinding)
+
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+
+&nbsp; <span class="blue">Next</span>
+</pre>
+
+Here are the steps to reproduce the issue:</p>
+
+<ol>
+<li>Run the external command with the lines marked HB commented out.
+Look at the Project Parameters section afterwards.
+The parameter is only is connected to ProjectInformation, like it was originally.
+No changes have been applied.
+
+<li>Remove the remark character in the lines marked HB and run the external command.
+Now there is a connection between the parameter and both ProjectInformation and Column, i.e. the changes have been successfully applied to the Revit project document.
+
+</ol>
+
+<p>Apparently, you have to make a call to the  ReInsert method  for the changes to have any effect.
+Nothing else seems to be good enough.</p>
+
+<p>Many thanks to Henrik for all his research and this clean solution!</p>

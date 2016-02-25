@@ -1,0 +1,271 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Håkan Wikemar Re: SV: Dockable Dialogs -->
+
+<h3>A Simpler Dockable Panel Sample</h3>
+
+<p>Here is a very nice little sample on using the new Revit 2014 dockable panels by Håkan Wikemar of
+
+<a href="http://www.aec.se">AEC</a>, Sweden.
+
+<p>In Håkan's words, it is close to the DockableDialogs SDK sample but easier to follow.</p>
+
+<p>The DockableDialogs SDK sample demonstrates modeless dialog design, external events, and the new dockable dialogs UI API framework.</p>
+
+<p>Håkan's DockableDialog sample described here focuses purely on the dockable panel functionality and nothing else.</p>
+
+<p>One thing to note is that you need to register the panel before it can be displayed, and this needs to happen in a zero document state, i.e. with no project open.</p>
+
+<p>In order for the external application ribbon panel to be accessible at all in zero document state, it needs to implement and register an availability class, and the associated command has to use manual transaction mode, as explained in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">enabling ribbon items in zero document state</a>.</p>
+
+<p>Once this is done, the panel appears like this:</p>
+
+<center>
+<img src="img/dockable_panel_1.png" alt="Register dockable panel in zero document state"/>
+</center>
+
+<p>If you try to register it twice, an exception is thrown, naturally, saying "Cannot register the same dockable pane ID more than once. Parameter name: id".</p>
+
+<p>Once the panel has been registered and a project activated, the commands to show and hide the dockable panel are presented:</p>
+
+<center>
+<img src="img/dockable_panel_2.png" alt="Show dockable panel in project document"/>
+</center>
+
+<p>Those two commands can happily use read-only transaction mode, since they do not modify the database in any way.</p>
+
+<p>The dockable panel is initially displayed sharing the same floating window as the project browser:</p>
+
+<center>
+<img src="img/dockable_panel_3.png" alt="Dockable panel in project browser floating window"/>
+</center>
+
+<p>It can be dragged off that pane to its own individual floating window:</p>
+
+<center>
+<img src="img/dockable_panel_4.png" alt="Dockable panel in separate floating window"/>
+</center>
+
+<p>Clicking 'Hide' removes it again.</p>
+
+<p>Here is the full source code, which unfortunately sports rather long lines.
+You can copy to a text editor or view the HTML source to see them in full, or simply download the zip file below:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Ribbon</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.CreateRibbonTab( <span class="maroon">&quot;AEC LABS&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> AECPanelDebug
+&nbsp; &nbsp; &nbsp; = a.CreateRibbonPanel( <span class="maroon">&quot;AEC LABS&quot;</span>, <span class="maroon">&quot;AEC LABS&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly().Location;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> DockableWindow
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> pushButtonRegisterDockableWindow = <span class="blue">new</span> <span class="teal">PushButtonData</span>( <span class="maroon">&quot;RegisterDockableWindow&quot;</span>, <span class="maroon">&quot;RegisterDockableWindow&quot;</span>, path, <span class="maroon">&quot;DockableDialog.RegisterDockableWindow&quot;</span> );
+&nbsp; &nbsp; pushButtonRegisterDockableWindow.LargeImage = GetImage( <span class="teal">Resources</span>.green.GetHbitmap() );
+&nbsp; &nbsp; pushButtonRegisterDockableWindow.AvailabilityClassName = <span class="maroon">&quot;DockableDialog.AvailabilityNoOpenDocument&quot;</span>;
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> pushButtonShowDockableWindow = <span class="blue">new</span> <span class="teal">PushButtonData</span>( <span class="maroon">&quot;Show DockableWindow&quot;</span>, <span class="maroon">&quot;Show DockableWindow&quot;</span>, path, <span class="maroon">&quot;DockableDialog.ShowDockableWindow&quot;</span> );
+&nbsp; &nbsp; pushButtonShowDockableWindow.LargeImage = GetImage( <span class="teal">Resources</span>.red.GetHbitmap() );
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> pushButtonHideDockableWindow = <span class="blue">new</span> <span class="teal">PushButtonData</span>( <span class="maroon">&quot;Hide DockableWindow&quot;</span>, <span class="maroon">&quot;Hide DockableWindow&quot;</span>, path, <span class="maroon">&quot;DockableDialog.HideDockableWindow&quot;</span> );
+&nbsp; &nbsp; pushButtonHideDockableWindow.LargeImage = GetImage( <span class="teal">Resources</span>.orange.GetHbitmap() );
+&nbsp; &nbsp; <span class="green">//IList&lt;RibbonItem&gt; ribbonpushButtonDockableWindow = AECPanelDebug.AddStackedItems(pushButtonRegisterDockableWindow, pushButtonShowDockableWindow, pushButtonHideDockableWindow);</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> ri1 = AECPanelDebug.AddItem( pushButtonRegisterDockableWindow );
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> ri2 = AECPanelDebug.AddItem( pushButtonShowDockableWindow );
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> ri3 = AECPanelDebug.AddItem( pushButtonHideDockableWindow );
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> System.Windows.Media.Imaging.<span class="teal">BitmapSource</span> GetImage(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> bm )
+&nbsp; {
+&nbsp; &nbsp; System.Windows.Media.Imaging.<span class="teal">BitmapSource</span> bmSource
+&nbsp; &nbsp; &nbsp; = System.Windows.Interop.<span class="teal">Imaging</span>.CreateBitmapSourceFromHBitmap(
+&nbsp; &nbsp; &nbsp; &nbsp; bm,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Windows.<span class="teal">Int32Rect</span>.Empty,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Windows.Media.Imaging.<span class="teal">BitmapSizeOptions</span>.FromEmptyOptions() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> bmSource;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> You can only register a dockable dialog in &quot;Zero doc state&quot;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">AvailabilityNoOpenDocument</span>
+&nbsp; : <span class="teal">IExternalCommandAvailability</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsCommandAvailable(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> a,
+&nbsp; &nbsp; <span class="teal">CategorySet</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( a.ActiveUIDocument == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Register your dockable dialog</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RegisterDockableWindow</span>
+&nbsp; : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="teal">MainPage</span> m_MyDockableWindow = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DockablePaneProviderData</span> data
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">DockablePaneProviderData</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MainPage</span> MainDockableWindow = <span class="blue">new</span> <span class="teal">MainPage</span>();
+&nbsp;
+&nbsp; &nbsp; m_MyDockableWindow = MainDockableWindow;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//MainDockableWindow.SetupDockablePane(me);</span>
+&nbsp;
+&nbsp; &nbsp; data.FrameworkElement = MainDockableWindow
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> System.Windows.<span class="teal">FrameworkElement</span>;
+&nbsp;
+&nbsp; &nbsp; data.InitialState = <span class="blue">new</span> <span class="teal">DockablePaneState</span>();
+&nbsp;
+&nbsp; &nbsp; data.InitialState.DockPosition
+&nbsp; &nbsp; &nbsp; = <span class="teal">DockPosition</span>.Tabbed;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//DockablePaneId targetPane;</span>
+&nbsp; &nbsp; <span class="green">//if (m_targetGuid == Guid.Empty)</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; targetPane = null;</span>
+&nbsp; &nbsp; <span class="green">//else targetPane = new DockablePaneId(m_targetGuid);</span>
+&nbsp; &nbsp; <span class="green">//if (m_position == DockPosition.Tabbed)</span>
+&nbsp;
+&nbsp; &nbsp; data.InitialState.TabBehind = <span class="teal">DockablePanes</span>
+&nbsp; &nbsp; &nbsp; .<span class="teal">BuiltInDockablePanes</span>.ProjectBrowser;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DockablePaneId</span> dpid = <span class="blue">new</span> <span class="teal">DockablePaneId</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;{D7C963CE-B7CA-426A-8D51-6E8254D21157}&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; commandData.Application.RegisterDockablePane(
+&nbsp; &nbsp; &nbsp; dpid, <span class="maroon">&quot;AEC Dockable Window&quot;</span>, MainDockableWindow
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">IDockablePaneProvider</span> );
+&nbsp;
+&nbsp; &nbsp; commandData.Application.ViewActivated
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">ViewActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; Application_ViewActivated );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> Application_ViewActivated(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ViewActivatedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; m_MyDockableWindow.lblProjectName.Content
+&nbsp; &nbsp; &nbsp; = e.Document.ProjectInformation.Name;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Show dockable dialog</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ShowDockableWindow</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DockablePaneId</span> dpid = <span class="blue">new</span> <span class="teal">DockablePaneId</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;{D7C963CE-B7CA-426A-8D51-6E8254D21157}&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DockablePane</span> dp = commandData.Application
+&nbsp; &nbsp; &nbsp; .GetDockablePane( dpid );
+&nbsp;
+&nbsp; &nbsp; dp.Show();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Hide dockable dialog</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">HideDockableWindow</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DockablePaneId</span> dpid = <span class="blue">new</span> <span class="teal">DockablePaneId</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;{D7C963CE-B7CA-426A-8D51-6E8254D21157}&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DockablePane</span> dp = commandData.Application
+&nbsp; &nbsp; &nbsp; .GetDockablePane( dpid );
+&nbsp;
+&nbsp; &nbsp; dp.Hide();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>In case you overlooked any of the following aspects, here is a list of the functionality demonstrated by the relatively few lines of code above:</p>
+
+<ul>
+<li>Implementation of an external application and several external commands in the same assembly</li>
+<li>Creation and population of a custom ribbon tab</li>
+<li>Creation and population of a custom ribbon panel with command buttons</li>
+<li>Loading of button images from .NET assembly resources</li>
+<li>Implementation of a command availability class</li>
+<li>Static enabling a command in zero document state</li>
+<li>Dynamic toggling of command availability based on document state</li>
+</ul>
+
+<p>Here is <a href="zip/DockableDialog.zip">DockableDialog.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of this external application.</p>
+
+<p>Many thanks to Håkan for this nice sample!</p>
+
+
+<p><strong>Addendum:</strong> Guy Robinson of <a href="http://www.redbolts.com">redbolts.com</a> adds to this and says:</p>
+
+<p>I noticed the post on DockablePanes and Håkan's comment about finding the SDK sample confusing.
+I did too.
+I've been testing some UI ideas for a new app today and posted a basic version of something similar if interested.</p>
+
+<p>I didn't want a register command on the ribbon and wanted more abstraction.
+For instance, I didn't want the Page inheriting IDockablePaneProvider.</p>
+
+<p>Therefore, registration is in the external application and uses some extension methods.</p>
+
+<p>It is not perfect; it would require use of the Win32 API to capture the dock hiding/showing state if hidden from the dock itself.</p>
+
+<p>Anyway, anyone interested can have a look at my
+
+<a href="https://github.com/Redbolts/R14Tests/tree/master/DockableUITest">DockableUITest</a> project on GitHub.</p>

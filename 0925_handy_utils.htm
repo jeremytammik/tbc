@@ -1,0 +1,130 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Rudolf Honke Re: migrate appstore app
+
+Hallo Jeremy,
+
+meine Gratis-App ist jetzt im Store, und zwar für 13 und 14.
+
+Soweit, so gut.
+
+Aber:
+
+Die beiden anderen Apps sind in der Review, und die dauert nun schon seit mehreren Wochen.
+Von meiner Seite aus sind die Apps fertig, aber von Autodesk kommt nichts, kein Feedback.
+
+Auch die (versprochene) Test-MSI (alte Dateien des VRMLexporters in neuem Installer, diesmal mit erweiterten Rechten), die Klarheit darüber bringen würde, ob unser 30-Tage-Test-Modus nun funktionieren würde, ist irgendwo bei Autodesk liegengeblieben.
+
+Also, an mir soll es nicht liegen.
+
+Zu den Utils:
+
+Wenn man in der Dokumentation nach „*Utils*“ sucht, findet man eine ganze Reihe an Einträgen:
+
+Diese Klassen haben in der Regel viele statische Methoden, die man aus jedem Kontext heraus aufrufen kann (daher muss man kein Objekt erzeugen, eben weil die Methoden statisch sind).
+
+Z.B. die LabelUtils, die die lokalisierten Strings für BuiltInParameter oder UnitTypes anzeigen:
+
+Diese LabelUtils habe ich auch schon verwendet.
+
+Wobei eine Methode für die BuiltInCategories fehlt ;-(
+
+Diese Utils beinhalten teilweise Funktionen, die man auch per Hand implementieren könnte.
+
+Aber wozu der Aufwand, wenn es sie schon gibt.
+
+Man muss sie nur kennen, oder zumindest ungefähr im Kopf haben, wo man sie findet.
+
+Dein Blog könnte sie ins Gedächtnis rufen.
+
+Ich könnte mir (für den Blog) vorstellen, dass Du die einzelnen Utils-Klassen in loser Reihenfolge vorstellst, eine Art Serie.
+
+Ganz zwanglos.
+
+Die Utils sind in der API.chm recht gut beschrieben, aber der User hat sie einfach nicht auf dem Schirm: er muss sie eigentlich nicht kennen, um ans Ziel zu kommen.
+
+Beispiel:
+Man kann ElementIDs von XRefs entweder durch einen entsprechenden ElementFilter ermitteln, oder man nutzt ExternalFileUtils.GetAllExternalFileReferences().
+
+Manches andere geht jedoch nicht ohne die Utils, z.B.:
+Wenn man ein paar DetailElemente platziert hat, dann kann man DetailElementOrderUtils.BringToFront(), BringForward(), SendBackward() oder SendToBack() aufrufen, um die Reihenfolge der Darstellung und Verdeckung zu bestimmen.
+
+Das geht, soweit ich das sehe, in diesem Fall nur über diese Methoden, nicht über irgendwelche Parameter oder Workarounds.
+
+Ich möchte aus dieser Utils-Geschichte keine große Nummer machen, und ich möchte auch keine formellen Anträge stellen (müssen).
+Es wäre aber sinnvoll, hin und wieder Beispiele zu erwähnen, weil Du ein Multiplikator bist.
+
+Treffer für den Begriff „*Utils*“ in der API.chm:
+
+2011: 43
+2012: 265
+2013: 405
+2014: 455
+
+Grüße,
+Rudolf
+
+-->
+
+<h3>Handy Utility Classes</h3>
+
+<p>Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+Mensch und Maschine acadGraph GmbH</a> has
+
+repeatedly encouraged me to raise awareness of the numerous utility classes available in the Revit API and now provided the following starting point for a discussion of them.</p>
+
+<p>One way to find a number of utility classes is to search the Revit API help file RevitAPI.chm for the string "utils":</p>
+
+<center>
+<img src="img/util_classes_1.png" alt="Revit API utility classes"/>
+</center>
+
+<p>In general, these classes provide static methods that can be called from any valid context with no need for an object instance.
+
+<p>One of the better-known examples is the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/built-in-parameter-name-and-labelutils.html">
+LabelUtils class</a> that
+
+returns localised display strings for built-in parameters and unit types:</p>
+
+<center>
+<img src="img/util_classes_2.png" alt="LabelUtils methods"/>
+</center>
+
+<p>By the way, Rudolf misses a method for built-in categories in this class...
+
+<p>If might be possible to implement some of these methods yourself, but using the utility methods obviously saves effort and duplication of code.</p>
+
+<p>Another utility class that has been mentioned here in the past is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/wall-joins-and-geometry.html">WallUtils</a>.</p>
+
+<p>It is important to be aware of their existence, or at least know where to look for them.</p>
+
+<p>They are mostly quite well described in the help file, and yet many developers fail to notice them.
+As said, sometimes you can get around using them, albeit with more effort on your own part.</p>
+
+<p>For example, you can retrieve the element id of a referenced document using an appropriate element filter, or, much more simply, via the ExternalFileUtils GetAllExternalFileReferences method.
+
+<p>On the other hand, some things cannot be achieved except by using these methods.</p>
+
+<p>For instance, after placing a couple of detail instances, their display order and visibility can be modified using the DetailElementOrderUtils class methods BringToFront, BringForward, SendBackward oder SendToBack.
+
+<p>Here is an occurrence count of the string "utils" in the different versions of the help file, showing the growth of this group of methods:
+
+<ul>
+<li>2011: 43</li>
+<li>2012: 265</li>
+<li>2013: 405</li>
+<li>2014: 455</li>
+</ul>
+
+<p>I hope this whets your appetite and look forward to hearing about more examples of unexpected and powerful uses of these methods.</p>

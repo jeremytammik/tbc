@@ -1,0 +1,160 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253742 [Parameter unit] -->
+
+<h3>Unit Suffix and the ProjectUnit SDK Sample</h3>
+
+<p>We delved into various aspects of units in several previous posts:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">Basics on units</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/formatting-units-strings.html">Formatting unit strings</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/unit-types-and-format-options.html">Unit types and format options</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">Unit conversion</a>.
+</ul>
+
+<p>And still the topic is not exhausted. Here is a new point to consider:
+
+<p><strong>Question:</strong> Is there a way to retrieve the unit for a parameter?
+I can read a parameter's value and its Display Unit Type but not the unit's symbol, the display string suffix used to represent the unit in the user interface.
+For example, for a length parameter I would like to retrieve FT or m for the unit symbol, or SF for an area parameter.
+I can read the parameter value and unit suffix combined by using AsValueString, but what about retrieving the unit symbol separately.
+If it is possible to get the parameter unit symbol, could you send me a short code snippet about it?
+
+<p>If the Revit API does not provide parameter value unit, then what is the use of FormatOption.Unitsymbol?
+For example, UST_FT_SUP_2? Can you give me an application of UST symbols?
+
+<p>Also, one way I can think of putting a unit next to a parameter value in the user interface is to write a long switch
+
+statement and determine the name of the parameter and its DUT.
+For example, if the parameter name is Area and its DUT is DUT_SQUARE_FEET then unit is SF, etc.
+Am I right?
+
+<p><strong>Answer:</strong> Let us dive into the unit handling and the classes and enumerations used for this a little bit deeper before returning to the question.
+
+<p>The unit suffix you mention is a user defined setting, so it is actually not directly defined by the parameter itself.
+The parameter is
+
+defined as having a certain unit type such as length or area, and it is completely up to the user to define how values of
+
+this type are represented in the user interface.
+
+<p>The UnitType enumeration lists 81 different available unit types, the simplest of which are UT_Length and UT_Area.
+
+<p>The unit types are further grouped by discipline into unit groups, represented by the UnitGroup enumeration with the
+
+following members:
+
+<ul>
+<li>UG_Common
+<li>UG_Electrical
+<li>UG_HVAC
+<li>UG_Piping
+<li>UG_Structural
+</ul>
+
+<p>Length and area belong to the common group, whereas more specific unit types such as force or moment are classified as
+
+according to discipline, e.g., structural.
+
+<p>How each unit is represented in the user interface is defined by the ProjectUnit and FormatOptions classes.
+
+<p>The description of the ProjectUnit class in the Revit API help file includes an example of accessing and listing this
+
+information.
+
+<p>The FormatOptions class contains the unit information of the current user settings in the project.
+
+It members include
+
+<ul>
+<li>Group: the unit's type group.
+<li>Name: the unit's type name.
+<li>Rounding: the unit's type rounding and accuracy.
+<li>Units: the unit type itself.
+<li>Unitsymbol: the unit's type symbol.
+</ul>
+
+<p>We mentioned this class once in the past in the following blog post:
+
+http://thebuildingcoder.typepad.com/blog/2009/01/unit-types-and-format-options.html
+
+<p>A full example of managing the user-defined unit settings is provided by the SDK sample ProjectUnit. It demonstrates how to
+
+read and set units and format options. It defines an external command which displays a dialogue box listing all the units in
+
+the current project and displaying their format information, including the decimal separator and slope type.
+
+<center>
+<img src="img/project_unit.png" alt="Revit SDK sample ProjectUnit"/>
+</center>
+
+<p>This functionality includes
+
+<ul>
+<li>List all units in current project and display each unit's format information.
+<li>Display the current project units decimal symbol type of set it to comma or dot.
+<li>Display the current project units slope type and set it to Rise or Angle.
+</ul>
+
+<p>The units listing uses the unit group classification by discipline, so a list all the available unit groups or disciplines is
+
+displayed and used to classify the units. When one unit group is selected in the list box, the corresponding project units
+
+and their name, format information, unit suffix type, and rounding is displayed.
+
+<ul>
+<li>The name is the user interface display string such as Length or Area.
+<li>The format information defines the display unit type such as DUT_KIP_FEET_PER_DEGREE_PER_FOOT, represented by the
+
+DisplayUnitType enumeration. This basically represents a numerical conversion factor from the Revit internal database units
+
+to the number you see in the user interface units.
+<li>The unit suffix type specifies a string suffix appended to the value to communicate what units are being displayed.
+
+Possible values are defined by the UnitSymbolType enumeration, such as UST_NONE for length or UST_M_SUP_2 for area.
+<li>The rounding or accuracy is a number like 1 or 0.2.
+</ul>
+
+<p>The unit's symbol that you mention in your question might correspond either to the format information or the unit suffix.
+There is a considerable overlap between these two enumerations.
+
+<p>The parameter definition has a ParameterType property, which returns the user visible interpretation of the parameter data.
+The Revit API help file provides a short code example of using this property.
+It returns a ParameterType enumeration value, and many of these values are associated with a
+
+unit type.
+The parameter definition also has a ParameterGroup property returning the group ID of the parameter definition, which is
+
+represented by the BuiltInParameterGroup enumeration.
+That can also give a hint on what units are appropriate.
+
+<p>To return to your original question,
+yes, there is a property on the parameter class itself for the DisplayUnitType as well as its definition.
+So you can simply use Parameter.DisplayUnitType to determine the DUT, just as you say.
+Yes, I do not see any access in the API to retrieve the display string of a DUT.
+These strings might be language dependent, and no API method has been provided to retrieve them for the localised product data.
+You will of course obtain the appropriate unit suffix by calling AsValueString.
+
+<p>For an application of the UnitSymbolType enumeration values, I can imagine that they might in fact be useful for what you
+
+are trying to achieve, since each enumeration name does actually describe the unit suffix. For instance:
+
+<ul>
+<li>UST_M represents m.
+<li>UST_M_CARET_2 represents m^2.
+<li>UST_M_SUP_2 represents m<sup>2</sup>.
+</ul>
+
+<p>So you could possibly reduce your switch statement to a shorter algorithm putting together your own unit suffix string based on
+
+interpreting the names of these enumeration values.
+
+<p>Alternatively, you could write a full switch statement such as you describe. It could be based on either the DUT or on the
+
+UST, since there is significant overlap between the two.
+This depends on what you actually want to display in the list.
+As you can see above, the default setting on my system for a length is DUT_Millimetres and UST_None, which are different, so depending on which of the two I base the unit symbol display on, I would get a different result.
+

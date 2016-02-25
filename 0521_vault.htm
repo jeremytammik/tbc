@@ -1,0 +1,142 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266075 [Revit + Vault] -->
+
+<h3>Using Vault with Revit</h3>
+
+<p>I recently made a brief mention of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/create-a-navisworks-file-from-revit.html">
+Navisworks</a> product 
+
+and how a native Navisworks file can be created from within a Revit add-in.
+
+<p>Today, let's have a look at another Autodesk product, Vault, and how that can be used in conjunction with Revit.
+
+<p>In case you do not know Vault, it is an Autodesk data management product and has a public API. 
+Here are links to the 
+
+<a href="http://www.autodesk.com/vault">
+Autodesk Vault product page</a> describing 
+
+the software and its capabilities and the
+
+<a href="http://www.autodesk.com/developvault">
+Vault developer center</a> describing
+
+its API and programming tools.
+
+<p>Here is a question that recently came up on using Vault with Revit:
+
+<p><strong>Question:</strong> I need to manage and distribute confidential project files including Revit model data on a server and have some questions regarding this:
+
+<ul>
+<li>Is Vault a viable solution for this?
+<li>Could I drive Vault through the API to control the data storage and access?
+<li>What is the Vault licensing situation for normal Revit users? 
+</ul>
+
+<p><strong>Answer:</strong> Yes, Vault can be used to store files of any type, so it can be used to manage the Revit model information as well.
+
+<p>Yes, you can use the Vault API to control the storage of data into Vault.
+
+<p>Vault can be used in the Revit context, as explained in this 
+
+<a href="http://www.youtube.com/watch?v=V4kzhZoewrI">
+video</a>:</p>
+
+<object width="420" height="340"><param name="movie" value="http://www.youtube.com/v/V4kzhZoewrI?fs=1&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/V4kzhZoewrI?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="420" height="340"></embed></object>
+
+<!--
+
+<p>Here are some blog posts discussing this presentation:
+
+<ul>
+<li>http://underthehood-autodesk.typepad.com/blog/2010/08/autodesk-vault-for-revit-users.html
+<li>http://autodeskmfg.blogspot.com/2010/08/autodesk-vault-for-users-of-autodesk.html
+<li>http://revit-archcenter.blogspot.com/2010/09/working-with-revit-and-vault.html
+</ul>
+-->
+
+<p>To evaluate it, I would suggest having a look at the Vault product itself.
+
+<p>As far as I know, the Vault Explorer is implemented only using the public Vault API, so anything that can be done there through the UI can also be done programmatically.
+
+<p>Actually, I learned that all Vault clients are built on top of the Vault API.   
+So, in theory, anything you see can be done in the UI can be done programmatically.  
+However, some things are easier to do than others.  
+A UI command may run a single API call or it may be a complex algorithm involving several API calls.  
+
+<p>A better way of describing the web service API in Vault is that it can be used to get or set any piece of Vault server data.
+It's the bridge that lets you talk to the server.
+
+<p>For introductory material on Vault and its API, please refer to 
+
+<ul>
+<li>This <a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=15166281&linkID=4901778">
+webcast</a>.
+
+<li>The samples provided in the Vault install folder.
+
+<li>Doug Redmond's 
+
+<a href="http://justonesandzeros.typepad.com">
+Vault blog</a>.
+
+</ul>
+
+<p>Regarding the samples, please note that for each given Vault product, there are two Vault installs, a Vault client and a Vault server.  
+The SDK is part of the Vault server installation only.
+
+<p>As far as I know, for simple project file management, the standard Vault version will be sufficient and you will have no need for Vault Professional.
+
+<p>The Vault product page listed above, which is also accessible through the 'Autodesk Vault' link on Doug's blog, includes a link to the 
+
+<a href="http://images.autodesk.com/adsk/files/vault_family_detail_brochure_us.pdf">
+product brochure</a> which 
+
+provides answers to several of the issues you address.
+
+<p>Regarding the licensing situation, there are four different Vault products.  
+A basic version of Vault is bundled with various CAD applications at no extra charge.  
+Furthermore, there are three levels of upgrades that must be purchased:  Vault Workgroup, Vault Collaboration, and Vault Professional.
+
+<p>The base version of Vault requires that the client machine have a qualifying CAD application installed on that machine.
+In other words, the CAD license is also the Vault license since Vault was bundled with the CAD application.  
+It is not OK to write a Vault client for users without a qualifying CAD application. 
+Here is the full list of qualifying CAD applications (all of them are version 2011):
+
+<ul>
+<li>Autodesk 3DS Max                  
+<li>Autodesk 3DS Max Design           
+<li>Autodesk Inventor (Stand Alone)   
+<li>Autodesk Inventor Suite           
+<li>Autodesk Inventor Professional    
+<li>Autodesk Inventor Simulation      
+<li>Autodesk Inventor Routed Systems  
+<li>Autodesk Inventor Tooling         
+<li>AutoCAD Mechanical                
+<li>AutoCAD Electrical                
+<li>AutoCAD                           
+<li>AutoCAD Map                       
+<li>AutoCAD Civil 3D                  
+<li>AutoCAD Architecture               
+<li>AutoCAD MEP                       
+<li>AutoCAD P&ID                      
+</ul>
+
+<p>Unfortunately, Revit is currently not a qualifying CAD application.
+In order to use Vault with a pure Revit installation, you cannot use the basic version but have to purchase one of the other three ones.
+
+<p>Obviously, if you have a Revit suite including AutoCAD, then one would assume that it qualifies.  
+The best test is to run the Vault client.  
+If no qualifying product exists, then the installer will block the install.  
+If the Vault client installs properly, it's usually safe to assume that you are licensed to use Vault.
+
+<p>The purchased versions of Vault have different licensing rules.  
+Network licensing is used and the Vault server keeps track of the usage.  
+There is no qualifying CAD application rule.  
+Anyone can connect in to Vault.  
+If there are no free licenses available, the server will deny the login.

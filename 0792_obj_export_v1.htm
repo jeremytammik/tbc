@@ -1,0 +1,691 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>OBJ Model Exporter Take One</h3>
+
+<p>Before continuing on the OBJ model exporter, I would like to mention I was finally up in the alps again for the first time in ages last weekend, to climb the 
+
+<a href="http://en.wikipedia.org/wiki/Gl%C3%A4rnisch">
+Vrenelisg&auml;rtli</a> mountain in 
+
+<a href="http://en.wikipedia.org/wiki/Canton_of_Glarus">
+Glarus</a>, "Verena's Little Garden". 
+
+<p>If you would like to skip straight to the meaty stuff, though, here is a table of contents:
+
+<ul>
+<li><a href="#2">AEC DevCamp 2012 material finalised</a>
+<li><a href="#3">Disk full</a>
+<li><a href="#4">Model up to cloud and down to mobile</a>
+<li><a href="#5">Face emitter interface</a>
+<li><a href="#6">OBJ exporter implementation</a>
+<li><a href="#7">Retrieving a solid from an element</a>
+<li><a href="#8">Exporting an element</a>
+<li><a href="#9">Exporting all collected elements</a>
+<li><a href="#10">Exporter mainline</a>
+<li><a href="#11">Export results</a>
+</ul>
+
+<p>The mountain name is shrouded in legend and presumably originated in the cooling down of the Little Ice Age. 
+In the summer of 2003, the firn fields, which can be seen from far away, became snow-free for the first time again since then.
+Right now they are covered again  :-)
+
+<p>The weather was fantastic on the summit, although it looked as if all the rest of the country including all other mountains were covered in clouds.
+Here is a view of the descent afterwards back down over the Glärnischfirn glacier
+
+(<a href="https://plus.google.com/photos/104316998805199988071/albums/5757979017881867041?authkey=CJjvrdzk5LCbwgE">more photos</a>):</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-06-23_vrenelisgaertli/dscf5493_jeremy_walking_down_glacier_over_clouds.jpg" alt="Jeremy descending Gl&auml;rnisch glacier from Vrenelisg&auml;rtli" width="400"/>
+</center>
+
+
+<a name="2"></a>
+
+<h4>AEC DevCamp 2012 Material Finalised</h4>
+
+<p>As Mikako Harada just 
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/materials-from-aec-devcamp-2012.html">
+pointed out</a>,
+
+the final version of the AEC DevCamp 2012 material is now available and has been relocated to its two final archival sites:
+
+<ul>
+<li>For ADN members: 
+<a href="http://adn.autodesk.com">ADN extranet</a> &gt; 
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&amp;id=5105692">Events</a> &gt; 
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&amp;id=19908969">Autodesk DevCamps 2012</a></li>
+              
+<li>Public: 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_webcast_archive.php">ADN Archive</a> &gt;
+<a href="http://download.autodesk.com/media/adn/Autodesk_AEC_DevCamp_2012.zip">AEC DevCamp - June 6, 2012</a></li>
+</ul>
+
+<p>For more information on the content, please refer to 
+
+<ul>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2012/06/aec-devcamp-2012-material.html">overview of the five tracks and the classes in each</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-one.html">Day one</a> of the Revit advanced track
+<li>Most of <a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html">day two</a> of the Revit advanced track
+<li>The <a href="http://adndevblog.typepad.com/files/aec-devcamp-2012---list-of-classes-final2-1.pdf">complete list of classes and course descriptions</a>
+</ul>
+
+<p>I hope you will find this material useful.  
+
+<p>Please note that the temporary DevCamp 2012 project site on Buzzsaw which was used during the event and up until now will be closed on July 2<sup>nd</sup>.
+
+<p>Once again, many thanks to all participants!
+It was great to have you there and meet!
+
+
+
+<a name="3"></a>
+
+<h4>Disk Full</h4>
+
+<p>Unfortunately, I spent much less time than expected on fun stuff, since almost all my time yesterday and this morning went to shuffling around gigabytes of files on my overfilled PC and external hard disk.
+
+<p>I was still using the Revit Quasar release preview, which suddenly stopped working.
+No big surprise, of course.
+
+<p>To 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/migrate-building-coder-samples-to-revit-2013.html">
+obtain a one-box version</a>, 
+
+I went for the ultimate design suite, which requires downloading seven 4 GB files for a grand total of 27.3 GB.
+After finally creating enough space for them and freeing up as much as possible for installation, I launched the installer.
+It took an hour or longer to just copy temporary files and then aborted with a disk full error before even starting the installation proper.
+
+<p>I just went out and bought a new and bigger external hard disk, and am still working at freeing up more space.
+Very time consuming business, this.
+
+<p>I later found two other helpful items which gave me another couple of gig:
+
+<ul>
+<li>
+<a href="http://www.ehow.com/how_5891038_delete-windows-installer-cache.html">Delete the Windows installer cache</a>:
+<ol>
+<li>Open Disk Cleanup: Start &gt; Run &gt; cleanmgr &gt; OK. This will launch the Disk Cleanup utility.
+<li>Select 'Temporary Files', the Windows Installer cache directory. 
+<li>Click OK.
+</ol>
+
+<li>
+<a href="http://www.ehow.com/how_12157017_clear-ccm-cache.html">Clear the CCM cache</a>:
+<ol>
+<li>Select Start &gt; Settings &gt; Control Panel.
+<li>Double click 'Configuration Manager' and open the 'Advanced' tab.
+<li>Change the location of future cached files, if needed, by clicking the 'Change Location' button and choosing a new location on your hard drive. The default location is '%windir%\system32\CCM\Cache.'
+<li>Delete all cached files in CCM by clicking the 'Delete Files' button. Press 'Yes' if asked to confirm.
+<li>Click 'OK' to save changes and exit the Advanced window.
+</ol>
+</ul>
+
+<p>I'm up to 44 GB free space now...
+
+<p>Meanwhile, I can talk about what I did for the OBJ exporter before uninstalling Quasar RP.
+
+
+<a name="4"></a>
+
+<h4>Model up to Cloud and Down to Mobile</h4>
+
+<p>As I explained yesterday in the basic
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/getting-going-with-the-cloud.html">
+Revit model export considerations</a>,
+
+the purpose of this exercise is to push Revit model data up to the cloud and provide access to it from mobile devices.
+
+<p>Adam Nagy is also currently discussing a similar project on the AEC DevBlog.
+After presenting his
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-1.html">
+Revit add-in to upload geometry data to a storage service</a>, 
+
+the second instalment discusses an
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-2.html">
+iOS application to download and display the data using OpenGL</a>.
+
+<p>One thing that I am thinking of doing is to define a flexible exporter architecture so that different export targets can easily be plugged in, for instance to switch between different file formats and disk-based versus cloud-based repositories.
+
+
+<a name="5"></a>
+
+<h4>Face Emitter Interface</h4>
+
+<p>For the moment, I am working with the following pretty trivial interface definition which only specifies one single output method to export a Revit geometry face:
+
+<pre class="code">
+<span class="blue">interface</span> <span class="teal">IJtFaceEmitter</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Emit a face with a specified colour.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> EmitFace( <span class="teal">Face</span> face, <span class="teal">Color</span> color );
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the final triangle count </span>
+&nbsp; <span class="gray">///</span><span class="green"> after processing all faces.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> GetFaceCount();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the final triangle count </span>
+&nbsp; <span class="gray">///</span><span class="green"> after processing all faces.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> GetTriangleCount();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the final vertex count </span>
+&nbsp; <span class="gray">///</span><span class="green"> after processing all faces.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> GetVertexCount();
+}
+</pre>
+
+<p>It also provides methods to query the number of exported faces and the resulting triangles and vertices when finished.
+I would have liked to define the count methods as simple properties instead, but that apparently cannot be done in an interface specification, unfortunately.
+
+
+<a name="6"></a>
+
+<h4>OBJ Exporter Implementation</h4>
+
+<p>The OBJ exporter class implementing this interface makes use of the vertex lookup dictionaries that I discussed yesterday to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html#5">
+eliminate duplicate vertices</a>.
+
+Initially I used the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html#6">
+XYZ-based lookup class</a>, and 
+
+later I switched to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html#7">
+integer-based one</a> instead.
+
+<p>The exported implements the four methods required by the interface definition plus a fifth method to save the resulting file:
+
+<ul>
+<li>EmitFace: export a Revit geometry Face object.
+<li>GetFaceCount, GetTriangleCount, GetVertexCount: return object counts.
+<li>ExportTo: save the resulting OBJ file.
+</ul>
+
+<p>The helper method StoreTriangle is called by EmitFace to populate the vertex lookup dictionary and triangle list.
+
+<p>The helper methods EmitVertex and EmitFacet are called by ExportTo to write out the OBJ vertex and face records.
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">ObjExporter</span> : <span class="teal">IJtFaceEmitter</span>
+{
+&nbsp; <span class="green">//VertexLookupXyz _vertices;</span>
+&nbsp; <span class="teal">VertexLookupInt</span> _vertices;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List of triangles, defined as </span>
+&nbsp; <span class="gray">///</span><span class="green"> triples of vertex indices.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; _triangles;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Keep track of the number of faces processed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> _faceCount;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Keep track of the number of triangles processed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> _triangleCount;
+&nbsp;
+&nbsp; <span class="blue">public</span> ObjExporter()
+&nbsp; {
+&nbsp; &nbsp; _faceCount = 0;
+&nbsp; &nbsp; _triangleCount = 0;
+&nbsp; &nbsp; _vertices = <span class="blue">new</span> <span class="teal">VertexLookupInt</span>();
+&nbsp; &nbsp; _triangles = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add the vertices of the given triangle to our</span>
+&nbsp; <span class="gray">///</span><span class="green"> vertex lookup dictionary and emit a triangle.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> StoreTriangle( <span class="teal">MeshTriangle</span> triangle )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 3; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = triangle.get_Vertex( i );
+&nbsp; &nbsp; &nbsp; <span class="teal">PointInt</span> q = <span class="blue">new</span> <span class="teal">PointInt</span>( p );
+&nbsp; &nbsp; &nbsp; _triangles.Add( _vertices.AddVertex( q ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Emit a Revit geometry Face object and </span>
+&nbsp; <span class="gray">///</span><span class="green"> return the number of resulting triangles.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> EmitFace( <span class="teal">Face</span> face, <span class="teal">Color</span> color )
+&nbsp; {
+&nbsp; &nbsp; ++_faceCount;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Mesh</span> mesh = face.Triangulate();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = mesh.NumTriangles;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot; {0} mesh triangles&quot;</span>, n );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++_triangleCount;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">MeshTriangle</span> t = mesh.get_Triangle( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; StoreTriangle( t );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> n;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetFaceCount()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _faceCount;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the number of triangles processed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetTriangleCount()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = _triangles.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 == n % 3,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a multiple of 3&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( _triangleCount.Equals( n / 3 ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal triangle count&quot;</span> );
+
+&nbsp; &nbsp; <span class="blue">return</span> _triangleCount;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> GetVertexCount()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _vertices.Count;
+&nbsp; }
+&nbsp;
+<span class="blue">&nbsp; #region</span> ExportTo: output the OBJ file
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Obsolete: emit an XYZ vertex.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> EmitVertex( <span class="teal">StreamWriter</span> s, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; s.WriteLine( <span class="maroon">&quot;v {0} {1} {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( p.X ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( p.Y ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( p.Z ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Emit a vertex to OBJ. The first vertex listed </span>
+&nbsp; <span class="gray">///</span><span class="green"> in the file has index 1, and subsequent ones</span>
+&nbsp; <span class="gray">///</span><span class="green"> are numbered sequentially.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> EmitVertex(
+&nbsp; &nbsp; <span class="teal">StreamWriter</span> s,
+&nbsp; &nbsp; <span class="teal">PointInt</span> p )
+&nbsp; {
+&nbsp; &nbsp; s.WriteLine( <span class="maroon">&quot;v {0} {1} {2}&quot;</span>, p.X, p.Y, p.Z );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Emit an OBJ triangular face.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> EmitFacet(
+&nbsp; &nbsp; <span class="teal">StreamWriter</span> s,
+&nbsp; &nbsp; <span class="blue">int</span> i,
+&nbsp; &nbsp; <span class="blue">int</span> j,
+&nbsp; &nbsp; <span class="blue">int</span> k )
+&nbsp; {
+&nbsp; &nbsp; s.WriteLine( <span class="maroon">&quot;f {0} {1} {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; i + 1, j + 1, k + 1 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ExportTo( <span class="blue">string</span> path )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamWriter</span> s = <span class="blue">new</span> <span class="teal">StreamWriter</span>( path ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PointInt</span> key <span class="blue">in</span> _vertices.Keys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; EmitVertex( s, key );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = _triangles.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( i &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> i1 = _triangles[i++];
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> i2 = _triangles[i++];
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> i3 = _triangles[i++];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; EmitFacet( s, i1, i2, i3 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// ExportTo: output the OBJ file</span>
+}
+</pre>
+
+<p>The command mainline makes use of three other helper methods:
+
+<ul>
+<li>GetSolid: Retrieve the first non-empty solid found for a given element.
+<li>ExportElement: Export an individual element.
+<li>ExportElements: Export all elements retrieved by a filtered element collector.
+</ul>
+
+
+<a name="7"></a>
+
+<h4>Retrieving a Solid from an Element</h4>
+
+<p>The GetSolid helper method retrieves the first non-empty solid found for a given element. 
+
+<p>In case it is a family instance, it may have its own non-empty solid, in which case we use that. 
+Otherwise we search the symbol geometry. 
+If we use the symbol geometry, we might have to keep track of the instance transform to map it to the actual instance project location. 
+Instead, we ask for transformed geometry to be returned, so the resulting solid is already in place:
+
+<pre class="code">
+<span class="teal">Solid</span> GetSolid( <span class="teal">Element</span> e, <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="green">//Transform t = Transform.Identity;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid &amp;&amp; <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp; &nbsp; &nbsp; <span class="green">//t = inst.Transform;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> solid;
+}
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Exporting an Element</h4>
+
+<p>The ExportElement helper method exports a given element and returns the number of solids found and exported from it.
+
+<p>If the element is a group, this method is called recursively on the group members, so the return value may be greater than one:
+
+<pre class="code">
+<span class="blue">int</span> ExportElement(
+&nbsp; <span class="teal">IJtFaceEmitter</span> emitter,
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="teal">Group</span> group = e <span class="blue">as</span> <span class="teal">Group</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != group )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> group.GetMemberIds() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e2 = e.Document.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; n += ExportElement( emitter, e2, opt );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> n;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( e );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e.Category )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Element '{0}' has no &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;category.&quot;</span>, desc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = GetSolid( e, opt );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unable to access &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;solid for element {0}.&quot;</span>, desc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Material</span> material;
+&nbsp; <span class="teal">Color</span> color;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; {
+&nbsp; &nbsp; material = e.Document.GetElement(
+&nbsp; &nbsp; &nbsp; face.MaterialElementId ) <span class="blue">as</span> <span class="teal">Material</span>;
+&nbsp;
+&nbsp; &nbsp; color = ( <span class="blue">null</span> == material )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : material.Color;
+&nbsp;
+&nbsp; &nbsp; emitter.EmitFace( face, color );
+&nbsp; }
+&nbsp; <span class="blue">return</span> 1;
+}
+</pre>
+
+
+
+<a name="9"></a>
+
+<h4>Exporting all Collected Elements</h4>
+
+<p>The ExportElements helper method exports all elements returned by a filtered element collector and reports the results:
+
+<pre class="code">
+<span class="blue">void</span> ExportElements(
+&nbsp; <span class="teal">IJtFaceEmitter</span> emitter,
+&nbsp; <span class="teal">FilteredElementCollector</span> collector,
+&nbsp; <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="blue">int</span> nElements = 0;
+&nbsp; <span class="blue">int</span> nSolids = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; ++nElements;
+&nbsp;
+&nbsp; &nbsp; nSolids += ExportElement( emitter, e, opt );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> nFaces = emitter.GetFaceCount();
+&nbsp; <span class="blue">int</span> nTriangles = emitter.GetTriangleCount();
+&nbsp; <span class="blue">int</span> nVertices = emitter.GetVertexCount();
+&nbsp;
+&nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} with {2} solid{3}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{4} face{5}, {6} triangle{7} and &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{8} vertice{9} exported.&quot;</span>,
+&nbsp; &nbsp; nElements, <span class="teal">Util</span>.PluralSuffix( nElements ),
+&nbsp; &nbsp; nSolids, <span class="teal">Util</span>.PluralSuffix( nSolids ),
+&nbsp; &nbsp; nFaces, <span class="teal">Util</span>.PluralSuffix( nFaces ),
+&nbsp; &nbsp; nTriangles, <span class="teal">Util</span>.PluralSuffix( nTriangles ),
+&nbsp; &nbsp; nVertices, <span class="teal">Util</span>.PluralSuffix( nVertices ) );
+&nbsp;
+&nbsp; InfoMsg( msg );
+}
+</pre>
+
+
+<a name="10"></a>
+
+<h4>Exporter Mainline</h4>
+
+<p>The external command mainline sets up a filtered element collector to define all elements to be exported.
+
+<p>It supports pre-selecting specific elements, in which case only those are used.
+
+<p>Even when limiting the filtered element collector to a predefined set, at least one filter must still be applied, or the filtered element collector will throw an exception.
+
+<p>I chose to apply the WhereElementIsNotElementType and WhereElementIsViewIndependent in all cases.
+
+<p>The user is prompted to select an output file, the exporter is instantiated, and the job is done:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Determine elements to export</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; <span class="teal">SelElementSet</span> set = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = set.Size;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// If any elements were preselected,</span>
+&nbsp; &nbsp; <span class="green">// export those to OBJ</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = set
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Element</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Element</span>, <span class="teal">ElementId</span>&gt;( e =&gt; e.Id )
+&nbsp; &nbsp; &nbsp; .ToArray&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc, ids );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// If nothing was preselected, export </span>
+&nbsp; &nbsp; <span class="green">// all model elements to OBJ</span>
+&nbsp;
+&nbsp; &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; }
+&nbsp;
+&nbsp; collector.WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent();
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _export_folder_name )
+&nbsp; {
+&nbsp; &nbsp; _export_folder_name = <span class="teal">Path</span>.GetTempPath();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">string</span> filename = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !FileSelect( _export_folder_name, 
+&nbsp; &nbsp; <span class="blue">out</span> filename ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; _export_folder_name 
+&nbsp; &nbsp; = <span class="teal">Path</span>.GetDirectoryName( filename );
+&nbsp;
+&nbsp; <span class="teal">ObjExporter</span> exporter = <span class="blue">new</span> <span class="teal">ObjExporter</span>();
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; ExportElements( exporter, collector, opt );
+&nbsp;
+&nbsp; exporter.ExportTo( filename );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="11"></a>
+
+<h4>Export Results</h4>
+
+<p>Here is the result of exporting a single wall. 
+It is actually one of the end walls in the standard Revit sample project rac_advanced_sample_project.rvt:</p>
+
+<center>
+<img src="img/obj_export_complex_wall.png" alt="A single wall in OBJ"/>
+</center>
+
+<p>Here are the resulting object counts of resulting elements, faces, triangles, etc.:</p>
+
+<center>
+<img src="img/obj_export_complex_wall_msg.png" alt="Single wall object counts"/>
+</center>
+
+<p>Running the same command without preselecting anything exports the entire model.
+Again, using rac_advanced_sample_project.rvt, the result looks like this:</p>
+
+<center>
+<img src="img/obj_export_entire_model.png" alt="Entire model in OBJ"/>
+</center>
+
+<p>The following object counts are reported in this case:</p>
+
+<center>
+<img src="img/obj_export_entire_model_msg.png" alt="Entire model object counts"/>
+</center>
+
+<p>The resulting OBJ file <a href="src/ObjExport/test/sample_model.obj">sample_model.obj</a> is 5 MB in size, which is pretty tolerable considering all faces are completely triangulated.
+
+<p>As you can see in both of these cases, the number of faces is significantly higher than the number of vertices.
+Just imagine what the number of vertices and resulting file size would be like if I had not gone to the effort of eliminating duplicate vertices.
+The vertex count would simply have been three times the triangle count in both cases, i.e. 82 * 3 = 246 instead of 43, a factor of 5.72, and 163964 * 3 = 491892 instead of 86527, a factor of 5.68.

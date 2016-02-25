@@ -1,0 +1,215 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07745121 [TaskDialog]
+
+-->
+
+<h3>Ensure WPF Add-in Remains in Foreground</h3>
+
+<p>Autumn arrived and passed in a flash.
+The woods are beautifully coloured, and, unusually, the first snow is already lying on the surrounding hills.
+
+<p>Here are some items of interest from cases we looked at last week:
+
+<ol>
+<li><a href="#1">Ensure WPF add-in remains in foreground</a>
+<li><a href="#2">Retrieve all model lines</a>
+<li><a href="#3">Set linked file visibility</a>
+<li><a href="#4">Access linked file elements and data</a>
+<li><a href="#5">Visual Studio 2012 Model Editor Supports OBJ and FBX</a>
+<li><a href="#6">Sie M&ouml;gen Sich</a>
+</ol>
+
+
+
+<a name="1"></a>
+
+<h4>Ensure WPF Add-in Remains in Foreground</h4>
+
+
+<p>Here is an issue concerning an interaction between a WPF add-in and the Revit TaskDialog, raised and solved by Simon Hooper of
+
+<a href="http://www.bestech.co.uk">Bestech Systems Ltd</a>:
+
+
+<p><strong>Question:</strong> I have a modal WPF Revit add-in application.
+
+<p>If I show a TaskDialog, e.g. call <code>TaskDialog.Show("Global", "Hello World")</code>, my WPF add-in is sent to 'the back' behind Revit, in spite of being modal!
+
+<p>If I use <code>MessageBox.Show("")</code>, the problem does not occur.
+
+<p>How can this be resolved, please?
+
+
+<p><strong>Answer:</strong> I ensured that the WPF form properly parented, i.e. is it a child form of the Revit main application window.
+
+<p>Googling for "JtWindowHandle wrapper class" provides lots of examples of how to parent a normal .NET modeless form.
+
+<p>The procedure is applicable to WPF forms as well.
+
+<p>It seems like the problem is solved by using the following lines:
+ 
+<pre class="code">
+&nbsp; exportForm = <span class="blue">new</span> ExportForm();
+&nbsp;
+&nbsp; System.Windows.Interop.<span class="teal">IWin32Window</span> revit_window 
+&nbsp; &nbsp; = <span class="blue">new</span> JtWindowHandle( Autodesk.Windows
+&nbsp; &nbsp; &nbsp; .ComponentManager.ApplicationWindow );
+&nbsp;
+&nbsp; System.Windows.Interop.WindowInteropHelper helper 
+&nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Interop.WindowInteropHelper(
+&nbsp; &nbsp; &nbsp; exportForm );
+&nbsp;
+&nbsp; helper.Owner = revit_window.Handle;
+</pre>
+
+<p>The helper line was the key.
+
+
+<a name="2"></a>
+
+<h4>Retrieve all Model Lines</h4>
+
+<p><strong>Question:</strong> I have a very simple question.
+
+<p>I want to scan my Revit model for all Model Line instances. 
+
+<p>RevitLookup tells me I should use the built-in category OST_Lines in my filter, but it does not find the lines. 
+
+<p>Here is my logic:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ElementClassFilter</span> familyInstanceFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ElementCategoryFilter</span> oCategoryFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Lines );
+&nbsp;
+&nbsp; <span class="teal">LogicalAndFilter</span> andFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>(
+&nbsp; &nbsp; &nbsp; familyInstanceFilter,
+&nbsp; &nbsp; &nbsp; oCategoryFilter );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; oElements
+&nbsp; &nbsp; = collector.WherePasses( andFilter )
+&nbsp; &nbsp; &nbsp; .ToElements();
+</pre>
+
+<p>However, this returns nothing at all!
+
+<p>What is wrong?
+
+
+<p><strong>Answer:</strong> 
+
+Yes, this is indeed a rather simple question.
+
+<p>Model lines are model curves. 
+Model curves are not family instances.
+
+<p>Your collector includes a family instance filter.
+The family instance filter will eliminate all model curves, preventing any model lines from being found.
+
+<p>Simply remove the family instance class filter, or replace it by a model curve class filter.
+
+<p>By the way, the most common quick filters are all available using shortcut methods on the collector class itself.
+
+<p>Using the shortcut methods saves you from having to instantiate a separate filter instance, and ensures that all the filters you apply are quick filers.
+
+<p>All the following three variants should work, and presumably produce identical results:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ModelCurve</span> ) )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Lines );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Lines );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ModelCurve</span> ) );
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Set Linked File Visibility</h4>
+
+<p>Saikat Bhattacharya demonstrates the use of the View class HideElements and UnhideElements methods to 
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/setting-visibility-of-linked-files-using-revit-api.html">
+control the visibility of linked files</a>, 
+
+and points out that the SetVisibility method cannot be used for this purpose.
+
+
+<a name="4"></a>
+
+<h4>Access Linked File Elements and Data</h4>
+
+<p>On a still more exciting and ever recurring linked file topic, Saikat shows how easy it is to access the elements and data contained in a linked file, e.g. to
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/accessing-data-from-linked-file-using-revit-api.html">
+read the level information of all walls in a linked file</a>.
+
+
+<a name="5"></a>
+
+<h4>Visual Studio 2012 Model Editor Supports OBJ and FBX</h4>
+
+<p>Visual Studio 2012 includes a 
+
+<a href="http://msdn.microsoft.com/en-us/library/hh315734.aspx">
+Model Editor</a> that
+
+enables you to inspect the 3-D model formats OBJ, Autodesk FBX and COLLADA. 
+You can also use built-in 3-D primitive generation and materials to create placeholder art for 3-D games and applications.
+
+<p>That sounds handy, doesn't it?
+
+<p>I recently had a look at the OBJ format to implement
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">
+Revit model export to OBJ</a>, 
+
+and obviously Revit already provides built-in support for 
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00001-Revit_He0/1468-Document1468/2171-Print_Ex2171/2172-Export2172/2226-Exportin2226/2232-Exportin2232">FBX export</a>
+
+(<a href="http://wikihelp.autodesk.com/Revit_LT/enu/2013/Help/0075-Revit_LT75/0888-Document888/1536-Print_Ex1536/1537-Export1537/1575-Exportin1575/1581-Exportin1581">LT</a>,
+
+<a href="http://wikihelp.autodesk.com/Vasari/enu/B1/Help/0296-Visualiz296/0499-Print_Ex499/0500-Export500/0544-Exportin544">Vasari</a>).
+
+<p>If you wanted to work in depth with FBX yourself, you would presumably use the 
+
+<a href="http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847">
+FBX SDK</a>,
+
+currently at version 2013.3, supporting C++ development in Visual Studio 2005, 2008, and 2010.
+
+<!-- Right now even though Revit, AutoCAD, 3ds Max, etc. all support the Autodesk materials, and also FBX exchange format, the Autodesk materials are encrypted with no way to access the material information. -->
+
+
+
+<a name="6"></a>
+
+<h4>Sie M&ouml;gen Sich</h4>
+
+<p>For something completely unrelated to computers and technology, here is a seven minute video, <a href="http://www.youtube.com/watch?v=apCal7ihvy0">Sie mögen sich</a>, a quite deep philosophical relationship analysis by Shaban & K&auml;ptn Peng that my son Christopher pointed out and that I enjoyed a lot:</p>
+
+<iframe width="480" height="274" src="http://www.youtube.com/embed/apCal7ihvy0" frameborder="0" allowfullscreen></iframe>
+
+<p>It is in German, however, and probably makes no sense at all unless you understand the language.

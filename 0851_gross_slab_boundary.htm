@@ -1,0 +1,193 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07666381 [Sign In Help] -->
+
+<h3>Gross Slab Boundary and the Temporary Transaction Trick</h3>
+
+<p>Last week I provided an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/slab-boundary-revisited.html">
+updated version</a>
+
+of the  
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+CmdSlabBoundary</a>
+
+external command to determine a floor slab boundary.
+
+<p>Here is a follow-up to that issue:
+
+<p><strong>Question:</strong> The solution provided to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/slab-boundary-revisited.html">
+retrieve the slab boundary</a> works 
+
+fine for me if no openings are cut out.
+
+<p>I have a situation where my slabs are cut by openings, however, and I need to retrieve the original uncut gross slab boundary.
+
+<p>Here is an example with two slabs A and B and an opening cutting out part of both of them:</p>
+
+<center>
+<img src="img/gross_slab_boundary_1.png" alt="Two slabs cut by an opening"/>
+</center>
+
+<p>The solution provided retrieves the cut out net slab boundary:</p>
+
+<center>
+<img src="img/gross_slab_boundary_2.png" alt="Net cut slab boundary"/>
+</center>
+
+<p>How can I obtain the following original gross uncut slab boundary?</p>
+
+<center>
+<img src="img/gross_slab_boundary_3.png" alt="Gross original uncut slab boundary"/>
+</center>
+
+<p><strong>Answer:</strong> One way to obtain the unmodified geometry of the slab is to use the temporary transaction trick to temporarily eliminate all openings and other elements affecting its shape.
+
+<p>This technique was used to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+determine gross material quantities</a> of 
+
+floors, walls and roofs in the material quantities sample from Scott Conover's Autodesk University 2009 class on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>,
+
+which was later add to the Revit SDK as the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+MaterialQuantities</a> sample. 
+
+<p>It shows how the transaction handling for the temporary operation can be simply and cleanly encapsulated. 
+
+<p>It analyses the material quantities of walls, floors, and roofs, and outputs the result to Excel by implementing the following steps:
+
+<ol>
+<li>Collect all roof elements
+<li>Iterate through each material found in each roof element
+<li>Find the net volume and area of the material
+<li>Store the material quantities
+<li>Write the results to the output file
+<li>Find the gross material quantities
+<ol type="a">
+<li>Start a new transaction
+<li>Delete the elements that cut the host (doors, windows, openings)
+<li>Find the volume and area for each material
+<li>Store the material quantities
+<li>Write the results to the output file
+<li>Rollback the transaction
+</ol>
+<li>Repeat the above steps for walls and floors
+<li>Open the output file in Microsoft Excel
+</ol>
+
+<p>To determine the boundary lines of the floor slab with all opening removed, you could proceed in the same fashion as described in step 6 for obtaining the gross material quantities.
+
+<p>Temporarily delete then openings in a separate transaction, retrieve the original slab geometry, and abort the transaction to restore the original state. 
+
+<p>This technique is easy to implement.
+We reused this method for many different purposes a number of times, e.g.
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+Determine host reference</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+Material quantity extraction</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/unmodified-element-geometry.html">
+Unmodified element geometry</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+Object relationships</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">VB</a>)
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+Retrieve all model elements via a temporary 3D view</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html">
+Access to sketch and sketch plane</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/08/wall-joins-and-geometry.html">
+Retrieve unjoined wall geometry</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">
+Retrieving detailed wall layer geometry</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/unit-conversion-and-display-string-formatting.html">
+Unit conversion and display string formatting</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html">
+Determine Revit demo mode</a>
+
+</ul>
+
+<p><strong>Addendum:</strong> Arno&scaron;t L&ouml;bel pointed out that 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+this will not always work</a>.
+
+Some modifications require the transaction to be committed before they take full effect.
+The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+workaround</a> for 
+
+that is to enclose it within a transaction group and roll back the group at the end.
+
+
+<a name="2"></a>
+
+<h4>Apphack @ AU</h4>
+
+<p>Do you have an interesting AutoCAD app you would like to publish?
+
+<p>Will you attend Autodesk University 2012 and would you like to win an attractive prize?
+
+<p>If so, take a look at the 
+
+<a href="http://promoshq.wildfireapp.com/website/6/contests/296215">
+APPHACK @ AU Hackathon</a>:</p>
+
+<center>
+<img src="img/au_2012_apphack.png" alt="Apphack @ AU"/>
+</center>
+
+<p>The 
+
+<a href="http://promoshq.wildfireapp.com/website/6/contests/296215/rules">
+official rules</a>
+
+list some great prizes.
+
+Unfortunately, they also restrict the participation to AutoCAD apps, so Revit add-ins are not permissible.
+
+<p>Kean Walmsley provides a 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/10/apphack-au-2012.html">
+a few more details</a>.
+
+<!--
+
+<a name="2"></a>
+
+<a href="">
+</a>
+
+<h4></h4>
+
+
+<pre>
+</pre>
+
+<pre class="code">
+</pre>
+
+-->

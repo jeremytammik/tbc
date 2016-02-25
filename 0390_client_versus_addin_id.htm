@@ -1,0 +1,28 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>ClientId Versus AddInId</h3>
+
+<p>Looking at many other developers' add-in manifest files here at the AEC DevLab in Waltham, I just noticed that the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#4">
+ClientId tag</a>
+
+that I have been using in my manifest files has actually been renamed to AddInId to be more consistent.
+Most other developers are using the AddInId tag instead of the ClientId one.
+The ClientId tag still works, but maybe I should start using AddInId myself as well in future.
+
+<p>I updated my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#5">
+guidize utility</a> to
+
+populate and update the contents of both the AddInId and ClientId tags.
+Here is version 2 which does that, both the 
+
+<a href="zip/guidize_src_2.zip">
+complete source code and Visual Studio solution file</a> and also the 
+
+<a href="zip/guidize_exe_2.zip">
+ready-built executable</a> for non-programmers. 

@@ -1,0 +1,93 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!--
+1234145 [How to display .rfa files, thumbnails in a windows.forms.picturebox]
+1238181 [Revit Preview Thumbnail]
+1245958 [Family or DWF viewer control]
+1249033 [icons and Instance properties]
+1249099 [.rfa Bitmap preview]
+1251446 [Revit API thumbnails]
+more search keys: preview image render bitmap
+-->
+
+<h3>RVT and RFA Thumbnail Image</h3>
+
+<p>Here is a question that reappears pretty regularly.</p>
+
+<p><strong>Question:</strong>
+How can I obtain the preview bitmap image or thumbnail from a Revit project or family file using the Revit API?</p>
+
+<p>This is an example of the kind of image I am interested in:</p>
+
+<img src="img/rfa_thumbnail.jpg" alt="RFA thumbnail preview bitmap image"/>
+
+<p><strong>Answer:</strong>
+The topic of 
+
+<a href="http://redbolts.com/blog/post/2008/12/01/Getting-your-Revit-thumbnails.aspx">
+getting your Revit thumbnails</a>
+
+was already been discussed by
+
+<a href="http://redbolts.com/blog">
+Guy Robinson</a>
+
+in
+
+<a href="http://redbolts.com/blog">
+Bolt out of the Red</a>, 
+
+but for completeness sake I will partially reiterate it here as well, since the query keep reappearing.</p>
+
+<p>The Revit API does not provide any built-in support for this, but you can make use of generic Windows API functionality instead.
+Revit project files use Windows structured storage to manage resources internally. 
+You can use the DocFile Viewer utility dfview.exe to look at the structured storage file contents. 
+Here is an example of a Revit project file with the preview image highlighted:</p>
+
+<img src="img/dfview2.png" alt="RVT file structured storage and preview image in dfview.exe"/>
+
+<p>We had a short look at the internal RVT file structure when exploring how to extract the Revit build version from 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html">
+RVT</a> 
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/rfa-version-grey-commands-family-context-and-rdb-link.html#1">
+RFA</a> 
+
+files.</p>
+
+<p>The thumbnail is a standard PNG file inserted into the Revit structured storage document.</p>
+
+<p>To extract the preview thumbnail image, you can use the Windows
+
+<a href="http://msdn.microsoft.com/en-us/library/bb761848(VS.85).aspx">
+IExtractImage interface</a>. 
+
+Preview.dll is a shell plug-in, i.e. an object that implements this interface. 
+It is used by the Windows Shell Folders to extract preview images for "known" file types.
+The preview extractor needs to register itself in the registry and implement the two following standard API functions:</p>
+
+<pre class="code">
+  STDMETHOD(GetLocation)(
+    LPWSTR pszPathBuffer,
+    DWORD cchMax,
+    DWORD *pdwPriority,
+    const SIZE *prgSize,
+    DWORD dwRecClrDepth,
+    DWORD *pdwFlags);
+
+  STDMETHOD(Extract)(HBITMAP*);
+</pre>
+
+<p>More details and sample code are available from 
+
+<a href="http://redbolts.com/blog/post/2008/12/01/Getting-your-Revit-thumbnails.aspx">
+Guy's post</a>.</p>

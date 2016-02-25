@@ -1,0 +1,63 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1270373 [Setting Cable Tray shape via API] -->
+
+<h3>Modifying Cable Tray Shape</h3>
+
+<p><strong>Question:</strong> I am able to successfully duplicate cable tray family types via the Revit API.
+
+<p>I would like to use that feature to duplicate an existing cable tray family type and then change the shape of a given cable tray to the new type.
+
+<p>So far, I have not been able to find any API methods to achieve this. 
+Is it possible?
+If so, how, please?
+
+
+<p><strong>Answer:</strong> There is nothing special at all about changing the cable tray type from channel to ladder.
+In fact, the approach to use is completely generic and can be used to change the type of almost any Revit element from its current element type to any other compatible type.
+I already provided a pretty generic solution to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/change-element-type.html">change the element type</a>.
+
+Please note that you can often achieve a lot of powerful functionality through the Revit API just making use of very generic and basic element and parameter access.
+
+<p>Still, here is a dedicated code snippet which selects the cable trays in a given model and changes their type from Channel to Ladder. 
+
+<p>You can run this code in any model with a channel shaped cable tray and a cable tray type named "Ladder Cable Tray" loaded. 
+As said, it changes all cable trays to ladder shaped:
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> doc = commandData.Application
+&nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="green">// Get the trays</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> trays 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_CableTray )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp;
+&nbsp; <span class="green">// Get the ladder tray type</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> trayTypes 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">CableTrayType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Element</span> ladderType = trayTypes.First&lt;<span class="teal">Element</span>&gt;( 
+&nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;Ladder Cable Tray&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// Set all trays type to ladder</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> tray <span class="blue">in</span> trays )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Edit Type&quot;</span> );
+&nbsp; &nbsp; trans.Start();
+&nbsp; &nbsp; tray.ChangeTypeId( ladderType.Id );
+&nbsp; &nbsp; trans.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Many thanks to Saikat Bhattacharya for this solution.

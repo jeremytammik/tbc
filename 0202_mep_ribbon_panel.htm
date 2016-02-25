@@ -1,0 +1,224 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1252576 [Use a button-image from the resources]
+
+-->
+
+<h3>MEP Sample Ribbon Panel</h3>
+
+<p>I am preparing our upcoming Revit MEP API webcast to be held on Thursday August 27<sup>th</sup>.
+To register, you can go to the Autodesk Developer Network (ADN) DevTech API
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+training schedule</a>
+
+and filter for Revit MEP API.</p>
+
+<p>One thing I did today was to update our MEP sample external application from the Revit 2009 menu-based user interface to a 2010-style custom ribbon panel.
+
+<p>Here is the code for the AddMenu method that was being used in Revit 2009 to create a custom menu:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> AddMenu( ControlledApplication app )
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> m = <span class="maroon">&quot;mep.Cmd&quot;</span>; <span class="green">// namespace and command prefix</span>
+&nbsp; <span class="blue">string</span> path = System.Reflection.<span class="teal">Assembly</span>.GetExecutingAssembly().Location;
+&nbsp; Autodesk.Revit.MenuItem rootMenu = app.CreateTopMenu( <span class="maroon">&quot;ME&amp;P API Samples&quot;</span> );
+&nbsp; MenuItem.MenuType mt = MenuItem.MenuType.BasicMenu;
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;&amp;Assign flow to terminals&quot;</span>, path, m + <span class="maroon">&quot;AssignFlowToTerminals&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;&amp;Change size&quot;</span>, path, m + <span class="maroon">&quot;ChangeSize&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;&amp;Populate CFM per SF on spaces&quot;</span>, path, m + <span class="maroon">&quot;PopulateCfmPerSf&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;&amp;Reset demo&quot;</span>, path, m + <span class="maroon">&quot;ResetDemo&quot;</span> );
+&nbsp; rootMenu.Append( MenuItem.MenuType.SeparatorMenu );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;Electrical &amp;System Browser&quot;</span>, path, m + <span class="maroon">&quot;ElectricalSystemBrowser&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;Electrical &amp;Hierarchy&quot;</span>, path, m + <span class="maroon">&quot;ElectricalHierarchy&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;Electrical Hierarchy &amp;2&quot;</span>, path, m + <span class="maroon">&quot;ElectricalHierarchy2&quot;</span> );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;&amp;Unhosted elements&quot;</span>, path, m + <span class="maroon">&quot;UnhostedElements&quot;</span> );
+&nbsp; rootMenu.Append( MenuItem.MenuType.SeparatorMenu );
+&nbsp; rootMenu.Append( mt, <span class="maroon">&quot;A&amp;bout...&quot;</span>, path, m + <span class="maroon">&quot;About&quot;</span> );
+}
+</pre>
+
+<p>To see the overly long lines, you can copy and paste to an editor.
+
+<p>AddMenu is called from the external application OnStartup method.
+
+<p>How can this be easily converted to a ribbon panel?
+
+<p>Well, note a couple of basic things here:
+
+<ul>
+<li>All the command implementation classes reside in the namespace mep and have the prefix "Cmd". Therefore, the variable 'm' is defined as "mep.Cmd" and used to prefix each command class name stem.
+<li>All commands reside in the same assembly as the external application, so they all have the same assembly path as the currently executing assembly.
+<li>A new top level menu with the text 'MEP API Samples' is created.
+<li>The menu items for the individual commands are added one by one, grouped by separators into HVAC, electrical, and the about groups.
+</ul>
+
+<p>Converting this to a ribbon panel is pretty straightforward.
+The basics and all possibilities provided by the Revit API for creating your own ribbon panels are demonstrated by the Revit SDK sample Ribbon.
+
+<p>Here is the code for the new AddRibbonPanel method, also called from the external application OnStartup method, which creates an equivalent custom ribbon panel:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> AddRibbonPanel(
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> m = <span class="maroon">&quot;mep.Cmd&quot;</span>; <span class="green">// namespace and command prefix</span>
+&nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly().Location;
+&nbsp;
+&nbsp; <span class="blue">string</span>[] text = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; <span class="maroon">&quot;Assign flow to terminals&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Change size&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Populate CFM per SF on spaces&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Reset demo&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Electrical System Browser&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Electrical Hierarchy&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Electrical Hierarchy 2&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Unhosted elements&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;About...&quot;</span>
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">string</span>[] classNameStem = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; <span class="maroon">&quot;AssignFlowToTerminals&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ChangeSize&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;PopulateCfmPerSf&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ResetDemo&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ElectricalSystemBrowser&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ElectricalHierarchy&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;ElectricalHierarchy2&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;UnhostedElements&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;About&quot;</span>
+&nbsp; };
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// create three stacked buttons for the </span>
+&nbsp; <span class="green">// HVAC, electrical and about commands respectively:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">RibbonPanel</span> panel = a.CreateRibbonPanel(
+&nbsp; &nbsp; <span class="maroon">&quot;MEP Sample&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">PulldownButtonData</span> d1 = <span class="blue">new</span> <span class="teal">PulldownButtonData</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Hvac&quot;</span>, <span class="maroon">&quot;HVAC&quot;</span> );
+&nbsp;
+&nbsp; d1.ToolTip = <span class="maroon">&quot;HVAC Commands&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">PulldownButtonData</span> d2 = <span class="blue">new</span> <span class="teal">PulldownButtonData</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Electrical&quot;</span>, <span class="maroon">&quot;Electrical&quot;</span> );
+&nbsp;
+&nbsp; d2.ToolTip = <span class="maroon">&quot;Electrical Commands&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">PushButtonData</span> d3 = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; classNameStem[8], text[8], path, m + classNameStem[8] );
+&nbsp;
+&nbsp; d3.ToolTip = <span class="maroon">&quot;About the HVAC and Electrical MEP Sample.&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RibbonItem</span>&gt; ribbonItems = panel.AddStackedButtons(
+&nbsp; &nbsp; d1, d2, d3 );
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// add subitems to the HVAC and electrical pulldown buttons:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="teal">PulldownButton</span> pulldown;
+&nbsp; <span class="teal">PushButton</span> pb;
+&nbsp; <span class="blue">int</span> j;
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 8; ++i )
+&nbsp; {
+&nbsp; &nbsp; j = i &lt; 4 ? 0 : 1;
+&nbsp; &nbsp; pulldown = ribbonItems[j] <span class="blue">as</span> <span class="teal">PulldownButton</span>;
+&nbsp;
+&nbsp; &nbsp; pb = pulldown.AddItem( text[i], path,
+&nbsp; &nbsp; &nbsp; m + classNameStem[i] );
+&nbsp;
+&nbsp; &nbsp; pb.ToolTip = text[i];
+&nbsp; }
+}
+</pre>
+
+<p>The procedure to create and populate the panel is straightforward:
+
+<ul>
+<li>We define the external command name prefix and assembly path like before.
+<li>The command name stems and menu item texts are stored in two string arrays.
+<li>A new ribbon panel is created.
+<li>Two pulldown buttons to group the HVAC and electrical commands are added to the panel.
+<li>One push button for the about box command is added.
+<li>The string arrays of menu item texts and class name stems are iterated.
+<li>A ribbon item is created for each command.
+</ul>
+
+<p>Here is the panel as it appears when dragged out of the ribbon to float freely:</p>
+
+<center>
+<img src="img/mep_panel.png" alt="MEP sample custom ribbon panel"/>
+</center>
+
+<p>Here is the complete source code and Visual Studio solution for the
+
+<a href="zip/mep_20090813.zip">
+MEP sample application</a>
+
+in its current state.
+We will be discussing more details of its implementation in the coming weeks.</p>
+
+<p>Here is a related question that just came up:</p>
+
+<h4>Ribbon Panel Image Resources</h4>
+
+<p><strong>Question:</strong>
+I want to populate my Revit add-in ribbon panel with images which I obtain from the resources with a method like this:</p>
+
+<pre>
+internal static System.Drawing.Bitmap door_button {
+  get {
+    object obj = ResourceManager.GetObject(
+      "door_button", resourceCulture);
+
+    return ((System.Drawing.Bitmap)(obj));
+  }
+}
+</pre>
+
+<p>The object type of the image to assign to a button for the ribbon toolbar is System.Windows.Media.ImageSource.
+I tried the same approach as above, to provide a method that returns an object of this type and cast to it to the required type before returning.
+This does not work, even though the compiler does not complain.
+How can I cast between these types, or how else can I retrieve an image of the type System.Windows.Media.ImageSource from the resources, so that I do not have to have the actual image file (png or bitmap) to be distributed with the application?</p>
+
+<p>I see that the method "ResourceManager.GetObject()" returns an object of type "System.Drawing.Bitmap", but the data type to be assigned to a ribbon-button is "BitmapImage". 
+I do not see any common base types or a constructor for this class that allows an object of type "System.Drawing.Bitmap" or any derived class from it, so I do not see how to convert between the types. 
+However, investigating the classes in the class browser I have found a method "FromResource" for the Bitmap class, but I have not seen an example on how to use it.</p>
+
+<p><strong>Answer:</strong>
+When I look at the Revit SDK sample Ribbon, I see it using the class System.Windows.Media.Imaging.BitmapImage to define the external application ribbon images.
+
+<p>I do agree that retrieving the bitmap image from the resources is a much cleaner solution than the one used in the Ribbon sample.
+
+<p>System.Windows.Media.ImageSource is an abstract class, so you will never be able to obtain an instance of that from anywhere.
+
+<p>You can open the PresentationCore assembly in the Visual Studio Object Browser, navigate to the class System.Windows.Media.Imaging.BitmapImage, and open its 'Base Types' sub node. That will show you that it is derived from BitmapSource, which is derived from ImageSource.
+
+<p>The Ribbon sample simply uses the BitmapImage constructor to create a BitmapImage which also constitutes an ImageSource.</p>
+
+<p>Now back to your main question, how to convert from the Bitmap returned from the resource manager to the BitmapImage required by the Revit ribbon API.
+
+<p>I googled for "cast Bitmap BitmapImage" and found various useful hits. 
+Based on these, this is the solution that I ended up with, which I tested in a simple console application:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+{
+&nbsp; <span class="teal">Bitmap</span> a = <span class="teal">Resource1</span>.Image1;
+&nbsp;
+&nbsp; <span class="teal">MemoryStream</span> ms = <span class="blue">new</span> <span class="teal">MemoryStream</span>();
+&nbsp; a.Save( ms, <span class="teal">ImageFormat</span>.Png );
+&nbsp;
+&nbsp; <span class="teal">BitmapImage</span> b = <span class="blue">new</span> <span class="teal">BitmapImage</span>();
+&nbsp; b.BeginInit();
+&nbsp; b.StreamSource = ms;
+&nbsp; b.EndInit();
+}
+</pre>
+
+<p>By the way, another example of using resources and utilising the .NET framework ResourceManager class to manage them is provided by the PowerCircuit Revit SDK sample.</p>

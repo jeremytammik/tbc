@@ -1,0 +1,145 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07696187 [Help for making decisision to use Revit instead of AutoCAD]
+
+-->
+
+<h3>Porting an AutoCAD Application</h3>
+
+<p>AutoCAD and Revit are 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/bim-versus-free-geometry-and-product-training.html">
+very different animals</a>, 
+
+as we already pointed out a couple of times in the past.
+
+<p>Exaggerating just a little, you might say that Revit manages a BIM and ensures its consistency at all times, so there are no exceptions to anything ever, meaning nothing can be overridden.
+Moreover, almost all Revit geometry is parametrically driven, so there is no way to tweak the model geometry either, except of course by changing the official parameter values.
+
+<p>This is obviously a challenge to developers with existing AutoCAD applications.
+Here is another example of some typical considerations of an application developer with an existing full-blown AutoCAD application, wondering whether there is any way to start supporting Revit as well: 
+
+
+<p><strong>Question:</strong> We have customers using our software and asking if we could port our AutoCAD.NET application to Revit.
+
+<p>In our current implementation, we override line functionality to display special walls. 
+We need to modify subcomponents individually, manipulate grip points, split them, add more components, etc.
+
+<p>Intersections between walls affect neighbouring walls and their subcomponents.
+
+<p>We have therefore currently overridden grip points, snap points, graphics, properties, a custom ribbon is regenerated then an object is selected and so on.
+
+<p>Is it possible to implement something similar with Revit? 
+I guess we probably need to customize the functionality of some wall type? 
+What is best place to start if this is possible?
+
+
+<p><strong>Answer:</strong> I am afraid that the answer is definitely not that you can simply port your existing application.
+
+<p>The Revit API is completely different from the AutoCAD one.
+
+<p>More than this, the entire underlying principles, workflows and paradigms are utterly different and almost beyond comparison.
+
+<p>In fact, one of the biggest stumbling blocks to learning the Revit API is being caught up in preconceptions coming from 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/bim-versus-free-geometry-and-product-training.html">
+AutoCAD or other non-BIM APIs</a>.
+
+<p>In Revit, almost all the functionality you list above cannot be overridden, because Revit manages a building information model, BIM, and ensures that it remains consistent at all times. 
+
+<p>The proper approach in Revit would probably be to define an appropriate family and family types. 
+
+<p>I am not at all a product expert, though, so I cannot advise you at all about how best to implement your specific model in Revit. 
+You need to consult with application engineers and product experts about that, and above all understand the existing Revit functionality in depth before you even start considering creating an add-in application, which may easily end up reproducing or even fighting against the recommended Revit paradigms and workflows.
+
+<p>What I can tell you with a hundred percent certainty is that your existing AutoCAD application cannot simply be ported to Revit, and that your best approach will almost certainly require reconsidering the whole implementation from scratch.
+
+<p>What I can also say with conviction is that it will probably be well worth your while in the long run to start learning and understanding the Revit BIM concepts and researching how a useful add-in for that domain might look, to enable you to start work on a BIM-compatible implementation, in which you will certainly be able to reuse a lot of your existing know-how and continue supporting your customers as they gradually migrate to BIM usage.
+
+<p>If you have customers knowledgeable in Revit who are interested in cooperating with you to drive such a project, I would take that opportunity with great gratitude if I were you.
+
+<p>Best place to start? Learn the product functionality, and do your best to forget AutoCAD for a moment.
+
+
+
+<p><strong>Response:</strong> Thank you for a great answer!
+
+<p>I think at this point we have to stick with AutoCAD due the limitations or the concept of Revit. 
+The main interest of our customer in using Revit was using IFC for integration with thermal calculation applications. 
+
+<p>Of course Revit would also save us having to implement a number of additional objects like openings, roofs etc. that are not available in AutoCAD.
+
+<p>I believe we will continue implementing the functionality on top of AutoCAD but still continue to research Revit at the same time. 
+Perhaps at some point we could implement some kind of separate editor for our model, maybe using a WPF dialogue user interface that plays with normal walls in Revit. 
+If I read the API documentation correctly, we can still store additional info to wall objects.
+
+
+<p><strong>Answer:</strong> Your approach sounds very feasible and sensible to me.
+
+<p>Implementing additional functionality in a separate WPF dialogue interacting with Revit would work fine.
+
+<p>Please be aware that you can also maintain your existing AutoCAD functionality and access that in the background, invisibly to the user, from your Revit add-in.
+
+<p>For example, you can read the relevant data from the Revit model, process it in the background using your existing application, and display useful results in your own WPF dialogue in a way that supports an efficient Revit workflow. That might enable you to achieve a near perfect solution with little effort.
+
+<p>And yes, absolutely, you can store any additional data you like on walls and any other elements using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/storage">
+extensible storage functionality</a>.
+
+
+<a name="2"></a>
+
+<h4>Importing SAT into Revit</h4>
+
+<p>People now and then ask about programmatically importing a SAT file into Revit.
+
+<p>You can export a SAT file using the API and import an SAT file from the user interface, simply by going through Insert &gt; Import &gt; Import CAD &gt; ACIS SAT Files. 
+
+<p>However, the Revit API Import methods only take options for DGN, DWG/DXF, gbXML, and images.
+
+<!--
+<p>In the user interface, this is just a click or two away, via &gt; .
+
+<p>I need to import an SAT file using the API. 
+
+I’m really hoping I’m missing something here because I’m on a project that is dependent on the ability to import an SAT file through automation. If there is no direct way to do it through the API can anyone suggest a work around?
+-->
+
+<p>One obvious workaround is to implement an intermediate step to generate a DWG file from the SAT one.
+
+<p>This can be achieved either using RealDwg or AutoCAD itself, if it happens to be installed on the same machine.
+
+<p>In either case, the description of implementing 
+
+<a href="http://adndevblog.typepad.com/autocad/2012/05/acisin-and-acisout-in-net.html">
+ACISIN and ACISOUT in .NET</a> might 
+
+come in handy to achieve this.
+
+
+<a name="3"></a>
+
+<h4>ElementTransformUtils and Family Instance Creation May Force Regeneration</h4>
+
+<p>If you are facing performance problems generating or manipulation largish models, please be aware that you need to watch out a bit with the ElementTransformUtils class.
+Some of its methods contain built-in regeneration at the end, which is executed regardless of your other regeneration actions.
+Family instance creation can also force regeneration at times.
+As always, some research and lots of benchmarking is advisable.
+
+
+<a name="4"></a>
+
+<h4>AU Registration Savings End October 14</h4>
+
+<p>The end is near! 
+
+<p>Oct 14 is the last chance to save $500 on the Autodesk University 2012 registration.
+
+<p>Prepare thyself and <a href="http://au.autodesk.com">register now</a>.
+
+<p>Hope to see you there!

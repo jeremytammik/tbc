@@ -1,0 +1,184 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1264130 [Blend Creation] -->
+
+<h3>NewBlend Sample</h3>
+
+<p>Until now, The Building Coder included no example at all of using the NewBlend method.
+A developer ran into an issue using it, and my colleague Joe Ye created an external command to resolve the issue, so I took and added it.
+Here is the issue that prompted this:
+
+<p><strong>Question:</strong> I am trying to create a blend with two circular profiles, but it is not working. 
+Can you please provide some solution for us? 
+
+<p><strong>Answer:</strong> After several tests, I found that the issue is due to the fact that the top and bottom profiles should contain at least two curves.
+
+<p>I split the circle that you were using for you profile into two semi-circle arcs.
+Now the command successfully creates the new blend.
+
+<p>I used Joe's sample code to create a new Building Coder sample external command CmdNewBlend.
+It exercises the following helper method CreateBlend for the actual new blend creation:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Blend</span> CreateBlend( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">Debug</span>.Assert( doc.IsFamilyDocument,
+&nbsp; &nbsp; <span class="maroon">&quot;this method will only work in a family document&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creApp 
+&nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">FamilyItemFactory</span> factory 
+&nbsp; &nbsp; = doc.FamilyCreate;
+&nbsp;
+&nbsp; <span class="blue">double</span> startAngle = 0;
+&nbsp; <span class="blue">double</span> midAngle = <span class="teal">Math</span>.PI;
+&nbsp; <span class="blue">double</span> endAngle = 2 * <span class="teal">Math</span>.PI;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> xAxis = <span class="teal">XYZ</span>.BasisX;
+&nbsp; <span class="teal">XYZ</span> yAxis = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> center = <span class="teal">XYZ</span>.Zero;
+&nbsp; <span class="teal">XYZ</span> normal = -<span class="teal">XYZ</span>.BasisZ;
+&nbsp; <span class="blue">double</span> radius = 0.7579;
+&nbsp;
+&nbsp; <span class="teal">Arc</span> arc1 = creApp.NewArc( center, radius, 
+&nbsp; &nbsp; startAngle, midAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; <span class="teal">Arc</span> arc2 = creApp.NewArc( center, radius, 
+&nbsp; &nbsp; midAngle, endAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> baseProfile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; baseProfile.Append( arc1 );
+&nbsp; baseProfile.Append( arc2 );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> center2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 1.27 );
+&nbsp;
+&nbsp; <span class="teal">Arc</span> arc3 = creApp.NewArc( center2, radius, 
+&nbsp; &nbsp; startAngle, midAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; <span class="teal">Arc</span> arc4 = creApp.NewArc( center2, radius, 
+&nbsp; &nbsp; midAngle, endAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> topProfile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; topProfile.Append( arc3 );
+&nbsp; topProfile.Append( arc4 );
+&nbsp;
+&nbsp; <span class="teal">Plane</span> basePlane = creApp.NewPlane( 
+&nbsp; &nbsp; normal, center );
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketch = factory.NewSketchPlane( 
+&nbsp; &nbsp; basePlane );
+&nbsp;
+&nbsp; <span class="teal">Blend</span> blend = factory.NewBlend( <span class="blue">true</span>, 
+&nbsp; &nbsp; topProfile, baseProfile, sketch );
+&nbsp;
+&nbsp; <span class="blue">return</span> blend;
+}
+</pre>
+
+<p>The command mainline simply checks that the current document is indeed a family document and then calls CreateBlend:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdNewBlend</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( doc.IsFamilyDocument )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Blend</span> blend = CreateBlend( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in a family document.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>This is what the resulting blend looks like in the family editor:</p>
+
+<center>
+<img src="img/newblend.png" alt="New blend element"/>
+</center>
+
+<p>I modified the code to create a more interesting shape using a skewed rectangle for the top profile like this:
+
+<pre class="code">
+&nbsp; <span class="teal">CurveArray</span> topProfile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; <span class="blue">bool</span> circular_top = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( circular_top )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// create a circular top profile:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> center2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 1.27 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc3 = creApp.NewArc( center2, radius,
+&nbsp; &nbsp; &nbsp; startAngle, midAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc4 = creApp.NewArc( center2, radius,
+&nbsp; &nbsp; &nbsp; midAngle, endAngle, xAxis, yAxis );
+&nbsp;
+&nbsp; &nbsp; topProfile.Append( arc3 );
+&nbsp; &nbsp; topProfile.Append( arc4 );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// create a skewed rectangle top profile:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>(0,0,3), 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>(2,0,3), 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>(3,2,3), 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>(0,4,3)
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 4; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; topProfile.Append( creApp.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; pts[0 == i ? 3 : i - 1], pts[i] ) );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Running that in a new family document based on the Metric Column template creates a shape like this:</p>
+
+<center>
+<img src="img/newblend2.png" alt="New blend element"/>
+</center>
+
+<p>Here is what it looks like in plan view:</p>
+
+<center>
+<img src="img/newblend3.png" alt="New blend element plan view"/>
+</center>
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_78.zip -->
+
+<a href="zip/bc_11_78.zip">
+version 2011.0.78.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.

@@ -1,0 +1,151 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256421 [Problem with Change of Z Direction Justification using API] -->
+
+<h3>Extra Transaction Required</h3>
+
+<p>Here is another interesting issue to discuss in between the series of instalments of background information on the Revit API geometry library from Scott's Autodesk University presentation on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>.
+
+<p>As we mentioned repeatedly in the past, Revit automatically opens a transaction when an external command is invoked, and closes or aborts it when the command terminates, depending on the command result returned by the Execute method.
+This affects the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/document-ismodified-property.html">
+document IsModified property</a> and 
+
+clarifies why you need to open you own transactions for certain 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/transactions.html">
+event handlers</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/modeless-dialogues-in-revit.html">
+modeless dialogues</a>,
+
+forcing you to take on some 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/transaction-responsibility.html">
+transaction responsibility</a> yourself.
+
+It is therefore always easier and more robust to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/export-family-instance-to-gbxml.html#1">
+use a modal dialogue</a> instead of a modeless one, if that is possible.
+
+<p>Here is an example from a case handled by Joe Ye of a situation where we are forced to open our own transaction in spite of executing code within a normal modal external command context.
+This is because in this specific situation, certain actions of our command depend on previous actions having completed, and this does apparently not always happen automatically.
+By encapsulating the first step in its own transaction and closing that, the second step depending on it can execute correctly as well.
+
+<p><strong>Question:</strong> I have created a new I beam in my Revit model. 
+I then use the Revit API to apply the following modifications to it:
+
+<ol>
+<li>Change the beam's "Vertical Projection" property to "Center of Beam".
+<li>Change the beam's "Z Direction Justification" property to "Center".
+<li>Create two rectangular openings to hold the beam using the beam's start and end points as center points and defining rectangles around them.
+</ol>
+
+<p>Of the two openings, the first is created in the wrong position, while the second one, at the end of the beam, is created correctly. 
+It seems as if the first opening is created before the "Z Direction Justification" is changed, and the second one afterwards.
+
+<p><strong>Answer:</strong> This issue has to do with the model update. 
+The changes to the Z direction justification and vertical projection properties modify the model.
+Apparently, these changes have not yet been completely applied to the model before the creation of the openings is launched.
+The complete changes are only guaranteed to be applied to the model after the external command has completely terminated and its automatic transaction has been closed.
+
+<p>In this case, it appears that the property modifications have not been applied when the first opening is created. 
+The creation of the first opening affects the model in a way as to apply the property modifications as well, and therefore the second opening can make use of the updated properties, whereas the first one could not.
+This explains why the first opening ended up in the wrong position and the second was correct.
+
+<p>The solution for this is to add a transaction to encapsulate the process of changing the two parameter values. 
+This makes sure the beam is updated. 
+After modifying the properties and closing the transaction, the two openings can be added successfully.
+
+<p>Here is a sample code snippet demonstrating this:
+
+<pre class="code">
+<span class="blue">using</span> <span class="teal">RvtElement</span> = Autodesk.Revit.<span class="teal">Element</span>;
+<span class="blue">using</span> <span class="teal">CreationDocument</span> = Autodesk.Revit.Creation.<span class="teal">Document</span>;
+
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">View</span> view = commandData.View;
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> elemSet = view.Elements;
+&nbsp;
+&nbsp; <span class="teal">IEnumerator</span> elementEnumerator 
+&nbsp; &nbsp; = elemSet.ForwardIterator();
+&nbsp;
+&nbsp; <span class="blue">while</span>( elementEnumerator.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = elementEnumerator.Current 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveArray</span> curves = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; app.ActiveDocument.BeginTransaction();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// set the Vertical Projection</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = fi.get_Parameter( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.BEAM_V_JUSTIFICATION );
+&nbsp;
+&nbsp; &nbsp; &nbsp; p.Set( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = fi.get_Parameter( <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .STRUCTURAL_ANALYTICAL_PROJECT_MEMBER_PLANE );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> elemId = p.AsElementId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; elemId.Value = -3;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p.Set( <span class="blue">ref</span> elemId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Vertical Projection modification ends here</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; app.ActiveDocument.EndTransaction();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = fi.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pointOnPlane = lc.Curve.get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> hostY = fi.FacingOrientation;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> hostX = fi.HandOrientation;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> hostZ = hostX.Cross( hostY );
+&nbsp;
+&nbsp; &nbsp; &nbsp; curves = CreateRectangle( app, pointOnPlane, 
+&nbsp; &nbsp; &nbsp; &nbsp; hostX, hostZ, 0.5, 0.5 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Opening</span> opening = doc.Create.NewOpening( fi, 
+&nbsp; &nbsp; &nbsp; &nbsp; curves, <span class="teal">CreationDocument</span>.<span class="teal">eRefFace</span>.CenterY );
+&nbsp;
+&nbsp; &nbsp; &nbsp; pointOnPlane = lc.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; curves = CreateRectangle( app, pointOnPlane, 
+&nbsp; &nbsp; &nbsp; &nbsp; hostX, hostZ, 0.5, 0.5 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; opening = doc.Create.NewOpening( fi, 
+&nbsp; &nbsp; &nbsp; &nbsp; curves, <span class="teal">CreationDocument</span>.<span class="teal">eRefFace</span>.CenterY );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>So the motto of this is that if you need to perform some model change immediately after some other model changing action, and the second change is closely related to the first, then it is safer to encapsulate the first change in a transaction to ensure that the second one correctly honours it.
+
+<p>Many thanks to Joe for handling this case!
+

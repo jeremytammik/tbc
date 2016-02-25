@@ -1,0 +1,544 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- SPR #212647 [Element.Paramameters.Contains always returns false] --> 
+
+<h3>Unofficial Parameters and BipChecker</h3>
+
+<p>I climbed the 
+
+<a href="http://www.mountwiki.com/wiki/view/Nadelhorn">
+Nadelhorn</a> last 
+
+weekend, the highest point in Switzerland for me so far, and the second highest point I have ever been, actually, 4387 m.
+Except for airplanes, of course.
+Here is a picture of the panorama from the Nadehorn summit with Monte Rosa, Dom, Matterhorn, Mont Blanc, etc.</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-09-23_nadelhorn/56.jpg" alt="Nadelhorn summit panorama" width="800"/>
+</center>
+
+<p>Here are some
+
+<a href="https://picasaweb.google.com/104316998805199988071/Nadelhorn4327mSaisonabschlussMitJeremy?authuser=0&authkey=Gv1sRgCJnTodeiktKZ4wE">
+more pictures</a> of
+
+our tour.
+
+<p>Meanwhile, on the Revit API side, Victor Chekalin, or Виктор Чекалин, raised a number of pertinent issues lately. 
+One of them is this question in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html?cid=6a00e553e168978833015391c90d6e970b#comment-6a00e553e168978833015391c90d6e970b">
+comment</a> on
+
+parameters:
+
+<p><strong>Question:</strong> In my project I find parameters on a particular element that do not appear in the Element.Parameters collection. 
+In 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploring element parameters</a>, 
+
+you wrote: "Sometimes an element will have other parameters attached to it as well, which are not listed in the 'official' collection returned by the Parameters property. 
+To explore all parameters attached to an element, one can make use of the built-in parameter checker." 
+And nothing more. 
+Can you explain the meaning of these parameters? 
+In my case I need to get the length of any element if length exists. 
+I wrote the 
+
+<a href="http://pastebin.com/GgKFmxdD">
+following code</a> for it: 
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">Double</span>? GetElementLength( <span class="teal">Element</span> element )
+{
+&nbsp; <span class="blue">var</span> lengthParam 
+&nbsp; &nbsp; = <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">BuiltInParameter</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where( p =&gt; p.ToString().Contains( <span class="maroon">&quot;LENGTH&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; .Select( param =&gt; element.get_Parameter( param ) )
+&nbsp; &nbsp; &nbsp; .Where( param =&gt; param != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; <span class="blue">if</span>( lengthParam != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> lengthValue = lengthParam.AsDouble();
+&nbsp; &nbsp; <span class="blue">return</span> lengthValue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>At first in BuiltInParameters I find all parameters whose name contains the word "LENGTH". 
+Then I check for each if this BuiltInParameter exists in element. 
+If it exists, return the value of this parameter. 
+The problem: there are sometimes no length parameters in Element.Parameters, but I can still retrieve such a parameter via Element.get_Parameter. 
+Of course I can get the length of the element by enumerating all parameters and checking the parameter name for length, but I'm curious about these "strange invisible" parameters. 
+
+<p><strong>Answer:</strong> Yes, there may be lots of parameters attached to elements that do not appear in the 'official' Element.Parameters collection.
+
+<p>You can retrieve them using any of the standard Element.Parameter property overloads. 
+
+<h4>The Element.Parameter Property</h4>
+
+<p>While we are at it, here are a few observations of strangeness on the Parameter property itself:
+
+<ul>
+<li>Yes, it is a property, and still, yes, it takes an argument.
+<li>Yes, it does not exist in C# per se, because it is called get_Parameter there instead. 
+<li>Yes, these two observations may be connected, even mutually dependent.
+</ul>
+
+<p>The complete list of arguments accepted by the overloads of the Parameter property or get_Parameter method is:
+
+<ul>
+<li>BuiltInParameter: Retrieves a parameter from the element given a parameter id. 
+
+<li>Definition: Retrieves a parameter from the element based on its definition. 
+
+<li>Guid: Retrieves a parameter from the element given a GUID for a shared parameter. 
+
+<li>String: Retrieves a parameter from the element given its name. 
+</ul
+
+<p>The Definition and name string can be provided and used for any parameter. 
+The BuiltInParameter enumeration value or 'parameter id' as it is called above only works for built-in parameters, and the GUID only for shared ones, so they work for mutually exclusive situations.
+
+<p>So if the parameter you are looking for is named "Length", you can retrieve it using that name.
+
+<p>I would recommend you <b>not to do so</b>, however, because this makes you code language dependent.
+
+<p>Better is to determine exactly which built-in parameter corresponds to it and use that instead.
+
+<p>Another issue with the approach you describe above is that for a complex element, there may be several different built-in parameters whose enumeration name contains the substring "LENGTH", and they may have completely different meanings. 
+It is even not completely clear what you yourself mean by 'length' of an element.
+
+<h4>Snooping and the Built-in Parameter Checker</h4>
+
+<p>Here is a code snippet with a loop that shows how to retrieve all parameters from an element. Actually, it may not retrieve all, but it mostly retrieves more than the official Parameters collection contains:
+
+<pre class="code">
+Array bips = Enum.GetValues(typeof(BuiltInParameter));
+Parameter p;
+foreach (BuiltInParameter a in bips)
+{
+  try
+  {
+    p = elem.get_Parameter(a);
+  }
+  catch { }
+}
+</pre>
+
+<p>This kind of loop to retrieve a value for each and every built-in parameter enumeration value is also used by the RevitLookup 'Built-In Enum Snoop' in the Snoop Parameters dialogue and my own built-in parameter checker.
+Here are some explorations I made in the past in which I discussed the use of these tools and provided the source code for my built-in parameter checker:
+
+<!--
+042_exploring_param.htm:and now we will recapitulate some basic
+099_locked_dimension.htm:built-in parameter checker.
+118_deeper_param_exploration.htm:<p>Looking at the element inst
+220_door_marks.htm:built-in parameter checker</a> to
+246_room_occupancy.htm:built-in parameter checker</a>.
+247_title_block_of_sheet.htm:built-in parameter checker</a> can
+364_pre_post_pick_select.htm:<a href="http://thebuildingcoder.t
+371_sheet_size.htm:<p>I analysed a sample project using the Rev
+512_lang_indep_subcat.htm:<p><strong>Answer:</strong> Have you
+
+Exploring Element Parameters
+Locked Dimensioning
+Deeper Parameter Exploration
+Door Marks
+Room Occupancy
+Title Block of Sheet
+Pre-, Post- and Pick Select
+Determine Sheet Size
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">Exploring element parameters</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/locked-dimensioning.html">Locked dimensioning</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/04/deeper-parameter-exploration.html">Deeper parameter exploration</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/door-marks.html">Door marks</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/room-occupancy.html">Room occupancy</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">Title block of sheet</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">Pre-, post- and pick selection</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/determine-sheet-size.html">Determining sheet size</a>
+</ul>
+
+<p>Since I do find my built-in parameter checker a very handy tool I decided to simplify access to and installation of it by extracting the code from the obsolete Revit API Introduction Labs.
+
+<p>Besides simply displaying the list of 'unofficial' element parameter values, like the RevitLookup 'Built-In Enum Snoop' functionality, this tool provides the following additional advantages:
+
+<ul>
+<li>For elements than cannot be selected on the screen, prompt to enter the element id to select them instead.
+<li>For elements with a type, prompt whether to display type or instance parameter data.
+<li>List the results in a data grid view.
+<li>Display the built-in parameter enumeration value and the user visible parameter name side by side.
+<li>Display both the internal database value and the user visible string value of real-valued data.
+<li>Sort the results by the values of any column.
+<li>Copy the entire list of data to the clipboard.
+</ul>
+
+<p>The ability to sort by any column makes it much easier to find the records you are interested in, since you can sort by and then locate by either built-in parameter enumeration value, user visibly name, type, string or database value, or even read-write status.
+
+<p>Extracting and cleaning up this code also provided a welcome opportunity to make use of the generic CanHaveTypeAssigned and GetTypeId element methods.
+Previously, the tool only supported displaying the type parameters for family instances.
+Now, this functionality should work for all elements that can have a type.
+The updated code of the external command Execute mainline below includes both the old family instance code and the implementation of the new generic functionality:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Select element:</span>
+&nbsp;
+&nbsp; <span class="teal">Element</span> e 
+&nbsp; &nbsp; = <span class="teal">Util</span>.GetSingleSelectedElementOrPrompt( 
+&nbsp; &nbsp; &nbsp; uidoc );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp; <span class="blue">bool</span> isSymbol = <span class="blue">false</span>;
+&nbsp; <span class="blue">string</span> family_name = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; <span class="green">// For a family instance, ask user whether to </span>
+&nbsp; <span class="green">// display instance or type parameters; in a </span>
+&nbsp; <span class="green">// similar manner, we could add dedicated </span>
+&nbsp; <span class="green">// switches for Wall --&gt; WallType, </span>
+&nbsp; <span class="green">// Floor --&gt; FloorType etc. ...</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> inst = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != inst.Symbol )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> symbol_name = <span class="teal">Util</span>.ElementDescription( 
+&nbsp; &nbsp; &nbsp; &nbsp; inst.Symbol, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; family_name = <span class="teal">Util</span>.ElementDescription( 
+&nbsp; &nbsp; &nbsp; &nbsp; inst.Symbol.Family, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format( _type_prompt,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;is a family instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.QuestionMsg( msg ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e = inst.Symbol;
+&nbsp; &nbsp; &nbsp; &nbsp; isSymbol = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( e.CanHaveTypeAssigned() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> typeId = e.GetTypeId();
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == typeId )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="maroon">&quot;Element can have a type,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; but the current type is null.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">ElementId</span>.InvalidElementId == typeId )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="maroon">&quot;Element can have a type,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; but the current type id is the&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; invalid element id.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp;
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> type = doc.get_Element( typeId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == type )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="maroon">&quot;Element has a type,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; but it cannot be accessed.&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format( _type_prompt,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;has an element type&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.QuestionMsg( msg ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e = type;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; isSymbol = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Retrieve parameter data:</span>
+&nbsp;
+&nbsp; <span class="teal">SortableBindingList</span>&lt;<span class="teal">ParameterData</span>&gt; data 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SortableBindingList</span>&lt;<span class="teal">ParameterData</span>&gt;();
+&nbsp;
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">WaitCursor</span> waitCursor = <span class="blue">new</span> <span class="teal">WaitCursor</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Array</span> bips = <span class="teal">Enum</span>.GetValues( 
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = bips.Length;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInParameter</span> a <span class="blue">in</span> bips )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = e.get_Parameter( a );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != p )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> valueString = 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">StorageType</span>.ElementId == p.StorageType)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="teal">Util</span>.GetParameterValue2( p, doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : p.AsValueString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data.Add( <span class="blue">new</span> <span class="teal">ParameterData</span>( a, p, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valueString ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Exception retrieving built-in parameter {0}: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a, ex );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Display form:</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> description 
+&nbsp; &nbsp; = <span class="teal">Util</span>.ElementDescription( e, <span class="blue">true</span> ) 
+&nbsp; &nbsp; + ( isSymbol 
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot; Type&quot;</span> 
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot; Instance&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">BuiltInParamsCheckerForm</span> form 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BuiltInParamsCheckerForm</span>( 
+&nbsp; &nbsp; &nbsp; description, data ) )
+&nbsp; {
+&nbsp; &nbsp; form.ShowDialog();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>For the rest of the implementation, please refer to
+
+<a href="zip/BipChecker01.zip">BipChecker01.zip</a> containing 
+
+the full source code, add-in manifest, and Visual Studio solution for BipChecker version 2012.0.1.0.
+
+<p><strong>Response:</strong> I understood that parameters may not appear in the Element.Parameters collection, and also how to get them via the Element.get_Parameter method.  I still do not understand why Autodesk developers make some parameters hidden from user. 
+I guess that these hidden parameters are system related and used in system methods. 
+Is that it?  
+
+<p>I find it difficult to know whether parameter is present in the Element.Parameters collection or not. 
+I've found only one way to check it:
+
+<pre class="code">
+<span class="blue">bool</span> IsParameterInCollection( <span class="teal">Parameter</span> parameter )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> p 
+&nbsp; &nbsp; <span class="blue">in</span> parameter.Element.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.IsShared 
+&nbsp; &nbsp; &nbsp; != _parameter.IsShared )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( ( p.Definition <span class="blue">as</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InternalDefinition</span> ).BuiltInParameter 
+&nbsp; &nbsp; &nbsp; == ( _parameter.Definition <span class="blue">as</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InternalDefinition</span> ).BuiltInParameter )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _parameterInElementParametersCollection = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+}
+</pre>
+
+<p>Regarding the second question on how to get the length of any element:
+
+<p>I agree with you that looking for parameter whose name contains 'Length' is a bad approach.
+
+<p>You say 'Better is to determine exactly which built-in parameter corresponds to it and use that instead'.
+But how I can do it if I don't know anything about the element I am analysing? 
+In my case it may be absolutely any element.
+
+<p>I've found some parameters among BuiltInParameters that contains word 'LENGTH' but named not 'length'. 
+So, my other approach is not good either.
+
+<p>Now I think apply next algorithm to find length:
+
+<ul>
+<li>Get all visible parameters of element. It's easy &ndash; Element.Parameters.
+<li>Check if (Parameter.Definition as InternalDefinition).BuiltInParameter contains 'LENGTH' substring.
+<li>Check if Parameter.Definition.ParameterGroup == PG_GEOMETRY.
+<li>Profit if parameter exists :-)
+</ul>
+
+<p>I looked at your useful BipChecker tool and made some little changes. 
+
+<p>I added a ParameterGroup field to the ParameterData class, and added a different parameter form with grouping using a ListView instead of DataGridView. Now you can see which parameters are provided by the Element.Parameters collection and which are retrieved via BuiltInParameter. 
+It seems more user friendly than in DataGridView. 
+
+<p>I hope you like these changes.
+
+<p>Here is 
+
+<a href="zip/BipCheckerVc.zip">BipCheckerVc.zip</a> containing 
+
+Victor's version using the list view display.
+
+<p><strong>Answer:</strong> Great, I love the addition of the new properties for the parameter group, group name, and whether or not a parameter is included in the Element.Parameters collection or not.
+
+<p>Since the ParameterData class is getting a bit heavy now, I moved it out into a new module of its own.
+
+<p>I do not like the list view all that much, because it segregates the parameters into separate groups and prevents me from sorting them all in one collection by any one of the properties.
+I therefore re-implemented the data grid view as well. 
+You can switch back and forth between the two views by setting a compile time pragma and rebuilding:
+
+<pre class="code">
+<span class="blue">#if</span> USE_LIST_VIEW
+<span class="gray">&nbsp; using( BuiltInParamsCheckerFormListView form</span>
+<span class="gray">&nbsp; &nbsp; = new BuiltInParamsCheckerFormListView(</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; description, data ) )</span>
+<span class="blue">#else</span>
+&nbsp; <span class="blue">using</span> (<span class="teal">BuiltInParamsCheckerForm</span> form
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BuiltInParamsCheckerForm</span>(
+&nbsp; &nbsp; &nbsp; description, data))
+<span class="blue">#endif</span> <span class="green">// USE_LIST_VIEW</span>
+&nbsp; {
+&nbsp; &nbsp; form.ShowDialog();
+&nbsp; }
+</pre>
+
+<p>I have not defined USE_LIST_VIEW in my code, and therefore the data grid view is used.
+If you want to use the list view instead, simply add the following as the first line of the file:
+
+<pre class="code">
+<span class="blue">#define</span> USE_LIST_VIEW
+</pre>
+
+
+<h4>Determining Whether a Parameter is Contained in Element.Parameters</h4>
+
+<p>Yes, I see that it is indeed unexpectedly difficult to determine whether a given parameter retrieved from an element using the Parameter property is contained in the official Element.Parameters collection.
+
+<p>The ParameterSet returned by Element.Parameters does provide a Contains method, but it does not return the expected result.
+
+<p>For example, for a wall, which has a parameter named "Length" with the built-in parameter id CURVE_ELEM_LENGTH, the following code snippet will still return false:
+
+<pre class="code">
+&nbsp; wall.Parameters.Contains( 
+&nbsp; &nbsp; wall.get_Parameter( 
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.CURVE_ELEM_LENGTH ) )
+</pre>
+
+<p>I used your code as a basis for implementing the following workaround:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return BuiltInParameter id for a given parameter,</span>
+<span class="gray">///</span><span class="green"> assuming it is a built-in parameter.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="teal">BuiltInParameter</span> BipOf( <span class="teal">Parameter</span> p )
+{
+&nbsp; <span class="blue">return</span> ( p.Definition <span class="blue">as</span> <span class="teal">InternalDefinition</span> )
+&nbsp; &nbsp; .BuiltInParameter;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Check whether two given parameters represent</span>
+<span class="gray">///</span><span class="green"> the same parameter, i.e. shared parameters</span>
+<span class="gray">///</span><span class="green"> have the same GUID, others the same built-in</span>
+<span class="gray">///</span><span class="green"> parameter id.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">bool</span> IsSameParameter( <span class="teal">Parameter</span> p, <span class="teal">Parameter</span> q )
+{
+&nbsp; <span class="blue">return</span>( p.IsShared == q.IsShared )
+&nbsp; &nbsp; &amp;&amp; ( p.IsShared
+&nbsp; &nbsp; &nbsp; ? p.GUID.Equals( q.GUID )
+&nbsp; &nbsp; &nbsp; : BipOf( p ) == BipOf( q ) );
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return true if the given element parameter </span>
+<span class="gray">///</span><span class="green"> retrieved by&nbsp; get_parameter( BuiltInParameter ) </span>
+<span class="gray">///</span><span class="green"> is contained in the element Parameters collection.</span>
+<span class="gray">///</span><span class="green"> Workaround to replace ParameterSet.Contains.</span>
+<span class="gray">///</span><span class="green"> Why does this not work?</span>
+<span class="gray">///</span><span class="green"> return _parameter.Element.Parameters.Contains(_parameter);</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">bool</span> ContainedInCollection( <span class="teal">Parameter</span> p, <span class="teal">ParameterSet</span> set )
+{
+&nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> q <span class="blue">in</span> set )
+&nbsp; {
+&nbsp; &nbsp; rc = IsSameParameter( p, q );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>Of course, as Victor pointed out, in the current context, one of the parameters will always be a built-in one obtained from the iteration over the BuiltInParameter enumeration, so the situation that both parameters are shared will never arise.
+
+<p>Furthermore, the comparison above can be vastly simplified by using the parameters Id property instead of the GUID or the built-in parameter id.
+
+<p>Making use of the Id property and letting LINQ perform the list processing operations for us in a generic fashion, all three methods above can be condensed into
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> ContainedInCollection( 
+&nbsp; &nbsp; <span class="teal">Parameter</span> p, 
+&nbsp; &nbsp; <span class="teal">ParameterSet</span> set )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> set
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Parameter</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Any( x =&gt; x.Id == p.Id );
+&nbsp; }
+</pre>
+
+<p>Here is 
+
+<a href="zip/BipChecker03.zip">BipChecker03.zip</a> containing 
+
+the source code, add-in manifest, and Visual Studio solution for the updated BipChecker version 2012.0.3.0.
+
+<p>Here is what it looks like now displaying the parameters of a standard wall:</p>
+
+<center>
+<img src="img/BipChecker.png" alt="BipChecker"/>
+</center>
+
+<p>I hope you find this as useful as I do!
+
+<p>P.S. One thing that is possibly still missing here is support for shared parameters.
+If you need that, add it, and let us know, please.

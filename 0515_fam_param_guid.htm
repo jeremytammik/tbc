@@ -1,0 +1,143 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+GUID property access
+1258938 [SPR #155050 - Not Fixed in Revit 2011?] by CoderBoy
+1264842 [Continuation of my last Support Request]
+1265164 [shared parameters]
+
+-->
+
+<h3>Access to Family Parameter GUID</h3>
+
+<p>Here is a question that came up several times.
+It also demonstrates a neat (if somewhat time consuming) use of Reflection to access a property that otherwise would be inaccessible.
+Here is the original question:
+
+<p><strong>Question:</strong> How can I reliably tell whether a parameter on a family document is
+a shared parameter, or is actually a family parameter?
+
+If it is a shared parameter, how can I retrieve its original GUID as it was when it was originally added to the family?
+
+<p>Note that I need the <strong>original</strong> GUID used to load that parameter, and cannot rely on the current shared parameters file, which may not be the same one as originally used.
+
+<p>I tried to solve this directly, but the retrieving the parameter definition of a parameter on a family only reports it as being an InternalDefinition, even if it is actually a shared parameter, which should return an ExternalDefinition instead.
+I tested it running a piece of code like this:
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyParameter</span> parameter
+&nbsp; &nbsp; = &lt;get a family parameter
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> from the <span class="teal">FamilyManager</span>&gt;
+&nbsp;
+&nbsp; <span class="teal">ExternalDefinition</span> externalDef
+&nbsp; &nbsp; = parameter.Definition <span class="blue">as</span> <span class="teal">ExternalDefinition</span>;
+&nbsp;
+&nbsp; <span class="teal">InternalDefinition</span> internalDef
+&nbsp; &nbsp; = parameter.Definition <span class="blue">as</span> <span class="teal">InternalDefinition</span>;
+</pre>
+
+<p>The externalDef variable always ends up being null, and the internalDef one has a valid value.
+
+<p><strong>Answer:</strong> This was resolved for non-family parameters by the Revit 2011 API.
+The Revit API help file RevitAPI.chm lists the following feature in the 'What's New' section:
+
+<span style="color:darkblue">
+
+<h4>Extract GUID from a Parameter</h4>
+<p>The new properties
+<ul>
+<li>Parameter.IsShared
+<li>Parameter.GUID
+</ul>
+<p>identify if a given parameter is a shared parameter, and if it is, extract its GUID.
+
+</span>
+
+<p>Unfortunately, this only works for standard parameters, and not for family parameters.
+
+<p>Using the debugger on an object of type Autodesk.Revit.DB.FamilyParameter, one can see
+something called "m_Parameter" which <strong>does</strong> have the properties IsShared and GUID which <strong>do</strong> have the correct values.
+
+<p>Unfortunately, again, you cannot simply cast an Autodesk.Revit.DB.FamilyParameter to an Autodesk.Revit.DB.Parameter type.
+
+<p>Happily, it is possible to access these properties using .NET System.Reflection.
+
+<p>Here is a workaround using this to access these properties which works in both Revit 2010 and 2011.
+It retrieves the underlying family parameter definition IsShared and GUID properties and returns true if the family parameter is shared and has a GUID:
+
+<pre class="code">
+<span class="blue">bool</span> GetFamilyParamGuid(
+&nbsp; <span class="teal">FamilyParameter</span> fp,
+&nbsp; <span class="blue">out</span> <span class="blue">string</span> guid )
+{
+&nbsp; guid = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; <span class="blue">bool</span> isShared = <span class="blue">false</span>;
+&nbsp;
+&nbsp; System.Reflection.<span class="teal">FieldInfo</span> fi
+&nbsp; &nbsp; = fp.GetType().GetField( <span class="maroon">&quot;m_Parameter&quot;</span>,
+&nbsp; &nbsp; &nbsp; System.Reflection.<span class="teal">BindingFlags</span>.Instance
+&nbsp; &nbsp; &nbsp; | System.Reflection.<span class="teal">BindingFlags</span>.NonPublic );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = fi.GetValue( fp ) <span class="blue">as</span> <span class="teal">Parameter</span>;
+&nbsp;
+&nbsp; &nbsp; isShared = p.IsShared;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( isShared &amp;&amp; <span class="blue">null</span> != p.GUID )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; guid = p.GUID.ToString();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> isShared;
+}
+</pre>
+
+<p>I implemented a new external command CmdFamilyParamGuid in The Building Coder samples to test this method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !doc.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; message =
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please run this command in a family document.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> isShared;
+&nbsp; &nbsp; <span class="blue">string</span> guid;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyManager</span> mgr = doc.FamilyManager;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyParameter</span> fp <span class="blue">in</span> mgr.Parameters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; isShared = GetFamilyParamGuid( fp, <span class="blue">out</span> guid );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>To run and test this, just open any family document and include at least one shared parameter.
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_82.zip -->
+
+<a href="zip/bc_11_82.zip">
+version 2011.0.82.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.

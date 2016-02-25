@@ -1,0 +1,133 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2012 API Features</h3>
+
+<p>Revit 2012 and the other 
+
+<a href="http://autodesk.blogs.com/between_the_lines/2011/03/autodesk-2012-products-announced-and-revealed.html">
+Autodesk 2012 products have been announced</a>, 
+
+and already there is abundant information on it on the web. 
+David Light discusses quite a few of the 
+
+<a href="http://autodesk-revit.blogspot.com/2011/03/autodesk-revit-architecture-2012.html">
+user interface and product features</a>.
+
+<p>A detailed exploration of some of the following items could fill volumes, but I'll try to briefly give you an idea of what each feature is about, at least.
+First, here is simply an overview of the highlights of the Revit 2012 API features.
+See below for a brief explanation of each item:
+
+<h4>Modifications and Updates Overview</h4>
+
+<p>These are the rather mundane but important issues which affect existing applications:
+
+<ul>
+<li>.NET Framework 4.0
+<li>Final bye bye ini, hello add-in manifest
+<li>Vendor identification
+<li>Manual regeneration mode
+<li>Compound structure and wall sweeps
+<li>Line and fill patterns
+<li>Independent tag
+<li>Import and export
+<li>Save and close
+<li>Reference properties
+<li>Events
+<li>Move/Mirror/Rotate/Array
+<li>Materials
+<li>Structural analytical model
+<li>Rebar
+</ul>
+
+<h4>New Features Overview</h4>
+
+<p>This is the really exciting and in some cases radical new stuff:
+
+<ul>
+<li>Open and Activate Document
+<li>Setting Active View
+<li>Custom Ribbon Tab Management
+<li>Worksharing
+<li>Geometry
+<li>Analysis of Room and Space 3D geometry
+<li>Detailed energy analysis
+<li>Conceptual energy analysis
+<li>Analysis Visualization Framework enhancements
+<li>MEP API enhancements
+<li>Rebar enhancements
+<li>Construction modelling
+<li>Point Clouds
+<li>Extensible Storage
+<li>Linked Models
+<li>Performance Advisor API
+<li>And More!
+</ul>
+
+<h4>Modifications and Updates Explanation</h4>
+
+<p>Many of the modifications have to do with cleaning up the separation between the user interface and the API, completing the database/user interface split that was introduced in the Revit 2011 API.
+Many changes are also due to improved automatic API code generation procedures that align the API much better with the internal Revit code and functionality.
+
+<ul>
+<li>.NET Framework 4.0: the Revit 2012 API has been enhanced to run with the .NET 4.0 runtime; to debug add-ins, you must Use Visual Studio 2010; add-ins compiled with VS 2008 will run outside the debug environment.
+<li>Final bye bye ini, hello add-in manifest: loading of external applications and commands through Revit.ini is no longer supported.
+<li>Vendor identification: an additional add-in manifest tag identifying the application developer is required. It makes use of the <a href="http://www.autodesk.com/symbreg">Autodesk Registered Developer Symbol RDS</a>.
+<li>Manual regeneration mode: automatic regeneration mode has been removed. All add-ins now use manual regeneration mode.
+<li>Compound structure and wall sweeps: the compound layer structure is now read-write and can be fully created and access via the API. It was previously read-only.
+<li>Line and fill patterns: new API classes.
+<li>Independent tag: API changed.
+<li>Import and export: API changed.
+<li>Save and close: API changes, better separation of UI and API, preview image can be set.
+<li>Reference properties: the Reference class has been completely renovated.
+<li>Events: various event argument changes.
+<li>Move/Mirror/Rotate/Array: a new ElementTransformUtils class has been introduced to replace the previous methods on the Document class. Implicit dependencies on the current view have been removed.
+<li>Materials: new material classes are introduced and the existing ones deprecated, part of a company-wide materials management undertaking.
+<li>Structural analytical model: API changes.
+<li>Rebar: API changes.
+</ul>
+
+<h4>New Features Explanation</h4>
+
+<p>Some of the new features are longstanding and frequently requested wish list items, other are unexpected and exciting completely new areas:
+
+<ul>
+<li>Open and Activate Document: a document can be programmatically opened and activated in the user interface.
+<li>Setting Active View: the active view can be set programmatically.
+<li>Custom Ribbon Tab Management: custom ribbon tabs can be created.
+<li>Worksharing: a comprehensive read-only API to worksharing features is introduced; access the list of worksets, find out what elements are in the workset, who borrowed what, has the element gone out of date with central.
+
+<li>Geometry: some really exciting new geometry features: applications can now create their own geometry; the geometry library was previously read-only. Boolean operations can be performed, and the results can be displayed using the Analysis Visualisation Framework AVF. More detailed access to and analysis of geometrical aspects of Revit elements is supported.
+<li>Analysis of Room and Space 3D geometry: We can now get the 3D geometry of spatial elements like rooms and spaces. It provides access to elements which form the boundary of the rooms and for those who needs fine-grained information of the geometry of the room. You can now access the detailed geometry of the elements that form the boundary of the rooms. Until now we were only able to read the general shape of the room – now we can associate that shape with the elements that form the boundary. One of the existing samples, RoofsRooms, which used 300 lines of code to find out if the top boundary of the room intersected the roof or not, has now reduced to 30-40 lines of code.
+<li>Detailed energy analysis: obtain and analyze the contents of a project's detailed energy model, as seen in the Export to gbXML and the Heating and Cooling Loads features; produce an analytical thermal model from the physical model of a building composed of spaces, zones and planar surfaces that represent the actual volumetric elements of the building.
+<li>Conceptual energy analysis: provide access to the elements and objects created by Revit to perform energy analysis on conceptual design models.
+<li>Analysis Visualization Framework enhancements: support multiple analysis results in the same view, store persistent meta data.
+<li>MEP API enhancements
+<ul>
+<li>Placeholder ducts and pipes: Identify, create, and convert placeholders to physical elements
+<li>PipeSettings, PipeSizeSettings: Read and write access to the plumbing settings governing pipe sizes in Revit MEP
+<li>DuctInsulation, PipeInsulation, DuctLining: Read, write and create access to new procedural insulation and lining features
+</ul>
+<li>Rebar enhancements: multi-planar 3D rebars, corbels.
+<li>Construction modelling: access to parts and assemblies, shop drawings, isolate groups of elements.
+<li>Point Clouds: Engine API for point cloud generation, Client API for point cloud consumption.
+<li>Extensible Storage: read and assign application-owned data to specific elements, create custom XML-based schemas for data storage.
+<li>Linked Models: find external file references, trace the file path of external files and understand the load state in a Revit session, identify if a file is imported or merely linked, what kinds of link, what path.
+<li>Performance Advisor API: issue warnings for elements or settings that may cause performance degradation or affect model performance, 
+access built-in Revit rules, define, add and remove custom rules, execute any combination of rules.
+<li>And More:
+<ul>
+<li>Adaptive Components
+<li>IFC Document Open
+<li>FamilyParameter.GUID property: identify shared parameters.
+<li>Copy Element: copy and translate (copy + move).
+<li>Workplane Flip for Family Instances: face-hosted family manipulation.
+<li>Disallow Wall End Joins
+<li>Write access to Element Pinned
+</ul>
+</ul>
+
+<p>Sound exciting?
+
+<p>I promise you, it is!

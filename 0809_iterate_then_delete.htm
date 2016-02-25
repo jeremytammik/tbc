@@ -1,0 +1,77 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Matt Wilson Re: Plug-in crash with no error message -->
+
+<h3>Do Not Delete During Iteration</h3>
+
+<p>Here is a type of question that crops up much too regularly, and that I am hoping this little example will help you avoid.
+
+<p>When you are iterating over a collection, deleting the elements in the collection at the same time can wreak havoc in many ways.
+
+<p>Here is an example:
+
+<p><strong>Question:</strong> Since my last plug-in was such a huge success here in the office I have been tasked with writing another. However, I've run into an issue. When I run the plug-in Revit crashes with no error message or anything. Revit simply disappears. How do I even begin to debug an issue like this?
+
+<p>The plug-in that I have created counts light fixtures and the room the light fixture is in and writes that data to an excel file so that I can use that data in an eQUEST energy model. If the light fixture is found in a room, and only 1 room, then the light fixture is deleted from the project. This is so I can print out the lighting plans and have a visual representation of the lights that I need to count by hand. 
+
+<p>I have tried adding a counter to the code to see where it crashes, however it does not crash on the same light fixture every time. On the sample project I have attached it crashes in the 50s. On a real project it crashes around 640 fixtures. Additionally I have commented out segments of code to fixture out where the issue is. If I comment out the "element delete code", then the plug in runs all the way and counts the fixtures to excel, but does not create the visual representation of "problem fixtures". I've tried setting the transaction mode to manual and wrapping the "element delete code" in a manually created transaction.
+
+<p>I've thought about creating a new family that I would import into the project with a fixture that is a single inch in size, and instead of deleting the fixture, setting the fixture to this really small family. However with that solution I feel like I'm fixture the symptom and not the problem. 
+
+<p>I've attached my code and a sample project where it crashes. Is there any insight you can provide about this problem?
+
+<p>Thanks again for your time.
+
+<p><strong>Answer:</strong> Congratulations on the great success of your first add-in!
+
+<p>Regarding your question: you are iterating over the elements and deleting them at the same time.
+
+<p>This is not allowed.
+
+<p>Iterate first and collect a list of elements to delete.
+
+<p>Delete them in a second separate step.
+
+<p>If this helps and you get it to work, this might make a nice blog article, if you are willing to share it, including the mail you sent me already, describing what a great success your first add-in was in your office.
+
+<p>I hope this next add-in (and the following ones?) work out as well as the first.
+
+<p><strong>Response:</strong> Your solution worked. 
+
+<p>I just iterated through and created a list and then deleted that list. 
+
+<p>Here is the code I used:
+
+<pre class="code">
+&nbsp; <span class="green">' Loop over rooms...</span>
+
+&nbsp; <span class="blue">If</span> <span class="blue">Not</span> roomname = <span class="maroon">&quot;Room not found&quot;</span> _
+&nbsp; &nbsp; <span class="blue">And</span> <span class="blue">Not</span> roomname = <span class="maroon">&quot;Fixture found in multiple rooms&quot;</span> _
+&nbsp; <span class="blue">Then</span>
+&nbsp; &nbsp; idstodelete.Add(e.Id)
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+
+&nbsp; <span class="green">' End loop.</span>
+&nbsp;
+&nbsp; <span class="green">' Delete the elements here</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> id <span class="blue">As</span> <span class="teal">ElementId</span>
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> id <span class="blue">In</span> idstodelete
+&nbsp; &nbsp; <span class="blue">Dim</span> e <span class="blue">As</span> <span class="teal">Element</span>
+&nbsp; &nbsp; e = doc.GetElement(id)
+&nbsp; &nbsp; doc.Delete(e)
+&nbsp; <span class="blue">Next</span>
+</pre>
+
+<p><strong>Answer:</strong> Glad it helped.
+
+<p>Your code can be further improved by using the Document Delete method overload taking an ElementId collection argument instead of the one taking an element itself.
+That provides two advantages:
+
+<ul>
+<li>No need to open the element from its element id.
+<li>Delete all of the elements in the list in one fell swoop.
+</ul>
+

@@ -1,0 +1,437 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Retrieving Newly Created Elements in Revit 2011</h3>
+
+<p>Here is a largish post which will hopefully keep you happily occupied over the weekend.
+We looked at the topic of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/retrieving-newly-created-elements.html">
+retrieving newly created elements</a> in
+
+Revit 2010 last year.
+Since the method presented there is based on simply retrieving sequential entries from the Revit element collection, and that collection is no longer directly accessible in Revit 2011, I was curious to see whether the approach presented there would still work.
+To my surprise, with some adaptation, it really does.
+
+<p>I also discovered a new approach which I believe to be significantly more reliable.
+It is based on the element ids, and the assumption that they will be monotonously increasing, instead of simply using the sequential order of retrieval of the elements themselves.
+This new algorithm makes use of the Revit 2011 API filtered element collector mechanism and a parameter filter.
+
+Since my recent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+collector benchmarking</a> seems
+
+to indicate that any kind of parameter filter will be significantly faster than post-processing the collector results, I would assume that this new approach is faster as well.
+
+<p>Please note that this technique is completely unnecessary for actually detecting newly added elements in real life, since the new Revit 2011 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#1">
+DocumentChanged element level event</a> provides 
+
+the application subscribing to it a set of all newly added elements each time a transaction is closed.
+So be aware that the following exercise is mainly academic in nature.
+Thank you very much, Guy, for noticing and pointing that out below.
+
+<p>Before looking at how to retrieve the newly created elements, we implemented a minimal command demonstrating the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/mirror-an-element.html">
+use of the Document.Mirror method</a> in
+
+Revit 2010 and used the result of that method to test the retrieval algorithm.
+I updated that command for Revit 2011 as well, and think it is worthwhile taking a quick look at the differences.
+
+<p>So here are the topics I will be discussing here:
+
+<ul>
+<li><a href="#1">Element mirroring and code changes</a>.
+<li><a href="#2">Revit element access</a>.
+<li>Newly created element retrieval based on <a href="#3">sequential element order</a>.
+<li>Newly created element retrieval based on <a href="#4">monotonously increasing element id values</a>.
+<li><a href="#5">Enhanced parameter filter</a> for greater element id values.
+<li><a href="#6">Download</a>
+</ul>
+
+
+<a name="#1"></a>
+
+<h4>Element Mirroring</h4>
+
+<p>Let us first have a look at the differences between the 2010 and 2011 versions of the very simple CmdMirror command.
+All it does is apply the Document.Mirror method on the set of currently selected elements.
+Here is the code for Revit 2010:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">CmdMirror</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> els = doc.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = app.Create.NewLine(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisX, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The equivalent code for Revit 2011 looks like this:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdMirror</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> els = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = app.Create.NewLine(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisX, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Note the following differences:
+
+<ul>
+<li>The class now requires the transaction mode and regeneration options.
+<li>The CmdResult enumeration has been renamed.
+<li>There are separate classes for the user interface and database versions of the application and document classes.
+</ul>
+
+<p>In addition to the code itself, the Revit namespaces have changed completely, and we also have to reference two Revit API assemblies instead of just one now after the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-is-coming.html">
+DLL split</a> and
+
+<a href="http://redbolts.com/blog/post/2010/03/27/Revit2011-API-e28093-Whate28099s-in-a-name.aspx">
+namespace refactoring</a>.
+Here are the namespaces and classes that we reference in the Revit 2010 version of the code:
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit;
+<span class="blue">using</span> <span class="teal">Line</span> = Autodesk.Revit.Geometry.<span class="teal">Line</span>;
+<span class="blue">using</span> <span class="teal">XYZ</span> = Autodesk.Revit.Geometry.<span class="teal">XYZ</span>;
+<span class="blue">using</span> <span class="teal">CmdResult</span> = Autodesk.Revit.<span class="teal">IExternalCommand</span>.<span class="teal">Result</span>;
+</pre>
+
+<p>In the Revit 2011 API, we make use of the following namespaces instead:
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+</pre>
+
+<p>Other than that, nothing has changed.
+In this super-simple seven-line command, though, that does mean that five of the original lines of code have been modified, four more added, and every single Revit namespace reference replaced.
+
+<p>All of the changes we encountered in this case, however, only have to do with the add-in packaging and connection to Revit.
+None of them have anything to do with its actual functionality, and the two lines of code which really do any work, the calls to NewLine and Mirror, have in fact not changed at all.
+Therefore, in a larger application, you would expect a much smaller percentage of the code to be affected.
+
+<p>Now that we have the mirroring operation sorted out for Revit 2011, let's have a look at the newly created element retrieval algorithm.
+But first, a couple of words on Revit element access in general.
+
+
+<a name="#2"></a>
+
+<h4>Revit Element Access</h4>
+
+<p>In Revit 2010 and previous versions, the Revit API provided direct access to the Revit element collection.
+In the Revit 2011 API, this collection is no longer directly accessible at all, since the API designers have decided that no normal application ever has any legitimate need to iterate over all elements in the database in one go, but should always be interested in only a subset.
+To retrieve such subsets, the API provides highly optimised filtered element collectors, as we saw in the recent discussions on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/performance-profiling.html">
+performance profiling</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+collector benchmarking</a>.
+
+<p>In Revit 2010, we implemented a system to retrieve newly added elements, for instance those generated by executing the mirror command, simply by making a note of the total number of elements before executing the command, executing the mirroring operation, and then retrieving all the ones returned after that number when sequentially iterating over the elements collection.
+Since the elements collection is no longer accessible in the Revit 2011 API, I was pretty sure that this would no longer work.
+Surprisingly, though, it still does.
+
+<p>Since there is no access to the full elements collection, I applied the filter WhereElementIsNotElementType to the document's FilteredElementCollector.
+ElementType is 2011-speak for Symbol, i.e. the Revit 2010 class Symbol has been renamed to ElementType in the Revit 2011 API, so this filter returns all elements which are not element types.
+I would assume that to include all elements which may result from a mirroring operation.
+Please correct me if I am mistaken.
+
+<p>Here is the very simple method making use of this filter, which we will later use for both the sequential element and the monotonously increasing element id retrieval methods:
+
+<pre class="code">
+<span class="teal">FilteredElementCollector</span> GetElements( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; <span class="blue">return</span> collector.WhereElementIsNotElementType();
+}
+</pre>
+
+
+<a name="#3"></a>
+
+<h4>Newly Created Element Retrieval Based on Sequential Element Order</h4>
+
+<p>To retrieve all elements returned after a given sequence number, similar to the original 2010 algorithm, we implemented the following methods:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return the current number of non-ElementType elements.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">int</span> GetElementCount( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">return</span> GetElements( doc ).ToElements().Count;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return all database elements after the given number n.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetElementsAfter( <span class="blue">int</span> n, <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; <span class="teal">FilteredElementCollector</span> c = GetElements( doc );
+&nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> c )
+&nbsp; {
+&nbsp; &nbsp; ++i;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( n &lt; i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.Add( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> a;
+}
+</pre>
+
+<p>They are called like this to determine the number of non-ElementType elements before the mirroring operation, execute the mirroring command, and retrieve the newly added elements afterwards:
+
+<pre class="code">
+<span class="blue">using</span>( <span class="teal">SubTransaction</span> t = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc ) )
+{
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="blue">int</span> n = GetElementCount( doc );
+&nbsp;
+&nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = GetElementsAfter( n, doc );
+&nbsp;
+&nbsp; <span class="blue">string</span> s = _msg;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; s += <span class="blue">string</span>.Format( <span class="maroon">&quot;\r\n&nbsp; {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; }
+&nbsp; <span class="teal">Util</span>.InfoMsg( s );
+&nbsp;
+&nbsp; t.RollBack();
+}
+</pre>
+
+<p>The entire operation is encapsulated in a sub-transaction which is subsequently rolled back, so that we can immediately continue to test the alternative and more reliable new retrieval method based on element ids instead of the sequence of the elements themselves.
+
+
+<a name="#4"></a>
+
+<h4>Newly Created Element Retrieval Based on Monotonously Increasing Element Id Values</h4>
+
+<p>Instead of simply using the sequential ordering of elements as they happen to be returned by the filtered element collector, a much more reliable assumption is that element ids are allocated monotonously increasing values.
+Therefore, instead of simply counting the number of elements returned by the GetElements method, as we did above in GetElementCount, a more reliable approach might be to determine the maximal element id value before the mirroring operation, and then retrieve all elements with a higher element id afterwards.
+
+<p>Since the element id is available through a parameter, we can make use of a parameter filter to retrieve these elements.
+To make use of a parameter filter, you have to define the following components:
+
+<ul>
+<li>The provider, e.g. the parameter you are interested in.
+<li>The evaluator, e.g. how to compare it with the target value.
+<li>The rule, which specifies how the provider and the comparison work together.
+</ul>
+
+<p>We demonstrated one implementation of using a parameter filter in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+collector benchmark</a> command
+
+CmdCollectorPerformance, in the method GetFirstNamedElementOfTypeUsingParameterFilter, where we used it to find an element with a specific name by checking the built-in parameter ELEM_NAME_PARAM for equality with the given target string.
+
+<p>In this case, we set up a parameter filter to retrieve elements whose element id is greater than a given value.
+We can achieve this by specifying that the value of the built-in parameter ID_PARAM must exceed the target element id, like this:
+
+<pre class="code">
+<span class="teal">FilteredElementCollector</span> GetElementsAfter(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">ElementId</span> lastId )
+{
+&nbsp; <span class="teal">BuiltInParameter</span> bip = <span class="teal">BuiltInParameter</span>.ID_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>(
+&nbsp; &nbsp; provider, evaluator, lastId );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector.WherePasses( filter );
+}
+</pre>
+
+<p>This method returns all elements in the entire document whose element id is greater than 'lastId'.
+
+<p>Here is the code making use of this method, analogously to the snippet above, i.e. determine the maximal element id before the mirroring operation, execute the mirroring command, and retrieve the newly added elements afterwards:
+
+<pre class="code">
+<span class="blue">using</span>( <span class="teal">SubTransaction</span> t = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc ) )
+{
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a = GetElements( doc );
+&nbsp; <span class="blue">int</span> i = a.Max&lt;<span class="teal">Element</span>&gt;( e =&gt; e.Id.IntegerValue );
+&nbsp; <span class="teal">ElementId</span> maxId = <span class="blue">new</span> <span class="teal">ElementId</span>( i );
+&nbsp;
+&nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; <span class="green">// get all elements in document with an</span>
+&nbsp; <span class="green">// element id greater than maxId:</span>
+&nbsp;
+&nbsp; a = GetElementsAfter( doc, maxId );
+&nbsp;
+&nbsp; <span class="blue">string</span> s = _msg;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; s += <span class="blue">string</span>.Format( <span class="maroon">&quot;\r\n&nbsp; {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; }
+&nbsp; <span class="teal">Util</span>.InfoMsg( s );
+&nbsp;
+&nbsp; t.RollBack();
+}
+</pre>
+
+
+<a name="#5"></a>
+
+<h4>Enhanced Parameter Filter for Greater Element Id Values</h4>
+
+<p>While writing this, I just noticed some potential for more improvement here.
+The parameter filter is a slow filter, so it is important to eliminate as many elements as possible using other quick filters before applying it.
+One filter that we did apply in all the previous element retrieval was the non-ElementType one, so why not use it here as well?
+
+<p>A filtered element collector need not necessarily be based on a document, but can also be used to apply further filtering to the results of a previous filter.
+Making use of this functionality, we can rewrite our parameter filter method as follows to use a collection of already filtered elements instead of the contents of the entire document:
+
+<pre class="code">
+<span class="teal">FilteredElementCollector</span> GetElementsAfter(
+&nbsp; <span class="teal">FilteredElementCollector</span> input,
+&nbsp; <span class="teal">ElementId</span> lastId )
+{
+&nbsp; <span class="teal">BuiltInParameter</span> bip = <span class="teal">BuiltInParameter</span>.ID_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>( 
+&nbsp; &nbsp; provider, evaluator, lastId );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="blue">return</span> input.WherePasses( filter );
+}
+</pre>
+
+<p>Then we can reuse the GetElements that we used above once again for the parameter filter retrieval as well like this:
+
+<pre class="code">
+<span class="blue">using</span>( <span class="teal">SubTransaction</span> t = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc ) )
+{
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a = GetElements( doc );
+&nbsp; <span class="blue">int</span> i = a.Max&lt;<span class="teal">Element</span>&gt;( e =&gt; e.Id.IntegerValue );
+&nbsp; <span class="teal">ElementId</span> maxId = <span class="blue">new</span> <span class="teal">ElementId</span>( i );
+&nbsp;
+&nbsp; doc.Mirror( els, line );
+&nbsp;
+&nbsp; <span class="green">// only look at non-ElementType elements</span>
+&nbsp; <span class="green">// instead of all document elements:</span>
+&nbsp;
+&nbsp; a = GetElements( doc );
+&nbsp; a = GetElementsAfter( a, maxId );
+&nbsp;
+&nbsp; <span class="blue">string</span> s = _msg;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; s += <span class="blue">string</span>.Format( <span class="maroon">&quot;\r\n&nbsp; {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; }
+&nbsp; <span class="teal">Util</span>.InfoMsg( s );
+&nbsp;
+&nbsp; t.RollBack();
+}
+</pre>
+
+<p>In a real-world application, there will probably be numerous other quick filters that can be applied additionally before resorting to slow ones to eliminate even more uninteresting elements and further improve performance.
+It would also be interesting to add some benchmarking code to the three cases presented above and run a test in a reasonably sized model to see whether the performance differences that I am postulating above really exist.
+I will leave that as an exercise to the interested reader, for the moment, leaving this post at is, for now, and hope that this exploration proves useful to you.
+
+
+<a name="#6"></a>
+
+<h4>Download</h4>
+
+<p>Here is 
+
+<a href="zip/bc_11_64.zip">
+version 2011.0.0.64</a>
+
+of the complete Visual Studio solution including the updated mirroring and newly created element retrieval commands CmdMirror and CmdMirrorListAdded.</p>

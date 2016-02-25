@@ -1,0 +1,363 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Modeless Loose Connectors</h3>
+
+<p>One of the most enthusiastically received samples I presented at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+AEC DevCamp</a> conference
+
+has also proved a valuable resource since then, in answering various questions on modeless dialogues and ensuring that the Revit application main window becomes the foreground window in certain situations.
+It demonstrates how we can combine several ubiquitously useful pieces of functionality that we already discussed in the past to implement a homogenous whole.
+We create an application which collects information from the Revit model and then displays it in a context that is pretty independent of Revit yet allows very close interaction with the Revit model.
+
+<p>This is the continuation and final instalment on the series on navigating through unconnected connectors in Revit MEP. So far, we covered the following topics:
+
+<ul>
+<li>Retrieving
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+MEP elements and connectors</a>.
+
+<li>Determining and hooking up a modeless form with the
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+Revit parent window</a>.
+
+<li>Populating a
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/populating-a-data-grid-view.html">
+data grid view</a>.
+
+</ul>
+
+<p>After populating and displaying the data grid view, all that remains is to implement the interaction from it with Revit. The challenging aspect of this is the fact that the modeless form is not in a Revit API context, and the Revit API is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+not asynchronously accessible</a>.
+
+As mentioned and as you can see from the last line of the implementation of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/populating-a-data-grid-view.html">
+Execute</a> method,
+
+we can work around that using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a>.
+
+<p>In short, the modeless dialogue passes back a pending element id to the command class.
+In the Idling event handler, the pending element id is picked up and displayed to the user on the Revit graphics screen.	
+
+
+<p>This actually shows that the challenge of
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+driving Revit from outside</a> can
+
+now be addressed pretty reliably and seamlessly, while it was not really solvable at all in prior releases.
+
+<p>Here is an overview of the complete functionality of the loose connectors sample:
+
+<ol>
+<li>Determine unconnected connectors in a Revit MEP model.
+<ul>
+<li>Filter for all MEP elements that can host connectors.
+<li>Iterate over the element connectors and list all unconnected ones
+</ul>
+<li>Display a modeless dialogue as a child window of the Revit main application displaying a list of the loose connectors.
+<ul>
+<li>Determine the main Revit application window handle.
+<li>Display a modeless Windows form and assign Revit as its parent window.
+</ul>
+<li>Drive Revit from outside from the modeless dialogue box using the idling event.
+<ul>
+<li>The modeless form lists all unconnected connectors in a data grid view.
+<li>The user can double click on any one of the listed connectors.
+<li>This selection is relayed to Revit via the Idling event, which causes Revit to switch to an appropriate view and zoom to display and highlight the element hosting the selected connector.
+</ul>
+</ol>
+
+<p>Its implementation was originally triggered by the following question and suggestion from Martin Schmid:</p>
+
+<h4>Martin's Proposal</h4>
+
+<p>I was wondering if there was a straight forward way to find all 'open' connections via the API?
+
+<p>Is there a generic way to get all 'Connectors' in a model, and then check if they are connected to another connector?
+Otherwise, I presume one would have to check all object instances that may have an MEP model, and check their Connector Manager for the connectors.
+
+<p>I think a sample that is able to find unconnected connectors (Duct, Pipe, Conduit, and Cable Tray) would be useful, because currently the UI doesn't provide a way to identify, for example, disconnected duct segments or fittings, etc.
+
+<p>A very nice to have additional feature would be to list all the unconnected elements and be able to click on a part to zoom to it in the Revit model, to step through the results.
+It would be most useful if you could zoom to part, fix the connection, then zoom to the next part.
+Not sure how practical that is because in many cases you'd have to switch views and the like, unless the 'results' could be modeless.
+
+<h4>Additional Loose Connector Sample Features</h4>
+
+<p>In addition to the main required functionality, the sample implements a couple of additional ones not directly related to its main functionality and are useful in many generic add-in development areas:</p>
+
+<ul>
+<li>Write and display a text-based log file.</li>
+<li>Use a simple data container to populate a data grid view with minimal coding effort.</li>
+<li>Use a sortable binding list to add sorting functionality to the data grid view columns.</li>
+</ul>
+
+<p>As you noticed, all these topics that I wanted to dive into makes it almost more work to document than to implement, which is why it has taken me a while to get around to finally completing this overview, and requiring it to be split up into several separate posts to keep them down to a reasonable and manageable size.</p>
+
+<h4>Idling Event</h4>
+
+<p>I already discussed one example of driving Revit from outside using the idling event to display a continuously updated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">
+webcam image</a> on
+
+the face of a Revit building element.
+In that case, the webcam image update event triggered an update in the Revit model.
+In the current sample, the double click of the user triggers a reaction in Revit, so the interaction seems very snappy.
+I have yet another sample up my sleeve which also reacts to an external event which can be triggered either by user interaction or programmatically, by detecting when the last modified timestamp of an external file on disk is updated and then automatically importing changes and modifying the Revit model.
+
+<p>In those cases, however, the external event is actually not driving Revit directly.
+On the contrary, we are making use of the Revit Idling event which is polling, i.e. checking whether a certain flag or signal has been set by the external event, and then reacting to that.
+
+<p>The apparent snappiness of the reaction is due to the fact that the Idling event is triggered very frequently when Revit is not busy with other tasks, possibly hundreds of times per second.
+
+<p>So how can we use the Idling event to really drive Revit from outside, i.e. react immediately to a double click in our external modeless loose connector navigator form and react to that input within Revit through the Revit API?</p>
+
+<p>So far, we discussed how to retrieve the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+MEP elements and connectors</a>,
+
+determine the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+Revit parent window</a> and
+
+attach a form to it, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/populating-a-data-grid-view.html">
+populate and display the modeless form</a>.
+
+<p>We set up Revit as the parent window of the modeless form, ensuring that it stays on top of Revit when Revit is visible, and also that it is minimised when the user minimises Revit.
+
+<h4>Driving Revit From Outside Revisited</h4>
+
+<p>Now let's discuss how to drive Revit from the modeless form, which is technically outside of Revit, and does not have synchronous access to the Revit API.
+
+<p>The form is populated with the unconnected connectors, and our intention is for the user to double click on an element to zoom to it in Revit.
+
+<p>The double click event is handled by subscribing to the CellDoubleClick event of the data grid view, which is the only widget displayed by our form.</p>
+
+<p>Once we are within a valid Revit API context, we can zoom to the desired element by calling the UIDocument ShowElements method.</p>
+
+<p>The question is how to get from one to the other.</p>
+
+<p>One possible answer is to post a message saying what to do in the double click event handler, and look out for it and react appropriately in the Idling event handler.</p>
+
+<p>In our case, the message that we post could be a pending element id to display.
+The pending element id can be stored in a global variable somewhere.</p>
+
+<p>In the Idling event handler, we check the value of the pending element id.
+If it is zero, we have nothing to do.
+Otherwise, we can zoom to the respective element, and set it back to zero when we are done.</p>
+
+<h4>Delegation</h4>
+
+<p>To decouple the two parts even further, we define a delegate method for setting the pending element id, store it in the Command class, and pass a reference to the delegate to the dialogue implementation class.
+We also simply store the element id as an integer value in this phase, so that the dialogue implementation does not even have to know what a Revit element id is.</p>
+
+<p>Here is the static variable in the external command class implementation holding the pending element id, the delegate method for setting it, and the implementation of the delegate that gets passed over to the modeless form:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Pending element id, element to zoom to</span>
+<span class="gray">///</span><span class="green"> next time the Idling event fires.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">int</span> _pending_element_id;
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Set a pending element id to zoom to</span>
+<span class="gray">///</span><span class="green"> when the Idling event fires.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">void</span> SetPendingElementId( <span class="blue">int</span> id )
+{
+&nbsp; _pending_element_id = id;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Delegate to set a pending </span>
+<span class="gray">///</span><span class="green"> element id to zoom to.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">delegate</span> <span class="blue">void</span> <span class="teal">SetElementId</span>( <span class="blue">int</span> id );
+</pre>
+
+<p>You already saw the code instantiating and displaying the modeless form, but may not have noticed that in addition to passing in the Revit widow handle to its Show method, we also passed in a delegate to the SetPendingElementId method in the constructor:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">LooseConnectorNavigator</span> navigator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LooseConnectorNavigator</span>(
+&nbsp; &nbsp; &nbsp; data,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SetElementId</span>( SetPendingElementId )&nbsp; );
+&nbsp;
+&nbsp; navigator.Show( _hWndRevit );
+</pre>
+
+<p>The LooseConnectorNavigator, derived from the System.Windows.Forms base class Form, stores the delegate in a local variable _set_id:</p>
+
+<pre class="code">
+<span class="teal">Command</span>.<span class="teal">SetElementId</span> _set_id;
+&nbsp;
+<span class="blue">public</span> LooseConnectorNavigator(
+&nbsp; <span class="teal">SortableBindingList</span>&lt;<span class="teal">ConnectorData</span>&gt; a,
+&nbsp; <span class="teal">Command</span>.<span class="teal">SetElementId</span> set_id )
+{
+&nbsp; InitializeComponent();
+&nbsp; dataGridView1.DataSource = a;
+&nbsp; _set_id = set_id;
+}
+</pre>
+
+<p>Right after instantiating and displaying the form, we subscribe to the Idling event and terminate the command.
+At that point, our access to the Revit API is closed, and the modeless form lives outside of the Revit API context.
+However, as said, every time the Idling event is triggered, our event handler is called, and we re-enter the Revit API context, giving us a chance to check whether we have a pending element id to display and giving us full access to the Revit API in order to do so.</p>
+
+<p>So let's look at the two event handlers.</p>
+
+<h4>Double Click Event Handler</h4>
+
+<p>The double click event handler has to determine the element id of the pending element to display.
+It can do so by retrieving the current row in the data grid view and extracting the appropriate cell contents.
+The element id of the element hosting the unconnected connector is stored in the last column of the grid view. Here is the implementation of the event handler and its SetElementIdFromRow helper method, which calls _set_id to transmit the pending element id back to the main command and the Idling event handler:</p>
+
+<pre class="code">
+<span class="blue">void</span> SetElementIdFromRow(
+&nbsp; <span class="blue">int</span> rowIndex,
+&nbsp; <span class="blue">bool</span> doubleClick )
+{
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// do something on double click, </span>
+&nbsp; <span class="green">// except when on the header:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">if</span>( rowIndex &gt; -1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DataGridViewRow</span> row
+&nbsp; &nbsp; &nbsp; = dataGridView1.Rows[rowIndex];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = row.Cells.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DataGridViewCell</span> cell = row.Cells[n - 1];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> id = ( <span class="blue">int</span> ) cell.Value;
+&nbsp;
+&nbsp; &nbsp; _set_id( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} click on row {1} --&gt; element id {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; doubleClick ? <span class="maroon">&quot;Double&quot;</span> : <span class="maroon">&quot;Single&quot;</span>,
+&nbsp; &nbsp; &nbsp; rowIndex, id );
+&nbsp; }
+}
+&nbsp;
+<span class="blue">void</span> dataGridView1_CellDoubleClick(
+&nbsp; <span class="blue">object</span> sender,
+&nbsp; <span class="teal">DataGridViewCellEventArgs</span> e )
+{
+&nbsp; SetElementIdFromRow( e.RowIndex, <span class="blue">true</span> );
+}
+</pre>
+
+<h4>Idling Event Handler</h4>
+
+<p>In the Idling event handler, we first of all check whether we have anything to do at all.
+This check should be extremely quick, since the event handler may be called hundreds of times per second if Revit has nothing else to do.
+If the pending element id is non-zero, we wish to highlight and display it on the Revit screen.
+
+<p>This can be achieved using the ShowElements, which requires access to the active UIdocument and Document, which we can retrieve from the Revit application.
+We already explained how to access the Revit application from an Idling event handler in the initial discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a>,
+
+by simply casting the sender argument to an Application instance.</p>
+
+<p>So here is the final resulting implementation of the Revit Idling event handler.
+As said, whenever the user has selected an element to zoom to in the modeless dialogue, the pending element id is set. The event handler picks it up and zooms to it.
+
+<p>Since we are not modifying the Revit document in any way, there is no need to start a transaction.
+
+<pre class="code">
+<span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> ea )
+{
+&nbsp; <span class="blue">int</span> id = _pending_element_id;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 != id )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app
+&nbsp; &nbsp; &nbsp; = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc
+&nbsp; &nbsp; &nbsp; = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc
+&nbsp; &nbsp; &nbsp; = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> eid = <span class="blue">new</span> <span class="teal">ElementId</span>( id );
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( eid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element id {0} requested --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; id, <span class="blue">new</span> <span class="teal">ElementData</span>( e, doc ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// look, mom, no transaction required!</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Clear();
+&nbsp; &nbsp; uidoc.Selection.Elements.Add( e );
+&nbsp; &nbsp; uidoc.ShowElements( e );
+&nbsp;
+&nbsp; &nbsp; <span class="green">//LooseConnectorNavigator.Id = 0;</span>
+&nbsp; &nbsp; _pending_element_id = 0;
+&nbsp; }
+}
+</pre>
+
+<h4>Reaction</h4>
+
+<p>The reaction to a double click is surprisingly snappy, if you know what is going on in the background.
+If you don't know there is nothing to indicate that the modeless form is not an integral part of Revit itself.</p>
+
+<p>I showed the modeless form in the discussion on populating a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/populating-a-data-grid-view.html">
+data grid view</a>:</p>
+
+<center>
+<img src="img/modeless_loose_connector_form.png" alt="Modeless loose connector form"/>
+</center>
+
+<p>Once a user clicks on one of the unconnected connectors listed in the form, Revit immediately zooms to it.
+In some cases, if the element is not visible in the current view, Revit will ask whether to search for another suitable view to display it in:</p>
+
+<center>
+<img src="img/modeless_loose_connector_search_view.png" alt="Revit asking whether to search for a suitable view"/>
+</center>
+
+<p>If the current view was suitable or a suitable one was found, the double clicked element is highlighted and zoomed in:</p>
+
+<center>
+<img src="img/modeless_loose_connector_element.png" alt="Highlighted element with a loose connector"/>
+</center>
+
+<p>I hope you find this sample useful in your development work. 
+As said, the response at the AEC DevCamp conference in Boston and the Waltham and Munich DevLabs was pretty enthusiastic.
+
+<p>Here is a slightly further cleaned up version of this sample,
+
+<!-- C:\a\doc\revit\blog\zip\loose_connectors_6.zip -->
+
+<a href="zip/loose_connectors_6.zip">
+loose_connectors_6.zip</a>,
+
+including the complete source code and Visual Studio solution.
+

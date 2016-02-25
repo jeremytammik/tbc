@@ -1,0 +1,91 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>ToElementIds Performance</h3>
+
+<p>Conversion of a filtered element collector to an explicit .NET collection of elements or element ids is always costly and mostly avoidable and unnecessary.</p>
+
+<p>Before getting to the details of that issue, here is another quick snapshot from our travels to the West European developer conferences.
+As you either know or might guess, one of the main topics of these is cloud and mobile development, e.g. looking at topics such as the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">
+BIM 360 Glue REST API and SDK</a> and
+
+my hands-on exploration of how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">
+access and use it via Python</a>.
+
+<p>Funnily enough, the lighting in the Paris Charles de Gaulle airport is designed along a cloud scheme, so here is very low quality picture of us almost touching the clouds at the airport gate preparing to board the flight to Milano:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2012/2012-12-12_devdays_paris/jeremy_under_cloud_charles_de_gaulle_paris.jpeg" alt="Jeremy in the clouds in Charles de Gaulle in Paris" width="400"/>
+</center>
+
+<p>Ora siamo arrivati in Milano per un'altra conferenza di sviluppatori.</p>
+
+<p>Returning to the Revit API, I recently mentioned a couple of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+FindElement and collector optimisations</a>.
+
+<p>One of them is the fact that the conversion from a filtered element collector to a .NET collection is costly and should be avoided if possible.</p>
+
+<p>Here is another observation related to that, brought up by <a href="http://redbolts.com">Guy Robinson</a> and answered by Scott Conover of the Revit API development team:</p>
+
+<p><strong>Question:</strong> I sometimes use the ToElementIds method, e.g. like this:</p>
+
+<pre class="code>">
+&nbsp; <span class="blue">var</span> fc = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfSomething()
+&nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> elemId <span class="blue">in</span> fc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> element = doc.GetElement( elemId );
+&nbsp; }
+</pre>
+
+<p>I noticed that this is about 25% slower than accessing the elements directly as follows:</p>
+
+<pre class="code>">
+&nbsp; <span class="blue">var</span> fc = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfSomething();
+&nbsp;
+&nbsp; <span class="blue">foreach</span> (<span class="blue">var</span> elem <span class="blue">in</span> fc)
+&nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> element = elem;
+&nbsp; }
+</pre>
+
+<p>I am wondering why the ToElementIds approach is so much slower?
+
+<p>Shouldn't the two approaches be equivalent?</p>
+
+<p>Is there any good reason to use ToElementIds at all?</p>
+
+<p>Not surprisingly, this ~25% slower figure has been the same on my tests ever since I started comparing in Revit 2012.</p>
+
+
+<p><strong>Answer:</strong> This is not unexpected.
+
+<p>ToElementIds and ToElements allocate a new concrete .NET collection containing the elements passing the filter.
+Then it returns this allocated collection to you, which involves a conversion from a native level collection to a managed object.
+This will take extra time as compared to a direct iteration.</p>
+
+<p>Why might you use the ToElementIds variants?
+Well, you might need a concrete collection to store in memory.
+Or you might need a collection to pass as input to an API method like Delete &ndash; which you should definitely not call from the middle of a foreach iteration unless you like unexpected behaviour.
+This provides a shortcut to building this allocation.</p>
+
+<p>For any sort of operation of the type "I want to read properties of each passing element" you can skip ToElements and the extra collection allocation.</p>
+
+<p>Thank you Scott for these insights!</p>
+
+<p>For one example of how this can be achieved, look at the aforementioned
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+FindElement and collector optimisations</a>.
+
+There are lots of other examples in many of The Building Coder discussions, since I consciously and consistently avoid this conversion whenever possible, i.e. almost always.</p>

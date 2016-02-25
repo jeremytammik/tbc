@@ -1,0 +1,67 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1260391 [How to find intersection between two elements?] -->
+
+<h3>Intersection Between Elements</h3>
+
+<p>One question that regularly comes up is how to determine whether certain building elements intersect.
+There are basically two approaches to this, either querying the elements for their pure geometry and making use of pure geometrical intersection methods, or using the higher-level FindReferencesByDirection method, which works on the building elements themselves.
+Here is a typical version of this question:
+
+<p><strong>Question:</strong> I need to find out if any two elements in a project are interfering with each other. 
+Searching the Revit API help, I found that the Intersect methods on the Autodesk.Revit.Geometry.GeometryObject can be used to calculate intersections. 
+
+<p>So it seems that I need to find out the type of geometry for the given building element and then call the relevant intersection method. 
+Is this correct?
+Is there any sample code available demonstrating this? 
+Is there any API method which accepts two elements and finds out whether they are interfering? 
+
+<p><strong>Answer:</strong> There is no direct API method that calculates the intersection between two Revit building elements. 
+One possibility is to query them for their geometry elements, and then use the geometry Intersect methods to determine intersection points.
+ 
+<p>Here is some sample code which shows how to find the intersection points of two geometry lines, excerpted from the Revit SDK sample CreateTruss:
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="teal">XYZ</span> GetIntersection( 
+&nbsp; &nbsp; <span class="teal">Line</span> line1, 
+&nbsp; &nbsp; <span class="teal">Line</span> line2 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntersectionResultArray</span> results;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SetComparisonResult</span> result 
+&nbsp; &nbsp; &nbsp; = line1.Intersect( line2, <span class="blue">out</span> results );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( result != <span class="teal">SetComparisonResult</span>.Overlap )
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">InvalidOperationException</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Input lines did not intersect.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( results == <span class="blue">null</span> || results.Size != 1 )
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">InvalidOperationException</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Could not extract line intersection point.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> iResult 
+&nbsp; &nbsp; &nbsp; = results.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> iResult.XYZPoint;
+&nbsp; }
+</pre>
+
+<p>A more advanced and complex use of the pure geometrical intersection methods is provided by the AreSolidsCut method defined by the Revit SDK 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/roomsroofs-sdk.html">
+RoomsRoofs sample</a>.
+
+<p>While there is no direct method to determine whether two building elements intersect, one could implement such a method based on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">
+FindReferencesByDirection</a> method,
+
+as we suggested in the discussion on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/analytical-support-tolerance.html">
+analytical support tolerance</a>.
+
+Several SDK samples demonstrate its use.
+

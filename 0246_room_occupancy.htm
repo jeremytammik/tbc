@@ -1,0 +1,192 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Room Occupancy</h3>
+
+<p>Shifali asked a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html#comment-6a00e553e1689788330120a6ab278e970c">
+question</a> on 
+
+reading and writing the room occupancy:
+
+<p><strong>Question:</strong> We get the document from ExternalCommandData object's Application and the project information in document. 
+We need to store the construction type of the current document or project file. 
+Moreover, we get the Room elements of the document but we need to store the occupancy type of each room for applying the International Building Code for compliance reports of the project.
+
+<p>We also need access to the BuildingConstruction and BuildingType in the document ProjectInformation.gbXMLSettings.
+
+<p><strong>Answer:</strong> I started by looking at the room occupancy issue, and found that this is actually very simple and straightforward and has been covered in numerous previous posts dealing with the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploration of element parameters</a>.
+
+Still, since this is a very typical and recurring issue, I will happily revisit it.
+
+<p>I started up Revit and created a new model with a room or two.
+Left clicking one of these, and selecting Element Properties... I see the parameter that I presume you are looking for listed as Occupancy under the Identity Data heading.
+So that is where to find this data in the user interface.
+I entered an arbitrary string value there in order to start exploring how to access the same data programmatically.
+
+<p>Next, I start up 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+RvtMgdDbg</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2009/10/rvtmgddbg-for-revit-2010.html">for 2010</a>)
+
+and use that to look at the room element parameters through the API via Add-Ins > RvtMgdDbg > Snoop Current Selection... > Parameters > Occupancy.
+It shows the same string I just entered, so I seem to have found the required data.
+Since I would like to access it language independently, I need to determine the built-in parameter enumeration value for this parameter, if one exists. 
+If I don't care about that, I can use the language dependent parameter name "Occupancy" to identify the data.
+The built-in parameter can be determined by using the Built-in Enums Snoop or Built-in Enums Map buttons in RvtMgdDbg, which show me that the built-in parameter I am looking for is ROOM_OCCUPANCY.
+
+<p>I can also look at the element parameters and see the associated built-in parameters using the Revit API introduction labs
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/deeper-parameter-exploration.html">
+built-in parameter checker</a>.
+
+<p>Both of these tools show me that the parameter is string valued and read-write, so there should be no problem modifying it.
+
+<p>I implemented a new Building Coder sample command CmdSetRoomOccupancy to demonstrate making use of this to read and write the parameter and do nothing else.
+For experienced Revit developers, this is a rather trivial command, since all it does is read and write the value of a single element parameter.
+Still, it should be useful to point people to in the future who raise this frequently asked question.
+The command retrieves either the currently selected rooms or all rooms in the model if nothing has been preselected using my GetSelectedElementsOrAll utility method.
+For each room, its occupancy parameter is read and incremented.
+This is achieved using the BumpStringSuffix helper method.
+
+<p>BumpStringSuffix increments the numerical suffix of a given string.
+If the string already ends in a sequence of digits representing a number, it returns a string with the number incremented by one.
+Otherwise, it returns the original string with a suffix "1" appended.
+In case the original string is null, "1" is returned:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">char</span>[] _digits = <span class="blue">null</span>;
+
+<span class="blue">static</span> <span class="blue">string</span> BumpStringSuffix( <span class="blue">string</span> s )
+{
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == s || 0 == s.Length )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;1&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _digits )
+&nbsp; {
+&nbsp; &nbsp; _digits = <span class="blue">new</span> <span class="blue">char</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">'0'</span>, <span class="maroon">'1'</span>, <span class="maroon">'2'</span>, <span class="maroon">'3'</span>, <span class="maroon">'4'</span>, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">'5'</span>, <span class="maroon">'6'</span>, <span class="maroon">'7'</span>, <span class="maroon">'8'</span>, <span class="maroon">'9'</span>
+&nbsp; &nbsp; };
+&nbsp; }
+&nbsp; <span class="blue">int</span> n = s.Length;
+&nbsp; <span class="blue">string</span> t = s.TrimEnd( _digits );
+&nbsp; <span class="blue">if</span>( t.Length == n )
+&nbsp; {
+&nbsp; &nbsp; t += <span class="maroon">&quot;1&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; n = t.Length;
+&nbsp; &nbsp; n = <span class="blue">int</span>.Parse( s.Substring( n ) );
+&nbsp; &nbsp; ++n;
+&nbsp; &nbsp; t += n.ToString();
+&nbsp; }
+&nbsp; <span class="blue">return</span> t;
+}
+</pre>
+
+<p>Here is the method BumpOccupancy which makes use of BumpStringSuffix to increment the room occupancy parameter on a given room element.
+It reads the value of the element ROOM_OCCUPANCY parameter.
+If it ends in a number, it increments that number, otherwise it appends "1":
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> BumpOccupancy( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ROOM_OCCUPANCY );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} has no room occupancy parameter.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> occupancy = p.AsString();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> newOccupancy = BumpStringSuffix( 
+&nbsp; &nbsp; &nbsp; occupancy );
+&nbsp;
+&nbsp; &nbsp; p.Set( newOccupancy );
+&nbsp; }
+}
+</pre>
+
+<p>Now we can apply the BumpOccupancy method to all or the currently selected rooms in the model.
+Here is the entire code of our external command Execute method which does so:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; rooms = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; rooms, doc, <span class="blue">typeof</span>( <span class="teal">Room</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;Please select some room elements.&quot;</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;No room elements found.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> room <span class="blue">in</span> rooms )
+&nbsp; {
+&nbsp; &nbsp; BumpOccupancy( room );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11054.zip">
+version 1.1.0.54</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>So, I would hope that this amply answers the question on accessing and modifying the room occupancy, and also serves as a model for further simple parameter setting explorations.
+
+<p>Turning to look at the BuildingConstruction and BuildingType values in the ProjectInformation gbXMLSettings, I once again resort to RvtMgdDbg.
+I select Add-Ins > RvtMgdDbg > Snoop Db... > ProjectInfo > Project Information 69280 > gbXML Settings ... and crash.
+Well, first a message was displayed saying that this is only available in Revit MEP.
+
+<p>Ok, I restarted in Revit MEP and navigated through the same path down to the gbXML settings, which I can enter and explore this time. 
+I see the building construction and building type properties.
+The former is an object, the latter displays a value kOffice.
+
+<p>Actually, I also see en entry for the gbXMLParamElem in the root directory of the RvtMgdDbg database snoop:</p>
+
+<center>
+<img src="img/gbXMLParamElem.png" alt="Snoop gbXMLParamElem"/>
+</center>
+
+<p>The element id shows me that this is the same object as the one stored in the project information.
+
+<p>So obviously there is no problem accessing this data either.
+gbXMLParamElem is one of the classes defined by the Revit API and can be accessed using the standard Revit 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/filter-for-a-family.html">
+element filters</a>, 
+
+for instance.
+The desired properties are both members of this class:
+
+<ul>
+<li>BuildingConstruction returns the Project Information Building Construction object. 
+<li>BuildingType gets or sets the Project Information Building Type.
+</ul>

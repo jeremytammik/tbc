@@ -1,0 +1,482 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Pipe to Conduit Converter</h3>
+
+<p>I am pretty busy right now, both with day-to-day work answering cases and preparing training material, and also preparing for upcoming events.
+These include:
+
+<ul>
+
+<li><a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Revit Programming Webcast</a> on May 20
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=10417086&siteID=123112&cname=Revit API, Webcast , May 20 2010, 201031">register</a>).
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html">
+DevCamp</a> conference on June 7-9.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html#devlabs">
+DevLabs</a> in Waltham, USA, on June 10-11
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=6703509&siteID=123112&cname=DevLab (AEC), Waltham, Jun 10 2010, 201039">register</a>).
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/devcamp-devlabs-and-updated-api-training-schedule.html#devlabs">
+DevLabs</a> in Munich, Germany, on June 21-25
+(<a href="http://usa.autodesk.com/adsk/servlet/item?id=6703509&siteID=123112&cname=DevLab (AutoCAD, Inventor and Revit), Munich, Jun 21 2010, 201041">register</a>).
+
+<li>Autodesk University ... still far away in the future, but some preparations already have to be made.
+
+<li>Lots and lots of vacation this summer!
+
+</ul>
+
+<p>Due to all that and because I keep discovering new exciting and surprising things to write about every single day, I have neglected to publish this nice article that I have had lying around for quite a while now, actually almost two months.
+
+<p>A number of the topics that I address below have already been covered, both by me and others, but this is probably the most succinct and complete coverage that you will find anywhere in one single piece.
+
+<p>In any case, this should give you enough reading material to digest over the coming weekend as well as a nice little end user utility.</p>
+
+<center>
+<hr>
+<h3><span style="font-size:larger">Pipe to Conduit Converter</span>
+<br>My First Revit 2011 Add-In</h3>
+</center>
+
+<h4>Abstract</h4>
+<p>The Revit 2011 pipe to conduit converter add-in p2c presented in this article is of interest in two respects:
+<ul>
+<li>It implements a useful utility for converting pipes to conduits.
+<li>It presents an opportunity to discuss many aspect of the new API functionality.
+</ul>
+
+<p>If you are interested in this utility for the sake of using it, look no further.
+The binary executable is available for download right here.
+So is the source code, and so is this text that you are reading, nicely formatted in RTF:</p>
+
+<ul>
+<li><a href="zip/p2cexe.zip">Binary executable</a> p2c.dll and its add-in manifest PipeToConduitConverter.addin.
+<li>Complete <a href="zip/p2csrc.zip">source code and Visual Studio solution</a>.
+<li><a href="zip/p2c.rtf">This text</a> in rich text format RTF.
+</ul>
+
+<h4>Pipes and Conduits</h4>
+<p>Some of the main new product features in Revit MEP 2011 are the support for conduits, cable trays and panel schedules.
+<p>In previous versions, many users used pipes to represent the missing conduit elements. With the introduction of native conduit elements in Revit MEP 2011, it makes sense to convert the legacy models to the new format. The pipe to conduit converter p2c prompts the user to select existing pipe elements and automatically converts them to conduits.
+<h4>Command Implementation Overview</h4>
+<p>There are two nice aspects of the p2c implementation which make it interesting to discuss as an introductory example to programming a Revit 2011 add-in:
+<ul>
+<li>The implementation is very short and sweet.
+<li>A large number of new API features are used.
+</ul>
+
+<p>The short and sweet aspect stems from the fact that it does very little. In fact, it simply converts certain user-selected pipes to conduits, i.e. reads the pipe location and dimensions, generates corresponding conduit elements, and deletes the original pipes.
+<p>As a last additional feature, I added code to read the pipe diameter and transfer that to the conduit replacing it. But that really is all it does.</p>
+<p>The amount of new API functionality that we are able to make use of in this short sample is really quite surprising. In less than two hundred lines of code, the following new and updated API features are used:
+
+<a name="toc"></a>
+<h4>Contents</h4>
+
+<ul>
+<li><a href="#1">Revit API assembly split</a>
+<li><a href="#2">Namespace reorganisation</a>
+<li><a href="#3">Command registration manifest</a>
+<li><a href="#4">External command Execute method and attributes</a>
+<li><a href="#5">Transaction mode</a>
+<li><a href="#6">Regeneration option</a>
+<li><a href="#7">Task dialogues for user messages</a>
+<li><a href="#8">Interactive filtered element selection</a>
+<li><a href="#9">Redesigned element filtering</a>
+<li><a href="#10">New element creation paradigm</a>
+<li><a href="#11">Access to pipe and conduit sizes</a>
+</ul>
+
+<a name="1"></a>
+<h4>Revit API Assembly Split</h4>
+<p>The Revit API was previously provided through one single .NET assembly named RevitAPI.dll and located together with Revit.exe and Revit.ini in the Program subdirectory of the main Revit installation folder. It has now been split into two separate assemblies, RevitAPI.dll and RevitAPIUI.dll. The former now contains only methods used to access Revit's application, documents, elements, and parameters at the database level, whereas the latter defines the interfaces related to manipulation and customization of the Revit user interface.
+<p>Almost all Revit add-ins will need to reference both of these, and so does p2c. As always, when referencing these, remember to set the 'Copy Local' flag to false.
+<p>To provide access to application and document level interfaces from both assemblies, the Application and Document classes have also been split into two:
+<ul>
+<li>Autodesk.Revit.UI.UIApplication provides access to UI-level interfaces for the application such as adding a ribbon panels to the user interface and accessing the active document in the user interface.
+<li>Autodesk.Revit.ApplicationServices.Application provides access to all other application level properties.
+<li>Autodesk.Revit.UI.UIDocument provides access to UI-level interfaces for the document, such as the contents of the selection and the ability to prompt the user to make selections and pick points.
+<li>Autodesk.Revit.DB.Document provides access to all other document level properties.
+</ul>
+
+<p>The ExternalCommandData interface now provides access to the UIApplication object as well as the active view. From the active UIApplication object you can obtain the active UI document. You can also construct the UIApplication from the Application object, and the UIDocument from the DB level document at any time.
+<a name="2"></a>
+<h4>Namespace Reorganisation</h4>
+<p>The Revit API namespaces have been renamed and rearranged to be more consistent and more suitable for future expansion. In previous releases, many API classes were split along the lines of functionality and Revit vertical product, which led to confusion about the location of element and symbol classes for the various flavours of Revit. In the new namespace structure, there is a primary division into three sets of namespaces:
+<ul>
+<li>Autodesk.Revit.ApplicationServices: settings and options for the main Revit application.
+<li>Autodesk.Revit.DB: access to Revit database data.
+<li>Autodesk.Revit.UI: access to and customisation of the Revit user interface.
+</ul>
+
+<p>These main namespaces can include subdivisions based on discipline, e.g.
+<ul>
+<li>Autodesk.Revit.DB.Architecture
+<li>Autodesk.Revit.DB.Electrical
+<li>Autodesk.Revit.DB.Mechanical
+<li>Autodesk.Revit.DB.Plumbing
+<li>Autodesk.Revit.DB.Structure
+</ul>
+
+<p>Classes useful in more than one discipline are placed in the Autodesk.Revit.DB main namespace.
+<p>Less commonly used classes, like event arguments, may also be placed in subordinate namespaces, such as
+<ul>
+<li>Autodesk.Revit.DB.Events
+<li>Autodesk.Revit.UI.Events
+</ul>
+
+<p>As a result of the rearrangement of the namespaces, a few classes have been modified more drastically than simply being moved to new namespaces:
+<ul>
+<li>Autodesk.Revit.Geometry.Element is renamed to Autodesk.Revit.DB.GeometryElement to avoid a naming conflict.
+<li>Autodesk.Revit.Geometry.Instance is renamed to Autodesk.Revit.DB.GeometryInstance to avoid a naming conflict.
+<li>Autodesk.Revit.Structural.Enums.Material is renamed to Autodesk.Revit.DB.MaterialType to avoid a naming conflict.
+<li>Autodesk.Revit.Options.Application has been removed. The properties accessible from this class have been moved into Autodesk.Revit.ApplicationServices.Application.
+</ul>
+
+<p>A full list mapping the changes is provided in the Revit SDK document "Revit 2011 API Namespace Remapping.xlsx".
+<p>In p2c, we make use of the following namespaces:
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.DB.Electrical;
+<span class="blue">using</span> Autodesk.Revit.DB.Plumbing;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">using</span> <span class="teal">InvalidOperationException</span>
+&nbsp; = Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">InvalidOperationException</span>;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+</pre>
+
+<a name="3"></a>
+<h4>Command Registration Manifest</h4>
+<p>P2c makes use of the new command registration facility based on add-in manifest files. This approach significantly simplifies the installation of an add-in, since there is no longer any need to edit the Revit.ini file. The add-in manifest files make it easier to share and customise the configuration of add-ins and provide much finer control of the loading process and additional options.
+<p>Manifest files are XML files. They are read automatically by Revit when they are placed in one of two locations on a user's system. There are separate locations for individual users or all users, and they also depend on whether you are running Windows XP or Vista/Windows 7. For a specific user, the files are located in
+<ul>
+<li>C:\Documents and Settings\<user>\Application Data\Autodesk\Revit\Addins\2011 for Windows XP, and
+<li>C:\Users\<user>\AppData\Roaming\Autodesk\Revit\Addins\2011 for Vista/Windows 7.
+</ul>
+
+<p>The non-user specific location is in
+<ul>
+<li>C:\Documents and Settings\All Users\Application Data\Autodesk\Revit\Addins\2011 for Windows XP, and
+<li>For Vista/Windows 7 - C:\ProgramData\Autodesk\Revit\Addins\2011 for Vista/Windows 7.
+</ul>
+
+<p>All files with an extension of .addin found in these locations will be read and processed by Revit during start-up. Multiple add-ins may be loaded by a single manifest file. The manifest file syntax defines tags allowing you to specify all the information previously defined in the Revit.ini registration data, i.e. assembly path, full class name, text and description:
+<ul>
+<li>Assembly: The full path to the add-in assembly file.
+<li>FullClassName: The full name of the class in the assembly file which implements IExternalCommand or IExternalApplication.
+<li>Text: The name of the button for an external command.
+<li>Description: Short description of the command, used as the button tooltip.
+</ul>
+
+<p>It also supports a long list of other new functionality:
+<ul>
+<li>ClientId: A GUID which represents the id of this particular application.
+<li>Name: The name of application. Required; for ExternalApplications only.
+<li>VisibilityMode: Provides the ability to specify if a command is visible in project documents, family documents, or no document at all. Also provides the ability to specify the discipline(s) where the command should be visible. Multiple values may be set for this option. By default, a command is available in all modes and disciplines, including when there is no active document.
+<li>AvailabilityClassName: The full name of a class in the assembly file implementing IExternalCommandAvailability. This class allows a command to be selectively grayed out depending on context.
+<li>LargeImage: The path to the command button icon to display in the External Tools pull-down menu.
+<li>LongDescription: Long description of the command, used as part of its extended tooltip. This tooltip is shown when the mouse hovers over the command for a long amount of time. You can split the text of this option into multiple paragraphs by placing &lt;p&gt; tags around each paragraph.
+<li>TooltipImage: The path to an image file to show as a part of the button extended tooltip.
+<li>LanguageType: Localization setting for Text, Description, LargeImage, LongDescription, and TooltipImage of external tools buttons. Revit will load the resource values from the specified language resource dll. The value can be one of the eleven languages supported by Revit.
+</ul>
+
+<p>As you can see, there is a large amount of very useful new functionality buried in here! For full details, especially on localisation, external command accessibility and the IExternalCommandAvailability interface, please refer to the "Revit Platform API Changes and Additions.doc" document provided in the Revit SDK.
+<p>The Revit.ini registration mechanism remains in place for the 2011 release but will be removed in the future. The Revit.ini mechanism does not offer any of the new capabilities listed above.
+<p>As an example of a pretty minimal add-in manifest file, here is the one for our p2c command:
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Convert Pipes to Conduits<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Convert Pipes to Conduits<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\src\p2c\p2c\bin\Debug\p2c.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>p2c.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>835d6ad1-1a99-4039-95dc-e752ff635928<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIn</span><span class="blue">&gt;</span>
+</pre>
+
+<p>As said, installation is now significantly simplified, since all you have to do is copy the add-in assembly to your hard disk, update the assembly path specified in the manifest file, and copy the manifest file to the desired location where Revit can pick it up without affecting any other existing functionality or touching any Revit files or other parts of the Revit installation.
+
+<a name="4"></a>
+<h4>External Command Execute Method and Attributes</h4>
+<p>As before, the external command class needs to fulfil the IExternalCommand interface, which requires it to implement the Execute method. The Execute method signature is virtually unchanged from the Revit 2010 API, except that the command result enumeration is now moved to Autodesk.Revit.UI.Result. The new API does require you to set two attributes on the command class, though, to define its
+<ul>
+<li>Transaction mode and
+<li>Regeneration option.
+</ul>
+
+<a name="5"></a>
+<h4>Transaction Mode</h4>
+<p>In previous versions of the Revit API, the transaction mode was rigorously predefined by the framework, more or less like the new automatic mode. In Revit 2011, an add-in can decide for itself how transactions should be set up for it. The new TransactionMode attribute must be applied to the IExternalCommand implementation class to control transaction behaviour. It controls how the API framework expects transactions to be used when the command is invoked and supports the following three values:
+<ul>
+<li>TransactionMode.Automatic: The framework creates a transaction on the active document before the external command is executed. The transaction is committed or rolled back after command completion based upon the return value of the Execute method. A command cannot create and start its own Transactions, but it can create SubTransactions as required.
+<li>TransactionMode.Manual: The framework will not create a transaction, but it will create an outer group to roll back all changes if the external command returns a failure status. Instead, you may use combinations of Transactions, SubTransactions, and TransactionGroups as you please. You will have to name your transactions, which will then appear in the Undo menu.
+<li>TransactionMode.ReadOnly: No transaction or group will be created automatically, and no own transactions may be created for the lifetime of the command. The command may only read from the model, not write anything to it.
+</ul>
+
+<p>In all three modes, the TransactionMode specified only applies to the active document. You may open other documents during the course of the command, and you have complete control over the creation and use of Transactions, SubTransactions, and TransactionGroups on those other documents, even in ReadOnly mode.
+<p>For quick porting of existing legacy commands, the automatic mode is obviously the closest to the old behaviour, and that is also the mode that we apply to the p2c command.
+
+<a name="6"></a>
+<h4>Regeneration Option</h4>
+<p>The new RegenerationAttribute must be applied to external application and command implementation classes to control their regeneration behaviour. This mode controls whether or not the API framework automatically regenerates after every model modification. There are two supported values:
+<ul>
+<li>RegenerationOption.Automatic: The framework regenerates after every change to the model. This is equivalent to the behaviour in Revit 2010 and earlier. Regeneration and update can be suspended using SuspendUpdating for some operations, but in general the performance of multiple modifications within the same file will be slower than when using the manual regeneration option. This mode is obsolete and provided for backwards compatibility only. It will be removed in a future release.
+<li>RegenerationOption.Manual: The API framework will not regenerate after every model level change. Instead, you may use the regeneration APIs to force update of the document after a group of changes. SuspendUpdating blocks are unnecessary and should not be used. Performance of multiple modifications of the Revit document is faster than using automatic regeneration. Since this mode suspends all updates to the document, your application should not read data from the document after it has been modified until after it has been regenerated, otherwise it will be accessing stale data. This mode will be the only option in a future release.
+</ul>
+
+<p>The regeneration mode used for an event or updater call-back is the same as the mode of the external application or command which registered it.
+<p>In addition, two new document methods have been added to allow an application running in manual regeneration mode to update Revit document elements at any time:
+<ul>
+<li>Document.Regenerate
+<li>Document.AutoJoinElements
+</ul>
+
+<p>P2c uses the manual regeneration mode.
+
+<h4>Command Class Implementation</h4>
+<p>To demonstrate the use we make of the new attributes and the access to the UI and DB document instances, here is the skeleton of the p2c external command implementation:
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Automatic)]
+&nbsp; [<span class="teal">Regeneration</span>(<span class="teal">RegenerationOption</span>.Manual)]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Result</span> result = <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ... main implementation goes here ...</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; result = <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// selection cancelled</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; result = <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// if any error occurs, display error </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// information and return failed</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<a name="7"></a>
+<h4>Task Dialogues for User Messages </h4>
+
+<p>The API now offers the ability to create and display Revit-style task dialogues. It provides capabilities similar to the System.Windows.Forms.MessageBox with a Revit look-and-feel, like this:</p>
+
+<center>
+<img src="img/task_dialog.png" alt="Task dialogue"/>
+</center>
+
+<p>To make use of it, you can construct an instance of the TaskDialog class and use its members to set the instructions, detailed text, icons, buttons and command links to be displayed. The class also provides a static shortcut method Show offering a quick way to show minimal task dialogue without explicitly instantiating it.
+<p>P2c makes use of both methods in the following utility methods:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _caption = <span class="maroon">&quot;Pipe to Conduit Converter&quot;</span>;
+&nbsp;
+<span class="blue">&nbsp; #region</span> Formatting and message handlers
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> MessageBox or Revit TaskDialog </span>
+&nbsp; <span class="gray">///</span><span class="green"> wrapper for informational message.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> InfoMsg( <span class="blue">string</span> msg )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( msg );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption, msg,
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialogCommonButtons</span>.Ok );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> MessageBox or Revit TaskDialog </span>
+&nbsp; <span class="gray">///</span><span class="green"> wrapper for error message.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ErrorMsg( <span class="blue">string</span> msg )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( msg );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span> d = <span class="blue">new</span> <span class="teal">TaskDialog</span>( _caption );
+&nbsp; &nbsp; d.MainIcon = <span class="teal">TaskDialogIcon</span>.TaskDialogIconWarning;
+&nbsp; &nbsp; d.MainInstruction = msg;
+&nbsp; &nbsp; d.Show();
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Message handlers</span>
+</pre>
+
+<a name="8"></a>
+<h4>Interactive Filtered Element Selection</h4>
+<p>The Revit 2010 API and previous versions provided some very rudimentary element picking facilities, and none at all for selecting other objects such as a point on the graphics screen or sub-entities such as a face or an edge within a building element. This has changed radically in Revit 2011.
+<p>This application has some very basic element selection requirements. The current implementation prompts the user to select a set of pipes to be converted. Generic element picking within an add-in is achieved using the PickObjects method. It comes in several overloads, taking the following lists of arguments:
+<ul>
+<li>ObjectType: prompts the user to select multiple objects.
+<li>ObjectType, string: prompts the user to select multiple objects while showing a custom status prompt string.
+<li>ObjectType, ISelectionFilter: prompts the user to select multiple objects which pass a customer filter.
+<li>ObjectType, ISelectionFilter, string: prompts the user to select multiple objects which pass a custom filter while showing a custom status prompt string.
+<li>ObjectType, ISelectionFilter, string, IList of Reference: prompts the user to select multiple objects which pass a custom filter while showing a custom status prompt string. A preselected set of objects may be supplied and will be selected at the start of the selection.
+</ul>
+
+<p>The latter three allow us to supply an element filter which we implement ourselves in which we can determine completely freely which elements the user will be allowed to select or not.
+<p>For our purposes, it makes sense to use this filtering facility to prohibit selection of anything but pipe elements. To do so, we have to implement the ISelectionFilter interface, i.e. derive a class from it and implement the two required methods AllowElement and AllowReference. These two are called each time the user hovers the cursor over a candidate object in the Revit model. Depending on our implementation, they return true or false, indicating to the Revit framework whether or not it should allow the user to pick the candidate object or not.
+<p>In our case, AllowElement will return true only if the candidate element is a pipe, which we can test by comparing its category with the built-in category OST_PipeCurves. Our AllowReference implementation simply returns true. Here is the full implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">PipeFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">const</span> <span class="teal">BuiltInCategory</span> _bic = <span class="teal">BuiltInCategory</span>.OST_PipeCurves;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.IntegerValue == ( <span class="blue">int</span> ) _bic;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+<p>Making use of this selection filter in the call to PickObjects is simple:
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs
+&nbsp; &nbsp; = uidoc.Selection.PickObjects(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PipeFilter</span>(),
+&nbsp; &nbsp; &nbsp; _prompt );
+</pre>
+
+<a name="9"></a>
+<h4>Redesigned Element Filtering</h4>
+<p>Before we can create any conduit elements, we need to know which conduit type to use for them. For the sake of simplicity, we simply use the first one encountered. If the user prefers a different one, they can easily be edited after the conversion. If this is a requirement, a simple user interface to select the style to use before converting from pipe to conduit could be added.
+<p>The methods to use for selecting the conduit types existing within the model has completely changed in this release and makes use of the new element filtering API. One creates a FilteredElementCollector for the given document and then applies various filters to it. It then returns all elements fulfilling all the required criteria. In our case, we require the elements to have the built-in category OST_Conduit and to be instances of the ElementType class. The ElementType class was named Symbol in previous versions of the API. We are only interested in an arbitrary conduit type, so we simply pick the first one. Happily, the collector provides a method to do exactly this, so our code ends up very short and succinct, shorter than this description:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfCategory(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Conduit );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>(
+&nbsp; &nbsp; <span class="teal">ElementType</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idConduitType
+&nbsp; &nbsp; = collector.FirstElementId();
+</pre>
+
+<a name="10"></a>
+<h4>New Element Creation Paradigm</h4>
+<p>In previous versions of Revit, all element creation methods were provided by the creation document class Autodesk.Revit.Creation.Document. In the Revit 2011, some elements such as the new MEP conduit one can instead be created using a new second generation element creation approach using a static creation method on the Conduit element class itself. This second generation API is automatically generated with RIDL, the Revit Interface Definition Language.
+<p>P2c makes use of the new style of element creation functionality in the following call made in the ConvertPipeToConduit method, which convert the given pipe element to a Revit MEP conduit using the specified conduit type. It also shows how the existing pipe is queried for its level, start and end points to be reused for the new conduit, and how the obsolete pipe is deleted afterwards. The level of the new conduit is specified by its element id. If it equals InvalidElementId, the nearest level is used:
+
+<pre class="code">
+<span class="teal">Conduit</span> ConvertPipeToConduit(
+&nbsp; <span class="teal">ElementId</span> idConduitType,
+&nbsp; <span class="teal">Pipe</span> pipe )
+{
+&nbsp; <span class="teal">Document</span> doc = pipe.Document;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idLevel = ( <span class="blue">null</span> == pipe.Level )
+&nbsp; &nbsp; ? <span class="teal">ElementId</span>.InvalidElementId
+&nbsp; &nbsp; : pipe.Level.Id;
+&nbsp;
+&nbsp; <span class="teal">LocationCurve</span> lc = pipe.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; <span class="teal">XYZ</span> startPoint = lc.Curve.get_EndPoint( 0 );
+&nbsp; <span class="teal">XYZ</span> endPoint = lc.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; <span class="teal">Conduit</span> conduit = <span class="teal">Conduit</span>.Create( doc, idConduitType,
+&nbsp; &nbsp; startPoint, endPoint, idLevel );
+&nbsp;
+&nbsp; doc.Delete( pipe );
+&nbsp;
+&nbsp; <span class="blue">return</span> conduit;
+}
+</pre>
+
+<a name="11"></a>
+<h4>Access to Pipe and Conduit Sizes</h4>
+<p>The initial code for the pipe to conduit conversion shown above does not take the pipe diameter into account. It would obviously be useful if that parameter value could be accessed and transferred to the new conduit as well. Access to the pipe diameter is provided by the pipe.Diameter property. To transfer this data to the new conduit requires the use of a built-in parameter. Actually, the pipe diameter is also available through a parameter as well, which manages the value returned more comfortably by the Diameter property. Here is the updated version including code to handle the transfer of the diameter property as well as some debug assertions to ensure the validity of our basic assumptions on the parameter usage:
+
+<pre class="code">
+<span class="teal">Conduit</span> ConvertPipeToConduit(
+&nbsp; <span class="teal">ElementId</span> idConduitType,
+&nbsp; <span class="teal">Pipe</span> pipe )
+{
+&nbsp; <span class="teal">Document</span> doc = pipe.Document;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idLevel = ( <span class="blue">null</span> == pipe.Level )
+&nbsp; &nbsp; ? <span class="teal">ElementId</span>.InvalidElementId
+&nbsp; &nbsp; : pipe.Level.Id;
+&nbsp;
+&nbsp; <span class="teal">LocationCurve</span> lc = pipe.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; <span class="teal">XYZ</span> startPoint = lc.Curve.get_EndPoint( 0 );
+&nbsp; <span class="teal">XYZ</span> endPoint = lc.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; <span class="blue">double</span> diameter = pipe.Diameter;
+&nbsp; <span class="teal">Parameter</span> p;
+&nbsp;
+<span class="blue">&nbsp; #region</span> Debug code
+<span class="blue">#if</span> DEBUG
+&nbsp; p = pipe.get_Parameter( _bipCurveDiameter );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, <span class="maroon">&quot;expected valid RBS_CURVE_DIAMETER_PARAM value on pipe&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">StorageType</span>.Double == p.StorageType, <span class="maroon">&quot;expected double RBS_CURVE_DIAMETER_PARAM value&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Assert( p.AsDouble().Equals( diameter ), <span class="maroon">&quot;expected RBS_CURVE_DIAMETER_PARAM value to equal diameter&quot;</span> );
+&nbsp;
+&nbsp; p = pipe.get_Parameter( _bipPipeDiameter );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, <span class="maroon">&quot;expected valid RBS_PIPE_DIAMETER_PARAM value on pipe&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">StorageType</span>.Double == p.StorageType, <span class="maroon">&quot;expected double RBS_PIPE_DIAMETER_PARAM value&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Assert( p.AsDouble().Equals( diameter ), <span class="maroon">&quot;expected RBS_PIPE_DIAMETER_PARAM value to equal diameter&quot;</span> );
+<span class="blue">#endif</span> <span class="green">// DEBUG</span>
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Debug code</span>
+&nbsp;
+&nbsp; <span class="teal">Conduit</span> conduit = <span class="teal">Conduit</span>.Create( doc, idConduitType,
+&nbsp; &nbsp; startPoint, endPoint, idLevel );
+&nbsp;
+&nbsp; p = conduit.get_Parameter( _bipConduitDiameter );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p, <span class="maroon">&quot;expected RBS_CONDUIT_DIAMETER_PARAM parameter on conduit&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">StorageType</span>.Double == p.StorageType, <span class="maroon">&quot;expected double RBS_CONDUIT_DIAMETER_PARAM value&quot;</span> );
+&nbsp; p.Set( diameter );
+&nbsp;
+&nbsp; doc.Delete( pipe );
+&nbsp;
+&nbsp; <span class="blue">return</span> conduit;
+}
+</pre>
+
+<h4>Conclusion</h4>
+<p>This little article covers the areas of new functionality provided by the Revit 2011 API that we immediately ran into implementing a very small and simple add-in.
+As you have seen from numerous other preceding posts, this overview only scratches the surface of the new functionality.
+And as you also can see, the new functionality provides a number of very important new features that developers have been requesting for a long time.
+So it is a great step forward and very good news indeed for all Revit add-in devotees. Happy Revit programming!

@@ -1,0 +1,409 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 08337512 [tying all external add-ins into a single ribbon tab] -->
+
+<h3>External Command Lister and Adding Ribbon Commands</h3>
+
+<p>I have been asked a couple of times how you can integrate multiple Revit add-ins from different sources together into a single ribbon panel.
+
+<p>This topic has also been discussed on the web, e.g. towards the end of
+
+<a href="http://www.revitforum.org/third-party-add-ins-api-r/9591-install-add-ins-tab-make-new.html">
+whether to install to the add-ins tab or make new ribbon tab</a>,
+
+and at Autodesk University, where Jose Guia presented
+
+<a href="http://au.autodesk.com/?nd=class&session_id=10493">
+CP3766 &ndash; Tying All of Your Revit Add-ins into a Pretty Little Ribbon</a>.
+
+<p>Unfortunately, none of these offer any very useful solution, or show or share any code.</p>
+
+<p>I have a very simple approach to suggest, though, which has been around for several years already:</p>
+
+<p>The RvtSamples SDK application reads a text file listing any number of .NET assemblies defining any number of external commands and generates a ribbon panel populated with buttons to launch them all.</p>
+
+<p>Each entry in that file occupies seven lines specifying a group, menu text, description, large image, small image, .NET assembly path and full name of the external command to launch.
+Here is the first entry in that file:</p>
+
+<pre>
+  Analysis
+  EnergyAnalysis Model
+  Demonstrates how to use EnergyAnalysisModel API.
+  LargeImage:
+  Image:
+  Z:\...\bin\Debug\EnergyAnalysisModel.dll
+  Revit.SDK.Samples.EnergyAnalysisModel.CS.Command
+</pre>
+
+<p>Only the two last lines of the entry are really relevant.
+Al the rest is decorative, and hopefully informative as well.</p>
+
+<p>In fact, that is the one and only method that I use myself to launch both SDK sample external commands and all The Building Coder sample code.</p>
+
+<p>Furthermore, the text file read by RvtSamples includes support for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+include files</a> that
+
+I implemented back in 2008, similar to the standard C
+
+<a href="http://en.wikipedia.org/wiki/Include_directive">
+#include pre-processor directive</a>.</p>
+
+<p>The only important information required to populate the RvtSamples text file is the .NET assembly filename of the DLL implementing the external command, and the full external command implementation class name, including its namespace prefix.</p>
+
+<p>Here is the complete EnergyAnalysisModel Revit SDK sample add-in manifest, showing the information corresponding to the lines shown above extracted from RvtSamples.txt:</p>
+
+<pre>
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>Z:\...\bin\Debug\EnergyAnalysisModel.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>6f559488-4285-40b7-bfca-043bb69ea0a7<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.SDK.Samples.EnergyAnalysisModel.CS.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>EnergyAnalysis Model<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Demonstrates how to use EnergyAnalysisModel API.<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>AlwaysVisible<span class="blue">&lt;/</span><span class="maroon">VisibilityMode</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>ADSK<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>Autodesk, www.autodesk.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+<p>As you can see, the content of the Assembly and FullClassName tags correspond exactly to the two last lines specified in the RvtSamples.txt entry.</p>
+
+<p>Where can this information be obtained?</p>
+
+<p>Well, the simplest and most direct source would the add-in manifest, if one is available.</p>
+
+<p>To load an external command on its own, the assembly path and implementation class name are listed in the Assembly and FullClassName
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#2">
+add-in manifest tags</a>.</p>
+
+<p>Unfortunately, if the add-in you wish to integrate defines an external application to create a custom panel, it may not list all its command names in the manifest file.</p>
+
+<p>Where can they be obtained from then?</p>
+
+<p>Well, several tools exist which can read .NET assemblies and display their contents.</p>
+
+<p>I talked about
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/converting-between-vb-and-c-and-net-decompilation.html">
+Reflector</a> way
+
+back in the early days of the blog.
+It since became commercial.
+Victor Chekalin mentioned using
+
+<a href="http://www.jetbrains.com/decompiler">
+dotPeek</a>,
+
+and my colleague Adam added that he uses the
+
+<a href="http://ilspy.net">
+ILSpy .NET decompiler</a> and
+
+is perfectly happy with that.</p>
+
+<p>Basically, the information is made accessible via the .NET Reflection namespace functionality.</p>
+
+<p>To make things really simple for you non-programmer guys, I went and implemented a little Revit add-in external command which does nothing but list the full class names of all other external commands defined in any assembly you care to point it at.</p>
+
+<p>It can be run in Revit without even opening a document, in zero document state.</p>
+
+<p>It prompts you to select a DLL file, opens it as a .NET assembly, and uses reflection to determine all the classes defined in it derived from the IExternalCommand interface.</p>
+
+<p>These are listed in a read-only dynamically generated resizable form.</p>
+
+<p>Here is the result of pointing it at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html">
+simpler DockableDialog sample</a> I
+
+published last week:</p>
+
+<center>
+<img src="img/external_command_lister.png" alt="External command lister"/>
+</center>
+
+<p>The code is very simple.</p>
+
+<p>The ExternalCommandLister class is instantiated with a .NET assembly filename and extracts all external command definitions from it like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">ExternalCommandLister</span>
+{
+&nbsp; <span class="blue">string</span> _assembly_filename;
+&nbsp; <span class="blue">string</span>[] _external_commmand_class_names;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Display error message</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;msg&quot;&gt;</span><span class="green">Message to display</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">void</span> ErrorMsg( <span class="blue">string</span> msg )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;External Command Lister: &quot;</span>
+&nbsp; &nbsp; &nbsp; + msg );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;External Command Lister&quot;</span>,
+&nbsp; &nbsp; &nbsp; msg );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> ExternalCommandLister(
+&nbsp; &nbsp; <span class="blue">string</span> assembly_filename )
+&nbsp; {
+&nbsp; &nbsp; _assembly_filename = assembly_filename;
+&nbsp; &nbsp; _external_commmand_class_names = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( assembly_filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentOutOfRangeException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;assembly_filename&quot;</span>, <span class="maroon">&quot;file not found&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// No need to load the Revit API assemblies, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// because we are ourselves a Revit API add-in </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// inside of Revit, so they are guaranteed to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// be present.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly revit = Assembly.LoadFrom( &quot;C:/Program Files/Autodesk/Revit Architecture 2014/RevitAPI.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//string root = &quot;C:/Program Files/Autodesk Revit Architecture 2014/&quot;;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly adWindows = Assembly.LoadFrom( root + &quot;AdWindows.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly uiFramework = Assembly.LoadFrom( root + &quot;UIFramework.dll&quot; );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Assembly revit = Assembly.LoadFrom( root + &quot;RevitAPI.dll&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Load the selected assembly into </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the current application domain:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Assembly</span> asm = <span class="teal">Assembly</span>.LoadFrom(
+&nbsp; &nbsp; &nbsp; &nbsp; assembly_filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == asm )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to load assembly '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; assembly_filename ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Type</span>&gt; types = asm.GetTypes()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Type</span>&gt;( t =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span> != t.GetInterface(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;IExternalCommand&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _external_commmand_class_names = types
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Type</span>,<span class="blue">string</span>&gt;( t =&gt; t.FullName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToArray();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Exception '{0}' processing assembly '{1}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; ex.Message, assembly_filename ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> AssemblyFilename
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Path</span>.GetFileName( _assembly_filename );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span>[] CommandClassnames
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _external_commmand_class_names;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The one single important line is really just</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Type</span>&gt; types = asm.GetTypes()
+&nbsp; &nbsp; .Where&lt;<span class="teal">Type</span>&gt;( t =&gt;
+&nbsp; &nbsp; &nbsp; <span class="blue">null</span> != t.GetInterface(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;IExternalCommand&quot;</span> ) );
+</pre>
+
+<p>It asks the assembly for all the types it defines and extracts the ones derived from IExternalCommand, i.e. the external command implementation classes.</p>
+
+<p>The external command mainline Execute implementation prompts the user to select a DLL file, instantiates an ExternalCommandLister instance, queries the command names and displays them in a form created on the fly like this:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define the initial .NET assembly folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _assembly_folder_name
+&nbsp; &nbsp; = <span class="maroon">&quot;C:\\ProgramData\\Autodesk\\Revit\\Addins\\2014&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Select a .NET assembly file in the given folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;folder&quot;&gt;</span><span class="green">Initial folder.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filename&quot;&gt;</span><span class="green">Selected filename on success.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Return true if a file was successfully selected.</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> FileSelect(
+&nbsp; &nbsp; <span class="blue">string</span> folder,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">OpenFileDialog</span> dlg = <span class="blue">new</span> <span class="teal">OpenFileDialog</span>();
+&nbsp; &nbsp; dlg.Title = <span class="maroon">&quot;Select .NET Assembly or Cancel to Exit&quot;</span>;
+&nbsp; &nbsp; dlg.CheckFileExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.CheckPathExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.InitialDirectory = folder;
+&nbsp; &nbsp; dlg.Filter = <span class="maroon">&quot;.NET Assembly DLL Files (*.dll)|*.dll&quot;</span>;
+&nbsp; &nbsp; <span class="blue">bool</span> rc = ( <span class="teal">DialogResult</span>.OK == dlg.ShowDialog() );
+&nbsp; &nbsp; filename = dlg.FileName;
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> DisplayExternalCommands(
+&nbsp; &nbsp; <span class="blue">string</span> filename,
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> owner )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ExternalCommandLister</span> lister
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExternalCommandLister</span>( filename );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] a = lister.CommandClassnames;
+&nbsp; &nbsp; <span class="blue">int</span> n = a.Length;
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">Form</span> form
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>();
+&nbsp;
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 400, 150 );
+&nbsp;
+&nbsp; &nbsp; form.Text = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} defines {1} external command{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; lister.AssemblyFilename, n,
+&nbsp; &nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; form.FormBorderStyle
+&nbsp; &nbsp; &nbsp; = <span class="teal">FormBorderStyle</span>.SizableToolWindow;
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">TextBox</span> tb
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">TextBox</span>();
+&nbsp;
+&nbsp; &nbsp; tb.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; tb.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; tb.Multiline = <span class="blue">true</span>;
+&nbsp; &nbsp; tb.TabIndex = 0;
+&nbsp; &nbsp; tb.WordWrap = <span class="blue">false</span>;
+&nbsp; &nbsp; tb.ReadOnly = <span class="blue">true</span>;
+&nbsp; &nbsp; tb.Text = <span class="blue">string</span>.Join( <span class="maroon">&quot;\r\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; lister.CommandClassnames );
+&nbsp;
+&nbsp; &nbsp; form.Controls.Add( tb );
+&nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( FileSelect(
+&nbsp; &nbsp; &nbsp; _assembly_folder_name,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; DisplayExternalCommands( filename,
+&nbsp; &nbsp; &nbsp; &nbsp; revit_window );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The reason I implemented this as a Revit command instead of a stand-alone command-line console application was simply to be sure that the Revit API assemblies are already present before I try to load the add-in assemblies.</p>
+
+<p>I implemented such a stand-alone console application in the past that loaded RevitAPI.dll itself, but that was a long time ago.
+Now the number of Revit API assemblies is larger, and other restrictions may have been added as well.</p>
+
+<p>A complex external command may obviously depend on additional dependencies in addition to the Revit API assemblies.
+In that case, it might be harder or impossible to simply load it as shown above.
+One option then might be to load the other add-in into Revit first using its own loading mechanism, and then try to access its assembly data.</p>
+
+<p>Another caveat is the ClientId tag in the external add-in manifest.
+For the simple add-ins that I create, it is hardly used, except for extensible storage access.
+It might be important for other applications as well, though.</p>
+
+<p>Here is <a href="zip/JtExternalCommandLister.zip">JtExternalCommandLister.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of this external command.</p>
+
+<p>I hope you find this useful and that it helps resolves discussions such as the one pointed to above.</p>
+
+
+
+<a name="2"></a>
+
+<p><strong>Addendum</strong> by Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+Mensch und Maschine acadGraph GmbH</a>:
+
+<p>If different add-ins create custom ribbon panels in the same tab, whichever one of them arrives last will obviously run into a collision attempting to create a tab that already exists.
+
+<p>Worse still: the Revit API provides no method to query the existence of a specific tab.
+It may be possible using the .NET UI Automation library.
+
+<p>However, you can always attempt to retrieve a tab with a specific name using GetRibbonPanels(tabName).
+If the tab does not exist, this method will throw an exception.
+
+<p>The two add-ins could therefore safely add their panels to the same tab using the following approach:</p>
+
+<pre class="code">
+<span class="blue">public</span> Autodesk.Revit.UI.<span class="teal">Result</span> OnStartup(
+&nbsp; <span class="teal">UIControlledApplication</span> application )
+{
+&nbsp; <span class="blue">string</span> tabName = <span class="maroon">&quot;TBC&quot;</span>;
+&nbsp; <span class="blue">string</span> panelName = <span class="maroon">&quot;TBC&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">RibbonPanel</span>&gt; panels = application
+&nbsp; &nbsp; &nbsp; .GetRibbonPanels( tabName );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Tab &quot;TBC&quot; does not yet exist, </span>
+&nbsp; &nbsp; <span class="green">// so create new</span>
+&nbsp;
+&nbsp; &nbsp; application.CreateRibbonTab( tabName );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">RibbonPanel</span> panel = application
+&nbsp; &nbsp; .CreateRibbonPanel( tabName, panelName );
+&nbsp;
+&nbsp; <span class="green">// Add your buttons here</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>In principle, this approach may be regarded as bad coding style, because
+
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">
+exceptions are and should remain exceptional</a>.
+
+<p>Since there is no other way to obtain the required information in this case, though, one is left no choice.
+
+<p>Actually an alternative might exist using the .NET UIAutomation library, but such an approach may be awfully slow.</p>

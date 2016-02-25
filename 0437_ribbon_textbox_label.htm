@@ -1,0 +1,217 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Simulating a Ribbon Textbox Label</h3>
+
+<p>On Wednesday evening I arrived in Stavanger on the coast of Norway, found the sailship 
+
+<a href="http://www.classicsailing.de">
+Pantagruel</a> and met the crew that I will be spending the coming week with.
+
+<p>Thursday we went on a hike rather than sailing, because we happened to be so close to the spectacular 
+
+<!-- http://www.stavanger-web.com/touristinfo/prekestol.htm -->
+
+<a href="http://en.wikipedia.org/wiki/Preikestolen">
+Preikestolen or Pulpit Stone</a> over 
+
+the Lysefjord.
+
+We took our boat over from Stavanger to J&oslash;rpeland by motor, since the wind was exactly opposite our direction, and then spent all afternoon hiking through the incredibly beautiful moors and rocks.
+
+<p>On Friday we started the real sailing tour, motoring out of the Stavanger bay in sunshine and very little wind, and catching more wind outside the coast to sail down towards Hidra.
+The wind grew and the waves as well, and all of us newbies got a thorough dose of seasickness.
+We arrived in a beautiful bay late in the evening and spent most of Saturday recuperating in tranquillity and sunshine.
+I also spend a couple of hours trying my hand at sailing a miniature boat, a jolle, before continuing down to Egersund for shopping.
+
+<p>Tonight we are planning to sail further south during the night.
+The final goal is to cross over to Denmark and from there cross the Skagerrak to Sweden, then sail on the west coast until we get to G&ouml;teborg and head back home.
+
+<!-- 
+<p>I am still underway on my sailing tour along the coast of Norway and western Sweden, if we have not capsized by now... 
+Here is a little item that I posted before leaving and that I hope you will find as interesting as I did:
+-->
+
+<p>We have not yet talked at all about the new ribbon capabilities in the Revit 2011 API.
+There are quite a few, as the following excerpt from the What's New section of the Revit API help file RevitAPI.chm shows:
+
+<span style="color:darkblue">
+
+<h4>Additional options for Ribbon customization</h4>
+
+<p>There are new Ribbon components supported via the Ribbon API:
+
+<ul>
+<li>SplitButton &ndash; a pulldown button with a default pushbutton attached
+<li>RadioGroup &ndash; a set of ToggleButtons, where only one of the set can be active at a time
+<li>ComboBox &ndash; a pulldown containing a set of selectable items, which can be grouped optionally
+<li>TextBox &ndash; an input field for users to enter text
+<li>SlideOut panel &ndash; an extra panel can optionally slide down from a Ribbon panel; this panel can contain any of the standard Ribbon components
+</ul>
+
+<p>For ComboBox and TextBox, events are included; these events call your API code when the component is changed by the user.
+
+<p>The new property
+
+<ul>
+<li>RibbonItem.Visible
+</ul>
+
+<p>provides control over whether a particular item is visible.
+
+<p>The new properties:
+
+<ul>
+<li>RibbonItem.LongDescription
+<li>RibbonItem.ToolTipImage
+</ul>
+
+<p>allow you to set up an extended tooltip for the Ribbon item.  This tooltip can display a longer set of text, and/or a single image.
+
+<p>The new property:
+
+<ul>
+<li>PushButton.AvailabilityClassName
+</ul>
+
+<p>allows assignment of an availability class to controlled whether or not the button is available, similar to the option provided for ExternalCommands registered by manifest.
+
+<p>There is also a new option supported for PulldownButton &ndash; a separator can now be added between buttons this component.
+
+<p>There is also a new option to add custom panels to the Analyze tab in Revit as well as the Add-Ins tab, via a new overload of Application.CreateRibbonPanel().
+
+<p>As a result of these enhancements, some pre-existing APIs have changed:
+
+<ul>
+<li>RibbonPanel.AddButton() has been replaced with RibbonPanel.AddItem()
+<li>RibbonPanel.AddStackedButtons() overloads have been replaced with RibbonPanel.AddStackedItems() overloads
+<li>Property RibbonPanel.Items has been replaced with method RibbonPanel.GetItems()
+<li>Property PulldownButton.Items has been replaced with method PulldownButton.GetItems()
+<li>Methods RibbonPanel.AddPushButton() and RibbonPanel.AddPulldownButton() have been removed. Use RibbonPanel.AddItem() for this operation.
+<li>RibbonPanel.AddToPulldown() has been removed. Use PulldownButton.AddItem() for this operation.
+<li>PulldownButton.AddPushButton() has been removed. Use PulldownButton.AddItem() for this operation.
+</ul>
+
+</span>
+
+<p>Some of the new functionality is demonstrated by the Ribbon SDK sample, but not all.
+
+<p>Here is a question on how to simulate a missing widget, a label to describe the use of a text box:
+
+<!--
+
+From: Mikako Harada
+Sent: Friday, July 16, 2010 10:31 AM
+Subject: Ribbon Textbox - how to add label?
+
+-->
+
+<p><strong>Question:</strong> How can I add a label to a ribbon text box like in these two examples from the Revit user interface?
+
+<p>Here is a label for the active workset:</p>
+
+<center>
+<img src="img/ribbon_textbox_label_active_workset.jpg" alt="Active workset label"/>
+</center>
+
+<p>Here is a different label in the Autodesk Seek panel:</p>
+
+<center>
+<img src="img/ribbon_textbox_label_seek.png" alt="Autodesk Seek panel"/>
+</center>
+
+<p>Could I possible use some stacked items to achieve this?
+
+<p>This is what my attempts so far end up looking like, displaying a textbox lacking a label:
+
+<center>
+<img src="img/ribbon_textbox_label_attempt.png" alt="Ribbon textbox lacking label"/>
+</center>
+
+<p>The code I am using to produce it looks like this:
+
+<pre class="code">
+<span class="blue">Sub</span> AddTextBox(<span class="blue">ByVal</span> panel <span class="blue">As</span> RibbonPanel)
+&nbsp;
+&nbsp; <span class="green">' fill the text gox information</span>
+&nbsp; <span class="blue">Dim</span> txtBoxData <span class="blue">As</span> <span class="blue">New</span> TextBoxData(<span class="maroon">&quot;TextBox&quot;</span>)
+&nbsp;
+&nbsp; txtBoxData.Image = <span class="blue">New</span> BitmapImage( _
+&nbsp; &nbsp; <span class="blue">New</span> Uri(m_imageFolder + <span class="maroon">&quot;Basics.ico&quot;</span>))
+&nbsp;
+&nbsp; txtBoxData.Name = <span class="maroon">&quot;Text Box&quot;</span>
+&nbsp; txtBoxData.ToolTip = <span class="maroon">&quot;Enter text here&quot;</span>
+&nbsp; txtBoxData.LongDescription _
+&nbsp; &nbsp; = <span class="maroon">&quot;&lt;p&gt;This is Revit UI Labs.&lt;/p&gt;&lt;p&gt;Ribbon Lab&lt;/p&gt;&quot;</span>
+&nbsp;
+&nbsp; txtBoxData.ToolTipImage = <span class="blue">New</span> BitmapImage( _
+&nbsp; &nbsp; <span class="blue">New</span> Uri(m_imageFolder + <span class="maroon">&quot;ImgHelloWorld.png&quot;</span>))
+&nbsp;
+&nbsp; <span class="green">' create the text box item on the panel </span>
+&nbsp; <span class="blue">Dim</span> txtBox <span class="blue">As</span> TextBox = panel.AddItem(txtBoxData)
+&nbsp; txtBox.PromptText = <span class="maroon">&quot;Enter a comment&quot;</span>
+&nbsp; txtBox.ShowImageAsButton = <span class="blue">True</span>
+&nbsp; txtBox.Width = 180
+&nbsp; <span class="green">'txtBox.ItemText = &quot;my text box&quot;</span>
+&nbsp; <span class="green">'txtBox.Name ' this is read only. </span>
+&nbsp;
+&nbsp; <span class="green">' p51. we'll talk about events in Lab4</span>
+&nbsp; <span class="blue">AddHandler</span> txtBox.EnterPressed, <span class="blue">New</span> EventHandler( _
+&nbsp; &nbsp; <span class="blue">Of</span> TextBoxEnterPressedEventArgs)( _
+&nbsp; &nbsp; <span class="blue">AddressOf</span> txtBox_EnterPressed)
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+<span class="green">' event hander for the text box above. </span>
+<span class="blue">Sub</span> txtBox_EnterPressed( _
+&nbsp; <span class="blue">ByVal</span> sender <span class="blue">As</span> <span class="blue">Object</span>, _
+&nbsp; <span class="blue">ByVal</span> e <span class="blue">As</span> TextBoxEnterPressedEventArgs)
+&nbsp;
+&nbsp; <span class="green">' cast sender as TextBox to retrieve text value</span>
+&nbsp; <span class="blue">Dim</span> txtBox <span class="blue">As</span> TextBox = sender
+&nbsp;
+&nbsp; TaskDialog.Show(<span class="maroon">&quot;TextBox Input&quot;</span>, _
+&nbsp; &nbsp; <span class="maroon">&quot;This is what you typed in: &quot;</span> _
+&nbsp; &nbsp; + txtBox.Value.ToString())
+&nbsp;
+<span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<!--
+
+From: Harry Mattison
+Sent: Friday, July 16, 2010 2:29 PM
+Subject: RE: Ribbon Textbox - how to add label?
+
+-->
+
+<p><strong>Answer:</strong> The ribbon API does not contain a text label item, so the best alternative might be a disabled pushbutton stacked above the other control.
+Here is an example of what this might look like:</p>
+
+<center>
+<img src="img/ribbon_textbox_label_disabled_pushbutton.jpg" alt="Simulate textbox label with disabled pushbutton"/>
+</center>
+
+<p>Here is the tweaked excerpt from the Ribbon SDK sample that produces this result:
+
+<pre class="code">
+&nbsp; <span class="teal">PushButtonData</span> pushButtonData
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Active Workset&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Active Workset&quot;</span>,
+&nbsp; &nbsp; &nbsp; AddInPath,
+&nbsp; &nbsp; &nbsp; className );
+&nbsp;
+&nbsp; <span class="teal">ComboBoxData</span> comboBoxDataLevel
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ComboBoxData</span>( <span class="maroon">&quot;LevelsSelector&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">RibbonItem</span>&gt; ribbonItemsStacked
+&nbsp; &nbsp; = ribbonSamplePanel.AddStackedItems(
+&nbsp; &nbsp; &nbsp; pushButtonData, comboBoxDataLevel );
+&nbsp;
+&nbsp; ( (<span class="teal">PushButton</span>) (ribbonItemsStacked[0]) ).Enabled
+&nbsp; &nbsp; = <span class="blue">false</span>;
+</pre>
+
+<p>Many thanks to Mikako Harada and Harry Mattison for this suggestion!</p>

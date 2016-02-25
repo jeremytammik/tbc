@@ -1,0 +1,63 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>External Application Attributes</h3>
+
+<p>Arno&scaron;t L&ouml;bel added a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html?cid=6a00e553e168978833014e5f658859970c#comment-6a00e553e168978833014e5f658859970c">
+comment</a> on
+
+the little 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">
+zero document external application</a> that 
+
+I presented last week, pointing out that the transaction attribute (e.g. TransactionMode.Manual) is only applicable to external commands, not applications.
+As he says, it should be treated as an add-in declaration error, but since it is harmless, it is quietly ignored. 
+(It could be treated as an error in the future though.)
+
+<p>The question is also how the regeneration attribute is handled. 
+It was originally intended for both commands and applications, but sometime in the future it will not be needed for either.
+
+<p>Currently it is required, however, and you will get an error if you remove it. 
+
+<p>To ensure absolute clarity on this issue, I tested removing both of the attributes.
+
+<p>That causes no warning or error messages during compilation, obviously, since Visual Studio does not care what attributes we set on the classes we define.
+
+The application cannot be loaded, however:
+
+<center>
+<img src="img/zero_doc_app_requires_regen_att.png" alt="External application required Regeneration option attribute"/>
+</center>
+
+<p>So the regeneration attribute really is required, and the transaction one is not.
+
+<p>This error message is maybe bit confusing, since it states 'Could not run', which does not really make sense for an external application. 
+In theory, it should probably say 'Could not load' instead.
+
+<p>I updated the code and the zip file provided in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">
+original post</a>
+
+to remove the extraneous transaction attribute.
+
+<h4>DevTV Template Update</h4>
+
+<p>I mentioned how 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+easy it is to update</a> the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+DevTV Visual Studio Wizard Revit add-in templates</a>.
+
+<p>So I updated my personalised C# version, which previously still generated the extraneous transaction attribute on the external application.
+That is actually the reason why it was included in the original application that Arno&scaron;t commented on, since I used my version of the DevTV template to create it...
+
+<p>Here is the new updated version,
+
+<a href="TemplateRevitArchAddinCsJt4.zip">TemplateRevitArchAddinCsJt4.zip</a>.

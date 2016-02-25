@@ -1,0 +1,149 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add-In Wizards for Revit 2014</h3>
+
+<p>I updated my Visual Studio Revit add-in wizards and am taking the time to publish them today, which is
+
+<a href="http://en.wikipedia.org/wiki/Ascension_Day">
+Ascension Day</a> and
+
+a holiday in Neuch&acirc;tel.
+
+<p>That also gives me some extra time to prepare for the June 3-4 Tech Summit presentation of my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>.
+
+<p>The presentation must be pre-submitted by May 20, and a full recording by May 27, so pressure is rising.
+I completed the implementation and still want to catch up on documenting it here on the blog as well.
+You will be happy to hear that the auto-updating functionality using the Idling event now works fine.
+
+
+<a name="1"></a>
+
+<h4>Old and New Wizardry</h4>
+
+<p>I am starting to create numerous Revit 2014 add-ins now for quick testing purposes.
+As soon as that stage is reached, I immediately update my Visual Studio Revit C# add-in wizard.
+
+<p>The 2014 version generates the same boiler-plate code as the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/add-in-wizard-for-revit-2013.html">
+Revit 2013</a> one
+
+did, which can be simply deleted if not needed.
+
+<p>Last time around, I egoistically did not implement the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/update-api-assembly-references-and-wizards.html#4">
+VB version</a> until later.
+
+<!-- If you need it, why did you not provide it for the community in general? -->
+
+<p>This time though, better realising how much appreciated it is, I took care of that as well, right up front.</p>
+
+<!-- Therefore, for the sake of you VB folks, I went and updated the Visual Basic version also, even though I never actually use it.
+I did test it once, though, and it does do its job  :-) -->
+
+<p>It is important to understand how easy it is to modify the wizards for your own needs, and make copies with variations to support different requirements.</p>
+
+<p>Here is an overview of previous explanations of various aspects that also show how create your own flavours:</p>
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64-bit versions</a> for C# and VB.
+
+<li>Support for the
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012 API</a> for
+
+C# and VB.
+
+<li>Updated C# and VB versions placing
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#3">
+assembly DLL alongside add-in manifest</a> and
+
+including other changes.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/add-in-wizard-for-revit-2013.html">
+Revit 2013 C#</a> version including more skeleton code.</li>
+
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/update-api-assembly-references-and-wizards.html#4">
+Revit 2013 VB</a> version.</li>
+
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Installing to non-x86 Program Files</h4>
+
+<p>I had a new issue to struggle with this time around, mentioned in the list above as well, dealing with 64-bit systems.</p>
+
+<p>My Windows 7 virtual machine is a 64-bit system.</p>
+
+<p>The $(ProgramFiles) used in the Visual Studio project template file automatically resolves that to "C:\Program Files (x86)", which is the wrong location.</p>
+
+<p>Revit 2014 is installed in "C:\Program Files" with no x86 suffix.</p>
+
+<p>Researching this, I found a resolution described and explained in this discussion on
+
+<a href="http://stackoverflow.com/questions/7066910/msbuild-and-programfiles-issue-with-32-64-bits">
+MSBuild and $(ProgramFiles) issue with 32/64 bits</a>.</p>
+
+<p>Unfortunately, that did not work at all.
+MSBuildExtensionsPath64 is not recognised in the Visual Studio wizard, at least in my simple use of it.</p>
+
+<p>In the end, I simply checked what system variables are actually set on my system and found ProgramW6432 instead.
+That works fine.</p>
+
+<p>Now both the C# and the VB versions work perfectly for me.
+
+
+<a name="3"></a>
+
+<h4>Revit Add-in Wizard Usage</h4>
+
+<p>I can simply install the wizard zip files in the appropriate locations, start up Visual Studio, create a new C# or VB Revit add-in project using the wizard default settings, and immediately hit F5 to start up Revit.exe in the debugger.
+
+<p>Revit is started up, my add-in is automatically loaded, and I am able to click on my new external command in the External Tools menu to test it immediately without having entered even one single byte of code myself.
+
+<p>The new command even executes in zero document state, although the default external command skeleton implementation throws an exception trying to access a property on the current UI document, which is null.
+It shows you that everything is working correctly right away, though.
+
+
+<a name="4"></a>
+
+<h4>Revit 2014 C# and VB Add-in Wizard Download</h4>
+
+<p>So, what are the appropriate locations, then?
+And where are the zip files?</p>
+
+<p>Right here!</p>
+
+<p>To install, simply copy the zip file of your choice to the matching Visual Studio project template folder in your local file system:
+
+<ul>
+<li><a href="zip/Revit2014AddinWizardCs.zip">Revit2014AddinWizardCs.zip</a> &ndash; copy to
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual C#
+<li><a href="zip/Revit2014AddinWizardVb.zip">Revit2014AddinWizardVb.zip</a> &ndash; copy to
+<br>[My Documents]\Visual Studio 2010\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>I hope you find this useful and look forward to your suggestions for improvement.

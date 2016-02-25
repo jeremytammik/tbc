@@ -1,0 +1,174 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The REX SDK</h3>
+
+<p>Last night I returned to the vegetarian restaurant that I remembered from my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+last visit to Verona</a>. 
+
+If used to be called Suca Baruca, or crazy pumpkin.
+Now it changed its style a bit, and its name, to 
+
+<a href="http://www.lafatazucchina.it">
+La Fata Zucchina</a>, ristorante biovegetariano; highly recommended!
+
+<p>I recently mentioned the main new features of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">
+Revit 2012 API</a> and pointed out that many 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html">
+wishes have been resolved</a> and
+
+new features such as 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">
+extensible storage</a> added.
+
+Besides the addition of some new features to the existing Revit API as we know and love it, there have also  been several completely new APIs and SDKs added, warranting entirely new subdirectories in the main Revit SDK folder:</p>
+
+<center>
+<img src="img/revit_2012_sdk_contents_in_explorer.png" alt="Revit 2012 SDK contents"/>
+</center>
+
+<p>The three new subdirectories are:
+
+<ul>
+<li>Point Cloud Indexing API
+<li>Revit Server SDK
+<li>REX SDK
+</ul>
+
+<p>Emmanuel Weyermann, Software Development Manager and gran capo of REX, has kindly provided the following introduction to the latter, the REX SDK.
+It was already available in a kind of preview version for Revit 2011 and has now been promoted to official inclusion in the standard Revit SDK.
+For more details, please see the ample documentation and sample collection in the REX SDK subfolder of the Revit 2012 SDK.
+This overview is just provided to whet your appetite and make you aware of the new possibilities it offers:
+
+<h3>What is the REX SDK?</h3>
+
+<h4>What is REX?</h4>
+
+<p>The primary goal of REX is to help Revit API developers concentrate on essential development aspects when creating various add-ins for Revit, by providing support for typical, commonly used functionality.
+
+<p>The outcome of this approach is:
+
+<ul>
+<li>Acceleration of add-in development
+<li>Better consistency across add-ins
+<li>Seamless integration within Revit 
+</ul>
+
+<p>REX is a technology or framework supporting development of add-ins for Revit and making them consistent and aligned with the way Revit interacts with users.
+
+<p>The primary goals for the REX framework can be defined as follows:
+
+<ul>
+<li>Provide a higher level of API interaction with Revit
+<li>Provide  components and tools for typical functionalities
+<li>Enable seamless add-in behaviour within the Revit environment
+<li>Enable easy add-in activation and registration
+</ul>
+
+
+<h4>What is the REX SDK?</h4>
+
+<p>The REX SDK is a development environment for Rapid Application Development purposes that helps to create, deploy and activate add-ins based on the REX technology.
+
+<p>The core part of the REX SDK is implemented in the form of a Microsoft Visual Studio C# template. Using the template provided, you can quickly build an add-in that has a similar look & feel to Autodesk Revit Extensions.  
+
+<p>The REX SDK  is composed of:
+
+<ul>
+<li>Project Template (C#)
+<ul>
+<li>UI definition
+<li>Interactions
+<li>Localization support
+<li>Deployment
+<li>Microsoft Installation project
+</ul>
+<li>Documentation
+<ul>
+<li>Getting Started
+<li>User manual and design guidelines
+<li>API documentation
+<li>Samples
+</ul>
+</ul>
+
+<h4>To whom is it addressed?</h4>
+
+<p>The advantages of this technology can be useful to all Revit API developers making add-ins for Revit, but it's most efficient for those whom the following  aspects are applicable:
+
+<ul>
+<li>Developing multiple add-ins
+<li>Advanced UI creation for add-ins
+<li>Create commercial add-ins for further distribution
+<li>Developing links with other products
+</ul>
+
+<h4>What are the most interesting features for API developers?</h4>
+
+<ul>
+<li>C# project templates, ready to build, distribution and activation in Revit
+<li>Common UI controls such as EditBox, ComboBox, IndexLabel, etc.
+<li>Components for HTML report generation
+<li>Unit conversions and unit based parameters display and editing consistently with Revit
+<li>Automated class data serialization and storage within BIM models
+</ul>
+
+<h4>What are the benefits for Revit users?</h4>
+
+<p>The primary advantages for end-users are:
+
+<ul>
+<li>Consistent look & feel across various add-ins.
+<li>Consistent behaviour aligned with Revit product (e.g. unit sensitive values edit and display).
+<li>Could be used on previous developed Revit add-ins to take advantage of dialogues, controls, units, and other utilities.
+</ul>
+
+<h4>What is the difference between the Revit and the REX API?</h4>
+
+<p>The REX SDK does not provide any additional access to internal Revit functionality.  The REX API extends the Revit API functionality with a set of new components. 
+
+<h4>What products can this technology be applied to?</h4>
+
+<p>The REX based approach is applicable for the Revit Architecture, Revit Structure and Revit MEP products.
+
+<h4>When are alternative approaches recommended?</h4>
+
+<p>The REX SDK provides a set of tools to develop External Commands on top of the Revit API.  
+Some other common structures for Revit API applications are not supported by the REX SDK, including:
+
+<ul>
+<li>Dynamic model updaters
+<li>Events and event driven applications
+<li>Customized Ribbon panels and controls
+</ul>
+
+<p>In addition, it is not possible to define custom failure definitions from a REX SDK application, as they must be defined in the start-up of an external application.  For applications which need to use any of these API features, the REX SDK would not be appropriate.  
+
+<p>Another limitation of the REX SDK lies in the supported language: project templates and examples are provided only in C# and are not applicable for development in other .NET compatible languages.
+
+
+<h4>How do I get started?</h4>
+
+<p>The following steps will help to create a first REX based add-in for Revit:
+
+<ul>
+<li>Make sure that Microsoft Visual Studio 2010 is installed
+<li>Make sure that  Revit 2012 is installed
+<li>Open the Getting Started Manual and follow these steps:
+<ul>
+<li>Create a project template
+<li>Develop necessary code
+<li>Build the application
+<li>Open Revit and run the add-in
+</ul>
+</ul>
+
+<p>It would be great if you find this useful and helpful in raising productivity and enhancing the look and feel of your Revit API applications.
+Good luck!

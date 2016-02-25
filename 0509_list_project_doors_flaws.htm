@@ -1,0 +1,86 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Arnost Lobel Re: Modeless Door Lister and Deleter -->
+
+<h3>Modeless Door Lister Flaws</h3>
+
+<p>I recently presented the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/modeless-door-lister-and-deleter.html">
+modeless door lister</a> created 
+
+by 
+
+<a href="http://coding-experiments.blogspot.com">
+Agnius Vasiliauskas</a> as
+
+his very first attempt to make use of the Revit API.
+While representing an impressive achievement, it also contains a number of flaws that I did not notice.
+Luckily, Arno&scaron;t L&ouml;bel of the Revit development team took the time to examine the application implementation in greater detail, and he has a number of suggestions that are of great interest to anyone wanting to make further use of the add-in presented, or the Idling event and modeless dialogues interacting with Revit in general.
+
+<p>You should probably read Arno&scaron;t's suggestions as a follow-up on his explanation of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous API calls and Idling</a>,
+
+which provides a valuable background to all the practical feedback on this specific new sample application given below.
+
+<p>Here are Arno&scaron;t's initial comments:
+
+<p>I am looking at the code of the application and you can probably guess I do not like it that much (although our PM is rather excited about it). 
+The sample demonstrates too many rather dangerous techniques for my taste.
+
+<ol>
+<li>It uses a direct connection to Revit's main window handle (probably safe, but risky).
+<li>It uses transactions from others than the main thread (as far as I can tell &ndash; I haven't actually run it).
+<li>The Idling event handler is not very useful here &ndash; other events would be far more effective (DocumentOpened, ViewActivated, DocumentChanged, etc.)
+<li>Events should be only subscribed to by a command if they are also unsubscribed in the same Execute method (not very common); that is why we recommend subscribing to events from the Application.OnStartup method.
+</ol>
+
+<p>I am not trashing, just commenting.
+
+<p>Here are some more detailed explanations of these points:
+
+<h4>1. Direct connection to Revit's main window handle</h4>
+
+<p>This one I am not saying it is critical; it is simply as dangerous as any sneaking under the hood of another application can be. The code of the sample does not try to communicate with Revit's main window, it only uses it as the parent of its modeless dialog. This way the dialog becomes Revit's main frame's child. If there is any code in Revit (now or in the future) that needs to iterate through all children it would most likely crash at this one. Or there could be a code that if it finds even one single modeless dialog it may believe it is Revit's and may do something to it that it would not work or crash
+
+<h4>2. Use of transactions from other than the main thread</h4>
+
+<p>Revit API safeguards API users' transactions. It does not allow more transactions than just one, and also makes sure there is no one left open behind by any external application (which would prevent the document from being modified again). The safeguard is in effect only when Revit knows it communicates with an external application (through regular Commands, Events, Callbacks, etc.). Revit does not prevent users calling into its API from outside threads, but the transaction firewall is off at those times, therefore damage to a document is possible and likely.
+
+<h4>3. Use of the Idling event</h4>
+
+<p>From what I saw in the code, the Idling was used only once &ndash; to start the dialog. If that is indeed how the sample works, I do not see it as very effective. The sample obviously works with documents and views, therefore it should bring up a dialog only when a document is opened and/or a view activated.
+
+<h4>4. Subscribing and unsubscribing to events</h4>
+
+<p>External Command objects are not guaranteed to live throughout an entire Revit session. Revit can decide, now or in the future, to unload commands at any time, which would cause objects used by the command be deleted and collected. If there is an event handler that depends, directly or indirectly, on such objects, it would crash. On the other hand, external applications are never unloaded, therefore whatever is allocated in them is not going to get deleted prematurely. For these reasons we recommend having event handlers, updaters, and other callbacks registered and defined in an external application rather than in a command. The exceptions are handlers and callbacks that are only used while their external commands are running.
+
+<h4>Recommendations</h4>
+
+<p>Besides the above points, the main issue is that Revit simply does not support external applications calling the API from other than the main thread (a work thread or a modeless dialog). The API is not built that way and even when it actually works (for some application) sometimes, it is not guaranteed it will always work (besides the point mentioned above about the transaction firewall). The only supported way for modeless dialogs to work within Revit is through standard callbacks, from which the Idling event is probably the most convenient way to deliver data back to Revit. The following steps outline how it is expected to work:
+
+<ol>
+<li>An application creates a modeless dialog either from OnStartup, a command or an event, depending on what the dialog is designed to do.
+<li>When the dialog is created and is designed to communicate back to Revit at any time, the application also subscribes to the Idling event. (The subscription must happen before the original command, event or OnStartup ends and should not be done from the dialog itself, for it is running in another thread already.)
+<li>The Idling event handler only does something when some signalled state is On, otherwise it does nothing.
+<li>When the end user requests an action via the dialog (a button pressed, or something), the dialog collects the data it needs to get to Revit and sets the signalled state to On.
+<li>Next time Idling is raised, the handler notices the signalled state and calls the dialog to do what it needs to do.
+</ol>
+
+<p>Again, I want to  point out that it is not my intention at all to trash the code of the sample. It is a very interesting example of using the API and we are happy to see more like that. On the other hand, I prefer to be careful when recommending code that does not exactly follow the guidelines for using the API. It's fine if it works for some, but I cannot generally recommend it as an example other application should closely mimic. I hope it is understandable.
+
+<p>Very many thanks to Arno&scaron;t for taking the time and effort to spell this out for us!
+
+<p>By the way, a slightly cleaner non-generic example of using the Idling event to handle messages received from a modeless dialogue attached to the main Revit window is given by my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless loose connector navigator</a>,
+
+although it also does violate some of Arno&scaron;t's  suggestions, and Daren Thomas suggested an elegant 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-api-access.html">
+generic pattern</a> for this kind of semi-asynchronous Idling API access.

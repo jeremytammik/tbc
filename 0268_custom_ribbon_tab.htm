@@ -1,0 +1,178 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+ 
+  augusto's ribbon sample:
+  C:\a\src\revit\add_ribbon_panel\augusto.htm
+  1253788 [Ribbon Tab]
+  1255660 [Can I add custom ribbon tab in the Ribbon control via Revit2010 API?]
+
+-->
+
+<h3>Custom Ribbon Tab</h3>
+
+<p>I am still on tour presenting at the Western European DevDays conferences, and with no time for blogging or responding to comments.
+In fact, I have almost no time for anything at all except presenting, meeting and discussing with participants during the day, and getting from one city to the next in the evenings.
+Right now I am sitting in the airport waiting for a plain to Milano. 
+Back to Bella Italia, albeit for less than twenty-four hours.
+
+<p>I was hoping to find time to prepare a few blog posts in advance for the coming weeks, when I will be gone on holidays and vacation.
+Friday is supposed to be my last working day this year, and I am starting to wonder whether I will be able to just walk away from all the unresolved issues and leave them to lie until next year.
+
+<p>Anyway, in a sleepless hour in between I noticed that Augusto Gon&ccedil;alves responded once again to a question that has already come up a few times in the past, so his interesting result is well worth while presenting, even if it is not directly useful in the context of the Revit API.
+It deals with the frequent question on whether it is possible to add your own ribbon tab to the Revit user interface.
+
+<p><strong>Question:</strong> I expect the answer to this is no, but I thought I would at least ask anyway.
+
+Is it possible to create a new ribbon tab in Revit, similar to AutoCAD 2010, or are panels within the Add-Ins tab and items within those panels the only ribbon objects that can be accessed and created from a Revit add-in?
+
+<p><strong>Answer:</strong> There is no documented support for this in the Revit API that I am aware of. 
+There are however a couple of undocumented and unsupported .NET assemblies that can be used to access the Revit ribbon in an unsupported way.
+The functionality they provide can even be used to add your own custom panel to the Revit ribbon.
+What you cannot do, however, is create the context and data required to invoke a standard Revit external command.
+We have implemented a sample that creates an own custom tab and adds it to the Revit ribbon.
+It displays a command button which can be used to invoke Revit independent functionality.
+
+<p>The functionality to create a new custom panel and add a command button to it is provided by classes in the Autodesk.Windows namespace. 
+These classes have no knowledge of Revit and its API, and we have not found any way to access the command data required to invoke an external command and make use of the Revit API from such a button. 
+As long as you are happy just doing .NET stuff completely independently of Revit, you can make use of this. 
+This functionality is unsupported, and to be used at your own risk, of course.
+
+<p>In addition to the RevitAPI.dll assembly providing access to the Revit API functionality, we reference two other undocumented .NET assemblies provided by Revit, which also live in the Revit Program folder: AdWindows.dll and UIFramework.dll. 
+These in turn require us to reference some other .NET framework functionality, so we end up with the following list of references.
+As always, we need to remember to set the 'Copy Local' flag to 'False' on the three assemblies referenced from the Revit folder:
+
+<ul>
+<li>AdWindows
+<li>PresentationCore
+<li>PresentationFramework
+<li>RevitAPI
+<li>System
+<li>System.Windows.Forms
+<li>UIFramework
+<li>WindowsBase
+</ul>
+
+<p>We implement an external application named App which makes use of the ribbon functionality provided by the AdWindows and UIFramework assemblies to add its own custom tab and panel to the existing Revit ribbon.
+The custom panel displays one ribbon button which invokes a command. 
+
+<p>The command needs to implement the System.Windows.Input.ICommand interface.
+Note that this definition is completely independent of the Revit external command interface, and actually that is the main problem with our custom ribbon tab: while we can add a tab with its panel and button invoking a command, this is not a standard Revit command, and we have no way to connect it with Revit or make proper use of the Revit API within the command implementation.
+It can be used to invoke Revit-independent functionality.
+
+<p>Here is the definition of the command implementation derived from ICommand and its Execute method, which in turn invokes the Execute method of an external Revit command implementation AddRibbonTab.Command, but supplies it with a null ExternalCommandData instance:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">AdskCommandHandler</span>
+&nbsp; : System.Windows.Input.<span class="teal">ICommand</span>
+{
+&nbsp; <span class="blue">string</span> AssemblyName
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; <span class="blue">set</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">string</span> ClassName
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>;
+&nbsp; &nbsp; <span class="blue">set</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> AdskCommandHandler(
+&nbsp; &nbsp; <span class="blue">string</span> assemblyName,
+&nbsp; &nbsp; <span class="blue">string</span> className )
+&nbsp; {
+&nbsp; &nbsp; AssemblyName = assemblyName;
+&nbsp; &nbsp; ClassName = className;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">event</span> <span class="teal">EventHandler</span> CanExecuteChanged;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> CanExecute( <span class="blue">object</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( <span class="blue">object</span> a )
+&nbsp; {
+&nbsp; &nbsp; System.Reflection.<span class="teal">Assembly</span> assembly
+&nbsp; &nbsp; &nbsp; = System.Reflection.<span class="teal">Assembly</span>.LoadFrom(
+&nbsp; &nbsp; &nbsp; &nbsp; AssemblyName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IExternalCommand</span> command
+&nbsp; &nbsp; &nbsp; = assembly.CreateInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; ClassName ) <span class="blue">as</span> <span class="teal">IExternalCommand</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;AdskCommandHandler.Execute command invoked: &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;assembly {0}, class {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; AssemblyName, ClassName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">string</span> message = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> r 
+&nbsp; &nbsp; &nbsp; = command.Execute( commandData, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> message, elements );
+&nbsp; }
+}
+</pre>
+
+<p>Here is the OnStartup method of the external application creating the custom ribbon tab.
+Note that the RibbonPanel created here is an Autodesk.Windows.RibbonPanel instance, not an Autodesk.Revit one:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnStartup( 
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; <span class="green">// create new ribbon button:</span>
+&nbsp;
+&nbsp; <span class="teal">RibbonButton</span> button = <span class="blue">new</span> <span class="teal">RibbonButton</span>();
+&nbsp; button.Text = <span class="maroon">&quot;My Button&quot;</span>;
+&nbsp; button.ShowText = <span class="blue">true</span>;
+&nbsp; button.CommandHandler = <span class="blue">new</span> <span class="teal">AdskCommandHandler</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;AddRibbonTab.dll&quot;</span>, <span class="maroon">&quot;AddRibbonTab.Command&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// create new ribbon panel:</span>
+&nbsp;
+&nbsp; <span class="teal">RibbonPanelSource</span> source = <span class="blue">new</span> <span class="teal">RibbonPanelSource</span>();
+&nbsp; source.Title = <span class="maroon">&quot;My Panel&quot;</span>;
+&nbsp; source.Items.Add( button );
+&nbsp;
+&nbsp; <span class="teal">RibbonPanel</span> panel = <span class="blue">new</span> <span class="teal">RibbonPanel</span>();
+&nbsp; panel.Source = source;
+&nbsp;
+&nbsp; <span class="green">// create custom ribbon tab:</span>
+&nbsp;
+&nbsp; <span class="teal">RibbonTab</span> tab = <span class="blue">new</span> <span class="teal">RibbonTab</span>();
+&nbsp; tab.Id = <span class="maroon">&quot;MY_TAB_ID&quot;</span>;
+&nbsp; tab.Title = <span class="maroon">&quot;My Custom Tab&quot;</span>;
+&nbsp; tab.IsVisible = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="green">// access Revit ribbon control and add custom tab:</span>
+&nbsp;
+&nbsp; <span class="teal">RibbonControl</span> control
+&nbsp; &nbsp; = UIFramework.<span class="teal">RevitRibbonControl</span>.RibbonControl;
+&nbsp;
+&nbsp; control.Tabs.Add( tab );
+&nbsp; tab.Panels.Add( panel );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is the resulting custom ribbon tab with its panel and command button displayed in Revit MEP 2010:</p>
+
+<center>
+<img src="img/custom_ribbon_tab.png" alt="Custom ribbon tab"/>
+</center>
+
+<p>Here is the complete 
+
+<a href="zip/AddRibbonTab.zip">
+AddRibbonTab</a> source code and Visual Studio solution.</p>
+
+<p>Many thanks to Augusto for exploring and discovering this undocumented functionality and providing the surprising sample code!

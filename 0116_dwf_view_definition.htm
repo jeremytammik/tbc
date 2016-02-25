@@ -1,0 +1,84 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>DWF View Definition</h3>
+
+<p>Here is a question is related to the 3D views in Revit, i.e. standard, top, left, bottom, etc. and user created, and the corresponding ones in a DWF file.
+The issue concerns the relationship between the internal Revit coordinate system and the exported coordinates in DWF. 
+For instance, how to create a 3D DWF with a custom view using the coordinates of the 3D view defined in Revit.</p>
+
+In a DWF file, the view is determined by</p>
+
+<ul>
+<li>Camera position</li>
+<li>Target toward which the camera is pointing</li>
+<li>Up vector</li>
+<li>Width</li>
+<li>Height</li>
+</ul>
+
+<p>Here is a description of these parameters from the 
+
+<a href="http://developer.hoops3d.com/documentation/Hoops3DGS/prog_guide/03_2_viewing_modelling_cameras.html">
+HOOPS/3dGS Programming Guide</a>.
+
+These parameters are defined for the standard views in one of the XML files contained in the DWF file.</p>
+
+<p>In Revit, the view is determined by the ViewDirection, UpDirection, and EyePosition properties of the View3D class in the Revit API. 
+When exporting a Revit file to DWF in Revit Architecture 2009, the parameters of the top view in the DWF file, for example (position, target, up vector), are different from the top view properties in Revit.
+Here are the approximate values of the top view parameters extracted from the Revit file and its corresponding DWF file:</p>
+
+<p>Revit top view:</p>
+
+<ul>
+<li>Eye position: 16.47, 7.45, 31.58</li>
+<li>Up direction: 0, 1, 0</li>
+<li>View direction: 0, 0, 1</li>
+</ul>
+
+<p>DWF top view:</p>
+
+<ul>
+<li>Position: 10, 15.01, -7.5</li>
+<li>Target: 10, 0, -7.5</li>
+<li>Up: 0, 0, -1</li>
+<li>Field width: 48.045</li>
+<li>Field height: 48.045</li>
+</ul>
+
+<p><strong>Question:</strong>
+What transformation should I apply to the 3D coordinates of view parameters in Revit so that I can get the corresponding 3D coordinates in DWF? 
+When I create custom views in Revit I want to make them available and apply them in the corresponding DWF file as well.
+I also need to calculate the field width and height parameters of the DWF view, which do not have analogues in the Revit 3D view.</p>
+
+<p><strong>Answer:</strong>
+Here are the transformations used to calculate the parameters of a DWF view from the Revit view.
+The camera for the default view and named views are defined slightly differently.</p>
+
+<p>This is the definition for the default view:</p>
+
+<ul>
+<li>DWF Position = Rvt_Position.x, Rvt_Position.z, -Rvt_Position.y;</li>
+<li>DWF Up Vector = Rvt_UpVector.x, Rvt_UpVector.z, -Rvt_UpVector.y;</li>
+<li>DWF Target = Rvt_TargetPos.x, Rvt_TargetPos.z, -Rvt_TargetPos.y;</li>
+<li>DWF Field of View = Rvt_FieldOfView.Width, Rvt_FieldOfView.Height;</li>
+</ul>
+
+<p>This is the one for a named view:</p>
+
+<ul>
+<li>unitScale = recorded in DWF as part of the transformation;</li>
+<li>DWF Position = Rvt_Position.x / unitScale, Rvt_Position.z / unitScale, -Rvt_Position.y / unitScale;</li>
+<li>DWF Up Vector = Rvt_UpVector.x / unitScale, Rvt_UpVector.z / unitScale, -Rvt_UpVector.y / unitScale;</li>
+<li>DWF Target = Rvt_TargetPos.x / unitScale, Rvt_TargetPos.z / unitScale, -Rvt_TargetPos.y / unitScale;</li>
+<li>DWF Field of View = Rvt_FieldOfView.Width / unitScale, Rvt_FieldOfView.Height / unitScale;</li>
+</ul>
+
+<p>Actually, the transformation for the default view is just a special case of the named view one with the unit scale set to one.</p>
+
+<p>Many thanks to Joe Ye for handling this case!</p>

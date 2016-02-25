@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Regeneration Option Best Practices</h3>
+
+<p>Our discussion of the risks of using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">
+manual regeneration option</a> triggered 
+
+several very interesting 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html#comments">
+comments and suggestions</a>.
+
+Here are some important fundamental things to note about the regeneration modes:
+
+<ul>
+<li>The automatic mode is not new. It is the mode that Revit has been using all along so far. Developers complained that it is too slow, so we introduced the SuspendUpdating mechanism and now the manual option, providing more and more optimisation possibilities.
+<li>There is no need to overcomplicate things. To keep it easy, just continue to use the automatic mode.
+<li>The manual mode will never be slower than the automatic one. The only problem is the risk of missing a regeneration and retrieving stale data. Regenerating more often than necessary is no problem and does not cause too great an overhead.
+</ul>
+
+<h4>Best Practices Round 1</h4>
+
+<p>Here is a first take at some best practices for dealing with the regeneration option, suggested by Harry Mattison and Arno&scaron;t Lobel of the Revit development team and based on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html?cid=6a00e553e1689788330133ecc9ca6a970b#comment-6a00e553e1689788330133ecc9ca6a970b">
+suggestion by David</a>:
+
+<p><strong>Suggestion:</strong> If automatic regeneration will be going away in a future release, one would think the only thing a responsible developer whose code will need to work beyond Revit 2011 can do is to deal with this issue NOW, while the code is as small and simple as it is likely to ever be, compared to the future.
+
+<p>That being the case, developers will *need* to know (soon) what the official Best Practices are for maximizing the life of existing code in a manual regeneration world.
+
+<p>Is it to call for regeneration after every change, or every group of query-free changes? 
+
+<p>That seems difficult to remember as you're writing code...
+
+<p>One would assume there is a performance cost for calling for a manual regeneration. Is it usually significant?
+
+<p>Would an application that makes many query-free changes in a row, then call for one regeneration at the end, get better performance than one that is running in Automatic mode? One would think so, if in Automatic mode a regeneration is happening after each change. But without knowing the general performance impact level of a regeneration, one has to ask: Would it even be noticeable?
+
+<p>Being aware of the situation is great (thank you very much!), but it would be nice if developers of long-term code could get some more extensive/explicit guidance.
+
+<p><strong>Response:</strong> 1. The "best practice" is to use manual regeneration and invoke regeneration only when needed. For example, regenerate must be called before reading data from a changed model. 
+The performance of regeneration will depend on the magnitude of change and the complexity of the model &ndash; there is no simple and generic answer about how long regeneration will take. 
+
+<p>2. It's difficult ;-) I do not think there is one best approach. 
+An ideal approach could differ from application to application. 
+There are a few solid points though, that programmers could use as a reference:
+
+<ul>
+<li>Manual mode can only be faster than automatic.
+<li>Typically, the performance increase in manual mode is likely to be significant, especially with many changes, e.g. performed in a loop.
+<li>Regeneration when nothing needs to be regenerated is rather fast, hence not so costly.
+<li>Querying data does not require regenerations unless there was a previous change to the part of the model that could affect the data being queried &ndash; that is sometimes hard to estimate, though.
+</ul>
+
+<p>Many thanks to David for raising this issue and to Harry and Arno&scaron;t for their responses!
+
+<h4>Best Practices Round 2</h4>
+
+<p>During the course of the day, several new comments were posted, and I was able to discuss these further with my colleagues in the development team, especially Arno&scaron;t (again) and Scott Conover.
+First, here are the additional comments:
+
+<p><strong>David said:</strong> It would be nice if there were some type of "RegenerationNeeded" Boolean method available.
+
+But it seems like there may be better ways for Revit to do this. For example, it would be GREAT if "Automatic" mode stayed, but changed how it worked: not be calling Regenerate internally after every change, but rather to have Revit simply call Regenerate INSTEAD of throwing an exception that is caused by the need for a Regenerate.
+
+Thus Regenerate would only get called when needed, and automatically by Revit, thus maximizing performance, without any special knowledge needed by the developer.
+
+To me, if that were possible it seems like the best of both worlds.
+
+<p><strong>Fernando Malard said:</strong> In my personal opinion, most of the cases the Automatic mode will solve the problem.
+
+Revit should be smart enough to just refresh those changed elements. This is related on how the Reactor mechanism is connected to the regeneration mechanism and how it monitors the changed elements.
+
+I really think it is strange to introduce a concept (this new "Automatic" Attribute) already marked as "to be removed soon". This will freak people and no one will use it (I have used because I don't want to review my code because it won't cause any significant impact). I believe most of Revit developers won't do this either.
+
+I agree with the idea of "Automatic" being kept and just tweaked to work as smart as possible. It will satisfy most of the cases and just when the user wants to really avoid the auto Regeneration he should change the attribute to "Manual" and handle his code flow.
+
+Another approach would be to create something like a PUSH/PULL Auto refresh feature which would empower the user to have control when to turn off auto refresh and when turn it back on after doing his heavy procedures.
+
+Does not make much sense to obligate people to control a mechanism when most of time its automatic mode will be suitable for them.
+
+<p><strong>Response:</strong> 
+
+<ul>
+<li>I do not think a 'RegenerationNeeded' method or alike is really needed. What would the usage be? If RegenerationNeeded then Regenerate, else Nothing? That is exactly what Regenerate already does anyway. Thus, if you think you need to call RegenerationNeeded, you may as well call Regenerate. It has exactly the same effect.
+<li>I think we all agree that throwing an exception when someone tries to call Regenerate in automatic mode is way too aggressive. We may re-evaluate this at some future point.
+<li>I do not agree with Fernando about automatic regeneration solving most needs. Regenerating all the time, after every single change even when nothing needs to be read from the model between those changes is very time consuming and hurts performance a lot. Revit does not do that internally and neither should API programmers. There is no 'automatic' regeneration for internal Revit programmers. Everyone needs to know when regeneration is needed. Our goal is to apply the same approach to API applications, and that is why automatic regeneration was marked as obsolete and will be removed in the future.
+<li>There is more than regeneration. There is also auto-joining. It is needed when such changes are made that could affect elements of which properties are needed to be read again (like when two walls created close to each other and then their lengths are needed). Auto-joining is also auto-executed in automatic mode, manually otherwise. Auto-joining is not as 'smart' as regeneration though. It will cost you every time it is called even when no joining is needed (that may change in the future, of course). Therefore auto-joining should be minimized (and that is also why manual regeneration mode is so much more efficient).
+<li>Programmers should keep in mind that committing a transaction will always invoke regeneration and auto-joining. Therefore there is no need to do so manually before ending a transaction (it may be needed after committing a sub-transaction, if data will need to be read again; sub-transactions do not regenerate nor auto-join in its finalizing procedure) 
+</ul>
+
+<p>As stated above, the automatic option is not new. 
+That is the mode that Revit has been using all along so far. 
+Developers complained that it is too slow, so we introduced the several different mechanisms to improve performance, such as the SuspendUpdating mechanism and the 'Batch Creation' methods in Autodesk.Revit.Creation.Document.
+We continued to get requests to enhance SuspendUpdating to cover more types of changes, and that led to the new manual regeneration option, providing even more optimisation possibilities, tighter integration into Revit and better access to the internal functionality.
+
+<p>Automatic regeneration is as 'intelligent' as it can be right now.  
+It knows enough not to do anything when there are no changes.  
+It knows enough to only update elements which have been changed, and elements to which changes propagate because of relationships.  
+But sometimes the performance hit from each successive change (for example, setting of 15 parameters on 100 instances) can add up.  
+
+<p>Manual regeneration is exactly the same routine used in Automatic regeneration (it knows not to do anything when nothing is needed, etc).  
+The add-in application has total control over when it is invoked.  
+This allows your application logic to minimize the number of calls, by only calling it when you really need to read data from a potentially modified element.  
+
+<p>The automatic option is not new, there just was no other choice previously. 
+When we discussed how to add the attributes to choose between manual and automatic, we considered making a default.  
+It turned out that there is no reasonable default: automatic is what existing code was written to expect, but not what developers were asking for or what we deem useful for moving forward.   
+So there is no default value for this attribute, and you must apply the Automatic value explicitly and endure the compiler warning.  
+
+<p>I hope that this helps clarify the issue and look forward to hearing what performance improvements can be achieved with the new option.

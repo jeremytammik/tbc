@@ -1,0 +1,250 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06936567 [How can I remove DWF links?] -->
+
+<h3>Remove DWF Links</h3>
+
+<p>I spent this weekend in Chamonix with my brother Nick.
+We did one day of rock climbing in the valley at Les Gaillants and Servoz doing 
+
+<a href="http://www.highmountainguides.com/index.php/eng/Gallery/Chamonix-Rock-Climbing/Chamonix-Rock-Climbing-Gallery/Surbac-a-Bras-6a-Servoz">
+Surbac a' Bras</a>, 6a+, and one day of skiing with Chris down the 
+
+<a href="http://fr.wikipedia.org/wiki/Vall%C3%A9e_Blanche">
+Vallee Blanche</a>,
+
+<a href="http://fr.wikipedia.org/wiki/Mer_de_Glace">
+Mer de Glace</a> and
+
+<a href="http://fr.wikipedia.org/wiki/Montenvers">
+Montenvers</a> from the 
+
+<a href="http://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9ph%C3%A9rique_de_l%27aiguille_du_Midi">
+Telepherique</a> de 
+
+<a href="http://fr.wikipedia.org/wiki/Aiguille_du_Midi">
+l'Aiguille du Midi</a>.
+
+<p>Our route from the telepherique actually joins the Vallee Blanche via the steep looking descent at the extreme right of this picture, with a sharp ridge crossing it diagonally, the upper half in sunshine, and the lower in shadow:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-03-04_vallee_blanche/WP_000578_nick_jeremy.jpg" alt="Nick and Jeremy in the Vallee Blanche at Chamonix" width="400"/>
+</center>
+
+<p>I had a fall and a hundred meter slide coming down that steep incline, which was interesting and a bit painful.
+
+<p>Returning to the Revit API, I recently explored how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/remove-imported-jpg-and-bmp-images.html">
+remove imported JPG and BMP images</a>.
+
+Soon afterwards, another query on removing file references in the model showed up.
+In my naivety, I assumed that the solution would be similar.
+Far failed, as we shall shortly see:
+
+<p><strong>Question:</strong> I want to remove all DWF links from a RVT file. 
+I can remove RVT and DWG links but cannot figure out how to do the same for DWF and did not find any way on the web, help file or API examples.
+
+<p><strong>Answer:</strong> I looked at your sample model which includes a couple of DWF mark-up objects:</p>
+
+<center>
+<img src="img/remove_dwf_link.png" alt="DWF mark-up elements"/>
+</center>
+
+<p>I used the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">
+element lister</a> on
+
+it to create an overview of all its elements in a text file. 
+The result shows an obvious way to identify at least some of the DWF import instances by using their category name, which includes the substring ".dwfx" (copy to an editor to see the truncated lines in full):
+
+<pre>
+Id=161300; Class=ImportInstance; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 3 1;
+Id=161301; Class=ImportInstance; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 2 1;
+Id=161302; Class=ImportInstance; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 1 1;
+</pre>
+
+<p>Searching for other objects with a dwf substring in their category name, I discovered the following element types:
+
+<pre>
+Id=161219; Class=ElementType; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Project1.dwfx[Sheet: A101 - Unnamed]; 
+Id=161278; Class=ElementType; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 3 1; 
+Id=161279; Class=ElementType; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 2 1; 
+Id=161280; Class=ElementType; Category=Project1.dwfx[Sheet: A101 - Unnamed]; Name=Markup Object 1 1; 
+</pre>
+
+<p>Apparently, there is one main element type for the file reference itself, then one element type and one import instance for each of its occurrences in the model.
+
+<p>I tried to use this information and an approach similar to the one described for the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/remove-imported-jpg-and-bmp-images.html">
+removal of image files</a> to
+
+delete them from the model.
+
+<p>Analogously to the ElementNameEndsWithJpg predicate checking the element name, I implemented ElementCategoryContainsDwf which retrieves and checks the category name for the DWF substring.
+It returns true if the given element category name contains the substring ".dwf":
+
+<pre class="code">
+<span class="blue">bool</span> ElementCategoryContainsDwf( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="blue">return</span> ( <span class="blue">null</span> != e.Category )
+&nbsp; &nbsp; &amp;&amp; e.Category.Name.ToLower()
+&nbsp; &nbsp; &nbsp; .Contains( <span class="maroon">&quot;.dwf&quot;</span> );
+}
+</pre>
+
+<p>I then implemented the algorithm which first retrieves and deletes the non-ElementType objects fulfilling this criterion, followed by the element type ones, but the call to doc.Delete with their ids simply returns null and does nothing.
+
+<p>I noted that the DWF mark-up elements are pinned, so I added code to unpin them prior to the deletion attempt:
+
+<pre class="code">
+<span class="blue">int</span> Unpin( <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids, <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">int</span> count = 0;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( id );
+&nbsp; &nbsp; <span class="blue">if</span>( e.Pinned )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e.Pinned = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; ++count;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> count;
+}
+</pre>
+
+<p>Unfortunately, that still did not help.
+
+<p>The new command CmdRemoveDwfLinks in The Building Coder samples that I implemented to demonstrate the working solution provided below includes the code for this failed attempt, in case you are interested, but I will omit it here for the sake of brevity.
+It may be of use if you ever run into the need to unpin a set of elements, for example.
+
+<p>Just as I was about to give up and ask for help, I discovered a previous case that provides a hint:
+
+<p>"Trying to delete the markup element will not work using the Document.Delete method, because you cannot delete that kind of element directly through the user interface either, like you would a wall or door.  
+Instead, you have to launch the Manage &gt; Manage Links dialogue and remove the markup there.  
+In the API, this can be achieved using the ExternalFileUtils class."
+
+<p>I implemented a new method RemoveDwfLinkUsingExternalFileUtils and a call to execute it to the external command CmdRemoveDwfLinks to test this.
+It removes all DWF links from the model and returns the total number of deleted elements:
+
+<pre class="code">
+<span class="blue">int</span> RemoveDwfLinkUsingExternalFileUtils(
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; idsToDelete
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="teal">ExternalFileUtils</span>
+&nbsp; &nbsp; .GetAllExternalFileReferences( doc );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExternalFileReference</span> xr = <span class="teal">ExternalFileUtils</span>
+&nbsp; &nbsp; &nbsp; .GetExternalFileReference( doc, id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExternalFileReferenceType</span> xrType
+&nbsp; &nbsp; &nbsp; = xr.ExternalFileReferenceType;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( xrType == <span class="teal">ExternalFileReferenceType</span>.DWFMarkup )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ModelPath</span> xrPath = xr.GetPath();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .ConvertModelPathToUserVisiblePath( xrPath );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( path.EndsWith( <span class="maroon">&quot;.dwf&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; || path.EndsWith( <span class="maroon">&quot;.dwfx&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; idsToDelete.Add( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = idsToDelete.Count;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; idsDeleted = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Delete DWFx Links&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; idsDeleted = doc.Delete( idsToDelete );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> m = ( <span class="blue">null</span> == idsDeleted )
+&nbsp; &nbsp; ? 0
+&nbsp; &nbsp; : idsDeleted.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;Selected {0} DWF external file reference{1}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} element{3} successfully deleted.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), m, <span class="teal">Util</span>.PluralSuffix( m ) ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> m;
+}
+</pre>
+
+<p>Here is the complete code of the external command mainline Execute method calling both the initial non-functional RemoveDwfLinkUsingDelete and the new working RemoveDwfLinkUsingExternalFileUtils methods:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">if</span>( doc.IsFamilyDocument )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;This command requires an active document.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> nDeleted = RemoveDwfLinkUsingDelete( doc );
+&nbsp;
+&nbsp; <span class="blue">int</span> nDeleted2 = RemoveDwfLinkUsingExternalFileUtils( doc );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>This seems to do the trick for me all right.
+
+<p>The new code in RemoveDwfLinkUsingExternalFileUtils is significantly shorter and simpler than the failed initial attempt using the Delete method directly, besides having the advantage of functioning  :-)
+
+<p>It also turns out that far more elements than just the seven listed above that I found by searching the element and category names for the DWF substring are deleted by the removal of the DWF file reference.
+In fact, a total of 25 elements are affected.
+
+<p>Running the CmdRemoveDwfLinks external command on it produces the following messages in the Visual Studio debug output window:
+
+<pre>
+Element <117704 Standard>
+Project1.dwfx[Sheet: A101 - Unnamed] <161219 Project1.dwfx[Sheet: A101 - Unnamed]>
+Selected 1 DWF external file reference, 25 elements successfully deleted.
+</pre>
+
+<p>Here is 
+
+<a href="zip/bc_12_98.zip">
+version 2012.0.98.0</a> of
+
+The Building Coder samples including the new command.

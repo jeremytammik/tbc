@@ -1,0 +1,258 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259898 [How to retrieve a curtain wall's geometry] -->
+
+<h3>Curtain Wall Geometry</h3>
+
+<p>Last week, I did some work exploring the geometry available in a curtain wall instance.
+It led to several interesting results:
+
+<ul>
+<li>An <a href="#1">exploration of the relationship between a curtain wall and its panels</a>.
+<li><a href="#2">Direct access to the curtain wall geometry</a> using the geometry options IncludeNonVisibleObjects property.
+<li>A new <a href="#3">model curve creator method</a>.
+<li><a href="#4">FootPrintRoof and CurtainSystem geometry</a>.
+</ul>
+
+<p>The starting point for all this was the following question:
+
+<p><strong>Question:</strong> I'm trying to retrieve the geometric curves, i.e. lines and arcs, that defining the perimeter of a wall element using the Curtain Wall system family.  
+Unfortunately, the Wall.Geometry.Objects' EdgeArray and FaceArray are empty.  
+This is not true for other types of walls.
+
+<p>How can I retrieve the X, Y and Z coordinates of the curtain wall profile?
+
+<p>The profile is displayed in the user interface as dashed lines marking the perimeter of the curtain wall when the cursor hovers over it:</p>
+
+<center>
+<img src="img/curtain_wall_dashed_lines.png" alt="Curtain wall perimeter dashed lines"/>
+</center>
+
+<p><strong>Answer:</strong> The curtain wall does indeed not have any geometry of its own when queried using the default geometry option settings. 
+We will see below that there is a useful option setting which returns more detailed results.
+Before looking into that, we will have a look at the associated panel elements which manage the visible standard geometry.
+
+
+<a name="1"></a>
+
+<h4>Relationship between a curtain wall and its panels</h4>
+
+<p>To explore the relationship between a curtain wall and its panels, I created a sample model and added a new curtain wall, using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">
+element lister</a>
+
+implemented in Lab2_1_Elements in the Revit API introduction labs to determine what new elements get added by that step.
+
+<p>Here is how I use it to determine the curtain wall and the panel:
+
+<ul>
+<li>Start up Revit and open a new project.
+<li>Run Lab2_1_Elements to create C:\tmp\RevitElements.txt.
+<li>Rename the resulting file to RevitElementsBeforeCurtainWall.txt.
+<li>Create a curtain wall and run Lab2_1_Elements again.
+<li>Rename the resulting file to RevitElementsAfterCurtainWall.txt.
+</ul>
+
+<p>The newly added elements in my model in Revit Architecture 2011 are:
+
+<pre>
+C:\tmp\ &gt;diff 
+  RevitElementsBeforeCurtainWall.txt 
+  RevitElementsAfterCurtainWall.txt
+2842a2843,2844
+&gt; Id=149169; Class=Wall; Category=Walls; Name=Curtain Wall
+&gt; Id=149170; Class=Panel; Category=Curtain Panels; Name=Glazed
+</pre>
+
+<p>I tried the same steps in Revit Architecture 2010 with an analogous result:
+
+<pre>
+C:\tmp\ &gt;diff 
+  RevitElementsBeforeCurtainWall2010.txt 
+  RevitElementsAfterCurtainWall2010.txt
+2255a2256,2257
+&gt; Id=130424; Class=Wall; Category=Walls; Name=Curtain Wall
+&gt; Id=130425; Class=Panel; Category=Curtain Panels; Name=Glazed
+</pre>
+
+<p>So the problem that needs to be solved is how to determine the relationship between the curtain wall and its associated panels.
+
+<p>By the way, I initially used this same technique to explore the relationship between a stacked wall and it basic wall components, with quite similar results.
+
+<p>If your application is creating the curtain wall itself, it can keep track of their ids when they are created. It could create and temporarily store a list of all element ids before creating the curtain wall, and then again afterwards. The newly added ids will be related to the curtain wall and its panel as shown above.
+
+<p>If you do not have the possibility to set such checkmarks before and after creating the curtain wall, you might still be able to use the fact that the associated ids are consecutive. 
+
+<p>Happily, several more reliable ways to determine the relationships between elements also exist.
+
+<p>One is to delete the main element inside a sub-transaction that is later aborted, and see what elements are deleted with it, as demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+object relationship viewer</a> (in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">
+VB</a>).
+
+<p>Better still is to use geometrical analysis. The curtain wall itself does not have any accessible geometry objects, as you have seen, but you can still use its bounding box or location curve to determine its position in the model.
+
+<p>The panel does have valid geometry, as we can determine by examining it using RevitLookup, stepping through the following hierarchy:
+
+Snoop DB &gt; Panel &gt; Glazed 149170 &gt; Geometry &gt; Objects &gt; Symbol geometry &gt; Objects &gt; Edges and Faces.
+
+<p>The panel instance geometrical objects are originally defined in the symbol definition local coordinate system and you need to apply the instance transform to them to retrieve the world coordinate system data, i.e. apply 
+
+Snoop DB &gt; Panel &gt; Glazed 149170 &gt; Geometry &gt; Objects &gt; Symbol geometry &gt; Transform
+
+<p>This is described in the analysis of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/transform-instance-coordinates.html">
+instance coordinate transformation</a>.
+
+<p>Using the position of the curtain wall determined from its location line or bounding box, and the geometry of the panel, you can determine their relationship to each other by checking for overlap or adjacency. One way to checking for adjacency is to use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">
+FindReferencesByDirection</a> method.
+This should work, using the curtain wall location line to define the starting point of the ray and then shooing it in various directions to intersect the panel geometry. 
+
+<p>You could also simply determine specific points on the location line and the panel geometry and check whether the volumes defined by each overlap.
+
+<p>So given the element id of the curtain wall or the panel, you can use this technique to search for the other associated element. In a large model, one would obviously want to add additional criteria to limit the search to as few candidate elements as possible. You could use the curtain wall and panel types, for instance, if these are known. You might be able to use the BoundingBoxIntersectsFilter class, although again, this might only work for the panel, which has accessible geometry, and maybe not for the curtain wall. One criterion which you can definitely use is the level property, which is defined on both the curtain wall and the panel.
+
+
+<a name="2"></a>
+
+<h4>Direct Access to the Curtain Wall Geometry</h4>
+
+<p>However interesting this exploration of the relationship between the curtain wall and its panels may seem, it would be nice to have a more direct access to the curtain wall perimeter without having to perform a complex analysis of the associated panel geometry.
+
+<p>If the wall was created from a mass, then the perimeter lines can be retrieved from the mass face edge loops. 
+If not, one might try to retrieve the curtain wall LocationCurve and calculate the perimeter lines with the height.
+
+<p>However, there is a pretty perfect and much simpler method that took some exploration to discover: simply setting the geometry options IncludeNonVisibleObjects property.
+This provides access to the geometry of an internal "hidden" wall that Revit uses to represent the curtain wall and the lines and arcs with Visibility=Highlight, which seems to be exactly what we are looking for.
+Here is a sample curtain wall:</p>
+
+<center>
+<img src="img/curtain_wall_sample.jpg" alt="Sample curtain wall"/>
+</center>
+
+<p>Here is some code to set the geometry options IncludeNonVisibleObjects property and retrieve and list the curves:
+
+<pre class="code">
+<span class="blue">void</span> list_wall_geom( <span class="teal">Wall</span> w, <span class="teal">Application</span> app )
+{
+&nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">CurtainGrid</span> cgrid = w.CurtainGrid;
+&nbsp;
+&nbsp; <span class="teal">Options</span> options 
+&nbsp; &nbsp; = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; options.ComputeReferences = <span class="blue">true</span>;
+&nbsp; options.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geomElem 
+&nbsp; &nbsp; = w.get_Geometry( options );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj 
+&nbsp; &nbsp; <span class="blue">in</span> geomElem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Visibility</span> vis = obj.Visibility;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> visString = vis.ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc = obj <span class="blue">as</span> <span class="teal">Arc</span>;
+&nbsp; &nbsp; <span class="teal">Line</span> line = obj <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( arc != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> length = arc.ApproximateLength;
+&nbsp;
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;Length (arc) (&quot;</span> + visString + <span class="maroon">&quot;): &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + length + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( line != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> length = line.ApproximateLength;
+&nbsp;
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;Length (line) (&quot;</span> + visString + <span class="maroon">&quot;): &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + length + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> faceCount = solid.Faces.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;Faces: &quot;</span> + faceCount + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;Face area (&quot;</span> + visString + <span class="maroon">&quot;): &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + face.Area + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( line == <span class="blue">null</span> &amp;&amp; solid == <span class="blue">null</span> &amp;&amp; arc == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;&lt;Other&gt;\n&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;revit&quot;</span>, s );
+}
+</pre>
+
+<p>The output returned for the wall above looks like this:</p>
+
+<center>
+<img src="img/curtain_wall_sample_result.png" alt="Sample curtain wall result"/>
+</center>
+
+<p>I applied this setting to the model with an arced curtain wall shown above.
+I asked the curtain wall for its geometry with IncludeNonVisibleObjects set to true, and then generated model lines offset by the length of the wall from the geometry returned by that call:</p>
+
+<center>
+<img src="img/curtain_wall_offset_model_lines.png" alt="Model lines generated from curtain wall perimeter curves offset by wall length"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>Model Curve Creator Method</h4>
+
+<p>To generate the model curves shown above, I made some enhancements to The Building Coder sample 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/model-line-creation.html">
+Creator</a> class, 
+
+which we will present in detail in a future post.
+
+
+<a name="4"></a>
+
+<h4>FootPrintRoof and CurtainSystem Geometry</h4>
+
+<p>Joe Offord of
+
+<a href="http://www.enclos.com">
+enclos corp.</a>,
+
+who initially raised this question, provided some further information on using the same technique to retrieve geometry from other elements as well.
+Says Joe:
+
+<p>I ran across some other loops I had to jump through.
+
+<p>What my program does is export all the curtain wall mullion geometry from Revit into an analytical software package.
+
+<p>Based on our discussion, I was able to retrieve the X,Y,Z of each end of each mullion that was hosted by a System Family - Curtain Wall.  
+But because architects like to dream up exotic shapes for glass structures, there may also exist curtain wall systems on non-vertical surfaces in the model.  
+Thus, I also had to export out CurtainSystems and RoofFootPrint elements that might contain CurtainGrids and Mullions.
+
+<p>Because CurtainGrids can be hosted by objects other than walls, I had to include these additional elements in my coding.  
+As far as I could tell, the GeometryObjects of these elements had to be one of three types: Line, Arc, or HermiteSpline.  
+I could retrieve the end points I needed from all of these.  
+The HermiteSpline elements usually occurred on sloped roofs with curved boundaries.
+
+<p>Using the same logic as the walls, I found X,Y,Z coordinates for the non-visible border of RoofFootPrints and CurtainSystems, as well as X,Y,Z coordinates of all the interior nodes using CurtainGridLines.ExistingSegments. 
+<p>Many thanks to Joe for the fruitful discussions on this subject!

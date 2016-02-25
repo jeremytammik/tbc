@@ -1,0 +1,176 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06649981 [Get Geometry Objects of ImportInstance] -->
+
+<h3>Polylines in Imported DWG Files</h3>
+
+<p>I still keep discovering functionality in Revit 2012 API that I have not yet discussed here, such as the following important enhancement:
+
+<p>Previous versions of the Revit API failed to retrieve polyline data from imported DWG files.
+The polylines were represented by an internal Revit class which was not exposed through the API, so the geometry retrieval simply ignored these objects.
+
+<p>Happily, that changed in the Revit 2012 API with the introduction of the PolyLine class.
+As stated by the Revit API help file RevitAPI.chm, it represents a polyline in space defined by a set of coordinate points.
+
+<!-- this is all about product features:
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/What%27s_New_in_Revit_2012%3f">
+<a href="http://wikihelp.autodesk.com/Revit/enu/2012/Help/Revit_User%27s_Guide/0001-What%27s_N1/0002-New_in_R2">
+-->
+
+<p>The 'What's New' section explains:
+
+<h4 style="color:darkblue">PolyLine returned from Element.Geometry</h4>
+
+<p style="color:darkblue">A new geometry object called a PolyLine is exposed through the API. 
+The PolyLine represents a set of coordinate points forming contiguous line segments. 
+Typically this type of geometry would be seen in geometry imported from other formats (such as DWG). 
+Previous Element.Geometry[] would skip extraction of these geometry object completely.</p>
+
+<p>Here is some sample code making use of this class, simply counting the number of curves and polylines returned by a DWG import instance.
+It makes use of two helper functions.
+
+<p>The first helper method is trivial.
+It simply returns an English plural suffix for the given number of items, i.e. 's' for zero or more than one items and nothing for exactly one, for prettier printing of the results:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> PluralSuffix( <span class="blue">int</span> n )
+{
+&nbsp; <span class="blue">return</span> 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span>;
+}
+</pre>
+
+<p>The second one, GetSingleSelectedElement, is a bit more substantial.
+It retrieves a single pre-selected element, if one exists, and otherwise prompts the user to select an element, including the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/pickobject-requires-valid-view.html">
+check for a valid selection view</a> that we recently discussed:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Result</span> GetSingleSelectedElement(
+&nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; <span class="blue">out</span> <span class="teal">Element</span> e )
+{
+&nbsp; e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="green">// Check for a single pre-selected element</span>
+&nbsp;
+&nbsp; <span class="teal">SelElementSet</span> set = sel.Elements;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 1 == set.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e2 <span class="blue">in</span> set )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = e2;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Prompt user to select an element</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ViewType</span>.Internal == uidoc.ActiveView.ViewType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Error&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot pick an element in this view: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + uidoc.ActiveView.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; e = uidoc.Document.get_Element( 
+&nbsp; &nbsp; &nbsp; &nbsp; r.ElementId );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>With these two in place, we can proceed to the actual code to retrieve the element geometry and extract polylines from it, provided it is in fact an import instance containing any such polylines:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp;
+&nbsp; <span class="teal">Result</span> r = GetSingleSelectedElement( uidoc, <span class="blue">out</span> e );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Result</span>.Succeeded == r )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> curveCounter = 0;
+&nbsp; &nbsp; <span class="blue">int</span> polylineCounter = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElement 
+&nbsp; &nbsp; &nbsp; = e.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geoObject 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> geoElement.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> instance 
+&nbsp; &nbsp; &nbsp; &nbsp; = geoObject <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != instance )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> instObj 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> instance.SymbolGeometry.Objects )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( instObj <span class="blue">is</span> <span class="teal">Curve</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++curveCounter;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( instObj <span class="blue">is</span> <span class="teal">PolyLine</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++polylineCounter;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;GeometryInstance Symbol Geometry&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} curve{1} and {2} polyline{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; curveCounter, PluralSuffix( curveCounter ),
+&nbsp; &nbsp; &nbsp; &nbsp; polylineCounter, PluralSuffix( polylineCounter ) ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> r;
+}
+</pre>
+
+<p>I tested it on the following simple model containing one imported DWG file representing a rectangular column:
+
+<center>
+<img src="img/import_instance_pinned_column.png" alt="Pinned column import instance"/>
+</center>
+
+<p>It reports one single polyline representing the geometry:
+
+<center>
+<img src="img/import_instance_geometry_result.png" alt="Import instance geometry containing polyline"/>
+</center>
+
+<p>Unfortunately, as said, this geometry could not be retrieved in previous versions of the Revit API.
+
+<p>Here is 
+
+<a href="zip/ImpInstGeo.zip">ImpInstGeo.zip</a> containing 
+
+the complete Visual Studio solution, C# source code, and add-in manifest file of this command.

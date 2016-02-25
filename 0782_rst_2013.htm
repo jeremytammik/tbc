@@ -1,0 +1,295 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit 2013 Structure API</h3>
+
+<p>I migrated the ADN Revit Structure API training material to Revit 2013, which led me to put together the following summary of the structural API enhancements and some details of the migration steps:
+
+<ul>
+<li><a href="#1">API enhancements</a>
+<li><a href="#2">RstLabs migration</a>
+<li><a href="#3">NewRstLab migration</a>
+<li><a href="#4">RstAvfDmu migration</a>
+<li><a href="#6">Materials</a>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Revit Structure 2013 API Enhancements</h4>
+
+<p>I mentioned a few 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#3">
+structure specific enhancements</a> in 
+
+the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a>.
+
+They are discussed in somewhat more detail in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/devdays-online-on-whats-new-in-revit-2013.html">
+DevDays Online presentation on What's New in Revit 2013</a> and
+
+the complementary 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/revit-2013-api-webcast-recording.html">
+Revit 2013 API webcast</a>,
+
+of which the first half provides an introduction to the Revit API in general, and the second covers some new 2013 specific features in more depth.
+
+<p>Actually, it was the webcast preparation that prompted me to start performing the migration described below, which in turn prompted me to publish the result and summarise the changes.
+
+<p>To recap, the structural enhancements include:
+
+<h5>Structural Product Related Enhancements</h5>
+
+<p>Before we get to the detailed API changes, here are some notes on the main product goals and features:
+
+<!-- for construction fabrication and engineering -->
+
+<p>Reinforcement detailing to help extend the BIM lifecycle from design to construction through detailing and fabrication:
+
+<ul>
+<li>Area/path reinforcement to host real rebar and set 
+<li>Welded wire mesh
+<li>Reinforcement fillets and hooks
+<li>Additional reinforcement units
+<li>Rebar cover
+</ul>
+
+<p>Structural analysis in BIM moving towards delivering structural analysis in the cloud and supporting partner ecosystem growth by 
+
+<ul>
+<li>Results storage, visualization and exploration in RST 
+<li>Improved analytical models for surface elements
+<li>Seamless workflow between RST/RSA
+<li>Improved rigid links
+</ul>
+
+<p>Structural analysis web service and visualisation to democratize analysis and make it more accessible, easy to both use and provide.
+Long term, we would like to deliver structural analysis in the cloud and thus support partner ecosystem growth.
+Support for modal and deformation analysis, enhanced results visualization.
+
+<p>Enhanced physical properties to centralize analysis workflows around BIM data and improve the efficiency of BIM-based analysis workflows.
+
+<ul>
+<li>Extended thermal and structural properties of building envelope
+<li>Material authoring and library management workflows
+<li>Foundation for material ecosystem
+<li>Data flow with key Building Performance and Structural Analysis applications
+</ul>
+
+<p>Now let's look at how these changes affect the API:
+
+
+<h5>Reinforcement</h5>
+
+<p>The Rebar class provides a number of new methods and properties:
+
+<ul>
+<li>CreateFromCurvesAndShape 
+<li>GetBarPositionTransform
+<li>GetBarExistsAtPosition
+<li>GetHookTypeId/SetHookTypeId
+<li>RebarShapeMatchesCurvesAndHooks
+<li>ScheduleMark 
+<li>TotalLength 
+<li>Volume
+</ul>
+
+<p>The Rebar.GetCenterlineCurves method takes new arguments to control 
+
+<ul>
+<li>Adjustment for self-intersection 
+<li>Inclusion of hooks 
+<li>Inclusion of bend radius curves (fillets) 
+</ul>
+
+<p>The BarDescription class is now obsolete and replaced by the new RebarInSystem class representing a bar in an AreaReinforcement or PathReinforcement system, providing access to individual rebars in a system and the ability to switch back and forth between system and individual elements.
+
+<p>A new class ReinforcementSettings is provided.
+When ReinforcementSettings.HostStructuralRebar is true, area and path reinforcement elements create individual rebar elements that participate in views and schedules. 
+The individual RebarInSystem elements have the same graphical representation and parameters as Rebar elements, and have the same API methods for inquiry.
+Since the RebarInSystem elements are almost entirely controlled by their area or path system element, they lack most of the modification methods of the Rebar class.
+
+<p>These two system classes now have types, and provide new members to retrieve system members, curve boundaries, remove an element and convert its bars into standard rebar via the new methods GetRebarInSystemIds, RemoveAreaReinforcementSystem, and RemovePathReinforcementSystem.
+
+<h5>Welded Wire Mesh</h5>
+
+<ul>
+<li>FabricSheet
+<ul>
+<li>Planar sheet of welded wire mesh
+<li>Created and cut by FabricArea
+<li>Option to automatically add symbols and tags
+</ul>
+<li>FabricArea
+<ul>
+<li>Creates and manages a distribution of FabricSheets
+<li>Allows sketched welded wire mesh objects
+<li>Planar hosts only, identical criteria to Area and Path Reinforcement
+</ul>
+<li>Related type classes
+<ul>
+<li>FabricAreaType provides identity data
+<li>FabricSheetType includes uncut dimensions,  wire sizes and layouts
+<li>FabricWireType defines wire diameter
+</ul>
+</ul>
+
+
+<h5>Physical Properties</h5>
+
+<ul>
+<li>Structural family instances support additional structural material element
+<li>Structural and thermal material assets can be shared and set on materials
+</ul>
+
+<h5>Structural Analytical Model</h5>
+
+<ul>
+<li>New element type AnalyticalLink
+<li>Created between two analytical elements, e.g. a beam and a column
+<li>Two kinds of links: user-defined and automatically generated
+<li>Access link properties like "fixity state"
+</ul>
+
+<h5>Analysis Visualization Framework</h5>
+
+<ul>
+<li>Support for deformed shapes as part of AVF display
+<li>AnalysisDisplayStyleDeformedShapeTextLabelType
+<li>AnalysisDisplayDeformedShapeSettings input argument to new CreateAnalysisDisplayStyle override
+</ul>
+
+<center>
+<img src="img/avf_deform.png" alt="AVF support for deformation" width="400"/>
+</center>
+
+
+
+<a name="2"></a>
+
+<h4>Revit Structure Labs RstLabs Migration</h4>
+
+<p>As said, I migrated the Revit Structure API material from 2012 to 2013, starting with the labs RstLabs.
+The standard steps are getting to be a habit, after already completing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/migrate-building-coder-samples-to-revit-2013.html">
+The Building Coder samples</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/xtra-adn-revit-2013-api-training-labs.html">
+ADN Revit API training labs</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+AdnRme Revit MEP API</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-one.html#2">
+extensible storage</a> samples:
+
+<ul>
+<li>Updated the Revit API assembly references.
+<li>Set the target .NET framework version to 4.
+<li>Removed the warnings caused by calls to the Element property in VB, represented as a call to the get_Element method n C#, replacing them by the new Revit 2013 GetElement method, which has the advantage of looking identical in both languages.
+</ul>
+
+<p>After that, no warnings remain.
+
+<p>There are four errors, though, which all are caused by the removal of the LOAD_USE_LOCAL_COORDINATE_SYSTEM_HOSTED built-in parameter.
+
+<p>Since the parameter value retrieved is not used anywhere and the call is just to demonstrate the retrieval of a parameter value in general, I simply commented out the offending statements.
+
+
+<a name="3"></a>
+
+<h4>New Revit Structure Labs NewRstLab Migration</h4>
+
+<p>Standard stuff, same as before: change the Revit API assembly references, .NET framework version, and replace the use of the Element property by calls to GetElement.
+
+<p>I also replaced the test for a concrete column by new code, since the MaterialConcrete class no longer exists in Revit 2013. 
+Here is the old code I replaced:
+
+<pre class="code">
+&nbsp; <span class="teal">MaterialSet</span> materials = column.Materials;
+&nbsp;
+&nbsp; MaterialConcrete matConcrete = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Material</span> mat <span class="blue">in</span> materials )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// cast it to concrete material</span>
+&nbsp; &nbsp; matConcrete = mat <span class="blue">as</span> MaterialConcrete; 
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == matConcrete )
+&nbsp; {
+&nbsp; &nbsp; messages = <span class="maroon">&quot;The selected column is not concrete&quot;</span>;
+&nbsp; &nbsp; trans.RollBack();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+</pre>
+
+<p>The new code is much clearer and simpler:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="teal">StructuralMaterialType</span>.Concrete 
+&nbsp; &nbsp; != column.StructuralMaterialType )
+&nbsp; {
+&nbsp; &nbsp; messages = <span class="maroon">&quot;The selected column is not concrete&quot;</span>;
+&nbsp; &nbsp; trans.RollBack();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Revit Structure AVF and DMU Sample RstAvfDmu Migration</h4>
+
+<p>RstAvfDmu is a dual sample by Saikat Bhattacharya on using the analysis visualisation framework AVF and the dynamic model update 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html">
+DMU in the context of Revit Structure</a>.
+
+<p>The only significant change required is due to the GetCenterlineCurves method taking some additional arguments in Revit 2013:
+
+<pre class="code">
+&nbsp; <span class="green">// For this we first access </span>
+&nbsp; <span class="green">// the rebar line geometry</span>
+&nbsp;
+&nbsp; <span class="green">//Line rebarLine = rebar.Curves.get_Item( </span>
+&nbsp; <span class="green">//&nbsp; 0 ) as Line; // 2011</span>
+&nbsp;
+&nbsp; <span class="green">//Line rebarLine = rebar.GetCenterlineCurves( </span>
+&nbsp; <span class="green">//&nbsp; false )[0] as Line; // 2012</span>
+&nbsp;
+&nbsp; <span class="teal">Line</span> rebarLine = rebar.GetCenterlineCurves(
+&nbsp; &nbsp; <span class="blue">false</span>, <span class="blue">true</span>, <span class="blue">true</span> )[0] <span class="blue">as</span> <span class="teal">Line</span>; <span class="green">// 2013</span>
+</pre>
+
+
+<!--
+
+<a name="5"></a>
+
+<h4>Revit Structure Link RstLink</h4>
+
+<p>Not done yet. Sorry.
+
+-->
+
+
+<a name="6"></a>
+
+<h4>Materials</h4>
+
+<p>Here is 
+
+<a href="zip/rst_2013_2012-06-12.zip">rst_2013_2012-06-12.zip</a> containing
+
+the result of my efforts so far, the Revit Structure 2013 versions of RstLabs, NewRstLab and RstAvfDmu.
+
+<p>The Revit Structure link sample RstLink is not yet completed, nor have I yet updated the Revit Structure API slide deck.

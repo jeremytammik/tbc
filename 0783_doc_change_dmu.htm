@@ -1,0 +1,352 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07310165 [Event Handler and NewAlignment]
+
+-->
+
+<h3>DocumentChanged versus Dynamic Model Updater</h3>
+
+<p>Here is an interesting little overview and comparison of possibilities to react efficiently to the addition of certain elements to the database.
+Two easy ways to achieve this are by subscribing to the unspecific <a href=#1">DocumentChanged event</a>, or by registering a more specific DMU <a href=#2">dynamic model updater</a>.
+If you subscribe to an event or register an updater, it is also important to keep in mind to <a href=#3">unsubscribe or unregister</a> when you are done with it.
+
+<p>We discussed both of these repeatedly in the past, e.g. when looking at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/lock-the-model-eg-prevent-deletion.html">
+preventing element deletion</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/avoid-idling.html">
+avoiding Idling</a>.
+
+<p>In this case, the aim is to display a message box to the user when a new elevation view is added.
+
+
+<a name="1"></a>
+
+<h4>Subscribe to DocumentChanged to React to Elevation View Creation</h4>
+
+<p>It is easy to detect when a specific element is added, such as a new elevation view, for instance by subscribing to the DocumentChanged event. This can be done either in  the OnStartup method of an external application or from an external command. In either case, you should pay attention to also unsubscribe from the event when it is no longer needed, for instance on application shutdown, at the end of the command, or from some other place.
+
+<p>In order to test the behaviour simply from within the standard framework of The Building Coder sample collection, I implemented a simple external command CmdElevationWatcher subscribing to the event. 
+The event handler receives a DocumentChangedEventArgs instance providing three separate collections of ids of added, deleted and modified elements.
+We pass in the list of added ids to the FindElevationView method, which returns the first elevation view in the given element id collection if one exists, causing a message box listing it to be displayed.
+
+<p>Here is the entire code of this external command implementation:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> React to elevation view creation subscribing to DocumentChanged event</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">class</span> <span class="teal">CmdElevationWatcher</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the first elevation view found in the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given element id collection or null.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">View</span> FindElevationView(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">View</span> view = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; view = doc.GetElement( id ) <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != view
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ViewType</span>.Elevation == view.ViewType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; view = <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> view;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> DocumentChanged event handler</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> OnDocumentChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.GetDocument();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> view = FindElevationView( 
+&nbsp; &nbsp; &nbsp; doc, e.GetAddedElementIds() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;You just created an &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;elevation view '{0}'. Are you &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;sure you want to do that? &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;(Elevations don't show hidden line &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;detail, which makes them unsuitable &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;for core wall elevations etc.)&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; view.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;ElevationChecker&quot;</span>, msg );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Subscribe to DocumentChanged event</span>
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>After this command has been executed, the event is subscribed to.
+Any subsequent elevation view insertion results in the message box being displayed, for instance when I duplicate the East elevation view:
+
+<center>
+<img src="img/ElevationWatcher1.png" alt="ElevationWatcher using DocumentChanged"/>
+</center>
+
+<p>This approach has two significant disadvantages: 
+
+<ol>
+<li>It reacts erroneously when a family is loaded.
+<li>Its performance is suboptimal.
+</ol>
+
+<p><b>1.</b> When a family is loaded into a project, its views are also inserted with it.
+This insertion currently triggers a DocumentChanged event on the elevation views as well.
+For instance, if I load the standard rectangular column 'family M_Rectangular Column.rfa', a similar message appears:
+
+<center>
+<img src="img/ElevationWatcher2.png" alt="ElevationWatcher reacting to family load"/>
+</center>
+
+<p>This is unintentional and potentially confusing.
+
+<p><b>2.</b> The performance is not optimal, since DocumentChanged reacts to each and every modification of the document.
+Furthermore, every single added element needs to be examined to check whether it is an elevation view.
+
+<p>Both of these disadvantages can easily be avoided by using the dynamic model update mechanism DMU instead.
+
+
+<a name="2"></a>
+
+<h4>Install Dynamic Model Updater to React to Elevation View Creation</h4>
+
+<p>As said, the dynamic model updater mechanism can easily be used to determine that specific elements have been added to the database, and it avoids the DocumentChanged event disadvantages mentioned above, since it reacts only to certain well-defined modifications on a certain well-defined set of elements used to set up the updater trigger.
+
+<p>First we need to implement our updater class to display a message if an elevation view is added:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Updater notifying user if an </span>
+<span class="gray">///</span><span class="green"> elevation view was added.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ElevationWatcherUpdater</span> : <span class="teal">IUpdater</span>
+{
+&nbsp; <span class="blue">static</span> <span class="teal">AddInId</span> _appId;
+&nbsp; <span class="blue">static</span> <span class="teal">UpdaterId</span> _updaterId;
+&nbsp;
+&nbsp; <span class="blue">public</span> ElevationWatcherUpdater( <span class="teal">AddInId</span> id )
+&nbsp; {
+&nbsp; &nbsp; _appId = id;
+&nbsp;
+&nbsp; &nbsp; _updaterId = <span class="blue">new</span> <span class="teal">UpdaterId</span>( _appId, <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;fafbf6b2-4c06-42d4-97c1-d1b4eb593eff&quot;</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( <span class="teal">UpdaterData</span> data )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = data.GetDocument();
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; data.GetAddedElementIds() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = doc.GetElement( id ) <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != view 
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ViewType</span>.Elevation == view.ViewType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;ElevationWatcher Updater&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;New elevation view '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view.Name ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetAdditionalInformation() 
+&nbsp; { 
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;The Building Coder, &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;http://thebuildingcoder.typepad.com&quot;</span>; 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">ChangePriority</span> GetChangePriority() 
+&nbsp; { 
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">ChangePriority</span>.FloorsRoofsStructuralWalls; 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">UpdaterId</span> GetUpdaterId() 
+&nbsp; { 
+&nbsp; &nbsp; <span class="blue">return</span> _updaterId; 
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetUpdaterName() 
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;ElevationWatcherUpdater&quot;</span>;
+&nbsp; }
+}
+</pre>
+
+<p>With this in place, we can implement a second external test command CmdElevationWatcherUpdater to instantiate and register our updater and define a trigger for it.
+The trigger reacts only to the creation of new view elements:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; <span class="green">// Register updater to react to view creation</span>
+&nbsp;
+&nbsp; <span class="teal">ElevationWatcherUpdater</span> updater 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElevationWatcherUpdater</span>(
+&nbsp; &nbsp; &nbsp; app.ActiveAddInId );
+&nbsp;
+&nbsp; <span class="teal">UpdaterRegistry</span>.RegisterUpdater( updater );
+&nbsp;
+&nbsp; <span class="teal">ElementCategoryFilter</span> f
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Views );
+&nbsp;
+&nbsp; <span class="teal">UpdaterRegistry</span>.AddTrigger(
+&nbsp; &nbsp; updater.GetUpdaterId(), f,
+&nbsp; &nbsp; <span class="teal">Element</span>.GetChangeTypeElementAddition() );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>After this command has been executed once, the updater is registered and its trigger installed.
+Like before, any subsequent elevation view insertion results in its message box being displayed, for instance when I again duplicate the East elevation view:
+
+<center>
+<img src="img/ElevationWatcher3.png" alt="ElevationWatcher using DMU"/>
+</center>
+
+
+
+<a name="3"></a>
+
+<h4>Unsubscribe from Event and Unregister Updater</h4>
+
+<p>Before letting this loose on the general public, I thought I would be a good citizen for the nonce and clean up after myself.
+
+<p>To do so, I modified both command implementations so that each call to the command toggles the event subscription or updater registration on and off.
+
+<p>In both cases, this was very easily achieved. 
+I simply implemented a static member variable to hold the event handler delegate or the updater and initialised it to null.
+It looks like this for the DocumentChanged event handler:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Keep a reference to the handler, so we know </span>
+&nbsp; <span class="gray">///</span><span class="green"> whether we have already registered and need </span>
+&nbsp; <span class="gray">///</span><span class="green"> to unregister or vice versa.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt; 
+&nbsp; &nbsp; _handler = <span class="blue">null</span>;
+</pre>
+
+<p>It is even simpler for the updater:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Keep a reference to the updater, so we know </span>
+&nbsp; <span class="gray">///</span><span class="green"> whether we have already registered and need </span>
+&nbsp; <span class="gray">///</span><span class="green"> to unregister or vice versa.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ElevationWatcherUpdater</span> _updater = <span class="blue">null</span>;
+</pre>
+
+<p>Each time the command is run, it either subscribes/registers and sets the reference if it was null previously, or unsubscribes/unregisters and nulls it in the other case.
+Here is the relevant updated code snippet for the DocumentChanged event:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _handler )
+&nbsp; {
+&nbsp; &nbsp; _handler
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Subscribe to DocumentChanged event</span>
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged += _handler;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; app.DocumentChanged -= _handler;
+&nbsp; &nbsp; _handler = <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>Here is the corresponding code for DMU:
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _updater )
+&nbsp; {
+&nbsp; &nbsp; _updater = <span class="blue">new</span> <span class="teal">ElevationWatcherUpdater</span>(
+&nbsp; &nbsp; &nbsp; app.ActiveAddInId );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Register updater to react to view creation</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.RegisterUpdater( _updater );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementCategoryFilter</span> f
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Views );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.AddTrigger(
+&nbsp; &nbsp; &nbsp; _updater.GetUpdaterId(), f,
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span>.GetChangeTypeElementAddition() );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.UnregisterUpdater( 
+&nbsp; &nbsp; &nbsp; _updater.GetUpdaterId() );
+&nbsp;
+&nbsp; &nbsp; _updater = <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>Here is 
+
+<a href="zip/bc_13_99_0.zip">
+version 2013.0.99.0</a> of
+
+The Building Coder samples including the two new commands.
+
+<p>I hope you find this comparison useful, appreciate how simple both of these mechanisms are to use, and understand the advantages offered by the DMU.
+
+<p><strong>Addendum:</strong> As Victor very correctly points out below, I omitted pointing out the main difference between the DocumentChanged event and the DMU mechanism, since we have discussed it several times in the past:
+<p>The DocumentChanged event is not raised until after the transaction causing it has been closed, so the changes made cannot be cancelled.
+If elements were deleted, they are gone by the time you receive the notification; all you receive from the event handler argument is their element ids, and you cannot even find out what type they were.
+The updater is called within the same transaction as the modification causing it, providing much more control.

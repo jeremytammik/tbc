@@ -1,0 +1,491 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07129697 [Extensible Storage] -->
+
+<h3>DevBlog, DevCamp, Element and Project Wide Data</h3>
+
+<p>Every once in a while, I like to start the week with a bang, so here goes, with a risk of information overload on the following topics:
+
+<ul>
+<li><a href="#1">ADN AEC DevBlog</a>
+<li><a href="#2">Autodesk AEC DevCamp</a>
+<li><a href="#3">Goodbye Kailash Kute</a>
+<li><a href="#4">Project Wide Data Storage</a>
+<li><a href="#5">DataStorage Element</a>
+<ul>
+<li><a href="#6">Simple DataStorage Sample</a>
+<li><a href="#7">Identifying DataStorage Elements</a>
+</ul>
+</ul>
+
+
+
+<a name="1"></a>
+
+<h4>ADN AEC DevBlog</h4>
+
+<p>I bet you are not half as confused as we always are internally about DevDays, DevLabs, DevNotes, and last but not least DevCamps.
+
+<p>I 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/failure-rollback.html">
+recently mentioned</a> that 
+
+we are raising the bar one further with the introduction of the Autodesk Developer Network 
+
+<a href="http://www.autodesk.com/joinadn">
+ADN</a> DevBlogs, 
+
+for AutoCAD and Infrastructure, marking the advent of a whole series and a significant shift from material available to ADN members, like technical solutions known as DevNotes on the ADN extranet, to material publicly available to everyone. 
+
+Following these two, we are now proud to present the AEC DevBlog!</p>
+
+<center>
+<img src="img/aec_devblog_banner.png" alt="AEC DevBlog"/>
+</center>
+
+<p>The AEC DevBlog covers Revit, Navisworks and other Autodesk AEC and BIM technologies and their APIs. 
+
+<p>Here are links to the three DevBlogs live so far:
+
+<ul>
+<li><a href="http://adndevblog.typepad.com/autocad">AutoCAD DevBlog</a>
+<li><a href="http://adndevblog.typepad.com/infrastructure">Infrastructure Modelling DevBlog</a>
+<li><a href="http://adndevblog.typepad.com/AEC">AEC DevBlog</a>
+</ul>
+
+<p>ADN DevBlogs for Manufacturing, Media & Entertainment are also expected.
+
+<p>For more information, please refer to 
+
+<a href="http://adndevblog.typepad.com/autocad/2012/02/welcome.html">
+Stephen Preston's welcome post</a>.
+
+
+
+<a name="2"></a>
+
+<h4>Only a month to go &ndash; Autodesk AEC DevCamp</h4>
+
+<p>I also 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/devcamp-and-refresh-display-for-a-kinetic-facade.html#1">
+recently mentioned</a> the 
+
+upcoming 
+
+<a href="http://tinyurl.com/83jzvov">
+AEC DevCamp conference</a> being 
+
+held in Boston June 6-7, where customers, resellers and professional developers come together and learn about extending Autodesk technologies through software development.
+
+<p>The AEC DevCamp comprises several parallel tracks for
+
+<ul>
+<!-- <li>Keynote -->
+<li>Revit App Development for Beginners and Intermediates		
+<li>Revit App Development for Intermediates and Experts		
+<li>Infrastructure Technologies		
+<li>Cloud/Mobile Technologies		
+<li>Other Autodesk AEC Technologies		
+<li>Business		
+</ul>
+
+<p>The classes are presented by a managers, core developers, ADN experts and others and cover all levels from people just beginning to do software development with our technologies to experts looking to build sophisticated cloud and mobile apps.  
+You can also grab a chance to meet and talk with these interesting and influential people.
+
+<p>Besides welcoming new beginners to the Revit API, I would also like to bid farewell to an old-timer:
+
+
+
+<a name="3"></a>
+
+<h4>Goodbye Kailash Kute</h4>
+
+<p>I gratefully acknowledge this very sweet parting message from one of our most prolific commenters and autonomous Revit MPE API problem solvers, 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html?cid=6a00e553e1689788330168eb7ca24d970c#comment-6a00e553e1689788330168eb7ca24d970c">
+Kailash Kute</a>:
+
+<p style="color:darkblue">Dear Jeremy, i would like to inform you that since i have changed my current company to another where there is no Revit, but till this whole time which i used to blog post on building coder, was very good and fantastic journey, your blog was most useful stuff for me, i liked the coding, the posts, the information provided on this.
+i will miss but i also like to appreciate the work you are doing for revit stuff. 
+Really it was a wonderful journey till this day on BuildingCoder. 
+
+<p>Very many thanks, Kailash, for your numerous contributions and great endurance in solving so many Revit MEP API issues!
+
+<p>I was always sorry not to be able to help you more, and very impressed that you struggled on and succeeded in solving every single issue in the end.
+
+<p>Funnily enough, I just last week published an 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/create-a-pipe-cap.html">
+updated pipe cap creation</a> post 
+
+superseding the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/create-a-pipe-cap.html">
+original one</a> on which you submitted all your comments  :-)
+
+<p>I wish you much success and all the best in your new role!
+
+<p>So long, and 
+
+<a href="http://en.wikipedia.org/wiki/So_Long,_and_Thanks_for_All_the_Fish">
+thanks for all the fish!</a>
+
+
+<p>Back to the nuts and bolts of the Revit API, here is a case brought up and eventually solved by Mario Guttman of Perkins+Will: 
+
+
+<a name="4"></a>
+
+<h4>Project Wide Data Storage</h4>
+
+<p>Here is a simple question that has been asked repeatedly, so I guess it is worthwhile pointing out:
+
+
+<p><strong>Question:</strong> Is it possible to save some data in the Revit model that has no relation to any specific Revit model building element?
+
+<p>For instance, in AutoCAD I can store data in the named objects dictionary, and I can store xdata or xrecord to be saved with an entity.
+
+<p>I know that it is possible to store extensible storage data on individual Revit elements, but I need a place to save data applying to the entire model.
+
+<p>How can I achieve this, please?
+
+
+<p><strong>Answer:</strong> Although extensible storage is indeed associated with individual elements, you can easily store global data in certain singleton elements.
+
+<p>There are several such elements that are always guaranteed to exist, and to exist only once, so-called singleton instances. 
+One such instance is the ProjectInformation element, whose category is OST_ProjectInformation. 
+
+<p>It was commonly used to store global shared parameters in the past, and the same of course applies for extensible storage as well:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/defining-a-new-parameter.html">Define a new parameter</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/store-project-data.html">Store project data</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/adding-a-category-to-a-parameter-binding.html">Add a category to a parameter binding</a>
+</ul>
+
+<p>In another case, an arbitrary element was required to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/unit-conversion-and-display-string-formatting.html">
+format a parameter value</a>,
+
+and the ProjectInformation singleton was used for that also.
+
+<p>For complete background information on extensible storage in Revit 2012, I would suggest looking at my Autodesk University 2011
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9263&jid=1725932">
+class</a> and 
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9726&jid=1725932">
+lab</a> on 
+
+this topic, which tell the complete story.
+
+I recently published the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#3">
+handouts and sample material</a> for 
+
+those here on the blog to provide more immediate access.
+
+
+<a name="5"></a>
+
+<h4>DataStorage Element</h4>
+
+<p>Better still for your case, one of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+add-in integration features</a> introduced 
+
+by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a> 
+
+is a new DataStorage element to enable add-ins to store extensible storage data completely independently of all BIM database elements.
+
+<p>The DataStorage element is only accessible through the API, not through the user interface. Here is the excerpt on it from the 'What's New' section of the Revit Quasar SDK help file RevitAPI.chm:
+
+<p style="color:darkblue">The new DataStorage class represents an element which API applications can create logically organize different sets of ExtensibleStorage entities into separate elements. This allows an application to update one set of data in a local workshared project without locking other elements.
+
+<p>To demonstrate the usage of the new DataStorage element, here is a very nice set of samples by Victor Chekalin, Виктор <!-- Владимирович --> Чекалин.
+
+
+<a name="6"></a>
+
+<h4>Simple DataStorage Sample</h4>
+
+<p>Storing data in a DataStorage element is very easy. 
+
+<p>You can follow these steps to write your own data to a DataStorage element:
+
+<ol>
+<li>Create a new DataStorage using static method Create of DataStorage class.
+<li>Create a Schema.
+<li>Create an Entity which contains data you want to save.
+<li>Set entity to the created DataStorage.
+</ol>
+
+<p>To read data from DataStorage you need to:
+
+<ol>
+<li>Find DataStorage in the project (using FilteredElementCollector).
+<li>Get the entity from the retrieved DataStorage.
+<li>Read data from the Entity.
+</ol>
+
+<p>For example, assume we need to store in each document when a document was created and by whom.
+
+<p>On DocumentCreated event write information about the creating user:
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( 
+&nbsp; &nbsp; doc, <span class="maroon">&quot;Create created info&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create data storage in new document</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DataStorage</span> createdInfoStorage 
+&nbsp; &nbsp; &nbsp; = <span class="teal">DataStorage</span>.Create( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create entity which store created info</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Entity</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( 
+&nbsp; &nbsp; &nbsp; <span class="teal">CreatedInfoSchema</span>.GetSchema() );
+&nbsp;
+&nbsp; &nbsp; entity.Set( <span class="maroon">&quot;CreatedUser&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">Environment</span>.UserName );
+&nbsp;
+&nbsp; &nbsp; entity.Set( <span class="maroon">&quot;CreatedDate&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Set entity to the data storage element</span>
+&nbsp;
+&nbsp; &nbsp; createdInfoStorage.SetEntity( entity );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+<p>And read information later:
+
+<pre class="code">
+&nbsp; <span class="green">// Retrieve data storage</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">var</span> dataStorage =
+&nbsp; &nbsp; &nbsp; collector
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">DataStorage</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstElement();
+&nbsp;
+&nbsp; <span class="blue">if</span>( dataStorage == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;No data storage found &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in current project&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Retrieve entity from the data storage</span>
+&nbsp;
+&nbsp; <span class="teal">Entity</span> createdInfoEntity = dataStorage.GetEntity( 
+&nbsp; &nbsp; <span class="teal">CreatedInfoSchema</span>.GetSchema() );
+&nbsp;
+&nbsp; <span class="blue">if</span>( !createdInfoEntity.IsValid() )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Data storage doesn't &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;have CreatedInfoSchema&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> createdUser = createdInfoEntity.Get&lt;<span class="blue">string</span>&gt;( 
+&nbsp; &nbsp; <span class="maroon">&quot;CreatedUser&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">var</span> createdDate = createdInfoEntity.Get&lt;<span class="blue">string</span>&gt;( 
+&nbsp; &nbsp; <span class="maroon">&quot;CreatedDate&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">StringBuilder</span> sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp;
+&nbsp; sb.AppendFormat( <span class="maroon">&quot;Created user: {0}\r\n&quot;</span>, 
+&nbsp; &nbsp; createdUser );
+&nbsp;
+&nbsp; sb.AppendFormat( <span class="maroon">&quot;Created date: {0}&quot;</span>, 
+&nbsp; &nbsp; createdDate );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Project created info&quot;</span>, 
+&nbsp; &nbsp; sb.ToString() );
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Identifying DataStorage Elements</h4>
+
+<p>The simple DataStorage example above very simple indeed. 
+It has one big disadvantage, though: In a project there could be a lot of DataStorage elements including elements created by other developers. 
+So, we must implement a method to differentiate one DataStorage from another and retrieve only the DataStorage elements we really need.
+
+<P>The simplest way to achieve this is to search for a singleton DataStorage element of the expected Schema. 
+
+<p>Let’s look at another example in which we store our own settings for the entire project which we could use in our add-in.
+
+<p>At first, create a Settings class 
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">MyProjectSettings</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Parameter1 { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Parameter2 { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+<p>Next, create a schema for it:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">MyProjectSettingsSchema</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">readonly</span> <span class="blue">static</span> <span class="teal">Guid</span> schemaGuid = <span class="blue">new</span> <span class="teal">Guid</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{9DBE0174-AA01-4CDD-BA86-96DE1FDCE041}&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Schema</span> GetSchema()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Schema</span> schema = <span class="teal">Schema</span>.Lookup( schemaGuid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( schema != <span class="blue">null</span> ) <span class="blue">return</span> schema;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( schemaGuid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; schemaBuilder.SetSchemaName( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;MyProjectSettings&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; schemaBuilder.AddSimpleField( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter1&quot;</span>, <span class="blue">typeof</span>( <span class="blue">int</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; schemaBuilder.AddSimpleField( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter2&quot;</span>, <span class="blue">typeof</span>( <span class="blue">string</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> schemaBuilder.Finish();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>For reading and writing settings to the DataStorage, we can implement a class like the following MyProjectSettingStorage:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">MyProjectSettingStorage</span>
+{
+&nbsp; <span class="blue">readonly</span> <span class="teal">Guid</span> settingDsId = <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;{A71F620F-BD0D-46DD-AECD-AFDEF0DFFD74}&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">MyProjectSettings</span> ReadSettings(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> settingsEntity = GetSettingsEntity( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( settingsEntity == <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; || !settingsEntity.IsValid() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MyProjectSettings</span> settings =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">MyProjectSettings</span>();
+&nbsp;
+&nbsp; &nbsp; settings.Parameter1 = settingsEntity.Get&lt;<span class="blue">int</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter1&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; settings.Parameter2 = settingsEntity.Get&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter2&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> settings;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> WriteSettings(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">MyProjectSettings</span> settings )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> settingDs = GetSettingsDataStorage(
+&nbsp; &nbsp; &nbsp; doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( settingDs == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; settingDs = <span class="teal">DataStorage</span>.Create( doc );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Entity</span> settingsEntity = <span class="blue">new</span> <span class="teal">Entity</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">MyProjectSettingsSchema</span>.GetSchema() );
+&nbsp;
+&nbsp; &nbsp; settingsEntity.Set( <span class="maroon">&quot;Parameter1&quot;</span>,
+&nbsp; &nbsp; &nbsp; settings.Parameter1 );
+&nbsp;
+&nbsp; &nbsp; settingsEntity.Set( <span class="maroon">&quot;Parameter2&quot;</span>,
+&nbsp; &nbsp; &nbsp; settings.Parameter2 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Identify settings data storage</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Entity</span> idEntity = <span class="blue">new</span> <span class="teal">Entity</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">DataStorageUniqueIdSchema</span>.GetSchema() );
+&nbsp;
+&nbsp; &nbsp; idEntity.Set( <span class="maroon">&quot;Id&quot;</span>, settingDsId );
+&nbsp;
+&nbsp; &nbsp; settingDs.SetEntity( idEntity );
+&nbsp; &nbsp; settingDs.SetEntity( settingsEntity );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">Entity</span> GetSettingsEntity(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> dataStorages =
+&nbsp; &nbsp; &nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">DataStorage</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find setting data storage</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">DataStorage</span> dataStorage <span class="blue">in</span> dataStorages )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Entity</span> settingEntity =
+&nbsp; &nbsp; &nbsp; &nbsp; dataStorage.GetEntity( <span class="teal">MyProjectSettingsSchema</span>.GetSchema() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If a DataStorage contains </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// setting entity, we found it</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !settingEntity.IsValid() ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> settingEntity;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+}
+</pre>
+
+<p>Remember, the DataStorage element storing project-wide settings must be a singleton. 
+So, before writing settings we look for an existing DataStorage and if it doesn’t exist, create it. 
+For searching, we check each data storage element for the Setting entity.
+
+<p>Of course, you could also use another way to differentiate one DataStorage element from another. 
+For example, by creating an auxiliary identification schema and attaching an entity instance of it to each DataStorage element. 
+Using this entity, you can check whether a given DataStorage element is the one we need or not when retrieving it. 
+You might also be able to make use of the built-in Revit API Element.UniqueId property, or other means of identification.
+It depends on your tasks.
+
+<p>Here is 
+
+<a href="zip/DataStorageSample.zip">DataStorageSample.zip</a> containing
+
+the full Visual Studio solution, project files, source code, and add-in manifests for Victor's two DataStorage samples.
+
+<p>Many thanks to Victor for providing and documenting this, providing such an easy entry point for everybody!

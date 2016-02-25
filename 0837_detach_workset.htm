@@ -1,0 +1,154 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07629017 [Suggestion]
+
+-->
+
+<h3>Detach Workset and Task Dialogue Command Link Order</h3>
+
+<p>Here is a neat and simple solution using the DialogBoxShowing event to detach and discard worksets by Erik Eriksson of 
+
+<a href="http://www.white.se">
+White Arkitketer AB</a>,
+
+who already provided a useful workaround to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/synchronize-with-central.html">
+synchronize with central</a> using 
+
+SendKeys in combination with the Idling and DocumentSynchronizedWithCentral events.
+
+<p>Here is the issue:
+
+<p><strong>Question:</strong> We have a need to detach project files without worksets.
+
+<p>For instance, it would be great to just have an option to detach and discard worksets.
+
+<p>Why do we need this?
+
+<p>This would be useful for our in-house tools to diagnose project files.
+For this to work, we need to have the project files without worksets, because we delete different types of elements and check the file size before and afterwards.
+To determine a correct file size, we need to compact the files after every operation.
+This cannot be done programmatically, but, for non-workshared files, it is performed automatically each time the project file is saved.
+
+<p>Currently, we execute the detach and discard operation manually.
+However, with big projects containing many files, it would be nice to do less of these things manually.
+
+<p><strong>Answer:</strong> The API currently does not provide this functionality directly.
+
+<p>However, the Revit 2013 API added some new document handling and worksharing changes which may help.
+Here is the description from the What's New section in the Revit API help file RevitAPI.chm:
+
+<a name="2"></a>
+
+<h5>Worksharing properties</h5>
+
+<p>The information required to identify a workshared file on the central or local locations has changed due to changes to RevitServer. 
+As a result, the members
+
+<ul>
+<li>Application.GetRevitServerNetworkHosts
+<li>Application.CurrentRevitServerAccelerator 
+<li>Document.WorksharingCentralFilename 
+</ul>
+
+<p>replace the properties
+
+<ul>
+<li>Application.CentralServerName 
+<li>Application.LocalServerName 
+<li>Document.GetWorksharingCentralModelPath
+</ul>
+
+<p>The new members:
+
+<ul>
+<li>Application.GetWorksharingCentralGUID(ServerPath serverModelPath) 
+<li>Document.WorksharingCentralGUID 
+</ul>
+
+<p>provide read access to the worksharing central GUID of the given server-based model. 
+This is applicable only to workshared models saved in Revit 2013 or later.
+
+<h5>New overloads for Application.OpenDocumentFile and UIApplication.OpenAndActivateDocument</h5>
+
+<p>The new overloads support parameters OpenOptions and OpenOptionsForUI, respectively, to specify how a Revit document should be opened. 
+Both options classes currently offer the ability to detach the opened document from central if applicable.
+
+<ul>
+<li>The OpenOptions.DetachFromCentralOption property can be set to the default DoNotDetach or to DetachAndPreserve.
+
+<li>The OpenOptionsForUI.DetachFromCentralOption property can be set to the default DoNotDetach, DetachAndPreserveWorksets or DetachAndPrompt.
+</ul>
+
+<p>In other words, the OpenOptions argument that you pass in to the OpenDocumentFile and OpenAndActivateDocument methods can now use the DetachFromCentral option to specify whether or not a workset-enabled document is detached from its central document. 
+
+
+<p><strong>Response:</strong> The new API functionality still does not provide the option of discarding the worksets.
+
+<p>I want the file to be a normal project file again.
+
+<p>OpenOptions holds the same options as OpenOptionsForUI (besides DetachAndPrompt). 
+However, maybe I can catch that dialogue programmatically using the DialogBoxShowing event and override the result...
+
+<p>Success!
+
+<!--
+<p>However, I had some problems with the Taskdialog and for future reference: is it always so that the 
+
+CommandLinks are ordered numerically?
+
+<p>So that CommandLink2 is always below CommandLink1 and above CommandLink3? (If I have a case with 3 links).
+-->
+
+<p>This is the code I used to fix it:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OnDialogBoxShowing(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e2 
+&nbsp; &nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e2 &amp;&amp; e2.DialogId.Equals( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Detach_Model_From_Central&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e.OverrideResult( 
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">TaskDialogResult</span>.CommandLink2 );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The full implementation of this method actually includes a few more statements taking care of other dialogue boxes, which I omitted here.
+
+<p>I checked the IsWorkshared property after opening the file, and it was set to false.
+This indicates that it is no longer workshared, which means that the operation to discard the worksets succeeded. 
+When you discard worksets, the workshared central file goes back to being a normal non-workshared project file, just like what you obtain when starting from a normal project template.
+
+<p>One thing I do wonder about is whether CommandLink2 is always below CommandLink1 and above CommandLink3?
+
+
+<p><strong>Answer:</strong> It would appear so, since the description of the TaskDialog.AddCommandLink method clearly states that "CommandLinks will always be shown in the dialog in the order of their ids".
+
+<p>Also, as always, keep in mind that there is no guarantee that this will continue working in future releases.
+The order of these options can change at any time, and the required functionality might even be added to the official API one of these days.
+
+<p>Congratulations on solving this, Erik, and thank you for sharing it and providing this helpful explanation!
+
+
+<a name="3"></a>
+
+<h4>Setting IndependentTag Label to Pick Up a Parameter Value</h4>
+
+<p>I'll wrap up with a quick pointer to another AEC DevBlog article by Saikat Bhattacharya on
+
+<a href="http://adndevblog.typepad.com/aec/2012/10/annotating-with-family-instance-parameter-data-with-independenttag-in-revit.html">
+defining the label displayed by an IndependentTag</a>.
+
+Unfortunately this does not seem to be possible programmatically.
+It can however easily be achieved using an appropriate template or tag family configuration.

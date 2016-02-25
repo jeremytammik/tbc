@@ -1,0 +1,326 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1272158 [Get geometry of wall Layers] -->
+
+<h3>Retrieving Detailed Wall Layer Geometry</h3>
+
+<p>We start off the week with a bang.
+I find the following topic especially exciting, for several reasons:
+
+<ul>
+<li>It deals with geometry. I like that.
+<li>It implements something that cannot be achieved out of the box. I like that.
+<li>It makes use of the Revit 2012 parts functionality and the PartUtils class, which we never looked at in detail before. I like that.
+<li>It uses a temporary transaction to make changes to the model to create and extract information that would otherwise not be available, and then discards the changes to the model. I like that.
+</ul>
+
+<p>I hope you like it too!
+
+<p>Starting off this week with something special is good in several ways, because I will be leaving for a ten-day vacation in southern Spain on Wednesday.
+I like that too, by the way.
+I hope  this helps keep you occupied while I am gone  :-)
+
+<p>Here goes:
+
+<p>It is easy to determine the wall layer locations and their corner points individually for unconnected walls, as I demonstrated by analysing and drawing model lines to represent the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+wall compound layers</a> way 
+
+back in 2008.
+Some additional information on working with wall layers was provided when discussing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/compound-wall-layer-volumes.html">
+compound wall layer volumes</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/core-structural-layer.html">
+core structural layer</a>.
+
+<p>However, it is a bit harder to determine the exact wall layer corners for connected walls, where the join type affects the layer geometry, e.g. for 'abut' or 'miter'.
+ 
+<p>How can we obtain the wall layer corner points in plan view taking the wall join into account?
+
+<p>This is a pretty advanced question on detailed geometry access which was raised by Marcelo Quevedo of 
+
+<a href="http://www.hsb-cad.com">
+hsbSOFT</a>.
+
+<p>Solving this task is not achievable using the functionality provided by the Revit API out of the box, but can be addressed by making use of two interesting tricks:
+
+<ul>
+<li>Splitting the wall into parts, which automatically take the wall layers into account.
+<li>Embedding the split into a temporary transaction so that it can be rolled back without affecting the model afterwards.
+</ul>
+
+<p>This provides a welcome first opportunity to present a practical use of the Revit 2012 parts functionality and the PartUtils class providing API access to it.
+
+<p>The technique of using a temporary transaction for geometry analysis purposes was originally suggested by Scott Conover of the Revit API development team and already mentioned several times here in the past, e.g. for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+gross material quantity extraction</a>.
+
+<p><strong>Question:</strong> I need to get the geometric information of the layers of a wall. 
+Specifically, I need to retrieve the four corner points of a layer to know its position within the wall. 
+
+<p>For example, if two walls are connected in a "Butt" type join, their layers are also connected using the same type join. 
+I would like to obtain this geometry information about layers. 
+
+<p>It would be very good if I can obtain the four points of a layer, or the two points. 
+Here is an image explaining the problem:</p>
+
+<center>
+<img src="img/compound_wall_layers.jpg" alt="Compound wall layers" width="500"/>
+</center>
+
+<p>I can see from the blog posts you listed above how to retrieve the layers of a wall.
+However, when two or more walls are joined, e.g. using abut, miter etc., also their layers are joined in the same fashion. 
+I want to get the four points of each layer:</p>
+
+<center>
+<img src="img/compound_wall_layer_joins.jpg" alt="Compound wall layer joins" width="500"/>
+</center>
+
+<p>The four points are different depending on the wall join. 
+
+<p>I looked into the Revit API help document, and I did find anything to access this information which is really necessary for us.  
+
+<p>Could you please advise me how to achieve this?
+
+
+
+<p><strong>Answer:</strong> The Revit API does not provide access to the geometrical information you seek out of the box. 
+On the other hand, though, here is the good news:
+
+<p>You could try splitting the wall into parts. 
+That will split it by layers. 
+Then you can access the geometry of each part individually. 
+
+<p>If you do so inside a temporary transaction that is rolled back afterwards, the model will remain unchanged.
+
+<p>Marcelo went ahead and implemented this, and the result works perfectly.
+
+<p>Here is a simple example of two walls with a compound internal layer structure:</p>
+
+<center>
+<img src="img/compound_walls_1.png" alt="Compound walls" width="300"/>
+</center>
+
+<p>Selecting the walls one at a time shows you that the individual wall layers have different lengths:</p>
+
+<center>
+<img src="img/compound_walls_2.png" alt="Compound wall layers" width="300"/>
+</center>
+
+<p>The arrangement of the wall layer corner points is non-trivial:</p>
+
+<center>
+<img src="img/compound_walls_3.png" alt="Compound wall layers" width="300"/>
+</center>
+
+<p>Marcelo's sample application GeometryPartsAnalyzer implements the suggestion above, determines the geometry of each wall layer by converting it into an individual temporary part, determines the bottom face of each part, and creates model line geometry to display it:</p>
+
+<center>
+<img src="img/compound_wall_layer_model_lines.png" alt="Model lines representing compound wall layers" width="400"/>
+</center>
+
+<p>The implementation includes several useful utility classes:
+
+<ul>
+<li>FaceExtractor
+<li>ModelLineCreator
+<li>WallSelectionFilter
+<li>CmdGeometryParts
+</ul>
+
+<p>The FaceExtractor queries a Revit element for its geometry, finds its solid, and extracts and returns all its faces.
+
+<p>Marcelo's ModelLineCreator is a simplified version of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/model-curve-creator.html">
+model curve creator</a> I 
+
+maintain in The Building Coder samples and last used to display model lines representing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/top-faces-of-wall.html">
+top faces of all walls</a>.
+
+<p>The WallSelectionFilter is a trivial selection filter to ensure that only walls can be selected.
+
+<p>CmdGeometryParts implements the external command.
+It makes use of the helper method GetBottomFacePoints to retrieve a list of points representing the bottom face of the given Revit element:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; GetBottomFacePoints( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; resultingPts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">FaceExtractor</span> faceExtractor 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FaceExtractor</span>( e );
+&nbsp;
+&nbsp; <span class="teal">FaceArray</span> faces = faceExtractor.Faces;
+&nbsp;
+&nbsp; <span class="blue">if</span>( faces.Size == 0 ) { <span class="blue">return</span> resultingPts; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = face <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pf == <span class="blue">null</span> ) { <span class="blue">continue</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pf.Normal.IsAlmostEqualTo( -<span class="teal">XYZ</span>.BasisZ ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> edgeLoops = face.EdgeLoops;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> edgeArray <span class="blue">in</span> edgeLoops )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> edgeArray )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; points 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = edge.Tessellate() <span class="blue">as</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; resultingPts.AddRange( points );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> resultingPts;
+}
+</pre>
+
+<p>Here is the CmdGeometryParts mainline Execute method, which performs the following steps:
+
+<ul>
+<li>Prompt the user to select the walls to process.
+<li>Use the PartUtils class to check whether the selected walls can be split into parts.
+<li>Start a temporary transaction for the part creation, so it can be rolled back later.
+<li>Create the parts and regenerate the model so the part geometry becomes accessible.
+<li>Extract the bottom faces of each part using the GetBottomFacePoints method.
+<li>Roll back the temporary transaction to undo the splitting of walls into parts.
+<li>Start a new transaction to create persistent model lines to display the part edges saved in the bottom face information.
+<li>Create the model lines.
+<li>Commit the second transaction.
+</ul>
+
+<p>Enjoy:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> cmdData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> msg, 
+&nbsp; <span class="teal">ElementSet</span> elems )
+{
+&nbsp; <span class="teal">Result</span> result = <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiApp = cmdData.Application;
+&nbsp; <span class="teal">UIDocument</span> uiDoc = uiApp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> strMsg = <span class="maroon">&quot;Select walls&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> filter 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">WallSelectionFilter</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; walls 
+&nbsp; &nbsp; &nbsp; = uiDoc.Selection.PickObjects( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, filter, strMsg );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( walls.Count == 0 ) { <span class="blue">return</span> result; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> reference <span class="blue">in</span> walls )
+&nbsp; &nbsp; &nbsp; ids.Add( reference.ElementId );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">PartUtils</span>.AreElementsValidForCreateParts(
+&nbsp; &nbsp; &nbsp; doc, ids ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; transaction.Start( <span class="maroon">&quot;parts&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Split walls into parts</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PartUtils</span>.CreateParts( doc, ids );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Regenerate document to get the part geometry</span>
+&nbsp;
+&nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve points from bottom faces of parts</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; bottomFacesPts 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">PartUtils</span>.HasAssociatedParts( doc, id ) )
+&nbsp; &nbsp; &nbsp; { 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>; 
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; partIds 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">PartUtils</span>.GetAssociatedParts( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, id, <span class="blue">true</span>, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> partId <span class="blue">in</span> partIds )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> part = doc.get_Element( partId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; bottomFacesPts.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetBottomFacePoints( part ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Do not affect the original state of walls</span>
+&nbsp;
+&nbsp; &nbsp; transaction.RollBack();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Draw lines to show the bottom faces of parts</span>
+&nbsp;
+&nbsp; &nbsp; transaction.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelLineCreator</span> model 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ModelLineCreator</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; bottomFacePts <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; bottomFacesPts )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; bottomFacePts.Count; ++i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; model.CreateLine( bottomFacePts[i - 1], 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; bottomFacePts[i], <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( bottomFacePts.Count &gt; 3 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; model.CreateLine( bottomFacePts[0], 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; bottomFacePts[bottomFacePts.Count - 1], 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; transaction.Commit();
+&nbsp;
+&nbsp; &nbsp; result = <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> e )
+&nbsp; {
+&nbsp; &nbsp; msg = e.Message;
+&nbsp; &nbsp; result = <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/GeometryPartsAnalyzer.zip">
+GeometryPartsAnalyzer.zip</a> including the complete source code and Visual Studio solution of this command.
+
+<p>Many thanks to Marcelo for his exploration and nice implementation!

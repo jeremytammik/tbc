@@ -1,0 +1,238 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Alexander Buschmann Re: TypePad: [The Building Coder] Alexander Buschmann submitted a comment on "Read Material Asset Parameter"
+
+08013712 [View Title check the show extension line]
+
+
+-->
+
+<h3>Parameters versus Properties</h3>
+
+<p>In his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/read-material-asset-parameter.html?cid=6a00e553e168978833017ee80eb1cc970d#comment-6a00e553e168978833017ee80eb1cc970d">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/read-material-asset-parameter.html">
+reading material asset data</a>,
+
+<a href="http://www.idat.de">Alexander Buschmann</a> points
+
+out that this same information can be accessed without retrieving, reading and converting the data directly from the undocumented built-in parameters.
+
+<p>Instead and more comfortably, you can use the following official properties on the appropriate classes:
+
+<pre class="code">
+&nbsp; <span class="teal">Material</span> material = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Material</span> mat <span class="blue">in</span> e.Materials )
+&nbsp; {
+&nbsp; &nbsp; material = mat;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp; <span class="teal">PropertySetElement</span> pse = doc.GetElement(
+&nbsp; &nbsp; material.StructuralAssetId )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">PropertySetElement</span>;
+&nbsp;
+&nbsp; <span class="teal">StructuralAsset</span> asset = pse.GetStructuralAsset();
+&nbsp;
+&nbsp; <span class="blue">double</span> a = asset.WoodBendingStrength;
+&nbsp; <span class="blue">double</span> b = asset.WoodParallelCompressionStrength;
+&nbsp; <span class="blue">double</span> c = asset.WoodParallelShearStrength;
+&nbsp; <span class="blue">double</span> d = asset.WoodPerpendicularCompressionStrength;
+&nbsp; <span class="blue">double</span> f = asset.WoodPerpendicularShearStrength;
+
+&nbsp; <span class="green">// ... and lots of other properties ...</span>
+</pre>
+
+<p>Even though a large and growing number of properties are available through this approach, the "Tension Parallel to Grain" one is actually currently not included in these, so you will indeed still have to use the direct parameter access anyway in this particular case.</p>
+
+<p>Going through parameters is more generic, and most properties available on the classes are also available via parameters.</p>
+
+<p>Parameters can also be used to define a parameter filter for a filtered element collector, so it is always useful to know that they are there and what they mean.</p>
+
+<p>To discover the existence and use of specific parameters, you can use RevitLookup and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/built-in-parameter-enumeration-duplicates-and-bipchecker-update.html">
+BipChecker</a> to
+
+explore a simple model.
+Modify the model interactively through the user interface and observe the effect on the parameters to discover their use and meaning.</p>
+
+<p>He also adds:</p>
+
+<p>For convenience, we use extension methods in our code to do this kind of thing, e.g.</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">ElementExtensions</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Material</span> material( <span class="blue">this</span> <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Material</span> m <span class="blue">in</span> e.Materials )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+}
+</pre>
+
+<p>If this class part of an imported namespace, it can be called as:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Material</span> material2 = e.material();
+</pre>
+
+<p>The compiler will translate that to this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Material</span> material3
+&nbsp; &nbsp; = <span class="teal">ElementExtensions</span>.material( e );
+</pre>
+
+<p>It is mostly just convenience, but it also improves the readability of the code, since the entire loop above collapses into just this one single property call.</p>
+
+<p>Many thanks to Alexander for pointing this out!</p>
+
+<p>Here are some pointers to other extension methods that we discussed in the past:</p>
+
+<!--
+183_scale_curve.htm
+303_extension_methods.htm
+485_cs_net_wonders.htm
+620_top_faces_of_wall.htm:I created a new class JtEdgeArrayExtensionMethods
+688_unit_display_str.htm
+700_materials_collection.htm
+798_revitrubyshell.htm
+810_room_in_area.htm
+829_family_param_shared.htm
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/scale-a-curve.html">
+Scale a curve</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html">
+GetPolygon extension methods</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/c-and-net-little-wonders.html">
+C# and .NET little wonders</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/07/top-faces-of-wall.html">
+Top faces of sloped wall</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/unit-conversion-and-display-string-formatting.html">
+Unit conversion and display string formatting</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/01/materials-collection-and-filtering.html">
+Materials collection and filtering</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/revitrubyshell-implementation-and-installer.html">RevitRubyShell implementation and installer</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/room-in-area-predicate-via-point-in-polygon-test.html">
+Room in area predicate via point in polygon test</a>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/familyparameter-isshared-property.html">
+FamilyParameter IsShared property</a>
+</ul>
+
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2013/01/changing-viewport-type.html?cid=6a00e553e168978833017d4046b782970c#comment-6a00e553e168978833017d4046b782970c
+
+Alexander Buschmann has left you a comment:
+
+Use ChangeTypeId-Method instead:
+
+// To change ViewType:
+
+Viewport vp = Autodesk.Revit.DB.Viewport.Create(...)
+ElementId id = getViewTypeId();
+vp.ChangeTypeId(id);
+
+// To get your ViewTypeId:
+
+ElementId getViewTypeId()
+{
+  FilteredElementCollector c = new FilteredElementCollector(doc);
+  c.WhereElementIsElementType();
+  c.Where( ..someRuleToIdentifyYourViewType.. );
+  return c.FirstElementId();
+}
+
+// To change properties of a ViewType:
+
+Parameter withLine = viewType.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_SHOW_EXTENSION_LINE);
+withLine.Set(0); // No Line
+withLine.Set(1); // Has Line
+
+Parameter withLabel = viewType.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_SHOW_LABEL);
+withLabel .Set(0); // No Label
+withLabel .Set(1); // Has Label
+
+Use ElementType.Duplicate to create a ViewType if your ViewType is not already defined in the Revit Project.
+
+-->
+
+<a name="2"></a>
+
+<h4>Show Viewport Extension Line or Label</h4>
+
+<p>Alexander also pointed out some other useful parameter to be aware of on the ViewType class in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/changing-viewport-type.html?cid=6a00e553e168978833017d4046b782970c#comment-6a00e553e168978833017d4046b782970c">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/changing-viewport-type.html">
+changing the viewport type</a>,
+
+and my colleague Joe Ye just ran into a case dealing with the very same issue:</p>
+
+<p><strong>Question:</strong> We can change the length of the view title line:</p>
+
+<center>
+<img src="img/view_title_line_1.png" alt="View title line"/>
+</center>
+
+<p>For that we have to go to edit type and check the show extension line toggle:</p>
+
+<center>
+<img src="img/view_title_line_2.png" alt="View title line check box" width="400"/>
+</center>
+
+<p>It is possible to achieve this using the API?</p>
+
+
+<p><strong>Answer:</strong> Yes, you can set that check box via the API as well.
+Here is the process:</p>
+
+<ol>
+<li>Get the view type object.
+<li>Get the parameter that represents the "Show Extension Line".
+<li>Change the parameter value.
+</ol>
+
+<p>Here is an example of performing these three steps:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> typeId = viewport.GetTypeId();
+&nbsp;
+&nbsp; <span class="teal">ViewType</span> viewtype = doc.GetElement( typeId )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ViewType</span>;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> withLine = viewtype.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; &nbsp; .VIEWPORT_ATTR_SHOW_EXTENSION_LINE );
+&nbsp;
+&nbsp; withLine.Set( 0 ); <span class="green">// No Line</span>
+&nbsp; withLine.Set( 1 ); <span class="green">// Has Line</span>
+</pre>
+
+<p>Alexander also points out that the built-in parameter VIEWPORT_ATTR_SHOW_LABEL affects the view label in a similar manner.</p>

@@ -1,0 +1,98 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Armand Marshall RE: TextNote.Width (solved) -->
+
+<h3>Setting Text Width Requires Regen</h3>
+
+<p>I presented a general introduction to the topic of regeneration in the discussion of my first Revit 2011 add-in, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html#6">
+pipe to conduit converter</a>, and
+
+in Kevin Vandecar's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">
+performance tips and tricks</a>.
+
+<p>We discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">
+danger of lacking regeneration calls</a>, 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">
+best regen practices</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">
+some performance issues</a> quite 
+
+a while ago, and an example of problems resulting from accessing stale data in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html">
+location curve of a newly inserted family instance</a>.
+
+<p>Here is another interesting and very clear little example of one of the many problems that you can run into if you forget to regenerate appropriately, raised and resolved by Armand Marshall of 
+
+<a href="http://www.eicengineers.com">
+EIC Engineers, Inc.</a>:
+
+<p><strong>Question:</strong> I've been working on reading values from an Excel file and creating text in Revit from that.
+I read the discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/textnote-rotation.html">
+TextNote rotation</a> and 
+
+notice that you read the TextNote.Width value.  
+When I create a TextNote myself and try to set the TextNote.Width, it doesn't seem to work:
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> activeDoc = commandData.Application
+&nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">View</span> currentView = activeDoc.ActiveView;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> origin = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> baseVec = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> upVec = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 1 );
+&nbsp;
+&nbsp; <span class="blue">double</span> lineWid = 0.125;
+&nbsp; <span class="blue">string</span> strText = string1;
+&nbsp;
+&nbsp; <span class="teal">TextNote</span> textNote
+&nbsp; &nbsp; = activeDoc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; currentView, origin, baseVec, upVec, lineWid,
+&nbsp; &nbsp; &nbsp; <span class="teal">TextAlignFlags</span>.TEF_ALIGN_CENTER
+&nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_MIDDLE, strText );
+&nbsp;
+&nbsp; textNote.Width = 21.2;
+</pre>
+
+<p>Setting the width seems to have no effect.  
+I am trying to set the width wide enough to avoid the text wrapping.
+
+<p>If I display the value in a task dialog, i.e. TaskDialog.Show("Test", textNote.Width.ToString()), it comes up and says that the width is zero.
+
+<p>Any idea what might be going on?
+
+<p><strong>Answer:</strong> Your code looks ok to me, and I am not aware of any issues with text notes and width at all.
+I am sure others are using this as well, so I cannot imagine what the problem might be.
+ 
+<p>The API documentation says: 
+<span style="color:darkblue">
+With this method, the width of the TextNote object can be retrieved and changed. 
+The set method will calculate the real width of the TextNote. 
+If the requested width is less than the real width, the real width will be set instead of the requested width.</span>
+ 
+<p>Have you tried using different alignment flags? 
+Different widths?
+
+<p><strong>Response:</strong> I figured out the problem!
+ 
+<p>After you create the TextNote, it is as if it doesn't exist until there is a regeneration.
+
+<p>So I added a call to activeDoc.Regenerate after creating it and before setting its width, and now it works fine.
+
+<p><strong>Answer:</strong> Yes, this is always a likely culprit, and I should definitely make a habit of always asking people what their regeneration option and transaction mode are before thinking of anything else.
+
+<p>Many thanks to Armand for this helpful example!

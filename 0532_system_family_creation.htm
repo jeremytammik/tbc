@@ -1,0 +1,80 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266650 [System Family Creation] -->
+
+<h3>System Family Creation</h3>
+
+<p>Here is a frequent query that came in once again today:
+
+<p><strong>Question:</strong> I would like to create new system families in the Revit project, specifically wall families, to represent my stored database values including data such as material, thickness and other required properties.
+
+<p>I would like to use the API to create a new wall and assign the structural layers their function and material.  
+I would appreciate some advice how to achieve the creation of these system family types.
+
+<p><strong>Answer:</strong> System families are built into Revit itself and cannot be modified, so the short answer to your question is simply 'No, you cannot create new system families'.
+
+<p>On the other hand, just like standard families, the purpose of system families is to provide types or symbols for use in the building model. 
+The types are represented by the ElementType base class, and it provides a Duplicate method which allows you to create new types of the same family.
+
+<p>Some system families are exposed as classes to the API, such as Wall. 
+In that case, the Wall class and its properties and methods define what you can do with it, and the wall types are represented by the WallType derived from ElementType.
+
+<p>Here is some VB code taken from the discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/creating-a-new-family-symbol.html">
+creating a new type</a> which 
+
+creates a new wall type using the Duplicate method, modifies it, and then assigns it to an existing wall:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> wallType <span class="blue">As</span> WallType = wall.WallType
+&nbsp;
+&nbsp; <span class="blue">Dim</span> newWallType <span class="blue">As</span> WallType _
+&nbsp; &nbsp; = <span class="blue">TryCast</span>(wallType.Duplicate( _
+&nbsp; &nbsp; &nbsp; newWallTypeName), WallType)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> layers <span class="blue">As</span> CompoundStructureLayerArray _
+&nbsp; &nbsp; = newWallType.CompoundStructure.Layers
+&nbsp;
+&nbsp; <span class="blue">For</span> <span class="blue">Each</span> layer <span class="blue">As</span> CompoundStructureLayer _
+&nbsp; &nbsp; <span class="blue">In</span> layers
+&nbsp;
+&nbsp; &nbsp; <span class="green">' double each layer thickness:</span>
+&nbsp;
+&nbsp; &nbsp; layer.Thickness *= 2.0R
+&nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; <span class="green">' assign the new wall type back to the wall:</span>
+&nbsp;
+&nbsp; wall.WallType = newWallType
+</pre>
+
+<p>For completeness sake, here is the same code in C#:
+
+<pre class="code">
+&nbsp; <span class="teal">WallType</span> wallType = wall.WallType;
+&nbsp;
+&nbsp; <span class="teal">WallType</span> newWallType = wallType.Duplicate( 
+&nbsp; &nbsp; newWallTypeName ) <span class="blue">as</span> <span class="teal">WallType</span>;
+&nbsp;
+&nbsp; <span class="teal">CompoundStructureLayerArray</span> layers 
+&nbsp; &nbsp; = newWallType.CompoundStructure.Layers;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">CompoundStructureLayer</span> layer <span class="blue">in</span> layers )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// double each layer thickness:</span>
+&nbsp;
+&nbsp; &nbsp; layer.Thickness *= 2.0;
+&nbsp; }
+
+&nbsp; <span class="green">// assign the new wall type back to the wall:</span>
+&nbsp;
+&nbsp; wall.WallType = newWallType;
+</pre>
+
+<p>In the current Revit API, you cannot create new layers in a wall type's compound layer structure.
+
+<p>The work-around for this is to create the required number of layers manually and save separate wall types for each number of layers in the template file used to create your project. 
+Then, when your application needs a new wall type with a specific number of layers, it can use a suitable one of the manually created predefined wall types and duplicate and modify that.

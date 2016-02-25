@@ -1,0 +1,71 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Filter for a Family</h3>
+
+<p>We already discussed the topic of
+
+<a href = "http://thebuildingcoder.typepad.com/blog/2009/01/family-category-and-filtering.html">
+family category and filtering</a>
+
+previously, but this question keeps cropping up anyway, so here is a repetition from a slightly different point of view by Saikat Bhattacharya.</p>
+
+<p><strong>Question:</strong>
+I am trying to get the loaded families with a LightingFixtures category.
+However, I am not getting the results I expected.
+I used the following code:</p>
+
+<pre class="code">
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">Filter</span> f1 = cf.NewTypeFilter(
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+<span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_LightingFixtures );
+&nbsp;
+<span class="teal">LogicAndFilter</span> f3 = cf.NewLogicAndFilter(
+&nbsp; f1, f2 );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt<span class="teal">Element</span>&gt;();
+
+doc.get_Elements( f3, a );
+
+<span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> a )
+{
+&nbsp; <span class="teal">Util</span>.InfoMsg( f.Name );
+}
+</pre>
+
+<p>No elements are returned from the Document using this filter.
+So, I retrieved all the families instead and checked if the category name of the family is "Lighting Fixtures".
+This is language dependant and consumes long time.
+How can I achieve this using filters?</p>
+
+<p><strong>Answer:</strong>
+As mentioned in the discussion on
+
+<a href = "http://thebuildingcoder.typepad.com/blog/2009/01/family-category-and-filtering.html">
+family category and filtering</a>,
+
+the Family class does not implement the Category property for all family files.
+Therefore, you cannot use a category filter to identify family files.</p>
+
+<p>If you retrieve all family files and check their category using some other means, like in you the workaround you describe, you can enhance performance and avoid the language dependence by comparing the category element id instead of its name string.</p>
+
+<p>By the way, you can always manually test and interactively simulate the result of any API filter by using the Revit SDK sample ElementsFilter.
+For a quick test, load a lighting fixture family into a new Revit document and run this sample with a family filter selecting the lighting fixture family.
+The following results show the Category as blank for the Family element:</p>
+
+<img src="img/filter_for_family.gif" alt="ElementsFilter results filtering for a family"/>
+
+<p>Instead of creating a filter using Family and Category, you can also change it to FamilySymbol and Category to obtain the symbols instead of the family elements.
+The Category property is always defined for family symbols.
+If you need the families, they are accessible from the symbols as well.
+If you simply replace typeof( Family ) by typeof( FamilySymbol ) in the definition of the filter f1 in the code above, it works fine.</p>

@@ -1,0 +1,277 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1254168 [Setting crop box of 3d view] -->
+
+<h3>Crop 3D View to Room</h3>
+
+<p>In case you have heard enough about both climbing and AU and AUv in the last few posts and would prefer to read about the Revit API and nothing but the Revit API, here is something for you.
+This is based on a recent case handled by Joe Ye and deals with the 3D view crop box and the transformations required to set it up properly, an issue we have never previously looked at.
+
+<p><strong>Question:</strong> I would like to set the crop box of a 3D view to correspond to a single room.
+
+<p><strong>Answer:</strong> As the 3D view rotates the room, the original bounding box of the plan view will not be suitable to use for the 3D view crop box.
+Here is an idea to calculate the crop box.  
+Retrieve all the corner point vertex coordinates of the room, and project them onto the plane perpendicular to the 3D view's view direction. 
+This produces projected point coordinates.  
+From these result point coordinates, determine the maximum and minimum X and Y values.  
+From the max and min points, create the 3D view's crop box.
+
+<p>Here are the detailed steps to implement this idea:
+
+<ul>
+<li>Retrieve all vertex coordinates of the room.
+
+<li>Project these coordinates to the plane perpendicular to the 3D view's view direction.   
+To do so, create a face perpendicular to the view direction. 
+The projected results can be obtained from the Face.Project method taking an XYZ point argument. 
+For more information, see the Revit API help file RevitAPI.chm for the usage and return value of this method.
+
+<li>Go through the resulting coordinates and determine the maximum and minimum X and Y coordinate values.
+
+<li>Use the four values to determine a bounding box:
+
+<pre>
+BoundingBoxXYZ bb = new BoundingBoxXYZ(); 
+bb.Min = NewXYZ( xMin, yMin, 0 );
+bb.Max = NewXYZ( xMax, yMax, 0 );
+</pre>
+
+<li>Use the bounding box to set the 3D view crop box:
+
+<pre>
+View3d.CropBox = bb;
+</pre>
+</ul>
+
+<p>Actually, after some further investigation, I found a better way to determine the room extents. 
+It is hard to create a solid and make one face of it perpendicular to the view direction.
+
+<p>You can also use the Transform class to calculate the crop box of the 3D view instead.  
+
+<p>First, determine the transformation for translating coordinates in the 3D view to the world coordinate system WCS from the View3d.CropBox.Transform property. 
+Then invert it to obtain the transformation to translate model WCS coordinates back to the 3D view coordinates. 
+
+<p>Determine the room vertices from its ClosedShell property, and translate them to 3D view coordinates. 
+Find the minimum and maximum X and Y coordinate values as described above and set the 3D view's crop box Max and Min properties using these.
+
+<p>You do need to activate and make the crop box visible to see the effect.
+You can do so using the Crop View and Show Crop Region buttons in the user interface:</p>
+
+<center>
+<img src="img/crop_settings.png" alt="Activate 3D view crop box"/>
+</center>
+
+<p>This can also be achieved programmatically using:</p>
+
+<pre class="code">
+  view3d.CropBoxActive = true;
+  view3d.CropBoxVisible = true;
+</pre>
+
+<p>So far for Joe's idea. Many thanks to Joe for all the research into this!
+
+<p>I implemented a new Building Coder sample command CmdCropToRoom to test and demonstrate this.
+In order to show how the crop box can be set to various different regions in the model, it iterates over all the rooms in the model and sets the crop box of the current 3D view to the next room in the sequence on each call.
+We retrieve a list of all rooms in the model using doc.get_Elements:
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; rooms = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+<span class="blue">int</span> n = doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Room</span> ), rooms );
+</pre>
+
+<p>To loop through the rooms in the model and step to the next room in the list on each invocation of the command, we use their index in the list of elements returned by this call.
+The last index used is stored in a static variable _i, and the method BumpRoomIndex is used to increment it by one on each call:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">int</span> _i = -1;
+
+<span class="blue">static</span> <span class="blue">int</span> BumpRoomIndex( <span class="blue">int</span> room_count )
+{
+&nbsp; ++_i;
+&nbsp;
+&nbsp; <span class="blue">if</span>( _i &gt;= room_count )
+&nbsp; {
+&nbsp; &nbsp; _i = 0;
+&nbsp; }
+&nbsp; <span class="blue">return</span> _i;
+}
+</pre>
+
+<p>The next room to crop the view to is selected using 
+
+<pre class="code">
+<span class="teal">Room</span> room = (0 &lt; n) 
+&nbsp; ? rooms[BumpRoomIndex( n )] <span class="blue">as</span> <span class="teal">Room</span> 
+&nbsp; : <span class="blue">null</span>;
+</pre>
+
+<p>Here is the entire code of the CmdCropToRoom external command Execute method which crops the current 3D view to the next room extents:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">View3D</span> view3d = doc.ActiveView <span class="blue">as</span> <span class="teal">View3D</span>;
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == view3d )
+{
+&nbsp; message = <span class="maroon">&quot;Please activate a 3D view&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot; before running this command.&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// get the 3d view crop box:</span>
+&nbsp;
+<span class="teal">BoundingBoxXYZ</span> bb = view3d.CropBox;
+&nbsp;
+<span class="green">// get the transform from the current view </span>
+<span class="green">// to the 3D model:</span>
+&nbsp;
+<span class="teal">Transform</span> transform = bb.Transform;
+&nbsp;
+<span class="green">// get the transform from the 3D model </span>
+<span class="green">// to the current view:</span>
+&nbsp;
+<span class="teal">Transform</span> transformInverse = transform.Inverse;
+&nbsp;
+<span class="green">// get all rooms in the model:</span>
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; rooms = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+<span class="blue">int</span> n = doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Room</span> ), rooms );
+&nbsp;
+<span class="teal">Room</span> room = (0 &lt; n) 
+&nbsp; ? rooms[BumpRoomIndex( n )] <span class="blue">as</span> <span class="teal">Room</span> 
+&nbsp; : <span class="blue">null</span>;
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == room )
+{
+&nbsp; message = <span class="maroon">&quot;No room element found in project.&quot;</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="green">// collect all vertices of room closed shell </span>
+<span class="green">// to determine its extents:</span>
+&nbsp;
+<span class="teal">GeoElement</span> e = room.ClosedShell;
+<span class="teal">XYZArray</span> vertices = app.Create.NewXYZArray();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">GeometryObject</span> o <span class="blue">in</span> e.Objects )
+{
+&nbsp; <span class="blue">if</span>( o <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// iterate over all the edges of all solids:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = o <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> solid.Edges )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> edge.Tessellate() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// collect all vertices, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// including duplicates:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; vertices.Append( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+&nbsp;
+<span class="teal">XYZArray</span> verticesIn3dView 
+&nbsp; = app.Create.NewXYZArray();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> vertices )
+{
+&nbsp; verticesIn3dView.Append( 
+&nbsp; &nbsp; transformInverse.OfPoint( p ) );
+}
+&nbsp;
+<span class="green">// ignore the Z coorindates and find the </span>
+<span class="green">// min and max X and Y in the 3d view:</span>
+&nbsp;
+<span class="blue">double</span> xMin = 0, yMin = 0, xMax = 0, yMax = 0;
+&nbsp;
+<span class="blue">bool</span> first = <span class="blue">true</span>;
+<span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> verticesIn3dView )
+{
+&nbsp; <span class="blue">if</span>( first )
+&nbsp; {
+&nbsp; &nbsp; xMin = p.X;
+&nbsp; &nbsp; yMin = p.Y;
+&nbsp; &nbsp; xMax = p.X;
+&nbsp; &nbsp; yMax = p.Y;
+&nbsp; &nbsp; first = <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( xMin &gt; p.X )
+&nbsp; &nbsp; &nbsp; xMin = p.X;
+&nbsp; &nbsp; <span class="blue">if</span>( yMin &gt; p.Y )
+&nbsp; &nbsp; &nbsp; yMin = p.Y;
+&nbsp; &nbsp; <span class="blue">if</span>( xMax &lt; p.X )
+&nbsp; &nbsp; &nbsp; xMax = p.X;
+&nbsp; &nbsp; <span class="blue">if</span>( yMax &lt; p.Y )
+&nbsp; &nbsp; &nbsp; yMax = p.Y;
+&nbsp; }
+}
+&nbsp;
+<span class="green">// grow the crop box by one twentieth of its </span>
+<span class="green">// size to include the walls of the room:</span>
+&nbsp;
+<span class="blue">double</span> d = 0.05 * ( xMax - xMin );
+xMin = xMin - d;
+xMax = xMax + d;
+&nbsp;
+d = 0.05 * ( yMax - yMin );
+yMin = yMin - d;
+yMax = yMax + d;
+&nbsp;
+bb.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( xMax, yMax, bb.Max.Z );
+bb.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( xMin, yMin, bb.Min.Z );
+&nbsp;
+view3d.CropBox = bb;
+&nbsp;
+<span class="green">// change the crop view setting manually or </span>
+<span class="green">// programmatically to see the result:</span>
+&nbsp;
+view3d.CropBoxActive = <span class="blue">true</span>;
+view3d.CropBoxVisible = <span class="blue">true</span>;
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>Here is a minimal model with two rooms to test this command:</p>
+
+<center>
+<img src="img/crop_to_room_0.png" alt="Sample model with 3D view of two rooms"/>
+</center>
+
+<p>Running the external command defined by CmdCropToRoom sets the 3D view crop box to the extents of the first room:</p>
+
+<center>
+<img src="img/crop_to_room_1.png" alt="3D view crop box set to first room extents"/>
+</center>
+
+<p>Running it another time increments the current room index and sets the 3D view crop box to its extents instead:</p>
+
+<center>
+<img src="img/crop_to_room_2.png" alt="3D view crop box set to next room extents"/>
+</center>
+
+<p>Here is
+
+<a href="zip/bc11056.zip">
+version 1.1.0.56</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>
+
+<p>There are a number of conceivable enhancements to this code.
+One of the most obvious would be to eliminate duplicate vertices before applying the inverse transformations and searching for the minimum and maximum coordinate values.
+We did implement some useful functionality for doing that with the XyzEqualityComparer class and GetVertices method in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instances geometry retrieval</a>.
+
+It might also be possible to use generic collections such as List&lt;XYZ&gt; instead of XYZArray for the original and transformed vertices, and generic .NET functionality to apply the transformation and determine the max and min coordinate values.
+We left out such enhancements in this case for the sake of clarity, but if you have any suggestions to make, please feel free to do so.

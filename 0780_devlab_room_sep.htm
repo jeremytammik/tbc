@@ -1,0 +1,113 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>DevLab and Room Separation</h3>
+
+<p>Today is DevLab with almost fifty participants, so we are in several separate rooms.
+I never left the Revit room, and am busy enough with that.
+Talk about room separation.
+
+<p>Here are one or two little items that cropped up today, contributed by Eric Boehlke of
+
+<a href="http://www.truevis.com">
+truevis.com</a>.
+
+The first is actually a question on the creation of room separation lines that I already replied to in response to a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/on-creating-a-mass-from-3d-points.html?cid=6a00e553e168978833016303fac96e970d#comment-6a00e553e168978833016303fac96e970d">
+comment</a> from 
+
+Ammar on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/on-creating-a-mass-from-3d-points.html">
+creating a mass</a>:
+
+<a name ="2"></a>
+
+<h4>Creating a Room Separation Line</h4>
+
+<p><strong>Question:</strong> It seems that we have no access to create room separation lines?
+
+<p><strong>Answer:</strong> Please check out the NewRoomBoundaryLines, NewSpaceBoundaryLines, NewSpaces and other related methods.
+
+<p>Eric ran into the same issue, and the answer I provided to Ammar does not show up in his Google search attempt, so here it is now, promoted to a main blog post status.
+
+<p>Here is Eric's code snippet to generate a 10 by 8 room by first creating a rectangular sequence of four room separation lines using the NewRoomBoundaryLines method on a given level:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create a room on a given level.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> CreateRoom( 
+&nbsp; <span class="teal">Document</span> doc, 
+&nbsp; <span class="teal">Level</span> level )
+{
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> 
+&nbsp; &nbsp; appCreation = app.Create;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> 
+&nbsp; &nbsp; docCreation = doc.Create;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> pt1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, -5, 0 );
+&nbsp; <span class="teal">XYZ</span> pt2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 5, 0 );
+&nbsp; <span class="teal">XYZ</span> pt3 = <span class="blue">new</span> <span class="teal">XYZ</span>( 8, 5, 0 );
+&nbsp; <span class="teal">XYZ</span> pt4 = <span class="blue">new</span> <span class="teal">XYZ</span>( 8, -5, 0 );
+&nbsp;
+&nbsp; <span class="teal">Line</span> line1 = appCreation.NewLine( pt1, pt2, <span class="blue">true</span> );
+&nbsp; <span class="teal">Line</span> line2 = appCreation.NewLine( pt2, pt3, <span class="blue">true</span> );
+&nbsp; <span class="teal">Line</span> line3 = appCreation.NewLine( pt3, pt4, <span class="blue">true</span> );
+&nbsp; <span class="teal">Line</span> line4 = appCreation.NewLine( pt4, pt1, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> curveArr = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; curveArr.Append( line1 );
+&nbsp; curveArr.Append( line2 );
+&nbsp; curveArr.Append( line3 );
+&nbsp; curveArr.Append( line4 );
+&nbsp;
+&nbsp; docCreation.NewRoomBoundaryLines(
+&nbsp; &nbsp; doc.ActiveView.SketchPlane,
+&nbsp; &nbsp; curveArr, doc.ActiveView );
+&nbsp;
+&nbsp; <span class="green">// Create a new room</span>
+&nbsp;
+&nbsp; <span class="teal">UV</span> tagPoint = <span class="blue">new</span> <span class="teal">UV</span>( 4, 0 );
+&nbsp;
+&nbsp; <span class="teal">Room</span> room = docCreation.NewRoom( 
+&nbsp; &nbsp; level, tagPoint );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == room )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Create a new room failed.&quot;</span> );
+&nbsp; }
+&nbsp; room.Number = <span class="maroon">&quot;42&quot;</span>;
+&nbsp; room.Name = <span class="maroon">&quot;Lobby&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">RoomTag</span> tag = docCreation.NewRoomTag( 
+&nbsp; &nbsp; room, tagPoint, doc.ActiveView );
+}
+</pre>
+
+
+<a name ="3"></a>
+
+<h4>CopyPathEx and Other Nifty Utilities</h4>
+
+<p>Eric also pointed to a list of 
+
+<a href="http://revitlearningclub.blogspot.com/2011/12/great-freeware-for-revit-work.html">
+great freeware for Revit work</a>,
+
+from which I immediately installed 
+
+<b><a href="http://www.mlin.net/other.shtml">PathCopyEx</a></b>
+
+<a href="http://www.mlin.net/files/PathCopyEx.msi">PathCopyEx.msi</a>.
+
+Many thanks to Eric for his code snippet and helpful pointers!
+
+<p>Now I have to start thinking about getting down to the airport in time for my flight back home to Europe...

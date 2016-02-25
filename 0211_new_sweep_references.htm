@@ -1,0 +1,118 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>New Sweep and References</h3>
+
+<p>Here is a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html?cid=6a00e553e1689788330120a55da0b8970c#comment-6a00e553e1689788330120a55da0b8970c">
+question</a>
+
+posted by Mike Cotreau of
+
+<a href="http://www.langan.com">
+Langan Engineering & Environmental Services</a>
+
+on how to create a new sweep using a reference array, which provided a welcome opportunity to explain a little about the use of references in the Revit API:</p>
+
+<p><strong>Question:</strong>
+I want to use the NewSweep method to create a 3D curb line that follows along a path of 3D points. 
+The NewSweep method can be invoked in two ways, one uses a ReferenceArray and the second uses a CurveArray. 
+There is an example provided in the VSTA Family Sample code that illustrates the CurveArray version and I have used that code to layout an entire curbline without issues. 
+Unfortunately, I need to use the first version that allows for a sweep to follow a 3D path using the ReferenceArray version. 
+I keep getting an error saying the object is not referenced, and I am clueless as to why.
+I am using VB.NET and here is the code I modified from the sample code:</p>
+
+<pre class="code"> 
+<span class="blue">Dim</span> arrarr <span class="blue">As</span> CurveArrArray = m_revit.Create.NewCurveArrArray()
+<span class="blue">Dim</span> arr <span class="blue">As</span> CurveArray = m_revit.Create.NewCurveArray()
+<span class="green">'****** This creates the section for the curb ********</span>
+<span class="blue">Dim</span> normal <span class="blue">As</span> XYZ = XYZ.BasisZ
+<span class="blue">Dim</span> sketchPlane <span class="blue">As</span> SketchPlane = CreateSketchPlane(normal, XYZ.Zero)
+<span class="blue">Dim</span> pnt1 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(0, 0, 0)
+<span class="blue">Dim</span> pnt2 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(0, 0.5, 0)
+<span class="blue">Dim</span> pnt3 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(0.5, 0.5, 0)
+<span class="blue">Dim</span> pnt4 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(0.5, -1, 0)
+<span class="blue">Dim</span> pnt5 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(0, -1, 0)
+arr.Append(m_revit.Create.NewLineBound(pnt1, pnt2))
+arr.Append(m_revit.Create.NewLineBound(pnt2, pnt3))
+arr.Append(m_revit.Create.NewLineBound(pnt3, pnt4))
+arr.Append(m_revit.Create.NewLineBound(pnt4, pnt5))
+arr.Append(m_revit.Create.NewLineBound(pnt5, pnt1))
+arrarr.Append(arr)
+<span class="blue">Dim</span> profile <span class="blue">As</span> SweepProfile = m_revit.Create.NewCurveLoopsProfile(arrarr)
+<span class="blue">Dim</span> curves <span class="blue">As</span> CurveArray = m_revit.Create.NewCurveArray()
+<span class="blue">Dim</span> refArray <span class="blue">As</span> ReferenceArray = m_revit.Create.NewReferenceArray
+<span class="blue">Dim</span> pt1 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(-265.9978, -358.3954, 0)
+<span class="blue">Dim</span> pt2 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(-265.9374, -340.4006, 0)
+<span class="blue">Dim</span> curve <span class="blue">As</span> Curve = m_revit.Create.NewLineBound(pt1, pt2)
+curves.Append(curve)
+refArray.Append(curve.Reference)
+<span class="green">'Create the Sweep</span>
+<span class="blue">Dim</span> sweep1 <span class="blue">As</span> Sweep = m_creationFamily.NewSweep(<span class="blue">True</span>, refArray, profile, 0, ProfilePlaneLocation.Start)
+<span class="green">' move to proper place </span>
+<span class="blue">Dim</span> transPoint1 <span class="blue">As</span> XYZ = m_revit.Create.NewXYZ(11, 0, 0)
+m_familyDocument.Move(sweep1, transPoint1)
+</pre>
+
+<p>An exception is thrown on the NewSweep method. I have also tried building the Reference array using code like this without any luck:
+
+<pre>
+refArray.Append(curve.get_EndPointReference(0))
+refArray.Append(curve.get_EndPointReference(1))
+</pre>
+
+<p>Any help you can provide that allows me to sweep along a 3D path would be GREATLY appreciated.
+
+<p><strong>Answer:</strong>
+NewSweep is used in the family document to create a new sweep.
+The overloads you refer to for creating a new sweep form are:</p>
+
+<ul>
+<li>NewSweep( Boolean, ReferenceArray, SweepProfile, Int32, ProfilePlaneLocation ), using an array of selected references as a 3D path.
+<li>NewSweep( Boolean, CurveArray, SketchPlane, SweepProfile, Int32, ProfilePlaneLocation ), using a path of curve elements. 
+</ul>
+
+<p>The three last arguments are the same for both overloads, so these are presumably not cause of the problem:
+
+<ul>
+<li>SweepProfile profile,
+<li>int profileLocationCurveIndex, and 
+<li>ProfilePlaneLocation profilePlaneLocation.
+</ul>
+
+<p>The API documentation specifies the reference array passed in to define the path in the first overload as follows:</p>
+
+<ul>
+<li>ReferenceArray path: 
+The path of the sweep. 
+The path should be reference of curve or edge obtained from existing geometry.
+</ul>
+
+<p>The cause of your problem is almost certainly the fact that the curve that you are trying to obtain references from is not part of any existing geometry, since you created it on the fly.
+
+<p>To understand the difference and the importance of this, here are some private hypothetical musings of mine on what references actually mean within Revit.
+I have never seen any hard documentation of this, but I am gradually getting the following idea:</p>
+
+<h4>References</h4>
+
+<p>All of objects living in the Revit API Geometry namespace are transient in-memory objects.
+The non-transient Revit BIM model resides in the database.
+To query the geometry of BIM objects, transient geometry is generated on the fly from their parametric representations.
+If a new BIM object B is to be generated and stored in the database, such as your sweep, and it needs to reference existing BIM geometry in any way, for instance some edge of an existing object A, then a reference can be generated to provide a hook from the new object B definition through the transient geometry back to the underlying BIM object A.
+Later on, when the BIM is saved, the transient geometry has all disappeared, but the reference ensures that B knows that it depends on the geometry and location of A in some way.
+If A is moved or modified, B can adapt.
+
+<p>In your sample, you are creating a new line between two fixed points pt1 and pt2.
+This is all transient geometry, and not referring back to any BIM object, so there is no way that the resulting curve can contain or provide a valid reference to anything.
+
+<p>The question is why you are trying to use the overload requiring a reference array at all?
+If your input data is fixed, you should use the curve array option instead.
+
+<p>By the way, for completeness sake, prompted by your query, I had a look at the VSTA family samples.
+They are provided in the Revit SDK VSTA Samples sub-folder, in the family file Revit_VSTA_Family_Samples.rfa.
+I see the code you based yours on, in the subroutine CreateSweep() of the GenericModelCreation project.
+This project is also provided as one of the standard SDK samples as well, albeit only in a C# version.</p>
+
+<p>I hope this answers your question. Good luck!

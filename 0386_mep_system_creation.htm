@@ -1,0 +1,235 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1260187 [MEP system creation fails] -->
+
+<h3>MEP System Creation</h3>
+
+<p>Yesterday was a great day here at the AEC DevCamp, except that I was unable to attend a session held by Scott Conover presenting material by Arno&scaron;t L&ouml;bel, since it collided with my own.
+I enjoyed myself in the latter, anyway, and so did the audience, it seemed.
+
+<p>Meanwhile, life outside DevCamp is also continuing, and here is a very interesting case submitted by my old friend Thomas Wegener and handled by Joe Ye on Revit MEP system creation.
+Our MEP expert Martin Schmid and Jorgen Dahl have also chipped in to help answer this.
+
+<p><strong>Question:</strong> I am working at creating a new duct system using the Revit API method
+
+<pre>
+MechanicalSystem NewMechanicalSystem(
+  Connector baseEquipmentConnector,
+  ConnectorSet connectors,
+  DuctSystemType );
+</pre>
+
+<p>According to the API documentation, the base equipment is optional for the system, so this argument may be a null reference.
+
+<p>In spite of this, I am always getting an exception if I try to create the system without the base equipment. Why?
+
+<p>I have also the feeling that Revit is checking the connector directions for specific systems, e.g. an air supply system requires a base equipment with an "out connector", and an air return system requires an "in connector". 
+Is that true? 
+If so, is there a rule list for all pipe and duct systems?
+
+<p>Or are there general requirements like:
+
+<ul>
+<li>A system is always structured as a tree, with a singleton root, the base equipment connector.
+<li>If the base equipment connector is an "out connector" all other equipment connectors must be "in" and vice versa.
+</ul>
+
+<p><strong>Answer:</strong> Yes, you are correct in that these kind of rules exist and they are not completely documented in the API reference material.
+
+<p>I implemented the following test code to create a new mechanical system without a base equipment.
+It can be used on the RVT model file provided with the AutoRoute sample in the 2011 SDK.
+Please select the two air terminals and launch the command. 
+It creates a mechanical system consisting of these two air terminals:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdNewDuctSystem</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;New Duct System&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectorSet = <span class="blue">new</span> <span class="teal">ConnectorSet</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> baseConnector = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSetIterator</span> csi;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// select a Parallel Fan Powered VAV </span>
+&nbsp; &nbsp; <span class="green">// and some Supply Diffusers prior to running </span>
+&nbsp; &nbsp; <span class="green">// this command</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> selection = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> selection )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Family</span> family = fi.Symbol.Family;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// assume the selected Mechanical Equipment </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// is the base equipment for new system:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( family.FamilyCategory.Name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="maroon">&quot;Mechanical Equipment&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// find the &quot;Out&quot; and &quot;SupplyAir&quot; connectors</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// on the base equipment</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi.MEPModel )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; csi = fi.MEPModel.ConnectorManager
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Connectors.ForwardIterator();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">while</span>( csi.MoveNext() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> conn = csi.Current <span class="blue">as</span> <span class="teal">Connector</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( conn.Direction == <span class="teal">FlowDirectionType</span>.Out
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; conn.DuctSystemType == <span class="teal">DuctSystemType</span>.SupplyAir )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; baseConnector = conn;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( family.FamilyCategory.Name == <span class="maroon">&quot;Air Terminals&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// add selected Air Terminals to </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// connector set for new mechanical system</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; csi = fi.MEPModel.ConnectorManager
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Connectors.ForwardIterator();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; csi.MoveNext();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; connectorSet.Insert( csi.Current <span class="blue">as</span> <span class="teal">Connector</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create a new SupplyAir mechanical system</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MechanicalSystem</span> ductSystem = doc.Create.NewMechanicalSystem(
+&nbsp; &nbsp; &nbsp; baseConnector, connectorSet, <span class="teal">DuctSystemType</span>.SupplyAir );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Regarding the base connector direction, I didn't see any documentation that explicitly points out this rule.
+According to my test, in a supply air system, if I select a connector whose direction is FlowDirectionType.In, then it fails to create the system, so the following rule that you assumed probably does apply:
+
+<ul>
+<li>If the base equipment connector is an "out connector" all other equipment connectors must be "in" and vice versa.
+</ul>
+
+<p><strong>Response:</strong> Thank you, you are right, your code works for me as well without providing a base connector for the SupplyAir system.
+
+<p>If you change the DuctSystemType.SupplyAir in the call to NewMechanicalSystem to DuctSystemType.ReturnAir your code will fail too in the AutoRoute model.
+It works again if you insert return air terminals instead (also without the base connector).
+
+<p>I am still unclear about the constraints between:
+
+<ul>
+<li>Base connector direction and system types, for both duct and pipe.
+<li>ConnectorSet and system types, for both duct and pipe.
+</ul>
+
+<p><strong>Answer:</strong> According to my testing so far, I found that this is necessary: an air supply system needs an 'out connector' as a base equipment connector.
+
+<p>The 'rules' you refer to are right on.
+
+<p>Here is the material from Martin Schmid's presentation ME204-3 'Getting into the Flow: Understanding Connectors in Revit MEP Content' at Autodesk University 2008, which deals with this topic.
+It does not cover everything, as quite a bit was left for the in-class demo, but should help:
+
+<ul>
+<li><a href="zip/ME204-3_Connectors_in_Revit_MEP_Content.pdf">PDF handout document</a>.
+<li><a href="zip/ME204-3_Connectors_in_Revit_MEP_Content.ppt">PPT presentation</a>.
+</ul>
+
+<p>In summary, yes, the flow direction has to match and systems should be setup as a "tree".
+The flow direction should be based on the system type.
+
+<p>Flow direction should be set to "out" on the base equipment and "in" on all other equipment for a supply system.
+The reverse is true for return systems.
+
+<p>Here is the more detailed specification extracted from Martin's material:
+
+<h4>Creating Duct Systems</h4>
+
+<p>Systems can be created from equipment or air terminals:
+
+<ol>
+<li>Supply Air systems can be created containing families with a Supply Air IN Connector
+<li>Return Air systems can be created containing families with a Return Air OUT Connector
+<li>Exhaust Air systems can be created containing families with an Exhaust Air OUT Connector
+</ol>
+
+<p>Note: You cannot create an 'Other' air system.
+
+<p>Mechanical Equipment Families can be the 'equipment for the system' using the following logic.
+The equipment must have a:
+
+<ol>
+<li>Supply Air OUT connector to be the equipment for a Supply Air system.
+<li>Return Air IN connector to be the equipment for a Return Air system.
+<li>Exhaust Air IN connector to be the equipment for an Exhaust Air system.
+</ol>
+
+<p>Thus, it is possible to create a system named 'Relief Air' by using components with Return or Exhaust system connectors.
+Similarly, a system named 'Outside Air' can be created using components with Supply system connectors.
+
+<p>So you assumption of the relationship between connector's direction and system type is correct.
+
+<p>Furthermore, just as you say, a system is always structured as a tree, with a singleton root, the base equipment connector.
+
+<p><strong>Final question:</strong> You described rules for duct systems.
+For pipe systems, Revit provides types like SupplyHydronic, ReturnHydronic, etc. 
+Are there similar restrictions as above defined for duct systems?
+
+<p><strong>Answer:</strong> Yes, for pipe systems, the rules are similar.
+The following rule of connector direction always applies in Revit MEP:
+
+<p>Flow direction has to match and systems should be setup as a tree. 
+What the flow direction should be is based on the system type.
+
+<p>Flow direction should be set to out on the base equipment and in on all other equipment for a supply system. 
+The reverse is true for return systems.
+
+<p>I packaged the test code provided by Joe above as a new external command CmdNewDuctSystem in The Building Coder samples.
+
+Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_71.zip -->
+
+<a href="zip/bc_11_71.zip">
+version 2011.0.71.0</a>
+
+of the complete source code and Visual Studio solution including the new command.
+
+<p>Many thanks to all involved for this interesting discussion.
+
+<p>Time for packing, checking out, breakfast and a new day at DevCamp now.
+Once again I am admiring a wonderful view on the brilliant morning outside the window.
+Again the cloudless blue sky which started out in all kinds of beautiful hues shifting from red and pink and orange through to clear blue and sunny now.
+
+<p>My session today is on the Revit MEP API, so this was a good warm-up to get into the subject...

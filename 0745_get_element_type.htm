@@ -1,0 +1,108 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07110970 [How to get an element's Type parameters] -->
+
+<h3>GetElement method and Get Element Type</h3>
+
+<p>In the far distant past, the Revit API boasted a property on the Element class that gave direct access to the element type.
+
+It was declared obsolete, and a new way to access the element type had to be implemented, and we discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/get-element-type.html">
+two years back</a>.
+
+This can still raise an issue even today:
+
+<p><strong>Question:</strong> I have an old plug-in that I am trying to update to Revit 2013. The code uses a property (element.ObjectType) that has been made obsolete and that is no longer in the 2013 API. The obsolete call uses objElement.ObjectType.Parameters. The suggested replacement (Element.GetElementType) does not have a Parameters property. So, my question is, in Revit 2013, how do I get the Type parameters from an element in a project?
+
+Here is a section of my code containing this obsolete call:
+
+<pre class="code">
+&nbsp; <span class="green">// Repeat the loop for the Type parameters </span>
+&nbsp; <span class="green">// on the element and assign values</span>
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> param <span class="blue">in</span>
+&nbsp; &nbsp; objElement.ObjectType.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . . </span>
+&nbsp; }
+</pre>
+
+<p><strong>Answer:</strong> The Element ObjectType property was actually declared deprecated quite a few releases back, and still remained dangling until a whole host of obsolete calls were cleaned up in the Revit 2013 API.
+
+<p>The replacement is simple:
+
+<p>Use GetTypeId to obtain the element id of the type of your element, and then use the document GetElement method to access the type object itself from its id. Here is the code to achieve that:
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> id = e.GetTypeId();
+&nbsp;
+&nbsp; <span class="teal">ElementType</span> type = doc.GetElement( id )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ElementType</span>;
+</pre>
+
+<p>I discussed this
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/get-element-type.html">
+two years back</a>.
+
+Since then, another change occurred as well, which Saikat mentioned in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/migrating-vsta-macros-to-sharpdevelop.html">
+macro migration notes</a>:
+
+<p>The Document.Element property taking an element id argument has been converted to a method named GetElement in Revit 2013.
+
+<p>The obsolete Element property was converted to a method with a "get_" prefix in C#, so it had to be accessed by calling get_Element, which sometimes
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/document-elements.html">
+caused a bit of confusion</a>.
+
+<p>Anyway, translated to your example code snippet, the new access might look like this in Revit 2013:
+
+<pre class="code">
+&nbsp; <span class="green">// Repeat the loop for the element </span>
+&nbsp; <span class="green">// type parameters and assign values</span>
+&nbsp;
+&nbsp; <span class="teal">Element</span> elementType = doc.GetElement(
+&nbsp; &nbsp; e.GetTypeId() );
+&nbsp;
+&nbsp; <span class="blue">foreach</span> (<span class="teal">Parameter</span> param <span class="blue">in</span> elementType.Parameters)
+</pre>
+
+
+<a name="2"></a>
+
+<h4>Element Display Overrides and Visibility Hierarchy</h4>
+
+<!-- graphics view -->
+
+<p>Revit provides a large number of ways to affect and override the display of an element, and it may not always be clear which method has the final say.
+
+<p>We had a look at one of these ways when describing how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/change-element-colour.html">
+change element colour using ProjColorOverrideByElement</a>.
+
+<!-- <p>The developer guide has little to say about how this can be managed programmatically. -->
+
+<p>The Revit Clinic provides a useful overview of the
+
+<a href="http://revitclinic.typepad.com/my_weblog/2012/02/revit-visibility-hierarchy.html">
+Revit visibility hierarchy</a> which
+
+helps understand the various possibilites and how they relate to each other.
+
+
+<a name="3"></a>
+
+<h4>Happy Easter!</h4>
+
+<p>I wish a Happy Easter to everybody celebrating this holiday, and a good time to everybody else as well  :-)</p>
+
+<center>
+<img src="img/Easter_Bunny_Postcard_1907.jpg" alt="Easter bunny postcard"/>
+</center>
+
+<p>Good luck and much success with your Revit add-in development efforts and all other important aspects of life, such as love, peace, and happiness for all beings  :-)

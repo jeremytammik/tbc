@@ -1,0 +1,310 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>DevCamp Day One</h3>
+
+<p>The first thing that happened here at DevCamp was that I was personally really deeply touched and honoured.
+
+<p>The conference was opened by Jim Quanci, director of ADN, the Autodesk Developer Network.
+He asked all of us twenty-five-plus Autodesk employees up onto stage and introduced us one by one.
+When the turn came to your humble author (or not so humble, after all), he asked all readers of this blog to raise their hands. 
+Almost every person in the room did.
+Deep thanks to all DevCamp participants and to all you readers out there for your appreciation and support; it really helps motivate and improve the work of us all.
+Grazie.
+
+<p>Jim's introduction wound up with some impressive cloud and mobile demos.
+
+<p>Adam presented his Revit 3D model cloud uploader and mobile device viewer, which I definitely want to write a separate post on as soon as possible, really soon now!
+Come on Adam, let's do it!
+
+<p>Augusto presented his cloud based cost per unit for AEC materials demo.
+
+<p>Nicolas Magnon gave the keynote speech with interesting insights on the AEC market and current Autodesk developments and focus areas.
+
+<p>Some of the questions and answers to Nicolas were really interesting, and probably not public, even though this is a public event, as far as I know.
+I don't even dare mention the two main Revit API topics that were discussed.
+You'd have to be here, man.
+
+<p>After that we moved on to the various lectures, split into the following five parallel tracks:
+
+<ul>
+<li>Revit Beginner
+<li>Revit Expert
+<li>Infrastructure and Other
+<li>Cloud/Mobile and Other
+<li>Business and Other
+</ul>
+
+<p>I started off presenting the first session in the expert track, and then was able to hang around in the same room to attend the interesting presentations of members of the Revit API development team, going through the following topics, in chronological order:
+
+<ul>
+<li><a href="#2">2-8 Extensible storage</a>
+<li><a href="#3">2-5 Materials, physical properties and compound structure</a>
+<li><a href="#4">2-6 Geometry API</a>
+<li><a href="#5">2-4 Core concepts</a>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Extensible Storage</h4>
+
+<p>The first session in the Revit expert track was on extensible storage.
+
+<p>I presented a
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9263&jid=1725932">
+class</a> and a
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9726&jid=1725932">
+lab</a> on 
+
+this topic at Autodesk University 2011, as mentioned in the overview of the AU 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/revit-and-aec-api-classes-at-autodesk-university.html">
+Revit and AEC API sessions</a>.
+
+<p>I never got around to writing about this class in much detail here on the blog, mainly because the AU handout is so good and complete that there was never any need for it.
+
+<p>Here is an overview of the discussions related to this area that I published here anyway so far:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">
+Extensible storage</a> 
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/05/extensible-storage-of-a-map.html">
+Estorage of a map</a> or dictionary
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html">
+Estorage features</a> a collection of questions and answers
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#3">
+AU 2011 Estorage materials</a>, handouts and sample code
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#4">
+Project Wide Data Storage</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#5">
+DataStorage Element</a>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#6">
+Simple DataStorage Sample</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#7">
+Identifying DataStorage Elements</a>
+</ul>
+</ul>
+
+<p>Anyway, the first session here at AEC DevCamp was based on that AU class, so I now updated the sample code and presentation for Revit 2013.
+
+<p>The migration was done in ten minutes after I got up this morning.
+That also gave me a chance to admire the beautiful sunrise before the sun disappeared again up into the clouds above.
+
+<p>As in previous migrations, I simply updated the Revit API assembly references from 2012 to 2013, bumped the .NET framework version from 3.5 to 4, and replaced the obsolete Document Element property usages via the get_Element method to its new GetElement replacement.
+
+<p>There was one single further issue I ran into, in the wall face selection filter, which was using the obsolete Reference GeometryObject property.
+I fixed that like this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Selection filter allowing only wall elements.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">WallFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Wall</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//return r.GeometryObject is Face; // 2012</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> r.ElementReferenceType == <span class="green">// 2013</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementReferenceType</span>.REFERENCE_TYPE_SURFACE; 
+&nbsp; }
+}
+</pre>
+
+<p>After migrating the add-in, I also rearranged it slightly.
+I renamed the About command and added an external command Cmd_7_DataStorage to exercise the new Revit 2013 DataStorage element, based on 
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#6">
+Victor's 
+DataStorage sample</a>.
+
+<p>Here is the list of the commands now provided by this add-in, or rather a list of its project files:
+
+<center>
+<img src="img/Estorage_2013_project.png" alt="Estorage project"/>
+</center>
+
+<p>It is worthwhile pointing out that the external application implementation is neat, since it generates the ribbon panel and the entries for the individual commands in a loop.
+Here is the resulting panel:
+
+<center>
+<img src="img/Estorage_2013_commands.png" alt="Estorage commands"/>
+</center>
+
+<p>The About box implementation is also neat, since it reads the information it displays from the add-in assembly DLL attributes instead of duplicating that information:
+
+<center>
+<img src="img/Estorage_2013_about.png" alt="Estorage About box"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/Estorage_2013.zip">Estorage_2013.zip</a> containing
+
+the full updated sample application including its add-in manifest, Visual Studio solution and full source.
+For good measure, here is the updated 
+
+<a href="file:///C:/a/j/adn/devcamp/2012/doc/2-8_estorage.pptx">
+slide deck</a> as 
+
+well.
+
+
+
+<a name="3"></a>
+
+<h4>Materials, Physical Properties and Compound Structure</h4>
+
+<p>After my own session on extensible storage, I could stay put right there in the same room to join the one by Steven Mycynek on 'Revit Materials, Physical Properties and Compound Structure API Basics', with the following agenda:
+
+<ul>
+<li>Material Model History
+<li>Material Properties
+<li>Dealing with Units
+<li>Working with Materials
+<li>GbXMLs role in Revit
+<li>Family Thermal Properties
+<li>Layered Assemblies
+<li>Layered Assembly Thermal Properties
+<li>A few last enhancements
+</ul>
+
+<p>From here on, my notes are very fragmentary.
+Hopefully, you will be able to access the DevCamp materials on the internet quite soon.
+At that point, these notes might help you decide what to explore.
+Actually, I added a 
+
+<a href="#6">snapshot of the materials</a>
+
+in their current state below, so please refer to those for more details.
+
+<p>Revit 2011 material inheritance model, in 2012 property set, obsolete material subclasses.
+
+<p>Revit 2013 material asset model, material subclasses removed.
+
+<p>Why? Extensibility, add new assets instead of deriving.
+
+<p>Airmax, consolidate all material handling across AutoCAD, Inventor, Revit, all Autodesk products to share same material library.
+
+<p>Material property hierarchy, PropertySetElement, StructuralAsset and ThermalAsset, discoverable properties, new in 2013.
+
+<p>Asset types and properties.
+
+<p>Units: length in feet, all other units in SI units, making compound units a bit confusing.
+
+<p>UnitUtility.cs Steve's personal sample code... 
+
+<p>ExporterIFCUtils.ConvertUnits...
+
+<p>There is no official API from display units back to system units, but Steve's sample includes the method DisplayUnitsToSystem.
+
+<p>FormatUnitValue&lt;ValueType&gt;...
+
+<p>Using ProjectUnits.get_FormatOptions( unitType )
+
+<p>Duplicating a material, a deep copy, including all assets; creating one from scratch.
+
+<p>FamilyThermalProperties...
+
+
+
+<a name="4"></a>
+
+<h4>Geometry API</h4>
+
+<p>After that, I attended Scott Conover's session on 'Geometry API in Autodesk Revit'.
+It is a continuation of his AU 2011 presentation
+
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9124&amp;jid=1725932">CP4011</a> 'Geometric Progression: Further Analysis of Geometry Using the Autodesk Revit 2012 API',
+
+enhanced for the Revit 2013 API.
+
+<p>In consists of two main sections, on geometry extraction fundamentals and tools, and support you in the following areas:
+
+<ul>
+<li>Extract and analyze the geometry of existing Revit elements 
+<li>Create and manipulate temporary curve and solid geometry
+<li>Find elements by 3D intersection
+<li>Find elements by ray projection and filtering
+<li>Apply an ExtrusionAnalyzer to geometry
+<li>Utilize parts to analyze geometry of HostObjects and their layers
+<li>Extract and analyze the boundary geometry of rooms and spaces
+<li>Analyze the geometry of point clouds
+</ul>
+
+<p>More details are available on the developer guide wiki, and examples of use of all the tools discussed are provided in the sample materials.
+
+<p>Display solids on the graphics screen marking the areas around doors that must not be obstructed in order to ensure safe fire or other emergency egress.
+
+<p><a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">ReferenceIntersector</a> class...
+
+<p>Point cloud geometry analysis...
+
+
+<a name="5"></a>
+
+<h4>Hashing Instead of Core Concepts</h4>
+
+<p>The last session of the day in the Revit expert track was Arno&scaron;t L&ouml;bel's class on the Core Revit API Frameworks, covering the following topics:
+
+<ul>
+<li>Regeneration modes
+<li>Transaction modes
+<li>Transaction phases
+<li>Document modifiability
+<li>Element validity
+<li>Object lifespan
+<li>API events
+<li>External commands
+<li>API callbacks
+<li>Dynamic updaters
+<li>API Scopes
+<li>API Firewall
+</ul>
+
+<p>I would have loved to attend, but was unfortunately forced to flee, breathe some fresh air, escape the so-called air conditioning, go running, join the hashers, the 
+
+<a href="http://bostonhash.com">
+Boston Hash House Harriers</a>, 
+
+the "drinking club with a running problem", that Michael Priestman introduced me to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/hashing-and-devlabs.html">
+two years back</a>.
+Once again, it was great fun.
+
+
+
+<a name="6"></a>
+
+<h4>Snapshot of Materials</h4>
+
+<p>Here is a snapshot of the materials of today's four Revit API expert sessions:
+
+<!-- that I did or did not attend -->
+
+<ul>
+<li><a href="devcamp_2012_2-4_Core_Revit_API_Frameworks.pdf">2-4 Core frameworks</a> 
+<li><a href="devcamp_2012_2-5_Materials_and_Assemblies.pptx">2-5 Materials, physical properties and compound structure</a>
+<li><a href="devcamp_2012_2-5_PropertyUtilityApp.zip">2-5 Materials sample code</a>
+<li><a href="devcamp_2012_2-6_Geometry_API.pptx">2-6 Geometry API</a>
+<li><a href="devcamp_2012_2-6_Geometry_API_Sample_code.zip">2-6 Geometry sample code</a> 
+<li><a href="devcamp_2012_2-6_Geometry_API.pptx">2-8 Extensible storage</a>
+<li><a href="Estorage_2013.zip">2-8 Estorage sample code</a> 
+</ul>
+
+<p>Please note that this is just a snapshot.
+Soon after the conference completes, the complete and final materials will be published.

@@ -1,0 +1,948 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+
+<h3>Sydney Revit API Training and Vacation</h3>
+
+<p>My days down under were pretty intense.</p>
+
+<p>I left Switzerland Sunday night and arrived safe and sound in Sydney early Tuesday morning.
+I took the train from the airport into the town centre and back out again to the Autodesk offices at Macquarie Park in North Sydney.</p>
+
+<p>Three hours later, I was teaching the two-day Revit API training.
+At the time of writing this, it is Thursday afternoon and I am sitting on the plane back home again.
+I am on vacation next week.</p>
+
+<p>Here is a rather monstrous blog post presenting some of the issues we discussed during the training, plus a number of other interesting fresh news items that I would like to mention before the break:</p>
+
+<ul>
+<li><a href="#2">Standard ADN Training Material</a></li>
+<li><a href="#3">Japanese Revit API question list</a></li>
+<li><a href="#4">Sydney Revit API training topics</a></li>
+<li><a href="#5">Purge zero-area rooms and spaces</a></li>
+<li><a href="#6">Minimal external application defining a ribbon panel</a></li>
+<li><a href="#7">Pick and extract complex beam edge curve</a></li>
+<li><a href="#8">Custom tagging and extensible storage</a></li>
+<li><a href="#9">Cloud-based room editor application</a></li>
+<li><a href="#10">Autodesk at TED and TED talks on UAV abilities</a></li>
+<li><a href="#11">Beyond design revamped</a></li>
+<li><a href="#12">Vacation</a></li>
+</ul>
+
+<p>I want to get this out the door quickly right now, because I am hopping on the plane back to Europe this afternoon and leaving on vacation next week, so please read this really slowly to make it last as long as possible.</p>
+
+<p>I also want to present you this happy little frog that I met in Ticino, the southern, Italian part of Switzerland, before leaving:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-19_piazzogna/frog_smile.jpeg" alt="Smiling frog"/>
+</center>
+
+
+<a href="2"></a>
+
+<h4>Standard ADN Training Material</h4>
+
+<p>As you are hopefully aware, all the standard ADN Revit training material is available and well documented online from the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>, recently updated for Revit 2014.</p>
+
+<p>It provides the 'My first Revit plugin' and DevTV tutorial videos as well as explicitly documented step-by-step training labs on the three basic topics of Revit element and database fundamentals, UI and the Family API.</p>
+
+<p>Before they were placed on the official site, I discussed my migration of the expanded versions of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+step-by-step labs</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/the-adn-sample-adnrme-for-revit-mep-2014.html">
+MEP sample AdnRme</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/adn-training-material-for-revit-structure-2014.html">
+structural labs and link sample</a> plus
+
+the update and command-line utility for removing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+processor architecture mismatch warning</a>.</p>
+
+<p>Since all participants in my training here already had either good programming knowledge or extensive Revit product usage experience, we were able to cover all the important basics of the Revit API using the participants' specific needs and wishes as a basis for discussion, without sticking to the standard ADN training material.</p>
+
+<p>That made it much more fun, interesting and challenging for me, and also enabled us to remain totally focused on the participants' goals throughout.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Japanese Revit API Question List</h4>
+
+<p>By a funny coincidence, the Japanese Developer Support team prepared a two-day Revit API training course this very same week as well.</p>
+
+<p>They came up with the following list of questions and answers to help clarify some central topics up front:</p>
+
+<ul>
+<li>Extensible Storage</li>
+<ul>
+<li>Is there a limitation on the size of the extensible storage that can be associated with a single element? No.</li>
+<li>Does this feature depend on the Revit version? Yes.</li>
+<li>When did it become available? In
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html"> Revit 2012</a>.</li>
+</ul>
+
+<li>Element Id</li>
+<ul>
+<li>Is the element id a persistent identifier like AutoCAD’s handle? Yes and no, see below.</li>
+<li>Is the element id a transient identifier per session? No, it remains valid beyond the session, but may be modified by worksharing and central file sharing regeneration.</li>
+<li>Can developers use it as a key name in an external relational database? The UniqueId is safer, and the only way to go in a worksharing environment.</li>
+</ul>
+
+<li>Parameters</li>
+<ul>
+<li>Is there any developer use case for shared parameters? How can shared parameters be useful to an add-in?
+I would avoid shared parameters for pure add-in data storage.
+Extensible storage is more flexible and better isolated than shared parameters, which are more geared towards end users than add-in applications.
+A shared parameter may be useful for two reasons: (i) if you make it visible, the Revit property palette provides an automatic user interface for it. (ii) it can be scheduled.
+If these two reasons are not interesting in your case, extensible storage is probably preferable.</li>
+<li>Is it possible to access a per document parameter outside of Revit without using any API? No.</li>
+</ul>
+
+<li>Dynamic Model Update</li>
+<ul>
+<li>As far as I understand, dynamic model update is just like a modification operation within DBObject.Modified on AutoCAD .NET API. Is that right? I believe so. The modification added by the dynamic updater is encapsulated into the same transaction as the modification that triggered it.</li>
+<li>Is this persistent between sessions, similar to AutoCAD’s persistent reactor? If the add-in which implements Dynamic Model Update has been loaded into Revit, this begins to work by opening a project file into Revit without any operation. Is that correct understanding or not? Yes.</li>
+<li>Is there a possibility to make an infinite loop? No, this is prevented by Revit.</li>
+</ul>
+
+<li>Family</li>
+<ul>
+<li>Does the API ability support create/modify of System Families and In-Place Families? Sorry, no to both.</li>
+</ul>
+</ul>
+
+
+<a name="4"></a>
+
+<h4>Sydney Revit API Training Topics</h4>
+
+<p>Here is a quick overview of some of the topics we ended up discussing in the course of the two-day Revit API training in Sydney:</p>
+
+<ul>
+<li>Filtered element collector and LINQ</li>
+<ul>
+<li>We implemented sample commands to purge redundant spaces: <a href="#5">PurgeRooms, PurgeSpaces</a>.</li>
+<li>We discussed how to determine and list a comparison of all room areas with the areas covered by the furniture and equipment they contain: the
+<a href="#9">cloud-based room editor</a> application provides most of the required functionality for this.</li>
+</ul>
+
+<li>Simple ribbon with an icon</li>
+<ul>
+<li>We implemented a <a href="#6">minimal external application</a> defining a ribbon panel and button to launch our new commend.</li>
+</ul>
+
+<li>Database Link</li>
+<ul>
+<li>How can Excel update the Revit database?
+Bi-directional linking of external data to family instances or other Revit elements: look at the FireRating SDK sample in VB, or the C# version provided by the Lab4_3_1_CreateAndBindSharedParam, Lab4_3_2_ExportSharedParamToExcel and Lab4_3_3_ImportSharedParamFromExcel commands in the XtraCs project in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html#12">
+Revit API training labs</a>.</li>
+</ul>
+
+<li>Prepare model for issue, strip out everything except model:
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">
+custom exporter</a>.</li>
+
+<li>Generate floor plans, e.g. large PNG: <a href="#9">cloud-based room editor</a>.</li>
+<li>Batching through files</li>
+<ul>
+<li>Import IFC</li>
+<li>Batching, e.g. make changes to font in family libraries: completed by Brett.</li>
+</ul>
+<li>Revit model checking: <a href="http://lmgtfy.com/?q=revit+model+review">Revit Model Review</a>.</li>
+<li>Family API: define and use a family:
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/key-concepts-of-the-family-editor.html">Key concepts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/family-api-add-in-load-family-and-place-instances.html">Load family and place instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-create-type-select-and-modify-instances.html">Create type, select and modify instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/family-api-nested-type-instance-and-symbol-retrieval.html">Nested types, instance and symbol retrieval</a>.</li>
+</ul>
+</li>
+<li>Filter for all tags: iterate built-in categories, search for *tag*, feed into LogicalOrFilter: completed by Brett</li>
+<li>Electrical loading and circuit design, non-US rules:
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/uk-electrical-schedule-sample.html">
+UK panel schedule</a> (2009),
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-schedule-api-and-access-to-schedule-data.html">
+Schedule API</a>.</li>
+
+
+<li><a href="#8">Custom tagging and extensible storage</a></li>
+<li>DWFx: ExportImage</li>
+</ul>
+
+<p>In fact, we were able to cover so many important topics in such depth and address the participants needs in such detail that I was able to cancel the meeting scheduled with an important large company for the day after the training because all their programming questions had already been answered.</p>
+
+<p>In fact, that cancellation is providing at least part of the time to write this report here now.</p>
+
+
+<a name="5"></a>
+
+<h4>Purge all Zero-Area Rooms and Spaces</h4>
+
+<p>One of the wishes that a participant brought along from his Revit team back home was a utility to purge unused rooms and spaces.</p>
+
+<p>This proved to be a perfect learning example to practice using RevitLookup and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">
+element lister</a> to
+
+explore the Revit database and basic filtered element functionality.</p>
+
+<p>We discussed the requirements for a basic implementation of an external Revit command:</p>
+
+<ul>
+<li>Visual Studio class project</li>
+<li>References to the Revit API assemblies</li>
+<li>Implement the external command interface, i.e. the Execute method</li>
+<li>Implement the add-in manifest</li>
+<li>Install the add-in</li>
+</ul>
+
+<p>This also provided an opportunity to demonstrate the many helpful features provided by the Visual Studio IDE, such as Intellisense, Ctrl-'.' to add a 'using' statement, 'Implement Interface', and numerous other important time-savers.</p>
+
+<p>All of the steps listed above are completely automated by my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html">
+Visual Studio Revit add-in wizards</a>.</p>
+
+<p>We ended up with the following command, which selects all rooms in the model with an area that is almost empty and deletes them, reporting whether they have been partially deleted or simply not yet placed:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve all room elements with zero area.</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// If you look carefully at the parameters </span>
+&nbsp; &nbsp; <span class="green">// defined on room elements, there may be a way </span>
+&nbsp; &nbsp; <span class="green">// to avoid all the post-processing steps.</span>
+&nbsp; &nbsp; <span class="green">// The area test could probably be replaced by </span>
+&nbsp; &nbsp; <span class="green">// a more effective slow element parameter </span>
+&nbsp; &nbsp; <span class="green">// filter, and maybe the cast and List </span>
+&nbsp; &nbsp; <span class="green">// instantiation can be avoided as well.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Where( e =&gt; e <span class="blue">is</span> <span class="teal">Room</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Room</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Room</span>&gt;( r =&gt; 1e-9 &gt; r.Area )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Element</span>,<span class="teal">ElementId</span>&gt;( e =&gt; e.Id ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; ids.Count() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Purge Rooms&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nUnplacedRooms = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nRedundantRooms = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nElements = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( doc.GetElement( id ).Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nElements += doc.Delete( id ).Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 == nElements )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nRedundantRooms;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nUnplacedRooms;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Purge Rooms&quot;</span>, <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} rooms ({1} redundant, {2} unplaced, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{3} total elements) deleted.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nRedundantRooms + nUnplacedRooms,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nRedundantRooms, nUnplacedRooms,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nElements ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Note that this non-trivial selection is implemented in one single statement to instantiate the filtered element collector and post-process its results using LINQ.</p>
+
+<p>Most of the effort is actually reporting the results in a differentiated manner.</p>
+
+<p>This provided a good starting point for understanding filtered element collectors, and a useful little utility to take home as well.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Minimal External Application</h4>
+
+<p>We decided to add a custom ribbon tab, panel and button to launch our new command.</p>
+
+<p>This requires an external application and the implementation of its two interface methods, OnStartup and OnShutdown.
+A skeleton application is set up by the add-in wizards.</p>
+
+<p>Once that is set up, the ribbon widget creation is pretty straightforward:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly()
+&nbsp; &nbsp; &nbsp; .Location;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> classNamePrefix = <span class="maroon">&quot;PurgeSpaces.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> tabName = <span class="maroon">&quot;Sydney API Training&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; a.CreateRibbonTab( tabName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> panel = a.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; tabName, tabName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonItem</span> button = panel.AddItem(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PushButtonData</span>(<span class="maroon">&quot;Purge Rooms&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Purge Rooms&quot;</span>, path,
+&nbsp; &nbsp; &nbsp; classNamePrefix + <span class="maroon">&quot;Command&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; button.ToolTip
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;Filter for unplaced and deleted rooms&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Pick and Extract Complex Beam Edge Curve</h4>
+
+<p>Brett Burling of
+
+<a href="http://www.bgeeng.com">
+BG&E</a> came
+
+to the training with some prior API experience, and used his multitasking capabilities to simultaneously effectively code several useful add-ins and actively participate in the group discussions.</p>
+
+<p>One of his samples enables picking and extracting a complex beam edge curve and converting it to a model curve.</p>
+
+<p>It also demonstrates a command implemented in VB.NET, use of the PickObject method to select an edge instead of an entire element, and the transformations required to handle the extraction correctly depending on thether the edge comes from a family instance or some other object:</p>
+
+<center>
+<img src="img/bb_extract_beam_edge.jpeg" alt="Beam edge curve converted to model curve" width="260"/>
+</center>
+
+<p>Here is the complete VB source code of the external command implementation achieving this:</p>
+
+<pre class="code">
+<span class="blue">#Region</span> <span class="maroon">&quot;Imported Namespaces&quot;</span>
+<span class="blue">Imports</span> System
+<span class="blue">Imports</span> System.Collections.Generic
+<span class="blue">Imports</span> Autodesk.Revit.ApplicationServices
+<span class="blue">Imports</span> Autodesk.Revit.Attributes
+<span class="blue">Imports</span> Autodesk.Revit.DB
+<span class="blue">Imports</span> Autodesk.Revit.UI
+<span class="blue">Imports</span> Autodesk.Revit.UI.Selection
+<span class="blue">#End</span> <span class="blue">Region</span>
+&nbsp;
+&lt;<span class="teal">Transaction</span>(<span class="teal">TransactionMode</span>.Manual)&gt;
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">AdskCommand</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>
+&nbsp;
+&nbsp; <span class="blue">Const</span> DisplayName <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;Extract Edge&quot;</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute(
+&nbsp; &nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>,
+&nbsp; &nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>,
+&nbsp; &nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> <span class="teal">ElementSet</span>) _
+&nbsp; <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> uiapp <span class="blue">As</span> <span class="teal">UIApplication</span> = commandData.Application
+&nbsp; &nbsp; <span class="blue">Dim</span> uidoc <span class="blue">As</span> <span class="teal">UIDocument</span> = uiapp.ActiveUIDocument
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> <span class="teal">Document</span> = uidoc.Document
+&nbsp; &nbsp; <span class="blue">Dim</span> sel <span class="blue">As</span> <span class="teal">Selection</span> = uidoc.Selection
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> selectedReference <span class="blue">As</span> <span class="teal">Reference</span> = sel.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Edge, <span class="maroon">&quot;Select Edge&quot;</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> selectedElement <span class="blue">As</span> <span class="teal">Element</span> = doc.GetElement(
+&nbsp; &nbsp; &nbsp; selectedReference.ElementId)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> selectedEdge <span class="blue">As</span> <span class="teal">Edge</span> = <span class="blue">TryCast</span>(
+&nbsp; &nbsp; &nbsp; selectedElement.GetGeometryObjectFromReference(
+&nbsp; &nbsp; &nbsp; &nbsp; selectedReference), <span class="teal">Edge</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> curve <span class="blue">As</span> <span class="teal">Curve</span> = selectedEdge.AsCurve
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> fi <span class="blue">As</span> <span class="teal">FamilyInstance</span> = <span class="blue">TryCast</span>(
+&nbsp; &nbsp; &nbsp; selectedElement, <span class="teal">FamilyInstance</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> fi <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; curve = curve.CreateTransformed(fi.GetTransform)
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">' Assuming the edge is horizontal</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> normal <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="teal">XYZ</span>.BasisZ
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Using</span> rvtTransaction <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc)
+&nbsp; &nbsp; &nbsp; rvtTransaction.Start(DisplayName)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> plane <span class="blue">As</span> <span class="teal">Plane</span> = doc.Application.Create.NewPlane(normal, curve.GetEndPoint(0))
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> sketchPlane <span class="blue">As</span> <span class="teal">SketchPlane</span> = sketchPlane.Create(doc, plane)
+&nbsp; &nbsp; &nbsp; doc.Create.NewModelCurve(curve, sketchPlane)
+&nbsp;
+&nbsp; &nbsp; &nbsp; rvtTransaction.Commit()
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p><strong>Update from Brett:</strong>
+I thought it might be interesting to also include the code for determining the normal of the curve.
+Replace Dim normal As XYZ = XYZ.BasisZ by the GetNormal method defined below.
+This enables the generation of a model line on any edge, not just horizontal ones:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Function</span> GetNormal(<span class="blue">ByVal</span> curve <span class="blue">As</span> <span class="teal">Curve</span>) <span class="blue">As</span> <span class="teal">XYZ</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> startpoint <span class="blue">As</span> <span class="teal">XYZ</span> = curve.GetEndPoint(0)
+&nbsp; &nbsp; <span class="blue">Dim</span> endpoint <span class="blue">As</span> <span class="teal">XYZ</span> = curve.GetEndPoint(1)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> curve.GetType() = <span class="blue">GetType</span>(<span class="teal">Arc</span>) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">TryCast</span>(curve, <span class="teal">Arc</span>).Normal
+&nbsp;
+&nbsp; &nbsp; <span class="blue">ElseIf</span> curve.GetType() = <span class="blue">GetType</span>(<span class="teal">Ellipse</span>) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">TryCast</span>(curve, <span class="teal">Ellipse</span>).Normal
+&nbsp;
+&nbsp; &nbsp; <span class="blue">ElseIf</span> curve.GetType() = <span class="blue">GetType</span>(<span class="teal">Line</span>) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> startpoint.CrossProduct(endpoint) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Normalize()
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> pointList <span class="blue">As</span> <span class="teal">IList</span>(<span class="blue">Of</span> <span class="teal">XYZ</span>) _
+&nbsp; &nbsp; &nbsp; &nbsp; = curve.Tessellate()
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> vectorToEndpoint <span class="blue">As</span> <span class="teal">XYZ</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = pointList(pointList.Count - 1) _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; - pointList(0)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> lastVector <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">Nothing</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> firstNormal <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">Nothing</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> nextNormal <span class="blue">As</span> <span class="teal">XYZ</span> = <span class="blue">Nothing</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> i <span class="blue">As</span> <span class="blue">Integer</span> = 1 <span class="blue">To</span> pointList.Count - 2
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> nextPoint <span class="blue">As</span> <span class="teal">XYZ</span> = pointList(i)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> nextVector <span class="blue">As</span> <span class="teal">XYZ</span> = nextPoint.Subtract(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startpoint)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> firstNormal <span class="blue">Is</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; firstNormal = AbsoluteVector(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vectorToEndpoint.CrossProduct(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nextVector).Normalize)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nextNormal = AbsoluteVector(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vectorToEndpoint.CrossProduct(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nextVector).Normalize)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> IsZero(firstNormal.DistanceTo(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nextNormal)) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">Nothing</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; lastVector = nextVector
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span> i
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> vectorToEndpoint.CrossProduct(lastVector) _
+&nbsp; &nbsp; &nbsp; &nbsp; .Normalize()
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Function</span> AbsoluteVector(<span class="blue">ByVal</span> vector <span class="blue">As</span> <span class="teal">XYZ</span>) <span class="blue">As</span> <span class="teal">XYZ</span>
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">New</span> <span class="teal">XYZ</span>(System.<span class="teal">Math</span>.Abs(vector.X),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; System.<span class="teal">Math</span>.Abs(vector.Y),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; System.<span class="teal">Math</span>.Abs(vector.Z))
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> IsZero(<span class="blue">ByVal</span> number <span class="blue">As</span> <span class="blue">Double</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="blue">Boolean</span>
+&nbsp; &nbsp; <span class="blue">Return</span> 0.000000001 &gt; System.<span class="teal">Math</span>.Abs(number)
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p><strong>Answer:</strong> Yes, thank you, very good!</p>
+
+<p>Better still might be to use the Curve.ComputeDerivatives method, so you do not have to differentiate between the different curve types and bail if it is not a simple arc, line or ellipse.</p>
+
+<p>Also please note that the XYZ.Normalize method may possibly remove the need for your personal AbsoluteVector function.</p>
+
+<p>For your convenience, here is
+
+<a href="zip/PickBeamEdgeCurve.zip">PickBeamEdgeCurve.zip</a> including
+
+the entire code above, its Visual Studio solution and the add-in manifest.</p>
+
+
+<a name="8"></a>
+
+<h4>Custom Tagging and Extensible Storage</h4>
+
+<p>One participant was interested in customising the text displayed by a tag.
+The original thought was to extract some data from the element parameters and reflect them in the text.
+Changing a tag text does not seem to be straightforward, so we ended up implementing an alternative approach using a TextNote element instead.</p>
+
+<p>Also, we decided it would be more interesting to display some information stored in extensible storage instead of parameter value data.</p>
+
+<p>After the first version was completed, we also wanted to demonstrate storing more complex data in extensible storage, e.g. a list of element ids.</p>
+
+<p>The final result of nailing down this moving target is the following two commands:</p>
+
+<ul>
+<li>CommandSingle: Select a source element E to display info from, attach a simple integer to it in extensible storage, read back that data from it, create a new TextNote, set its text and attach it to the upper right corner of E's bounding box.</li>
+<li>CommandMulti: Select multiple source elements to display info from, attach a simple integer to each one of them in extensible storage, read back that data from them, create a new TextNote, set its text, attach it to the upper right corner of the first element's bounding box, and store a list of all the source elements' element ids in its extensible storage.</li>
+</ul>
+
+<p>Here is the CommandSingle implementation:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CommandSingle</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> SchemaGuid
+&nbsp; &nbsp; = <span class="maroon">&quot;5e10a0d2-12bb-428a-a382-b71bcf3e0362&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Schema</span> CreateSchema()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( <span class="blue">new</span> <span class="teal">Guid</span>( SchemaGuid ) );
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;SimpleIntSchema&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Have to define the field name as string and </span>
+&nbsp; &nbsp; <span class="green">// set the type using typeof method</span>
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.AddSimpleField( <span class="maroon">&quot;SomeValue&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="blue">int</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> schemaBuilder.Finish();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == uidoc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command in a valid project document.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view
+&nbsp; &nbsp; &nbsp; || <span class="teal">ViewType</span>.FloorPlan != view.ViewType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command on a floor plan view.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> source = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select at most one element.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( 1==n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; source = e;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select source element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; source = doc.GetElement( r.ElementId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 1. Looking for the schema in the memory</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Schema</span> schema = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>(
+&nbsp; &nbsp; &nbsp; SchemaGuid ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 2. Check if schema exists in the memory or not</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( schema == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// 3. Create it, if not</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; schema = CreateSchema();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 4. Create entity of the specific schema</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 5. Set the value for the Field.</span>
+&nbsp;
+&nbsp; &nbsp; entity.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 888 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 6. Attach entity to the element</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Attach Extensible Storage Data to Source Element&quot;</span> );
+&nbsp; &nbsp; &nbsp; source.SetEntity( entity );
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Read the extensible storage information </span>
+&nbsp; &nbsp; <span class="green">// from the source element to display</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Entity</span> ent = source.GetEntity( schema );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = ent.Get&lt;<span class="blue">int</span>&gt;( <span class="maroon">&quot;SomeValue&quot;</span> ).ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Text Note to Display Extensible Storage Data&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = source.get_BoundingBox( view );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Create.NewTextNote( view, bb.Max,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY, 0.0,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, s );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<p>Here is the CommandMulti implementation.</p>
+
+<p>The biggest irritation here is that we have assembled our list of element ids to store in the extensible storage a generic List&lt;ElementId&gt;, and yet the Revit API forces us to convert them from List to IList to fulfill the restrictive expectations of the Entity.Set method:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CommandMulti</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _schema2_guid = <span class="maroon">&quot;a6b4fec9-a778-4def-9c5e-1faef5b2a65e&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">Schema</span> CreateSchema2()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( <span class="blue">new</span> <span class="teal">Guid</span>( _schema2_guid ) );
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;ListOfElementIdsSchema&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Have to define the field name as string and </span>
+&nbsp; &nbsp; <span class="green">// set the type using typeof method</span>
+&nbsp;
+&nbsp; &nbsp; schemaBuilder.AddArrayField( <span class="maroon">&quot;ListOfElementIds&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> schemaBuilder.Finish();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == uidoc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command in a valid project document.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view || <span class="teal">ViewType</span>.FloorPlan != view.ViewType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please run this command on a floor plan view.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 &lt;= n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = sel.PickObjects(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select source elements.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( refs.Count );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ids.AddRange(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>,<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.ElementId ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 1. Looking for the schema in the memory</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Schema</span> schema = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>( <span class="teal">CommandSingle</span>.SchemaGuid ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 2. Check if schema exists in the memory or not</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( schema == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// 3. Create it, if not</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; schema = <span class="teal">CommandSingle</span>.CreateSchema();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 4. Create entity of the specific schema</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 5. Set the value for the Field.</span>
+&nbsp;
+&nbsp; &nbsp; entity.Set( <span class="maroon">&quot;SomeValue&quot;</span>, 888 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create schema to save list of element ids</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Schema</span> schema2 = <span class="teal">Schema</span>.Lookup( <span class="blue">new</span> <span class="teal">Guid</span>( _schema2_guid ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// 2. Check if schema exists in the memory or not</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( schema2 == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// 3. Create it, if not</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; schema2 = CreateSchema2();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Attach Extensible Storage Data to Source Elements&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.GetElement( id ).SetEntity( entity );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Text Note to Display Extensible Storage Data&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; data = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;( ids.Count );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == bb )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; bb = e.get_BoundingBox( view );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Read the extensible storage information </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// from the source element to display</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Entity</span> ent = e.GetEntity( schema );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; data.Add( ent.Get&lt;<span class="blue">int</span>&gt;( <span class="maroon">&quot;SomeValue&quot;</span> ).ToString() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Join( <span class="maroon">&quot;,&quot;</span>, data.ToArray() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNote</span> tn = doc.Create.NewTextNote( view, bb.Max,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY, 0.0,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, s );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 4. Create entity of the specific schema</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> entity2 = <span class="blue">new</span> <span class="teal">Entity</span>( schema2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 5. Set the value for the Field.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; ids2 = ids;
+&nbsp;
+&nbsp; &nbsp; &nbsp; entity2.Set( <span class="maroon">&quot;ListOfElementIds&quot;</span>, ids2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tn.SetEntity( entity2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="9"></a>
+
+<h4>Cloud-based Room Editor Application</h4>
+
+<p>My round-trip cloud-based 2D room editor provides a lot of useful functionality for all kinds of tasks, including some of the participants immediate wishes, so we took a deeper look at that, especially how the room and furniture plan view geometry is extracted from the BIM, stored in the cloud data repository, and displayed on mobile device using server-side JavaScript and SVG.</p>
+
+<p>I have not yet published the complete full Revit add-in for this, because I was planning to migrate it from Revit 2013 to 2014 and place it on GitHub first.</p>
+
+<p>However, due to time constraints and popular demand, here is an immediate snapshot of
+
+<a href="zip/RoomEditorApp_13_08.zip">version 2013.0.0.8</a> of
+
+the RoomEditorApp for Revit 2013 in its current state.
+I already discussed a number of its features.
+Others have been added since, and I'll go into those in detail when I find time to port this to Revit 2014.</p>
+
+
+
+<a name="10"></a>
+
+<h4>Autodesk at TED and TED Talks on UAV Abilities</h4>
+
+<p>TED is a non-profit organisation devoted to Ideas Worth Spreading that started out as a conference bringing together people from three worlds: Technology, Entertainment, Design.</p>
+
+<p>Obviously, this is a perfect fit with the mission of Autodesk, and we are
+
+<a href="http://labs.blogs.com/its_alive_in_the_lab/2013/07/autodesk-participation-at-tedglobal.html">
+participating enthusiastically at TEDGlobal</a>.</p>
+
+<center>
+<img src="img/adsk_ted.png" alt="Autodesk participation at TEDGlobal" width="400"/>
+</center>
+
+<p>Talking about TED, Philip Smith, CAD Systems Manager at
+
+<a href="http://www.beca.com">
+Beca</a> and
+
+Sydney Revit API training participant, pointed out some amazing TED presentations on the capabilities of UAVs,
+
+<a href="">
+unmanned aerial vehicles</a>,
+
+and explained some of his ideas on how they could be used for automatically scanning buildings and other surveying purposes:</p>
+
+<ul>
+<li><a href="http://www.ted.com/talks/vijay_kumar_robots_that_fly_and_cooperate.html">Robots that fly and cooperate</a></li>
+<li><a href="http://www.youtube.com/watch?v=w2itwFJCgFQ">Astounding athletic power of quadcopters</a></li>
+</ul>
+
+<p>Definitely worth watching, and an important area for further exploration.</p>
+
+
+
+
+<a name="11"></a>
+
+<h4>Beyond Design Revamped</h4>
+
+Check out the newly revamped
+
+<a href="http://beyonddesign.typepad.com">Beyond Design construction blog</a>,
+
+now covering more topics, including BIM 360 Field.
+
+
+<a name="12"></a>
+
+<h4>Vacation Time Next Week</h4>
+
+<p>This may be my last post for a while.</p>
+
+<p>I am happy we had such a successful and interesting training and were able to create so many useful and instructive little utilities in just two days.</p>
+
+<p>I am sitting in Dubai airport now, travelling back to Switzerland, and going on vacation next week.</p>
+
+<p>I wish you a good time, and we will continue our Revit API adventures in August!</p>

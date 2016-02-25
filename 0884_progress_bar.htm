@@ -1,0 +1,143 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Implement Progress Bar and Abort Lengthy Process</h3>
+
+<p>The time has come to talk of many things: of shoes and ships, and sealing-wax, of cabbages and kings
+[<a href="http://www.jabberwocky.com/carroll/walrus.html">^</a>]...
+or no, let's continue sticking to the Revit API for now, more or less;
+today's topics are:
+
+<ul>
+  <li>A <a href="#2">walk in the snow</a> and a crystal covered baby tree</li>
+  <li>Implementation of a Revit add-in <a href="#3">progress bar</a></li>
+  <li><a href="#4">Aborting a lengthy process</a> from the progress bar</li>
+  <li>Harry's <a href="#5">image generation video competition</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>A Walk in the Snow</h4>
+
+<p>I went for a walk in snow and fog on a local hill and appreciated this wind-driven ice crystal covered baby tree that:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-01-15_belchen/32_crystal_covered_twigs_cropped.png" alt="Wind-driven ice crystal covered baby tree"/>
+</center>
+
+<p>I thought I would like to share that with you.
+Sorry that it is so dark, but that's the way it was.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Implementing a Revit Add-in Progress Bar</h4>
+
+<p>I chatted with Harry Mattison on various topics during the winter break.
+One of them was the implementation of a Revit add-in progress bar:</p>
+
+<p><strong>Question:</strong> I am trying to make a simple progress dialog based on your post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">modeless dialogues</a>.
+
+It seems to work well basically but has a few problems:
+
+<ol>
+<li>The first time I run the command, the progress dialog flashes briefly on the screen and then disappears.
+<li>The text label does not display properly.
+<li>Sometimes the entire progress dialogue content turns white and the title bar says 'Not Responding'.
+</ol>
+
+<p>Could you help me figure out if my approach is flawed or if it just needs some small adjustments?
+
+
+<p><strong>Answer:</strong> Thank you, but no thank you...  :-)
+
+<p>Instead, I propose that you look at my existing modeless progress bar implementation in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+ADN Revit MEP sample add-in</a>,
+
+which has worked flawlessly for years now.
+
+
+<p><strong>Response:</strong> Your progress bar is great!
+I wish I had found it earlier.
+
+
+<a name="4"></a>
+
+<h4>Aborting a Lengthy Process</h4>
+
+<p>Here's hopefully one last question about the progress bar:
+
+<p>How can the user cancel the operation from the progress bar?</p>
+
+<p><strong>Answer:</strong> You could implement some standard .NET stuff on the progress bar; maybe simply add a cancel button to it, and an event handler for that.
+
+<p><strong>Response:</strong> After spending some time thinking about events and the like, I realized the progress bar cancel solution is almost trivial.
+
+<p>An idle event wouldn't work in my case, because Revit was never going idle.
+It was too busy doing hard work of exporting images for my <a href="http://boostyourbim.wordpress.com/products">Image-O-Matic</a> application.
+Instead, all I needed to do is add the Abort button to the progress dialog, and put this little bit of code in the progress bar class:
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> btnAbort_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; btnAbort.Text = <span class="maroon">&quot;Aborting...&quot;</span>;
+&nbsp; &nbsp; abortFlag = <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> getAbortFlag()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> abortFlag;
+&nbsp; }
+</pre>
+
+<p>Then, inside my foreach loops, I just need to check the status of the flag:
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> phaseName <span class="blue">in</span> phaseList )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( progressForm.getAbortFlag() )
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>Many thanks to Harry for the fruitful discussion and helpful hint!</p>
+
+
+
+<a name="5"></a>
+
+<h4>Image Generation Video Competition</h4>
+
+<p>Yet another item from Harry, this time a rather shameless plug, but I guess he earned it  :-)</p>
+
+<p>Harry announced a
+
+<a href="http://boostyourbim.wordpress.com/2013/01/16/win-a-free-custom-built-revit-api-app-for-using-image-o-matic">
+competition</a> in
+
+which you can win a free, custom-built Revit API add-in according to your own specifications for downloading his
+
+<!--
+
+http://apps.exchange.autodesk.com/RVT/Detail/Index?id=appstore.exchange.autodesk.com%3aimage-o-matic%3aenhttp://apps.exchange.autodesk.com/RVT/Detail/Index?id=appstore.exchange.autodesk.com%3aimage-o-matic%3aen
+http://apps.exchange.autodesk.com/RVT/Detail/Index?id=appstore.exchange.autodesk.com%3aimage-o-matic%3aen
+
+-->
+
+<a href="http://apps.exchange.autodesk.com/RVT/Detail/Index?id=appstore.exchange.autodesk.com%3aimage-o-matic%3aen">
+Image-O-Matic</a> application,
+
+generating a video with it, and uploading that to YouTube.
+
+<p>Have fun, and good luck to you!

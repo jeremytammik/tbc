@@ -1,0 +1,87 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262635 [PointLoad.Force.Y] -->
+
+<h3>Immutable PointLoad Force</h3>
+
+<p>Today we crossed the 
+
+<a href="http://en.wikipedia.org/wiki/Kattegat">
+Kattegat</a> from 
+
+<a href="http://en.wikipedia.org/wiki/L%C3%A6s%C3%B8">
+L&aelig;s&oslash;</a> in Denmark to 
+
+<a href="http://en.wikipedia.org/wiki/R%C3%B6r%C3%B6">
+R&ouml;r&ouml;</a> in Sweden, 
+
+north of G&ouml;teborg, so we have finally arrived in the archipelago on the west coast of Sweden.
+As said, you can follow our exact route on the 
+
+<a href="http://share.findmespot.com/shared/faces/viewspots.jsp?glId=0fQEu0hRkYX5FQpeMDEj8hms84EuXOsRl">
+Pantagruel tracker</a>.
+
+<p>We spent more than 48 hours at sea when going from Norway to Denmark, with some very beautiful moments, among others the night watches with more stars than you can imagine.
+I saw four shooting stars the first night.
+And fluorescent 
+
+<a href="http://en.wikipedia.org/wiki/Plankton">
+plankton</a> in our wake.
+
+<p>Today we had quite strong winds and made more than ten knots several times, which was nice.
+
+<p>Looking at the Revit API again, we already discussed the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/xyz-immutable.html">
+immutability of the XYZ class</a> in
+
+the Revit 2011 API.
+Here is another aspect of that modification, from a case handled by 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html">
+Augusto Gon&ccedil;alves</a> and Scott Conover:
+
+<p><strong>Question:</strong> Using the Revit 2010 API, I was able to modify the X, Y and Z components of the PointLoad Force and Moment properties, e.g.
+
+<pre class="code">
+  PointLoad.Force.X 
+  PointLoad.Force.Y 
+  PointLoad.Force.Z 
+  PointLoad.Moment.X 
+  PointLoad.Moment.Y 
+  PointLoad.Moment.Z 
+</pre>
+
+In the Revit 2011 API, these values are read-only.
+How can I modify this data in Revit 2011?
+
+<p><strong>Answer:</strong> Actually, even in the Revit 2010 API, changing the value of the X, Y and Z components of the PointLoad Force and Moment properties never had any effect on the underlying Revit model.
+The XYZ data returned by these properties is and always has been a copy of the underlying data, so changing it does not affect and never has affected the actual force or moment value inside the point load.
+
+<p>One of the main reasons why the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/xyz-immutable.html">
+XYZ class is now immutable</a> is 
+
+to ensure that this mistake cannot be assumed to work anymore.
+
+<p>If the PointLoad Force and Moment properties were not read-only properties, you would be able to change their values by assigning a new XYZ value to the PointLoad element property, e.g.
+
+<pre class="code">
+  pointLoad.Force = new XYZ( 1.0, 2.0, 3.0 );
+</pre>
+
+<p>Unfortunately they are read-only, so this obvious approach cannot be used in this case. 
+It would however work for other, similar, examples.
+
+<p>In this case, the modification can be achieved via the parameter associated with the appropriate built-in parameter enum, e.g. BuiltInParameter.LOAD_FORCE_FY:
+
+<pre class="code">
+  Parameter p = pointLoad.get_Parameter(
+    BuiltInParameter.LOAD_FORCE_FY );
+  p.Set( 10.00 );
+</pre>
+
+<p>Many thanks to Scott and Augusto for the explanation!</p>

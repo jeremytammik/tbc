@@ -1,0 +1,101 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html?cid=6a00e553e168978833013485f433e1970c#comment-6a00e553e168978833013485f433e1970c
+
+Joo Lee has left you a comment:
+
+Dear Jeremy,
+
+I tested your cmdWallFooting command in revit architecture 2011.
+
+But it is not work.
+
+transaction is not start.
+
+how can i work with transaction?
+
+sorry, my english is to bad.
+
+August 03, 2010 at 01:03
+
+-->
+
+<h3>Transaction Migration Errors</h3>
+
+<p>Joo Lee just submitted a
+
+<!-- http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html#comment-6a00e553e168978833013485f4e7ab970c -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html?cid=6a00e553e168978833013485f433e1970c#comment-6a00e553e168978833013485f433e1970c">
+comment</a> pointing
+
+out an error or two in the flat migration of the CmdWallFooting command, which demonstrates an approach to retrieve the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+host reference</a> using
+
+a wall footing:
+
+<p><strong>Question:</strong> I tested your CmdWallFooting command in Revit Architecture 2011.
+
+But it does not work.
+
+The transaction is not started.
+
+How can I get the transaction to work?
+
+<p><strong>Answer:</strong> Thank you very much for pointing this out!
+
+<p>This command was flat migrated from Revit 2010 and never tested.
+
+I tested it now as well and discovered two problems with it:
+
+<ol>
+<li>It did not have any active transaction open at all, since it was set to read-only transaction mode.
+<li>The Revit 2010 transaction was replaced by a Revit 2011 sub-transaction, which requires a call to Start before it can be used.
+</ol>
+
+<p>Fix 1: The read-only transaction mode causes the following error when trying to delete the wall: "Attempt to modify the model outside of transaction."
+
+<p>It can be fixed by specifying the transaction attribute like this:
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+</pre>
+
+<p>Alterntively, you can specify manual transaction mode and start your own main transaction.
+That requires a little bit more coding and gives you full and explicit control in return.
+
+<p>Fix 2: The sub-transaction can be started by calling its Start method. Then the code to temporarily delete the wall looks like this:
+
+<pre class="code">
+&nbsp; <span class="teal">SubTransaction</span> t = <span class="blue">new</span> <span class="teal">SubTransaction</span>( doc );
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; delIds = <span class="blue">null</span>;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; t.Start();
+&nbsp; &nbsp; delIds = doc.Delete( wall );
+&nbsp; &nbsp; t.RollBack();
+&nbsp; }
+&nbsp; <span class="blue">catch</span> ( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Deletion failed: &quot;</span> + ex.Message;
+&nbsp; &nbsp; t.RollBack();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+</pre>
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_74_3.zip -->
+
+<a href="zip/bc_11_74_3.zip">
+version 2011.0.74.3</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the updated command.
+
+<p>Thank you very much again, Joo Lee, for picking this up and pointing it out!

@@ -1,0 +1,77 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Porting the Building Coder Samples to Revit 2011</h3>
+
+<p>Last year, I postponed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">
+porting of The Building Coder samples to Revit 2010</a> until
+
+pretty late, because I wanted to avoid forcing anyone to update.
+
+<p>This time around, I am doing it pretty early, and have a good reason for that as well.
+The migration from the Revit 2010 to the 2011 API is not quite as painless as in previous updates, because the whole Revit API has been significantly restructured and future-proofed.
+For details, please refer to the Revit 2011 beta SDK documentation, which includes ample explanations of all aspects.
+
+<p>Therefore, it is important to get some information and examples of the modifications required out there pretty early on, so that others can make use of the new samples for their own migration efforts.
+
+<p>I spent several days migrating The Building Coder samples.
+This may seem like a huge amount of time, and compared to the previous cycle it is, too.
+
+<p>On the other hand, I did have over sixty commands to migrate, and a lot of the migration effort has to do with the command registration and setup.
+Once you are past the command definition itself, the Execute method entry point, and the initial element selection or user interaction, there are much less changes in the real meat of an application.
+And I would assume that no other application out there defines sixty separate commands.
+
+<p>So without further ado, first of all let me present the new
+
+<a href="zip/bc_11_62.zip">
+Revit 2011 version 2011.0.0.62</a>
+
+of The Building Coder sample code.
+To make it easier to compare with the 2010 version, here is an updated
+
+<a href="zip/bc11065.zip">
+last Revit 2010 version 1.1.0.65</a>.
+
+<p>I hope you are aware of the Unix
+
+<a href="http://en.wikipedia.org/wiki/Diff">
+diff</a>,
+
+Visual Studio
+
+<a href="http://en.wikipedia.org/wiki/WinDiff">
+Windiff</a>,
+
+and the numerous other tools
+for comparing files and directory structures.
+
+<p>Note that every single source file differs.
+Many of the differences are systematic, however, and are the same for all, such as the transaction mode and regeneration option settings.
+I did go through and try to identify commands which do not modify the database at all, so I could explicitly set their transaction mode to read-only.
+
+<p>I also introduced a new version numbering system.
+Previously the major revision number was always 1.
+The minor revision number 0 corresponded to Revit 2009, and 1 to Revit 2010.
+Now I bumped the major revision to 2011, so that the correspondence to Revit 2011 is more obvious.
+I may use the minor revision to indicate intermediate updates of the Revit API, if any appear.
+The last number is currently set to 62 and indicates the number of commands defined, at the moment, at least.
+
+<p>I dropped one or two commands during the migration process, notably the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/filter-performa.html">
+filter performance</a> one.
+
+It was targeted specifically at benchmarking the Revit 2009 and 2010 filtering mechanism, which has been totally revamped in 2011.
+Obviously, a new filter performance test for 2011 would be very interesting to implement and evaluate.
+
+<p>I am still using RvtSamples to load and launch all The Building Coder samples, as well as all the other ADN samples that I work with.
+The BcSamples.txt include file read by RvtSamples is included in the zip file and provides all the details required.
+That data can also be used to define alternative loading mechanisms, e.g. using the old Revit.ini or the new add-in manifest approach.
+
+<p>More about the issues I encountered by and by.
+Much more!
+
+<p>Good luck in your own porting efforts!

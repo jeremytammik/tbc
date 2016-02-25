@@ -1,0 +1,54 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1256407 [Get extrusions out of a family] -->
+
+<h3>Access Extrusions in a Family</h3>
+
+<p>I am very busy right now preparing for the next Revit API training class which will be held in Warsaw, Poland, just after Easter. 
+For a full list of upcoming Revit API classes, please refer to the ADN 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+API training schedule</a>.
+
+<p>Meanwhile, here is a short and sweet little issue which clarifies the relationship between project elements such as family instances and the geometric primitives contained within them, which are family elements:
+
+<p><strong>Question:</strong> I am using families of category Curtain Panel that have extrusions in them.
+I can access all the panels from the Revit model.
+Once I have the panel, how can I retrieve all the extrusions in the family and access the extrusion parameters?
+
+<p><strong>Answer:</strong> The panel instances that you insert into your model live in the project document. 
+The extrusion elements that are used to define their geometry live in the family document, i.e. in a completely different space. 
+To access the extrusion elements, you have to open the family document and read the elements from there.
+
+Here are some previous topics which should help understand the situation better:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">
+The Revit Family API</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">
+The Revit Family Creation API Labs</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/remove-all-geometry-from-a-family.html">
+Removing all geometry from a family</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/nested-family.html">
+Creating a nested family</a>.</li>
+
+</ul>
+
+<p>One issue that you need to tackle in this context is how to open the family file. 
+If it is already opened by Revit, it will be listed in the application Documents collection. 
+Otherwise, you need to determine the family document path name, as explained in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/access-to-linked-file-geometry.html">
+accessing linked file geometry</a>.
+
+Finally, you should be able to adapt the example that 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/imports-in-families.html">
+opens all family documents and searches them for certain elements</a> to
+
+search for the extrusions instead.

@@ -1,0 +1,228 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!-- 
+
+  1251604 [Playing back journal file (txt) when Revit is running]
+  1251058 [Two Revit API questions]
+
+-->
+
+<h3>Journal File Replay</h3>
+
+<p>In spite of pretty mixed weather I went on a climb in the alps with my friend Robert on Saturday, the route 
+
+<a href="http://www.bergtour.ch/tourenfuehrer/routen/id/943">
+Kurze Kombination</a>
+
+(4c) on the mountain 
+
+<a href="http://www.bergtour.ch/tourenfuehrer/bilder/id/1047">
+Schmalst&ouml;ckli</a> 
+
+(2012 m) close to the Lidernenen H&uuml;tte.</p>
+
+<center>
+<img src="img/schmalstoeckli.jpg" alt="Schmalst&ouml;ckli mountain"/>
+</center>
+
+<p>Here I am after the climb, just below the summit:</p>
+
+<center>
+<img src="img/jeremy_near_schmalstoeckli_summit.jpg" alt="Jeremy near Schmalst&ouml;ckli summit"/>
+</center>
+
+<p>And this is Robert on the summit itself:</p>
+
+<center>
+<img src="img/robert_on_schmalstoeckli_summit.jpg" alt="Robert on Schmalst&ouml;ckli summit"/>
+</center>
+
+<p>We would made another climb on the same mountain if the weather had not been pretty grey and moist.
+Anyway, now it is Monday morning, and I am back again to Revit programming.</p>
+
+<p>We mentioned the Revit journal file repeatedly in previous posts, but a basic introduction to this topic was still missing.
+There is a good reason for this, because Autodesk does not provide any official support for the usage of journal files as a means of automating a portion of the design or production process. 
+The only official support for journal files is as a replay mechanism for testing or reporting issues.
+One can make use of the journaling mechanism totally at one's own risk, and there will almost certainly be changes, incompatibilities between versions, and other problems.</p>
+
+<p>The testing and reporting mechanism provided by the journaling mechanism is fully accessible to Revit add-ins as well.
+This access is demonstrated by the Revit SDK Journaling sample. 
+Anyone interested in making use of journaling for any purpose whatsoever should have a good look at this sample in order to understand the mechanism in more depth.</p>
+
+<p>Being unsupported, the journaling mechanism should be used only as a last resort.
+
+One example of a preferable approach for some tasks is to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/prompt-the-user-for-pinning-and-ifc-export.html">
+prompt the user</a> 
+
+instead.</p>
+
+<p>Still, with some imagination and due to the lack of automation support for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+driving Revit from outside</a>
+
+or 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/vb-samples-and-other-questions.html#1">
+invoking Revit commands</a> 
+
+such as the IFC export programmatically, it does sometimes offer interesting possibilities.</p>
+
+<p>All the uses mentioned above are related to driving Revit by replaying an existing or an automatically generated journal file.
+Another way of using the journal file is to read out its contents dynamically during an on-going session to find out what is going on. 
+I mentioned an idea to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/volume-computation-enable.html?cid=6a00e553e1689788330115708fd987970c#comment-6a00e553e1689788330115708fd987970c">
+determine the last Revit command</a>
+
+from it, and Greg Wesner discussed 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/getting-the-journal-file-path.html">
+getting the journal file path</a>
+
+for other monitoring purposes.</p>
+
+<p>Here are some recent questions on this topic, one of which lead to me finally putting together an example and proving to myself that a journal file can be used pretty reliably to drive a completely encapsulated sequence of commands, including Revit start up and shutdown. But first, let us look at a negative result.</p>
+
+<p><strong>Question:</strong>
+Is it possible to play back a Revit journal file while Revit is already running and a document is already opened?
+
+<p><strong>Answer:</strong>
+Sorry, I am not aware of any way to play back a journal file in the middle of a running session, with an opened document. 
+The only way I know of using journal files for programmatic purposes is to include the entire sequence of starting up Revit, opening the document, executing the desired action, and closing down Revit again within the journal file execution. 
+You may possibly omit the closing down part, in which case Revit will be left open, if you are willing to give up control to the user at that point.</p>
+
+<p>Here is the question that led me to test running Revit from a journal file and including steps in it which provide me API access for additional control during the replay process:</p>
+
+<p><strong>Question:</strong>
+Is it possible to use the Revit API to create a new family within the OnStartup method of an external application?</p>
+
+<p><strong>Answer:</strong>
+The argument provided to OnStartup is a ControlledApplication instance. 
+This object provides methods to manipulate the ribbon, access the shared parameters file, access some application level properties and set up application level event handler.</p>
+
+<p>It does not include access to the documents. 
+That access is provided by the Documents collection on the Application class, which is provided as an argument to external commands, which are only active after OnStartup has completed and a document has been opened.</p>
+
+<p>If you wish to start up Revit and immediately create a new family document, you can do so once manually and save the journal file that is generated by this interaction. 
+The journal file can then later be used to restart Revit and re-execute this process.</p>
+
+<p>If you wish to continue working programmatically with the new family document, you can set up an event handler for the DocumentCreated or DocumentOpened notification.</p>
+
+<p>Some notes on external applications and document event handling are provided by the blog entries:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/vb-samples-and-other-questions.html#3">External application OnStartup implementation in VB</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/barcelona-questions.html">External application implementing automatic synchronisation using document save and close events</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html">Transactions and document modification in a DocumentOpened event handler</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/document-modification-in-an-event.html">Document modification in the DocumentClosing event handler</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">Programmatic handling of dialogue box events</a>.</li>
+</ul>
+
+<p>Following this suggestion to implement an external application reacting to an event to programmatically process a newly created family file created by driving Revit from a journal file led to the following new question:</p>
+
+<p><strong>Question:</strong>
+I have created a journal file that opens a family document on Revit start up.
+However, it issues an error when calling my external application's OnStartup method saying "The journal file could not be run to completion."</p>
+
+<p><strong>Answer:</strong>
+
+I cannot reproduce the problem you describe.
+In my experience, the message that the journal file could not run to completion is due to other problems. 
+I do not believe it is caused by the event handler registration.
+To test this, I implemented a new external application AutoExecuteOnOpen which does what you say, registering event handlers for the DocumentCreated and DocumentOpened events in the OnStartup method. 
+Both of these simply print a message to the Visual Studio debug output window:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnStartup(
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; a.DocumentCreated 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentCreatedEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; a_DocumentCreated );
+&nbsp;
+&nbsp; a.DocumentOpened 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentOpenedEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; a_DocumentOpened );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnShutdown(
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; a.DocumentCreated
+&nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentCreatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; a_DocumentCreated );
+&nbsp;
+&nbsp; a.DocumentOpened
+&nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentOpenedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; a_DocumentOpened );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+}
+&nbsp;
+<span class="blue">void</span> a_DocumentCreated( <span class="blue">object</span> sender, Autodesk.Revit.Events.<span class="teal">DocumentCreatedEventArgs</span> e )
+{
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;DocumentCreated&quot;</span> );
+}
+&nbsp;
+<span class="blue">void</span> a_DocumentOpened( <span class="blue">object</span> sender, <span class="teal">DocumentOpenedEventArgs</span> e )
+{
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;DocumentOpened&quot;</span> );
+}
+</pre>
+
+<p>I registered this external application in Revit.ini.</p>
+
+<p>I then ran through the following sequence and saved the resulting journal file:</p>
+
+<ul>
+<li>Start up Revit.
+<li>Open a family document.
+<li>Close the family document.
+<li>Shut down Revit.
+</ul>
+
+<p>These steps resulted in a new journal file:</p>
+
+<pre>
+C:\Program Files\Autodesk Revit Architecture 2010\Journals\journal.0180.txt
+</pre>
+
+<p>I saved this journal file for replay and had no problem rerunning it. 
+It executes all the following expected steps without problems:</p>
+
+<ul>
+<li>Start up Revit.
+<li>Load the external application.
+<li>Open a family document.
+<li>Fire the DocumentOpened event.
+<li>Print the message.
+<li>Close the family document.
+<li>Shut down Revit.
+</ul>
+
+<p>In the first attempt at implementing my external application event handlers, I displayed a message box.
+This did not work, at least not when run from the debugger, because clicking OK in the message box had no effect, so the journal file execution was blocked at that point. 
+Replacing the message box by a simple Debug.Print statement solved that problem. 
+This shows that the entire execution process is very sensitive and picky, though.</p>
+
+<p>Here is a copy of my 
+
+<a href="zip/journal_file.txt">
+journal file</a>, 
+
+and here the entire Visual Studio solution 
+
+<a href="zip/AutoExecuteOnOpen.zip">
+AutoExecuteOnOpen</a>.</p>
+

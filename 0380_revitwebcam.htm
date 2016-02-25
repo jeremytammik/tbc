@@ -1,0 +1,479 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Display Webcam Image on Building Element Face</h3>
+
+<p>We are now ready to implement RevitWebcam, making use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/grabbing-an-internet-webcam-image.html">
+webcam image grabber</a>
+
+that I presented yesterday.
+
+<p>As I explained, the idea is to make use of the new Revit API
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a> 
+
+which allows 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+semi-asynchronous access</a> to the Revit API.
+
+<p>In order to display the webcam image updating itself in real-time on a Revit building element face, I implement the following steps:
+
+<ul>
+<li><a href="#1">Select a face on a BIM element</a>.
+<li><a href="#2">Set up a spatial field primitive for it</a>.
+<li><a href="#3">Set the analysis display style</a>.
+<li><a href="#4">Subscribe to the Idling event</a>.
+<li><a href="#5">Handle the Idling event</a>.
+</ul>
+
+<p>The first item is standard selection handling, and a suitable Revit SDK sample demonstrating that is the aptly named Selections sample.
+The second and third items have more to do with the analysis visualisation framework than the Idling event handling, and I based the code I wrote to implement them on the Revit SDK AVF samples DistanceToSurfaces and SpatialFieldGradient.
+
+<a name="1"></a>
+
+<h4>Select a Face on a BIM Element</h4>
+
+<p>In order to select the face, we make use of the new picking facilities and set up a filter to allow the user to only select faces, and only on building elements. 
+The method that I use to check whether an element is in fact a building element and not part of the annotation or something else is to check whether it has a valid category and its category contributes material to the building model.
+The call to select the element face and store it in a global variable _faceReference looks like this:
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject( 
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, 
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">BimElementFilter</span>(), 
+&nbsp; &nbsp; _prompt );
+
+&nbsp; _faceReference = r;
+</pre>
+
+<p>It makes use of the following selection filter:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">BimElementFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.HasMaterialQuantities;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+
+<a name="2"></a>
+
+<h4>Set a Spatial Field Primitive for a Face on a BIM Element</h4>
+
+<p>To display analysis results on the selected face requires us to set up a spatial field primitive for it.
+Spatial field primitives are handled by the SpatialFieldManager class, which uses integer indices to keep track of them.
+In order to update the correct primitive later on, we store it in a global variable _sfp_index.
+Here is the code to access the manager and set up the primitive:
+
+<pre class="code">
+&nbsp; <span class="teal">SpatialFieldManager</span> sfm
+&nbsp; &nbsp; = <span class="teal">SpatialFieldManager</span>.GetSpatialFieldManager( 
+&nbsp; &nbsp; &nbsp; view );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != sfm &amp;&amp; 0 &lt; _sfp_index )
+&nbsp; {
+&nbsp; &nbsp; sfm.RemoveSpatialFieldPrimitive( 
+&nbsp; &nbsp; &nbsp; _sfp_index );
+&nbsp;
+&nbsp; &nbsp; _sfp_index = -1;
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Set the Analysis Display Style</h4>
+
+<p>I set up an analysis display style in order to turn off the gridlines and define a black and white colour range suitable for the greyscale image I retrieve from the webcam.
+The code to do so is based on the SpatialFieldGradient SDK sample and looks like this:
+
+<pre class="code">
+<span class="blue">void</span> SetAnalysisDisplayStyle( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">AnalysisDisplayStyle</span> analysisDisplayStyle;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> styleName 
+&nbsp; &nbsp; = <span class="maroon">&quot;Revit Webcam Display Style&quot;</span>;
+&nbsp;
+&nbsp; <span class="green">// extract existing display styles with specific name</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> a 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; elements = a
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">AnalysisDisplayStyle</span> ) )
+&nbsp; &nbsp; .Where( x =&gt; x.Name.Equals( styleName ) )
+&nbsp; &nbsp; .Cast&lt;<span class="teal">Element</span>&gt;()
+&nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; elements.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// use the existing display style</span>
+&nbsp;
+&nbsp; &nbsp; analysisDisplayStyle = elements[0] 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">AnalysisDisplayStyle</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// create new display style:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// coloured surface settings:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">AnalysisDisplayColoredSurfaceSettings</span> 
+&nbsp; &nbsp; &nbsp; coloredSurfaceSettings 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisDisplayColoredSurfaceSettings</span>();
+&nbsp;
+&nbsp; &nbsp; coloredSurfaceSettings.ShowGridLines = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// color settings:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">AnalysisDisplayColorSettings</span> colorSettings 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisDisplayColorSettings</span>();
+&nbsp;
+&nbsp; &nbsp; colorSettings.MaxColor = <span class="blue">new</span> <span class="teal">Color</span>( 255, 255, 255 );
+&nbsp; &nbsp; colorSettings.MinColor = <span class="blue">new</span> <span class="teal">Color</span>( 0, 0, 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// legend settings:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">AnalysisDisplayLegendSettings</span> legendSettings 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisDisplayLegendSettings</span>();
+&nbsp;
+&nbsp; &nbsp; legendSettings.NumberOfSteps = 10;
+&nbsp; &nbsp; legendSettings.Rounding = 0.05;
+&nbsp; &nbsp; legendSettings.ShowDataDescription = <span class="blue">false</span>;
+&nbsp; &nbsp; legendSettings.ShowLegend = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// extract legend text:</span>
+&nbsp;
+&nbsp; &nbsp; a = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; elements = a
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; .Where( x =&gt; x.Name == <span class="maroon">&quot;LegendText&quot;</span> )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Element</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; elements.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// if LegendText exists, use it for this display style</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteType</span> textType = elements[0] <span class="blue">as</span> <span class="teal">TextNoteType</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; legendSettings.SetTextTypeId( textType.Id, doc );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create the analysis display style:</span>
+&nbsp;
+&nbsp; &nbsp; analysisDisplayStyle = <span class="teal">AnalysisDisplayStyle</span>
+&nbsp; &nbsp; &nbsp; .CreateAnalysisDisplayStyle(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, styleName, coloredSurfaceSettings, 
+&nbsp; &nbsp; &nbsp; &nbsp; colorSettings, legendSettings );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// assign the display style to the active view</span>
+&nbsp;
+&nbsp; doc.ActiveView.AnalysisDisplayStyleId 
+&nbsp; &nbsp; = analysisDisplayStyle.Id;
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Subscribe to the Idling Event</h4>
+
+<p>Now we get to the real meat of this discussion, subscribing to the Idling event and implementing the handler to process it.
+
+<p>The actual subscription process is a one-liner:
+
+<pre class="code">
+&nbsp; uiapp.Idling
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; OnIdling );
+</pre>
+
+<a name="5"></a>
+
+<h4>Handle the Idling Event</h4>
+
+<p>The event handler may be called very frequently, as demonstrated by The Building Coder 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+CmdIdling</a> command.
+
+Since the webcam image will be updated less frequently, it makes sense to check for updates less frequently than the handler is called, i.e. skip the majority of the calls. 
+I do so by defining a minimum elapsed time interval, and simply returning immediately from the handler if it has not yet passed since the last update.
+
+<p>If the minimum time interval is up, I grab the current image from URL.
+There is still no guarantee that it has changed, so before starting a transaction and making any changes to the Revit model, I compare the current image with the last one displayed.
+The comparison is rather simplistic, based on a SHA256Managed hash value calculated from the image pixel data like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">byte</span> [] HashValue
+{
+&nbsp; <span class="blue">get</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// convert image to a byte array</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ImageConverter</span> ic = <span class="blue">new</span> <span class="teal">ImageConverter</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">byte</span>[] bytes = ( <span class="blue">byte</span>[] ) ic.ConvertTo( 
+&nbsp; &nbsp; &nbsp; _bitmap, <span class="blue">typeof</span>( <span class="blue">byte</span>[] ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// compute a hash for image</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SHA256Managed</span> shaM = <span class="blue">new</span> <span class="teal">SHA256Managed</span>();
+&nbsp; &nbsp; <span class="blue">return</span> shaM.ComputeHash( bytes );
+&nbsp; }
+}
+</pre>
+
+<p>If an update is deemed necessary, a transaction is started, the spatial field primitive is set up for the face, and the field points and values to display the image data are calculated and applied.
+
+<p>Here is the code to calculate the points and values for a given face and greyscale bitmap data:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> GetFieldPointsAndValues( 
+&nbsp; <span class="blue">ref</span> <span class="teal">IList</span>&lt;<span class="teal">UV</span>&gt; pts,
+&nbsp; <span class="blue">ref</span> <span class="teal">IList</span>&lt;<span class="teal">ValueAtPoint</span>&gt; valuesAtPoints,
+&nbsp; <span class="blue">ref</span> <span class="teal">GreyscaleBitmapData</span> data,
+&nbsp; <span class="teal">Face</span> face )
+{
+&nbsp; <span class="teal">BoundingBoxUV</span> bb = face.GetBoundingBox();
+&nbsp;
+&nbsp; <span class="blue">double</span> umin = bb.Min.U;
+&nbsp; <span class="blue">double</span> umax = bb.Max.U;
+&nbsp; <span class="blue">double</span> ustep = ( umax - umin ) / data.Width;
+&nbsp; <span class="blue">double</span> u = umin;
+&nbsp;
+&nbsp; <span class="blue">double</span> v = bb.Min.V;
+&nbsp; <span class="blue">double</span> vmax = bb.Max.V;
+&nbsp; <span class="blue">double</span> vstep = ( vmax - v ) / data.Height;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; values = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;( 1 );
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> y = 0; y &lt; data.Height; ++y, v += vstep )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( v &lt; vmax, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected v to remain within bounds&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; u = umin;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> x = 0; x &lt; data.Width; ++x, u += ustep )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( u &lt; umax, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected u to remain within bounds&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> brightness = data.GetBrightnessAt( 
+&nbsp; &nbsp; &nbsp; &nbsp; x, y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UV</span> uv = <span class="blue">new</span> <span class="teal">UV</span>( u, v );
+&nbsp; &nbsp; &nbsp; pts.Add( uv );
+&nbsp;
+&nbsp; &nbsp; &nbsp; values.Clear();
+&nbsp; &nbsp; &nbsp; values.Add( brightness );
+&nbsp; &nbsp; &nbsp; valuesAtPoints.Add( <span class="blue">new</span> <span class="teal">ValueAtPoint</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; values ) );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>To summarise, the event handler thus needs to perform the following steps:
+
+<ul>
+<li>Check minimum elapsed time interval</a>.
+<li>Grab current image from URL</a>.
+<li>Check whether an update is required</a>.
+<li>Start transaction for write access</a>.
+<li>Set up spatial field primitive</a>.
+<li>Calculate field points and values from the image data.
+<li>Update the spatial field primitive.
+</ul>
+
+<p>Here is the actual code implementing these steps:
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> OnIdling( 
+&nbsp; <span class="blue">object</span> sender, 
+&nbsp; <span class="teal">IdlingEventArgs</span> e )
+{
+&nbsp; <span class="blue">if</span>( <span class="teal">DateTime</span>.Now.Subtract( _lastUpdate ) 
+&nbsp; &nbsp; &gt; _interval )
+&nbsp; {
+&nbsp; &nbsp; Log( <span class="maroon">&quot;OnIdling&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GreyscaleBitmapData</span> data 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">GreyscaleBitmapData</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; _width, _height, _url );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">byte</span>[] hash = data.HashValue;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _lastHash
+&nbsp; &nbsp; &nbsp; || 0 != CompareBytes( hash, _lastHash ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _lastHash = hash;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// access active document from sender:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != app,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a valid Revit application instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; Log( <span class="maroon">&quot;OnIdling image changed, active document &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + doc.Title );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> transaction 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;Revit Webcam Update&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; transaction.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView; <span class="green">// maybe has to be 3D</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SpatialFieldManager</span> sfm 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">SpatialFieldManager</span>.GetSpatialFieldManager( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sfm ) 
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sfm = <span class="teal">SpatialFieldManager</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CreateSpatialFieldManager( view, 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; _sfp_index )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _sfp_index = sfm.AddSpatialFieldPrimitive(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _faceReference );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nPoints = data.Width * data.Height;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">UV</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">UV</span>&gt;( nPoints );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ValueAtPoint</span>&gt; valuesAtPoints 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ValueAtPoint</span>&gt;( nPoints );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Face</span> face = _faceReference.GeometryObject 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; GetFieldPointsAndValues( <span class="blue">ref</span> pts, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> valuesAtPoints, <span class="blue">ref</span> data, face );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FieldDomainPointsByUV</span> fieldPoints 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FieldDomainPointsByUV</span>( pts );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FieldValues</span> fieldValues 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FieldValues</span>( valuesAtPoints );
+&nbsp;
+&nbsp; &nbsp; &nbsp; sfm.UpdateSpatialFieldPrimitive( 
+&nbsp; &nbsp; &nbsp; &nbsp; _sfp_index, fieldPoints, fieldValues );
+&nbsp;
+&nbsp; &nbsp; &nbsp; transaction.Commit();
+&nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; _lastUpdate = <span class="teal">DateTime</span>.Now;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Notice that we open our own transaction here and regenerate the document manually.
+
+<p>The mainline of the external command Execute method putting this all together looks like this:
+
+<pre class="code">
+<span class="teal">UIApplication</span> uiapp = commandData.Application;
+<span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+<span class="teal">Document</span> doc = uidoc.Document;
+<span class="teal">View</span> view = doc.ActiveView; <span class="green">// maybe has to be 3D</span>
+&nbsp;
+<span class="teal">Reference</span> r = uidoc.Selection.PickObject( 
+&nbsp; <span class="teal">ObjectType</span>.Face, 
+&nbsp; <span class="blue">new</span> <span class="teal">BimElementFilter</span>(), 
+&nbsp; _prompt );
+&nbsp;
+<span class="teal">Debug</span>.Assert( <span class="blue">null</span> != r, 
+&nbsp; <span class="maroon">&quot;expected non-null reference from PickObject&quot;</span> );
+&nbsp;
+<span class="teal">Debug</span>.Assert( <span class="blue">null</span> != r.Element, 
+&nbsp; <span class="maroon">&quot;expected non-null element from PickObject&quot;</span> );
+&nbsp;
+<span class="teal">Debug</span>.Assert( <span class="blue">null</span> != r.GeometryObject, 
+&nbsp; <span class="maroon">&quot;expected non-null geometry object from PickObject&quot;</span> );
+&nbsp;
+<span class="teal">SpatialFieldManager</span> sfm
+&nbsp; = <span class="teal">SpatialFieldManager</span>.GetSpatialFieldManager( 
+&nbsp; &nbsp; view );
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> != sfm &amp;&amp; 0 &lt; _sfp_index )
+{
+&nbsp; sfm.RemoveSpatialFieldPrimitive( 
+&nbsp; &nbsp; _sfp_index );
+&nbsp;
+&nbsp; _sfp_index = -1;
+}
+_faceReference = r;
+&nbsp;
+SetAnalysisDisplayStyle( doc );
+&nbsp;
+uiapp.Idling
+&nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; OnIdling );
+&nbsp;
+<span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>The mainline is enclosed in an exception handler, but I have not noticed any exceptions being thrown by it so far.
+
+<p>The command uses manual transaction mode and the manual regeneration option, since the required transaction and regeneration handling is indeed implemented by the OnIdling method.
+
+<p>We can use of the view of Piccadilly Circus from the webcam we used for our 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/grabbing-an-internet-webcam-image.html">
+image grabbing samples</a>:</p>
+
+<center>
+<img src="img/webcam_piccadilly.jpg" alt="Webcam image of Picadilly Circus"/>
+</center>
+
+<p>I test ran the add-in in the sample project SpatialFieldGradient.rvt provided with the AVF SDK sample mentioned above, which contains various types of wall elements.
+Here is a daytime view of the Revit screen:</p>
+
+<center>
+<img src="img/webcam_on_wall.jpg" alt="RevitWebcam image of Picadilly Circus at daytime"/>
+</center>
+
+<p>Here is a similar view at night:</p>
+
+<center>
+<img src="img/webcam_on_wall_at_night.jpg" alt="RevitWebcam image of Picadilly Circus at night"/>
+</center>
+
+<p>Here is 
+
+<a href="zip/RevitWebcam.zip">
+RevitWebcam.zip</a>
+
+containing the complete source code and Visual Studio solution for this Revit external command add-in.
+
+<p>I still have one more Idling sample up my sleeve which I hope to be able to document in the coming days as well. 
+Meanwhile, I hope that you find this as interesting as I do, even if this specific sample may not have that many immediate uses in most people's day-to-day work, and that the underlying principles and solution steps are useful anyway.

@@ -1,0 +1,157 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>TextNote Rotation</h3>
+
+<p>Although the Document and FamilyItemFactory classes provide a NewTextNote method which allows us to freely specify the rotation angle when creating new text note instances, there is currently no access to read the rotation of an existing TextNote element in the Revit API.
+Exploring this issue in a little bit more depth discovered a possibility for a workaround, though, which I think worth while presenting.
+It also prompted me to update The Building Coder sample command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/element-bounding-box.html">
+CmdBoundingBox</a>, 
+
+which displays the values of a selected building element bounding box.
+Here is the question that prompted this update:
+
+<p><strong>Question:</strong> I would like to transfer all text elements from a backup version of a project to a newer updated version.
+
+It seems the using the clipboard to copy and paste aligned works nicely view by view, but there is no way to access this UI functions from the API. Since there are over a thousand views to process, doing it manually is not an option for us.
+
+I am able to extract all the views and text notes in it programmatically, but I do not see how to obtain the rotational value of an existing text note. Is there any accessible property providing this data?
+
+<p><strong>Answer:</strong> Unfortunately not, although we have registered a wish list item for this functionality. Here is a suggestion for a workaround, though:
+
+<p>From the TextNote element, you can access the following graphical properties:
+
+<ul>
+<li>BoundingBox
+<li>Coord
+<li>Width
+</ul>
+
+<p>I created a sample model with the following text note:</p>
+
+<center>
+<img src="img/textnote_rotated.png" alt="Rotated text note"/>
+</center>
+
+<p>Extracting those three properties and creating a couple of simple geometric drawing primitives to represent them, I obtain the following:</p>
+
+<center>
+<img src="img/textnote_rotated_properties.png" alt="Text note graphical properties"/>
+</center>
+
+<p>In this drawing, 
+
+<ul>
+<li>BoundingBox is displayed as a box.
+<li>Coord is displayed as a circle.
+<li>Width is represented by the length of the line.
+</ul>
+
+<p>From this you can see that you can calculate an approximate rotation angle plus minus &pi; from these three values, by determining the angle required to rotate the line around the Coord position to fit it inside the bounding box.
+
+<a name="2"></a>
+
+<h4>CmdBoundingBox Update</h4>
+
+<p>In preparing the images above, I noticed that my original implementation of The Building Coder sample command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/element-bounding-box.html">
+CmdBoundingBox</a> examining 
+
+the bounding box of a Revit element was rather limited in functionality.
+
+<p>Querying the bounding box of a text note without specifying a view returns null.
+In that case, the command would throw an exception.
+Although it included a debugging assertion to check that a non-null value was returned, there was no runtime check to react to the null value and avoid dereferencing it.
+
+<p>Also, in this case, the null value returned when no view is specified should cause the command to try again with a valid view, which will return a valid bounding box in the case of a text note.
+
+<p>I therefore updated command in the following ways:
+
+<ul>
+<li>If a null value is returned for the bounding box without a view specified, try again using the current view.
+<li>If a null value is still returned, print an error message in both release and debug mode.
+<li>List the results in a message box, not just in the Visual Studio debug output console.
+<li>Since the command makes no modifications to the database, change the transaction mode to read-only.
+</ul>
+
+<p>Here is the updated source code for the bounding box command:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdBoundingBox</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="teal">Util</span>.SelectSingleElement(
+&nbsp; &nbsp; &nbsp; uidoc, <span class="maroon">&quot;an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No element selected&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> v = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> b = e.get_BoundingBox( v );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == b )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; v = commandData.View;
+&nbsp; &nbsp; &nbsp; b = e.get_BoundingBox( v );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == b )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e )
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; has no bounding box.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( b.Transform.IsIdentity,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected identity bounding box transform&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> in_view = ( <span class="blue">null</span> == v )
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;model space&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;view &quot;</span> + v.Name;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element bounding box of {0} in &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{1} extends from {2} to {3}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; &nbsp; &nbsp; in_view,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Min ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Max ) ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>It now displays the following message when running it and selecting the text note shown above:</p>
+
+<center>
+<img src="img/textnote_bounding_box.png" alt="Text note bounding box coordinates"/>
+</center>
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_72_2.zip -->
+
+<a href="zip/bc_11_72_2.zip">
+version 2011.0.72.2</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution and the updated version of the command.

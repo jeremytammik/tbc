@@ -1,0 +1,405 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<h3>Recursively Disable Architecture Mismatch Warning</h3>
+
+<p>I recently explained the cause and resolution of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+processor architecture mismatch warning MSB3270</a>.</p>
+
+<p>On closer consideration, I decided to fix it for all the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+ADN training material labs and samples</a>,
+
+and actually for the entire collection of Revit SDK samples as well.</p>
+
+<p>This is obviously not something you want to do manually, considering that it involves a modification of hundreds of project files.</p>
+
+<p>Here are the steps involved in automating and testing this process:</p>
+
+<ul>
+<li><a href="#2">Disable mismatch warning utility</a></li>
+<li><a href="#3">Project file header and property group</a></li>
+<li><a href="#4">Property group string constants</a></li>
+<li><a href="#5">File processing and prerequisites check</a></li>
+<li><a href="#6">Recursive directory traversal</a></li>
+<li><a href="#7">Mainline</a></li>
+<li><a href="#8">Potential enhancements</a></li>
+<li><a href="#9">Results on SDK and ADN sample code</a></li>
+<li><a href="#10">Other warnings, hitherto hidden</a></li>
+<li><a href="#11">Download and updated ADN training material</a></li>
+<li><a href="#12">Update for Gopi</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Disable Mismatch Warning Utility</h4>
+
+<p>Since this involves hundreds of project files, I implemented a script to fulfil the task.
+Normally, I would use either Python or a Unix shell script driving sed.
+In order to share it more easily with you guys and the development team, I decided to implement a C# .NET command line executable instead, DisableMismatchWarning.exe.</p>
+
+<p>It recursively searches for all C# and VB project files in and below the current working directory and adds the relevant property group to them.</p>
+
+
+<a name="3"></a>
+
+<h4>Project File Header and Property Group</h4>
+
+<p>What property group? And how, exactly, please?</p>
+
+<p>Well, for instance, looking at the AddSpaceAndZone SDK sample, one of the first, alphabetically speaking, here are the first five lines in the project file with the filename extension CSPROJ (view source or copy to an editor to see the truncated lines in full):</p>
+
+<pre class="prettyprint">
+&lt;Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;Configuration Condition=" '$(Configuration)' == '' "&gt;Debug&lt;/Configuration&gt;
+    &lt;Platform Condition=" '$(Platform)' == '' "&gt;AnyCPU&lt;/Platform&gt;
+    &lt;ProductVersion&gt;9.0.30729&lt;/ProductVersion&gt;
+</pre>
+
+<p>As explained in the above-mentioned discussion, I can define the required new property group to suppress the undesired compilation warning message by adding the following lines (or single long line, if desired) before the existing property groups:</p>
+
+<pre class="prettyprint">
+&lt;PropertyGroup&gt;
+  &lt;ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;
+    None
+  &lt;/ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;
+&lt;/PropertyGroup&gt;
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Property Group String Constants</h4>
+
+<p>Here are the two string constants that I define to check for an existing tag in order to tell whether a given project file has already been processed, and the entire property group to add if that is not the case:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _arch_mismatch_tag
+&nbsp; = <span class="maroon">&quot;&lt;ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;&quot;</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> _property_group
+&nbsp; = <span class="maroon">&quot;&nbsp; &lt;PropertyGroup&gt;\r\n&quot;</span>
+&nbsp; + <span class="maroon">&quot;&nbsp; &nbsp; &lt;ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;\r\n&quot;</span>
+&nbsp; + <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; None\r\n&quot;</span>
+&nbsp; + <span class="maroon">&quot;&nbsp; &nbsp; &lt;/ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch&gt;\r\n&quot;</span>
+&nbsp; + <span class="maroon">&quot;&nbsp; &lt;/PropertyGroup&gt;\r\n&quot;</span>;
+</pre>
+
+
+<a name="5"></a>
+
+<h4>File Processing and Prerequisites Check</h4>
+
+<p>Before I make this modification to a file, I obviously want to be absolutely sure that:</p>
+
+<ul>
+<li>I have write access to it.</li>
+<li>It really is a valid Visual Studio project file.</li>
+<li>It has not already been processed, i.e. it does not already contain a ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch tag.</li>
+<li>A backup file is created before adding the property group.</li>
+</ul>
+
+<p>Here is a C# .NET method that performs these steps on a given filename, adds the new property group lines to it, and reports the results on the command line:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Examine the given file.</span>
+<span class="gray">///</span><span class="green"> Check that it is not read-only.</span>
+<span class="gray">///</span><span class="green"> Check that it appears to be a valid </span>
+<span class="gray">///</span><span class="green"> Visual Studio project file.</span>
+<span class="gray">///</span><span class="green"> Check that it does not already contain a </span>
+<span class="gray">///</span><span class="green"> ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch </span>
+<span class="gray">///</span><span class="green"> tag.</span>
+<span class="gray">///</span><span class="green"> If so, create a backup file and </span>
+<span class="gray">///</span><span class="green"> add the property group.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">bool</span> AddPropertyGroup( <span class="blue">string</span> filename )
+{
+&nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">Console</span>.WriteLine( filename + <span class="maroon">&quot; -- examine...&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">FileAttributes</span> atts = <span class="teal">File</span>.GetAttributes(
+&nbsp; &nbsp; filename );
+&nbsp;
+&nbsp; <span class="blue">bool</span> isReadOnly = (<span class="teal">FileAttributes</span>.ReadOnly
+&nbsp; &nbsp; == (atts &amp; <span class="teal">FileAttributes</span>.ReadOnly));
+&nbsp;
+&nbsp; <span class="blue">if</span>( isReadOnly )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Console</span>.WriteLine( filename + <span class="maroon">&quot; -- read-only.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; lines = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; <span class="teal">File</span>.ReadLines( filename ) );
+&nbsp;
+&nbsp; <span class="blue">bool</span> isProjectFile
+&nbsp; &nbsp; = lines[0].StartsWith( <span class="maroon">&quot;&lt;?xml version=&quot;</span> )
+&nbsp; &nbsp; &amp;&amp; lines[1].StartsWith( <span class="maroon">&quot;&lt;Project &quot;</span> )
+&nbsp; &nbsp; &amp;&amp; lines[2].Equals( <span class="maroon">&quot;&nbsp; &lt;PropertyGroup&gt;&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = 2;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !isProjectFile )
+&nbsp; {
+&nbsp; &nbsp; isProjectFile
+&nbsp; &nbsp; &nbsp; = lines[0].StartsWith( <span class="maroon">&quot;&lt;Project &quot;</span> )
+&nbsp; &nbsp; &nbsp; &amp;&amp; lines[1].Equals( <span class="maroon">&quot;&nbsp; &lt;PropertyGroup&gt;&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; n = 1;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( !isProjectFile )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Console</span>.WriteLine( filename + <span class="maroon">&quot; -- not a Visual Studio project.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">bool</span> hasArchMismatchTag = 0 &lt; lines.Where(
+&nbsp; &nbsp; a =&gt; a.Contains( _arch_mismatch_tag ) ).Count();
+&nbsp;
+&nbsp; <span class="blue">if</span>( hasArchMismatchTag )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Console</span>.WriteLine( filename + <span class="maroon">&quot; -- already has an architecture mismatch tag.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Console</span>.WriteLine( filename + <span class="maroon">&quot; -- process...&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">File</span>.Copy( filename, filename + <span class="maroon">&quot;.bak&quot;</span>, <span class="blue">true</span> );
+&nbsp;
+&nbsp; lines.Insert( n, _property_group );
+&nbsp;
+&nbsp; <span class="teal">File</span>.WriteAllLines( filename, lines );
+&nbsp;
+&nbsp; rc = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Recursive Directory Traversal</h4>
+
+<p>I would like to apply this method recursively to all files with a CSPROJ or VBPROJ filename extension.</p>
+
+<p>I looked and quickly found the following suggestion for a
+
+<a href="http://stackoverflow.com/questions/437728/recursive-file-search-in-net">recursive file search in .NET</a> as
+
+a starting point:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return full path of all files mathing pattern</span>
+<span class="gray">///</span><span class="green"> found recursively below the given root folder.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;root&quot;&gt;</span><span class="green">Root starting folder</span><span class="gray">&lt;/param&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;searchPattern&quot;&gt;</span><span class="green">Filename pattern</span><span class="gray">&lt;/param&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Enumeration of full file paths</span><span class="gray">&lt;/returns&gt;</span>
+<span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;<span class="blue">string</span>&gt; Search(
+&nbsp; <span class="blue">string</span> root,
+&nbsp; <span class="blue">string</span> searchPattern )
+{
+&nbsp; <span class="teal">Queue</span>&lt;<span class="blue">string</span>&gt; dirs = <span class="blue">new</span> <span class="teal">Queue</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; dirs.Enqueue( root );
+&nbsp;
+&nbsp; <span class="blue">while</span>( 0 &lt; dirs.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> dir = dirs.Dequeue();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// files</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] paths = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; paths = <span class="teal">Directory</span>.GetFiles(
+&nbsp; &nbsp; &nbsp; &nbsp; dir, searchPattern );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// swallow</span>
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( paths != <span class="blue">null</span> &amp;&amp; 0 &lt; paths.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> file <span class="blue">in</span> paths )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">yield</span> <span class="blue">return</span> file;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// sub-directories</span>
+&nbsp;
+&nbsp; &nbsp; paths = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; paths = <span class="teal">Directory</span>.GetDirectories( dir );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// swallow</span>
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( paths != <span class="blue">null</span> &amp;&amp; paths.Length &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> subDir <span class="blue">in</span> paths )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; dirs.Enqueue( subDir );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>As explained by its author, it avoids the access denied exception thrown by the built-in recursive search and is lazily evaluated, returning results as soon as it finds them.</p>
+
+
+<a name="7"></a>
+
+<h4>Mainline</h4>
+
+<p>With these two methods in place, there is nothing left for the console application mainline to do, beyond determining the current working directory and launching the process:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Add a new property group to suppress the </span>
+<span class="gray">///</span><span class="green"> processor architecture mismatch warning MSB3270</span>
+<span class="gray">///</span><span class="green"> to all Visual Studio C# and VB .NET project </span>
+<span class="gray">///</span><span class="green"> files with the filename extension CSPROJ or </span>
+<span class="gray">///</span><span class="green"> VBPROJ found recursively in the current working </span>
+<span class="gray">///</span><span class="green"> directory or any of its subfolders.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">int</span> Main( <span class="blue">string</span>[] args )
+{
+&nbsp; <span class="blue">string</span> root = <span class="teal">Directory</span>.GetCurrentDirectory();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> match <span class="blue">in</span> Search( root, <span class="maroon">&quot;*proj&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = match.ToLower();
+&nbsp; &nbsp; <span class="blue">if</span>( path.EndsWith( <span class="maroon">&quot;.csproj&quot;</span> )
+&nbsp; &nbsp; &nbsp; || path.EndsWith( <span class="maroon">&quot;.vbproj&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; AddPropertyGroup( match );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> 0;
+}
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Potential Enhancements</h4>
+
+<p>It might be cleaner to handle this by reading and writing the project files as XML files, not just simple line-based text.</p>
+
+<p>This utility will not overwrite a read-only file.
+The standard Revit SDK installation sets all project files to read-only, so you may have to change that before you can run the utility.</p>
+
+
+<a name="9"></a>
+
+<h4>Results on SDK and ADN Sample Code</h4>
+
+<p>Initially, it processed only 56 project files out of the total 169 provided in the Revit 2014 SDK.
+Others were not recognised as valid Visual Studio projects.</p>
+
+<p>For instance, some (or all?) VB project files apparently lack the initial <code>?xml</code> tag line, and the first attribute of the <code>Project</code> tag may be either <code>DefaultTargets</code> or <code>ToolsVersion</code>.</p>
+
+<p>The criteria I initially applied to check for a valid Visual Studio project file were stricter than the ones listed above.
+Relaxing them slightly enabled the utility to successfully recognise and process all 169 Revit SDK projects.</p>
+
+<p>All of those pesky architecture mismatch warnings are now eliminated.</p>
+
+
+<a name="10"></a>
+
+<h4>Other Warnings, Hitherto Hidden</h4>
+
+<p>Once the hundreds of architecture mismatch warnings were gone, I noticed five completely unexpected and unrelated new warning messages that previously were impossible to find in the multitude:</p>
+
+<ol>
+<li>XML comment is not placed on a valid language element C:\a\lib\revit\2014\SDK\Samples\FamilyCreation\WindowWizard\CS\Command.cs 41 9 WindowWizard</li>
+<li>ExternalCommandRegistration: Could not locate the assembly "RevitAddInUtility". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.</li>
+<li>The referenced component 'RevitAddInUtility' could not be found.</li>
+<li>RoutingPreferenceTools: Could not locate the assembly "RevitAPIIFC". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.</li>
+<li>The referenced component 'RevitAPIIFC' could not be found.</li>
+</ol>
+
+<p>All five were trivial to fix manually by removing the offending elements, i.e. an erroneous comment in the WindowWizard Command.cs and the two completely unnecessary RevitAddInUtility and RevitAPIIFC assembly references in the ExternalCommandRegistration and RoutingPreferenceTools projects.</p>
+
+
+<a name="11"></a>
+
+<h4>Download and Updated ADN Training Material</h4>
+
+<p>You can download the complete source code and Visual Studio solution from my
+
+<a href="https://github.com/jeremytammik/DisableMismatchWarning">
+DisableMismatchWarning GitHub repository</a>,
+
+my second foray into this realm.</p>
+
+<p>I also updated all the ADN training material labs and sample applications.</p>
+
+<p>The last version I posted was set up to refer to the Revit Architecture 2014 API assemblies.</p>
+
+<p>I now switched to Revit 2014 Onebox, to I changed the path to these from <code>C:\Program Files\Autodesk\Revit Architecture 2014</code> to <code>C:\Program Files\Autodesk\Revit 2014</code>.</p>
+
+<p>The compilation of the last version of the ADN Revit API training labs that I posted still generated
+
+<a href="zip/adn_migr_2014_b.txt">35 warnings</a>.
+
+The new version reduces these to
+
+<a href="zip/adn_migr_2014_c.txt">19 warnings</a>.
+
+<p>Here is
+
+<a href="file:////a/lib/revit/2014/adn/zip/adn_src_2014_1.zip">adn_src_2014_1.zip</a> including
+
+the updated source code, lab instructions, Visual Studio solutions and add-in manifests of the ADN Revit API training labs, Revit MEP sample, and Revit Structure labs, link and other samples, which was last published in three separate chunks:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/migrating-the-adn-training-labs-to-revit-2014.html">
+ADN Training Labs for Revit 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/the-adn-sample-adnrme-for-revit-mep-2014.html">
+ADN AdnRme sample for Revit MEP 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/adn-training-material-for-revit-structure-2014.html">
+ADN Training Material for Revit Structure 2014</a></li>
+</ul>
+
+<a name="12"></a>
+
+<h4>Update for Gopi</h4>
+
+<p>After comparing my ADN sample code with my colleague Gopi's version, I discovered that he had corrected one deprecated API usage warning that I had not.</p>
+
+<p>In order to get us better synchronised, I went ahead and fixed that, only to discover that once I started, I might as well go ahead and fix a few more.</p>
+
+<p>Here is therefore an updated
+
+<a href="file:////a/lib/revit/2014/adn/zip/adn_labs_2014_2.zip">
+version 2014.0.0.2</a> of
+
+the ADN Training Labs for Revit 2014, whose compilation now only produces
+
+<a href="zip/adn_migr_2014_d.txt">7 warnings</a>.</p>
+
+<p>It also includes Gopi's updated version of the lab instruction documents.</p>
+
+<p>I would have said that 'we'll get there eventually', meaning 'down to zero warnings', only a few of these are actually intentional, for demonstration purposes...</p>

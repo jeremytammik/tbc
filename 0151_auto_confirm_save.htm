@@ -1,0 +1,143 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1250788 [suppress message box on Save / Close] -->
+
+<h3>Auto-Confirm Save Using DialogBoxShowing Event</h3>
+
+<p>Simon Del Faveo of 
+
+<a href="http://www.revittv.com">
+RevitTV Limited</a>
+
+asked an interesting question which I decided to implement a sample application for, since it may be of general interest and even general use.
+It demonstrates a specific use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html">
+new events</a>
+
+provided by the Revit 2010 API.</p>
+
+<p><strong>Question:</strong>
+We are trying to save loaded family files after some parameters have been added.
+When using the Save or Close functions, Revit always prompts you with the confirm message box asking 'Do you want to save changes to filename.rfa?' and offering Yes, No, and Cancel options.
+We are processing a whole series of RFA files, so we don't want that message box appearing hundreds of times.
+Is there any way via the API to prevent the message box from appearing?</p>
+
+<p><strong>Answer:</strong>
+You can request notification on the display of certain dialogue boxes by registering to the Application.DialogBoxShowing event. Its event handler takes two arguments, the sender and a DialogBoxShowingEventArgs instance. The sender argument is actually the Revit application object. The event args parameter provides a HelpId property to enable you to identify the dialogue, and an OverrideResult method to define how the dialogue should be handled.</p>
+
+<!-- not all dialogs raise events: 1249891 [Is it possible to access the message queue in Revit?] -->
+
+<p>Note that not all dialogues in Revit raise a DialogBoxShowing event. Only dialogs derived from a specific internal class do so, unless a specific derived class overrides that default behaviour. I do not have a list of exceptions, but the at least the file open dialogs are derived from a different class, so these events are not raised for the SaveAs dialog. Luckily, this does not affect your case.</p>
+
+<p>The event argument DialogBoxShowingEventArgs class is actually a parent class for more specialised subclasses MessageBoxShowingEventArgs and TaskDialogShowingEventArgs. The actual instance class depends on the dialogue being handled.</p>
+
+<p>The confirm message box is a task dialogue, so the latter subclass is used and the help id is set to -1.</p>
+
+<p>The task dialogue event args provides additional properties to access the dialogue id and message being displayed. For the confirm message box, these are TaskDialog_Save_File and something similar to 'Do you want to save changes to filename.rvt?'</p>
+
+<p>Therefore, we can install an external application which registers for this event, keeps its eyes open for this task dialogue being displayed, and then uses the OverrideResult method to answer Yes to the confirmation message.</p>
+
+<p>The OverrideResult method takes an integer argument to specify the dialogue result, and is described a follows in the API documentation:</p>
+
+<span style="color:darkblue">
+
+<p>The range of valid result values depends on the type of dialog as follows:</p>
+
+<ul>
+<li>DialogBox: Any non-zero value will cause a dialog to be dismissed. 
+<li>MessageBox: Standard Message Box IDs, such as IDOK and IDCANCEL, are accepted. For all possible IDs, please refer to the Windows API documentation. Naturally, the ID used must be relevant to the buttons in a message box. 
+<li>TaskDialog: Either standard Message Box IDs or Revit Custom IDs are accepted depending on the buttons used in a dialog. Standard buttons, such as OK and Cancel, have standard IDs as described in Windows API documentation. Buttons with custom text have custom IDs with incremental values starting at 1001 for the left-most or top-most button in a task dialog. 
+</ul>
+
+</span>
+
+<p>The options displayed by the confirm message are Yes, No and Cancel, which correspond to standard Windows API message box ids. These are accessible through the DialogResult enumeration in the System.Windows.Forms namespace.</p>
+
+<p>To explore and test this issue, I implemented an external application named AutoConfirmSave for you. It implements the IExternalApplication interface as follows, registering an event handler named a_DialogBoxShowing to react to Revit dialogues popping up:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnShutdown( 
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnStartup( 
+&nbsp; <span class="teal">ControlledApplication</span> a )
+{
+&nbsp; a.DialogBoxShowing 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; a_DialogBoxShowing );
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is the implementation of the event handler:</p>
+
+<pre class="code">
+<span class="blue">void</span> a_DialogBoxShowing( 
+&nbsp; <span class="blue">object</span> sender, 
+&nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+{
+&nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e2 
+&nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e2 )
+&nbsp; {
+&nbsp; &nbsp; s = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;, dialog id {0}, message '{1}'&quot;</span>, 
+&nbsp; &nbsp; &nbsp; e2.DialogId, e2.Message );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> isConfirm = e2.DialogId.Equals( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Save_File&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span> ( isConfirm )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e2.OverrideResult( 
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) WinForms.<span class="teal">DialogResult</span>.Yes );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;, auto-confirmed.&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; <span class="maroon">&quot;DialogBoxShowing: help id {0}, cancellable {1}{2}&quot;</span>,
+&nbsp; &nbsp; e.HelpId,
+&nbsp; &nbsp; e.Cancellable ? <span class="maroon">&quot;Yes&quot;</span> : <span class="maroon">&quot;No&quot;</span>,
+&nbsp; &nbsp; s );
+}
+</pre>
+
+<p>This method checks whether the dialogue being displayed is a task dialogue by attempting to cast the event arguments to TaskDialogShowingEventArgs.
+If this succeeds, it is a task dialogue and we can use the event argument DialogId to check whether it is the confirm message.
+If so, we specify DialogResult.Yes as the result of the dialogue, which causes it not to be displayed to the user at all.
+Finally, we print out some of the event argument properties, regardless of which dialogue it was.</p>
+
+<p>Opening and closing a project named wall_footing.rvt on my system displays the following message in the Visual Studio debug output window and automatically confirms the save, so the dialogue box is not displayed to the user:</p>
+
+<pre>
+DialogBoxShowing: 
+  help id -1, 
+  cancellable No, 
+  dialog id TaskDialog_Save_File, 
+  message 'Do you want to save changes to wall_footing.rvt?', 
+  auto-confirmed.
+</pre>
+
+<p>So all you need to do to achieve your task is to install the AutoConfirmSave external application alongside any existing applications, and the question whether to save your project will always be automatically answered with Yes.
+You obviously need to be careful to remove the external application from Revit.ini again once you are finished processing your files, or you will never again see the message box asking you to confirm changes.</p>
+
+<p>Here is the complete 
+
+<a href="zip/AutoConfirmSave.zip">
+AutoConfirmSave</a>
+
+Visual Studio solution implementing this external application.</p>

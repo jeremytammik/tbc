@@ -1,0 +1,78 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Structural Analytical Code Checking and Results Builder</h3>
+
+<p>In case you have not noticed, I would like to point out one important specialised addition to the Revit 2014 SDK: the new Structural Analysis Software Developer Kit.</p>
+
+<p>It lives in its own sub-directory <i>Structural Analysis SDK</i> and consists of documentation, sample code and Visual Studio templates for two main components:</p>
+
+<ul>
+<li>Code checking framework</li>
+<ul>
+<li>Facilitate code checking workflows</li>
+<li>For both users and developers</li>
+<li>Complete extensible add-in</li>
+<li>User interface, report generator, data storage</li>
+<li>Documentation, samples, Visual Studio templates</li>
+</ul>
+<li>Results builder framework</li>
+<ul>
+<li>Store and access results data in Revit</li>
+<li>High-level API for consumption, exchange, remote providers</li>
+</ul>
+</ul>
+
+<p>Here is an overview of the sample applications provided with this toolkit:</p>
+
+<ul>
+<li>ExtensibleStorageUI and ExtensibleStorageDocumentation &ndash; exercise the ExtensibleStorage framework user interface and reporting functionality.</li>
+<li>CodeCheckingConcreteExample &ndash; a concrete code checking application with step-by-step document.</li>
+<li>ConcreteCalculationsExample &ndash; concrete calculations component for all cases listed in the calculation manual.</li>
+<li>SectionPropertiesExplorer &ndash; demonstrate use the engineering component.</li>
+<li>StoringResults and QueryingResults &ndash; store and query structural analysis results stored in BIM using the results builder component.</li>
+</ul>
+
+<p>If you are active in this area, this provides a big lump of functionality you definitely need to be aware of, similarly to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/rex-content-generator.html">
+REX SDK</a> and content generator.</p>
+
+<p>In a related vein, here is a question that just arose today:</p>
+
+
+<a name="2"></a>
+
+<p><strong>Question:</strong> I would like to start working programmatically with Autodesk Robot to read relevant data result from structural elements such as beam, column, foundations, slab etc.</p>
+
+<p>Where can I find some information about that, please?</p>
+
+<p><strong>Answer:</strong> Please take a look at the discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/optimisation-using-robot-structural-analysis-api.html">
+Robot Structural Analysis API</a>.
+
+<p>Good luck!</p>
+
+
+<a name="3"></a>
+
+<p><strong>Addendum:</strong> Here is the complete
+
+<a href="zip/APITutorial.zip">
+Robot API documentation and tutorial</a> from April 2010, copied
+
+from the
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Robot-Structural/API-Tutorial/td-p/3939601">
+API Tutorial</a> thread
+
+on the
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Robot-Structural/bd-p/351">
+Autodesk Robot Structural Analysis</a> discussion
+
+group.
+Note that this information is pretty dated by now, so I would not recommend putting in any significant effort developing new projects based on this today.

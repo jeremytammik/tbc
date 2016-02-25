@@ -1,0 +1,103 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+C:\a\doc\revit\devtv\augusto.htm
+C:\a\doc\revit\devtv\augusto2.htm
+C:\a\doc\revit\devtv\DevTv Revit NET English.pptx
+C:\a\doc\revit\devtv\mikako.htm
+C:\a\doc\revit\devtv\TemplateRevitArchAddinCS.zip
+C:\a\doc\revit\devtv\TemplateRevitArchAddinVB.zip
+
+-->
+
+<h3>DevTV Add-In Templates</h3>
+
+<p>Here are the add-in templates prepared by my colleague Augusto Gon&ccedil;alves of Autodesk Brazil for the upcoming DevTV presentations.
+
+<p>I really love both the implementation and the description, both are so short and sweet and yet complete!
+
+<p>They save you a lot of typing and clicking when setting up a new add-in, and especially help avoid all the potential errors that insist on creeping in when you set things up manually. 
+Support is provided for both external commands and external applications.
+
+<p>These are the same templates we used during DevCamp, but with several changes and improvements, especially on the add-in manifest file creation. 
+
+<h4>How to use</h4>
+
+<p>Installation could hardly be simpler.
+No need to unzip, just save the following two files in the specified locations on your local system:
+
+<ul>
+<li><a href="zip/TemplateRevitArchAddinCS.zip">TemplateRevitArchAddinCS.zip</a>: [My Documents]\Visual Studio 2008\Templates\ProjectTemplates\Visual C#
+<li><a href="zip/TemplateRevitArchAddinVB.zip">TemplateRevitArchAddinVB.zip</a>: [My Documents]\Visual Studio 2008\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>You obviously replace '2008' by '2010' for Visual Studio 2010.
+
+<h4>Benefits</h4>
+
+<ul>
+<li>Works on all versions of VS, including Express.
+<li>Simple project with one ExternalApplication and one ExternalCommand, plus commonly used namespaces.
+<li>References to Revit assemblies (RevitAPI and RevitAPIUI) with Copy Local set to False.
+<li>Debug features configured and enabled (important for Express version).
+<li>Creates the required .addin including the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+add-in manifest ClientId</a>, 
+
+copies it to the appropriate Revit\Addins\2011 user specific folder (through post-build events) and deletes it again during Clean (through after-clean event), e.g. on using Visual Studio Build &gt; Clean Solution.
+The &lt;Assembly&gt; mark is initially created with the Bin\Debug build.
+</ul>
+
+<h4>Weaknesses</h4>
+
+<ul>
+<li>The references path is partially hard coded, so Revit *must* be under [Program Files]\Autodesk\Revit Architecture 2011 (or the template requires changes).
+<li>As the path is hard coded, it does not work for other flavours. The workaround is create a separate template for each flavour (easy, just change the path).
+<li>Visual Express (only this version) creates the project at a temporary location ("as designed"), therefore the .addin file requires manual edit on the &lt;Assembly&gt; mark. 
+</ul>
+
+<h4>Example</h4>
+
+<p>The Visual Studio IDE will automatically detect, pick up and unpack the files when they are present in these directories, so the full functionality is available immediately after they have been placed there.
+When you next create a new project, the template is presented for selection:</p>
+
+<center>
+<img src="img/devtv_template_new_project.png" alt="Template in new project dialogue"/>
+</center>
+
+<p>The newly created project is fully populated with the Revit API references, a sample command, application, and add-in manifest file:</p>
+
+<center>
+<img src="img/devtv_template_project.png" alt="DevTV template project contents"/>
+</center>
+
+<p>It is immediately ready for compilation.
+On successful compilation, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">
+add-in manifest</a>
+
+is created and copied to the proper location:</p>
+
+<center>
+<img src="img/devtv_template_build.png" alt="DevTV template project build output"/>
+</center>
+
+<p>Here is the build output in text format (copy to an editor to see the truncated lines):
+
+<pre>
+------ Rebuild All started: Project: RevitNETAddin2, Configuration: Debug Any CPU ------
+c:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:DEBUG;TRACE /reference:"C:\Program Files\Autodesk\Revit Architecture 2011\Program\RevitAPI.dll" /reference:"C:\Program Files\Autodesk\Revit Architecture 2011\Program\RevitAPIUI.dll" /reference:"c:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\System.Core.dll" /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Data.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Deployment.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /reference:c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Xml.dll /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\RevitNETAddin2.dll /target:library Application.cs Commands.cs Properties\AssemblyInfo.cs
+
+Compile complete -- 0 errors, 0 warnings
+RevitNETAddin2 -> C:\a\doc\revit\devtv\test\RevitNETAddin2\RevitNETAddin2\bin\Debug\RevitNETAddin2.dll
+copy "C:\a\doc\revit\devtv\test\RevitNETAddin2\RevitNETAddin2\RevitNETAddin2.addin" "C:\Documents and Settings\tammikj\Application Data\Autodesk\REVIT\Addins\2011\RevitNETAddin2.addin"
+        1 file(s) copied.
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+</pre>
+
+<p>On cleaning the solution, the add-in manifest file is removed again, so that Revit does not complain about the missing add-in assembly DLL.

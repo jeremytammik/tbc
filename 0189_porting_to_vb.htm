@@ -1,0 +1,109 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<!--
+
+  adam: RE: importExport sample in VB.NET in blog folder
+  http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=13574707&linkID=4901650
+
+-->
+
+<h3>Porting from C# to VB.NET</h3>
+
+<p>Yesterday, we mentioned Kean Walmsley's recent post on 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/07/converting-between-c-and-vbnet.html">
+converting between C# and VB.NET</a>.
+
+In response to the closely related frequently asked question on porting the Revit SDK samples provided in C# to VB.NET, here is an exhaustive study of the topic by Adam Nagy.</p>
+
+<p><strong>Question:</strong>
+I'm looking at the Revit SDK samples, but many of them are in C#.
+Since I am a VB.NET programmer I'd prefer to use a VB.NET version. 
+I tried to convert them myself but ran into some problems. 
+Could you tell me the exact steps I could follow?</p>
+
+<p><strong>Answer:</strong>
+The best thing is to show it through an example.
+Let's port the ImportExport sample to VB.NET.
+The 
+
+<a href="zip/importexport-vb.net.zip">
+attached sample</a>
+
+only contains the DWG Import/Export part.
+
+<ol>
+<li>Open the "ImportExport" C# project.
+<li>Open another instance of Visual Studio.
+<li>In the second instance, create a VB.NET "Class Library" project with "Name" = "VB.NET", "Location" = "[Revit SDK]\Samples\ImportExport" and "Create directory for solution" unticked.
+This way, all the project content will automatically be placed in the "[Revit SDK]\Samples\ImportExport\VB.NET" folder instead of e.g. "[Revit SDK]\Samples\ImportExport\VB.NET\ImportExport" folder.
+<li>Select the "VB.NET" project in the "Solution Explorer" and then click on it again so you can rename it to "ImportExport".
+<li>Select the Solution in the "Solution Explorer" (top node) and in the "Properties" window change its "(Name)" to "ImportExport".
+<li>Go to Project > Properties > Application and set "Assembly Name" to "ImportExport" and "Root namespace" to "".
+<li>Right-click on the project in the "Solution Explorer" and select "Add reference..."; on the "Browse" tab, navigate to "[Revit install folder]\Program\RevitAPI.dll" and click "OK".
+<li>Click the "Show All Files" button in the top of the "Solution Explorer", then select "References > RevitAPI.dll" and in the "Properties" window set "Copy Local" to "False".
+<li>Select "Class1.vb" and in the "Properties" window set "File Name" to "Command.vb".
+A dialog might pop up asking if you want to perform a rename in the project - click "Yes".
+<li>Copy all the content of Command.cs - just select Command.cs in the C# project, select its content (Ctrl+A), and copy it (Ctrl+C).
+<li>Now convert the code to VB.NET by using e.g. one of the online tools - 
+<a href="http://www.developerfusion.com/tools/convert/csharp-to-vb">
+http://www.developerfusion.com/tools/convert/csharp-to-vb</a>
+
+seemed to work fine.
+Just paste (Ctrl+V) the code into the edit window on the site - if it already has some content in it, then first select all of that (Ctrl+A).
+Then click "Convert to VB.NET" and once the conversion is finished click "copy to clipboard".
+<li>Select all the contents of Command.vb (Ctrl+A) and replace it with the converted code, which has been copied to the clipboard (Ctrl+V).
+In case of interface implementations in VB.NET you need to explicitly define what interface function a given function implements - in C# it's not needed.
+So when you copied over the content of "Command.cs" to "Command.vb" then you need to insert "Implements IExternalCommand.Execute" at the end of the line of "Public Function Execute(...".
+<li>You have to go through all the other files and repeat the above steps.
+<li>To be consistent with the samples' structure either.
+<ol>
+<li>replace "Namespace Revit.SDK.Samples.ImportExport.CS" with "Namespace Revit.SDK.Samples.ImportExport.VB.Net" in all "*.vb" files,
+<li>or delete "Namespace Revit.SDK.Samples.ImportExport.CS" in all "*.vb" files (including Designer files) and set "Project > Properties > Application > Root namespace" to "Revit.SDK.Samples.ImportExport.VB.Net".
+</ol>
+<li>Now you can just copy "[Revit SDK]\Samples\ImportExport\CS\Revit.ini" to "C:\Revit SDK\Samples\ImportExport\VB.NET" and replace "Revit.SDK.Samples.ImportExport.CS.Command" with "Revit.SDK.Samples.ImportExport.VB.Net.Command" in it.
+</ol>
+
+<p>In case of simple code files, e.g. "MainData.cs" you just need to create a similar file
+
+<ol>
+<li>Right-click the VB.NET project in the "Solution Explorer" and select "Add > Class... > Common Items > Class" and set "Name" to "MainData.vb".
+<li>Copy all the content from "MainData.cs" and then paste its converted version into "MainData.vb" as we've done above with "Command.cs".
+</ol>
+
+<p>In case of form files, e.g. "MainForm.cs"
+
+<ol>
+<li>Right-click the VB.NET project in the "Solution Explorer" and select "Add > Windows Form..." and set "Name" to "MainForm.vb".
+<li>Since we earlier clicked the "Show All Files" button in the top of the "Solution Explorer", we can see that there is also a "Designer" file listed under "MainForm.vb" in the "Solution Explorer".
+<li>First copy the converted code of "MainForm.Designer.cs" to "MainForm.Designer.vb" - this will automatically copy all the controls and their event handlers over as well.
+<li>Right-click on "MainForm.cs", select "View Code", and copy the converted code to "MainForm.vb".
+</ol>
+
+<p>To retain the same project structure as in the original ImportExport sample, you can simply add folders to the VB.NET project:
+Right-click the project and select "Add > New Folder".
+You can also drag & drop files inside the project to reorganize them.
+
+<p>Thank you very much Adam for this detailed description!</p>

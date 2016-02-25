@@ -1,0 +1,125 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>RFA Version, Grey Commands, Family Context and RDB Link</h3>
+
+<p>Here are some recent issues that cropped up in case queries and other information:</p>
+
+<ol>
+<li><a href=#1>RFA file version.</a></li>
+<li><a href=#2>Greyed out commands in the ribbon.</a></li>
+<li><a href=#3>Project versus Family editor context.</a></li>
+<li><a href=#4>RDB Link Tool for Revit Family.</a></li>
+</ol>
+
+<a name="1"></a>
+
+<h4>1. RFA file version</h4>
+
+<!-- 1251104 [rfa revit version] -->
+
+<p><strong>Question:</strong>
+When loading an RFA file, i.e. through LoadFamily, is there any way to know the Revit version that was used to create it, or at least to know that this RFA file has been converted to the current Revit version format?</p>
+
+<p><strong>Answer:</strong>
+I am not aware of any Revit API methods for determining the Revit version used to create or last save an RFA file. 
+However, I did implement and discuss a stand-alone command line utility 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html">
+rvtver.py</a>
+
+to extract the Revit version information from a project file. 
+I just tested rvtver.py on an RFA file. 
+I selected the door family M_Single-Flush.rfa from the folder
+
+'C:\Documents and Settings\All Users\Application Data\Autodesk\RAC 2010\Metric Library\Doors'.
+
+Running rvtver.py on that file reports
+
+<pre>
+&gt; rvtver.py M_Single-Flush.rfa
+Build string found in 'M_Single-Flush.rfa' 
+  at offset 16470: Build: 20090224_0900
+</pre>
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html">
+post on rvtver.py</a>
+
+explains some of the background on the file structure. 
+If you look at the RFA file in a binary or hexadecimal editor, you may be able to glean some further information.
+
+
+<a name="2"></a>
+
+<h4>2. Greyed out commands in the ribbon</h4>
+
+<p><strong>Question:</strong>
+In Revit 2010, what are the reasons for commands being disabled?
+My commands are active when I switch to family template or family file. 
+In previous versions, external commands were greyed out in 3D view and family editor mode. 
+What could be the reasons in this case?
+
+<p>I've created some external commands and they appear in the menu. 
+The commands are disabled, i.e. greyed out, until I open a family template or family file. 
+Opening a new  existing project does not enable the commands as it should. 
+What might I check as possible causes of the problem?
+Note that if I open a family template or file, the commands are enabled and I can execute them.
+
+<p><strong>Answer:</strong>
+One possible reason is that the focus is not in the current view. 
+For example, after left clicking an item in project browser, for instance plan view, the external command item is grey.
+You need to click any place in the region of the current view to make them active.
+Other reasons why they might be greyed out are:
+
+<ul>
+<li>You are in a tool other than the main selection tool.
+<li>You are in a perspective view.  
+<li>You are in a schedule view.
+</ul>
+
+<p>None of these modes permit API commands to run at this time.
+
+
+<a name="3"></a>
+
+<h4>3. Project versus Family editor context</h4>
+
+<!-- 1251105 [family editor] -->
+
+<p><strong>Question:</strong>
+My command works well when it is executed from within a project but not when executed from the family editor. 
+Is there any way to know if the command is being executed from the family editor or from a project context?
+In any case, how can I obtain the Family object of the current family in the family editor?</p>
+
+<p><strong>Answer:</strong>
+You can check if the current document is a Family document using the Document.IsFamilyDocument property. The owner family is accessible through Document.OwnerFamily.
+
+<p>Please have a look at the family creation samples in the FamilyCreation subdirectory of the Revit SDK samples folder. The most comprehensive of these in the WindowWizard sample.
+
+<p>Thanks to Adam Nagy for handling this case.
+
+
+<a name="4"></a>
+
+<h4>4. RDB Link Tool for Revit Family</h4>
+
+<p>A brand new
+
+<a href="http://labs.autodesk.com/utilities/revit_rdb">
+RDB Link Tool for Revit Family</a>
+
+is now available on 
+
+<a href="http://labs.autodesk.com">
+Autodesk Labs</a>.
+
+In case you are interested, please check it out.</p>
+
+

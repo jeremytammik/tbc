@@ -1,0 +1,115 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07791178 [Determine if a RVT has Worksharing enabled without opening it?]
+
+-->
+
+<h3>Moving to the Mac</h3>
+
+<p>I have been quiet for a whole week now, busy setting up my Mac, learning new functionality, techniques, keyboard shortcuts, editors, you name it.
+
+<p>Under Windows, I was already using quite a number of batch files and command line Unix-style tools, so I am havery happy to have a real Unix shell to play with now.
+
+<p>On the other hand, each batch file needs some fixes applied to convert it to a shell script, and every keystroke needs some additional neutrons firing to switch from the Windows habits to new Mac conventions.
+
+<p>Several of my colleagues are also using Macs nowadays, although they seem to be mostly remaining inside a Windows environment and using Parallels to run it on the Mac.
+I am <a href="http://en.wiktionary.org/wiki/go_native">going native</a>  :-)</p>
+
+<p>I installed the Xcode envornment to have access to standard development tools like make and gcc, the
+
+<a href="http://komodo-edit.en.softonic.com">Komodo</a> text editor,
+
+<a href="http://www.truecrypt.org">TrueCrypt</a> to manage all my secret stuff,
+
+Firefox, Skype, Office, Parallels, and much more.
+
+<p>Some of my own command line tools are in C, others in Python.
+Everything works fine, so far, many things required some tweaks or cleanup, and much remains to be done.
+
+
+<a name="2"></a>
+
+<h4>AU Material Submitted</h4>
+
+<p>I managed to keep the deadline yesterday for submission of the Autodesk University material.</p>
+
+<p>For your delectation and the pleasure of online search engines, here is a reproduction of it in its current state.</p>
+
+<p>I may and probably will update it a bit more before the final event, but this should give you a rough idea of everything:</p>
+
+<ul>
+<li><a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4109">CP4109</a> Revit API Round Table: Meet the Champions
+<ul>
+<li>Tuesday, Nov 27, 5:30 PM - 7:00 PM
+<li><a href="">Handout</a>
+<li><a href="">Presentation</a>
+</ul>
+  
+<li><a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4108">CP4108</a> Revit MEP Programming: All Systems Go 
+<ul>
+<li>Wednesday, Nov 28, 1:00 PM - 2:30 PM
+<li><a href="">Handout</a>
+<li><a href="">Presentation</a>
+<li><a href="">Material</a> 
+</ul>
+
+<li><a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=4107">CP4107</a> Let's face it: New Autodesk Revit 2013 UI API Functionality
+<ul>
+<li>Thursday, Nov 29, 1:00 PM - 2:30 PM
+<li><a href="">Handout</a>
+<li><a href="">Presentation</a>
+<li><a href="">Material</a> 
+</ul>
+
+</ul>
+
+<p>All done on the Mac  :-)</p>
+
+<p>Meanwhile, Joe and Saikat brought a case to my attention and asked me to publish a qiuick note on it, since the answer is apparently not completely trivial to find:
+
+
+<a name="3"></a>
+
+<h4>Determine Whether Project Document is Workshared or Not</h4>
+
+<p><strong>Question:</strong> I'm creating a utility to copy central (workshared) RVT files to a specific folders on the user laptop to make a local copy, then open it in Revit.
+
+<p>How can I determine whether the RVT file is a central file (workshared) or stand-alone before copying it?
+
+<p>If stand-alone, it would not require copying; it could just be opened in Revit.
+
+<p>It could be opened in memory first, but that would increase the time to eventually open and activate it for work.
+
+<p>I looked into the TransmissionData, but I can find no solution.
+Is there one?
+
+
+<p><strong>Answer from Joe:</strong> I think BasicFileInfo.IsWorkshared property is what you are looking for.
+
+<p>The BasicFileInfo class can retrieve some metadata file information without fully opening the RVT file in Revit.
+
+<p>This was briefly mentioned between the lines when recently discussing how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/detach-workset-and-taskdialog-command-link-order.html">
+detach and discard worksets</a>.
+
+I hope it helps to highlight this fact for itself as well.
+
+
+<a name="4"></a>
+
+<h4>Create Radial Dimension</h4>
+
+<p>Saikat published another example on the AEC DevBlog, showing how to access the sketch of a circular extrusion in a family document and make a call to
+
+<a href="http://adndevblog.typepad.com/aec/2012/11/adding-radial-dimension-to-a-circular-column-in-edit-extrusion-mode-using-revit-api.html">
+NewRadialDimension to create a radial dimension</a>.
+
+
+<p>There, my first blog post completed and published on a Mac.
+
+<p>Now to get back to real work again, gradually, at least for a short period before sinking into the gory mess of conference time.</p>

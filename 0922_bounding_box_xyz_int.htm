@@ -1,0 +1,1002 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Curve Following Face and Bounding Box Implementation</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I looked at using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+ExtrusionAnalyzer</a>
+
+to create a plan view boundary profile for the furniture and equipment family instances and implemented a utility method
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+SortCurvesContiguous</a> to
+
+sort and re-orient the curves it returns into a closed contiguous loop.
+
+<p>An alternative and more effective method is to use the Edge AsCurveFollowingFace call instead of AsCurve, as we shall see below.</p>
+
+<p>In any case, we want to check the results, e.g. to ensure that we really have obtained the valid closed boundary loops we expect.</p>
+
+<p>The easiest way to do so is to visualise them graphically.
+To visualise something, you mostly need to know how big it is first.
+You often need to scale it to fit into your visualisation space, e.g. a fixed-size window, i.e. transform from its given initial size and location to the target coordinate space.
+A useful way to determine the size of a boundary loop is to calculate the bounding box of its collection of vertices.</p>
+
+<p>That leads to the following topics of today's post, including one additional unrelated issue that just came in:</p>
+
+<ul>
+<li><a href="#2">Using AsCurveFollowingFace</a></li>
+<li><a href="#3">XYZ point bounding box calculation</a></li>
+<li><a href="#4">2D integer-based point bounding box calculation</a></li>
+<li><a href="#5">Overview of sweep sample code and issue resolutions</a></li>
+</ul>
+
+
+
+
+<a name="2"></a>
+
+<h4>Use Curve Following Face</h4>
+
+<p>I already had one stab at using a built-in Revit API method instead of implementing my own
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+SortCurvesContiguous</a> solution:
+
+Rudolf Honke suggested testing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html#4">
+ExporterIFCUtils ValidateCurveLoops</a> method instead, but that did not work.</p>
+
+<p>Now Bettina Zimmermann provided another idea:</p>
+
+<i><p>I don’t understand why you write your own code for direction sorting of the curves when Revit can provide it for you: Edge.AsCurveFollowingFace.
+
+Scott Conover's
+
+<a href="zip/cp4011_conover.pdf">Geometry API document</a> describes
+
+it a bit but not very detailed.
+
+<p>I have written some code using Revit API to find the curves sorted in the right direction for using GeometryCreationUtilities.CreateExtrusionGeometry, so I found out it is possible using this call.</i></p>
+
+<p>I tested that, simply replacing the call to Edge.AsCurve by AsCurveFollowingFace:
+
+<pre class="code">
+&nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; <span class="teal">ExtrusionAnalyzer</span> extrusionAnalyzer = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; extrusionAnalyzer = <span class="teal">ExtrusionAnalyzer</span>.Create(
+&nbsp; &nbsp; &nbsp; solid, plane, <span class="teal">XYZ</span>.BasisZ );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; {
+&nbsp; &nbsp; ++nExtrusionAnalysisFailures;
+&nbsp; &nbsp; <span class="blue">return</span> nAdded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Face</span> face = extrusionAnalyzer
+&nbsp; &nbsp; .GetExtrusionBase();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> a <span class="blue">in</span> face.EdgeLoops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> nEdges = a.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; curves
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;( nEdges );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="blue">null</span>; <span class="green">// loop start point</span>
+&nbsp; &nbsp; <span class="teal">XYZ</span> p; <span class="green">// edge start point</span>
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="blue">null</span>; <span class="green">// edge end point</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// This requires post-processing using</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// SortCurvesContiguous:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = e.AsCurve();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This returns the curves already</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// correctly oriented:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; curve = e.AsCurveFollowingFace(
+&nbsp; &nbsp; &nbsp; &nbsp; face );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1} following face&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; curves.Add( curve );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveUtils</span>.SortCurvesContiguous(
+&nbsp; &nbsp; &nbsp; creapp, curves, _debug_output );
+&nbsp;
+&nbsp; &nbsp; q = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtLoop</span> loop = <span class="blue">new</span> <span class="teal">JtLoop</span>( nEdges );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curves )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Todo: handle non-linear curve.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Especially: if two long lines have a </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// short arc in between them, skip the arc</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and extend both lines.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; loop.Add( <span class="blue">new</span> <span class="teal">Point2dInt</span>( p ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == q
+&nbsp; &nbsp; &nbsp; &nbsp; || q.IsAlmostEqualTo( p, 1e-05 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == q ? 0 : p.DistanceTo( q ))&nbsp; ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; q = curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _debug_output )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} --&gt; {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p0 = p; <span class="green">// save loop start point</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( p0, 1e-05 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point, not distance {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; p0.DistanceTo( q ) ) );
+&nbsp;
+&nbsp; &nbsp; loops.Add( loop );
+&nbsp;
+&nbsp; &nbsp; ++nAdded;
+&nbsp; }
+</pre>
+
+<p>I also added new code to the SortCurvesContiguous method to report correctly sorted and oriented curves.
+A typical snippet of output looks like this now:</p>
+
+<pre>
+(2.18,8.4,0) --> (2.18,5.78,0)
+(2.18,8.4,0) --> (2.18,5.78,0) following face
+(2.18,5.78,0) --> (7.31,5.78,0)
+(2.18,5.78,0) --> (7.31,5.78,0) following face
+(7.31,5.78,0) --> (7.31,8.4,0)
+(7.31,5.78,0) --> (7.31,8.4,0) following face
+(7.31,8.4,0) --> (6.75,8.4,0)
+(7.31,8.4,0) --> (6.75,8.4,0) following face
+(6.75,8.4,0) --> (6.75,8.46,0)
+(6.75,8.4,0) --> (6.75,8.46,0) following face
+(6.75,8.46,0) --> (6.41,8.46,0)
+(6.75,8.46,0) --> (6.41,8.46,0) following face
+(6.41,8.46,0) --> (6.41,8.4,0)
+(6.41,8.46,0) --> (6.41,8.4,0) following face
+(6.41,8.4,0) --> (3.08,8.4,0)
+(6.41,8.4,0) --> (3.08,8.4,0) following face
+(3.08,8.46,0) --> (3.08,8.4,0)
+(3.08,8.4,0) --> (3.08,8.46,0) following face
+(2.74,8.46,0) --> (3.08,8.46,0)
+(3.08,8.46,0) --> (2.74,8.46,0) following face
+(2.74,8.4,0) --> (2.74,8.46,0)
+(2.74,8.46,0) --> (2.74,8.4,0) following face
+(2.74,8.4,0) --> (2.18,8.4,0)
+(2.74,8.4,0) --> (2.18,8.4,0) following face
+0 endPoint (2.18,5.78,0)
+1 start point match, no need to swap
+1 endPoint (7.31,5.78,0)
+2 start point match, no need to swap
+2 endPoint (7.31,8.4,0)
+3 start point match, no need to swap
+3 endPoint (6.75,8.4,0)
+4 start point match, no need to swap
+4 endPoint (6.75,8.46,0)
+5 start point match, no need to swap
+5 endPoint (6.41,8.46,0)
+6 start point match, no need to swap
+6 endPoint (6.41,8.4,0)
+7 start point match, no need to swap
+7 endPoint (3.08,8.4,0)
+8 start point match, no need to swap
+8 endPoint (3.08,8.46,0)
+9 start point match, no need to swap
+9 endPoint (2.74,8.46,0)
+10 start point match, no need to swap
+10 endPoint (2.74,8.4,0)
+11 start point match, no need to swap
+11 endPoint (2.18,8.4,0)
+(2.18,8.4,0) --> (2.18,5.78,0)
+(2.18,5.78,0) --> (7.31,5.78,0)
+(7.31,5.78,0) --> (7.31,8.4,0)
+(7.31,8.4,0) --> (6.75,8.4,0)
+(6.75,8.4,0) --> (6.75,8.46,0)
+(6.75,8.46,0) --> (6.41,8.46,0)
+(6.41,8.46,0) --> (6.41,8.4,0)
+(6.41,8.4,0) --> (3.08,8.4,0)
+(3.08,8.4,0) --> (3.08,8.46,0)
+(3.08,8.46,0) --> (2.74,8.46,0)
+(2.74,8.46,0) --> (2.74,8.4,0)
+(2.74,8.4,0) --> (2.18,8.4,0)
+FamilyInstance Furniture Desk <212646 1525 x 762mm> has 1 loop:
+  0: (664,2561), (664,1761), (2227,1761), (2227,2561),
+    (2056,2561), (2056,2580), (1954,2580), (1954,2561),
+    (937,2561), (937,2580), (836,2580), (836,2561)
+</pre>
+
+<p>As you can see, AsCurveFollowingFace does indeed return all the curves correctly oriented and sorted, and SortCurvesContiguous has nothing at all left to do.</p>
+
+<p>Thank you very much Bettina for this valuable suggestion!</p>
+
+<p>Also thanks to Scott Conover for his valuable Geometry API document from the Autodesk University 2011 class, which I already mentioned numerous times in the past but was not previously published in PDF format and therefore not included in web searches until now.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Bounding Box Determination for XYZ Points</h4>
+
+<p>As explained above, I would like to check the validity of the boundary loop listed above.
+The easiest way to do so is by displaying it visually.
+To do so, I need to transform it from its native coordinate space to my display space, for instance Windows device or HTML5 Canvas coordinates.
+This normally requires scaling and translation, and in turn knowledge of the size and location of the native coordinate space.
+The latter can be easily determined by calculating a bounding box.</p>
+
+<p>I therefore set out to implement a bounding box determination for XYZ points.</p>
+
+<p>I could use the existing Revit API BoundingBoxXyz class, because it does provide both read and write access to its Min and Max properties.
+However, it includes a number of additional features that are of no interest to me at this point, so I prefer to create my own lightweight class for this.</p>
+
+<p>My first idea was to use a generic Tuple class, e.g.</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">JtBoundingBoxXyz</span> : <span class="teal">Tuple</span>&lt;<span class="teal">XYZ</span>, <span class="teal">XYZ</span>&gt;
+</pre>
+
+<p>However, the components of such a tuple are read-only and cannot be changed after instantiation, so I cannot easily update the min and max values as I add new points using this approach.</p>
+
+<p>My next idea was to implement my own class and manage Revit XYZ max and min member variables within it.
+However, the components of an XYZ are read-only and cannot be changed except by re-instantiation, so extending the bounding box to include new points would have sub-optimal performance in this case as well.</p>
+
+<p>The simplest solution appears to be managing six individual doubles instead, and instantiating XYZ return values when needed, like this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A bounding box for a collection of XYZ instances.</span>
+<span class="gray">///</span><span class="green"> The components of a tuple are read-only and cannot </span>
+<span class="gray">///</span><span class="green"> be changed after instantiation, so I cannot use </span>
+<span class="gray">///</span><span class="green"> that easily.</span>
+<span class="gray">///</span><span class="green"> The components of an XYZ are read-only and cannot </span>
+<span class="gray">///</span><span class="green"> be changed except by re-instantiation, so I cannot </span>
+<span class="gray">///</span><span class="green"> use that easily either.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtBoundingBoxXyz</span> <span class="green">// : Tuple&lt;XYZ, XYZ&gt;</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Minimum and maximum X, Y and Z values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">double</span> xmin, ymin, zmin, xmax, ymax, zmax;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Initialise to infinite values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> JtBoundingBoxXyz()
+&nbsp; {
+&nbsp; &nbsp; xmin = ymin = zmin = <span class="blue">double</span>.MaxValue;
+&nbsp; &nbsp; xmax = ymax = zmax = <span class="blue">double</span>.MinValue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current lower left corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> Min
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">XYZ</span>( xmin, ymin, zmin ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current upper right corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> Max
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">XYZ</span>( xmax, ymax, zmax ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> MidPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> 0.5 * ( Min + Max ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Expand bounding box to contain </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given new point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ExpandToContain( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &lt; xmin ) { xmin = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &lt; ymin ) { ymin = p.Y; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Z &lt; zmin ) { zmin = p.Z; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &gt; xmax ) { xmax = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &gt; ymax ) { ymax = p.Y; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Z &gt; zmax ) { zmax = p.Z; }
+&nbsp; }
+}
+</pre>
+
+
+
+
+
+<a name="4"></a>
+
+<h4>Bounding Box Determination for 2D Integer Points</h4>
+
+<p>Applying the same principles, here is a pretty optimal implemenetation of a bounding box for 2D integer-based points.
+It includes a constructor taking a collection of loops, which is the output I am generating from my furniture and equipment plan view calculation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A bounding box for a collection </span>
+<span class="gray">///</span><span class="green"> of 2D integer points.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtBoundingBox2dInt</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Minimum and maximum X and Y values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> xmin, ymin, xmax, ymax;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Initialise to infinite values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> JtBoundingBox2dInt()
+&nbsp; {
+&nbsp; &nbsp; xmin = ymin = <span class="blue">int</span>.MaxValue;
+&nbsp; &nbsp; xmax = ymax = <span class="blue">int</span>.MinValue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current lower left corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> Min
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>( xmin, ymin ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current upper right corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> Max
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>( xmax, ymax ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current center point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> MidPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>)(0.5 * ( xmin + xmax )),
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>)(0.5 * ( ymin + ymax )) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Expand bounding box to contain </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given new point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ExpandToContain( <span class="teal">Point2dInt</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &lt; xmin ) { xmin = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &lt; ymin ) { ymin = p.Y; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &gt; xmax ) { xmax = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &gt; ymax ) { ymax = p.Y; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Instantiate a new bounding box containing</span>
+&nbsp; <span class="gray">///</span><span class="green"> the given loops.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> JtBoundingBox2dInt( <span class="teal">JtLoops</span> loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">JtLoop</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point2dInt</span> p <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ExpandToContain( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Stay tuned to see how I use this to finally display and verify the extrusion analyser output and my integer-based boundary loop management implementation, coming next.</p>
+
+
+<a name="5"></a>
+
+<h4>Overview of Sweep Sample Code and Issue Resolutions</h4>
+
+<p>Before closing, here is one last issue that just came up and I would like to mention here as well:</p>
+
+<p><strong>Question:</strong> I am trying to create a sweep in a new family using the Revit API, and am having some difficulties.
+
+<p>I found only one single example in the Revit SDK Samples, and can only get it working using your template.
+When I use my own, it fails.
+
+<p>Where can I find some more information on this, please?</p>
+
+
+<p><strong>Answer:</strong> I discussed some very advanced sweep issues with Bill Adkison, and we published the essence of his results on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/sweep-pickpath-tolerance-criteria.html">sweep path tolerance criteria</a>.
+
+Normally, sweep issues are nowhere near as hard as the ones he encountered and mastered.
+
+<p>The most recent sample code demonstrating sweep generation was for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sweep-family-performance-enhancement.html">
+sweep family performance enhancement</a>.
+
+<p>Furthermore, the AEC DevBlog discusses a number of sweep creation issues and provides several source code samples to generate them:
+
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2012/06/sweep-creation.html">Sweep creation</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/08/sweep-with-the-same-pathprofile-produce-different-results-when-different-path-sketch-planes-are-used.html">Sweep paths and sketch planes</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/08/newsweptblend-code-sample.html">NewSweptBlend code sample</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/05/prerequisites-for-input-profiles-in-newsweptblend-form-creation-with-revit-api.html">NewSweptBlend profile prerequisites</a></li>
+</ul>
+
+<p>I hope this helps.
+Good luck!
+
+
+<!--
+<a href="">
+</a>
+
+<hr>
+
+(9.03,10.13,0) -- (-14.59,10.13,0)
+(-14.59,10.13,0) -- (-14.59,1.93,0)
+(-14.59,1.93,0) -- (-2.45,1.93,0)
+(-2.45,1.93,0) -- (-2.45,-3.98,0)
+(-2.45,-3.98,0) -- (9.03,-3.98,0)
+(9.03,-3.98,0) -- (9.03,10.13,0)
+(0.98,-0.37,0) -- (0.98,1.93,0)
+(0.98,1.93,0) -- (5.57,1.93,0)
+(5.57,1.93,0) -- (5.57,-0.37,0)
+(5.57,-0.37,0) -- (0.98,-0.37,0)
+Room Rooms <212639 Room 1> has 2 loops:
+  0: (2753,3087), (-4446,3087), (-4446,587), (-746,587), (-746,-1212), (2753,-1212)
+  1: (298,-112), (298,587), (1698,587), (1698,-112)
+(2.18,8.4,0) -- (2.18,5.78,0)
+(2.18,8.4,0) -- (2.18,5.78,0) following face
+(2.18,5.78,0) -- (7.31,5.78,0)
+(2.18,5.78,0) -- (7.31,5.78,0) following face
+(7.31,5.78,0) -- (7.31,8.4,0)
+(7.31,5.78,0) -- (7.31,8.4,0) following face
+(7.31,8.4,0) -- (6.75,8.4,0)
+(7.31,8.4,0) -- (6.75,8.4,0) following face
+(6.75,8.4,0) -- (6.75,8.46,0)
+(6.75,8.4,0) -- (6.75,8.46,0) following face
+(6.75,8.46,0) -- (6.41,8.46,0)
+(6.75,8.46,0) -- (6.41,8.46,0) following face
+(6.41,8.46,0) -- (6.41,8.4,0)
+(6.41,8.46,0) -- (6.41,8.4,0) following face
+(6.41,8.4,0) -- (3.08,8.4,0)
+(6.41,8.4,0) -- (3.08,8.4,0) following face
+(3.08,8.46,0) -- (3.08,8.4,0)
+(3.08,8.4,0) -- (3.08,8.46,0) following face
+(2.74,8.46,0) -- (3.08,8.46,0)
+(3.08,8.46,0) -- (2.74,8.46,0) following face
+(2.74,8.4,0) -- (2.74,8.46,0)
+(2.74,8.46,0) -- (2.74,8.4,0) following face
+(2.74,8.4,0) -- (2.18,8.4,0)
+(2.74,8.4,0) -- (2.18,8.4,0) following face
+0 endPoint (2.18,5.78,0)
+1 start point match, no need to swap
+1 endPoint (7.31,5.78,0)
+2 start point match, no need to swap
+2 endPoint (7.31,8.4,0)
+3 start point match, no need to swap
+3 endPoint (6.75,8.4,0)
+4 start point match, no need to swap
+4 endPoint (6.75,8.46,0)
+5 start point match, no need to swap
+5 endPoint (6.41,8.46,0)
+6 start point match, no need to swap
+6 endPoint (6.41,8.4,0)
+7 start point match, no need to swap
+7 endPoint (3.08,8.4,0)
+8 start point match, no need to swap
+8 endPoint (3.08,8.46,0)
+9 start point match, no need to swap
+9 endPoint (2.74,8.46,0)
+10 start point match, no need to swap
+10 endPoint (2.74,8.4,0)
+11 start point match, no need to swap
+11 endPoint (2.18,8.4,0)
+(2.18,8.4,0) -- (2.18,5.78,0)
+(2.18,5.78,0) -- (7.31,5.78,0)
+(7.31,5.78,0) -- (7.31,8.4,0)
+(7.31,8.4,0) -- (6.75,8.4,0)
+(6.75,8.4,0) -- (6.75,8.46,0)
+(6.75,8.46,0) -- (6.41,8.46,0)
+(6.41,8.46,0) -- (6.41,8.4,0)
+(6.41,8.4,0) -- (3.08,8.4,0)
+(3.08,8.4,0) -- (3.08,8.46,0)
+(3.08,8.46,0) -- (2.74,8.46,0)
+(2.74,8.46,0) -- (2.74,8.4,0)
+(2.74,8.4,0) -- (2.18,8.4,0)
+FamilyInstance Furniture Desk <212646 1525 x 762mm> has 1 loop:
+  0: (664,2561), (664,1761), (2227,1761), (2227,2561), (2056,2561), (2056,2580), (1954,2580), (1954,2561), (937,2561), (937,2580), (836,2580), (836,2561)
+(-3.94,8.4,0) -- (-3.94,5.78,0)
+(-3.94,8.4,0) -- (-3.94,5.78,0) following face
+(-3.94,5.78,0) -- (1.19,5.78,0)
+(-3.94,5.78,0) -- (1.19,5.78,0) following face
+(1.19,5.78,0) -- (1.19,8.4,0)
+(1.19,5.78,0) -- (1.19,8.4,0) following face
+(1.19,8.4,0) -- (0.63,8.4,0)
+(1.19,8.4,0) -- (0.63,8.4,0) following face
+(0.63,8.4,0) -- (0.63,8.46,0)
+(0.63,8.4,0) -- (0.63,8.46,0) following face
+(0.63,8.46,0) -- (0.29,8.46,0)
+(0.63,8.46,0) -- (0.29,8.46,0) following face
+(0.29,8.46,0) -- (0.29,8.4,0)
+(0.29,8.46,0) -- (0.29,8.4,0) following face
+(0.29,8.4,0) -- (-3.04,8.4,0)
+(0.29,8.4,0) -- (-3.04,8.4,0) following face
+(-3.04,8.46,0) -- (-3.04,8.4,0)
+(-3.04,8.4,0) -- (-3.04,8.46,0) following face
+(-3.38,8.46,0) -- (-3.04,8.46,0)
+(-3.04,8.46,0) -- (-3.38,8.46,0) following face
+(-3.38,8.4,0) -- (-3.38,8.46,0)
+(-3.38,8.46,0) -- (-3.38,8.4,0) following face
+(-3.38,8.4,0) -- (-3.94,8.4,0)
+(-3.38,8.4,0) -- (-3.94,8.4,0) following face
+0 endPoint (-3.94,5.78,0)
+1 start point match, no need to swap
+1 endPoint (1.19,5.78,0)
+2 start point match, no need to swap
+2 endPoint (1.19,8.4,0)
+3 start point match, no need to swap
+3 endPoint (0.63,8.4,0)
+4 start point match, no need to swap
+4 endPoint (0.63,8.46,0)
+5 start point match, no need to swap
+5 endPoint (0.29,8.46,0)
+6 start point match, no need to swap
+6 endPoint (0.29,8.4,0)
+7 start point match, no need to swap
+7 endPoint (-3.04,8.4,0)
+8 start point match, no need to swap
+8 endPoint (-3.04,8.46,0)
+9 start point match, no need to swap
+9 endPoint (-3.38,8.46,0)
+10 start point match, no need to swap
+10 endPoint (-3.38,8.4,0)
+11 start point match, no need to swap
+11 endPoint (-3.94,8.4,0)
+(-3.94,8.4,0) -- (-3.94,5.78,0)
+(-3.94,5.78,0) -- (1.19,5.78,0)
+(1.19,5.78,0) -- (1.19,8.4,0)
+(1.19,8.4,0) -- (0.63,8.4,0)
+(0.63,8.4,0) -- (0.63,8.46,0)
+(0.63,8.46,0) -- (0.29,8.46,0)
+(0.29,8.46,0) -- (0.29,8.4,0)
+(0.29,8.4,0) -- (-3.04,8.4,0)
+(-3.04,8.4,0) -- (-3.04,8.46,0)
+(-3.04,8.46,0) -- (-3.38,8.46,0)
+(-3.38,8.46,0) -- (-3.38,8.4,0)
+(-3.38,8.4,0) -- (-3.94,8.4,0)
+FamilyInstance Furniture Desk <212801 1525 x 762mm> has 1 loop:
+  0: (-1200,2561), (-1200,1761), (362,1761), (362,2561), (191,2561), (191,2580), (89,2580), (89,2561), (-927,2561), (-927,2580), (-1028,2580), (-1028,2561)
+(-13.57,8.4,0) -- (-13.57,5.78,0)
+(-13.57,8.4,0) -- (-13.57,5.78,0) following face
+(-13.57,5.78,0) -- (-8.44,5.78,0)
+(-13.57,5.78,0) -- (-8.44,5.78,0) following face
+(-8.44,5.78,0) -- (-8.44,8.4,0)
+(-8.44,5.78,0) -- (-8.44,8.4,0) following face
+(-8.44,8.4,0) -- (-9,8.4,0)
+(-8.44,8.4,0) -- (-9,8.4,0) following face
+(-9,8.4,0) -- (-9,8.46,0)
+(-9,8.4,0) -- (-9,8.46,0) following face
+(-9,8.46,0) -- (-9.34,8.46,0)
+(-9,8.46,0) -- (-9.34,8.46,0) following face
+(-9.34,8.46,0) -- (-9.34,8.4,0)
+(-9.34,8.46,0) -- (-9.34,8.4,0) following face
+(-9.34,8.4,0) -- (-12.67,8.4,0)
+(-9.34,8.4,0) -- (-12.67,8.4,0) following face
+(-12.67,8.46,0) -- (-12.67,8.4,0)
+(-12.67,8.4,0) -- (-12.67,8.46,0) following face
+(-13.01,8.46,0) -- (-12.67,8.46,0)
+(-12.67,8.46,0) -- (-13.01,8.46,0) following face
+(-13.01,8.4,0) -- (-13.01,8.46,0)
+(-13.01,8.46,0) -- (-13.01,8.4,0) following face
+(-13.01,8.4,0) -- (-13.57,8.4,0)
+(-13.01,8.4,0) -- (-13.57,8.4,0) following face
+0 endPoint (-13.57,5.78,0)
+1 start point match, no need to swap
+1 endPoint (-8.44,5.78,0)
+2 start point match, no need to swap
+2 endPoint (-8.44,8.4,0)
+3 start point match, no need to swap
+3 endPoint (-9,8.4,0)
+4 start point match, no need to swap
+4 endPoint (-9,8.46,0)
+5 start point match, no need to swap
+5 endPoint (-9.34,8.46,0)
+6 start point match, no need to swap
+6 endPoint (-9.34,8.4,0)
+7 start point match, no need to swap
+7 endPoint (-12.67,8.4,0)
+8 start point match, no need to swap
+8 endPoint (-12.67,8.46,0)
+9 start point match, no need to swap
+9 endPoint (-13.01,8.46,0)
+10 start point match, no need to swap
+10 endPoint (-13.01,8.4,0)
+11 start point match, no need to swap
+11 endPoint (-13.57,8.4,0)
+(-13.57,8.4,0) -- (-13.57,5.78,0)
+(-13.57,5.78,0) -- (-8.44,5.78,0)
+(-8.44,5.78,0) -- (-8.44,8.4,0)
+(-8.44,8.4,0) -- (-9,8.4,0)
+(-9,8.4,0) -- (-9,8.46,0)
+(-9,8.46,0) -- (-9.34,8.46,0)
+(-9.34,8.46,0) -- (-9.34,8.4,0)
+(-9.34,8.4,0) -- (-12.67,8.4,0)
+(-12.67,8.4,0) -- (-12.67,8.46,0)
+(-12.67,8.46,0) -- (-13.01,8.46,0)
+(-13.01,8.46,0) -- (-13.01,8.4,0)
+(-13.01,8.4,0) -- (-13.57,8.4,0)
+FamilyInstance Furniture Desk <213000 1525 x 762mm> has 1 loop:
+  0: (-4135,2561), (-4135,1761), (-2572,1761), (-2572,2561), (-2743,2561), (-2743,2580), (-2845,2580), (-2845,2561), (-3862,2561), (-3862,2580), (-3963,2580), (-3963,2561)
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+(-11.75,3.75,0) -- (-11.75,3.81,0)
+(-11.75,3.81,0) -- (-11.75,3.75,0) following face
+(-11.69,3.75,0) -- (-11.75,3.75,0)
+(-11.75,3.75,0) -- (-11.69,3.75,0) following face
+(-11.69,3.75,0) -- (-11.69,3.63,0)
+(-11.69,3.75,0) -- (-11.69,3.63,0) following face
+(-11.69,3.63,0) -- (-9.91,3.63,0)
+(-11.69,3.63,0) -- (-9.91,3.63,0) following face
+(-9.91,3.63,0) -- (-9.91,3.75,0)
+(-9.91,3.63,0) -- (-9.91,3.75,0) following face
+(-9.85,3.75,0) -- (-9.91,3.75,0)
+(-9.91,3.75,0) -- (-9.85,3.75,0) following face
+(-9.85,3.81,0) -- (-9.85,3.75,0)
+(-9.85,3.75,0) -- (-9.85,3.81,0) following face
+(-9.85,3.81,0) -- (-9.91,3.81,0)
+(-9.85,3.81,0) -- (-9.91,3.81,0) following face
+(-9.91,3.81,0) -- (-9.91,4.93,0)
+(-9.91,3.81,0) -- (-9.91,4.93,0) following face
+(-9.91,4.93,0) -- (-9.85,4.93,0)
+(-9.91,4.93,0) -- (-9.85,4.93,0) following face
+(-9.85,5.06,0) -- (-9.85,4.93,0)
+(-9.85,4.93,0) -- (-9.85,5.06,0) following face
+(-9.85,5.06,0) -- (-9.91,5.06,0)
+(-9.85,5.06,0) -- (-9.91,5.06,0) following face
+(-9.91,5.06,0) -- (-9.91,5.17,0)
+(-9.91,5.06,0) -- (-9.91,5.17,0) following face
+(-9.91,5.17,0) -- (-11.69,5.17,0)
+(-9.91,5.17,0) -- (-11.69,5.17,0) following face
+(-11.69,5.17,0) -- (-11.69,5.06,0)
+(-11.69,5.17,0) -- (-11.69,5.06,0) following face
+(-11.69,5.06,0) -- (-11.75,5.06,0)
+(-11.69,5.06,0) -- (-11.75,5.06,0) following face
+(-11.75,4.93,0) -- (-11.75,5.06,0)
+(-11.75,5.06,0) -- (-11.75,4.93,0) following face
+(-11.75,4.93,0) -- (-11.69,4.93,0)
+(-11.75,4.93,0) -- (-11.69,4.93,0) following face
+(-11.69,4.93,0) -- (-11.69,3.81,0)
+(-11.69,4.93,0) -- (-11.69,3.81,0) following face
+(-11.69,3.81,0) -- (-11.75,3.81,0)
+(-11.69,3.81,0) -- (-11.75,3.81,0) following face
+0 endPoint (-11.75,3.75,0)
+1 start point match, no need to swap
+1 endPoint (-11.69,3.75,0)
+2 start point match, no need to swap
+2 endPoint (-11.69,3.63,0)
+3 start point match, no need to swap
+3 endPoint (-9.91,3.63,0)
+4 start point match, no need to swap
+4 endPoint (-9.91,3.75,0)
+5 start point match, no need to swap
+5 endPoint (-9.85,3.75,0)
+6 start point match, no need to swap
+6 endPoint (-9.85,3.81,0)
+7 start point match, no need to swap
+7 endPoint (-9.91,3.81,0)
+8 start point match, no need to swap
+8 endPoint (-9.91,4.93,0)
+9 start point match, no need to swap
+9 endPoint (-9.85,4.93,0)
+10 start point match, no need to swap
+10 endPoint (-9.85,5.06,0)
+11 start point match, no need to swap
+11 endPoint (-9.91,5.06,0)
+12 start point match, no need to swap
+12 endPoint (-9.91,5.17,0)
+13 start point match, no need to swap
+13 endPoint (-11.69,5.17,0)
+14 start point match, no need to swap
+14 endPoint (-11.69,5.06,0)
+15 start point match, no need to swap
+15 endPoint (-11.75,5.06,0)
+16 start point match, no need to swap
+16 endPoint (-11.75,4.93,0)
+17 start point match, no need to swap
+17 endPoint (-11.69,4.93,0)
+18 start point match, no need to swap
+18 endPoint (-11.69,3.81,0)
+19 start point match, no need to swap
+19 endPoint (-11.75,3.81,0)
+(-11.75,3.81,0) -- (-11.75,3.75,0)
+(-11.75,3.75,0) -- (-11.69,3.75,0)
+(-11.69,3.75,0) -- (-11.69,3.63,0)
+(-11.69,3.63,0) -- (-9.91,3.63,0)
+(-9.91,3.63,0) -- (-9.91,3.75,0)
+(-9.91,3.75,0) -- (-9.85,3.75,0)
+(-9.85,3.75,0) -- (-9.85,3.81,0)
+(-9.85,3.81,0) -- (-9.91,3.81,0)
+(-9.91,3.81,0) -- (-9.91,4.93,0)
+(-9.91,4.93,0) -- (-9.85,4.93,0)
+(-9.85,4.93,0) -- (-9.85,5.06,0)
+(-9.85,5.06,0) -- (-9.91,5.06,0)
+(-9.91,5.06,0) -- (-9.91,5.17,0)
+(-9.91,5.17,0) -- (-11.69,5.17,0)
+(-11.69,5.17,0) -- (-11.69,5.06,0)
+(-11.69,5.06,0) -- (-11.75,5.06,0)
+(-11.75,5.06,0) -- (-11.75,4.93,0)
+(-11.75,4.93,0) -- (-11.69,4.93,0)
+(-11.69,4.93,0) -- (-11.69,3.81,0)
+(-11.69,3.81,0) -- (-11.75,3.81,0)
+FamilyInstance Furniture Chair - Office <214027 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214027 Office Chair> has 1 loop:
+  0: (-3581,1162), (-3581,1142), (-3561,1142), (-3561,1108), (-3021,1108), (-3021,1142), (-3001,1142), (-3001,1162), (-3021,1162), (-3021,1502), (-3001,1502), (-3001,1542), (-3021,1542), (-3021,1577), (-3561,1577), (-3561,1542), (-3581,1542), (-3581,1502), (-3561,1502), (-3561,1162)
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+(-2.09,3.75,0) -- (-2.09,3.81,0)
+(-2.09,3.81,0) -- (-2.09,3.75,0) following face
+(-2.02,3.75,0) -- (-2.09,3.75,0)
+(-2.09,3.75,0) -- (-2.02,3.75,0) following face
+(-2.02,3.75,0) -- (-2.02,3.63,0)
+(-2.02,3.75,0) -- (-2.02,3.63,0) following face
+(-2.02,3.63,0) -- (-0.25,3.63,0)
+(-2.02,3.63,0) -- (-0.25,3.63,0) following face
+(-0.25,3.63,0) -- (-0.25,3.75,0)
+(-0.25,3.63,0) -- (-0.25,3.75,0) following face
+(-0.19,3.75,0) -- (-0.25,3.75,0)
+(-0.25,3.75,0) -- (-0.19,3.75,0) following face
+(-0.19,3.81,0) -- (-0.19,3.75,0)
+(-0.19,3.75,0) -- (-0.19,3.81,0) following face
+(-0.19,3.81,0) -- (-0.25,3.81,0)
+(-0.19,3.81,0) -- (-0.25,3.81,0) following face
+(-0.25,3.81,0) -- (-0.25,4.93,0)
+(-0.25,3.81,0) -- (-0.25,4.93,0) following face
+(-0.25,4.93,0) -- (-0.19,4.93,0)
+(-0.25,4.93,0) -- (-0.19,4.93,0) following face
+(-0.19,5.06,0) -- (-0.19,4.93,0)
+(-0.19,4.93,0) -- (-0.19,5.06,0) following face
+(-0.19,5.06,0) -- (-0.25,5.06,0)
+(-0.19,5.06,0) -- (-0.25,5.06,0) following face
+(-0.25,5.06,0) -- (-0.25,5.17,0)
+(-0.25,5.06,0) -- (-0.25,5.17,0) following face
+(-0.25,5.17,0) -- (-2.02,5.17,0)
+(-0.25,5.17,0) -- (-2.02,5.17,0) following face
+(-2.02,5.17,0) -- (-2.02,5.06,0)
+(-2.02,5.17,0) -- (-2.02,5.06,0) following face
+(-2.02,5.06,0) -- (-2.09,5.06,0)
+(-2.02,5.06,0) -- (-2.09,5.06,0) following face
+(-2.09,4.93,0) -- (-2.09,5.06,0)
+(-2.09,5.06,0) -- (-2.09,4.93,0) following face
+(-2.09,4.93,0) -- (-2.02,4.93,0)
+(-2.09,4.93,0) -- (-2.02,4.93,0) following face
+(-2.02,4.93,0) -- (-2.02,3.81,0)
+(-2.02,4.93,0) -- (-2.02,3.81,0) following face
+(-2.02,3.81,0) -- (-2.09,3.81,0)
+(-2.02,3.81,0) -- (-2.09,3.81,0) following face
+0 endPoint (-2.09,3.75,0)
+1 start point match, no need to swap
+1 endPoint (-2.02,3.75,0)
+2 start point match, no need to swap
+2 endPoint (-2.02,3.63,0)
+3 start point match, no need to swap
+3 endPoint (-0.25,3.63,0)
+4 start point match, no need to swap
+4 endPoint (-0.25,3.75,0)
+5 start point match, no need to swap
+5 endPoint (-0.19,3.75,0)
+6 start point match, no need to swap
+6 endPoint (-0.19,3.81,0)
+7 start point match, no need to swap
+7 endPoint (-0.25,3.81,0)
+8 start point match, no need to swap
+8 endPoint (-0.25,4.93,0)
+9 start point match, no need to swap
+9 endPoint (-0.19,4.93,0)
+10 start point match, no need to swap
+10 endPoint (-0.19,5.06,0)
+11 start point match, no need to swap
+11 endPoint (-0.25,5.06,0)
+12 start point match, no need to swap
+12 endPoint (-0.25,5.17,0)
+13 start point match, no need to swap
+13 endPoint (-2.02,5.17,0)
+14 start point match, no need to swap
+14 endPoint (-2.02,5.06,0)
+15 start point match, no need to swap
+15 endPoint (-2.09,5.06,0)
+16 start point match, no need to swap
+16 endPoint (-2.09,4.93,0)
+17 start point match, no need to swap
+17 endPoint (-2.02,4.93,0)
+18 start point match, no need to swap
+18 endPoint (-2.02,3.81,0)
+19 start point match, no need to swap
+19 endPoint (-2.09,3.81,0)
+(-2.09,3.81,0) -- (-2.09,3.75,0)
+(-2.09,3.75,0) -- (-2.02,3.75,0)
+(-2.02,3.75,0) -- (-2.02,3.63,0)
+(-2.02,3.63,0) -- (-0.25,3.63,0)
+(-0.25,3.63,0) -- (-0.25,3.75,0)
+(-0.25,3.75,0) -- (-0.19,3.75,0)
+(-0.19,3.75,0) -- (-0.19,3.81,0)
+(-0.19,3.81,0) -- (-0.25,3.81,0)
+(-0.25,3.81,0) -- (-0.25,4.93,0)
+(-0.25,4.93,0) -- (-0.19,4.93,0)
+(-0.19,4.93,0) -- (-0.19,5.06,0)
+(-0.19,5.06,0) -- (-0.25,5.06,0)
+(-0.25,5.06,0) -- (-0.25,5.17,0)
+(-0.25,5.17,0) -- (-2.02,5.17,0)
+(-2.02,5.17,0) -- (-2.02,5.06,0)
+(-2.02,5.06,0) -- (-2.09,5.06,0)
+(-2.09,5.06,0) -- (-2.09,4.93,0)
+(-2.09,4.93,0) -- (-2.02,4.93,0)
+(-2.02,4.93,0) -- (-2.02,3.81,0)
+(-2.02,3.81,0) -- (-2.09,3.81,0)
+FamilyInstance Furniture Chair - Office <214138 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214138 Office Chair> has 1 loop:
+  0: (-636,1162), (-636,1142), (-616,1142), (-616,1108), (-76,1108), (-76,1142), (-56,1142), (-56,1162), (-76,1162), (-76,1502), (-56,1502), (-56,1542), (-76,1542), (-76,1577), (-616,1577), (-616,1542), (-636,1542), (-636,1502), (-616,1502), (-616,1162)
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll
+(4.14,3.75,0) -- (4.14,3.81,0)
+(4.14,3.81,0) -- (4.14,3.75,0) following face
+(4.21,3.75,0) -- (4.14,3.75,0)
+(4.14,3.75,0) -- (4.21,3.75,0) following face
+(4.21,3.75,0) -- (4.21,3.63,0)
+(4.21,3.75,0) -- (4.21,3.63,0) following face
+(4.21,3.63,0) -- (5.98,3.63,0)
+(4.21,3.63,0) -- (5.98,3.63,0) following face
+(5.98,3.63,0) -- (5.98,3.75,0)
+(5.98,3.63,0) -- (5.98,3.75,0) following face
+(6.05,3.75,0) -- (5.98,3.75,0)
+(5.98,3.75,0) -- (6.05,3.75,0) following face
+(6.05,3.81,0) -- (6.05,3.75,0)
+(6.05,3.75,0) -- (6.05,3.81,0) following face
+(6.05,3.81,0) -- (5.98,3.81,0)
+(6.05,3.81,0) -- (5.98,3.81,0) following face
+(5.98,3.81,0) -- (5.98,4.93,0)
+(5.98,3.81,0) -- (5.98,4.93,0) following face
+(5.98,4.93,0) -- (6.05,4.93,0)
+(5.98,4.93,0) -- (6.05,4.93,0) following face
+(6.05,5.06,0) -- (6.05,4.93,0)
+(6.05,4.93,0) -- (6.05,5.06,0) following face
+(6.05,5.06,0) -- (5.98,5.06,0)
+(6.05,5.06,0) -- (5.98,5.06,0) following face
+(5.98,5.06,0) -- (5.98,5.17,0)
+(5.98,5.06,0) -- (5.98,5.17,0) following face
+(5.98,5.17,0) -- (4.21,5.17,0)
+(5.98,5.17,0) -- (4.21,5.17,0) following face
+(4.21,5.17,0) -- (4.21,5.06,0)
+(4.21,5.17,0) -- (4.21,5.06,0) following face
+(4.21,5.06,0) -- (4.14,5.06,0)
+(4.21,5.06,0) -- (4.14,5.06,0) following face
+(4.14,4.93,0) -- (4.14,5.06,0)
+(4.14,5.06,0) -- (4.14,4.93,0) following face
+(4.14,4.93,0) -- (4.21,4.93,0)
+(4.14,4.93,0) -- (4.21,4.93,0) following face
+(4.21,4.93,0) -- (4.21,3.81,0)
+(4.21,4.93,0) -- (4.21,3.81,0) following face
+(4.21,3.81,0) -- (4.14,3.81,0)
+(4.21,3.81,0) -- (4.14,3.81,0) following face
+0 endPoint (4.14,3.75,0)
+1 start point match, no need to swap
+1 endPoint (4.21,3.75,0)
+2 start point match, no need to swap
+2 endPoint (4.21,3.63,0)
+3 start point match, no need to swap
+3 endPoint (5.98,3.63,0)
+4 start point match, no need to swap
+4 endPoint (5.98,3.75,0)
+5 start point match, no need to swap
+5 endPoint (6.05,3.75,0)
+6 start point match, no need to swap
+6 endPoint (6.05,3.81,0)
+7 start point match, no need to swap
+7 endPoint (5.98,3.81,0)
+8 start point match, no need to swap
+8 endPoint (5.98,4.93,0)
+9 start point match, no need to swap
+9 endPoint (6.05,4.93,0)
+10 start point match, no need to swap
+10 endPoint (6.05,5.06,0)
+11 start point match, no need to swap
+11 endPoint (5.98,5.06,0)
+12 start point match, no need to swap
+12 endPoint (5.98,5.17,0)
+13 start point match, no need to swap
+13 endPoint (4.21,5.17,0)
+14 start point match, no need to swap
+14 endPoint (4.21,5.06,0)
+15 start point match, no need to swap
+15 endPoint (4.14,5.06,0)
+16 start point match, no need to swap
+16 endPoint (4.14,4.93,0)
+17 start point match, no need to swap
+17 endPoint (4.21,4.93,0)
+18 start point match, no need to swap
+18 endPoint (4.21,3.81,0)
+19 start point match, no need to swap
+19 endPoint (4.14,3.81,0)
+(4.14,3.81,0) -- (4.14,3.75,0)
+(4.14,3.75,0) -- (4.21,3.75,0)
+(4.21,3.75,0) -- (4.21,3.63,0)
+(4.21,3.63,0) -- (5.98,3.63,0)
+(5.98,3.63,0) -- (5.98,3.75,0)
+(5.98,3.75,0) -- (6.05,3.75,0)
+(6.05,3.75,0) -- (6.05,3.81,0)
+(6.05,3.81,0) -- (5.98,3.81,0)
+(5.98,3.81,0) -- (5.98,4.93,0)
+(5.98,4.93,0) -- (6.05,4.93,0)
+(6.05,4.93,0) -- (6.05,5.06,0)
+(6.05,5.06,0) -- (5.98,5.06,0)
+(5.98,5.06,0) -- (5.98,5.17,0)
+(5.98,5.17,0) -- (4.21,5.17,0)
+(4.21,5.17,0) -- (4.21,5.06,0)
+(4.21,5.06,0) -- (4.14,5.06,0)
+(4.14,5.06,0) -- (4.14,4.93,0)
+(4.14,4.93,0) -- (4.21,4.93,0)
+(4.21,4.93,0) -- (4.21,3.81,0)
+(4.21,3.81,0) -- (4.14,3.81,0)
+FamilyInstance Furniture Chair - Office <214409 Office Chair>: 2 extrusion analyser failures
+FamilyInstance Furniture Chair - Office <214409 Office Chair> has 1 loop:
+  0: (1263,1162), (1263,1142), (1283,1142), (1283,1108), (1823,1108), (1823,1142), (1843,1142), (1843,1162), (1823,1162), (1823,1502), (1843,1502), (1843,1542), (1823,1542), (1823,1577), (1283,1577), (1283,1542), (1263,1542), (1263,1502), (1283,1502), (1283,1162)
+-->

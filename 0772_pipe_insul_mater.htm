@@ -1,0 +1,285 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07223180 [Get PipeInsulation and Pipe material] -->
+
+<h3>Pipe Insulation and Insulation Material</h3>
+
+<p>I recently looked at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html">
+Revit MEP 2013 API</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">
+migrated the AdnRme sample to it</a>.
+
+<p>To follow up on that, here is an unexpectedly hard Revit MEP 2013 question by Victor Chekalin, who recently created the nice 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html">
+DataStorage sample</a>.
+
+The new question leads to some tricky and interesting aspects on how to access data or database elements through the Revit API that are not immediately accessible via the expected route or "normal" channels.
+Where there's a will, there's a way, though  :-)
+
+<p><strong>Question:</strong> I always get Element materials using an Element.Materials property. 
+But now I've found the issue that I cannot retrieve PipeInsulation and pipe material using Materials property, although these elements have a material.
+
+<p>Furthermore, even if I can retrieve the pipe material via Pipe.PipeType.Material, I still cannot find any way to get PipeInsulation.
+
+<p>So I have two questions
+
+<ol>
+<li>Why there is no possibility to get PipeInsulation and pipe materials via Element.Materials Property?
+<li>Is there a way to get the PipeInsulation material?
+</ol>
+
+<p>I understand that pipe material is defined by the pipe type, but, for example, wall materials are defined by wall type as well and I can retrieve them from a wall instance without resorting to the wall type using the Wall.Materials property. Furthermore, the pipe material has a PipeMaterialType type not a Material type. 
+Why?
+
+<p>I looked at the API help, API Reference Guide and read the post on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/the-revit-mep-2012-api.html">
+Revit MEP 2012 API</a> describing
+
+the new pipe and duct insulations, but I didn't find the answer how to retrieve PipeInsulation material via API. 
+
+<p>PipeInsulation and PipeInsulationType don't have a Material property or GetMaterial method. 
+The Materials property has zero size.
+
+<p>By the way, why are so many differences accessing materials from pipe and pipe insulation compared to other elements? 
+It seems for me as if the MEP version has been created by other developers  :-)</p>
+
+<center>
+<img src="img/pipe_insulation2.png" alt="Pipe insulation"/>
+</center>
+
+
+<p><strong>Answer:</strong> As you are aware and point out, the pipe material is defined by the type and not the instance, so you would obviously query the type and not the instance for it.
+
+<p>Pipe insulation is a completely separate element from the pipe, so you have to access the insulation material from the insulation element, not from the pipe. Here is the relevant section from the Revit API 2012 help file What's New section:
+
+<h4 style="color:darkblue">Duct and pipe insulation and lining</h4>
+
+<p style="color:darkblue">The new classes
+
+<ul>
+<li style="color:darkblue">DuctInsulation 
+<li style="color:darkblue">PipeInsulation 
+<li style="color:darkblue">DuctLining 
+</ul>
+
+<p style="color:darkblue">and related types support read/write and create access to duct and pipe insulation and lining. 
+In Revit 2012, these objects are now accessible as standalone elements related to their parent duct, pipe, or fitting.
+
+<p>Yes, you are correct in that the access to materials for pipes is different and more difficult compared to other elements such as walls.
+
+<p>There is actually on-going work in this area, and it is not yet complete; prior to 2013, pipes didn't have 'normal' materials, but rather just a string property. 
+We are aware that materials for Walls and other elements in general are directly API accessible from the Element, instead of having to dig into the type, and would like pipe and pipe insulation material access to be just as easy.
+
+<p>Again, as you saw, RevitLookup displays the pipe insulation with a MaterialSet which is not displayed in bold like it is for other elements, because it is empty:</p>
+
+<center>
+<img src="img/snoop_pipe_insulation_type.png" alt="Pipe insulation type in RevitLookup" width="400"/>
+</center>
+
+<p>Still, we found a solution to your issue by using alternative access routes.
+
+<p>You can retrieve the parameter named 'Material' off the PipeInsulationType object from the PipeInsulation object. 
+The parameter is an ElementId.
+
+<p>This little difficulty is compounded by the fact that we did not immediately find any easy way to get the PipeInsulationType from a pipe.
+
+<p>One way that we found to achieve this is to use a filter to retrieve all PipeInsulation elements in the document and compare the HostElementId of each one to that of the original pipe.  
+When the matching one is found, you have the PipeInsulation element corresponding to that pipe, you can get the PipeInsulationType from that, and then get the material from the parameter.
+
+<p>We implemented the following helper classes and methods to demonstrate this:
+
+<ul>
+<li>PipeFilter: Restrict user selection to pipe element only.
+<li>GetSelectedElement: Return first pre-selected element or prompt user to select a pipe.
+<li>GetPipeInslationFromPipe: Return pipe insulation from given pipe.
+<li>GetMaterialFromPipeInsulation: Return material from given pipe insulation.
+<li>GetInsulationFromSelection: Prompt user to select a pipe, retrieve its insulation and insulation material, and report the results.
+</ul>
+
+<p>Here is the entire sample code exercising these:
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _caption = <span class="maroon">&quot;Pipe Insulation Info&quot;</span>;
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Restrict user selection to pipe element only</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">PipeFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Pipe</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return first pre-selected element or </span>
+<span class="gray">///</span><span class="green"> prompt user to select a pipe.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Element</span> GetSelectedElement( <span class="teal">UIDocument</span> uidoc )
+{
+&nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">SelElementSet</span> elements = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == elements || elements.IsEmpty )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PipeFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a pipe&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; e = uidoc.Document.GetElement( r.ElementId );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> != elements &amp;&amp; !elements.IsEmpty )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IEnumerator</span> it = elements.GetEnumerator();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( it.MoveNext() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> e;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return pipe insulation from given pipe.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">PipeInsulation</span> GetPipeInslationFromPipe(
+&nbsp; <span class="teal">Pipe</span> pipe )
+{
+&nbsp; <span class="blue">if</span>( pipe == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;pipe&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = pipe.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> fec
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipeInsulation</span> ) );
+&nbsp;
+&nbsp; <span class="teal">PipeInsulation</span> pipeInsulation = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">PipeInsulation</span> pi <span class="blue">in</span> fec )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Find the pipe that has this inulation</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pi.HostElementId == pipe.Id )
+&nbsp; &nbsp; &nbsp; pipeInsulation = pi;
+&nbsp; }
+&nbsp; <span class="blue">return</span> pipeInsulation;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Return material from given pipe insulation.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Material</span> GetMaterialFromPipeInsulation(
+&nbsp; <span class="teal">PipeInsulation</span> pipeInsulation )
+{
+&nbsp; <span class="blue">if</span>( pipeInsulation == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;pipeInsulation&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = pipeInsulation.Document;
+&nbsp;
+&nbsp; <span class="teal">PipeInsulationType</span> pipeInsulationType
+&nbsp; &nbsp; = doc.GetElement( pipeInsulation.GetTypeId() )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">PipeInsulationType</span>;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> p = pipeInsulationType.get_Parameter(
+&nbsp; &nbsp; <span class="maroon">&quot;Material&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> == p
+&nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; : doc.GetElement( p.AsElementId() ) <span class="blue">as</span> <span class="teal">Material</span>;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Prompt user to select a pipe, retrieve its </span>
+<span class="gray">///</span><span class="green"> insulation and insulation material, </span>
+<span class="gray">///</span><span class="green"> and report the results.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> GetInsulationFromSelection(
+&nbsp; <span class="teal">UIDocument</span> uidoc )
+{
+&nbsp; <span class="teal">Element</span> e = GetSelectedElement( uidoc );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Pipe</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PipeInsulation</span> pi
+&nbsp; &nbsp; &nbsp; &nbsp; = GetPipeInslationFromPipe( e <span class="blue">as</span> <span class="teal">Pipe</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pi )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Insulation not found&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> material
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = GetMaterialFromPipeInsulation( pi );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == material )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Material not found&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;Material '{0}' &lt;{1}&gt;&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; material.Name, material.Id ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption, <span class="maroon">&quot;Not a pipe&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/PipeInsulationMaterial.zip">PipeInsulationMaterial.zip</a> containing
+
+the full Visual Studio solution, source code, and add-in manifest for this external command.
+
+<p>Many thanks to Steven Mycynek for researching and creating this solution!
+
+<p>Later, Martin Schmid pointed out that the GetPipeInslationFromPipe method using a filtered element collector and  comparing all pipe insulation element HostElementId properties with the target pipe can be simplified by calling the InsulationLiningBase GetInsulationIds method instead. 
+It takes the pipe element id and returns all pipe insulation element ids associated with it directly like this:
+
+<pre class="code">
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; pipeInsulationIds 
+&nbsp; &nbsp; = <span class="teal">InsulationLiningBase</span>.GetInsulationIds( 
+&nbsp; &nbsp; &nbsp; doc, pipe.Id );
+</pre>
+
+<p>Not so easy to find, though  :-)
+
+<p>I updated the code in the zip file above to take this approach into account as well, simply adding an assertion to verify that the result is the same.

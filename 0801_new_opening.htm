@@ -1,0 +1,125 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+C:\a\j\adn\case\special\geometrygym
+C:\a\j\adn\case\special\geometrygym\Class1.cs updated
+
+-->
+
+<h3>Creating an Opening</h3>
+
+<p>Here is a question that we have looked at in the distant past, brought up again and reinforced by Jon Mirtschin of
+
+<a href="http://geometrygym.blogspot.com">
+Geometry Gym</a>, 
+
+working on BIM and model exchange with Rhino, Grasshopper et al:
+
+<p><strong>Question:</strong> Sorry to bother you, but trying to get a quick answer to this problem.
+If you happen to have 5 minutes to help, it will be greatly appreciated.
+
+<p>I've attached a sample Revit project.  
+It simply creates a polyline curve array and slab outline, and then attempts to add an internal opening.
+This is a simplification from my IFC importer.
+When I run it, I get an error message about a circular reference.
+
+<p>Can you please advise what is wrong and how to fix?  
+I've tried searching samples and online help to no avail.
+
+<p><strong>Answer:</strong> Okey-doke, five minutes.
+
+<ul>
+<li>Countdown starting at 9:45:34.70.
+<li>I read the mail and stored your attachment: 9:47:09.20;
+<li>Created a repository for your issue and unzipped: 9:48:12.65;
+<li>Started up Visual Studio to look at your project: 9:49:02.60;
+<li>Updated references to be able to compile: 9:49:55.64;
+<li>Bumped .NET framework version to 4.0: 9:50:33.15;
+<li>Fixed post-build event... or no, I'll just ignore that error: 9:51:21.87;
+</ul>
+
+<p>Sorry for being so literal, I just can't help it, and I even think it is fun  :-)
+
+<p>Well, this looks like an interesting issue.
+
+<p>Before I dig any further, have you looked at the suggestions on creating a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/hole-in-a-floor.html">
+hole in a floor</a>?
+
+They include exploring the NewOpenings and ShaftHolePuncher SDK samples.
+
+<p>Do those SDK samples work for you?
+
+<p>In additional to that very old post, here is another half-old one which raises another interesting and important point for you to explore: an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/extra-transaction-required.html">
+extra transaction may be required</a> after
+
+creating the slab and before punching a hole through it.
+
+<p>Please try that out as well.
+
+<p>I expect a full report including answers to every single one of the questions above, ok?
+
+<p>Thank you!
+
+<p>P.S.: 9:57:42.51  :-)
+
+
+<p><strong>Response:</strong> 
+
+<p>Well, at least you have a great stop watch.  
+Most the time I'm too scared to even glance at the clock on the wall.
+I actually should also ask you to report your Revit start up time;
+I can probably allow a minute reduction for your great computers vs. my poor laptop  ;-)
+
+<p>Ok, good news.  
+You are correct about the transaction.  
+It was one of the things I had in the back of my mind but hadn't checked yet.
+Thanks for pointing it out.
+
+<p>Adding the manual transactions and setting a commit and start before adding the opening profile worked.
+Note that when I went back to my real project, it has tiers of commands, so I was getting an exception to start a new transaction within the outer program command transaction.  
+I added a call to the doc.Regenerate method instead, and that resolved this issue, so problem solved.
+
+<p>I did look at the examples you mention, and will be using them.  
+In this case, the IFC data is presenting an outer and inner profile curves, so the nominated method is the best for this situation.
+
+<p>I don't know if I've answered every single one of your questions, but I'm close.  
+
+<p>Here is my 
+
+<a href="zip/geometrygym_new_opening.cs.txt">amended source code</a>.
+
+Now I'm off to implement the change in my real project.
+
+<p>Please feel free to blog about this, I have read through most of your blog several times now and to me it is an invaluable resource.  
+I would like to contribute in any small way.
+
+<p>Here is a sample image of a basic test:</p>
+
+<center>
+<img src="img/geometrygym_new_opening.png" alt="Sample model with new floor opening" width="600"/>
+</center>
+
+<p>This is an IFC generated from an Archicad model and now opened in Revit.
+I already had the wall openings working, and now slabs are there too.  
+There are some more impressive and real world projects behind this.
+
+
+<p><strong>Answer:</strong> For the stopwatch, I use the Windows command console time command, i.e. an old MS-DOS command  :-)
+
+<pre>
+C:\a\doc\revit\blog\ > time
+The current time is: 10:43:48.29
+Enter the new time:
+</pre>
+
+<p>My computer is pretty old and decrepit, actually. 
+I am up for renewal soon  :-)
+
+<p>Thank you for the appreciation and nice example!

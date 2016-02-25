@@ -1,0 +1,137 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1252964 [Remove all Geometry from a RFA] -->
+
+<h3>Remove all Geometry from a Family</h3>
+
+<p>Here is a question from Joel Karr of
+
+<a href="http://www.esdesign.com">
+Environmental Systems Design, Inc</a>
+
+that nicely complements the issue of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html">
+identifying model elements in a project file</a>
+
+with the subsequent 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">
+correction</a>
+
+added.
+
+<p><strong>Question:</strong>
+Is it possible to delete all geometry from a Revit RFA family file?  
+I would like to keep all parameters but delete all geometry.</p>
+
+<p><strong>Answer:</strong>
+To achieve what you desire, we first need to identify all elements contributing geometry to the model, similarly to the model element selection issues mentioned above.
+
+<p>This is simpler in a family file than in a project file, since there are normally less elements and almost all elements having geometry are the ones we are interested in.
+
+<p>I implemented a sample application RemoveRfaGeom to test this, with the following mainline code for its Execute method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">ElementIterator</span> it = doc.Elements;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = it.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e.get_Geometry( opt ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.Add( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = a.Count;
+&nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} have non-null geometry{2}&quot;</span>, 
+&nbsp; &nbsp; n, 
+&nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ),
+&nbsp; &nbsp; ( 0 == n ? <span class="maroon">&quot;.&quot;</span> : <span class="maroon">&quot;:&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ElementSet</span> els = <span class="blue">new</span> <span class="teal">ElementSet</span>();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> cat = (<span class="blue">null</span> == e.Category)
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;&lt;null&gt;&quot;</span>
+&nbsp; &nbsp; &nbsp; : e.Category.Name;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Category={0}; Name={1}; Id={2}; Type={3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; cat,
+&nbsp; &nbsp; &nbsp; e.Name,
+&nbsp; &nbsp; &nbsp; e.Id.Value.ToString(),
+&nbsp; &nbsp; &nbsp; e.GetType().Name );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e.Category )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; els.Insert( e );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">ElementIdSet</span> ids = doc.Delete( els );
+&nbsp;
+&nbsp; n = (<span class="blue">null</span> == ids) ? 0 : ids.Size;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} element{1} deleted.&quot;</span>,
+&nbsp; &nbsp; n,
+&nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre> 
+
+<p>It performs the following steps, assuming that the active document is indeed a family document:
+
+<ul>
+<li>Iterate over all family document elements.
+<lI>Identify and list all elements with non-null geometry.
+<li>Create a set of all elements with geometry whose category is null.
+<li>Delete the latter set and display the number of deleted elements.
+</ul>
+
+<p>Running this in the metric library rectangular column family file 'M_Rectangular Column.rfa' produces the following output:
+
+<pre>
+2 elements have non-null geometry:
+Category=<null>; Name=Extrusion; Id=105; Type=Extrusion
+Category=Cameras; Name=View 1; Id=427; Type=Element
+13 elements deleted.
+</pre>
+
+<p>As you can see from this, there are some elements having geometry that you presumably do not want to eliminate, such as the camera, so you will need to remove those from the set before deletion. 
+In this case, I simply noted that the camera has a non-null category, whereas the category of the extrusion I want to remove is null, so I just check the null category property to select the extrusion.
+
+<p>Secondly, deleting an element causes other dependent elements to be deleted also, so even though we just pass in one single extrusion element to the Delete method, a whole group of other elements are eliminated as well.
+We already discussed and made use of this effect to determine the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+association between a tag and the tagged element</a>
+
+and between
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/host-reference.html">
+a host and its hosted elements</a>.
+
+<p>Here is the complete Visual Studio solution 
+
+<a href="zip/RemoveRfaGeom.zip">
+RemoveRfaGeom</a>
+
+implementing the new command.</p>

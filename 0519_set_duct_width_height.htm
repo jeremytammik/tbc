@@ -1,0 +1,132 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266177 [Sizing the rectangular duct fittings] -->
+
+<h3>Setting Duct Width and Height Requires Regeneration</h3>
+
+<p>Whenever you have a problem modifying or querying the model with your Revit plug-in, one of the first things to check is always your regeneration mode.
+If you are using the manual regeneration option, you need to check whether you possibly omitted a required intermediate regeneration call.
+It seems that there can never be enough reminders of this.
+Here is another case at hand:
+
+<p><strong>Question:</strong> I am sizing rectangular duct fittings through the API, and I noticed that the different dimensions for width and height must be set in different transactions. 
+Otherwise, you lose the first size change when the second one is made.
+
+<p>Is this a feature or a bug? 
+
+<p>The requirement to start and commit a separate transaction for each dimension change makes sizing of the network quite clumsy and even slow with larger drawings.
+
+<p>Here are two simple example code snippets in managed C++ setting the width and height of an elbow to 500x500 mm.
+They have both the TransactionMode and the RegenerationOption set to Manual.
+The first one uses a single transaction and does not work.
+The second uses two transactions and does.
+
+<p>Here is the first test with the size changes in same transaction:
+
+<pre class="code">
+Result AddinTest1::Execute(
+&nbsp; ExternalCommandData^ commandData, 
+&nbsp; System::String^% message, 
+&nbsp; ElementSet^ elements)
+{&nbsp; 
+&nbsp; Document ^doc = commandData-&gt;Application
+&nbsp; &nbsp; -&gt;ActiveUIDocument-&gt;Document;
+&nbsp;
+&nbsp; <span class="green">// Duct/bend IDs in example project</span>
+&nbsp; 
+&nbsp; <span class="blue">int</span> west_east&nbsp;&nbsp; = 505594;
+&nbsp; <span class="blue">int</span> north_south = 505598;
+&nbsp; <span class="blue">int</span> bend_id&nbsp; &nbsp;&nbsp; = 505610;
+&nbsp;
+&nbsp; ElementId ^elemId = <span class="blue">gcnew</span> ElementId(west_east);
+&nbsp; Element ^ductElem1 = doc-&gt;Element::get(elemId);
+&nbsp;
+&nbsp; elemId = <span class="blue">gcnew</span> ElementId(north_south);
+&nbsp; Element ^ductElem2 = doc-&gt;Element::get(elemId);
+&nbsp;
+&nbsp; elemId = <span class="blue">gcnew</span> ElementId(bend_id);
+&nbsp; Element ^bendElem1 = doc-&gt;Element::get(elemId);
+&nbsp;
+&nbsp; FamilyInstance ^bend 
+&nbsp; &nbsp; = <span class="blue">safe_cast</span>&lt;FamilyInstance^&gt;(bendElem1);
+&nbsp;
+&nbsp; ConnectorSet ^cSet 
+&nbsp; &nbsp; = bend-&gt;MEPModel-&gt;ConnectorManager-&gt;Connectors;
+&nbsp;
+&nbsp; Transaction tr(doc, L<span class="maroon">&quot;sizing&quot;</span>);
+&nbsp; tr.Start();
+&nbsp;
+&nbsp; <span class="blue">for</span> <span class="blue">each</span> (Connector ^connector <span class="blue">in</span> cSet)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span> (connector-&gt;ConnectorType 
+&nbsp; &nbsp; &nbsp; != ConnectorType::EndConn)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; connector-&gt;Width::set((500 * 0.0032808399));
+&nbsp; &nbsp; connector-&gt;Height::set((500 * 0.0032808399));&nbsp;&nbsp; <span class="green">// This is not set into the drawing</span>
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; tr.Commit();
+&nbsp;
+&nbsp; <span class="blue">return</span> Result::Succeeded;
+}
+</pre>
+
+Here is the second test doing exactly the same thing but using two separate transactions:
+
+<pre class="code">
+&nbsp; Transaction tr(doc, L<span class="maroon">&quot;sizing&quot;</span>);
+&nbsp; tr.Start();
+&nbsp;
+&nbsp; <span class="green">// We do separate transactions for both dimensions</span>
+&nbsp;
+&nbsp; <span class="blue">for</span> <span class="blue">each</span> (Connector ^connector <span class="blue">in</span> cSet)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span> (connector-&gt;ConnectorType 
+&nbsp; &nbsp; &nbsp; != ConnectorType::EndConn)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; connector-&gt;Width::set((500 * 0.0032808399));
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; tr.Commit();
+&nbsp;
+&nbsp; tr.Start();
+&nbsp;
+&nbsp; <span class="blue">for</span> <span class="blue">each</span> (Connector ^connector <span class="blue">in</span> cSet)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span> (connector-&gt;ConnectorType 
+&nbsp; &nbsp; &nbsp; != ConnectorType::EndConn)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; connector-&gt;Height::set((500 * 0.0032808399));
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; tr.Commit();
+</pre>
+
+
+<p><strong>Answer:</strong> I have two suggestions for you, but only one is meant seriously:
+
+<ol>
+<li>You could use automatic regeneration mode. 
+I would not recommend this, however, for many reasons, not least because it is obsolete and will soon be removed.
+<li>You could try to regenerate the document between the setting of the two parameters. Does this help?
+</ol>
+
+<p><strong>Response:</strong> Thanks for your quick and complete answer. 
+
+<p>Yes, regeneration between those settings <strong>does</strong> help; no whole additional transaction procedure is needed.
+
+<p>Thanks again and best wishes for this New Year 2011!

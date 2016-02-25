@@ -1,0 +1,142 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1250274 [Host reference] -->
+
+<h3>Host Reference</h3>
+
+<p>Still enjoying my climbing and sunshine holiday with my sons in Avignon. 
+Yesterday we went climbing and exploring the cliffs or 'calanque' of Cassis, east of Marseille
+
+(<a href="http://images.google.fr/images?hl=fr&q=calanque+de+cassis&um=1&ie=UTF-8&ei=-kkmSqO8KYq5jAe-q_3oBw&sa=X&oi=image_result_group&resnum=5&ct=title">more images</a>):</p>
+
+<img src="img/calanque-cassis.jpg" alt="Calanque de Cassis"/>
+
+<p>Besides climbing, swimming in the Gard river and Mediterranean Sea, and blogging now and then, my sons are also artistically active:</p>
+
+<img src="img/hund1.jpg" alt="Dog by Cornelius"/>
+
+<p>Returning to the Revit API, however:
+We already touched on the relationship between a host and its hosted elements in some previous posts.
+
+The first such topic was the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+relationship inverter</a>,
+
+making use of the explicit property providing a reference to the host of hosted elements such as doors, windows and other family instances.
+Since this property only specifies the relationship in one direction, we implemented the relationship inverter to obtain the inverse references.</p>
+
+<p>No such explicit property is provided in either direction in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+association between a tag and the tagged element</a>, 
+
+and that discussion mentions four ideas for possible workarounds instead.</p>
+
+<p>Here is another question on a similar topic, the relationship between a wall and its wall footing:</p>
+
+<p><strong>Question:</strong>
+How can I obtain a reference to a wall footing from the wall attached to it?
+And vice versa, is it possible to obtain a reference to the wall supported by a wall footing?</p>
+
+<img src="img/wall_footing.png" alt="Wall footing"/>
+
+<p><strong>Answer:</strong>
+As in the case of the tag and the tagged element, the Revit API does not provide any direct access to the link in either direction, 
+neither to get the reference of a wall footing from the wall attached to it or vice versa.
+
+The workaround via the Document.Delete method mentioned as one of the four workarounds to determine the association between 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+a tag and the tagged element</a>
+
+can be used in this case as well:
+You call the method to delete the wall.
+It automatically includes the wall footing in the deletion, and returns the element ids of all deleted objects in an ElementIdSet, from which you can pick out the wall footing.
+If you encapsulate this operation in a transaction which is aborted after the call, the deletion will not be committed, and you will have obtained the desired information with no changes made to the model.
+Here is a sample code snippet to implement this:</p>
+
+<p>I added a new command class CmdWallFooting to The Building Coder sample implementing this functionality.
+Here is the source code of its Execute method:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">ContFooting</span> footing = <span class="blue">null</span>;
+&nbsp;
+<span class="teal">Wall</span> wall = <span class="teal">Util</span>.SelectSingleElementOfType( 
+&nbsp; doc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ), <span class="maroon">&quot;a wall&quot;</span> ) <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+<span class="blue">if</span> ( <span class="blue">null</span> == wall )
+{
+&nbsp; message = <span class="maroon">&quot;Please select a single wall element.&quot;</span>;
+}
+<span class="blue">else</span>
+{
+&nbsp; doc.BeginTransaction();
+&nbsp; <span class="teal">ElementIdSet</span> delIds = <span class="blue">null</span>;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; delIds = doc.Delete( wall );
+&nbsp; }
+&nbsp; <span class="blue">catch</span> ( System.<span class="teal">Exception</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Deletion failed.&quot;</span>;
+&nbsp; &nbsp; doc.AbortTransaction();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp; doc.AbortTransaction();
+&nbsp;
+&nbsp; <span class="blue">foreach</span> ( <span class="teal">ElementId</span> id <span class="blue">in</span> delIds )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> refId = id;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = doc.get_Element( <span class="blue">ref</span> refId );
+&nbsp; &nbsp; <span class="blue">if</span> ( <span class="blue">null</span> == elem )
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; footing = elem <span class="blue">as</span> <span class="teal">ContFooting</span>;
+&nbsp; &nbsp; <span class="blue">if</span> ( <span class="blue">null</span> != footing )
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+}
+<span class="blue">string</span> s = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+<span class="teal">Util</span>.InfoMsg( ( <span class="blue">null</span> == footing )
+&nbsp; ? <span class="blue">string</span>.Format( <span class="maroon">&quot;No footing found for {0}.&quot;</span>, s )
+&nbsp; : <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} has {1}.&quot;</span>, s,
+&nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( footing ) ) );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>This is the result of running the new command on the wall depicted above:</p>
+
+<img src="img/wall_footing_message.png" alt="Wall footing message"/>
+
+<p>Another efficient workaround has become possible in Revit 2010 by making use of the new API method <strong>FindReferencesByDirection</strong>.
+It finds both elements and geometric references that intersect a ray extending in a certain direction from an origin point.
+The Revit 2010 SDK Samples AvoidObstruction and RaytraceBounce demonstrate the use of this new method.
+By using a couple of points on the wall footing, we can easily determine which wall is located directly above it, and vice versa as well.
+This provides a much stronger possibility to the workarounds using general geometric proximity suggested in the post on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/tag-association.html">
+tag association</a>.</p>
+
+<p>Here is
+
+<a href="zip/bc11034.zip">
+version 1.1.0.34</a>
+
+of the complete Visual Studio solution with the new command.</p>
+
+<p><strong>Update:</strong> I updated this article for Revit 2011 on August 3 2010 based on the comment below by Jo Lee to fix the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/transaction-migration-errors.html">
+transaction migration errors</a> introduced
+
+by the simplistic initial flat port of the code from Revit 2010 to the Revit 2011 API.

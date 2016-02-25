@@ -1,0 +1,368 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Genesis of Revit and its API</h3>
+
+<p>I wanted to end the last year with a look back, far back, all the way to the origins of time.
+Revit time, that is.
+It ended up taking a bit longer than planned, so here it comes now at the beginning of this year instead.
+
+<p>In December I
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/interior-side-of-a-wall.html#2">
+mentioned</a> the
+
+topic of the history and origins of Revit, and promised to see whether I could dig up some more on that.
+
+A thread listing the
+
+<a href="http://forums.augi.com/showthread.php?t=20803">
+Revit Timeline</a> is available on AUGI, and
+
+a short description is given in the
+
+<a href="http://en.wikipedia.org/wiki/Revit#History_of_Revit">
+history section</a> of the
+
+<a href="http://en.wikipedia.org/wiki/Revit">
+Wikipedia article on Revit</a>.
+
+<p>I asked my colleagues in the Revit team whether they could contribute some titbits on the early times to flesh this out a bit, and reaped a ripe harvest of anecdotes from
+
+<a href="#1">David Conant</a>,
+<a href="#2">Matt Jezyk</a>, and
+<a href="#3">Richard Taylor</a>
+
+on the company and players, and from
+
+<a href="#4">Emile Kfouri</a> on the Revit API.
+
+
+<a name="1"></a>
+
+<p><strong>Dave:</strong>
+In the beginning, there were two PTC alumni Leonid and Irwin.
+Each, after spending some time enjoying not working, began thinking independently about where they could next use their experience.
+Both identified building and construction as a field where the potential benefits of design computing were largely unrealized.
+When, after talking, they discovered they were both interested in the same issue, they decided to run with it.
+After about 6 months of working over their concept, they wanted to get feedback from actual architects.
+Through some serendipitous connections, I presented myself to them thinking this would be an interesting conversation with some people with yet another pipe dream.
+It soon became obvious to me, that I should abandon my attempts to build various FM connections to AutoCAD as shareware and work with these guys who had the chops to provide something of real substance.
+
+<p>Our office for the spring and summer of '98 was a 5 room space hidden behind and above a Domino's pizza joint on Rt. 9. Its most distinguishing feature was the large collection of 'genuine oil paintings' featuring sad clowns, big eyed puppies, and cliché landscapes all left by the previous tenant. As I was only a consultant at that point, I would drive out there after my day job and engage in hours long discussions on the architecture/building process and on what we could do with a complete building model. I worked with them to document the ideas as planning statements and then as a paper prototype. We took these around to a number of local architecture and engineering firms to get some validation of the ideas. We also brought along venture funders to help build their confidence in our concept in preparation for getting funding. One of the comments that seemed to sum up the response was 'I don't think you can pull this off, but if you could do this, it would be the Holy Grail'.
+
+<p>By the end of the summer, I had quit my day job, talked Leonid into a higher salary so that I could buy a second car, and come on full time. At that point there were 5 people in the office. All funding was still coming out of Leonid and Irwin's pockets, but VC money was just around the corner. By September we were hiring the 7th person and it was time to move. By virtue of a two week sooner availability, we took space on Speen St in Framingham, overlooking the Turnpike toll plaza. In this office we got the first VC money and began serious hiring including a CEO and a number of people still in the organization to this day.
+
+<p>I could go on, but that would go beyond the 'short' history.
+Some items of interest:
+
+<ul>
+<li>The paper prototype envisioned much of current Revit behaviour and some things we have yet to complete such as the ability to extract initial form from a freehand sketch, the ability to build a sharable family in the project as well as a special family editing environment, and an ability for users to create a palette of commonly used tools or elements.
+<li>The name Revit was developed in conjunction with a branding consultant organization. We did have a big company brainstorm where everyone was encouraged to put up suggested names. After not liking any of those suggestions, we brought in the consultant and ended up with a name quite close to a few of the earlier ideas.
+<li>The name Revit was already in use by a Dutch manufacturer of motorcycle clothing. After a short period using the addresses gorevit.com, and revit.net, Revit.com was purchased.
+<li>When I was assigned to visit all our customers east of the Mississippi (6), I asked Leonid what our official expenses policy was. He thought for a moment then said 'be reasonable'.
+</ul>
+
+
+<a name="2"></a>
+
+<p><strong>Matt:</strong>
+Oh boy, this could turn into a long thread.
+Here are some more old-school data points:
+
+<ul>
+<li>I started a little after David did and was employee number 20-something of Charles River Software (the name before Revit Technology Corp). I interviewed with Leonid in the summer of '99 and still remember him asking me logic questions while David flipped through my architecture portfolio. Intense.
+<li>Before jumping into start-up life I was working for a local Boston architecture firm with Steve Crotty. We were the young AutoCAD jocks there and happened to sit in the back of the room when David and our old CEO Dave Lemont came by shopping for early adopter firms. They proceeded to demo this early thing called 'Perspective' (the code name for the product); I had already seen it in my interview. Crotty and I sat in the back and snickered, mostly talking about the unrealistic way that multiple people could work together on one model (pre-worksets, this was called 'Merge'). Steve and I were both interviewing with Charles River at the time. Crotty joined 6-7 months later and is still here as well.
+<li>We were on Speen St already when I started and there were maybe 15 developers. We had hired a CEO and were just starting to ramp up QA, Support and PM organizations by hiring architects from the local Boston area.
+<li>In October of 99 the software ran but was pre-alpha still, you could draw walls and add windows and doors. The column tool was just being added and crashed on placement. The roof tool could basically create the 4 roof types that Irwin passed on the way to the office. We did not have the project browser yet and there were only enough buttons for single toolbars on the top and left sides. There are still screenshots of Revit 1.0 that pop up every so often, what we shipped in 1.0 was much more advanced than what was there the summer before.
+<li>David ran the issue database until we hired a CIO who built the underpinnings of the current one.
+<li>We signed up early adopter firms, some of which are using still today.
+<li>We moved to 300 5th Ave office in Waltham that spring. Lemont made us lay out the floor plan for our new office using Revit, which was challenging but a good test case.
+<li>We did a launch event at the Fogg Museum in Cambridge Ma. Many journalists thought we were running the software in the cloud. We were simply allowing people to download the installer from the web and licensing on a monthly term license.
+<li>The main launch event was at the AIA Conference in Philadelphia, Pa in May of 2000. We were the loudest booth there, pumping out a great soundtrack and video (our VP of marketing came from larger consumer tech and IT companies). Other vendors were asking us to turn down the music. Buzzsaw (the separate company) also launched at that show, right next to us. I remember some of the ADT product managers and developers stopping by our booth for a demo.
+<li>We did a 1.01, 1.1 and then a 2.0 release all in rapid succession that summer. Talk about a blur.
+</ul>
+
+
+<a name="3"></a>
+
+<p><strong>Richard:</strong>
+I started in April 2000 just before the release of 1.0 and the big AIA show that Matt refers to.
+I remember several times at the AIA show being told to quiet down because I had a microphone that seemed to be on full blast directly toward the Autodesk booth.
+
+<p>In Revit 1.0, we had the AccuRender rendering engine, but no way to save the image! You had to run a rendering and then take a screen shot to capture and save the rendering for inclusion in any sheet or drawing. That was just one of many interesting work-arounds.
+
+<p>We launched Revit 2.0 at AEC Systems in England in August or September. My understanding was the VC people wanted to see an expansion into international markets very early on. I was lucky to attend with Dave Lemont (CEO) and the freshly minted 'sales team' from the UK. I remember staying up until 5 in the morning at 'My Hotel' bonding with the CEO and sales team and telling WAY TOO many personal stories.
+
+<!--
+<p>As David states, there was not much 'policy' or 'procedures' until much later.
+
+<p>One funny story about Leonid:  Very early that first summer, he asked me to go for a walk with him one day behind the office building, which is Prospect Hill Park.  I thought that was strange and I was kind of scared.   He was very nice, but he informed me that I needed to be careful with the 'sales' team that I was reporting under.  I was the first 'inside' technical sales person that did Revit demonstrations via the web primarily instead of visiting customers in person.  I was highly technical and had just come from Bentley.  So, I was fairly familiar with the software world.  So it seems that I had been logging so many 'bugs' and 'requests' that I had caught the attention of Leonid.  He was concerned that I might be giving the sales team a somewhat negative opinion of Revit.  He quietly but firmly requested that I continue logging bugs and requests but I should be very careful about informing the sales team of any shortcomings in Revit.  It was sort of a 'They don't know any better so they're going to sell the heck out of this software.'
+It was kind of funny, but I really understood where he was coming from.
+-->
+
+<!-- As Stephen Rines can attest to, I dropped that attitude later to a more honest approach.
+Steve was constantly telling customers that Revit could do something it couldn't, and I always corrected him.  (He really hated me for that!!  LOL)   We were like some old married couple when we visited customers because we would get into arguments!
+It was like 'The Real housewives meet Revit demonstrations!'
+-->
+
+
+<a name="4"></a>
+
+<p><strong>Emile:</strong>
+Well, Dave, Matt and Richard bring a very interesting perspective because they came in at the ground level. I arrived just before Revit Building 8 was released which was also the first official API release. I was brought in as the Revit API Product Manager but for a few months I also worked as the Revit Structure Product designer.
+
+<p>Originally the API was built specifically to support a single workflow &ndash; getting the analytical model out of RST into a structural analysis application and getting the results of any structural member changes back into Revit. There was a single person Giles Gilbert working on the API and it is quite amazing what a single person was able to do given the three realties he had to work with:
+
+<ol>
+<li>He was asked to build the API on his own without help from anyone else because they had more important work to do
+<li>He was working in Revit which was built from the ground up with absolutely no intention of ever exposing anything through an API
+<li>He had to do everything himself &ndash; design, development, testing, support for partners and training for partners and the ADN team which was just starting to ramp up for Revit.
+</ol>
+
+<p>All this while trying to figure out what a BIM API should really look like and how it should work.
+Needless to say, the first API left much room for improvement when looking from the outside in, but was quite an accomplishment when looked at it from the inside out. During the next few releases through Revit 2008 we worked our tails off to build out a larger team, improve our requirements gathering from partners and scale our training, documentation etc. At this point we were still getting features from the feature developers and then figuring out how to build an API around them. A quick-back-of-the-envelope calculation made us realize that if we continued along this path there would need to be as many Revit API developers as there were Revit internal developers just to keep up with feature development and expose existing features.
+
+<p>So starting with the development of Revit 2009 we started our transition to what I call API Centric Development. The idea is that the API is developed and exposed at the same time as the features and by the same developers. We started off slow and had a few successes. For the past couple of development cycles we have been doing almost 100% API centric development.
+
+<p>Beyond API Centric Development the other major shift that moved the Revit API forward was the concept of Asynchronous Development when the Revit team and the rest of Autodesk started to develop applications on top of the Revit API outside of the regular development cycle.
+The best three examples are probably the Workshare Monitor, the Revit DBLink and the REX based applicators that are still some of our most used applications.
+REX specifically showed everyone inside and outside Autodesk that Revit could be a viable development platform.
+
+<p>The journey from a single API developer and a few partners to what we have now has had many great memories. In the first few years I used to know every single partner, their business goals, their needs and even their hobbies. Then the Revit community working on the Revit API ballooned to the point that I could not even keep up with whom was developing what. The Revit API developers went from needing to respond to every API related support question to just providing second tier support as ADN has ramped up their skills. We now look at Revit as a development platform and always look to see if and how features can be developed purely on top of the API &ndash; eTransmit is a recent example of that.
+
+<p>So what does the future look like for Revit? Well, I continue to see it getting brighter and brighter. It is more often than not that I find partners doing amazing things with the Revit API that impress me or that I did not think possible. Looking at the dedication of the Revit team to the API and the platform and knowing some of the things we plan on delivering in the next few releases I sometimes admit I get a little bit giddy.
+
+<p>Much has changed in the past few years &ndash; I handed the Product Manager responsibilities to Anthony who has done an amazing job continuing to push Revit forward. I now hear people all across the organization talking about how to leverage the API. I continue to see external developers who are working on the Revit API being very passionate about Revit and continue to pressure us to make the API even better.
+
+<p>In summary I would say if people have seen our humble beginnings, our accelerated progress in the API for the past few years they may wonder what else we have up our sleeves.
+The answer is you ain't seen nothing yet!
+
+
+<a name="5"></a>
+
+<p><strong>Adendum</strong> by Kirshan Kumar, BIM Manager at <a href="http://www.systra.com/en">SYSTRA</a> India, on Oct 1, 2014:</p>
+
+<h4><a href="https://www.linkedin.com/pulse/article/20141001091057-42441121-the-revit-history-is-now-the-future-of-aec-industries">
+The Revit History is now the Future of AEC industries</a></h4>
+
+<p>The History is now the future.</p>
+
+<p>Revit was created in 1997. It is currently in it 33rd release. 2 to 3 releases a year.....</p>
+
+<p>Revit = Revise Instantly</p>
+
+<p>Revit was developed by individuals that came from the company PTC, Parametric Technology Corporation.
+Revit was developed specifically with Architecture in mind and was purpose built for Architects by Architects.
+To that point, the majority of the product development teams are architects or come from a design and construction background. The Revit Building application has been developed as a purpose built tool for Architecture and is the only completely parametric Building Information Modeling tool available.</p>
+
+<p>AutoCAD is the de facto standard non-specialized CAD solution and its file formats DXF and DWG are the most common for CAD interchange. Since the late 1990's, the company made a concerted effort to provide a product for every solution in the industry, often purchasing competing companies and technologies.</p>
+
+<p>In 2002, Autodesk purchased a competing software called Revit, from Massachusetts-based Revit Technologies for $133 million. Revit, for the building solutions and infrastructure group and Inventor for the manufacturing group, formed the foundation for future Autodesk products &ndash; a strong departure away from their 20-year old AutoCAD software code.</p>
+
+<h4>Revit Timeline</h4>
+
+<p>Prior to Public release &ndash; Charles River Software</p>
+
+<ul>
+<li>0.1 1999 11 (Early Adopter 1)</li>
+
+<li>0.2 2000 01 (Early Adopter 2)</li>
+</ul>
+
+<p>Product released to Public &ndash; Revit Technology Corporation</p>
+
+<ul>
+<li>1.0 2000 04</li>
+
+<li>2.0 2000 08</li>
+
+<li>2.1 2000 10</li>
+
+<li>3.0 2001 02</li>
+
+<li>3.1 2001 06</li>
+
+<li>4.0 2001 11</li>
+
+<li>4.1 2002 01</li>
+</ul>
+
+<p>Autodesk Revit</p>
+
+<ul>
+
+<li>2002 04 04 (Autodesk buys Revit Technology Corp)</li>
+
+<li>4.5 2002 05 09</li>
+
+<li>5.0 2002 12 17</li>
+
+<li>2003 04 28 (Zoogdesign Revit Forum goes Live)</li>
+
+<li>5.1 2003 05</li>
+
+<li>5.5 2003 04 01 (pseudo mac release screen shot, April Fools joke...Author unknown)</li>
+
+<li>6.0 2003 12 22</li>
+
+<li>6.1 2004 03 11</li>
+
+<li>2004 05 26 (Zoogdesign Read Only to Merge with AUGI)</li>
+
+<li>7.0 2004 12 13</li>
+
+<li>Autodesk Revit Building (New Name)</li>
+
+<li>8.0 2005 02 26ish</li>
+
+<li>8.1 2005 08 12 (web release then withdrawn)</li>
+
+<li>8.1 2005 08 23 (Actual release)</li>
+
+<li>9.0 2006 04 12 (Shipping & Web Release)</li>
+
+<li>Autodesk Revit Series (Marketing Bundle w/ AutoCAD)</li>
+
+<li>1.0 2003 12 01 (Revit 6.1)</li>
+
+<li>2.0 2004 XX XX (Revit 6.1)</li>
+
+<li>8.0 2005 XX XX (Revit 8.0)</li>
+
+<li>8.1 2005 XX XX (Revit 8.1, AutoCAD 2006)</li>
+
+<li>Autodesk AutoCAD Revit Series 9 &ndash; Building (Marketing Bundle w/ AutoCAD)</li>
+
+<li>9.0 2006 04 12 (Revit 9.0, AutoCAD 2007)</li>
+
+<li>Revit Architecture 2008 (new name) 2007 04</li>
+
+<li>AutoCAD Revit Architecture Suite (Bundle with AutoCAD 2008 ) 2007 04</li>
+
+<li>Revit Architecture 2009 2008 04 15</li>
+
+<li>AutoCAD Revit Series 2009 2008 04 15</li>
+
+<li>Autodesk Revit Architecture 2010 2009 04 16</li>
+
+<li>AutoCAD Revit Architecture Suite 2010 2009 04 16</li>
+
+<li>Autodesk Revit Architecture 2011 2010 04 16</li>
+
+<li>AutoCAD Revit Architecture Suite 2011 2010 04 16</li>
+
+<li>Autodesk Revit Architecture 2012 2011 04 11</li>
+
+<li>Autodesk Revit Architecture Suite 2012 2011 04 11</li>
+
+<li>Autodesk Building Design Suite 2012 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite 2013 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2015 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2015 (includes all Revit versions)</li>
+
+</ul>
+
+<p>Structural Version of Revit</p>
+
+<ul>
+
+<li>Autodesk Revit Structure (New Application)</li>
+
+<li>1.0 2005 06 07</li>
+
+<li>2.0 2005 08 23</li>
+
+<li>3.0 2006 04 12</li>
+
+<li>Autodesk AutoCAD Revit Series 3 &ndash; Structure (Marketing Bundle w/ AutoCAD)</li>
+
+<li>3.0 2006 04 12 (RS 3 & AutoCAD 2007)</li>
+
+<li>Revit Structure 2008 (New Name) 2007 04</li>
+
+<li>AutoCAD Revit Structure Suite 2008 (Bundle with AutoCAD 2008 ) 2007 04</li>
+
+<li>Revit Structure 2009 2008 04 15</li>
+
+<li>AutoCAD Revit Structure Series 2009 2008 04 15</li>
+<li>Autodesk Revit Structure 2010 2009 04 16</li>
+
+<li>Autodesk Revit Structure 2011 2010 04 16</li>
+
+<li>Autodesk Revit Structure Suite 2011 2010 04 16</li>
+
+<li>Autodesk Revit Structure 2012 2011 04 11</li>
+
+<li>Autodesk Revit Structure Suite 2012 2011 04 11</li>
+
+<li>Autodesk Building Design Suite 2012 2011 tba (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite 2013 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2015 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2015 (includes all Revit versions)</li>
+
+</ul>
+
+<p>MEP Version of Revit </p>
+
+<ul>
+
+<li>Autodesk Revit Systems 1 (New Application) </li>
+
+<li>1.0 2006 04 XX </li>
+
+<li>Autodesk Revit Systems 2 </li>
+
+<li>2.0 2006 09 XX </li>
+
+<li>Autodesk AutoCAD Revit Series 1 &ndash; Systems Plus (Marketing Bundle w/ Autodesk Building Systems) </li>
+
+<li>1.0 2006 04 XX </li>
+
+
+<li>Autodesk AutoCAD Revit Series 2 &ndash; Systems Plus </li>
+
+<li>2.0 2006 09 XX </li>
+
+<li>Revit MEP 2008 (New Name) 2007 04 </li>
+
+<li>AutoCAD Revit MEP Suite (Bundle with AutoCAD 2008 ) 2007 04 </li>
+
+<li>Revit MEP 2009 2008 04 15 </li>
+
+<li>AutoCAD Revit MEP Series 2009 2008 04 15 </li>
+
+<li>Autodesk Revit MEP 2010 2009 04 16 </li>
+
+<li>Autodesk Revit MEP Suite 2011 2010 04 16 </li>
+
+<li>Autodesk Revit MEP Suite 2012 2011 04 11 </li>
+
+<li>Autodesk Building Design Suite 2012 2011 tba (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite 2013 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2014 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Premium 2015 (includes all Revit versions)</li>
+
+<li>Autodesk Building Design Suite Ultimate 2015 (includes all Revit versions)</li>
+
+</ul>

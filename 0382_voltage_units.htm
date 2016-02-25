@@ -1,0 +1,91 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Voltage Units</h3>
+
+<p>The last day before DevCamp!
+
+<p>I am happy to note that the articles on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/grabbing-an-internet-webcam-image.html">
+grabbing a webcam image</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">
+displaying it on a Revit element face</a> were 
+
+so popular ... I will be demonstrating that and other samples using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">
+Idling event</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+modeless dialogues</a> at DevCamp.
+
+<p>Meanwhile, here is an interesting little item that my colleagues Jorgen Dahl and Martin Schmid (who by the way published a 
+
+<a href="http://www.amazon.com/exec/obidos/tg/detail/-/1439057664/ref=ord_cart_shr?_encoding=UTF8&m=ATVPDKIKX0DER&v=glance">
+book on AutoCAD MEP 2010</a>)
+
+dug up, another nugget of information on the topic of Revit database units, an area that we looked at repeatedly in the past:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">Units</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/formatting-units-strings.html">Formatting unit strings</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/unit-types-and-format-options.html">Unit types and format options</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">Unit conversion</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/unit-suffix-and-the-projectunit-sdk-sample.html">Unit Suffix and the ProjectUnit SDK sample</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/dut-versus-ust.html">DisplayUnitType and UnitSymbolType</a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/12/parameter-filter-units.html">Parameter filter units</a>.</li>
+</ul>
+
+<p>Martin is an expert in the MEP domain, so one area of interest to him is the following:
+
+<p><strong>Question:</strong> What is the internal unit used by Revit for voltage?  
+In the API, the ElectricalSystem.Voltage property returns a value that is about 10.76391 times the expected value in Volts, i.e., I get 1291.669 instead of 120 V.
+The same applies to the TrueLoad property.
+So I assume Revit is using some non-standard unit for voltage?
+
+<p><strong>Answer:</strong> Electrical potential can be defined using the following more fundamental units:
+
+<p>(Length<sup>2</sup> * Mass) / (Time<sup>3</sup> * Current).
+
+<p>In Revit, this formula makes use of the following units:
+
+<ul>
+<li>Length: feet
+<li>Mass: kg
+<li>Time: s
+<li>Current: A
+</ul>
+
+<p>The unit Volt is defined in the same way, of course, but uses the 
+
+<a href="http://nostalgia.wikipedia.org/wiki/SI_unit">
+SI unit</a> meters 
+
+instead of feet, as specified by the International System of Units SI.
+
+<p>As a result, to convert the Revit internal database voltage unit to Volts, you have to multiply it with 0.3048^2. 
+
+<p>It would be nice to upgrade the internal Revit database unit to use meters as well, but the problem is that there are a lot of data fields on elements in Revit that don’t know if they are just a number or a length. 
+We are working on it, though.
+
+<p>Every unit in Revit knows what base units it is built of, and data is stored in that format. 
+The base units used internally by Revit are currently:
+
+<pre class="code">
+<span class="blue">enum</span> <span class="teal">BaseUnit</span>
+{
+&nbsp; BU_Length = 0,&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="green">// length, feet (ft)</span>
+&nbsp; BU_Angle,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// angle, radian (rad)</span>
+&nbsp; BU_Mass,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="green">// mass, kilogram (kg)</span>
+&nbsp; BU_Time,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="green">// time, second (s)</span>
+&nbsp; BU_Electric_Current,&nbsp;&nbsp; <span class="green">// electric current, ampere (A)</span>
+&nbsp; BU_Temperature,&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// temperature, kelvin (K)</span>
+&nbsp; BU_Luminous_Intensity, <span class="green">// luminous intensity, candela (cd)</span>
+&nbsp; BU_Solid_Angle,&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// solid angle, steradian (sr)</span>
+};
+</pre>
+
+<p>Many thanks to Jorgen and Martin for this useful background information!

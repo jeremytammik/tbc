@@ -1,0 +1,309 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1264475 [IsUsed property]
+Katsuaki Takamizawa and Harry Mattison RE: Purging unused elements
+Chuck Dodson 
+
+-->
+
+<h3>Purge Unused Text Note Types</h3>
+
+<p>Chuck Dodson of
+
+<a href="http://www.scottgoble.com">
+Scott&Goble Architects</a> and
+
+my colleague Katsuaki Takamizawa came up with a question on how to purge unused elements from the Revit database, and Harry Mattison from the Revit API development team provides a partial answer:
+
+<p><strong>Question:</strong> I would like to purge unused elements from the Revit project, such as line types, materials, fonts, etc., especially those imported from AutoCAD.
+The AutoCAD API provides an IsUsed property for layers and other elements.
+I have not found any Revit API method for purging.
+
+<p>Is there any way to determine if an element is not being used by any other elements and can be deleted safely?
+
+<p><strong>Answer:</strong> The Revit API does not provide a generic member such as IsUsed.
+Each type of element will have to be handled individually.
+
+<p>Here is one way to do it for text note types:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNoteTypes
+&nbsp; &nbsp; = collector.OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElementIds()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collectorUsed
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNotes
+&nbsp; &nbsp; = collectorUsed.OfClass( <span class="blue">typeof</span>( <span class="teal">TextNote</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> textNoteid <span class="blue">in</span> textNotes )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TextNote</span> textNote = doc.get_Element(
+&nbsp; &nbsp; &nbsp; textNoteid ) <span class="blue">as</span> <span class="teal">TextNote</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> removed = textNoteTypes.Remove(
+&nbsp; &nbsp; &nbsp; textNote.TextNoteType.Id );
+&nbsp; }
+&nbsp;
+&nbsp; doc.Delete( textNoteTypes );
+</pre>
+
+<p>Here is another approach:
+
+<pre class="code">
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNotesTypeIds
+&nbsp; &nbsp; = <span class="blue">new</span> Collection&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> textNoteCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNotes
+&nbsp; &nbsp; = textNoteCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">TextNote</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> textNoteid <span class="blue">in</span> textNotes )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TextNote</span> tn = doc.get_Element(
+&nbsp; &nbsp; &nbsp; textNoteid ) <span class="blue">as</span> <span class="teal">TextNote</span>;
+&nbsp;
+&nbsp; &nbsp; textNotesTypeIds.Add( tn.TextNoteType.Id );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> unusedTypeCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; unusedTypes
+&nbsp; &nbsp; = unusedTypeCollector
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; .Excluding( textNotesTypeIds )
+&nbsp; &nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; doc.Delete( unusedTypes );
+</pre>
+
+<p>Many thanks to Katsu-san and Harry for this hint!
+
+<p>Note the difference between the two:
+
+<ul>
+<li>In the first approach, a collection A of all text note types is created, then all text notes are collected and iterated, removing each one's text note type from A.
+<li>In the second approach, a collection B is created of the text note types in use. Then the filtered element collector Excluding method is used to retrieve all text note types except those contained in B.
+</ul>
+
+<p>In both approaches, some simplification and optimisation of the text note iteration to determine the types in use can be achieved as follows, iterating over the collector directly instead of asking it for its element ids and then opening each text note element from its id:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> textNotes
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNote</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">TextNote</span> textNote <span class="blue">in</span> textNotes )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> removed = textNoteTypes.Remove(
+&nbsp; &nbsp; &nbsp; textNote.TextNoteType.Id );
+&nbsp; }
+</pre>
+
+<p>I was curious whether the two approaches show any discernible performance difference, so I took this code and implemented a new Building Coder sample command CmdPurgeTextNoteTypes to benchmark the two.
+
+<p>Since the deletion operation is identical in both cases, I implemented two methods which just collect the unused text note types, GetUnusedTextNoteTypes and GetUnusedTextNoteTypesExcluding, and then common code can be used to delete them.
+
+<p>GetUnusedTextNoteTypes returns all unused text note types by collecting all existing types in the document and removing the ones in use afterwards:
+
+<pre class="code">
+<span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; GetUnusedTextNoteTypes(
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNoteTypes
+&nbsp; &nbsp; = collector.OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElementIds()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> textNotes
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNote</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">TextNote</span> textNote <span class="blue">in</span> textNotes )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> removed = textNoteTypes.Remove(
+&nbsp; &nbsp; &nbsp; textNote.TextNoteType.Id );
+&nbsp; }
+&nbsp; <span class="blue">return</span> textNoteTypes;
+}
+</pre>
+
+<p>GetUnusedTextNoteTypesExcluding return all unused text note types by first determining all text note types in use and then collecting all the others using an exclusion filter:
+
+<pre class="code">
+<span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt;
+&nbsp; GetUnusedTextNoteTypesExcluding(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; usedTextNotesTypeIds
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Collection</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> textNotes
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNote</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">TextNote</span> textNote <span class="blue">in</span> textNotes )
+&nbsp; {
+&nbsp; &nbsp; usedTextNotesTypeIds.Add(
+&nbsp; &nbsp; &nbsp; textNote.TextNoteType.Id );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> unusedTypeCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; usedTextNotesTypeIds.Count )
+&nbsp; {
+&nbsp; &nbsp; unusedTypeCollector.Excluding(
+&nbsp; &nbsp; &nbsp; usedTextNotesTypeIds );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; unusedTypes
+&nbsp; &nbsp; = unusedTypeCollector.ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">return</span> unusedTypes;
+}
+</pre>
+
+<p>Note that we have to check whether usedTextNotesTypeIds is empty before calling the Excluding method.
+If Excluding is called with an empty collection, it throws an exception.
+
+<p>Here is the code of the mainline benchmarking these two methods and deleting the unused text note types, using manual regeneration option and transaction mode:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; unusedTextNoteTypes
+&nbsp; &nbsp; = GetUnusedTextNoteTypes( doc );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = unusedTextNoteTypes.Count;
+&nbsp;
+&nbsp; <span class="blue">int</span> nLoop = 100;
+&nbsp;
+&nbsp; <span class="teal">Stopwatch</span> sw = <span class="blue">new</span> <span class="teal">Stopwatch</span>();
+&nbsp;
+&nbsp; sw.Reset();
+&nbsp; sw.Start();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nLoop; ++ i )
+&nbsp; {
+&nbsp; &nbsp; unusedTextNoteTypes
+&nbsp; &nbsp; &nbsp; = GetUnusedTextNoteTypes( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( unusedTextNoteTypes.Count == n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same number of unused texct note types&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; sw.Stop();
+&nbsp; <span class="blue">double</span> ms = (<span class="blue">double</span>) sw.ElapsedMilliseconds
+&nbsp; &nbsp; / (<span class="blue">double</span>) nLoop;
+&nbsp;
+&nbsp; sw.Reset();
+&nbsp; sw.Start();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nLoop; ++ i )
+&nbsp; {
+&nbsp; &nbsp; unusedTextNoteTypes
+&nbsp; &nbsp; &nbsp; = GetUnusedTextNoteTypesExcluding( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( unusedTextNoteTypes.Count == n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same number of unused texct note types&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; sw.Stop();
+&nbsp; <span class="blue">double</span> msExcluding
+&nbsp; &nbsp; = (<span class="blue">double</span>) sw.ElapsedMilliseconds
+&nbsp; &nbsp; &nbsp; / (<span class="blue">double</span>) nLoop;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; <span class="maroon">&quot;Purging unused text note types&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; sw.Reset();
+&nbsp; sw.Start();
+&nbsp;
+&nbsp; doc.Delete( unusedTextNoteTypes );
+&nbsp;
+&nbsp; sw.Stop();
+&nbsp; <span class="blue">double</span> msDeleting
+&nbsp; &nbsp; = (<span class="blue">double</span>) sw.ElapsedMilliseconds
+&nbsp; &nbsp; &nbsp; / (<span class="blue">double</span>) nLoop;
+&nbsp;
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} text note type{1} purged. &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} ms to collect, {3} ms to collect &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;excluding, {4} ms to delete.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; ms, msExcluding, msDeleting ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>The assertions ensure that the number of unused text note types is always the same.
+I was worried whether the assertions would affect the benchmarking results, so I ran two sets of tests, one with the assertions commented out, but that makes no difference.
+
+<p>Here are some results in various sample models, with and without assertions, listing the
+
+<ul>
+<li>M &ndash; Sample model:
+<ul>
+<li>A &ndash; a small model
+<li>B &ndash; rac_basic_sample_project.rvt
+<li>C &ndash; rac_advanced_sample_project.rvt
+<li>D &ndash; a slightly larger model
+</ul>
+<li>N &ndash; number of unused text note types purged
+<li>C &ndash; milliseconds required to collect
+<li>E &ndash; milliseconds required to collect excluding
+<li>D &ndash; milliseconds required to delete
+</ul>
+
+<p>The first row of each pair shows the time with assertions, the second without:</p>
+
+<center>
+<table>
+<tr><th align="right">M</th><th align="right">&nbsp;N</th><th align="right">C</th><th align="right">E</th><th align="right">D</th></tr>
+<tr><td align="right">A</td><td align="right">7</td><td align="right">4.97</td><td align="right">4.35</td><td align="right">0.07</td></tr>
+<tr><td align="right">A</td><td align="right">7</td><td align="right">4.43</td><td align="right">4.39</td><td align="right">0.07</td></tr>
+<tr><td align="right">B</td><td align="right">1</td><td align="right">5.8</td><td align="right">5.25</td><td align="right">0.12</td></tr>
+<tr><td align="right">B</td><td align="right">1</td><td align="right">6.4</td><td align="right">5.38</td><td align="right">0.29</td></tr>
+<tr><td align="right">C</td><td align="right">3</td><td align="right">23.45</td><td align="right">29.7</td><td align="right">0.03</td></tr>
+<tr><td align="right">C</td><td align="right">3</td><td align="right">24.29</td><td align="right">28.41</td><td align="right">0.03</td></tr>
+<tr><td align="right">D</td><td align="right">0</td><td align="right">89.91</td><td align="right">107.73</td><td align="right">0.00</td></tr>
+<tr><td align="right">D</td><td align="right">0</td><td align="right">&nbsp;89.18</td><td align="right">&nbsp;108.94</td><td align="right">&nbsp;0.00</td></tr>
+</table>
+</center>
+
+<p>As you can see, the performance of the two methods is similar, with an advantage for the Excluding method in small models and a disadvantage in larger ones.
+If you seriously want to optimise a similar algorithm, you will have to decide based on the characteristics of the models you typically work with.
+I am pretty certain that the total number of text notes and used versus unused text note types will play a significant role.</p>
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_79.zip -->
+
+<a href="zip/bc_11_79.zip">
+version 2011.0.79.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.

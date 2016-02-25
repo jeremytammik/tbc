@@ -1,0 +1,398 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>BIM 360 Glue REST API Authentication Using Python</h3>
+
+<p>I provided an overview of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">
+BIM 360 Glue REST API and SDK</a> last
+
+Friday and hinted at upcoming further exploration.
+Well, here it is already.
+
+<p>Due to Autodesk University and the world-wide developer conferences, I had to skip my last education day, but this stuff was too exciting to wait any longer  :-)</p>
+
+<p>So, unwilling to go for any length of time without trying out something new, I played a bit with the Glue API anyway.</p>
+
+<p>For fun, I will describe here stepping through the exploration of the Glue authentication process completely manually, making use of the Python programming language and a handy library which probably provides an easier access to the REST API than you imagined possible.
+Here are the steps:
+
+<ol>
+<li><a href="#1">Python and requests</a></li>
+<li><a href="#2">Get the Google page</a></li>
+<li><a href="#3">Access BIM 360 Glue</a></li>
+<li><a href="#4">Adding authentication</a></li>
+<li><a href="#5">Timestamp and MD5 digest</a></li>
+<li><a href="#6">More login credentials</a></li>
+<li><a href="#7">Successful authentication</a></li>
+</ol>
+
+
+<a name="1"></a>
+
+<h4>Python and Requests</h4>
+
+<p>Looking for an easy way to manually interact with REST, I immediately turned to Python and found the
+
+<a href="http://pypi.python.org/pypi/requests/0.4.1">
+requests</a> library,
+
+which describes itself as an 'awesome Python HTTP library that's actually usable'.
+I would agree that is a fair assessment.
+
+
+
+<a name="2"></a>
+
+<h4>Get the Google Page</h4>
+
+<p>Here is an example showing how simple it is to issue an HTTP request from scratch, including launching the Python interpreter from the command line; basically, it uses one single line of code, calling the method requests.get with the desired URL:</p>
+
+<pre>
+$ python
+Python 2.7.2 (default, Jun 20 2012, 16:23:33)
+[GCC 4.2.1 Compatible Apple Clang 4.0 (tags/Apple/clang-418.0.60)] on darwin
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import requests
+&gt;&gt;&gt; r = requests.get('http://google.com')
+&gt;&gt;&gt; print r
+<span class="blue">&lt;<span class="maroon">Response</span><span class="blue"> [</span><span class="red">200</span>=&quot;&quot;<span class="blue">]&gt;</span>
+&gt;&gt;&gt; r.headers['content-type']
+'text/html; charset=ISO-8859-1'
+&gt;&gt;&gt; r.content
+'<span class="blue">&lt;!</span><span class="maroon">doctype</span> <span class="red">html</span>&gt;
+&lt;<span class="maroon">html</span> <span class="red">itemscope</span>=&quot;<span class="blue">itemscope</span>&quot; <span class="red">itemtype</span>=&quot;<span class="blue">http://schema.org/WebPage</span>&quot;&gt;
+&lt;<span class="maroon">head</span>&gt;
+&lt;<span class="maroon">meta</span> <span class="red">content</span>=&quot;<span class="blue">Search the world\'s information, including webpages, images, videos and more. Google has many special features...</span>&quot;
+</pre>
+
+<p>The REST response 200 is a typical
+
+<a href="http://restpatterns.org/HTTP_Status_Codes">
+HTTP status code</a> and
+
+means OK.
+
+
+
+<a name="3"></a>
+
+<h4>Accessing BIM 360 Glue</h4>
+
+<p>Ok, so requesting the Google home page is simple.
+Let's try accessing BIM 360 in a similar manner.
+
+<p>Trying to access something, e.g. query the model services, immediately reacts:</p>
+
+<pre>
+&gt;&gt;&gt; u1='https://bim360.autodesk.com/api/model/v1/info.json'
+&gt;&gt;&gt; r = requests.get(u1)
+&gt;&gt;&gt; print r
+&lt;<span class="maroon">Response</span><span class="blue"> [</span><span class="red">400</span>=&quot;&quot;<span class="blue">]&gt;</span>
+</pre>
+
+<p>Oops.
+Response codes in the 400 range indicate client errors.
+400 itself stands for
+
+<a href="http://restpatterns.org/HTTP_Status_Codes/400_-_Bad_Request">
+bad request</a>.
+
+<p>Yes, of course, we need some authentication!</p>
+
+<p>Time to start looking at the documentation.
+First, find out where it can be found at all.
+The starting point
+
+<a href="https://bim360.autodesk.com/api">
+bim360.autodesk.com/api</a> redirects
+
+us to
+
+<a href="https://bim360.autodesk.com/api/doc/index.shtml">
+bim360.autodesk.com/api/doc/index.shtml</a>,
+
+providing human readable documentation and a link to the
+
+<a href="https://bim360.autodesk.com/api/doc/doc_api.shtml">
+web services API documentation</a>.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Adding Authentication</h4>
+
+<p>So, let's authenticate ourselves:</p>
+
+<p>Looking at the Glue
+
+<a href="https://bim360.autodesk.com/api/doc/doc_api.shtml">
+web services API documentation</a> on
+
+<a href="https://bim360.autodesk.com/api/doc/doc_api.shtml#createsigned">
+creating a signed request</a>,
+
+this requires some interesting bits and pieces besides the basic information, which consists of
+
+<ul>
+<li>Company id
+<li>API key
+<li>API secret
+</ul>
+
+<p>The API key and secret need to be requested from Autodesk.
+Currently, there is no official developer program running for Glue.
+You can however buy a normal user account and ask for additional developer access based on that.</p>
+
+<p>As we can see from the documentation, in addition to the API key and secret, plus the normal user account login credentials, the authentication requires a timestamp, more precisely a Unix epoch timestamp using GMT time, the number of seconds since the Unix epoch, January 1 1970 00:00:00 GMT.
+
+<p>The API key and secret are concatenated with the timestamp and encoded using an MD5 cryptographic hash to create a signature, which also has to be sent with the request.</p>
+
+
+<a name="5"></a>
+
+<h4>Timestamp and MD5 Digest</h4>
+
+<p>Luckily, Python can easily support us in providing the timestamp and signature components.</p>
+
+<p>The timestamp can be generated like this using the time module:</p>
+
+<pre>
+<span class="blue">import</span> time
+<span class="blue">def</span> expires():
+  <span class="maroon">'''return a UNIX style timestamp representing 5 minutes from now'''</span>
+  <span class="blue">return int</span>(time.time()+300)
+</pre>
+
+<p>The Python Standard Library Cryptographic Services includes the MD5 message digest algorithm 'md5', so that is also easily taken care of.
+
+<p>Following the example given in the Glue API documentation, I created the concatenation and digest of the following items:</p>
+
+<ul>
+<li>API Key: ddbf3f51b3824ecbb824ae4e65d31be4
+<li>API Secret: 12345678901234567890123456789012
+<li>UNIX Timestamp: 1305568169 - (5/16/2011 5:50:36 PM)
+</ul>
+
+<p>Here is the code doing that by hand, interacting with the interpreted environment:</p>
+
+<pre>
+&gt;&gt;&gt; key='ddbf3f51b3824ecbb824ae4e65d31be4'
+&gt;&gt;&gt; secret='12345678901234567890123456789012'
+&gt;&gt;&gt; timestamp='1305568169'
+&gt;&gt;&gt; s=key+secret+timestamp
+&gt;&gt;&gt; s
+'ddbf3f51b3824ecbb824ae4e65d31be4123456789012345678901234567890121305568169'
+&gt;&gt;&gt; import md5
+&gt;&gt;&gt; signature=md5.new(s)
+&gt;&gt;&gt; print signature
+&lt;<span class="maroon">md5</span> HASH=&quot;&quot; object=&quot;&quot; @=&quot;&quot; 0x10c0b5d30=&quot;&quot;&gt;
+&gt;&gt;&gt; print signature.hexdigest()
+b3298cf0b4dc88450d00773b4449ba51
+</pre>
+
+<p>The hexadecimal digest exactly matches the signature string listed in the Glue documentation example, so we seem to be on the right track so far.</p>
+
+
+<a name="6"></a>
+
+<h4>More Login Credentials</h4>
+
+<p>Studying the documentation further, we end up at the nitty-gritty internals of the
+
+<a href="https://bim360.autodesk.com/api/security/v1/login/doc">
+Security Service: Login</a> request,
+
+specifying the following full list of required parameters:
+
+<ul>
+<li>format
+<li>login_name
+<li>password
+<li>company_id
+<li>api_key
+<li>api_secret
+<li>timestamp
+<li>sig
+</ul>
+
+<p>Actually, I intuitively fixed an error or two when transferring this list; e.g. the secret was not mentioned at this point, and the timestamp has a wrong description associated with it.
+So do what every programmer always has to do: ignore the documentation (but only some of it!), trust your own insight, take everything with a grain of salt, and use your brains, intuition and good taste.</p>
+
+<p>By the way, the user name and password required here are the Autodesk id single sign-on credentials, also known as SSO, formerly Autodesk unique login or AUL.</p>
+
+<p>I initially tried to use a GET request and was kindly informed by a suitable error message that I should be using POST instead.</p>
+
+
+<a name="7"></a>
+
+<h4>Successful Authentication</h4>
+
+<p>I ran into a couple of other not unexpected issues as well, and finally ended up with this method to construct the authentication POST request:</p>
+
+<pre>
+url = <span style='color:#0000e6; '>'https://bim360.autodesk.com:443/api/security/v1/login.json'</span>
+
+<span style='color:#800000; font-weight:bold; '>def</span> bim_360_glue_authenticate( login_name, password, company_id, api_key, api_secret ):
+  timestamp = <span style='color:#e34adc; '>str</span>(<span style='color:#e34adc; '>int</span>(time.time()))
+  sig=md5.new(api_key + api_secret + timestamp).hexdigest()
+  data=<span style='color:#800080; '>{</span>
+    <span style='color:#0000e6; '>'login_name'</span> : login_name,
+    <span style='color:#0000e6; '>'password'</span> : password,
+    <span style='color:#0000e6; '>'company_id'</span> : company_id,
+    <span style='color:#0000e6; '>'api_key'</span> : api_key,
+    <span style='color:#0000e6; '>'api_secret'</span> : api_secret,
+    <span style='color:#0000e6; '>'timestamp'</span> : timestamp,
+    <span style='color:#0000e6; '>'sig'</span> : sig
+  <span style='color:#800080; '>}</span>
+  r = requests.post(url, data=data)
+  <span style='color:#800000; font-weight:bold; '>print</span> r.status_code
+  <span style='color:#800000; font-weight:bold; '>print</span> r.headers[<span style='color:#0000e6; '>'content-type'</span>]
+  <span style='color:#800000; font-weight:bold; '>print</span> r.content
+</pre>
+
+<p>This call succeeds and prints:</p>
+
+<pre>
+&gt;&gt;&gt; bim_360_glue_authenticate( ... )
+200
+application/json; charset=UTF-8;
+<span style='color:#800080; '>{<span style='color:#0000e6; '>"auth_token"</span>:<span style='color:#0000e6; '>"b61d3ec10a7042cf884806e4e5a55601"</span>,<span style='color:#0000e6; '>"user_id"</span>:<span style='color:#0000e6; '>"b2409a28-08b4-4bd4-a935-a6e33d5b030d"</span>}
+</pre>
+
+<p>Again, 200 means OK, i.e. success.
+Hooray!</p>
+
+<p>Cool, huh?</p>
+
+<p>There may be easier ways to achieve this, but hardly more instructive  :-)</p>
+
+<p>And as you can see, the interactive Python environment and rich library support really help a lot!</p>
+
+<p>The resulting code is also pretty succinct, considering we are starting from absolute zero here.</p>
+
+<p>How long would you have needed to explore and implement this in a compiled environment?</p>
+
+<!--
+$ python
+Python 2.7.2 (default, Jun 20 2012, 16:23:33)
+[GCC 4.2.1 Compatible Apple Clang 4.0 (tags/Apple/clang-418.0.60)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import requests
+>>> r = requests.get('http://google.com')
+>>> print r
+<Response [200]>
+>>> r.headers['content-type']
+'text/html; charset=ISO-8859-1'
+>>> r.content
+'<!doctype html>
+<html itemscope="itemscope" itemtype="http://schema.org/WebPage">
+<head>
+<meta content="Search the world\'s information, including webpages, images, videos and more. Google has many special features...
+
+
+>>> u1='https://bim360.autodesk.com/api/model/v1/info.json'
+>>> r = requests.get(u1)
+>>> print r
+<Response [400]>
+
+
+
+>>> key='ddbf3f51b3824ecbb824ae4e65d31be4'
+>>> secret='12345678901234567890123456789012'
+>>> timestamp='1305568169'
+>>> s=key+secret+timestamp
+>>> s
+'ddbf3f51b3824ecbb824ae4e65d31be4123456789012345678901234567890121305568169'
+>>> import md5
+>>> signature=md5.new(s)
+>>> print signature
+<md5 HASH object @ 0x10c0b5d30>
+>>> print signature.hexdigest()
+b3298cf0b4dc88450d00773b4449ba51
+
+
+url = 'https://bim360.autodesk.com:443/api/security/v1/login.json'
+
+def bim_360_glue_authenticate( login_name, password, company_id, api_key, api_secret ):
+  timestamp = str(int(time.time()))
+  sig=md5.new(api_key + api_secret + timestamp).hexdigest()
+  data={
+    'login_name' : login_name,
+    'password' : password,
+    'company_id' : company_id,
+    'api_key' : api_key,
+    'api_secret' : api_secret,
+    'timestamp' : timestamp,
+    'sig' : sig
+  }
+  r = requests.post(url, data=data)
+  print r.status_code
+  print r.headers['content-type']
+  print r.content
+
+
+>>> bim_360_glue_authenticate( ... )
+200
+application/json; charset=UTF-8;
+{"auth_token":"b61d3ec10a7042cf884806e4e5a55601","user_id":"b2409a28-08b4-4bd4-a935-a6e33d5b030d"}
+
+https://bim360.autodesk.com/api/model/v1/info.json?
+&company_id=autodesk_partner
+&api_key=c7e5c5c49a85421c8444e91733f64774
+&auth_token=f79462fc5a5346ba9dbd4f395781f9b4
+&timestamp=1349801232
+&sig=de4c1771541d4789a1e63762c60b34f1
+&model_id=53c41451-49e7-4b0a-919c-1499604d10c6
+&sterm=
+&pretty=1
+
+params={
+'company_id' : 'autodesk_partner'
+'api_key' : 'c7e5c5c49a85421c8444e91733f64774'
+'auth_token' : 'f79462fc5a5346ba9dbd4f395781f9b4'
+'timestamp' : '1349801232'
+'sig' : 'de4c1771541d4789a1e63762c60b34f1'
+'model_id' : '53c41451-49e7-4b0a-919c-1499604d10c6'
+'sterm' : ''
+'pretty' : '1'
+}
+
+company_id: autodesk_partner
+key: 47ecb8e052824826836b2c84277d6834
+secret: 4f0044b4a21d4bf38da1a07d26cb0861
+
+params={
+  'company_id' : 'autodesk_partner'
+  'api_key' : '47ecb8e052824826836b2c84277d6834'
+  'api_secret' : '4f0044b4a21d4bf38da1a07d26cb0861'
+}
+
+bim_360_glue_authenticate( 'jeremytammik', 'B2n2n222', 'autodesk_partner', '47ecb8e052824826836b2c84277d6834', '4f0044b4a21d4bf38da1a07d26cb0861' )
+
+-->
+
+<h1>Cloud and Mobile</h1>
+
+<h3>BIM 360 Glue SDK, REST API, and Authentication</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</p>
+
+<p>Hi.
+I just published two articles related to BIM 360 Glue:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">An overview of the SDK components and the REST API.</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">An example of manually authenticating in the REST API using Python.</a>
+</ul>
+
+<p>I hope these prove useful not only for BIM 360 Glue specifically, but also to understand how to use REST in general, and what a powerful tool Python and its huge range of libraries can provide, especially for manual experimentation in this area.

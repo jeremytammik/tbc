@@ -1,0 +1,153 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1261476 [Shared parameters disappear] -->
+
+<h3>Modeless Form and Shared Parameter Disappearance</h3>
+
+<p>I am still acclimatising to Europe after four weeks in Thailand and Cambodia.
+So many differences: time zone, temperature, food, health, people...
+
+<p>Yesterday I was able to join some colleagues in Neuch&acirc;tel for a game of hockey, which is generally the most exhausting sportive event I participate in on a regular basis.
+I managed to keep up in spite of feeling a bit weak, and was saved by the rain which stopped us from going for the full customary hour and a half.
+Great fun!
+
+<p>Here is a question from before my holidays which starts out discussing a shared parameter visibility issue seemingly arising from a port of an application from a previous API version to Revit 2011.
+However, it ends up as a completely different issue, showing the importance of proper handling of asynchronous access to the Revit API, for instance the special care that needs to be taken when trying to interact with Revit from a modeless dialogue.
+
+<p>This just goes to show how much confusion an attempt to access the Revit from an invalid context can cause.
+It also shows how useful it can be to create a really minimal sample project to reproduce an issue, because that very often narrows down the question so significantly, almost automatically producing the answer.
+Finally, it also shows that a completely different approach can vastly reduce complexity and avoid certain errors completey, in this case the use of the new PickObjects method instead of a modeless dialogue.
+
+<p><strong>Question 1:</strong> We have to add some instance parameters through the API to elements within our Revit model. 
+I used the code on page 270 of the 2011 developer's guide. 
+This code works fine until I hit the save button. 
+After save the newly added parameters are 'lost'. 
+They are no longer visible within the element properties. 
+Though, they are still visible in the shared parameter window within Revit. 
+
+<p>In 2010 we use the 2010 version of the same code without any problems. 
+The difference we see is that after the parameters are added, in 2010 they show up as project parameters. 
+In 2011 they do not show up as project parameters.
+
+<p>Is there a fix or workaround so that my parameters are not getting lost in 2011?
+
+<p><strong>Answer 1:</strong> I had a look at the sample code you mention, and I see that it uses the line
+
+<pre class="code">
+&nbsp; <span class="green">// create an instance definition in </span>
+&nbsp; <span class="green">// definition group MyParameters</span>
+
+&nbsp; <span class="teal">Definition</span> myDefinition_ProductDate 
+&nbsp; &nbsp; = myGroup.Definitions.Create( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Instance_ProductDate&quot;</span>, 
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Text );
+</pre>
+
+<p>Looking at the Definitions.Create method in the Revit API help file RevitAPI.chm, I see the following two overloads 
+
+listed:
+
+<ul>
+<li>Create(String, ParameterType) Creates a new parameter definition using name, type and visibility.  
+<li>Create(String, ParameterType, Boolean) Creates a new user visible parameter definition using name and type.
+</ul>
+
+<p>Note that the second version taking three parameters mentions 'user visible', whereas the first overload with only two arguments does not. 
+The name of the Boolean argument is 'visible'. 
+I assume that you need to set that to true to ensure that the shared parameter appears in the user interface.
+
+<p>I looked at the Revit 2010 and 2009 API help files as well, and the overloads there are identical and described in a similar fashion, so I do not actually see how that should affect the behaviour of your code. Anyway, I would suggest using the overload taking the 'visible' argument and setting it to true and seeing whether that helps.
+
+<p>Some categories do not allow visible shared parameters to be added to them at all. 
+This is indicated by the AllowsBoundParameters property on the corresponding category instance.
+
+<p>For an example of checking that property and setting the shared parameter to be visible whenever that is permitted, 
+
+please refer to the CmdCreateSharedParams command in The Building Coder sample code that I touched on most recently when discussing the creation of a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/shared-type-parameter.html">
+shared type parameter</a>.
+
+It is also described in previous posts to highlight various topics in the area of the creation of shared parameters 
+
+that may also be of interest to you.
+
+<p>Here is the code snippet that checks the property and sets the visibility accordingly:
+
+<pre class="code">
+&nbsp; <span class="green">// set visibility of the new parameter:</span>
+&nbsp;
+&nbsp; <span class="green">// Category.AllowsBoundParameters property </span>
+&nbsp; <span class="green">// indicates if a category can have shared </span>
+&nbsp; <span class="green">// or project parameters. If it is false, </span>
+&nbsp; <span class="green">// it may not be bound to shared parameters </span>
+&nbsp; <span class="green">// using the BindingMap. Please note that </span>
+&nbsp; <span class="green">// non-user-visible parameters can still be </span>
+&nbsp; <span class="green">// bound to these categories.</span>
+&nbsp;
+&nbsp; <span class="blue">bool</span> visible = cat.AllowsBoundParameters;
+&nbsp;
+&nbsp; <span class="green">// get or create the shared params definition:</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> defname = _defname + nameSuffix.ToString();
+&nbsp;
+&nbsp; <span class="teal">Definition</span> definition = group.Definitions.get_Item(
+&nbsp; &nbsp; defname );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == definition )
+&nbsp; {
+&nbsp; &nbsp; definition = group.Definitions.Create(
+&nbsp; &nbsp; &nbsp; defname, _deftype, visible );
+&nbsp; }
+</pre>
+
+<p><strong>Question 2:</strong> I created a sample project to illustrate the problem and now I know exactly where the problem is. 
+The problem seems not to be related to the method of adding parameters after all. 
+
+<p>I add parameters from within a Windows form. 
+When I display this form with MyForm.ShowDialog it all works fine and the parameters do not disappear. 
+The problem occurs when I want to keep my form open. 
+For that I use MyForm.Show. 
+
+<p>I want to keep the form open while users set different parameter values to different Revit elements. 
+To close and open the tool each time for every new set of elements is annoying, so I need to keep the form open. 
+
+<p>Is there another way to keep the form open so that users can select one or more elements while the form is open?
+
+<p><strong>Answer 2:</strong> Thank you for your update, and I am very glad that you were able to nail down the exact problem.
+
+<p>That clarifies everything completely for me. Now let's see if I can explain it to you.
+
+<p>The problem you are encountering is the fact that the Revit API is only available and accessible to your add-in as long as you remain within a valid Revit API context. 
+One such context is during the execution of your external command Execute method. Other valid Revit API contexts are provided by all of the various notification methods called by the Revit API events. 
+
+<p>I provided a detailed discussion of this issue in the presentation of my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless loose connectors</a> navigator,
+
+which points to more detailed previous posts on the topic as well.
+
+<p>In short, you can solve the problem by subscribing to the Idling event. 
+Your modeless form has no valid Revit API context. 
+When some user action in your modeless form requires access to the Revit API, you can notify you Idling event handler, which does have Revit API access. 
+The next time it fires, it can pick up the request from the modeless form and execute it.
+
+<p>The Idling event is called so frequently that the user will not necessarily notice that the modeless form is actually running in a separate thread, as demonstrated by my modeless loose connector navigator form.
+
+<p><strong>Response:</strong> Thank you for your reply. 
+I understand why it loses the API context and how I can implement a work around through the idle event, but maybe I have another easier solution. 
+If I remember well, from 2011 onwards the API provides a PickObjects method. 
+
+The reason to keep the window open is to let the user select elements. 
+Maybe I can alter the user interface a little to make use of this method. 
+
+<p><strong>Answer:</strong> Yes, making use of the Selection.PickObjects method instead will definitely be much simpler and more stable.
+If you can avoid the modeless interaction, you definitely should.
+
+For samples of using PickObjects, please refer to the Revit SDK Selections sample and my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">
+pipe to conduit converter</a> sample.

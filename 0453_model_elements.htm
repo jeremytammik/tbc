@@ -1,0 +1,282 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Konstanty S. -->
+
+<h3>Selecting Model Elements</h3>
+
+<p>We repeatedly looked at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+selection of model elements</a>,
+
+and in the discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+material quantity extraction</a> I 
+
+mentioned the idea that one possible additional improvement might be to make use of the Category.HasMaterialQuantities property.
+
+<p>The topic keeps returning, and now it arose again in a question from Konstanty Seniut.
+I have updated the answer after the initial posting to add some 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+later notes</a> by <!-- add link -->
+
+Scott Conover, so that they are not missed.
+To see Scott's notes and explanations in full, please refer to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+follow-up post</a>. <!-- add link -->
+
+<p><strong>Question:</strong> I would like to retrieve all elements from the model, for example floors, walls, windows, lines, but ignoring all views, levels and etc. 
+For now my solution is simply to make list of all the categories of the things that I don't want to retrieve. 
+Is there any easier way to achieve this? 
+
+<p>Currently, the following approach is working for me:
+
+<pre class="code">
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt; GetAllCategories( 
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Document</span>&gt; allDocuments )
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt; categories 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">int</span>, <span class="teal">Element</span>&gt; elemnts 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">int</span>, <span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Document</span> doc <span class="blue">in</span> allDocuments )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;Autodesk.Revit.DB.<span class="teal">Element</span>&gt; found 
+&nbsp; &nbsp; &nbsp; = collector
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent()
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIsElementTypeFilter</span>( <span class="blue">false</span> ), 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementIsElementTypeFilter</span>( <span class="blue">true</span> ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> disElems = (<span class="blue">from</span> elem <span class="blue">in</span> found <span class="blue">select</span> elem)
+&nbsp; &nbsp; &nbsp; .Distinct();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span> disElems )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( element.Category != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( element.Parameters.Size &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( element.PhaseCreated != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !categories.ContainsKey( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categories.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; elemnts.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Id.IntegerValue, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( element.Location != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LocationPoint</span> point = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> curve = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; point = element.Location 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span> { }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve = element.Location 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span> { }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( curve != <span class="blue">null</span> || point != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !categories.ContainsKey( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categories.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; elemnts.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Id.IntegerValue, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> categories;
+}
+</pre>
+
+<p>Is this a good solution? 
+What do you think?
+
+<p><strong>Answer:</strong> As said, I presented one approach in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+selection of model elements</a>.
+
+Scott 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+later pointed out</a> <!-- add link -->
+
+that that solution appends filters to each other one at a time. 
+The new Revit 2011 LogicalOrFilters support more than two inputs, so it should actually be updated to make more efficient use of 2011 filtering.
+
+<p>The other approach I mentioned, based on the Category.HasMaterialQuantities property, allows a much shorter implementation like this:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Lab2_2_ModelElements</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &amp;&amp; null != e.Materials</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &amp;&amp; 0 &lt; e.Materials.Size</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.HasMaterialQuantities )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; a.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Category={0}; Name={1}; Id={2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Category.Name, e.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Id.IntegerValue ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LabUtils</span>.InfoMsg( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Project contains {0} model element{1}{2}&quot;</span>, a );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+<p>Note that this approach may not retrieve all desired elements, as Scott explains in his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+update notes</a>.  <!-- add link -->
+
+<p>Which approach to use, or how to combine them, depends on your exact needs, obviously.
+
+<p>Some notes on your implementation:
+
+<ul>
+<li>I find the check for parameters interesting, and also checking the PhaseCreated and Location properties.
+
+<li>I would recommend you never to use an 
+
+<a href="http://en.wikipedia.org/wiki/Exception_handling">
+exception handler</a> to 
+
+check for a valid condition, if you can avoid it.
+
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">
+Exceptions should always be exceptional</a>, 
+
+for handling unexpected errors.
+
+<li>Scott 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+later pointed out</a> <!-- add link -->
+
+that the use of the WherePasses clause is totally unnecessary and should be removed.
+</ul>
+
+<p><strong>Response:</strong> The additional check for Category.HasMaterialQuantities suits me well for now. 
+Thank you very much!
+
+<p>The first approach you suggested in the blog is very good; in the beginning of solving this problem I had a similar idea to make list of redundant categories, but I wanted a simpler approach.
+
+<p>My final solution for now is:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> GetAllCategories( 
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Document</span>&gt; allDocuments )
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt; categories 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Document</span> doc <span class="blue">in</span> allDocuments )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent()
+&nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != element.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; element.Parameters.Size
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (element.Category.HasMaterialQuantities 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || <span class="blue">null</span> != element.PhaseCreated) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !categories.ContainsKey( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categories.Add( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category.Name, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; element.Category );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; elements.Add( element );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>If in future there will be any need to retrieve some specific categories, I can use a list of specific categories in addition to this approach. 
+
+<p>For now I do not know how to eliminate the try catch when needing to check the Location property, because I had situations when an element had a Location, but trying to access it threw an exception.
+At the moment I can avoid checking that property completely, though.
+
+<p>I think it is good idea to share :) maybe someone like me will have a similar problem also :)
+
+<p><strong>Answer:</strong> The call to ToElements in this code is completely redundant, as Scott explains in his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+update notes</a>,  <!-- add link -->
+
+so it should simply be removed.
+
+<p><strong>Response:</strong> Interesting things. I will try to improve them. 
+The HasMaterialQuantities property is not set in every element I am interested in, just as Scott said.
+This is why I used the Location property to populate the dictionary with all specific elements  :)

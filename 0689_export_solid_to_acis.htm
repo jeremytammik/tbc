@@ -1,0 +1,73 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+From: Ishwar Nagwani 
+Sent: 05 December 2011 16:45
+To: Revit API
+Subject: Solid to ACIS
+
+Hi Experts,
+
+Do we have any undocumented API to creats ACIS file from individual solid, currently we can export only views as ACIS. For example in AutoCAD we have AcDbBody->acisout() method.
+
+Thanks,
+Ishwar
+
+From: Miroslav Schonauer 
+Sent: Monday, December 05, 2011 6:07 PM
+To: Ishwar Nagwani; Revit API
+Subject: RE: Solid to ACIS
+
+Hi Ishwar,
+
+I don't think so, but you can, in a single, eventually non-committed transaction, programmatically create a 3D View and then set visibility in a loop ON for single element-by-element, OFF all other and export to SAT.
+Never tried it, but should hopefully work ;-)
+
+Good luck and cheers,
+
+Miro
+
+From: Emmanuel Weyermann 
+Sent: 5 December 2011 21:09
+To: Miroslav Schonauer; Ishwar Nagwani; Revit API
+Subject: RE: Solid to ACIS
+
+I confirm it works – we are using this path for Revit Extensions  
+Thanks 
+Emmanuel 
+
+-->
+
+<h3>Export Solid to ACIS</h3>
+
+<p>Today we are en route to Tel Aviv in Israel after the successful conference held in Moscow yesterday.
+In Tel Aviv I even have a personal activity lined up, besides the official reason for going there to hold another conference on Wednesday: a
+
+<a href="http://en.wikipedia.org/wiki/5Rhythms">
+5Rhythms</a> 
+
+<a href="http://www.5rhythms-rivi.co.il/Preview.asp?Page=7594&WebsiteID=3751">
+City Wave</a> is
+
+offered very Tuesday evening by Rivi Diamond and fits my schedule perfectly.
+That will provide another wonderful change from airplanes, taxis, hotels, and conferences.
+
+<p>Meanwhile, here is a sweet little question on exporting a Revit solid to ACIS raised yesterday by Ishwar Nagwani and answered by Miroslav Schonauer and Emmanuel Weyermann:
+
+<p><strong>Question:</strong> Is there any way to programmatically create an ACIS file from an individual solid?
+
+<p>For example, AutoCAD ObjectARX provides the method AcDbBody::acisout to achieve this.
+
+<p>As far as I can tell, the Revit API only supports exporting entire views to ACIS. 
+
+
+<p><strong>Answer:</strong> You can programmatically create a 3D view, loop through all the visible elements in the view to set the individual element visibility ON for your desired solid element and OFF for all others, and export the view to the SAT file format.
+
+<p>The whole operation can be encapsulated in a transaction that is never committed and aborted afterwards so the database is not affected by this operation.
+
+<p>I can confirm that this works, because we have actually used this exact strategy ourselves.
+
+<p>Many thanks to Ishwar, Miro and Emmanuel for raising and resolving this issue!

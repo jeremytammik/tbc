@@ -1,0 +1,85 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Model Review</h3>
+
+<p>We recently mentioned the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/10/revit-2010-subscription-pack.html">
+subscription pack</a> for 
+
+Revit 2010.
+In addition to the product update itself, the
+
+<a href="http://subscription.autodesk.com/sp/servlet/download/item?siteID=11564774&id=14055363">
+subscription page</a> for 
+
+Autodesk Revit Architecture 2010 includes some new applications to complement Revit workflows to:
+
+<ul>
+<li>Validate the accuracy of building information models against pre-determined standards.
+<li>Import and export data between a Revit project and an external database.
+<li>Facilitate the creation of 3D models from 2D digital photographs.
+</ul>
+
+<p>These areas are obviously of great interest for developers as well.
+The first of these points is addressed by the 
+
+<a href="http://subscription.autodesk.com/sp/servlet/item?siteID=11564774&id=14055412">
+model review plug-in</a>, 
+
+which includes a small API for developers or customers to hook into to specify their own rules and standards to be checked.
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a> of 
+
+<a href="http://www.avatechsolutions.com">
+Avatech Solutions</a>,
+
+who is one of the original Model Review developers, now kindly wrote a summary of its functionality:
+
+<h4>Introduction</h4>
+
+<p>Autodesk Revit<sup>®</sup> Model Review is a new add-in product available to Autodesk subscription customers via the 
+
+<a href="http://subscription.autodesk.com/sp/servlet/download/item?siteID=11564774&id=14055363">
+Revit 2010 Subscription Advantage Pack</a>.
+
+Model Review provides the capability to configure and run checks against Revit projects or families and provide a report of whether the checks have passed or failed. Model Review provides 35 different kinds of checks, within the areas of:
+
+<ul>
+<li>Modelling for Energy Analysis
+<li>Revit Family consistency and standards
+<li>Firm or Project-based Revit Standards
+<li>GSA Spatial Program Validation
+</ul>
+
+<p>Here is a sample screen snapshot:</p>
+
+<center>
+<img src="img/model_review.png" alt="Autodesk Revit Model Review"/>
+</center>
+
+<h4>The Checking Platform</h4>
+
+<p>Model Review is not just a configurable set of checks provided by Autodesk &ndash; it is also a platform for developers to write their own checks and plug them in to the checking process. 
+This could be desirable if BIM administrators want to check for issues which are not possible to check with the "out-of-the-box" Model Review checks, either because the check has not yet been implemented, or because it is too specialized to ever exist in the base product.
+
+<p>Creating a plug-in enables a developer who understands the Revit API to write a simple extension which leverages the Model Review platform for configuring, running, and reporting check results. These "plug-in" checks can be added to built-in checks to create the complete set of checks required by a particular firm or project.
+
+<p>Developers implement a few methods defining how the check should be configured, executed, reported &ndash; and optionally corrected. 
+The check is then made available and can be run by Revit users as any other check in Model Review.
+
+<p>For your convenience, here is a direct link to a copy of the 
+
+<a href="zip/Developing_ModelReview_Plugins.pdf">
+plug-in developer guide</a>.
+
+<h4>An Example</h4>
+
+<p>For example, one firm inquired about checking for whether a door’s Fire Rating was less than its host wall’s Fire Rating. 
+This was made even more challenging because the Fire Rating field is text-based rather than a number, so the value might contain a string like "2 hours" instead of just numbers.
+Still, it is a fairly simple function to write within C# or VB.NET and the Revit API. A variation of this check is provided as a sample in the Model Review installation folder along with the developer guide.
+
+<p>Note: While Model Review is available for either Revit 2009 or 2010 products, the plug-in capability is only available in the 2010 version.</p>

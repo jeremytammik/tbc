@@ -1,0 +1,238 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08367690 [Insert View from file] -- duplicate views
+
+unique ids in copied files
+
+08303426 [API access to adsklib files] -- use copy and paste instead
+
+08241837 [Transfer groups form one project file to another] -- Revit 2014 performance issues
+08241837 [Transfer groups form one project file to another] -- copy and paste API is useful
+
+modeless form assertion
+08281697 [Revit 2014 api transactions]
+08369102 [Modelss Form Error - starting a transation from an external application running outside of api context is not allowed]
+http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html?cid=6a00e553e168978833017eeae9657f970d#comment-6a00e553e168978833017eeae9657f970d
+
+08435100 [loading window families]
+
+-->
+
+<h3>Copy and Paste API Applications and New Modeless Assertion</h3>
+
+<p>Here is a detailed description of one of the most exciting Revit 2014 API features that you should have heard about by now and promises numerous uses, prompted by a question from a developer on duplicating views from one document to another.
+Another couple of uses of it cropped up in the past, so it seems like an overview is called for:</p>
+
+<ul>
+<li><a href="#2">Duplicating a view from one document to another</a></li>
+<li><a href="#3">Solving the non-unique unique id problem</a></li>
+<li><a href="#4">Managing materials in adsklib or template files</a></li>
+<li><a href="#5">Transferring groups between projects</a></li>
+<li><a href="#5.2">Copy family symbols to another project</a></li>
+<li><a href="#6">Revit API use in modeless form throws an exception</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Duplicating a View from one Document to Another</h4>
+
+<p><strong>Question:</strong> I need to perform the following action programmatically:</p>
+
+<p>Insert Tab &gt; Insert from File &gt; Insert view from file &gt; Select File &gt; Select view in this file.</p>
+
+<p>Is there some way to achieve this via API in Revit?</p>
+
+<p><strong>Answer:</strong> Yes, you are in luck, this is covered by the new Revit 2014 API.</p>
+
+<p>And even more luckily, the development team selected very good and suitable API samples, so the exact workflow you describe is covered by the new Revit 2014 DuplicateViews SDK sample illustrating the new copy and paste API.</p>
+
+<p>Look at the second bullet item in the overview of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html">
+Revit 2014 API news</a>,
+
+mentioning the new copy and paste API.</p>
+
+<p>Here is the description from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New section</a> of
+
+the Revit API help file RevitAPI.chm, reproduced here:</p>
+
+<span style="color: darkblue">
+
+<h4>Copy & paste elements</h4>
+
+<p>The new methods:</p>
+
+<ul></ul>
+<li>ElementTransformUtils.CopyElements(Document, ICollection&lt;ElementId&gt;, Document, Transform)</li>
+<li>ElementTransformUtils.CopyElements(View, ICollection&lt;ElementId&gt;, View, Transform)</li>
+<li>Transform ElementTransformUtils.GetTransformFromViewToView(View, View)</li>
+</ul>
+
+<p>support copy and paste of arbitrary elements.  The first overload supports copy within documents, or from document to document.  The second overload also support copying within one document or between two documents, but specifically supports copy and paste of view-specific elements.</p>
+
+</span>
+
+<a name="2.1"></a>
+
+<h4>The DuplicateViews SDK Sample</h4>
+
+<p>DuplicateViews copies and pastes drafting views and schedules from one document to another , demonstrating use of the CopyPasteOptions, ElementTransformUtils, FilteredElementCollector, IDuplicateTypeNamesHandler and IFailuresPreprocessor classes. The drafting view contents are also copied.</p>
+
+<p>The DuplicateAcrossDocumentsCommand.cs module implements an external command to copy schedules and drafting views across documents and makes use of a number of useful utility classes defined in DuplicateViewUtils.cs.</p>
+
+<p>In detail, DuplicateViews copies all drafting views, image views, and schedules from the currently active document into another document that is currently in memory. All drafting elements in the non-schedule views are also copied, as is all schedule formatting and filtering.  It uses API tools to hide any duplicate types warnings that typically arise when doing this from the user interface.</p>
+
+<p>To test this, open any two project documents in Revit. Set the active document to be the document from which you wish to copy views. Launch Add-ins &gt; CopyPaste &gt; Duplicate across documents and enjoy. A popup message will appear listing the number of schedules, drafting views and drafting elements copied by the command.</p>
+
+<p>If you prefer to watch someone else run this sample rather than trying it yourself, it is also demonstrated live in the
+
+<a href="http://thebuildingcoder.typepad.com/revit_2014_api/index.html">
+Revit 2014 DevDays presentation recording</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Solving the Non-unique Unique Id Problem</h4>
+
+<p>A couple of times, people mentioned issues caused by copied files, resulting in copied unique ids on certain elements, e.g. thus:</p>
+
+<p><strong>Question:</strong> Do you have any recommendation on how to handle unique ids in copied files?</p>
+
+<p>We cannot tell people 'do not copy the files', because they sometimes put in a large effort to create a file that is used as a basic starting point for multiple projects.</p>
+
+<p><strong>Answer:</strong> Yes, you are in luck again. The copy and paste API should solve this.</p>
+
+<p>Documents that are copied obviously contain exact copies the ids of their elements.
+This also can happen when using a document as a template to create another document.</p>
+
+<p>Elements created by copying them through the copy and paste API obviously are assigned new unique ids.
+That should solve the issue.
+
+<p>Of course, there is no way to change the unique id of an element that already exists.</p>
+
+
+<a name="4"></a>
+
+<h4>Managing Materials in Adsklib or Template Files</h4>
+
+<p><strong>Question:</strong> I would like to know if it is possible to access data stored in adsklib files through API functions.
+The desired functionality would be to load materials, appearance, physical and thermal assets from an external adsklib file to the current active project document.
+
+<p>The aim is to implement a custom materials library with our application using an adsklib file instead of a project template,
+as described in the Autodesk wiki on
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/community/videos/Customize_Revit/Managing_Materials_Libraries_(2013)">
+managing material libraries</a>,
+
+so only the required materials are included and not all, to decrease the project template size and speed up the material browser.
+
+<p>Is this possible? If so, how?
+
+<p><strong>Answer:</strong> Nope, sorry, as far as I know, there is no API support for this.
+
+<p>From my naive grass roots perspective, the adsklib idea was born quite a few years back and has since been displaced by visions of cloud and mobile.
+
+<p>The file formats have died, and long live the new format, ubiquitous JSON or whatever.
+
+<p>You say you "have been looking into this subject for some time already" ... maybe it is time to start looking into something new?
+
+I see two possibilities for moving forward, besides the solution that you mention of including all materials in the template file:
+
+<ol>
+<li>Store the materials in several separate adsklib files, and only load the ones you really need.</li>
+<li>Use the new Revit 2014 copy and paste API functionality to copy and paste only the required materials from your or some other project.</li>
+</ol>
+
+<p><strong>Response:</strong> Thank you for thinking of other solutions.
+
+<p>Option 1 probably still requires API access to the adsklib file to programmatically transfer the material assets from the adsklib into the project.
+
+<p>I had a quick look at the copy and paste functionality and think this would be a good solution.
+We could use a separate project or template file as our material library instead of the adsklib one and copy/paste the required materials into the current project.
+
+
+<a name="5"></a>
+
+<h4>Transferring Groups Between Projects</h4>
+
+<p>I have been working with the Revit API to create a Revit application that can transfer a group type from one project file to another. I am working on a very large project, so we have to separate it into several project files due to performance. We are using groups to ensure that rooms having the same characteristics always are the same and can be updated quickly. But the model separation creates a problem to ensure that all group types in all project files are updated. We tried to use the link functionality instead of groups, but when there are many instances of a link Revit become very slow. We also considered using family nesting to solve the problem, but we want to be able to include system families as well, so that solution won't work.</p>
+
+<p>We have one project file where we create the Groups, use 'Save Group' to create a project file, then 'Load Group' or 'Reload Group' to get it in to the actual project file (we have 21 project files). So what I want is to create a Revit application that optimizes this workflow by transferring groups from one project file to another. But working with the API has raised a couple of questions:</p>
+
+<ul>
+<li>Why are the user interface functions 'Load Group', 'Save Group', 'Reload group' not accessible from the API? Are there any plans to make them accessible?</li>
+<li>If I want to transfer a group type from one project file to another, is the only way to do this to create every group member in the receiving project file using the API functions for every member, e.g. Wall.Create and then group the members?</li>
+<li>Is there a way to transfer system families from one project file to another using the API? The user interface function transfer project standards is not available, are there any plans to make it available?</li>
+<li>It seems like Revit is more appropriate for small projects, there are some plans to make Revit better for larger projects? For instance by sharing families (system and loadable) and groups across project files?</li>
+</ul>
+
+
+<p><strong>Answer:</strong> I am surprised that you say that Revit is more appropriate for small projects. I was under the impression that the opposite is true.</p>
+
+<p>You may be surprised to hear that the answer to all your questions is <b>yes</b>.</p>
+
+<p>You will be glad to hear that a number of improvements in Revit 2014 are specifically targeted at supporting still larger projects, and many of these improvements specifically target the family management and loading performance.</p>
+
+<p>Regarding all of your other questions, I have one single big suggestion to make to you: please take a look at Revit 2014, and especially at the new copy and paste API functionality it provides.
+I think that may meet your needs exactly and efficiently.</p>
+
+
+<p><strong>Response:</strong> I took a look at the Revit 2014 API and I must say that the copyElement method is just what I need ;-)</p>
+
+<p>It is a much safer way to transfer groups from one project file to another.</p>
+
+
+<a name="5.2"></a>
+
+<h4>Copy Family Symbols to Another Project</h4>
+
+<p>Joe Ye presents source code demonstrating how to
+
+<a href="http://adndevblog.typepad.com/aec/2013/05/copy-family-between-documents-via-api.html">
+copy all symbols of a selected family</a> from
+
+the current project to another.</p>
+
+
+<a name="6"></a>
+
+<h4>Revit API use in Modeless Form Throws an Exception</h4>
+
+<p>Finally, on a completely different topic, several people making illegal use of the Revit API from an invalid context in Revit 2013, e.g. in a modeless form, are now running into a problem.
+David Rock describes it in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html?cid=6a00e553e168978833017eeae9657f970d#comment-6a00e553e168978833017eeae9657f970d">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html">
+accessing the Revit main window handle</a>:</p>
+
+<p><strong>Question:</strong> In Revit 2014 I'm having trouble showing a modeless form and calling a transaction whilst inside the form. It is producing an error stating that "starting a transaction from an external application running outside of API context is not allowed".
+
+<p><strong>Answer:</strong> Yes, it looks as if you are calling the Revit API directly from your modeless dialogue running in another thread.
+
+<p>As you should know, actually, that was never supported.
+
+<p>Now, in Revit 2014, an exception is raised when you make such an attempt.
+
+<p>You are lucky that it worked so far without corrupting anything.
+
+<p>The solution is described in depth here on the blog: simply google for "modeless site:thebuildingcoder.typepad.com", or look at the discussions in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling</a> category.
+
+<p>In short, make use of the Idling event, or implement an external event, which is a simplified wrapper around that, and base you application on the ModelessForm_ExternalEvent and ModelessForm_IdlingEvent SDK samples.
+
+<p>Do not call the Revit API directly, ever.</p>

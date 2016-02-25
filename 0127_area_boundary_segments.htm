@@ -1,0 +1,49 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Area Boundary Segments</h3>
+
+<p>Here are some notes on the properties and ordering of area boundary segments from a case handled by my colleagues Katsuaki Takamizawa, Harry Mattison and Tamas Badics:</p>
+
+<p><strong>Question:</strong>
+I am analysing a Revit area element, marked below by the red circle, with another adjacent area beside it:</p>
+
+<img src="img/area_boundary_segments_1.jpg" alt="Area boundary"/>
+
+<p>I would have assumed this area to have 4 segments in its boundary. 
+When I use the RvtMgdDbg snoop functionality to explore it, though, it displays 5 segments:</p>
+
+<img src="img/area_boundary_segments_2.jpg" alt="Snooping area boundary"/>
+
+<p>Is this the expected behaviour? 
+If so, I cannot simply use the vertex and edge count to analyse an area and determine whether it is triangular or rectangular.
+Instead, I have to check whether adjacent edges are parallel, and if so, treat them as one edge instead of two.</p>
+
+<p>Concerning the ordering of edges, I have drawn the lines using the edge coordinates, starting from segment 0 in red and ending with segment 4 in dark blue:</p>
+
+<img src="img/area_boundary_segments_3.jpg" alt="Boundary segment ordering"/>
+
+<p>The boundary segments seem to be stored in counter clockwise order. 
+Is this always true?</p>
+
+<p><strong>Answer:</strong>
+The order of storage is counter clockwise for outer boundaries and clockwise for inner boundaries. 
+For instance, imagine a room with an island at the centre. 
+It will have two boundaries, one outer, and one inner.</p>
+
+<p>As for the number of segments, what you see is expected in this situation.</p>
+
+<h4>Questions for you</h4>
+
+<p>By the way, before we close, I have two questions for you:</p>
+
+<ol>
+<li>Is anyone out there using RealDWG inside a Revit add-in, to read DWG files in native format?</li>
+<li>Does anyone know of a profiler that works with Revit 2010 add-ins?</li>
+</ol>
+
+<p>Thank you!</p>

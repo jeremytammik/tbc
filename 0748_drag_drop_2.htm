@@ -1,0 +1,253 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06851703 [Emulating drag drop from explorer]
+C:\a\j\adn\case\sfdc\06851703\attach\DragDropRevitExample.zip
+
+SPR #223323 [UIAPI sample missing .rtf]
+SPR #223324 [Revit crash in UIApplication.DoDragDrop(IDropHandler) if Revit command is active]
+
+-->
+
+<h3>Drag and Drop API</h3>
+
+<p>We already looked at what can be done using
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/drag-and-drop-to-revit.html">
+drag and drop in Revit 2012</a>.
+
+<p>At that point, an external Windows application could be used to initiate a standard Revit drag and drop sequence, but we had no control over Revit's behaviour on receiving the dropped files.
+
+<p>This has changed in the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a>,
+
+which provides a drag and drop API as part of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+add-in integration</a> features
+
+and includes the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">
+UIAPI</a> sample
+
+in the Revit SDK to demonstrate its use, among several other new API features such as discipline dependent application availability, preview control, and a custom WPF options dialogue.
+
+<p>By the way, the UIAPI sample differs from many other SDK samples in a couple of points:
+
+<ul>
+<li>It is an external application, so you cannot use RvtSamples to load and run it. 
+You have to install it separately.
+<li>It is still rather undocumented in the Revit 2013 RP version of the SDK, in that it lacks the customary readme file and is not listed in SamplesReadMe.htm like the others.
+</ul>
+
+<p>To make up for that, here is a pretty detailed description of its drag and drop functionality, at least.
+
+
+<a name="1"></a>
+
+<h4>UIAPI SDK Sample Drag and Drop</h4>
+
+<p>The UIAPI drag and drop command displays the following modeless dialogue:</p>
+
+<center>
+<img src="img/drag_drop_form.png" alt="UIAPI DragAndDrop form" width="400"/>
+</center>
+
+<p>It presents a list of loaded furniture family symbols on the left and all furniture family files found by recursively searching the content library on the right.
+
+
+<a name="2"></a>
+
+<h4>UIApplication DoDragDrop Method Overloads</h4>
+
+<p>The UIApplication now provides two overloads of the new static method DoDragDrop for interacting with drag and drop events:
+
+<ul>
+<li><a href="#3">DoDragDrop( ICollection&lt;string&gt; )</a> to initiate a standard Revit drag and drop operation of a collection of file names on the Revit user interface. 
+<li><a href="#5">DoDragDrop( object, IDropHandler )</a> to initiate a drag and drop operation with a custom drop implementation. 
+</ul>
+
+<p>This method and its same two overloads are also provided on the macro-specific ApplicationEntryPoint class, for Revit macro use only.
+
+
+<a name="3"></a>
+
+<h4>Drag and Drop a List of Files</h4>
+
+<p>In the first overload, the method argument holds a list of paths and names of files to be dropped on the Revit user interface, which causes the following default behaviour:
+
+<ul>
+<li>Only one AutoCAD format or image file dragged onto Revit: a new import placement editor will be started to import the file.
+<li>More than one AutoCAD format or image files dragged onto Revit: a new import placement editor will be started only for the first AutoCAD format or image file.
+<li>Only one family file dragged onto Revit: the family will be loaded, and an editor will be started to place the family.
+<li>More than one family file dragged onto Revit: all the families will be loaded.
+<li>More than one family file including other format files dragged onto Revit: Revit will try to open all the files.
+<li>If a valid file or list of files is passed, Revit will do its best to use them appropriately. If any files are not usable, failure will be signalled to the interactive Revit user, but <b>no</b> exception is thrown and the add-in will not be notified.
+</ul>
+
+<p>Here again, this behaviour is built into Revit and cannot be modified.
+
+<p>The code initiating the drag and drop from the modeless dialogue is as simple as this:
+
+<pre class="code">
+&nbsp; <span class="green">// Drag action from list box</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> listBox1_MouseMove( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">MouseEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( System.Windows.Forms.<span class="teal">Control</span>.MouseButtons 
+&nbsp; &nbsp; &nbsp; == <span class="teal">MouseButtons</span>.Left )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyListBoxMember</span> member 
+&nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">FamilyListBoxMember</span>) listBox1.SelectedItem;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Use standard Revit drag and drop behavior</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">String</span>&gt; data = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">String</span>&gt;();
+&nbsp; &nbsp; &nbsp; data.Add( member.FullPath );
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span>.DoDragDrop( data );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>In other words, dragging a file name from the list on the right onto Revit will trigger the same built-in default behaviour as dragging the same file from the Windows explorer.
+
+
+
+<a name="4"></a>
+
+<h4>Yet another Caveat against Invoking Revit API Methods Modelessly</h4>
+
+<p>Note that both this method and the one discussed below call the static UIApplication DoDragDrop method from a modeless dialogue, i.e. outside a valid Revit API context, which is unusual for the Revit API.
+
+<!-- This is most likely going to be changed in the sample, as it is possible that this method will cause problems if used when there is another tool active. -->
+
+This is most likely going to be changed in the sample, as it will almost certainly cause serious problems such as unexpected results, corrupted documents, crashes, etc. if utilised in a commercial application.
+
+A better approach would be to use the Idling or an external event to trigger the DragDrop activity at a later time.
+
+<!-- <p>Actually, on further testing, it turns out that calling DoDragDrop with a list of file paths is treated like another command which interrupts the current one, and it is OK to call this outside of an API context. The overload taking a handler crashes Revit when a tool is currently active, so you cannot use it outside a valid Revit API context. We are in the process of updating the sample to fix this issue. -->
+
+<p>The only safe option is to call DoDragDrop from an Idling or external event call-back, just like all other Revit API calls.
+
+<p>Actually, on further discussion, we realised that the situation is even worse: invoking the drag-and-drop method during both Idling and external events is never recommendable, because it is likely to cause
+
+<a href="http://en.wikipedia.org/wiki/Deadlock">
+deadlock</a>. 
+
+<p>The problem is that the user interface is not expecting to be invoked during idling; the application is idling for the exact reason that there is no UI activity. 
+If UI operations are invoked in this situation, two things may happen:
+
+<ul>
+<li>The same message pump is re-entered with a new request, which cannot be processed, since the pump is still waiting for the idling event to be ended.
+<li>Another, secondary message pump is entered, which may eventually invoke another idling event, which may dead-lock the client application.
+</ul>
+
+<p>Unfortunately, this means that there really is no totally safe way to utilise this wonderful new API from a modeless dialogue.
+We will obviously be taking a new look at this in future versions, but for now it is important to realise the risks of invoking the Revit UI during the Idling event.
+
+<!-- (Note: the idling reentrancy will be fixed in 2014 (or possibly in 2013 update), but the dead lock will always be possible; Revit UI should not be invoked during idling.) -->
+
+<p>Here are some ideas which may help relativate these worries:
+
+<ul>
+<li>The problem of dead-lock or re-entering idling will only be apparent if invoking Revit UI, for instance the interactive placement of a family instance
+If the method only loads the family or does some other non-UI activity, it will be OK.
+
+<li>The tool works perfectly well if there is no other Revit tool active.    
+Of course, the best way to tell this is from Idling, which it seems cannot successfully call the call-back.
+
+<!-- 
+We have thus possibly found a valid use for the Application.IsQuiescent property.
+Although we do not really have a case for it, because one doesn't really need it during the Idling event (or any other event or external command, for that matter), and outside of the events it is not much more useful, since Revit cannot be called from a different thread anyway.
+
+...
+
+If I could change one thing, I would remove the sentence in which is Application.IsQuiescent mentioned. 
+I believe that method was implemented only because it existed in AutoCAD, except it has never meant the same thing like it means in AutoCAD. 
+Users should not use it, since there is no actually scenario in which it makes sense.
+-->
+
+</ul>
+
+<p>So once again: make sure that you test the scenario in which you plan to use this very carefully, and avoid all risks in a commercial implementation.
+
+
+<a name="5"></a>
+
+<h4>Drag and Drop with a Custom Handler</h4>
+
+<p>The second overload is much more exciting, because it allows us to define our own drop behaviour inside Revit.
+
+<p>This can only be used to define behaviour within the context of the add-in's own UI, though.  
+For example, it does not allow you to define new drag and drop behaviour for files which are not supported by the method above when dropped onto Revit from explorer, or from an unconnected application like Excel, AutoCAD, etc.  
+The drag operation must be initiated from a point where it can call DoDragDrop to Revit to allow it to complete.
+
+<p>It requires us to set up a handler for the drop event, which is derived from the IDropHandler interface, requiring then implementation of one single method, Execute.
+
+<p>In this sample, the drop handler expects the element id of a family symbol to be passed in and simply calls the PromptForFamilyInstancePlacement method on the symbol.
+
+<p>You are obviously completely free to pass in any data you like when invoking the handler, and can choose to do something completely different with it inside Revit on receipt:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Custom handler for placement of loaded family types</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">LoadedFamilyDropHandler</span> : <span class="teal">IDropHandler</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( 
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> doc, 
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> data )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> familySymbolId = (<span class="teal">ElementId</span>) data;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = doc.Document.GetElement( 
+&nbsp; &nbsp; &nbsp; &nbsp; familySymbolId ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( symbol != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.PromptForFamilyInstancePlacement( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbol );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>With the drop handler in place, we can initiate a custom drag and drop like this:
+
+<pre class="code">
+&nbsp; <span class="green">// Drag action from list view</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> listView_MouseMove( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">MouseEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( System.Windows.Forms.<span class="teal">Control</span>.MouseButtons 
+&nbsp; &nbsp; &nbsp; == <span class="teal">MouseButtons</span>.Left )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ListViewItem</span> selectedItem = <span class="blue">this</span>.listView1
+&nbsp; &nbsp; &nbsp; &nbsp; .SelectedItems.Cast&lt;<span class="teal">ListViewItem</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">ListViewItem</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( selectedItem != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Use custom Revit drag and drop behavior</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LoadedFamilyDropHandler</span> myhandler 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LoadedFamilyDropHandler</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span>.DoDragDrop( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; selectedItem.Tag, myhandler );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<p>Be sure to take a look at the other commands defined by the UIAPI SDK sample as well, because they are all pretty exciting and address a number of long-standing wish list items.

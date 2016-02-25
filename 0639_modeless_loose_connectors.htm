@@ -1,0 +1,226 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Modeless Loose Connector Navigator Update</h3>
+
+<p>Here is an update to my 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless loose connector navigator</a>,
+
+which I created as a sample application to demonstrate how to set up a modeless dialogue to drive Revit using the 
+
+Idling event</a>.
+
+Please refer to the original post for a full description.
+
+<p>The original Revit 2011 version had one flaw: the external command it implements subscribes to the Idling event.
+That means that a new subscription is added for every call to the command.
+Also, the subscription was never revoked.
+
+<p>That prompted me to present an updated version of the application for Revit 2012, which brings up a number of little items of interest:
+
+<ul>
+<li><a href="#1">Adding an external application and loading in MEP only</a>
+<li><a href="#2">Idling sender type changed</a>
+<li><a href="#3">Multiplatform support</a>
+<li><a href="#4">ElementMulticlassFilter</a>
+<li><a href="#5">Logical connector check</a>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Adding an External Application and Loading in MEP Only</h4>
+
+<p>The safest way to subscribe to application events is to implement an external application, and subscribe and unsubscribe to them from the OnStartup and OnShutdown event handlers.
+
+<p>The external command already makes use of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/addin-visibility-mode.html">
+VisibilityMode tag</a> to 
+
+appear only in the MEP product, but that tag is not supported for external applications.
+
+<p>Therefore, I implemented a check in the OnStartup method to refuse to load the application unless it is being loaded into Revit MEP, as described in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/addin-applications-for-multiple-revit-products.html">
+add-in applications for multiple Revit products</a>:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="teal">ProductType</span> pt = a.ControlledApplication.Product;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">ProductType</span>.MEP == pt )
+&nbsp; {
+&nbsp; &nbsp; a.Idling += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+}
+</pre>
+
+On successful loading, we subscribe to the Idling event. 
+The application OnIdling method simply forwards the notification to the existing handler in the external command, which is now a static method:
+
+<pre class="code">
+<span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> e )
+{
+&nbsp; <span class="teal">Command</span>.OnIdling( sender, e );
+}
+</pre>
+
+<p>All the rest remains unchanged.
+
+<p>Oh no, not true at all.
+
+
+<a name="2"></a>
+
+<h4>Idling Sender Type Changed</h4>
+
+<p>One thing that changed between the Revit 2011 and Revit 2012 API is the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/cascaded-events-and-renaming-the-active-document.html">
+type of the Idling event sender argument</a>.
+
+It used to be an Application instance, and was changed in 2012 to be a UIApplication instance instead.
+Here is a snippet showing the simplest and most foolproof method for handling this that I could come up with, which eliminates any need to actually check which version of Revit your add-in is running in:
+
+<pre class="code">
+&nbsp; <span class="green">// Support both 2011, where sender is an </span>
+&nbsp; <span class="green">// Application instance, and 2012, where </span>
+&nbsp; <span class="green">// it is a UIApplication instance:</span>
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp 
+&nbsp; &nbsp; = sender <span class="blue">is</span> <span class="teal">UIApplication</span>
+&nbsp; &nbsp; &nbsp; ? sender <span class="blue">as</span> <span class="teal">UIApplication</span>
+&nbsp; &nbsp; &nbsp; : <span class="blue">new</span> <span class="teal">UIApplication</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; sender <span class="blue">as</span> <span class="teal">Application</span> );
+</pre>
+
+<p>If this code is executed by Revit 2011, the sender will be an Application, and we instantiate our own UIApplication instance  from it. Otherwise, we can use the UIApplication instance  provided by the sender argument directly.
+
+
+<a name="3"></a>
+
+<h4>Multiplatform Support</h4>
+
+<p>Note that the change above refers to <b>running</b> the add-in in Revit 2012. 
+However, it does not mean that I have to <b>compile</b> it specifically for Revit 2012.
+I am still referencing the Revit 2011 API DLLs, which means that I can run it in both Revit 2011 and 2012.
+
+<p>I did however migrate the codebase from Visual Studio 2008 to 2010.
+I created backup files of the entire loose connector navigator source code just before and after this migration, so I actually have three different versions of it to share with you here which are compiled using the Revit 2011 API and run on both the Revit 2011 and 2012 platforms, in case you are interested in comparing the gradual evolution:
+
+<ul>
+<li><a href="zip/loose_connectors_7_2008.zip">loose_connectors_7_2008.zip</a> &ndash; 
+last Visual Studio 2008 version.
+
+<li><a href="zip/loose_connectors_7_2010.zip">loose_connectors_7_2010.zip</a> &ndash; 
+first Visual Studio 2010 version.
+
+<li><a href="zip/loose_connectors_8.zip">loose_connectors_8.zip</a> &ndash;
+updated version using an external application to subscribe to the Idling event.
+</ul>
+
+
+<a name="4"></a>
+
+<h4>ElementMulticlassFilter</h4>
+
+<p>Actually, there is one Revit 2012 API feature that one might potentially make use of, although it makes very little difference:
+
+<p>The ElementMulticlassFilter allows us to check for multiple types of elements using one single filtered element collector.
+We can use this in the GetConnectorElements method for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">
+retrieving all elements which may have some kind of MEP connector</a>.
+
+It selects all elements which are family instances belonging to one of a given list of categories, which are retrieved by a filter named 'familyInstanceFilter', OR are one of a given list of types, which is defined like this in the Revit 2011 code:
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementFilter</span>&gt; b
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 6 );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">CableTray</span> ) ) );
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Conduit</span> ) ) );
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) ) );
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Pipe</span> ) ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( include_wires )
+&nbsp; {
+&nbsp; &nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Wire</span> ) ) );
+&nbsp; }
+
+&nbsp; b.Add( familyInstanceFilter );
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> classFilter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( b );
+</pre>
+
+<p>Making use of the ElementMulticlassFilter enables us to simplify this a little bit:
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; types = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt;( 5 );
+&nbsp;
+&nbsp; types.Add( <span class="blue">typeof</span>( <span class="teal">CableTray</span> ) );
+&nbsp; types.Add( <span class="blue">typeof</span>( <span class="teal">Conduit</span> ) );
+&nbsp; types.Add( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) );
+&nbsp; types.Add( <span class="blue">typeof</span>( <span class="teal">Pipe</span> ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( include_wires )
+&nbsp; {
+&nbsp; &nbsp; types.Add( <span class="blue">typeof</span>( <span class="teal">Wire</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt; b
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 2 );
+&nbsp;
+&nbsp; b.Add( <span class="blue">new</span> <span class="teal">ElementMulticlassFilter</span>( types ) );
+&nbsp;
+&nbsp; b.Add( familyInstanceFilter );
+&nbsp;
+&nbsp; <span class="teal">LogicalOrFilter</span> classFilter 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( b );
+</pre>
+
+<p>Well, maybe not simplify, exactly, but make use of a smaller total number of filters, by using one single ElementMulticlassFilter instead of five separate ElementClassFilter instances OR'ed together.
+Since we are OR'ing them with the familyInstanceFilter in any case, it makes little difference, and actually increases the number of lines of code instead of decreasing them.
+Therefore, I will revert this change in my code to retain the compatibility with Revit 2011.
+Introducing this change would be the first and single stumbling block causing the application not to work on Revit 2011 any longer.
+
+
+<a name="5"></a>
+
+<h4>Logical Connector Check</h4>
+
+<p>By the way, here is another minute change introduced by the Revit 2012 API that I also discovered while switching back and forth between the two versions:
+
+<p>In Revit 2011, I skipped unconnected logical connectors using the following code:
+
+<pre class="code">
+&nbsp; <span class="teal">ConnectorType</span>.LogicalConn != c.ConnectorType <span class="green">// 2011</span>
+</pre>
+
+<p>The ConnectorType enumeration value has been renamed in the Revit 2012 API, and the check is now
+
+<pre class="code">
+&nbsp; <span class="teal">ConnectorType</span>.Logical != c.ConnectorType <span class="green">// 2012</span>
+</pre>
+
+<p>It really is pretty impressive how the .NET API shields us so well from the underlying platform, that we can use the old or new API interchangeably to run on the new platform, if we are able to simply avoid using any functionality that changed significantly.
+
+<!--
+C:\a\src\revit\loose_connectors\zip\loose_connectors_7_2008.zip
+C:\a\src\revit\loose_connectors\zip\loose_connectors_7_2010.zip
+C:\a\src\revit\loose_connectors\zip\loose_connectors_8.zip
+-->
+

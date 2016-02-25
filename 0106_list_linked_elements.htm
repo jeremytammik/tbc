@@ -1,0 +1,219 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>List Linked Elements</h3>
+
+<p>We already had a look at the issue of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/linked-files.html">
+linked files</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/hiding-linked-files.html">
+how to hide them</a>.
+
+A frequent question in this context is how to access the elements in linked files.
+This can be very simple, actually, as we will demonstrate.
+I had a discussion on this with Joel Karr of
+
+<a href="http://www.esdesign.com">
+Environmental Systems Design, Inc</a>.
+
+He is implementing a command to order to monitor and compare the lighting fixtures in an MEP model with the ones defined in a linked in architectural model.
+He very kindly provided a sample application listing the lighting fixture elements contained in a linked file, as a starting point for implementing a comparison of those with the ones in the current model.
+I rewrote and significantly simplified his application and find that we can achieve a lot of functionality with minimal effort.</p>
+
+<p>For this purpose we implemented a new external command CmdLinkedFileElements which iterates over all open documents, which includes the linked ones as well, and displays selected properties for all lighting fixture elements in a data grid.</p>
+
+<h4>Displaying element properties</h4>
+
+<p>We define a class ElementData to manage the properties we wish to display:</p>
+
+<ul>
+<li>Document, the project containing the element.</li>
+<li>Element, the element name.</li>
+<li>Id, the element id.</li>
+<li>X, Y and Z, the family instance location point coordinates.</li>
+<li>UniqueId, the unique id.</li>
+<li>Folder, the document folder.</li>
+</ul>
+
+<p>These data items are stored in individual private members.
+We define a constructor in order to initialise all the members for a given Revit element.
+By defining public properties for accessing each data item to display, we can save the effort of transferring data manually into the form.
+Here is the class implementation including member data, constructor, and accessors:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ElementData</span>
+{
+&nbsp; <span class="blue">string</span> _document;
+&nbsp; <span class="blue">string</span> _elementName;
+&nbsp; <span class="blue">int</span> _id;
+&nbsp; <span class="blue">double</span> _x;
+&nbsp; <span class="blue">double</span> _y;
+&nbsp; <span class="blue">double</span> _z;
+&nbsp; <span class="blue">string</span> _uniqueId;
+&nbsp; <span class="blue">string</span> _folder;
+&nbsp;
+&nbsp; <span class="blue">public</span> ElementData(
+&nbsp; &nbsp; <span class="blue">string</span> path,
+&nbsp; &nbsp; <span class="blue">string</span> elementName,
+&nbsp; &nbsp; <span class="blue">int</span> id,
+&nbsp; &nbsp; <span class="blue">double</span> x,
+&nbsp; &nbsp; <span class="blue">double</span> y,
+&nbsp; &nbsp; <span class="blue">double</span> z,
+&nbsp; &nbsp; <span class="blue">string</span> uniqueId )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> i = path.LastIndexOf( <span class="maroon">"\\"</span> );
+&nbsp; &nbsp; _document = path.Substring( i + 1 );
+&nbsp; &nbsp; _elementName = elementName;
+&nbsp; &nbsp; _id = id;
+&nbsp; &nbsp; _x = x;
+&nbsp; &nbsp; _y = y;
+&nbsp; &nbsp; _z = z;
+&nbsp; &nbsp; _uniqueId = uniqueId;
+&nbsp; &nbsp; _folder = path.Substring( 0, i );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Document {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _document; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Element {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _elementName; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Id {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _id; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> X {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="teal">Util</span>.RealString( _x ); }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Y {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="teal">Util</span>.RealString( _y ); }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Z {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="teal">Util</span>.RealString( _z ); }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> UniqueId {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _uniqueId; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> Folder {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _folder; }
+&nbsp; }
+}
+</pre>
+
+<p>With these properties defined, displaying the data in the form is handled completely automatically by one single line in the form constructor:</p>
+
+<pre class="code">
+<span class="blue">public</span> CmdLinkedFileElementsForm(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementData</span>&gt; a )
+{
+&nbsp; InitializeComponent();
+&nbsp; dataGridView1.DataSource = a;
+}
+</pre>
+
+<h4>Collecting element data from linked files</h4>
+
+<p>We have discussed how to display the element data in a data grid.
+Before we can display it, we need to retrieve it from the Revit database.
+To do so, we can simply iterate over all the open documents in the application.
+If desired, we can implement a filter to eliminate the documents that do not represent a linked file.</p>
+
+<p>We implement a utility method to filter for elements matching a given category and type.</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetElements(
+&nbsp; <span class="teal">BuiltInCategory</span> bic,
+&nbsp; <span class="teal">Type</span> elemType,
+&nbsp; <span class="teal">Application</span> app,
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">CreationFilter</span> cf = app.Create.Filter;
+&nbsp; <span class="teal">Filter</span> f1 = cf.NewCategoryFilter( bic );
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewTypeFilter( elemType );
+&nbsp; <span class="teal">Filter</span> f3 = cf.NewLogicAndFilter( f1, f2 );
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; doc.get_Elements( f3, elements );
+&nbsp; <span class="blue">return</span> elements;
+}
+</pre>
+
+<p>This can be used both to extract the lighting fixtures to display in the form as well as the linked files instances, if we need those.
+We will only use it for the lighting fixtures in the real code.
+For completeness sake, this would be the call to retrieve the link instances:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; links = GetElements(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_RvtLinks,
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Instance</span> ), app, doc );
+</pre>
+
+<p>The external command performs the following steps:</p>
+
+<ul>
+<li>Iterate over the application documents.</li>
+<li>Select all lighting fixtures in each linked document.</li>
+<li>Instantiate and populate an ElementData instance for each fixture.</li>
+<li>Display the form with the data collected.</li>
+</ul>
+
+<p>Here is the mainline for the command:</p>
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">ElementData</span>&gt; data = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementData</span>&gt;();
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">DocumentSet</span> docs = app.Documents;
+
+<span class="blue">foreach</span>( <span class="teal">Document</span> doc <span class="blue">in</span> docs )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements = GetElements(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_LightingFixtures,
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ), app, doc );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> e <span class="blue">in</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> name = e.Name;
+&nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = e.Location <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != lp )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = lp.Point;
+&nbsp; &nbsp; &nbsp; data.Add( <span class="blue">new</span> <span class="teal">ElementData</span>( doc.PathName, e.Name,
+&nbsp; &nbsp; &nbsp; &nbsp; e.Id.Value, p.X, p.Y, p.Z, e.UniqueId ) );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">using</span>( <span class="teal">CmdLinkedFileElementsForm</span> dlg = <span class="blue">new</span> <span class="teal">CmdLinkedFileElementsForm</span>( data ) )
+{
+&nbsp; dlg.ShowDialog();
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Cancelled;
+</pre>
+
+<p>Notice how short and sweet this is?</p>
+
+<p>Here is an example of the command displaying the data in the sample model provided by Joel:</p>
+
+<img src="img/LinkedFileElements.png" alt="Linked file element data"/>
+
+<p>This can obviously easily be adapted to handle other element types or more general selections than just lighting fixtures.
+For the moment, of course, we are ignoring all the thorny issues to do with transformations and stuff. 
+I am looking forward to your comments on this one.</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10027.zip">
+version 1.0.0.27</a>
+
+of the complete Visual Studio solution with the new CmdLinkedFileElements command.
+It also includes the new command CmdNewRailing which unfortunately does <strong>not</strong> create a new railing instance.
+The reasons for this can be found in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-railing-types.html#comments">
+discussion with Berria</a>.</p>

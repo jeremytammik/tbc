@@ -1,0 +1,50 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266148 [Convert .rvt file to .nwd file using Revit API] -->
+
+<h3>Create a Navisworks File from Revit</h3>
+
+<p>In case you do not know Navisworks, it is an Autodesk product which provides a flexible platform for integrating multiple CAD formats to create a compound model from multiple sources and provide specialised viewing and analysis of large projects.
+It allows you to combine models from AutoCAD, Revit, Inventor, and many more. 
+Here is the blurb from the 
+
+<a href="http://www.autodesk.com/navisworks">
+Autodesk Navisworks product page</a>:
+
+<p style="color:darkblue">Autodesk Navisworks products deliver project review software for 3D coordination, 4D planning, photorealistic visualization, dynamic simulation, and accurate analysis. 
+Create a whole-project model by integrating design and construction information, including complex building information modelling (BIM), Digital Prototyping (DP), and process plant data. 
+With Autodesk Navisworks project review software, you can collaborate, coordinate, and communicate more effectively to reduce problems during design and construction.</p>
+
+<p>I recently answered a question on whether you can create a native Navisworks NWD file from within Revit:
+
+<p><strong>Question:</strong> I want to convert an RVT file into an NWD file with the help of the Revit API. 
+Is this possible at all?
+If so, is there any sample code available?
+
+<p><strong>Answer:</strong> You certainly can create a Navisworks file from a Revit add-in. 
+This can be achieved using NWcreate, which is a stand-alone Navisworks library and thus can be integrated into a Revit add-in. 
+
+<p>The caveat is that you can only create NWC files using a standalone app, not the native NWD format.
+In order to create a native NWD file, you will need Navisworks installed on the machine. 
+The only limitation of NWC files is that they cannot be loaded it into Navisworks Freedom.
+
+<p>The NWcreate samples that ship with Navisworks include a standalone program that creates an NWC file. 
+
+<p>Note that the NWcreate samples are written in C/C++, and the project files are for VC++ 6.0 (Visual Studio 6). 
+They should not be too hard to port to Visual Studio 2008 or 2010, if you need to do so.
+
+<p>More information, samples, documentation and the Navisworks development tools are available from the Autodesk 
+
+<a href="http://www.autodesk.com/developnavisworks">
+Navisworks Developer Centre</a>.
+
+<p>Thanks to Michael Priestman, Sr Navisworks SW Engineer, for providing most of this information!
+
+<h4>Programming Quotes</h4>
+
+<p>Before closing for today, I will mention that I found some of the entries in and comments on this list of
+
+<a href="http://www.junauza.com/2010/12/top-50-programming-quotes-of-all-time.html">
+top 50 programming quotes of all time</a> quite amusing...

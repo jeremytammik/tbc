@@ -1,0 +1,102 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add Reference Points Read From CSV File</h3>
+
+<p>For your convenience and my own future reference, here is a summary of a recent 
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/reading-a-csv-file-code-evolved/td-p/3303833">
+conversation</a> with 
+
+Dermott Mcmeel and a pointer to his
+
+<a href="http://vimeo.com/36167862">
+video of the resulting add-in in action</a>.
+
+<p><strong>Question:</strong> I'm using this
+
+<a href="http://nmillerarch.blogspot.com/2010/01/streaming-grasshopper-points-into-revit.html">
+wicked tutorial</a>
+
+as a basis for a plug-in that will read info out of a CSV file. 
+However, it's a few years old and from what I gather some of the definitions have been redefined our outdated. 
+I've done the 'First Revit API plug-in tutorial' and am stoked about my success. 
+But I'm new to VB and C#, so I was wondering if anyone has updated info? 
+Or could point out changes and where updated info might be found?
+
+<p><strong>Answer:</strong> I converted the 
+
+<a href="http://nmillerarch.blogspot.com/2010/01/streaming-grasshopper-points-into-revit.html">
+VB code to read a CSV file and generate Revit reference points</a> to
+
+C# for you:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> filepath = <span class="maroon">&quot;insert file path here&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">File</span>.Exists( filepath ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">StreamReader</span> s = <span class="blue">new</span> <span class="teal">StreamReader</span>( 
+&nbsp; &nbsp; &nbsp; filepath );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( -1 != s.Peek() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> line = s.ReadLine();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>[] data = line.Split( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">','</span> } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = app.Create.NewXYZ( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span>.Parse( data[0] ), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span>.Parse( data[1] ), 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span>.Parse( data[2] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ReferencePoint</span> rp = doc.FamilyCreate
+&nbsp; &nbsp; &nbsp; &nbsp; .NewReferencePoint( p );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p><strong>Response:</strong> The code is very much appreciated. 
+I am however having some trouble pasting it into the right context... 
+
+<p>I've tried some remedial trouble shooting, but as I fix one error it creates another one. 
+
+<p>I pasted the code straight into a blank C# class library template (as per Revit API tutorial 1) but get lots of errors &ndash; I assume I'm making a stupid mistake in the syntax but can't figure it out. 
+Any help appreciated... and again thanks for the helping hand.
+
+<p><strong>Answer:</strong> Please work through one of the getting started tutorials first, before even thinking about CSV:
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/getting-started-with-the-revit-2012-api.html">
+Getting started with the Revit API</a>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+Preparing for a hands on Revit API training</a>
+</ul>
+
+<p>Then you will have a reliable working skeleton in place and almost certainly gotten a better hang of it.
+
+<p><strong>Response:</strong> Thanks for all your help!
+
+<p>See the results:</p>
+
+<iframe src="http://player.vimeo.com/video/36167862?title=0&amp;byline=0&amp;portrait=0" width="400" height="253" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+
+<p><a href="http://vimeo.com/36167862">Revit API for CSV reading</a> from <a href="http://vimeo.com/user2916257">Dermott Mcmeel</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+
+<p><strong>Answer:</strong> For the sake of completeness, here is 
+
+<a href="zip/ReadCsvPoints.zip">
+ReadCsvPoints.zip</a> containing
+
+Jeremy's C# version (and complete Visual Studio solution with add-in manifest) of an add-in to read point data from a CSV file and generate Revit reference points from it, and a snapshot of Dermott's
+
+<a href="zip/ReadCsvPointsDm.cs">
+WIP C# code</a> (work in progress).
+
+<p>Many thanks to Dermott for the interesting topic, his research, and sharing the code!
+

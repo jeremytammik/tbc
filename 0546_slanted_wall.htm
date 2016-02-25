@@ -1,0 +1,186 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html?cid=6a00e553e168978833011571944bd1970b#comment-6a00e553e168978833011571944bd1970b
+
+http://www.dericwallace.com/tapered_wall.jpg
+
+1267007 [slant wall?]
+
+-->
+
+<h3>The FaceWall Class and Slanted Walls</h3>
+
+<p>We have never previously taken looked at the FaceWall class.
+Here is a question on this handled by Joe Ye, which also addresses an old 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html?cid=6a00e553e168978833011571944bd1970b#comment-6a00e553e168978833011571944bd1970b">
+comment</a> by 
+
+Deric Wallace on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html">
+creating a wall with a sloped profile</a>.
+
+Deric wishes to create a wall like this programmatically:</p>
+
+<center>
+<img src="img/slanted_wall.png" alt="Slanted wall"/>
+</center>
+
+<p>This was not easily achievable in Revit 2010.
+The access to slanted walls is improved in Revit 2011, as we can see from Joe's answer below:
+
+
+<p><strong>Question:</strong> How can I use the API to distinguish a slanted wall from a normal one?
+
+<p>Once I have a slanted wall, how can I determine its angle?</p>
+
+<center>
+<img src="img/slanted_wall2.png" alt="Slanted wall angle"/>
+</center>
+
+
+<p><strong>Answer:</strong> Slanted walls are represented by the FaceWall class, whereas normal walls use the Wall class. 
+You can thus take advantage of the Revit element's .NET class to distinguish between slanted and non-slanted walls.
+
+<p>With regard to getting the angle of a slanted wall, you can determine one of its side faces, calculate the side face's normal vector, and then determine the angle between that and the vertical vector or Z axis (0,0,1):
+
+<center>
+<img src="img/slanted_wall3.png" alt="Slanted wall angle calculation"/>
+</center>
+
+<p>Now the question remains how to obtain the slanted wall's upside face. 
+To do so, first retrieve the slanted wall solid using its Geometry property. 
+Then go through each face of the solid.
+If the face area times the wall thickness equals the wall volume, and the face normal vector's Z coordinate is positive, then this face is the upside face we are looking for. 
+
+<p>As said, we can then calculate the angle between vertical vector (0,0,1) and the upside face's normal to determine the slanted wall angle.
+
+<p>Here is the code to achieve all of this:
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">RegenerationAttribute</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">GetSlantedWallAndAngle</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Walls );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FaceWall</span> slantedWall = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> elem <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// use the class to identify slanted wall</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elem <span class="blue">is</span> <span class="teal">FaceWall</span> ) 
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; slantedWall = elem <span class="blue">as</span> <span class="teal">FaceWall</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( slantedWall == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; messages = <span class="maroon">&quot;There is no slanted wall in this model&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve geometry</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> options = app.Application.Create
+&nbsp; &nbsp; &nbsp; .NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElement 
+&nbsp; &nbsp; &nbsp; = slantedWall.get_Geometry( options );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the only solid</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> wallSolid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geoObject 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> geoElement.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geoObject <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; wallSolid = geoObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// get the wall width</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> typeId = slantedWall.GetTypeId();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WallType</span> type = doc.get_Element( typeId ) 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">WallType</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dWidth = type.Width;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dTolerance = 0.01;
+&nbsp; &nbsp; <span class="blue">double</span> dAngle = 0.0;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">PlanarFace</span> face <span class="blue">in</span> wallSolid.Faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( dTolerance &gt; <span class="teal">Math</span>.Abs( 
+&nbsp; &nbsp; &nbsp; &nbsp; face.Area * dWidth - wallSolid.Volume ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face.Normal.Z &gt; dTolerance )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// calculate the angle</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> verticalVector = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dAngle = verticalVector.AngleTo( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face.Normal ) * 180 / 3.1415926;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Slanted wall angle to XOY plane&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dAngle.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is the complete Visual Studio code project 
+
+<a href="zip/slanted_wall.zip">
+slanted_wall.zip</a>. 
+
+<p>Many thanks to Joe for this answer and sample code!
+
+<p>One last-minute idea for a possible enhancement of the filtering code that came to me while editing this post is that since we are searching for walls whose .NET class is FaceWall, the filtering could probably be further optimised by using 
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FaceWall</span> ) )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Walls );
+</pre>
+
+<p>Then the explicit iteration after setting up the filter could be avoided.
+Maybe we could even skip the check for the category, since FaceWall instances presumably always will have the OST_Walls built-in category.
+Eliminating the category check would probably have an absolutely negligible effect, though.

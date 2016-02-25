@@ -1,0 +1,128 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+1271625 [Acad control in form]
+
+C:\a\j\adn\case\special\progiscad\src\LaunchAcad2\testole
+/a/j/adn/case/special/progiscad/testole.zip
+
+-->
+
+<h3>Launching AutoCAD within a Revit Add-in</h3>
+
+<p>We looked at the topic of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/running-autocad-inside-revit.html">
+running AutoCAD inside a Revit add-in</a> way
+
+back in 2008, in the grey and dusty beginnings of this blog.
+
+<p>Many developers have made use of that since then, and the topic is still important for all those who have significant functionality running inside an AutoCAD application and wish to make use of or enhance it by connecting it with their Revit add-in.
+
+<p>Therefore, it is about time to dig that out and have a fresh look at it.
+Actually, it is rather overdue.
+I have some more up-to-date information on this that has been sitting around on my to-do list for quite a while.
+In fact, it is high time to get it out there before it becomes obsolete, and should still prove useful to anyone interested in this topic.</p>
+
+<p>Actually, here are two separate solutions,
+
+<a href="#2">testole.zip</a> and
+
+<a href="#3">Acctrl_Interops.zip + EmbedAutoCAD.zip</a>.
+
+<h4>Testole.zip</h4>
+
+<p>I will simply provide the sample code as it is with no further comment:
+
+<pre class="code">
+<span class="green">// This could have been read-only, but then it </span>
+<span class="green">// cannot be started in zero document state:</span>
+&nbsp;
+[Transaction( TransactionMode.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : IExternalCommand
+{
+&nbsp; <span class="blue">public</span> Result Execute(
+&nbsp; &nbsp; ExternalCommandData commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; ElementSet elements )
+&nbsp; {
+&nbsp; &nbsp; Autodesk.AutoCAD.Interop.AcadApplication a
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Autodesk.AutoCAD.Interop.AcadApplication();
+&nbsp;
+&nbsp; &nbsp; a.Visible = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; Autodesk.AutoCAD.Interop.AcadDocument doc
+&nbsp; &nbsp; &nbsp; = a.Documents.Application.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span>[] stpoint = <span class="blue">new</span> <span class="blue">double</span>[3];
+&nbsp; &nbsp; <span class="blue">double</span>[] enpoint = <span class="blue">new</span> <span class="blue">double</span>[3];
+&nbsp; &nbsp; stpoint[0] = 5;
+&nbsp; &nbsp; stpoint[1] = 5;
+&nbsp; &nbsp; stpoint[2] = 0;
+&nbsp; &nbsp; enpoint[0] = 12;
+&nbsp; &nbsp; enpoint[1] = 3;
+&nbsp; &nbsp; enpoint[2] = 0;
+&nbsp;
+&nbsp; &nbsp; doc.ModelSpace.AddLine( stpoint, enpoint );
+&nbsp;
+&nbsp; &nbsp; doc.SaveAs( <span class="maroon">&quot;C:/tmp/testline.dwg&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; a.Quit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> Result.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>That shows how simple this can be.</p>
+
+<p>Here is <a href="zip/launch_acad_testole.zip">testole.zip</a> containing the complete Visual Studio solution.</p>
+
+<p>This is up to you to explore further on your own, if you like  :-)</p>
+
+<h4>2. Acctrl_Interops.zip + EmbedAutoCAD_2012.zip</h4>
+
+<!-- 1271625 [Acad control in form] -->
+
+<p>The second solution is not directly related to the Revit API, but should work in an add-in as well.
+It was prompted by the following query:
+
+<p><strong>Question:</strong> How can I view and manipulate DWG files in a Windows form?
+
+<p>I want to create an AutoCAD add-in that shows a preview of another DWG file (not the current one) in a VB.NET form and then switch some layers on and off.
+
+<p>I am using Visual Studio 2010.
+
+<p><strong>Answer:</strong> You can use the AutoCAD control AcCtrl for this.
+
+<p>Kean's article on
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2008/03/embedding-autoc.html">
+embedding AutoCAD in a standalone dialog</a> explains
+
+everything in full detail.
+
+<p><strong>Response:</strong> This control does not seem to work with VS 2010 on the .NET framework 4.
+
+<p><strong>Answer:</strong> I have attached the sample project that uses the Acctrl.dll from AutoCAD 2012 and Visual Studio 2010 with the .NET 4 framework.
+
+<p>The code is identical to the one that you download from the blog and works fine.
+
+<p>Here are the only things I changed:
+
+<ul>
+<li>I used aximp to generate the interop DLLs from Acctrl.dll and attached them below in Acctrl_Interops.zip.
+These interop DLLs need to be referenced in the project.</li>
+<li>Set the 'Embed Interop types' toggle to False in the properties of these references.</li>
+</ul>
+
+<p>Here are the two attachments,
+
+<a href="zip/Acctrl_Interops.zip">Acctrl_Interops.zip</a> containing the interop DLLs I generated and
+
+<a href="zip/EmbedAutoCAD.zip">EmbedAutoCAD.zip</a> containing the complete Visual Studio solution using them.</p>
+
+<p>I hope you find this useful!</p>

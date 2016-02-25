@@ -1,0 +1,248 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08329547 [Cannot get idling event to work]
+Dan Tartaglia, NBBJ LP
+
+-->
+
+<h3>Auto PDF Print from Revit 2014</h3>
+
+<p>Below, we will take a look at a Revit multi-project batch PDF printer project driven by the Windows task scheduler and the Revit Idling event.</p>
+
+<p>Before getting to that, though, let me share some of my Sunday activities.</p>
+
+
+<a name="2"></a>
+
+<h4>Contact Impro Jam and Tech Summit Arrival</h4>
+
+<p>From the
+
+<a href="http://en.wikipedia.org/wiki/Middlesex_Fells_Reservation">Fells</a>, I
+
+continued along the Mystic Valley Parkway and stopped to enjoy the beautiful
+
+<a href="http://en.wikipedia.org/wiki/Mystic_Lakes_%28Boston%29">Mystic Lakes</a> on
+
+my way to the weekly Sunday
+
+<a href="http://contactimprovboston.com/sunday_jam">contact improvisation jam</a> in the
+
+<a href="http://www.arlingtoncenter.org">Arlington Center</a>,
+
+followed by a magnificent lunch at
+
+<a href="http://www.sabzikabab.com">Sabzi Persian restaurant</a> and
+
+wonderful conversation with Mike Klinger of
+
+<a href="http://www.anzuglobal.com">Anzu Global</a>,
+
+who actually used to work with Revit at Autodesk, as it turns out.
+Small world.</p>
+
+<p>In the evening I checked in to the Tech Summit hotel on the Charles River in Cambridge and went for a very nice dinner with Adam, Manu and Mikako to the Spanish
+
+<a href="http://www.tapeo.com">Tapeo</a> restaurant on Newbury Street in Boston.
+That was the first time I set foot in the city since my arrival.</p>
+
+<p>As Mikako pointed out, it is quite a novelty for me to be pleased with restaurant food &ndash; I normally prefer to cook myself &ndash; and on Sunday I had two good experiences in a row! Yay!</p>
+
+<p>Back to the Revit API.</p>
+
+
+<a name="3"></a>
+
+<h4>Batch Processing RVT Files Overnight</h4>
+
+<p>This is a contribution from Dan Tartaglia of
+
+<a href="http://www.nbbj.com">
+design technology@NBBJ</a>.</p>
+
+<p>It started off from the following query:</p>
+
+<p><strong>Question:</strong> I created a tool that uses a UIControlledApplication Idling event when Revit launches.
+It works perfectly correctly in Revit Architecture 2013.
+However, if I use the same code on the same computer in Revit Architecture 2012, the Idling event does not fire.
+
+<p><strong>Answer:</strong> In Revit 2012, the Idling event is not fired until a document is opened.
+
+<p><strong>Response:</strong> Is it possible to open launch Revit then open a RVT file programmatically in Revit 2012?
+I can do this in Revit 2013 via the Idling event.
+
+<p><strong>Answer:</strong> Yes, definitely.
+Simply specify the project filename on the Revit.exe command line.
+
+<p><strong>Response:</strong> I got it to work after all.
+I just open a small dummy RVT before processing the RVTs for the users.
+I am using this to implement a batch PDF printer than can run from the Windows Task Scheduler overnight.
+
+<p>Based on this approach, Dan implemented AutoPDFPrint, a Revit multi-project batch PDF printer than can be driven by the Windows Task Scheduler overnight.</p>
+
+
+<a name="4"></a>
+
+<h4>Task Scheduler and Revit Idling</h4>
+
+<p>Dan underlines that the Task Scheduler and Revit API Idling event allow you to automate almost any task.
+A few that help my firm are:</p>
+
+<ul>
+<li>PDF creation
+<li>DWG creation
+<li>Audit RVT files
+<li>Compact RVT files
+<li>Standards compliance checking
+<li>Extracting data from RVT files
+</ul>
+
+<p>Some new features in the Revit 2014 API make the above tasks easier still, e.g. the OpenDocumentFile method that now enables you to open workshared RVT files detached from central and determine which user created worksets are open or closed.
+
+<p>There are a couple of things you need to consider before running any of the above tasks:
+
+<ul>
+<li>Make sure the computer you use has enough RAM. Process one RVT file at a time to determine how much time and RAM it takes to finish. You may need to process one RVT file per Task Scheduler Task since Revit does not free memory until it closes.
+
+<li>Warnings can cause the process to fail. The tool currently clicks OK for any dialog that opens. If a warning opens during the open process that cannot be closed by clicking OK, the file is skipped. This can be a good thing since it will inform you if an RVT has an issue while opening you need to investigate.
+</ul>
+
+
+<a name="5"></a>
+
+<h4>AutoPDFPrint Components</h4>
+
+<p>Looking in more detail at the PDF printer system, one its parts is the AutoPDFPrint_Bridge executable run from the task scheduler:</p>
+
+<center>
+<img src="img/auto_pdf_print_bridge.png" alt="AutoPDFPrint_Bridge executable"/>
+</center>
+
+<p>The second component and the main actor in the process is the AutoPDFPrint Revit add-in:</p>
+
+<center>
+<img src="img/auto_pdf_print_addin.png" alt="AutoPDFPrint Revit add-in"/>
+</center>
+
+<p>Here are the detailed steps required to set up the system:</p>
+
+<ol>
+<li><a href="#6">Adobe PDF print preferences</a></li>
+<li><a href="#7">CFG file</a></li>
+<li><a href="#8">Task scheduler</a></li>
+</ol>
+
+<p>All components presented are available for <a href="#9">download</a> below.</p>
+
+
+<a name="6"></a>
+
+<h4>Step #1 &ndash; Set Up the Adobe PDF Print Preferences</h4>
+
+<ol>
+<li>Click the Windows 'Start' button and select 'Devices and Printers'.
+<li>Right-click the 'Adobe PDF printer' and select 'Printing Preferences'.
+<li>Change these settings:
+<ol type="a">
+<li>'Adobe PDF Page Size' to user Documents folder.
+<li>'View Adobe PDF results': disable.
+</ol>
+</ol>
+
+<center>
+<img src="img/auto_pdf_print_1.png" alt="Adobe PDF Print Preferences" width="500"/>
+</center>
+
+
+<a name="7"></a>
+
+<h4>Step #2 &ndash; Set Up the CFG File</h4>
+
+<ol>
+<li>The CFG file goes here:
+
+<pre>
+C:\AutoPDFPrint2014\Scripts
+</pre>
+
+<li>CFG file example name:
+
+<pre>
+100XXX.00 - My Project.cfg
+</pre>
+
+<li>CFG file format (comma delimited):
+
+<pre>
+&lt;view/sheet set&gt;,&lt;print set&gt;,&lt;RVT file&gt;,&lt;output folder for PDFs&gt;
+</pre>
+</ol>
+
+<center>
+<img src="img/auto_pdf_print_2.png" alt="CFG File"/>
+</center>
+
+<p>Notes:</p>
+
+<ul>
+<li>Multiple files/print jobs can be processed in the same CFG file.
+<li>Make sure enough hard drive space and RAM exists on the computer.
+</ul>
+
+
+<a name="8"></a>
+
+<h4>Step #3 &ndash; Set Up the Task Scheduler</h4>
+
+<ol>
+<li>Open the Windows Task Scheduler:
+<br/>Click the Windows 'Start' button and select All Programs &gt; Administrative Tools &gt; Task Scheduler.
+
+<li>Create a new Task.
+<br/>In the Actions tab:
+<ol type="a">
+
+<li>Program/script:
+<pre>
+C:\AutoPDFPrint2014\Program\AutoPDFPrint_Bridge.exe
+</pre>
+<li>Add arguments (optional):
+<pre>
+“100XXX.00 - My Project.cfg”
+</pre>
+</ol>
+</ol>
+
+<center>
+<img src="img/auto_pdf_print_3.png" alt="Task Scheduler" width="400"/>
+</center>
+
+<p>Notes:</p>
+
+<ul>
+<li>No guarantee the tool will work if a user is not logged on to the computer.
+This is related to the issue specified in the add-in flowchart above concerning PrintManager.PrintToFileName.
+<li>Make sure the value for 'Add Arguments (optional)' is surrounded by quotes.
+</ul>
+
+
+<a name="9"></a>
+
+<h4>Download</h4>
+
+<p>Here is <a href="zip/Auto_PDF_Print_from_Revit_2014_example.zip">Auto_PDF_Print_from_Revit_2014_example.zip</a> containing the following:
+
+<ol start="0">
+<li>ReadMe.txt (this list).</li>
+<li>Auto PDF Print from Revit 2014.vsd (pseudo logic).</li>
+<li>Auto PDF Print from Revit 2014.docx (instructions for use).</li>
+<li>Folders.zip (copy the Projects and AutoPDFPrint folders to the root C:).</li>
+<li>AutoPDFPrint.zip (Revit 2014 add-in Application).</li>
+<li>AutoPDFPrint_Bridge.zip (EXE run from Task Scheduler).</li>
+</ol>
+
+<p>Thank you very much, Dan, for implementing and sharing this powerful tool.</p>

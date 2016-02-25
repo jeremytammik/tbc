@@ -1,0 +1,141 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Piotr Zurek Re: Filter comparison update -->
+
+<h3>Type Filter Benchmark Update</h3>
+
+<p>We have come to trust the Revit 2011 API filters to really be the most performant approach to retrieve sets of database elements fulfilling a complex combination of criteria.
+To reinforce that message, here is another benchmark by Piotr Zurek, who says:
+
+<p>While searching for some answers in your blog I have stumbled across an old post where Guy Robinson compared the performance of the Revit 2010 API 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/filter-performa.html">
+class filter vs an anonymous method</a>. 
+
+<p>I found the result really intriguing since I always assumed that the filter would be quicker.
+Since the post was a bit old I decided to check how those results would look in the current version. 
+I also decided to add a third element to the comparison &ndash; filtering using LINQ. 
+You know, just for the kicks... :-) 
+
+<p>I'm happy to report that the situation has improved, by which I mean the speed of the "elegant" Revit filter is on par with both other methods.
+I probably should have tried to test it on a bigger model with more elements to filter to get a bit measurable result but what I got clearly shows that the 3x difference is gone.
+Here are my results from five runs:</p>
+
+<center>
+<table>
+<tr><th align="right">Method</th><th>&nbsp;</th>     <th colspan="5">&nbsp; &nbsp; Time in ms to retrieve 860 elements</th></tr>
+<tr><td align="right">Class filter</td><td></td>     <td align="right">108</td><td align="right">40</td><td align="right">36</td><td align="right">37</td><td align="right">37</td></tr>
+<tr><td align="right">Anonymous method</td><td></td> <td align="right">192</td><td align="right">36</td><td align="right">39</td><td align="right">38</td><td align="right">37</td></tr>
+<tr><td align="right">LINQ</td><td></td>             <td align="right">129</td><td align="right">37</td><td align="right">37</td><td align="right">39</td><td align="right">39</td></tr>
+</table>
+</center>
+
+<p>Here is the
+
+<a href="https://gist.github.com/772300">source code</a> used, reproduced here below for your convenience:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Commands</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uiDoc = uiApp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiApp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Stopwatch</span> sw = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// f5 = f1 &amp;&amp; f4</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// = f1 &amp;&amp; (f2 || f3)</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// = family instance and (door or window)</span>
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Filters and collector definitions
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementClassFilter</span> f1 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementCategoryFilter</span> f2 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementCategoryFilter</span> f3 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Windows );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LogicalOrFilter</span> f4 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( f2, f3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LogicalAndFilter</span> f5 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( f1, f4 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//#region Filtering with a class filter</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//List&lt;Element&gt; openingInstances = </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; collector.WherePasses(f5).ToElements() </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; as List&lt;Element&gt;;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//#endregion</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//#region Filtering with an anonymous method</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//List&lt;Element&gt; openings = collector</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; .WherePasses(f4)</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; .ToElements() as List&lt;Element&gt;;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//List&lt;Element&gt; openingInstances</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; = openings.FindAll(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; e => e is FamilyInstance );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//#endregion</span>
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Filtering with LINQ
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; openings = collector
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( f4 )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements() <span class="blue">as</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; openingInstances 
+&nbsp; &nbsp; &nbsp; &nbsp; = ( <span class="blue">from</span> instances <span class="blue">in</span> openings
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> instances <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> instances ).ToList&lt;<span class="teal">Element</span>&gt;();
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = openingInstances.Count;
+&nbsp; &nbsp; &nbsp; sw.Stop();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Time to get {0} elements: {1}ms&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; n, sw.ElapsedMilliseconds ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = ex.Message + ex.StackTrace;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to Piotr for testing and sharing these results!
+
+<p>By the way, this comparison and the results are quite comparable to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/level-filter-benchmark.html">
+level filter benchmark</a> included
+
+in Kevin Vandecar's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/filtered-element-collectors.html">
+filtered element collector overview and benchmarking suite</a>.

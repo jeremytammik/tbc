@@ -1,0 +1,191 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Translate Revit Tooltips</h3>
+
+<p>Kean Walmsley recently started exploring the exciting and useful idea of hooking up machine translation to AutoCAD, initially to 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/07/automatic-translation-of-autocad-tooltips-using-net.html">
+auto-translate tooltips</a>. 
+
+As Kean points out, you can get all AutoCAD tooltips translated into one of 35 different languages, which is a great help for people learning or using the product in regions for which we don't currently localize. 
+Here's a tooltip in Arabic, for instance:</p>
+
+<center>
+<img src="img/transtips_arabic.png" alt="Arabic AutoCAD tooltip"/>
+</center>
+
+<p>Kean quickly followed up the original proof of concept with an 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/07/caching-translations-of-autocad-tooltips-using-net.html">
+improved implementation</a> including caching and other features.
+
+<p>Thanks to the fact that many Autodesk products are now sharing a number of basic platform tools, it is possible to use the same tooltip translation mechanism for Revit.
+
+<p>This tool mainly uses AdWindows.dll, the .NET assembly providing the Autodesk.Windows namespace, which provides part of the ribbon user interface implementation.
+
+<p>As Rudolf Honke already pointed out in a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+number of posts on UI Automation</a>, the .NET framework provides a lot of powerful functionality for manipulating and hooking into the ribbon.
+
+<p>To catch the tooltips being displayed, we can subscribe to the Autodesk.Windows.ComponentManager.ToolTipOpened event, which is fired for all tooltips.
+
+<p>Here is a snapshot of an initial prototype of the tooltip translation, running in an English version of Revit and causing it to display its tooltips in Italian:</p>
+
+<center>
+<img src="img/transtips_revit_it.png" alt="Italian Revit tooltip"/>
+</center>
+
+<p>The current prototype implementation makes use of a very simplistic front end in which you explicitly specify the source and target languages:</p>
+
+<center>
+<img src="img/transtips_revit_dlg.png" alt="Source and target language form"/>
+</center>
+
+<p>Obviously, in a more foolproof and user friendly version, the source language would be determined automatically from the Revit application, and the target version would at least default to the OS language.
+
+<p>Currently, this prototype for Revit is working quite well.
+The source has only small differences to the AutoCAD implementation.
+Revit's way to work with tooltips differs slightly from AutoCAD, in that most of the ribbon items need to be resolved on the first run.
+
+<p>We are planning to clean this up some more, which should be pretty straightforward. 
+Having a separate source file included in both projects is probably enough, and there is no need for a separately compiled component. 
+
+<p>Reporting errors is currently handled in AutoCAD by posting to the command line, and in Revit by displaying a task dialogue. 
+That will need to be resolved, presumably by defining a 'ProcessWebException' or 'display error' call-back, or something. 
+
+<p>Obviously, this tool has little to do with the Revit API, actually, and the functionality may possibly even be achievable from a stand-alone external executable.
+It does have to load and access the functionality in the AdWindows.dll .NET assembly, though.
+The easiest (and maybe only?) way to do that is to implement it as an add-in.
+
+<p>You can translate back into English by setting the target language to English.
+The AutoCAD version implements a 'None' option which also does this.
+
+<p>The source and target languages are managed by storing the language code in global class variables.
+We have not implemented indexing into the arrays of language names and codes, because these indices would become invalid in offline mode with just the pre-existing or deployed translations on disk to work from.
+
+<p>So, without further ado, let's take a look at the source code for this utility in its current untested form.
+First of all, here is the very simple external command implementation:
+
+<pre class="code">
+<span class="blue">namespace</span> TransTipsRvt
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TransTips</span>.Run();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>All the add-in does is run the TransTips class static method Run.
+Since it does not touch the Revit database at all, it can use a read-only transaction mode.
+
+<p>The TransTips Run method queries the web service for the available languages, displays the form prompting for the source and target language, and then hijacks the tooltips for translation. 
+The latter is identical to Kean's implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> Run()
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; codes = GetLanguageCodes();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; names =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;( GetLanguageNames( codes ) );
+&nbsp;
+&nbsp; <span class="green">// Get the name corresponding to a language code</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> srcName =
+&nbsp; &nbsp; names[codes.FindIndex( x =&gt; x.Equals( _srcLang ) )];
+&nbsp;
+&nbsp; <span class="blue">string</span> trgName =
+&nbsp; &nbsp; names[codes.FindIndex( x =&gt; x.Equals( _trgLang ) )];
+&nbsp;
+&nbsp; <span class="teal">TransTipsForm</span> dlg =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">TransTipsForm</span>( names, srcName, trgName );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == dlg.ShowDialog() )
+&nbsp; {
+&nbsp; &nbsp; _srcLang = codes[ names.FindIndex(
+&nbsp; &nbsp; &nbsp; x =&gt; x.Equals( dlg.SourceLanguage ) ) ];
+&nbsp;
+&nbsp; &nbsp; _trgLang = codes[ names.FindIndex(
+&nbsp; &nbsp; &nbsp; x =&gt; x.Equals( dlg.TargetLanguage ) ) ];
+&nbsp; }
+&nbsp; HijackTooltips();
+}
+</pre>
+
+<p>Here is the 
+
+<a href="zip/TransTipsRvt02.zip">complete Visual Studio solution</a>, as well as a 
+
+<a href="zip/TransTipsRvt.dll">compiled DLL</a> and 
+
+<a href="zip/TransTipsRvt.addin">add-in manifest file</a>,
+
+in case you wish to test this without compiling it yourself.
+
+<p>Here is a last snapshot from my final test run before posting, displaying the 'Modify' tooltip of an English Revit in Korean:
+
+<center>
+<img src="img/transtips_revit_ko.png" alt="Korean Revit tooltips"/>
+</center>
+
+<p><strong>Addendum:</strong> Please also look at Kean Walmsley's updated single solution which will build 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/07/translating-tooltips-in-both-autocad-and-revit-using-net.html">
+TransTips for both AutoCAD and Revit</a> (including 
+
+built versions of the DLLs), 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/07/translating-tooltips-inside-autocad-inventor-and-revit-using-net.html">
+TransTips for AutoCAD, Inventor and Revit</a>, and later for
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/08/translating-tooltips-in-autocad-inventor-revit-and-3ds-max-using-net.html">
+AutoCAD, Inventor, Revit and 3ds Max</a>.
+
+<!--
+
+<p>Later:
+
+<pre>
+From: Krisztian Hegedus 
+Sent: Wednesday, July 27, 2011 10:00 AM
+To: Uwe Wassermann; Tomoko Sasaki; Elena Arroyo
+Cc: Steven Butler; Tony Sinisi; Jeremy Tammik; Kean Walmsley
+Subject: RE: Automatic tooltip translation in the AIR products
+</pre>
+
+<p>The machine translation is an extremely interesting 'free' solution. I've seen couple of real-life cases where people are using eg. the automatic Google toolbar translation for web pages. It is seamless (similar to the translation solution below) but the biggest trouble is of course the quality of it.
+
+<p>It would be nice to see the solution below as a built-in solution, otherwise most of our users will never able to give even a try.
+
+<p>On the other side, I found interesting the Facebook way where the translation was made and QA-d by the members of the social network. It showed that one of the quickest, best QA-d, fast reacting and probably most cost effective translation in today cloud-based world can be completed by the user's community (with moderation of course).
+
+<p>For months, volunteer translators around the world have been using Facebook's innovative Translations application to translate all 24,000 phrases on Facebook into Spanish, German, and French. Now, Facebook has opened up the Translation application to everyone in order to translate Facebook into every major language on earth.
+
+<p>www.insidefacebook.com/2008/04/02/now-you-can-help-translate-facebook-into-any-language
+
+<pre>
+From: Kean Walmsley 
+Sent: Wednesday, July 27, 2011 11:10
+To: Krisztian Hegedus; Uwe Wassermann; Tomoko Sasaki; Elena Arroyo
+Cc: Steven Butler; Tony Sinisi; Jeremy Tammik
+Subject: RE: Automatic tooltip translation in the AIR products
+</pre>
+
+<p>I think it's worth considering Machine Translation is the first step: much in the same way as our Localization team uses MT as a productivity tool for translators, this app could also be considered a productivity tool for crowdsourced localization. It'd be a relatively simple step to implement in-product editing/submission of the content, allowing us to gather and approve community translations. And if a single partner wanted to invest in delivering their own 'complete' tooltip localization, the same mechanism could be used by them to collect the strings in XML and allow editing and deployment for offline use by their customers. 
+
+<p>I'd be interested to see this becoming a core feature, but there are alternative distribution mechanisms to consider, in case (Labs or the Exchange Stores, as they come online for our various products).
+
+-->

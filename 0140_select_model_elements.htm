@@ -1,0 +1,184 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Selecting Model Elements</h3>
+
+<p>This morning I woke up really early.
+The hotel clock was set incorrectly, so when I woke up and looked at it, I thought I was much too late for my meeting.
+I jumped out of bed, grabbed and packed all my things and ran out of the room to the lobby, where I noticed that it seemed rather quiet outside and the light was very soft and special in the early morning.
+Up here in the north it does get light very early, though.
+At least I noticed my error before actually getting out into the street.
+Now I am unable to sleep, sitting in bed and writing this post.</p>
+
+<p>The Revit API Introduction Lab 2-2 demonstrates how to select all model elements, i.e. elements which are visible on the graphics screen and represent physical parts in the building model.
+
+This lab is part of the sample code used to explain the basics of programming Revit in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/revit-api-introduction-webcast.html">
+Revit programming webcast</a>.
+
+When updating this code for Revit 2010, I noticed that one change has occurred in Revit which causes this command to return incorrect results.
+
+First let us have a look at the original version which worked properly in Revit 2009, and then discuss the changes I made for 2010.</p>
+
+<p>In 2009, we used the following helper method to select all model elements:</p>
+
+<pre class="code">
+public static ElementSet GetAllModelElements(
+  Application app )
+{
+  ElementSet elems = app.Create.NewElementSet();
+
+  Geo.Options opt = app.Create.NewGeometryOptions();
+
+  ElementIterator iter = app.ActiveDocument.Elements;
+  while( iter.MoveNext() )
+  {
+    Element e = iter.Current as Element;
+
+    if( !( e is Symbol || e is FamilyBase ) )
+    {
+      if( null != e.Category )
+      {
+        if( null != e.get_Geometry( opt ) )
+        {
+          elems.Insert( e );
+        }
+      }
+    }
+  }
+  return elems;
+}
+</pre>
+
+<p>It iterates over all elements in the active document and checks their class, category and geometry content to select the model elements.
+The selected elements are stored in a new element set, which is returned to the caller.</p>
+
+<p>When asking the elements for their geometry, a geometry options instance must be provided.
+This argument cannot be null.
+Otherwise, an exception will be thrown.
+However, its detail level property and other properties may be left uninitialized.
+
+<p>The iterator type can be specified as either ElementIterator or IEnumerator.
+The iterator returned by the document Elements property is in fact an ElementIterator instance.
+This class is derived from the IEnumerator interface, and we only make use of the base class functionality, so an IEnumerator instance could be used just as well.</p>
+
+<p>All the objects returned by the iterator are Autodesk.Revit.Element instances.
+It would be nice to know that we only need to check for certain specific types of objects, derived from the Autodesk.Revit.Element class, for example FamilyInstance and HostObject classes.
+Unfortunately, some Revit building model objects such as stairs are still represented in the API using the generic Autodesk.Revit.Element class, so this is not possible.
+Instead, we use the inverse approach of eliminating certain element types which are <strong>not</strong> used for building model objects, namely the Symbol and FamilyBase classes.</p>
+
+<p>All building model objects have a valid category and non-empty geometry, so those properties can be used reliably.</p>
+
+<p>However, in Revit 2010, running the same code suddenly returns a number of unexpected objects, even in an empty model.</p>
+
+<h3>Legend Component Geometry</h3>
+
+<p>The reason for the change in behaviour in Revit 2010 is that legend component objects now also return geometry.
+Since they are represented by Autodesk.Revit.Element instances, are not Symbol or ElementBase instances, and also have a valid category, they pass all the filters applied above in spite of not being model objects.
+Here is a list of the legend component elements returned in Revit 2010 in an empty model (copy to an editor to see the full line length):</p>
+
+<pre>
+There are 50 model elements:
+  Name=Basic Wall : Generic - 150mm (Floor Plan); Category=Legend Components; Id=137075
+  Name=Basic Wall : Interior - 138mm Partition (1-hr) (Floor Plan); Category=Legend Components; Id=137076
+  Name=Basic Wall : Exterior - Brick and Block on Mtl. Stud (Floor Plan); Category=Legend Components; Id=137077
+  Name=Basic Roof : Generic Roof - 300mm (Section); Category=Legend Components; Id=137078
+  Name=Basic Roof : Generic Roof - 750mm (Section); Category=Legend Components; Id=137079
+  Name=Basic Roof : Generic Roof - 500mm (Section); Category=Legend Components; Id=137080
+  Name=Floor : Generic Floor - 400mm (Section); Category=Legend Components; Id=137081
+  Name=Basic Ceiling : Generic (Section); Category=Legend Components; Id=137082
+  Name=Basic Wall : Generic - 200mm (Floor Plan); Category=Legend Components; Id=137083
+  Name=Basic Wall : Generic - 250mm (Floor Plan); Category=Legend Components; Id=137084
+  Name=Basic Wall : Generic - 300mm (Floor Plan); Category=Legend Components; Id=137085
+  Name=Basic Wall : Generic - 375mm (Floor Plan); Category=Legend Components; Id=137086
+  Name=Basic Wall : Generic - 300mm Masonry (Floor Plan); Category=Legend Components; Id=137087
+  Name=Basic Wall : Generic - 200mm CMU (Floor Plan); Category=Legend Components; Id=137088
+  Name=Basic Wall : Generic - 150mm Masonry (Floor Plan); Category=Legend Components; Id=137089
+  Name=Basic Wall : Exterior - EIFS on Mtl Stud (Floor Plan); Category=Legend Components; Id=137090
+  Name=Basic Wall : Generic - 90mm Brick (Floor Plan); Category=Legend Components; Id=137091
+  Name=Basic Wall : Interior - 79mm Partition (1-hr) (Floor Plan); Category=Legend Components; Id=137092
+  Name=Basic Wall : Interior - 123mm Partition (1-hr) (Floor Plan); Category=Legend Components; Id=137093
+  Name=Basic Wall : Interior - 135mm Partition (2-hr) (Floor Plan); Category=Legend Components; Id=137094
+  Name=Basic Wall : Interior - 126mm Partition (2-hr) (Floor Plan); Category=Legend Components; Id=137095
+  Name=Basic Wall : Exterior - Brick on CMU (Floor Plan); Category=Legend Components; Id=137096
+  Name=Curtain Wall (Floor Plan); Category=Legend Components; Id=137097
+  Name=Floor : Wood Joist 220mm - Wood Finish (Section); Category=Legend Components; Id=137098
+  Name=Floor : Steel Bar Joist - VCT on LW Concrete  (Section); Category=Legend Components; Id=137099
+  Name=Basic Roof : Wood Rafter 184mm - Asphalt Shingles (Section); Category=Legend Components; Id=137100
+  Name=Basic Roof : Steel Truss - Insulation on Metal Deck- EPDM (Section); Category=Legend Components; Id=137101
+  Name=Basic Wall : Foundation - 300mm Concrete (Floor Plan); Category=Legend Components; Id=137102
+  Name=Basic Wall : Retaining - 300mm Concrete (Floor Plan); Category=Legend Components; Id=137103
+  Name=Basic Wall : Generic - 200mm - Filled (Floor Plan); Category=Legend Components; Id=137104
+  Name=Basic Roof : Generic Roof - 300mm - Filled (Section); Category=Legend Components; Id=137105
+  Name=Floor : Generic Floor - 400mm - Filled (Section); Category=Legend Components; Id=137106
+  Name=Compound Ceiling : 600 x 1200mm grid (Section); Category=Legend Components; Id=137107
+  Name=Compound Ceiling : 600 x 600mm grid (Section); Category=Legend Components; Id=137108
+  Name=Compound Ceiling : GWB on Mtl Stud (Section); Category=Legend Components; Id=137109
+  Name=Roof Soffit : Generic - 300mm (Section); Category=Legend Components; Id=137110
+  Name=Curtain Wall : Exterior Glazing (Floor Plan); Category=Legend Components; Id=137111
+  Name=Curtain Wall : Storefront (Floor Plan); Category=Legend Components; Id=137112
+  Name=Basic Wall : Exterior - Brick on Mtl. Stud (Floor Plan); Category=Legend Components; Id=137113
+  Name=Stacked Wall : Exterior - Brick Over Block w Metal Stud (Floor Plan); Category=Legend Components; Id=137114
+  Name=Basic Wall : Exterior - Block on Mtl. Stud (Floor Plan); Category=Legend Components; Id=137115
+  Name=Foundation Slab : 150mm Foundation Slab (Section); Category=Legend Components; Id=137116
+  Name=; Category=Legend Components; Id=137117
+  Name=; Category=Legend Components; Id=137118
+  Name=; Category=Legend Components; Id=137119
+  Name=; Category=Legend Components; Id=137120
+  Name=; Category=Legend Components; Id=137121
+  Name=; Category=Legend Components; Id=137122
+  Name=; Category=Legend Components; Id=137123
+  Name=; Category=Legend Components; Id=137124
+</pre>
+
+<p>These legend components are the keepers of the images displayed in the type preview dialog.
+The graphical previews are new in 2010 and so the presence of these elements is also new.
+The exposure of their geometry to the API is not intentional and may be removed again in future.
+Their only function is to create and hold that one image, and the user has no other way to interact with them.
+
+<p>How can we improve our filter to eliminate these unwanted elements?
+
+<p>Since the legend components have a valid category, we could simply add that additional criterion to the list of properties that we are checking, for instance like this:
+
+<pre class="code">
+const string _CategoryNameLegendComponents
+  = "Legend Components";
+
+  if( !(e is Symbol)
+    && !(e is FamilyBase)
+    && (null != e.Category)
+    && (_CategoryNameLegendComponents != e.Category.Name)
+    && (null != e.get_Geometry(opt)) )
+  {
+    // . . .
+  }
+</pre>
+
+<p>Instead of using a string comparison on the category name, we could also determine the element id of the legend component category and compare that with each candidate element id.
+
+<p>However, both of these options would add yet another item to an already lengthy list of checks.
+
+<p>A simpler option that seems to work well in the tests I have run so far is to skip checking the object type at all, and replacing it by requiring a valid level, like this:</p>
+
+<pre class="code">
+  if( (null != e.Category)
+    && (null != e.Level)
+    && (null != e.get_Geometry(opt)) )
+</pre>
+
+<p>Besides being simpler and easier to understand, this check is probably also slightly more efficient.
+It has not been extensively tested yet, so please let me know if you discover any situations in which it fails.
+
+<p>Here is the current version of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20090518.zip">
+Revit API introduction labs</a>,
+
+including the new version of Lab 2-2 to select all model elements using this criterion.
+The labs are still in the process of being further updated and enhanced for the Revit 2010 API and its new features.
+All of the labs are provided in two versions, one each for C# and VB.</p>

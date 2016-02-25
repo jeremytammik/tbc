@@ -1,0 +1,113 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Document Modification in an Event</h3>
+
+<p>Here is a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html?cid=6a00e553e1689788330115706bb24f970b#comment-6a00e553e1689788330115706bb24f970b">
+question</a>
+
+raised by Phillip Miller on the topic of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/new-2010-events.html">
+new 2010 events</a>:</p>
+
+<p><strong>Question:</strong>
+I'm having trouble with the DocumentClosing event.
+I want to set parameters of objects as Revit closes down the document.
+I'm using element.Parameter("Schedule").Set(nul), but the error says that Revit can't do it outside of the transaction.
+I tried wrapping the command in a Transaction but that fails as well.
+I am however using the same code to set parameters on objects during the DocumentOpened event.
+Any suggestions or can it even be done?</p>
+
+<p><strong>Answer:</strong>
+First, here is some background information on the various document closing events in the Revit 2009 and 2010 APIs.</p>
+
+<p>In 2009, we have the Application.OnDocumentClosed event, to be notified after a document is closed.
+
+OnDocumentClosed is marked obsolete in 2010, and we are asked to use the DocumentClosed event instead.
+The Revit 2009 API also provides the OnClose event on the Document class, to be notified before the current document is closed.
+This is also marked obsolete in 2010, and replaced by the DocumentClosing event.</p>
+
+<p>In 2010, the Application.DocumentClosing event notifies when Revit is just about to close a
+
+document, and DocumentClosed notifies immediately after it has finished closing it.
+On the Document class, DocumentClosing notifies when Revit is just about to close the document.
+
+<p>The documentation on the Application.DocumentClosing event states that the document may not be
+
+modified during this event, so that is probably why your parameter modification is failing.
+
+<p>On the Document.DocumentClosing event, the documentation states that the event is raised when Revit
+
+is just about to close the document, and that this document-level event precedes the
+
+application-level event of the same name. This event is cancellable, except when it is raised during
+
+close of the application. Here again, the document may not be modified during this event.
+
+<p>This seems a bit strange to me, because one reason to want to watch this event might be in order to
+
+add some last-minute information to it, such as the parameter modification you are attempting.
+
+<p>Aaah, I just had an idea. When the document is being closed, we can assume that Revit really has finished with it and nothing more can be done, no further modifications applied or saved. If we wish to modify a document, then that only makes sense if the modifications will also be saved. In that case, we do not need to watch out for DocumentClosing, but for DocumentSaving.
+
+<p>In all of the document and application level DocumentSaving and DocumentSavingAs events, the documentation states that the document may be modified during this event.
+
+<p>So the solution to your issue is to use the DocumentSaving and DocumentSavingAs events instead of DocumentClosing, since you actually wish to apply modifications before closing the document.
+
+<h4>Further Exploration and Background</h4>
+
+<p>After providing the information above, the discussion with Phillip continued, and he provided the following update:</p>
+
+<p>Thank you so much for your quick reply.  It was very helpful and unfortunately confirmed for me what I thought was happening.  I thought the whole idea of DocumentClosing was that I would be able to do things to the document before it closes?
+
+<p>Essentially what I am doing is passing parameters from Revit objects to a calculator that I have created.
+It does calculations on the information and then passes the correct information back to Revit and sets the parameters.
+All this information is then shown in schedules.
+
+<p><strong>What I would like to do:</strong> on document closing, set the parameters that our calculator calculates to nothing.
+Therefore, when a person opens it without our tools, the schedules show with all the correct info except what our calculator calculates.
+The fields will be blank.
+When a person opens the document that has our tools installed, the parameters will be recalculated and populated again.
+
+<p><strong>A work around maybe:</strong> catch the document closing event, set a project wide variable or maybe a registry entry to False.
+Then cancel the doc closing and fire up the save event.
+Catch the save event, and if the variable is False, set all of our parameters to nothing, then close Revit.
+This time, in the Document Close event, the document will close because the variable is false.
+Maybe this would work.
+
+<p>Can we through the API save a Revit document and close a Revit document?
+
+<p>Once again thank you so much for taking the time to look at this for me.
+It is greatly appreciated.
+I have learnt so much from your blog even though it is in C#.
+
+<p>I have tried calling the Doc.Save() method from within the DocClosing event and guess what.
+It is disabled.
+I think the only way I can do this is to always cancel the Document closing and pop up with a message that the user needs to use my close document command where I can set the parameters and then close the document.
+Not a very nice way of doing things, but it looks as though I will just have to wait and hope that in the 2011 API it is different.
+
+<h4>Further Replies</h4>
+
+<p>As said, DocumentClosing is sent when the document is closing, but <strong>after</strong> all changes have been applied.
+So calling Save from this context is also not possible.
+I would not bank on this being different in any future releases of the API.</p>
+
+<p>The Revit API does of course allow us to both save and close a document. For instance, the Document class itself provides Save, SaveAs and Close methods. Just not in the closing event, when no more changes are possible.</p>
+
+<p>As repeatedly stated, there should be no difference between having the blog code in C# or VB, since
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/converting-between-vb-and-c-and-net-decompilation.html">
+conversion</a>
+
+is easy and the features are identical. I am sorry if that makes it harder for you to read, though.</p>
+
+<p>I am absolutely no expert on copy protection, but it all seems a bit dodgy to me.
+I would hope that you can find some simpler and more streamlined method.
+Good luck, in any case, and thank you very much Phillip for the interesting discussion!</p>

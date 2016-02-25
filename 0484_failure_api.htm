@@ -1,0 +1,403 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Joe Ye article for ADN - AEC Customization Newsletter - BIM Edition - Fall 2010 -->
+
+<h3>Failure API Take Two</h3>
+
+<p>Before I get into today's topic, let me lament a bit about my Wednesday morning.
+
+<h4>Travel Woes</h4>
+
+<p>I am flying to Las Vegas today in order to have time for last-minute AU preparations and acclimatise properly there.
+For reasons unknown to me, my travel agent (who shall remain unnamed here in public) booked me a flight leaving at seven in the morning from Switzerland to London, and a continuation from London to Las Vegas with an eight hour wait in between.
+I have a brother in London, so we arranged to meet, making the wait quite a tolerable affair.
+
+<p>Be that as it may, I tried to check in online to my British Airways flight yesterday morning. 
+The system asked me to enter all my data, which took ten or fifteen minutes the first time around, then went ahead and processed my entry for a while, only to return with an error message saying something went wrong, and please to try later. 
+So I did. 
+Three times, in fact, with a couple of hours in between each attempt, to no avail.
+Rather frustrating, of course, since I had to re-enter all my data for each attempt.
+
+<a href="http://en.wikipedia.org/wiki/SNAFU">
+Snafu</a>...
+
+
+<p>This morning at the airport, I checked in, everything seemed in order, but there was a problem in the very last step, printing the boarding pass. 
+It turned out to be the 
+
+<a href="http://en.wikipedia.org/wiki/Electronic_System_for_Travel_Authorization">
+US ESTA</a>. 
+
+Since i visited the US in June and the ESTA is valid for two years, I assumed that would not be a problem. 
+I updated my passport in the meantime, though, and now I apparently need a new ESTA. 
+<a href="http://en.wikipedia.org/wiki/SNAFU">
+Snafu</a>...
+
+<p>They asked me to go to an Internet point next door and reapply for the new ESTA, which I did. 
+The machine accepted coins only; I bought ten minutes of time, filled in the form, everything complete, and reached the validation step just before the ten minutes were up. 
+The machine would not accept my next coin. 
+Result: start again from scratch. 
+
+<a href="http://en.wikipedia.org/wiki/SNAFU">
+Snafu</a>...
+
+<p>The second time around I was much faster, completed the form in five minutes, and was told by the system that I could either pay immediately or within seven days' time. 
+I was in deep stress by now, afraid of missing my flight, so I thought "ok, I'll do it when I arrive, within seven days", and went back to check in. 
+Same problem. 
+Apparently, payment is required within seven days, but also before departure. 
+And the latter was not mentioned. 
+By now, of course, the flight was closed.
+
+<a href="http://en.wikipedia.org/wiki/SNAFU">
+Snafu</a>...
+
+<p>The next step in the list of bungles is the fact that my unnamed travel agent had booked me on this early flight at seven in the morning, with the continuation three in the afternoon. 
+I wonder why they did that? 
+Anyway, it turns out there is another flight at lunch time that serves just as well, and I am now rebooked for that. 
+And successfully checked in as well, I am pleased to say.
+
+<p>BA was kind enough to let me enter the lounge, which provides Internet access, so I can went my frustration here.
+Thank you for that, at least.
+
+<p>Summary:
+
+<ul>
+<li>The British Airways online check-in system should have told me what the problem was.
+<li>I should have thought of checking my ESTA validity.
+<li>The Internet machine should have accepted my second coin.
+<li>The ESTA processing form should have said payment is required before departure.
+<li>The travel agent should have booked the later flight; really, I wonder why they did not?
+<li>Thank God they didn't!
+</ul>
+
+<p>Anyway, I think I can leave that topic now, to return to the Revit API.
+I already gave a brief introduction to the Revit 2011
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">
+Failure API and the ErrorHandling SDK Sample</a>
+
+which demonstrates its use.
+
+<p>By the way, maybe the story above just illustrates my real-world failure API taking control of the snafu?
+
+<p>One of the most common uses of this API is to disable undesired warning and error messages.
+Previously, one way to achieve this was to use an older and simpler approach based on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/autoconfirm-save-using-dialogboxshowing-event.html">
+DialogBoxShowing event</a>.
+
+The Failure API provides a much more powerful and complete solution, as we showed in the discussions on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/editing-elements-inside-groups.html">
+editing elements inside groups</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/suppress-unwanted-dialogue.html">
+suppressing an unwanted dialogue</a>.
+
+<p>Now Joe Ye of Autodesk Beijing wrote the following more extensive introduction to the Failure API, including several interesting examples:
+
+<h4>Failure Posting and Handling API</h4>
+
+<p>Revit posts failure messages which may report either a warning or an error when there are issues in the model. 
+For example, when two walls partially overlap, Revit displays the following warning message:</p>
+
+<center>
+<img src="img/failure_wall_overlap.png" alt="Wall overlap warning message"/>
+</center>
+ 
+<p>Revit 2011 exposes the Failure API for posting and handling these kinds of failures. 
+Failure posting APIs can be used to define and register new custom failures. 
+Custom failures can be posted in your own plug-ins. 
+Failure handling APIs can delete or resolve Revit failures when an operation on the model has been submitted. 
+You can do something to the model during the handling process. 
+If failures are handled by the failure handling API, users might not see the warning or error dialogs at all as if everything goes well. 
+In fact, these failures are handled by your application.
+
+<h4>Failure Posting</h4>
+
+<p>The failure posting API is easy to use. 
+A new failure definition can be registered in the OnStartup method of an external application, and then the failure severity and resolution type can be set. 
+Here is the code showing the registration of a warning. 
+Once custom failings have been registered, they can be posted in your program.
+Here is a code fragment to register a custom failure:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+{
+&nbsp; <span class="green">// Create failure definition Ids</span>
+&nbsp;
+&nbsp; m_idWarning = <span class="blue">new</span> <span class="teal">FailureDefinitionId</span>( <span class="blue">new</span> <span class="teal">Guid</span>( 
+&nbsp; &nbsp; <span class="maroon">&quot;0C3F66B5-3E26-4d24-A228-7A8358C76D39&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// Create failure definition and add resolution</span>
+&nbsp;
+&nbsp; m_fdWarning 
+&nbsp; &nbsp; = <span class="teal">FailureDefinition</span>.CreateFailureDefinition( 
+&nbsp; &nbsp; &nbsp; m_idWarning, <span class="teal">FailureSeverity</span>.Warning, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;I am the warning.&quot;</span> );
+&nbsp;
+&nbsp; m_fdWarning.AddResolutionType( 
+&nbsp; &nbsp; <span class="teal">FailureResolutionType</span>.MoveElements, 
+&nbsp; &nbsp; <span class="maroon">&quot;MoveElements&quot;</span>, <span class="blue">typeof</span>( <span class="teal">DeleteElements</span> ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The Document.PostFailure method is used to notify the document of a problem. 
+
+<p>Here is a code fragment to post a custom failure:
+
+<pre class="code">
+&nbsp; transaction.Start();
+&nbsp;
+&nbsp; <span class="teal">FailureMessage</span> fm 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FailureMessage</span>( m_idWarning );
+&nbsp;
+&nbsp; m_doc.PostFailure( fm );
+&nbsp;
+&nbsp; transaction.Commit();
+</pre>
+
+<p>Failures will be validated and possibly resolved at the end of the transaction.  
+
+<h4>Failure Handling</h4>
+
+<p>Normally posted failures are processed by Revit's standard failure resolution UI at the end of transaction. 
+The user is presented information and options in the UI to deal with the failures. 
+Besides, if operations on the document require some special treatment for certain errors (or even all possible errors), you can customize automatic failure resolution. 
+
+<p>Revit may detect failures at the end of any transaction.
+When it does so, it starts to handle the failures in repeated cycles. 
+Each cycle of failure processing includes three steps:
+
+<ul>
+<li>Failure pre-processing (IFailuresProcessor)
+<li>Failure processing event (FailureProcessing event)
+<li>Final processing (IFailureProcessor)
+</ul>
+
+<p>These steps are called one by one in a cycle. 
+Each of these three steps can control what happens and whether to continue to the next step by returning different FailureProcessingResults. 
+Corresponding with these three steps, there are two interfaces and an event to implement failure handling. 
+If you know the transaction, IFailuresPreprocessor can be used. 
+To handle all possible errors, you can use the FailuresProcessing event. 
+Finally, the IFailuresProcessor interface offers the ability to completely replace the standard failure processing. 
+
+<p>Implement IFailuresPreprocessor interface and its method PreprocessFailures to handle failures. 
+Register and define an event handler to handle all failures. 
+Implement IFailureProcessor interface and its ProcessFailures method to implement final failure handling. 
+
+<p>In each step, we can delete elements, delete a warning, and resolve or post a failure.
+All actions that can be taken are wrapped in the FailuresAccessor class.
+
+<h4>Handling a Warning</h4>
+
+<p>Here is a sample showing how to handle a warning posted by deleting the last instance of a linked Revit model. The following warning message is displayed to the user if no failure handling mechanism has been added:</p>
+
+<center>
+<img src="img/failure_link_removal.png" alt="Link removal warning"/>
+</center>
+
+<p>Revit users can manually click one of the three buttons to respond to the warning and dismiss the dialog. 
+Instead, we will use failure handling APIs to mimic the manual click. 
+First we use an event to handle the warning. 
+
+<p>You can define the event handler and register to the FailuresProcessing event in an external command like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RegisterFailureEvent</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; app.Application.FailuresProcessing 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">FailuresProcessingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; OnFailuresProcessing );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define event handler.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> OnFailuresProcessing( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">FailuresProcessingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FailuresAccessor</span> failuresAccessor 
+&nbsp; &nbsp; &nbsp; = e.GetFailuresAccessor();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> transactionName 
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetTransactionName();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; fmas 
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fmas.Count == 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// FailureProcessingResult.Continue is to let </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the failure cycle continue next step.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; e.SetProcessingResult( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FailureProcessingResult</span>.Continue );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If manually delete an element, the </span>
+&nbsp; &nbsp; <span class="green">// transaction name is 'Delete Selection'</span>
+&nbsp; &nbsp; <span class="green">// if the failure is caused by deleting element.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( transactionName.Equals( <span class="maroon">&quot;Delete Selection&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> fma <span class="blue">in</span> fmas )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the following line mimics clicking the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 'Remove Link' button to resolve </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the failure.&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.ResolveFailure( fma );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the following line mimics clicking the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 'Ok' button by just deleting the warning.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//failuresAccessor.DeleteWarning(fma);&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; e.SetProcessingResult( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FailureProcessingResult</span>.ProceedWithCommit );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; e.SetProcessingResult( <span class="teal">FailureProcessingResult</span>.Continue );
+&nbsp; }
+}
+</pre>
+
+<p>The code in the event handler above shows two options to handle the warning. 
+The uncommented one resolves the warning, so that both the linked model and the linked file are removed. 
+If you comment the line saying 'failuresAccessor.ResolveFailure(fma)' and uncomment the 'failuresAccessor.DeleteWarning(fma)' one, the linked model is removed and the linked file remains. 
+
+<p>Steps to use the failure handling above:
+
+<ol>
+<li>Build the code in a project, and create an add-in manifest file to load it into Revit.
+<li>Start Revit and create a new document.
+<li>Run the external command to register the event handler.
+<li>In the current Revit document, import a Revit model.
+<li>Delete the linked model using Revit's 'Delete' command.
+<li>You will see the expected result.
+</ol>
+
+<h4>Pre-processing a Warning</h4>
+
+<p>Now we will talk about how to pre-process warning. 
+To use the IFailuresPreprocessor interface to handle failures, we need to register the interface derived class to transaction. 
+Then the derived interface class will be triggered when the failure is posted. 
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">RegenerationAttribute</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">FailureHandle</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( 
+&nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;DeleteLinkedModel&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FailureHandlingOptions</span> options 
+&nbsp; &nbsp; &nbsp; = trans.GetFailureHandlingOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MyPreProcessor</span> preproccessor 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">MyPreProcessor</span>();
+&nbsp;
+&nbsp; &nbsp; options.SetFailuresPreprocessor( preproccessor );
+&nbsp; &nbsp; trans.SetFailureHandlingOptions( options );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = app.ActiveUIDocument.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> ref1 = sel.PickObject( <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a linked model instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = ref1.Element;
+&nbsp;
+&nbsp; &nbsp; doc.Delete( elem );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Define a failure preprossor to handle failure</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">MyPreProcessor</span> : <span class="teal">IFailuresPreprocessor</span>
+{
+&nbsp; <span class="teal">FailureProcessingResult</span> 
+&nbsp; &nbsp; <span class="teal">IFailuresPreprocessor</span>.PreprocessFailures( 
+&nbsp; &nbsp; &nbsp; <span class="teal">FailuresAccessor</span> failuresAccessor )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">String</span> transactionName 
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetTransactionName();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; fmas 
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fmas.Count == 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We already know the transaction name.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( transactionName.Equals( <span class="maroon">&quot;DeleteLinkedModel&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> fma <span class="blue">in</span> fmas )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ResolveFailure mimics clicking </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 'Remove Link' button&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; .</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.ResolveFailure( fma );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// DeleteWarning mimics clicking 'Ok' button.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//failuresAccessor.DeleteWarning( fma );&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .ProceedWithCommit;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+}
+</pre>
+
+<p>Failure pre-processing can only be used for the failures caused by actions in your transaction. 
+In the sample, we delete the linked model by picking it and then delete it in our transaction. 
+The core code to handle the failure is the same as the event method above. 
+
+<h4>Further Reading</h4>
+
+<p>This article is a general introduction to the failure posting and handing mechanism. 
+More resources are provided in the Revit 2011 SDK. 
+The sample project ErrorHandling shows more Failure API functionality. 
+A detailed description of the Failure API is provided in Chapter 26 of the Developer Guide in the Revit 2011 SDK.  
+For a reference to all relevant classes and methods, please refer to the Revit API help file RevitAPI.chm.
+
+<p>Many thanks to Joe for the useful overview and samples!

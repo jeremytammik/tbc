@@ -1,0 +1,79 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 06979261 [Updating compound layers of walls] -->
+
+<h3>Updating the Wall Compound Layer Structure</h3>
+
+<p>We have a new Revit API supporter on the DevTech team!
+
+<p>Balaji joined ADN DevTech a year or two ago and dived straight into supporting AutoCAD with great zest, setting new records in speed and efficiency.
+Now he addressed his first Revit API case, on how to update a wall compound layer structure.
+
+<p>We touched on this topic in the past when discussing the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/many-issues-resolved.html#1264438">
+changes made to the CompoundStructure class</a> in
+
+Revit 2012.
+
+<p>An example is also given by the CmdNewWallLayer external command in The Building Coder samples, which required a complete rewrite due to these changes when 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">
+migrating The Building Coder samples to Revit 2012</a>.
+
+<p>Here is Balaji's case:
+
+
+<p><strong>Question:</strong> I have been updating wall layers through the API, but I am having trouble with the layer thicknesses in a wall with a compound structure. What might I be doing wrong?
+
+<p><strong>Answer:</strong> As explained in the ADN technical solution on
+
+<a href="http://adn.autodesk.com/adn/servlet/devnote?siteID=4814862&id=16779684&linkID=4901650">
+Changes to compound layer don't apply to wall type</a>, 
+
+accessible to ADN members only, GetCompoundStructure works on a copy and the modifications to the compound structure do not change the original type until SetCompoundStructure is called.
+
+<p>Here is a snippet of sample code that uses the CompoundStructure SetLayerWidth method and works ok:
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uiDoc = uiApp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;changeLayerWidth&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Reference</span> ref1 = uiDoc.Selection.PickObject( 
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;Pick a wall&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> id = ref1.ElementId;
+&nbsp; <span class="teal">Element</span> elem = doc.get_Element( id );
+&nbsp; <span class="teal">Wall</span> wall = elem <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; <span class="blue">if</span>( wall == <span class="blue">null</span> )
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; <span class="teal">CompoundStructure</span> cs 
+&nbsp; &nbsp; = wall.WallType.GetCompoundStructure();
+&nbsp;
+&nbsp; <span class="blue">double</span> layerWidth = 0.2;
+&nbsp; <span class="blue">int</span> layerIndex = cs.GetFirstCoreLayerIndex();
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">CompoundStructureLayer</span>&gt; cslayers 
+&nbsp; &nbsp; = cs.GetLayers();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">CompoundStructureLayer</span> csl <span class="blue">in</span> cslayers )
+&nbsp; {
+&nbsp; &nbsp; cs.SetLayerWidth( layerIndex, layerWidth );
+&nbsp; &nbsp; layerIndex++;
+&nbsp; }
+&nbsp; wall.WallType.SetCompoundStructure( cs );
+&nbsp; trans.Commit();
+</pre>
+
+<p>I verified the total wall thickness and it does add up correctly.
+
+<p>Many thanks to Balaji for this solution, and congratulations on answering your first Revit API ADN case!
+Welcome to the club!
+

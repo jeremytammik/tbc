@@ -1,0 +1,177 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Revit 2010 Web Update 2</h3>
+
+<p>The 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-2010-web-update-1.html">
+first web update</a> of Revit 2010 (build 20090612_2115) was already released earlier this year.
+
+Now the web update 2 for Revit 2010 (build 20090914_1845) including new fixes and minor enhancements has been published and can be downloaded from the public Revit product pages:
+
+<ul>
+<li><a href="http://www.autodesk.com/revitarchitecture">Revit Architecture</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262388">Product Download</a></li>
+<li><a href="http://www.autodesk.com/revitstructure">Revit Structure</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9339705">Product Download</a></li>
+<li><a href="http://www.autodesk.com/revitmep">Revit MEP</a> &gt; <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=9262907">Product Download</a></li>
+</ul>
+
+<p>The update is also available from the 
+
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&id=5017413&linkID=4901650">ADN Revit download</a> page.
+
+Look there for the
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=13910658&linkID=4901650">Autodesk Revit 2010 September/October update</a>.
+
+<p>The update is accompanied by an updated SDK as well. Here is an overview of the material:
+
+<ul>
+<li><a href="#1">Product and Documentation</a></li>
+<li><a href="#2">The Revit SDK</a></li>
+</ul>
+
+<a name="1"></a>
+
+<h4>Product and Documentation</h4>
+
+<p>Since there are three different flavours of the update for Architecture, MEP and Structure, and each of these has its own 'what's new' documentation and is available both for 32 and 64 bit operating systems, the whole release adds up to this list of nine files:
+
+<ul>
+<li>autodesk_revit_architecture_2010-x86_update_2.exe (exe - 69643 Kb)
+<li>autodesk_revit_architecture_2010-x64_update_2.exe (exe - 96330 Kb)
+<li>rac2010_update2_list.docx (docx - 42 Kb)
+<li>autodesk_revit_mep_2010-x86_update_2.exe (exe - 69641 Kb)
+<li>autodesk_revit_mep_2010-x64_update_2.exe (exe - 96327 Kb)
+<li>rme2010_update2_list.docx (docx - 30 Kb)
+<li>autodesk_revit_structure_2010-x86_update_2.exe (exe - 69647 Kb)
+<li>autodesk_revit_structure_2010-x64_update_2.exe (exe - 96333 Kb)
+<li>rst2010_update2_list.docx (docx - 42 Kb)
+</ul>
+
+<p>The three separate 'update 2 list' documents discuss the enhancements made both to the product and API.
+
+<p>The only API enhancement listed for update 2 is improved stability when subscribing to a DocumentOpened event. 
+We return to that issue <a href="#3">below</a> in the discussion of the updated SDK.
+
+
+<a name="2"></a>
+
+<h4>The Revit SDK</h4>
+
+<p>The Revit SDK has also been updated for the web update. 
+Normally, the SDK is included in the product installation files. 
+Its default location in the temporary installation folder on my machine is
+
+<ul><li>C:/Autodesk/RAC_2010_English_Win_32bit/support/SDK/RevitSDK.exe</ul>
+
+<p>This however is not valid for the updated SDK.
+To obtain that, you need to download it from the public
+
+<!-- http://usa.autodesk.com/adsk/servlet/index?id=2484975&siteID=123112 -->
+
+<a href="http://www.autodesk.com/developrevit">
+Revit developer page</a>.
+
+Look for 
+
+<a href="http://images.autodesk.com/adsk/files/revit2010sdkupdaterelease2.exe">
+Revit 2010 SDK</a> (Update 2, Sept 15, 2009), a 82402 Kb EXE file.
+
+It is also available from the members-only 
+
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&id=5017413&linkID=4901650">
+Revit software download page</a> on the ADN web site, where it is posted as
+
+<a href="http://adn.autodesk.com/adn/servlet/file/revit2010sdkupdaterelease2.exe?siteID=4814862&id=13910420">
+Revit 2010 SDK Update Release 2</a>.
+
+<p>The new API functionality is described in the file 'Revit Platform API Changes and Additions.doc', namely:
+
+<span style="color:darkblue">
+
+<h4>Changes to the Revit API since the initial release of Autodesk Revit 2010</h4>
+
+<h5>Rename and replace a family parameter</h5>
+
+<p>The method
+
+<ul>
+<li>FamilyManager.RenameParameter() 
+</ul>
+
+<p>allows you to rename a Family parameter.
+
+<p>The overloaded methods
+
+<ul>
+<li>FamilyManager.ReplaceParameter() 
+</ul>
+
+<p>allow you to replace a Family parameter with a new shared parameter, or a shared parameter with a new Family parameter.
+
+<h5>Extract GUID from a Parameter</h5>
+
+<p>The new properties
+
+<ul>
+<li>Parameter.IsShared 
+<li>Parameter.GUID 
+</ul>
+
+<p>identify if a given parameter is a shared parameter, and if it is, extract its GUID.
+
+</span>
+
+<p>The help file RevitAPI.chm file also reflects these changes.
+
+
+<h4>Revit SDK Differences</h4>
+
+<p>I ran a file comparison to analyse the differences between the initial release of the Revit SDK and the updated one and found them to be virtually identical, except for three files:
+
+<ul>
+<li>read me first.doc &ndash; minimal changes.
+<li>revit platform api changes and additions.doc &ndash; the new functionality listed above.
+<li>revitapi.chm &ndash; different.
+</ul>
+
+<p>The sample applications provided in the updates are also identical to the ones in the original release of the SDK with a very few minute modifications.
+
+
+<h4>SDK Backward Compatibility</h4>
+
+<p><strong>Question:</strong> I installed Revit 2010 together with the original SDK. 
+When installing, the web update was automatically picked up, downloaded and installed as well.
+
+<p>My question is: would this updated SDK work with my Revit 2010 as such? 
+Do I need to install anything on top of it, i.e. one of the web update 2 or subscription pack releases?
+
+<p><strong>Answer:</strong> The web update 2 release is simply an update, so the accompanying SDK will work for both that and the initial release.
+There are a few new APIs that will work only on the update, but as long as you are not using those, it should be compatible between these versions.
+You need to ensure that the update has been installed before making calls to any of the new API methods.
+
+<p>See the 'Revit Platform API changes and Additions.doc' document for details of the new APIs for each SDK. 
+This information is also provided in the RevitAPI.chm file in the 'What's New' topic.
+
+
+<a name="3"></a>
+
+<!-- 1253711 [Revit crashes with DocumentOpened event and linked revit document] -->
+
+<h4>DocumentOpened Event Stability</h4>
+
+<p><strong>Question:</strong> I defined a DocumentOpened event handler and added it in my OnStartUp function:
+
+<pre>
+application.DocumentOpened 
+  += new EventHandler<DocumentOpenedEventArgs>(
+    application_DocumentOpened );
+</pre>
+
+<p>Once I do so, however, Revit crashes when I open a document with linked documents, 
+even in an empty project, and even if the application_DocumentOpened function is empty too!
+Is this a known issue?
+
+<p><strong>Answer:</strong> This issue is resolved by the improved stability of this API in the web update 2.

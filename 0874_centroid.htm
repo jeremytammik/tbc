@@ -1,0 +1,721 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Solid Centroid and Volume Calculation</h3>
+
+<p>I have not posted anything since last Friday, being too caught up in the West European Developer days and travelling.
+Today and tomorrow we spend in Gothenburg on the last lap of our journey, after Paris, Milano, Farnborough and Munich.
+I had a nap in the taxis to and from the airport yesterday, both in Germany and Sweden, so I was able to burn some midnight oil to share the following exploration with you.</p>
+
+<p>One of the many interesting conversations I had at Autodesk University that caught my special attention dealt with a simple geometrical Revit API question; geometrical questions are among my favourites, and this one is really basic: how to calculate the
+
+<a href="http://en.wikipedia.org/wiki/Center_of_mass">
+centre of mass</a> or
+
+<a href="http://en.wikipedia.org/wiki/Centroid">
+centroid</a> of a solid.</p>
+
+<p>Once again, that led to the exploration of a number of interesting little sub-topics:</p>
+
+<ul>
+<li><a href="#1">Revit API centroid and volume calculation</a> methods</li>
+<li><a href="#2">Gap free triangulation for polyhedral approximation</a></li>
+<li><a href="#3">Polyhedron centroid calculation algorithm</a></li>
+<li><a href="#4">Revit implementation and CentroidVolume class</a></li>
+<li><a href="#5">Polyhedron centroid calculation implementation</a></li>
+<li><a href="#6">Support for multiple solids</a></li>
+<li><a href="#7">Mainline with picking twists</a></li>
+<li><a href="#8">Results</a></li>
+<li><a href="#9">Download</a></li>
+</ul>
+
+<p>Before getting into that, here is a quick heads-up to point out a new free technology preview to simulate airflow around buildings or other objects in a virtual wind tunnel:</p>
+
+
+<a name="0"></a>
+
+<h4>Project Falcon Computational Fluid Dynamics CFD Add-in</h4>
+
+<p>Autodesk released
+
+<a href="http://labs.autodesk.com/utilities/falcon">
+Falcon for Revit</a> to
+
+<a href="http://labs.autodesk.com">
+Autodesk Labs</a>.
+
+Project Falcon is an outdoor airflow simulation add-in for Revit:</p>
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/oszINdlRjPQ" frameborder="0" allowfullscreen></iframe>
+
+<p>Emile Kfouri describes the
+
+<a href="http://autodesk.typepad.com/bpa/2012/12/cfd-integrated-into-revit.html">
+use and advantages of Falcon</a> in
+
+some depth on his
+
+<a href="http://autodesk.typepad.com/bpa">
+Building Performance Analysis</a> blog
+
+that I was previously unaware of.
+He includes detailed explanations of the kind of problems this software addresses, getting started, and comparisons with other technologies such as the wind tunnel feature in
+
+<a href="http://autodeskvasari.com">Project Vasari</a> and
+
+<a href="http://usa.autodesk.com/adsk/servlet/pc/index?id=17141897&amp;siteID=123112">Simulation CFD 360</a>.
+Fascinating stuff.
+
+<p>By the way, this is extremely interesting to look at for any Revit add-in developer, even if you do not care about this specific kind of analysis, because it shows an impressive example of using Revit as a front-end input tool to a powerful analysis component, reporting the results back graphically using the analysis visualisation framework AVF. If you hook up these components intelligently, a lot of functionality can be achieved with little effort.
+
+
+<a name="1"></a>
+
+<h4>Centroid and Volume of a Solid</h4>
+
+<p>Returning to the centroid and volume calculation, the Revit API provides both of these through the Solid ComputeCentroid method and Volume property.
+As said, a conversation prompted me to explore how to implement these calculations on my own as well.
+
+<p>Calculating exact results for an arbitrary solid is not trivial, of course, and could currently only be achieved making use of an external library.</p>
+
+<p>If high precision is not paramount, however, we can simplify the solid to a planar faceted representation by triangulating all its faces to create a
+
+<a href="http://en.wikipedia.org/wiki/Polyhedron">
+polyhedral</a> approximation of it.
+
+<p>Determining the centroid of a polyhedron is something that can be achieved in a very few lines of code, as I will show below.</p>
+
+
+<a name="2"></a>
+
+<h4>Gap Free Triangulation for Polyhedral Approximation</h4>
+
+<p>Happily, the Revit 2013 API provides a method for triangulating the entire surface of a solid in one single call, ensuring a closed volume, unlike doing it face by face, which does not.</p>
+
+<p>The Face.Triangulate method returns a triangular mesh approximation to the face.
+Revit defines the approximation tolerance internally.
+Calling it separately for neighbouring faces, however, will return independent triangulations that do not line up where the faces meet, leaving
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/birthdays-and-gaps-in-shells.html">
+gaps in the shell</a> of
+
+the original solid.</p>
+
+<p>This deficiency was eliminated by the SolidUtils class introduced in Revit 2013, which provides the
+
+TessellateSolidOrShell method to facet an entire solid or open shell in one single call.
+This enables each boundary component of the solid or shell to be represented by a single properly closed triangulated structure.
+
+
+<a name="3"></a>
+
+<h4>Polyhedron Centroid Calculation Algorithm</h4>
+
+<p>With these necessary and powerful basics in place, I searched the Internet for a bit of help on implementing an algorithm to calculate the centroid, and found a discussion on determining the
+
+<a href="http://gmc.yoyogames.com/index.php?showtopic=397122">
+centre of mass of a 3D model</a> from
+
+the
+
+<a href="http://gmc.yoyogames.com">
+Game Maker Community</a>.
+
+Here is my edited version summarising the results of that thread:</p>
+
+<p><strong>Question:</strong> I'm working on a model editor and I have a set centre function to reset the centre of a model. I can do this a few ways which I have implemented.
+
+<p><strong>Method 1:</strong> Add vertices, average them and move the model; pseudocode:
+
+<pre>
+  for each point
+    dx += point.x
+    dy += point.y
+    dz += point.z
+    count ++
+
+  dx/=count
+  dy/=count
+  dz/=count
+
+  for each point
+    point.x-=dx
+    point.y-=dy
+    point.z-=dz
+</pre>
+
+<p>The problem: If the model has many points in one area, the deviation favours that area.
+Which is not always good because some models have many, many points like at the tip of a gun or the cone of a ship.
+
+<p><strong>Method 2:</strong> Find min max of vertices, average the min max into a deviation and move the model:
+
+<pre>
+  for each point
+    mindx = min( point.x, mindx )
+    maxdx = max( point.x, maxdx )
+    same for y and z
+
+  dx = (mindx + maxdx) / 2
+  same for dy, dz;
+
+  for each point
+    point.x -= dx
+    same for y and z
+</pre>
+
+<p>That works OK.
+
+<p>For my third method, I would really like to centre the model on its estimated centre mass.
+
+<p>I have a series of 3 points defining the planes/faces.
+I figure I could plug either the plane area or perimeter into the deviation calculation.
+That way many points defining a tiny area would not affect the calculation that much.
+But I can't figure out the right math for this.
+
+<p>Can you determine the surface areas of each face?
+
+<p><strong>Answer:</strong> Well, one would assume that we'd want to count the inside of the model into the mass calculation as well, in which case you want to find the volume of the model.
+This actually isn't too difficult to compute assuming that the model is closed (no holes; otherwise it wouldn't really have a well-defined volume) and that it's simple (in the mathematical sense; that means it doesn't intersect with itself).
+Each triangular face contributes a tetrahedron's worth of volume to the whole model.
+To find this volume given the three vertices of the face v1, v2, and v3, you need only compute v1 &middot; (v2 &times; v3 ) / 6.
+
+<p>The following is very important.
+The vertices of every face must be oriented the same way.
+This means that if you look at a face from the outside of a model, its vertices should be oriented in a clockwise fashion (counter-clockwise is valid too, as long as you're consistent).
+
+<p>So, now we essentially have a way to compute a weighting factor for every face in the model. The coordinates we have to weight this by are the centroids of each tetrahedron, given by (v1 + v2 + v3)/4.
+This is because one of the vertices of every tetrahedron is the origin so it's 0, so there's no reason to include it here.
+So, the centroid of the model is given by the following:
+
+<p>&sum; (v1 + v2 + v3)/4 [v1 &middot; (v2 &times; v3 )] / &sum; [v1 &middot; (v2 &times; v3)]
+
+<p>The sum is performed over each face.
+
+<p>Also, the factor of 6 in the volume is left out because it cancels out because of the division.
+So, loop over each face, compute the volume contribution and add that onto a total volume counter and also multiply it by that average position (you can move the division by 4 outside of the sum to make the loop faster; that way only one division needs to be performed instead of one for each face) of the tetrahedron (i.e. multiply it by the sum of the vertices).
+Then, outside of the loop, divide by the total volume times 4 (assuming you moved that division by 4 outside of the loop).
+You now have the centroid assuming constant density.
+
+<p>The variables are all vectors.
+The product of the three vectors is a triple scalar product.
+It's the dot product with the cross product (and also the determinant of the matrix of these vectors).
+It's equal to this, which can be used as a formula for the volume:
+
+<pre>
+  x1*(y2*z3 - y3*z2)
+  + y1*(z2*x3 - z3*x2)
+  + z1*(x2*y3 - x3*y2)
+</pre>
+
+<p>This is because one of the vertices of every tetrahedron is the origin.
+
+<p>Note that this does not require the model to be convex.
+All the tetrahedrons are not necessarily entirely contained inside the model.
+
+<p>I only assume that the model is closed and simple.
+Any tetrahedrons outside the model will have their area computed to be negative.
+They'll subtract off their contributions.
+The origin of the system can be anywhere as well.
+It doesn't have to be inside the model.
+
+<p>Here is the entire pseudo-code:
+
+<pre>
+  var cx, cy, cz, volume, v, i, x1, y1, z1, x2, y2, z2, x3, y3, z3;
+  volume = 0;
+  cx = 0; cy = 0; cz = 0;
+  // Assuming vertices are in vertX[i], vertY[i], and vertZ[i]
+  // and faces are faces[i, j] where the first index indicates the
+  // face and the second index indicates the vertex of that face
+  // The value in the faces array is an index into the vertex array
+  i = 0;
+  repeat (numFaces) {
+    x1 = vertX[faces[i, 0]]; y1 = vertY[faces[i, 0]]; z1 = vertZ[faces[i, 0]];
+    x2 = vertX[faces[i, 1]]; y2 = vertY[faces[i, 1]]; z2 = vertZ[faces[i, 1]];
+    x3 = vertX[faces[i, 2]]; y3 = vertY[faces[i, 2]]; z3 = vertZ[faces[i, 2]];
+    v = x1*(y2*z3 - y3*z2) + y1*(z2*x3 - z3*x2) + z1*(x2*y3 - x3*y2);
+    volume += v;
+    cx += (x1 + x2 + x3)*v;
+    cy += (y1 + y2 + y3)*v;
+    cz += (z1 + z2 + z3)*v;
+    i += 1;
+  }
+  // Set centroid coordinates to their final value
+  cx /= 4 * volume;
+  cy /= 4 * volume;
+  cz /= 4 * volume;
+  // And, just in case you want to know the total volume of the model:
+  volume /= 6;
+</pre>
+
+<p>Remember that the vertices of each face must be oriented in the same way (one way to see if they are is to turn on back face culling; if the model appears normally then they're all oriented properly--the model could also appear inside-out which would also be a valid orientation).
+
+<p>Part of this is actually calculating the area of each triangle without having to figure out the angles, simply using the 3 side lengths.
+
+<p>One way to achieve this is using Heron's Formula:
+
+<pre>
+  A = sqrt( s * (s - a) * (s - b) * (s - c) )
+</pre>
+
+<p>Here a, b, c are the lengths of each side and s is the semi-perimeter, s = (a + b + c) / 2.</p>
+
+<p>You can also just take the magnitude of the cross product of two edge vectors of the face and divide it by 2.
+This means that you can find the area of a face as a side effect of determining its normal vector, just as I do in my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+GetSignedPolygonArea</a> method.
+
+
+<a name="4"></a>
+
+<h4>Revit Implementation and CentroidVolume Class</h4>
+
+<p>I used the algorithm described above to implement a volume and centre of mass calculation for a Revit solid.</p>
+
+<p>As said, curved solids are approximated by triangulating them.
+The result is pretty precise for solids that are planar faceted to start with.</p>
+
+<p>The code includes an assertion to ensure that the volume calculated as a side effect is not too far removed from the value provided by the Solid.Volume property.</p>
+
+<p>Since the algorithm above calculates both the centroid and volume, I implemented the following little helper class to package the two together:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">CentroidVolume</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> CentroidVolume()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> Centroid { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> Volume { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">override</span> <span class="blue">public</span> <span class="blue">string</span> ToString()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> RealString( Volume ) + <span class="maroon">&quot;@&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + PointString( Centroid );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Polyhedron Centroid Calculation Implementation</h4>
+
+<p>My translation of the algorithm described above to Revit API looks like this, including the validation assertions at the end and an exception handler around the call to TessellateSolidOrShell for reasons explained below:</p>
+
+<pre class="code">
+<span class="teal">CentroidVolume</span> GetCentroid( <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">CentroidVolume</span> cv = <span class="blue">new</span> <span class="teal">CentroidVolume</span>();
+&nbsp; <span class="blue">double</span> v;
+&nbsp; <span class="teal">XYZ</span> v0, v1, v2;
+&nbsp;
+&nbsp; <span class="teal">SolidOrShellTessellationControls</span> controls
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SolidOrShellTessellationControls</span>();
+&nbsp;
+&nbsp; controls.LevelOfDetail = 0;
+&nbsp;
+&nbsp; <span class="teal">TriangulatedSolidOrShell</span> triangulation = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; triangulation
+&nbsp; &nbsp; &nbsp; = <span class="teal">SolidUtils</span>.TessellateSolidOrShell(
+&nbsp; &nbsp; &nbsp; &nbsp; solid, controls );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = triangulation.ShellComponentCount;
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TriangulatedShellComponent</span> component
+&nbsp; &nbsp; &nbsp; = triangulation.GetShellComponent( i );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> m = component.TriangleCount;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; m; ++j )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TriangleInShellComponent</span> t
+&nbsp; &nbsp; &nbsp; &nbsp; = component.GetTriangle( j );
+&nbsp;
+&nbsp; &nbsp; &nbsp; v0 = component.GetVertex( t.VertexIndex0 );
+&nbsp; &nbsp; &nbsp; v1 = component.GetVertex( t.VertexIndex1 );
+&nbsp; &nbsp; &nbsp; v2 = component.GetVertex( t.VertexIndex2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; v = v0.X*(v1.Y*v2.Z - v2.Y*v1.Z)
+&nbsp; &nbsp; &nbsp; &nbsp; + v0.Y*(v1.Z*v2.X - v2.Z*v1.X)
+&nbsp; &nbsp; &nbsp; &nbsp; + v0.Z*(v1.X*v2.Y - v2.X*v1.Y);
+&nbsp;
+&nbsp; &nbsp; &nbsp; cv.Centroid += v * (v0 + v1 + v2);
+&nbsp; &nbsp; &nbsp; cv.Volume += v;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Set centroid coordinates to their final value</span>
+&nbsp;
+&nbsp; cv.Centroid /= 4 * cv.Volume;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> diffCentroid = cv.Centroid
+&nbsp; &nbsp; - solid.ComputeCentroid();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 0.6 &gt; diffCentroid.GetLength(),
+&nbsp; &nbsp; <span class="maroon">&quot;expected centroid approximation to be &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;similar to solid ComputeCentroid result&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// And, just in case you want to know </span>
+&nbsp; <span class="green">// the total volume of the model:</span>
+&nbsp;
+&nbsp; cv.Volume /= 6;
+&nbsp;
+&nbsp; <span class="blue">double</span> diffVolume = cv.Volume - solid.Volume;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 0.3 &gt; <span class="teal">Math</span>.Abs(
+&nbsp; &nbsp; diffVolume / cv.Volume ),
+&nbsp; &nbsp; <span class="maroon">&quot;expected volume approximation to be &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;similar to solid Volume property value&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> cv;
+}
+</pre>
+
+<p>As you may have noticed, the assertion limits are pretty arbitrarily chosen.</p>
+
+
+<a name="6"></a>
+
+<h4>Support for Multiple Solids</h4>
+
+<p>Since the centroid of any given element will be determined by all of its solids, which may be multiple, I implemented the following GetCentroid method to determine all solids belonging to a given element and calculate its total centroid and volume across all its component solids:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Calculate centroid for all non-empty solids </span>
+<span class="gray">///</span><span class="green"> found for the given element. Family instances </span>
+<span class="gray">///</span><span class="green"> may have their own non-empty solids, in which </span>
+<span class="gray">///</span><span class="green"> case those are used, otherwise the symbol geometry.</span>
+<span class="gray">///</span><span class="green"> The symbol geometry could keep track of the </span>
+<span class="gray">///</span><span class="green"> instance transform to map it to the actual </span>
+<span class="gray">///</span><span class="green"> project location. Instead, we ask for </span>
+<span class="gray">///</span><span class="green"> transformed geometry to be returned, so the </span>
+<span class="gray">///</span><span class="green"> resulting solids are already in place.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">CentroidVolume</span> GetCentroid(
+&nbsp; <span class="teal">Element</span> e,
+&nbsp; <span class="teal">Options</span> opt )
+{
+&nbsp; <span class="teal">CentroidVolume</span> cv = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> s;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// List of pairs of centroid, volume for each solid</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CentroidVolume</span>&gt; a
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CentroidVolume</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = geo.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CentroidVolume</span> cv1;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != s
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; s.Faces.Size
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">SolidUtils</span>.IsValidForTessellation( s )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (<span class="blue">null</span> != ( cv1 = GetCentroid( s ) ) ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; a.Add( cv1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == a.Count &amp;&amp; <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != s
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; s.Faces.Size
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">SolidUtils</span>.IsValidForTessellation( s )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (<span class="blue">null</span> != ( cv1 = GetCentroid( s ) ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.Add( cv1 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get the total centroid from the partial</span>
+&nbsp; &nbsp; <span class="green">// contributions. Each contribution is weighted</span>
+&nbsp; &nbsp; <span class="green">// with its associated volume, which needs to </span>
+&nbsp; &nbsp; <span class="green">// be factored out again at the end.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; a.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; cv = <span class="blue">new</span> <span class="teal">CentroidVolume</span>();
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CentroidVolume</span> cv2 <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; cv.Centroid += cv2.Volume * cv2.Centroid;
+&nbsp; &nbsp; &nbsp; &nbsp; cv.Volume += cv2.Volume;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; cv.Centroid /= a.Count * cv.Volume;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> cv;
+}
+</pre>
+
+<p>The calculation of the total volume and centroid is similar to the base algorithm described above, with each centroid contribution weighted by the corresponding volume.</p>
+
+
+<a name="7"></a>
+
+<h4>Mainline with Picking Twists</h4>
+
+<p>Finally, here is the external command Execute method implementation driving this and including some additional useful picking interaction handling twists, such as:</p>
+
+<ul>
+<li>Support for pre-selection or interactive picking.</li>
+<li>Checking for a valid active view type before prompting the user to pick an element.</li>
+<li>Exception handling to gracefully terminate picking and the entire command on cancels.</li>
+</ul>
+
+<p>The resulting code looks like this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; <span class="teal">SelElementSet</span> set = sel.Elements;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; set.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> set )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ViewType</span>.Internal == doc.ActiveView.ViewType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( _caption,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot pick elements in this view: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + doc.ActiveView.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = sel.PickObjects(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select some elements&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> refs )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ids.Add( r.ElementId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CentroidVolume</span> cv = GetCentroid( e, opt );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; (<span class="blue">null</span> == cv ? <span class="maroon">&quot;&lt;nil&gt;&quot;</span> : cv.ToString()),
+&nbsp; &nbsp; &nbsp; ElementDescription( e ) );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Results</h4>
+
+<p>I ran this on the basic sample model delivered with Revit, rac_basic_sample_project.rvt, simply selecting all elements on level 1.
+Not surprisingly, this causes a couple of hiccups, notably a few assertions stating that my volume approximation does not match Revit's and an exception thrown by the TessellateSolidOrShell method, in spite of calling IsValidForTessellation beforehand to ensure tht I only feed in acceptable solids to it.
+This exception is caused by the teapot in the model, which is in fact a rather abnormal building element, but still...</p>
+
+<p>These hiccups can be ironed out.
+Here is the report logged to the debug output window with the hiccups and exception messages manually edited away, informing us that a large number of elements in the model are correctly processed and that for all of them my calculated approximate values correspond more or less to the ones reported by the built-in Revit API methods;
+copy and paste to an editor to see the truncated lines in full:</p>
+
+<pre>
+115.87@(-52.42,8.9,11.04) Wall Walls &lt;117653 Foundation - 305 Concrete&gt;
+455.96@(-20.92,6.23,11.54) Wall Walls &lt;117654 Generic - 200&gt;
+461.1@(-24.09,27.23,11.75) Wall Walls &lt;117698 CORR&gt;
+&lt;nil&gt; Wall Walls &lt;117714 Storefront&gt;
+52.65@(-19.42,13.54,4.88) Wall Walls &lt;117945 Interior - Partition&gt;
+36.09@(-12.55,15.23,5.22) Wall Walls &lt;117963 Interior - Partition&gt;
+&lt;nil&gt; Element Stairs &lt;118049 open treads&gt;
+&lt;nil&gt; Railing Railings &lt;118116 Handrail - Pipe&gt;
+64.4@(-7.56,11.37,4.92) Wall Walls &lt;118356 Interior - Partition&gt;
+168.87@(11.08,17.15,13.97) Wall Walls &lt;123926 CORR&gt;
+&lt;nil&gt; Wall Walls &lt;123967 Storefront&gt;
+0.32@(5.54,12.96,0.69) FamilyInstance Doors Window_Insert &lt;123981 Window_Insert&gt;
+0.24@(11.08,25.92,0.13) Mullion Curtain Wall Mullions Rectangular Mullion &lt;123986 64 x 128 rectangular&gt;
+0.29@(11.08,22.37,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;123987 64 x 128 rectangular&gt;
+0.34@(5.54,12.96,1.97) FamilyInstance Doors Window_Insert &lt;123990 Window_Insert&gt;
+0.29@(10.95,27.23,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;123995 64 x 128 rectangular&gt;
+0.29@(11.08,22.37,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;124013 64 x 128 rectangular&gt;
+0.29@(11.08,27.1,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;124015 64 x 128 rectangular&gt;
+0.29@(11.08,27.1,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;124016 64 x 128 rectangular&gt;
+0.24@(11.08,25.92,2.62) Mullion Curtain Wall Mullions Rectangular Mullion &lt;124017 64 x 128 rectangular&gt;
+0.29@(10.95,27.23,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;124019 64 x 128 rectangular&gt;
+0.6@(-10.02,6.82,1.5) FamilyInstance Windows Fixed &lt;125448 406 x 610&gt;
+3.16@(2.85,4.18,0.91) FamilyInstance Doors Double-Glass 1 &lt;126295 1800 x 2100&gt;
+252.05@(-24.2,34.28,6.92) Wall Walls &lt;127132 Foundation - 305 Concrete&gt;
+236.66@(-1.03,9.27,2.21) FamilyInstance Walls FIREPLACE &lt;127491 FIREPLACE&gt;
+51.52@(-31.92,13.3,4.86) Wall Walls &lt;127659 Interior - Partition&gt;
+79.29@(-31.83,20.23,5.11) Wall Walls &lt;127660 Interior - Partition&gt;
+3.84@(-11.31,6.72,1.2) FamilyInstance Doors Single-Flush &lt;127661 800 x 2100&gt;
+3.84@(-9.97,6.72,1.2) FamilyInstance Doors Single-Flush &lt;127662 800 x 2100&gt;
+17.84@(-35.67,24.22,5.51) Wall Walls &lt;127663 Interior - Partition&gt;
+0.26@(-5.33,3.72,0.31) FamilyInstance Plumbing Fixtures Sink Vanity-Square &lt;127666 508 x 445&gt;
+3.84@(-11.92,7.41,1.2) FamilyInstance Doors Single-Flush &lt;127667 800 x 2100&gt;
+1.47@(-8.6,1.54,1.38) FamilyInstance Windows Fixed &lt;127718 1219 X 915&gt;
+1.47@(-5.51,1.54,1.38) FamilyInstance Windows Fixed &lt;127719 1219 X 915&gt;
+28.59@(-27.64,23.9,6.44) Wall Walls &lt;127941 Interior - Partition&gt;
+11.78@(-19.42,25.25,4.95) Wall Walls &lt;128006 Interior - Partition&gt;
+&lt;nil&gt; CurtainGridLine Curtain Wall Grids &lt;128399 Grid Line&gt;
+0.29@(0.69,13.62,0.69) FamilyInstance Doors Window_Insert &lt;128400 Window_Insert&gt;
+0.3@(0.69,13.62,1.97) FamilyInstance Doors Window_Insert &lt;128401 Window_Insert&gt;
+&lt;nil&gt; CurtainGridLine Curtain Wall Grids &lt;128408 Grid Line&gt;
+0.57@(2.29,13.62,0.69) FamilyInstance Doors Window_Insert &lt;128409 Window_Insert&gt;
+0.59@(2.29,13.62,1.97) FamilyInstance Doors Window_Insert &lt;128410 Window_Insert&gt;
+0.46@(4.58,27.23,0.13) Mullion Curtain Wall Mullions Rectangular Mullion &lt;128432 64 x 128 rectangular&gt;
+0.2@(1.37,27.23,2.62) Mullion Curtain Wall Mullions Rectangular Mullion &lt;128433 64 x 128 rectangular&gt;
+0.46@(4.58,27.23,2.62) Mullion Curtain Wall Mullions Rectangular Mullion &lt;128434 64 x 128 rectangular&gt;
+0.29@(2.41,27.23,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;128450 64 x 128 rectangular&gt;
+0.29@(2.41,27.23,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;128452 64 x 128 rectangular&gt;
+4.73@(19.5,10.48,9.25) FamilyInstance Columns Rectangular Column &lt;128571 140 X 140&gt;
+2.38@(19.5,6.82,3.67) FamilyInstance Columns Rectangular Column &lt;128683 140 X 140&gt;
+&lt;nil&gt; CurtainGridLine Curtain Wall Grids &lt;130207 Grid Line&gt;
+0.55@(4.42,13.62,0.69) FamilyInstance Doors Window_Insert &lt;130208 Window_Insert&gt;
+0.58@(4.42,13.62,1.97) FamilyInstance Doors Window_Insert &lt;130209 Window_Insert&gt;
+0.44@(8.85,27.23,0.13) Mullion Curtain Wall Mullions Rectangular Mullion &lt;130248 64 x 128 rectangular&gt;
+0.44@(8.85,27.23,2.62) Mullion Curtain Wall Mullions Rectangular Mullion &lt;130249 64 x 128 rectangular&gt;
+0.29@(6.75,27.23,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;130256 64 x 128 rectangular&gt;
+0.29@(6.75,27.23,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;130257 64 x 128 rectangular&gt;
+2.38@(-8.38,34.98,3.67) FamilyInstance Columns Rectangular Column &lt;130550 140 X 140&gt;
+4.23@(-5.81,5.05,1.21) FamilyInstance Doors Single-Flush &lt;135477 915 x 2134&gt;
+13.47@(-15.67,13.3,4.92) Wall Walls &lt;135527 Interior - Partition&gt;
+8.72@(-1.14,2.81,0.13) FamilyInstance Furniture Chair-Corbu &lt;137191 Chair-Corbu&gt;
+8.72@(0.4,2.99,0.13) FamilyInstance Furniture Chair-Corbu &lt;137272 Chair-Corbu&gt;
+4.73@(-26.85,34.98,9.25) FamilyInstance Columns Rectangular Column &lt;137480 140 X 140&gt;
+0.29@(0.37,27.23,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;139162 64 x 128 rectangular&gt;
+0.29@(0.37,27.23,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;139163 64 x 128 rectangular&gt;
+0.2@(1.37,27.23,0.13) Mullion Curtain Wall Mullions Rectangular Mullion &lt;139229 64 x 128 rectangular&gt;
+9.04@(-35.67,18.87,4.92) Wall Walls &lt;140108 Interior - Partition&gt;
+15.8@(-39.9,17.9,6.41) Wall Walls &lt;140130 Interior - Partition&gt;
+4.39@(-5.72,2.54,0.51) FamilyInstance Doors Bifold-4 Panel &lt;140140 1800 x 2100&gt;
+9.04@(-28.17,18.87,4.92) Wall Walls &lt;140190 Interior - Partition&gt;
+15.93@(-23.79,17.9,6.27) Wall Walls &lt;140191 Interior - Partition&gt;
+4.39@(-3.4,2.54,0.51) FamilyInstance Doors Bifold-4 Panel &lt;140192 1800 x 2100&gt;
+33.57@(1.08,8.95,4.79) Wall Walls &lt;140204 Generic - 200&gt;
+13.99@(-8.49,6.36,0.37) FamilyInstance Specialty Equipment Dryer &lt;144101 686 x 635 x 889&gt;
+13.63@(-10.27,8.48,0.49) FamilyInstance Specialty Equipment Washer &lt;144494 686 x 635 x 889&gt;
+4.39@(-4.57,3.4,0.51) FamilyInstance Doors Bifold-4 Panel &lt;144534 1800 x 2100&gt;
+4.39@(-3.27,3.4,0.51) FamilyInstance Doors Bifold-4 Panel &lt;144657 1800 x 2100&gt;
+10.42@(-27.54,25.45,5.03) Wall Walls &lt;144706 Interior - Partition&gt;
+64.17@(5.93,7.23,4.92) Wall Walls &lt;144998 CORR&gt;
+22.4@(10.08,9.17,4.92) Wall Walls &lt;145015 CORR&gt;
+12.23@(10.58,11.11,4.92) Wall Walls &lt;145032 CORR&gt;
+36@(6.75,10.69,2) FamilyInstance Casework Bar &lt;145182 Bar&gt;
+6.5@(-7.92,13.3,2.38) Wall Walls &lt;145199 Interior - Partition&gt;
+0.29@(0.34,27.23,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;150839 64 x 128 rectangular&gt;
+0.29@(0.34,27.23,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;150840 64 x 128 rectangular&gt;
+308.55@(-22,6.39,-0.49) Wall Walls &lt;150987 Generic - 305&gt;
+134.41@(-44.42,17.07,1.02) Wall Walls &lt;151006 Generic - 200&gt;
+256.5@(-25.18,27.08,-0.49) Wall Walls &lt;151081 Generic - 305&gt;
+1284.19@(-38.12,13.27,4) Room Rooms &lt;152552 BEDROOM 1 5&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152553 Room Tag&gt;
+1298.34@(-25.66,13.27,4) Room Rooms &lt;152555 BEDROOM 2 6&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152556 Room Tag&gt;
+420.33@(-27.44,22.07,4) Room Rooms &lt;152557 HALL 7&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152558 Room Tag&gt;
+423.9@(-39.98,23.65,4) Room Rooms &lt;152559 BATH 8&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152560 Room Tag&gt;
+839.97@(-10.26,9.39,4) Room Rooms &lt;152561 STORAGE 9&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152562 Room Tag&gt;
+&lt;nil&gt; ModelLine &lt;Room Separation&gt; &lt;152596 Model Lines&gt;
+352.08@(-27.54,25.49,4) Room Rooms &lt;152642 MECH 11&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;152643 Room Tag&gt;
+19.63@(-6.85,1.82,0.17) FamilyInstance Furniture Bed-Box &lt;153466 Double 1346 x 1880&gt;
+19.63@(-3.76,1.79,0.17) FamilyInstance Furniture Bed-Box &lt;153556 Double 1346 x 1880&gt;
+&lt;nil&gt; ReferencePlane Reference Planes &lt;165634 Reference Plane&gt;
+&lt;nil&gt; Opening Rectangular Straight Wall Opening &lt;166134 Rectangular Straight Wall Opening&gt;
+0.47@(-2.86,22.65,0.01) FamilyInstance Furniture Rug_zk &lt;167847 1220 x 2134&gt;
+2.44@(-0.57,4.53,0.23) FamilyInstance Furniture Table-Coffee &lt;168561 915 x 1830 x 457&gt;
+0.02@(-1.7,11.35,0.98) FamilyInstance Generic Models teapot &lt;169568 teapot&gt;
+0.1@(-2.09,6.25,0.48) FamilyInstance Lighting Fixtures Floor Lamp 1 &lt;171113 150 watt Halogen&gt;
+3@(-14.28,8.03,0.18) FamilyInstance Plumbing Fixtures Tub-Rectangular-3D &lt;178179 Tub-Rectangular-3D&gt;
+&lt;nil&gt; CurtainGridLine Curtain Wall Grids &lt;178753 Grid Line&gt;
+0.39@(11.19,23.55,1.38) Panel Curtain Panels System Panel &lt;178754 Glazed&gt;
+0.41@(11.19,23.55,3.94) Panel Curtain Panels System Panel &lt;178755 Glazed&gt;
+0.24@(11.08,23.55,0.13) Mullion Curtain Wall Mullions Rectangular Mullion &lt;178774 64 x 128 rectangular&gt;
+0.24@(11.08,23.55,2.62) Mullion Curtain Wall Mullions Rectangular Mullion &lt;178775 64 x 128 rectangular&gt;
+0.29@(11.08,24.73,1.31) Mullion Curtain Wall Mullions Rectangular Mullion &lt;178782 64 x 128 rectangular&gt;
+0.29@(11.08,24.73,3.94) Mullion Curtain Wall Mullions Rectangular Mullion &lt;178783 64 x 128 rectangular&gt;
+&lt;nil&gt; Room Rooms &lt;180268 LIVING ROOM 12&gt;
+&lt;nil&gt; RoomTag Room Tags &lt;180269 Room Tag&gt;
+11.72@(-0.33,2.33,0.13) FamilyInstance Furniture Chair-Corbu &lt;181500 Couch Corbu&gt;
+</pre>
+
+<p>This is more than enough for me and my rather quick and dirty exploration of this.
+Improved filtering and error handling is left as an exercise to the inclined reader.</p>
+
+
+<a name="9"></a>
+
+<h4>Download</h4>
+
+<p>Here is
+
+<a href="zip/GetCentroid.zip">
+GetCentroid.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for this command.</p>

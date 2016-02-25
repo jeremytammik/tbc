@@ -1,0 +1,72 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Creating a Non-rectangular Slab</h3>
+
+<p>Here is a question raised and answered by my colleagues Katsuaki Takamizawa and Phil Xia on creating and editing a slab.
+
+Some related topics that we already discussed are related to the analysis of the geometry of existing slabs, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+slab boundary</a>
+
+and its 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/slab-side-faces.html">
+side faces</a>,
+
+explorations of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/cylindrical-column.html">
+geometry of other elements</a>,
+
+the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/roof-eave-cut-in-revit-and-aca.html">
+eave cut property</a> of roof slabs,
+
+and how to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">
+edit a floor profile</a>.
+
+Now let's look at this generic slab issue:</p>
+
+<p><strong>Question:</strong>
+In the user interface, we can use the shape editing tools to modify slab surfaces and to create non-rectangular slabs. 
+Is it possible to create slabs like these through the API as well?</p>
+
+<center>
+<img src="img/two_slabs.jpg" alt=Two slabs"/>
+</center>
+
+<p>Also, can we define slope angles on these non-rectangular slabs?</p>
+
+<p><strong>Answer:</strong>
+You can modify the slab surface with the slab editor, accessible through the SlabShapeEditor property on the Floor class.
+The SDK sample SlabShapeEditing shows how to use it.
+
+<p>There is no way to modify the slope of an existing slab, but it can be specified when a new slab is created with NewSlab method:
+
+<pre>
+public Floor NewSlab(
+  CurveArray profile,
+  Level level,
+  Line slopedArrow,
+  double slope,
+  bool isStructural
+)
+</pre>
+
+The parameters are:
+
+<ul>
+<li>profile: an array of planar lines and arcs that represent the horizontal profile of the slab.
+<li>level: the level on which the slab is to be placed.
+<li>slopedArrow: a line to control the sloped angle of the slab. It should be in the same face as the profile.
+<li>slope: defines the slope. 
+<li>isStructural: specifies whether the slab is structural.
+</ul>
+
+<p>Many thanks to Phil and Katsu-san for this overview!</p>

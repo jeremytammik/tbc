@@ -1,0 +1,232 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Filtering for a Non-Native Class</h3>
+
+<p>I left Ko Tao by boat and night bus to Bangkok and am now heading towards 
+
+<a href="http://en.wikipedia.org/wiki/Pattaya">
+Pattaya</a>,
+
+where my brother Marcus currently lives.
+Mentioning this to a resident of Ko Tao I learned that Pattaya is renowned for foreign old age pensioners and prostitutes, and a saying says that "good boys go to heaven &ndash; bad boys go to Pattaya".
+Marcus has friends there, enjoys the local bridge club, great transport links, a nice apartment at a good price and the best Internet connection he has ever had in Thailand. 
+I am looking forward to seeing him and it.
+
+<p>I just arrived in Kao San Road in Bangkok at three am in the morning after a good sleep on the bus and now need to find out how to get to Ekamai to catch a bus for the three hour ride over there.
+
+<p>Before continuing, and before returning to the Revit API, here are a few more memorable items from my stay on Ko Tao:
+
+<!-- getting there -->
+
+<ul>
+<li>Maurizio's cocoanut.
+<li>My cocoanut.
+<li>Ripe mangoes.
+<li>A beautiful sunset and new moon.
+</ul>
+
+<p>Maurizio's cocoanut almost fell on and killed him as he sat in a deckchair on the veranda of a bar.
+It landed less than a foot away from him and splashed him soaking wet with its juice.
+The owners came out, laughed, and said 'Oh yes, that is the second one today'.
+They didn't even move the deck chair in case another one might come down and smash it to smithereens.
+
+<p>My cocoanut was a much more pleasurable affair.
+I have always wanted to experience step by step how a cocoanut can be opened and consumed.
+One morning at breakfast, one fell down ten metres away.
+I went and picked it up and asked the workmen next to us how to open it.
+They were building a little hut to house a new beach bar, and I thought that their tools might come in useful. 
+Instead they took me over to a pole stuck firmly in the earth with a sharp long metal blade attached.
+You need both hands to hold and twist the nut against the blade to cut and lever off its husk.
+Once the husk is off, the point of the same blade can be used to poke out a hole in one of the three weak spots at one end of the nut to stick in a straw to drink the juice.
+
+<p>After I had drunk the juice, I took the empty nut over to the workmen again.
+One good whack with a hammer split it cleanly in two, and then I was able to cut out the cocoanut flesh strip by strip all day long.
+I didn't finish it until breakfast next morning.
+
+<p>The mangoes are ripe here! 
+I love ripe mangoes!
+
+<p>I climbed  hill and went and sat on a promontory to watch the one sunset that halfway made it through the last days' cloudy skies.
+It was a beautiful viewpoint and gave an impressive panorama of several beautiful cloudscapes and storms of all shapes and sizes in all directions.
+The sun was obscured before actually setting, but the exquisite thin crescent of the new moon waxing appeared sharp and clear further up soon after.
+
+<p>Anyway, back to the Revit API again, and another episode in the interminable saga of the filtered element collectors, the latest of which were on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html">
+parameter filters</a>,
+
+a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">
+correction</a> to that,
+
+and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/elementparameterfilter-with-a-shared-parameter.html">
+filtering for shared parameters</a>.
+
+The first of these includes a list of pointers to many previous filtered element collector examples. 
+
+<p>Here is another filtering query that has cropped up repeatedly, in spite of the API documentation explaining the situation pretty clearly:
+
+<p><strong>Question:</strong> Please advise me on how to access AnnotationSymbols in the API. 
+There is not enough documentation, and no code samples provided in the SDK.
+
+<p>I want to get a collection of annotation symbols in a family document (but this should work on any document)
+
+<p>I first tried to create a filtered element collector
+
+<pre class="code">
+ElementClassFilter filter1 
+  = new ElementClassFilter(
+    typeof( AnnotationSymbol ) ); 
+</pre>
+
+<p>This throws the following exception:
+"Input type is of an element type that exists in the API, but not in Revit's native object model. Try using Autodesk.Revit.DB.FamilyInstance instead, and then post-processing the results to find the elements of interest."
+
+<p>After that I tried the following:
+
+<pre class="code">
+List<AnnotationSymbol> ann 
+  = new List<AnnotationSymbol>();
+
+ElementClassFilter filter1 
+  = new ElementClassFilter(
+    typeof( FamilyInstance ) );
+
+FilteredElementCollector coll1 
+  = new FilteredElementCollector( doc );
+
+coll1.WherePasses( filter1 );
+
+foreach( Element el in coll1 )
+{
+  AnnotationSymbol anns 
+    = el as AnnotationSymbol;
+
+  if( anns != null )
+  {
+    ann.Add( el as AnnotationSymbol );
+  }
+}
+</pre>
+
+<p>This returns nothing.
+
+<p>I found the post on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/imports-in-families.html">
+imports in families</a>,
+
+but the following code provided there does not work in the Revit 2011 API:
+
+<pre class="code">
+List<Element> annotations = new List<Element>();
+  doc.get_Elements( typeof( AnnotationSymbol ),
+    annotations );
+</pre>
+
+<p><strong>Answer:</strong> The message that you received is actually pretty self explanatory: the AnnotationSymbol class is available in the Revit API, but does not correspond to a "real" internal Revit class, so the internal Revit filtering mechanisms cannot search for it. 
+Instead, you can specify a base class of AnnotationSymbol in the filter, such as the FamilyInstance class.
+
+<p>The code that you found in the blog post calling the get_Elements method is making use of the document Elements property which returned an iterator over all the database elements in the Revit 2010 API. 
+That property was removed, because it is much less efficient than the filtered element collector access introduced in the Revit 2011 API.
+
+<p>The Revit API help file RevitAPI.chm lists the AnnotationSymbol base classes: 
+
+<pre>
+System.Object
+  Autodesk.Revit.DB.Element
+    Autodesk.Revit.DB.Instance
+      Autodesk.Revit.DB.FamilyInstance
+        Autodesk.Revit.DB.AnnotationSymbol
+</pre>
+
+<p>Here is an example of a helper method that retrieves Revit MEP spaces and runs into the same issue:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all spaces in given document.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">Space</span>&gt; GetSpaces( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="green">// trying to collect all spaces directly causes </span>
+&nbsp; <span class="green">// the following error:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Input type is of an element type that exists </span>
+&nbsp; <span class="green">// in the API, but not in Revit's native object </span>
+&nbsp; <span class="green">// model. Try using Autodesk.Revit.DB.Enclosure </span>
+&nbsp; <span class="green">// instead, and then postprocessing the results </span>
+&nbsp; <span class="green">// to find the elements of interest.</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">//collector.OfClass( typeof( Space ) );</span>
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Enclosure</span> ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> (<span class="blue">from</span> e <span class="blue">in</span> collector.ToElements() 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> e <span class="blue">is</span> <span class="teal">Space</span> <span class="blue">select</span> e <span class="blue">as</span> <span class="teal">Space</span>)
+&nbsp; &nbsp; .ToList&lt;<span class="teal">Space</span>&gt;();
+}
+</pre>
+
+<p>The same issue also occurs with rooms, represented by the Room class, also derived from the Enclosure base class. For rooms, another solution is also possible using the dedicated RoomFilter filter class: 
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> rooms
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">RoomFilter</span> filter = <span class="blue">new</span> <span class="teal">RoomFilter</span>();
+&nbsp; rooms.WherePasses( filter );
+</pre>
+
+<p>I beg to differ from your opinion that "There is not enough documentation". If you look at the description of the ElementClassFilter class that you are using in the sample code you provided, it clearly states:
+
+<span style="color:darkblue">
+
+<p>This filter is a quick filter. Quick filters operate only on the ElementRecord, a low-memory class which has a limited interface to read element properties. Elements which are rejected by a quick filter will not be expanded in memory. 
+This filter will match elements whose class is an exact match to the input class, or elements whose class is derived from the input class.
+
+<p>There is a small subset of Element subclasses in the API which are not supported by this filter. These types exist in the API, but not in Revit's native object model, which means that this filter doesn't support them. In order to use a class filter to find elements of these types, it is necessary to use a higher level class and then process the results further to find elements matching only the subtype. The following types are affected by this restriction: 
+
+<ul>
+<li>Subclasses of Autodesk.Revit.DB.Material
+<li>Subclasses of Autodesk.Revit.DB.CurveElement
+<li>Subclasses of Autodesk.Revit.DB.ConnectorElement
+<li>Subclasses of Autodesk.Revit.DB.HostedSweep
+<li>Autodesk.Revit.DB.Architecture.Room
+<li>Autodesk.Revit.DB.Mechanical.Space
+<li>Autodesk.Revit.DB.Area
+<li>Autodesk.Revit.DB.Architecture.RoomTag
+<li>Autodesk.Revit.DB.Mechanical.SpaceTag
+<li>Autodesk.Revit.DB.AreaTag
+<li>Autodesk.Revit.DB.CombinableElement
+<li>Autodesk.Revit.DB.Mullion
+<li>Autodesk.Revit.DB.Panel
+<li>Autodesk.Revit.DB.AnnotationSymbol
+<li>Autodesk.Revit.DB.Structure.AreaReinforcementType
+<li>Autodesk.Revit.DB.Structure.PathReinforcementType
+<li>Autodesk.Revit.DB.AnnotationSymbolType
+<li>Autodesk.Revit.DB.Architecture.RoomTagType
+<li>Autodesk.Revit.DB.Mechanical.SpaceTagType
+<li>Autodesk.Revit.DB.AreaTagType
+<li>Autodesk.Revit.DB.Structure.TrussType
+</ul>
+
+</span>
+
+<p>The sample code that you provided looks perfectly correct to me, though. I do not see why it should not return any annotation symbols if there are any present in the model.
+
+<p>One idea for retrieving annotation symbols is to debug what goes on in RevitLookup. I created a new project and looked at the database contents using Add-Ins &gt; Revit Lookup &gt; Snoop DB... In the empty project, there was no entry for the AnnotationSymbol class.
+
+<p>I added an annotation symbol to the model using Annotate &gt; Symbol and looked at the updated database contents in RevitLookup again, at which point the annotation symbol appears as expected:</p>
+
+<center>
+<img src="img/snoop_annotation_symbol.png" alt="Snoop annotation symbol"/>
+</center>
+

@@ -1,0 +1,190 @@
+<!-- 
+
+http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html?cid=6a00e553e1689788330153915d8721970b#comment-6a00e553e1689788330153915d8721970b
+http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html?cid=6a00e553e168978833014e8b5a59dd970d#comment-6a00e553e168978833014e8b5a59dd970d 
+http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html?cid=6a00e553e168978833015391670221970b#comment-6a00e553e168978833015391670221970b 
+http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html?cid=6a00e553e168978833015391670c37970b#comment-6a00e553e168978833015391670c37970b 
+
+-->
+
+<h3>FilledRegion Coordinates</h3>
+
+<p>Here is a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/access-to-sketch-and-sketch-plane.html?cid=6a00e553e1689788330153915d8721970b#comment-6a00e553e1689788330153915d8721970b">
+question</a>
+
+raised by Trang on how to access the coordinates of a filled region.
+
+<p>It demonstrates that you can make (completely unsupported and at your own risk) use of the sequential nature of the element id allocation to determine relationships between Revit database elements and their data that is not otherwise accessible through the Revit API.
+
+<p><strong>Question:</strong> I try to get coordinates of corners of a FilledRegion but I couldn't. 
+Could you show me how I can get the boundary of a FilledRegion?
+
+<p><strong>Answer:</strong> The current Revit API does not provide any direct access to this data. 
+
+<p>Meanwhile, however, just creating a filled region on the fly and using RevitLookup to analyse the results, I see that a FilledRegion element was created with the element id 161178. 
+Immediately before, a sketch with id 161176 was created. Its profile defines a curve array, and the lines are accessible. 
+Maybe this kind of approach can help you retrieve the data you are looking for?
+
+<p><strong>Response:</strong> What I want is coordinates of a FilledRegion, so here is my code.
+
+<pre class="code">
+<span class="blue">public</span> List getBoundaryCorner( 
+&nbsp; <span class="teal">FilledRegion</span> region, 
+&nbsp; <span class="teal">Document</span> doc )
+{
+&nbsp; List result = <span class="blue">new</span> List();
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>( 
+&nbsp; &nbsp; region.Id.IntegerValue - 1 );
+&nbsp;
+&nbsp; <span class="teal">Sketch</span> boundary = doc.get_Element( id ) <span class="blue">as</span> <span class="teal">Sketch</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != boundary )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curBoundary 
+&nbsp; &nbsp; &nbsp; = boundary.Profile.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != curBoundary )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> cur <span class="blue">in</span> curBoundary )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> corner = cur.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; result.Add( corner );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p><strong>Answer:</strong> Congratulations on getting it working!
+
+<p>I created a new external command CmdFilledRegionCoords from your solution for The Building Coder samples.
+For that, I updated your getBoundaryCorner implementation very slightly like this:
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; GetBoundaryCorners( <span class="teal">FilledRegion</span> region )
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; result = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>( 
+&nbsp; &nbsp; region.Id.IntegerValue - 1 );
+&nbsp;
+&nbsp; <span class="teal">Sketch</span> sketch = region.Document.get_Element( 
+&nbsp; &nbsp; id ) <span class="blue">as</span> <span class="teal">Sketch</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != sketch )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curves = sketch.Profile.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != curves )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> cur <span class="blue">in</span> curves )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> corner = cur.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; result.Add( corner );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p>This helper method is driven by the following mainline in the Execute method implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; filledRegions 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.GetSelectedElementsOrAll( 
+&nbsp; &nbsp; filledRegions, uidoc, <span class="blue">typeof</span>( <span class="teal">FilledRegion</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> n = filledRegions.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] results = <span class="blue">new</span> <span class="blue">string</span> [n];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FilledRegion</span> region <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; filledRegions.Cast&lt;<span class="teal">FilledRegion</span>&gt;() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( region );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; corners = GetBoundaryCorners( 
+&nbsp; &nbsp; &nbsp; &nbsp; region );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> result = ( <span class="blue">null</span> == corners ) ? <span class="maroon">&quot;failed&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; corners.ConvertAll&lt;<span class="blue">string</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p =&gt; <span class="teal">Util</span>.PointString( p ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToArray() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; results[i++] = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}: {1}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; desc, result );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Retrieving corners for {0} filled region{1}{2}&quot;</span>, 
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> t = <span class="blue">string</span>.Join( <span class="maroon">&quot;\r\n&quot;</span>, results );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( s, t );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is a sample filled region to test this code on:
+
+<center>
+<img src="img/filledregion.png" alt="FilledRegion"/>
+</center>
+
+<p>Here are the resulting coordinates as displayed by the new overload of the InfoMsg method using a task dialogue:
+
+<center>
+<img src="img/filledregion_coords.png" alt="FilledRegion coordinates"/>
+</center>
+
+<p>For completeness' sake, here they are in text format as well:
+
+<pre>
+Retrieving corners for 1 filled region:
+
+Detail Items <161178 Detail Filled Region>: 
+  (-19.01,40.84,0), 
+  (1.64,11.35,0), 
+  (-35.7,17.93,0), 
+  (-38.81,21.04,0)
+</pre>
+
+<p>Thanks to Trang for raising this topic and testing out the idea.
+
+<p>Here is
+
+<a href="zip/bc_12_92.zip">
+version 2012.0.92.0</a> of
+
+The Building Coder samples including the new command CmdFilledRegionCoords.
+
+<p>Some additional notes: the element ids I originally saw in RevitLookup were not consecutive, but two apart. 
+Trang used consecutive ones, I am assuming after a more detailed analysis than my quick glance.
+
+<p>Obviously, the method described here is completely unsupported and will almost certainly fail in some future version.
+You use it completely at your own risk.
+
+<p>Probably, at some point in the future, the Revit API will provide official access to the filled region coordinates, and this workaround will no longer be needed.
+
+<p>Still, it was pretty satisfying and good fun to make use of this undocumented feature, and also hear from Rudolf in his comment below that he is aware of it as well, for a similar use with revision clouds.

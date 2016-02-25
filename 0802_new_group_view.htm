@@ -1,0 +1,46 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 07397569 [duplicating elements through grouping] -->
+
+<h3>View of NewGroup Duplicated Elements</h3>
+
+<p>I already mentioned that you can work around the lack of programmatic creation possibilities for some element types by grouping existing ones, creating new instances of that group, and then ungrouping it again.
+
+<p>One question that came up in that context is what view the new group appears in:
+
+<p><strong>Question:</strong> I am using code like this to duplicate one or more elements:
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> CreateGroup( 
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids,
+&nbsp; &nbsp; <span class="teal">XYZ</span> offset )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Group</span> group = doc.Create.NewGroup( ids );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationPoint</span> location = group.Location 
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = location.Point + offset;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Group</span> newGroup = doc.Create.PlaceGroup( 
+&nbsp; &nbsp; &nbsp; p, group.GroupType );
+&nbsp;
+&nbsp; &nbsp; group.UngroupMembers();
+&nbsp; }
+</pre>
+
+<p>However, under certain circumstances, the new group is not placed in the same view as the old one. 
+
+<p>Is there any way to specify the target view?
+
+
+<p><strong>Answer:</strong> Sorry, there is currently no direct API access to control the view used when placing a group.
+
+<p>The active view will be used to place the new group, so all you have to do is ensure that the target view really is activated.
+
+<p>To be on the really safe side, you might want to try closing all other views to absolutely force the open one to be used.
+
+<p>The Revit API calls should in theory obviously not be influenced by any of the user interface settings, but there may still be some obsolete remnants of such dependencies left.

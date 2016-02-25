@@ -1,0 +1,446 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Victor Chekalin, Potok Csjc -- 08535207 [Create floor with complex boundary] -->
+
+<h3>Create a Floor with an Opening or Complex Boundary</h3>
+
+<p>Here is another question raised and solved by Victor Chekalin, Виктор Чекалин:</p>
+
+<p><strong>Question:</strong> I need to programmatically create a floor.
+The problem is that the floor is complex with different boundary loops, like this:</p>
+
+<center>
+<img src="img/vc_complex_floor_boundaries.png" alt="Complex floor boundaries" width="200"/>
+</center>
+
+<p>The API provides only one single method to create a new floor &ndash; Document.NewFloor.
+I have to pass a CurveArray to this method, and the floor will be created on these curves.</p>
+
+<p>But using this method I cannot create a complex floor as shown, with openings.
+If I create an array containing eight lines for the outer and inner boundary loops, it produces the following:</p>
+
+<center>
+<img src="img/vc_complex_floor_creating_result.png" alt="Erroneous resulting floor" width="200"/>
+</center>
+
+<p>Actually, I also cannot find the way retrieve the existing floor boundaries.
+The ones displayed above were obtained from the floor geometry solid, which does not produce exactly the same results as its boundary.</p>
+
+<p>Is there way to create a floor programmatically with several boundary loops?</p>
+
+
+
+<p><strong>Answer:</strong> Here are the examples of using the NewFloor method that I am aware of:
+
+<ul>
+<li>SDK samples: FoundationSlab, GenerateFloor
+<li>RevitLookup: Utils/Elements.cs and TestElements.cs
+<li>Blog posts:
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">Editing a Floor Profile</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">Boolean Operations for 2D Polygons</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/hole-in-a-floor.html">Hole in a Floor</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/08/floor-creation.html">Floor Creation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/pick-corners-and-create-floor.html">Pick Corners and Create Floor</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/validate-roof-type-and-view-obj-on-android.html">Validate Roof Type and View OBJ on Android</a></li>
+</ul>
+</ul>
+
+<p>Have you looked at all of these?</p>
+
+<p>The blog post discussing a hole in a floor states that you have to use an opening to generate the hole.</p>
+
+<p>Is there any other way to create a floor with a hole manually, or does it also require a shaft or an opening of some kind?</p>
+
+<p>If that is the case, then the API will impose the same requirement.</p>
+
+<p>Mostly the API will not allow you to model things that you cannot also create manually.</p>
+
+<!-- <p>If you can assure me that the user interface enables direct creation of a floor with holes in it, i.e. by specifying multiple boundary loops defining the outer perimeter and the interior holes in one go, then I will happily ask the development team how to define the appropriate floor profile including multiple loops defining an outer boundary and inner holes using the CurveArray argument provided as input to the NewFloor method.</p> -->
+
+
+<p><strong>Response:</strong> In fact I already could copy floor without openings like in your sample to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">
+edit a floor profile</a>.</p>
+
+<p>After reading the posts you listed, I created the function to copy existing floor with openings.
+I assumed that the first EdgeArray in the Face.EdgeLoops is the outer boundary of the floor and the following ones are opening boundaries.
+As it turns out, this is not always the case.</p>
+
+<p>Here is the
+
+<a href="http://pastebin.com/sWXvLyKc">
+code implementing this</a>:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ElementRoomInfoCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _eps = 1.0e-9;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; r = uidoc.Selection.PickObject( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FloorSelectionFilter</span>(), <span class="maroon">&quot;Select a floor&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> floor = doc.GetElement( r.ElementId ) <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Copy Floor&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> newFloor = CopyFloor( floor );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> moveRes =
+&nbsp; &nbsp; &nbsp; &nbsp; newFloor.Location.Move( <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 10 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create new floor openings&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; CreateFloorOpenings( floor, newFloor );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> res = t.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> CreateFloorOpenings(
+&nbsp; &nbsp; <span class="teal">Floor</span> sourceFloor,
+&nbsp; &nbsp; <span class="teal">Floor</span> destFloor )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Looking if source floor has openings</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> floorGeometryElement =
+&nbsp; &nbsp; &nbsp; &nbsp; sourceFloor.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> geometryObject <span class="blue">in</span> floorGeometryElement )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> floorSolid =
+&nbsp; &nbsp; &nbsp; &nbsp; geometryObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( floorSolid == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> topFace =
+&nbsp; &nbsp; &nbsp; &nbsp; GetTopFace( floorSolid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor does not have top face&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace.EdgeLoops.IsEmpty )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor top face does not have edges&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If source floor has openings</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace.EdgeLoops.Size &gt; 1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; topFace.EdgeLoops.Size; i++ )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> openingEdges =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFace.EdgeLoops.get_Item( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> openingCurveArray =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetCurveArrayFromEdgeArary( openingEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> opening =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sourceFloor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewOpening( destFloor,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; openingCurveArray,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">Floor</span> CopyFloor( <span class="teal">Floor</span> sourceFloor )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> floorGeometryElement =
+&nbsp; &nbsp; &nbsp; sourceFloor.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> geometryObject <span class="blue">in</span> floorGeometryElement )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> floorSolid =
+&nbsp; &nbsp; &nbsp; &nbsp; geometryObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( floorSolid == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> topFace =
+&nbsp; &nbsp; &nbsp; &nbsp; GetTopFace( floorSolid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor does not have top face&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace.EdgeLoops.IsEmpty )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor top face does not have edges&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> outerBoundary =
+&nbsp; &nbsp; &nbsp; &nbsp; topFace.EdgeLoops.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create new floor using source </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// floor outer boundaries</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveArray</span> floorCurveArray =
+&nbsp; &nbsp; &nbsp; &nbsp; GetCurveArrayFromEdgeArary( outerBoundary );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> newFloor =
+&nbsp; &nbsp; &nbsp; &nbsp; sourceFloor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewFloor( floorCurveArray, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> newFloor;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">CurveArray</span> GetCurveArrayFromEdgeArary(
+&nbsp; &nbsp; <span class="teal">EdgeArray</span> edgeArray )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curveArray =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> edgeArray )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> edgeCurve =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; edge.AsCurve();
+&nbsp;
+&nbsp; &nbsp; &nbsp; curveArray.Append( edgeCurve );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> curveArray;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">PlanarFace</span> GetTopFace( <span class="teal">Solid</span> solid )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> topFace = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( <span class="teal">Math</span>.Abs( pf.Normal.X - 0 ) &lt; _eps
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( pf.Normal.Y - 0 ) &lt; _eps ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( <span class="blue">null</span> == topFace )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || ( topFace.Origin.Z &lt; pf.Origin.Z ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFace = pf;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> topFace;
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">FloorSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> elem <span class="blue">is</span> <span class="teal">Floor</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotImplementedException</span>();
+&nbsp; }
+}
+</pre>
+
+<p>Unfortunately, this produces an error when I try to copy a floor with openings:</p>
+
+<center>
+<img src="img/vc_complex_floor1.png" alt="Error message" width="400"/>
+</center>
+
+<p>The reason is that Revit cannot create an opening in the floor until after the floor creation transaction has been committed.
+That means that you cannot copy a floor with openings in one single transaction.</p>
+
+<p>My next attempt consists in copying the floor without its openings, committing the transaction, and then creating the openings in a second step.</p>
+
+<p>This method works.
+Here is the main implementation source code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="teal">Floor</span> CopyFloor( <span class="teal">Floor</span> sourceFloor )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> floorGeometry =
+&nbsp; &nbsp; &nbsp; sourceFloor.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> geometryObject <span class="blue">in</span> floorGeometry )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> floorSolid =
+&nbsp; &nbsp; &nbsp; &nbsp; geometryObject <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( floorSolid == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> topFace =
+&nbsp; &nbsp; &nbsp; &nbsp; GetTopFace( floorSolid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor does not have top face&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace.EdgeLoops.IsEmpty )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">NotSupportedException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Floor top face does not have edges&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> outerBoundary =
+&nbsp; &nbsp; &nbsp; &nbsp; topFace.EdgeLoops.get_Item( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create new floor using source </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// floor outer boundaries</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveArray</span> floorCurveArray =
+&nbsp; &nbsp; &nbsp; &nbsp; GetCurveArrayFromEdgeArary( outerBoundary );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> newFloor =
+&nbsp; &nbsp; &nbsp; &nbsp; sourceFloor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewFloor( floorCurveArray, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If source floor has openings</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( topFace.EdgeLoops.Size &gt; 1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; topFace.EdgeLoops.Size; i++ )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> openingEdges =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFace.EdgeLoops.get_Item( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> openingCurveArray =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetCurveArrayFromEdgeArary( openingEdges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> opening =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sourceFloor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Document
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewOpening( newFloor,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; openingCurveArray,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> newFloor;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="teal">CurveArray</span> GetCurveArrayFromEdgeArary(
+&nbsp; &nbsp; <span class="teal">EdgeArray</span> edgeArray )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curveArray =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> edgeArray )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> edgeCurve =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; edge.AsCurve();
+&nbsp;
+&nbsp; &nbsp; &nbsp; curveArray.Append( edgeCurve );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> curveArray;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">PlanarFace</span> GetTopFace( <span class="teal">Solid</span> solid )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> topFace = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( <span class="teal">Math</span>.Abs( pf.Normal.X - 0 ) &lt; _eps
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Math</span>.Abs( pf.Normal.Y - 0 ) &lt; _eps ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( <span class="blue">null</span> == topFace )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || ( topFace.Origin.Z &lt; pf.Origin.Z ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; topFace = pf;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> topFace;
+&nbsp; }
+</pre>
+
+<p>Here is the result, with the original floor at the bottom and the copy at the top:</p>
+
+<center>
+<img src="img/vc_complex_floor2.png" alt="Floor with openings" width="400"/>
+</center>
+
+<p>But, as you pointed out, the copied floor is not an exact replica of the original floor:</p>
+
+<center>
+<img src="img/vc_complex_floor3.png" alt="Floor with openings" width="400"/>
+</center>
+
+<p>They have only the same visualization:</p>
+
+<center>
+<img src="img/vc_complex_floor4.png" alt="Floor with openings" width="400"/>
+</center>
+
+<p>The original floor does not have an opening. It has complex multiply boundaries.</p>
+
+<p>Also, the problem is that my approach is not right.
+The first item in the Face.EdgeLoops is not always the outer boundary.
+A floor may contain several EdgeArrays without boundaries, for example like this single floor consisting of multiple disjoint pieces:</p>
+
+<center>
+<img src="img/vc_complex_floor5.png" alt="Floor with several pieces" width="400"/>
+</center>
+
+<p>This is one single floor, whose geometry contains one single solid.
+The top face of this solid has four separate EdgeArrays and the floor doesn't have any openings.
+So, I have to implement a method to determine whether a given EdgeArray represents an opening or not.
+I think I can do it by just checking if each edge of the EdgeArray is inside any previous EdgeArray, which would mean that it represents an opening.</p>
+
+<p>The other problem: even if I determine all openings and create a 'copy' of the floor, I cannot create a copy of the copy using the same method.</p>
+
+<p>Conclusion:</p>
+
+<ul>
+<li>There is no way to create an exact copy of a floor with holes using API as in the UI.</li>
+<li>There is a workaround to create holes in the floor using openings instead.</li>
+</ul>
+
+<p>The entire source code and Visual Studio project implementing this command to copy a floor with openings is available from Victor's
+
+<a href="https://github.com/vchekalin/RevitFloorCopy">
+RevitFloorCopy GitHub repository</a>,
+
+which also includes this direct link to the
+
+<a href="https://github.com/vchekalin/RevitFloorCopy/archive/master.zip">
+complete zip archive</a>.</p>
+
+<p>Thank you very much, Victor, for your persistent and insightful research and sharing this valuable solution!</p>

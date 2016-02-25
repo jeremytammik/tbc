@@ -1,0 +1,254 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06676034 [Transfering system content between projects] 
+1271890 [Transfer Project Standard]
+
+-->
+
+<h3>Transfer Project Standards</h3>
+
+<p>Developers occasionally ask about programmatic access to the 'Transfer Project Standards' user interface functionality.
+Unfortunately, that is currently not provided by the Revit API.
+However, it is possible to implement a workaround, although it would require quite a bit of work and testing to ensure that it fulfils your needs, as the following sample by Joe Ye shows:
+
+
+<p><strong>Question:</strong> Is it possible through the 2012 Revit API to transfer project standards and or system families between Revit projects?
+
+<p>For example, through the Revit user interface, I can insert drafting views from another project. 
+I can also transfer wall types, fill patterns, line styles, text types, and various other project wide settings from one project to another. 
+Alternatively, if I only want to transfer the types related to one object, I can copy and paste a complex object like a railing from one project into another. 
+This will not only copy the railing type but also the related types such as rail profiles and baluster families.
+
+<p>Is there a way to automate this through the Revit 2012 API?
+
+
+<p><strong>Answer:</strong> I am sorry to say that there is currently no API access to the built-in 'Transfer Project Standards' functionality.
+
+<p>A possible workaround would obviously be to read the system types of interest from the source project, determine similar existing elements in the target project, use 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/system-family-creation.html">
+the Duplicate method</a>
+
+to create new target instances of them, and copy all relevant properties from the source to the new target elements.
+
+<p>I implemented a new external command CmdCopyWallType for The Building Coder solution from Joe's sample code that shows the principles of implementing this for a wall type. 
+
+<p>The source wall type is selected from an existing project by name, an equivalent new target wall type is created in the current project, and the properties are copied across.
+
+<p>Some aspects are not handled here, e.g. element-id-valued and shared parameters, other properties, the compound structure, etc.
+
+<p>It does give you the general idea, however, proves feasibility in principle, and provides a starting point if you really want to take this further.
+
+<p>Here is the CmdCopyWallType implementation:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdCopyWallType</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Source project to copy system type from.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _source_project_path 
+&nbsp; &nbsp; = <span class="maroon">&quot;C:/a/j/adn/case/bsd/06676034/test/NewWallType.rvt&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Source wall type name to copy.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _wall_type_name = <span class="maroon">&quot;NewWallType&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Open source project</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> docHasFamily = app.OpenDocumentFile( _source_project_path );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Find system family to copy, e.g. using a named wall type</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WallType</span> wallType = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">WallType</span> wt <span class="blue">in</span> docHasFamily.WallTypes )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wt.Name.Equals( _wall_type_name ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; wallType = wt;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == wallType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot find source wall type '{0}'&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; in source document '{1}'. &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; _source_project_path, 
+&nbsp; &nbsp; &nbsp; &nbsp; _wall_type_name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create a new wall type in current document</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Transfer Wall Type&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WallType</span> newWallType = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">WallType</span> wt <span class="blue">in</span> doc.WallTypes )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wt.Kind == wallType.Kind )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; newWallType = wt.Duplicate( _wall_type_name ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">WallType</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;New wall type '{0}' created.&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _wall_type_name ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Assign parameter values from source wall type:</span>
+&nbsp;
+<span class="blue">#if</span> COPY_INDIVIDUAL_PARAMETER_VALUE
+<span class="gray">&nbsp; &nbsp; // Example: individually copy the &quot;Function&quot; parameter value:</span>
+&nbsp;
+<span class="gray">&nbsp; &nbsp; BuiltInParameter bip = BuiltInParameter.FUNCTION_PARAM;</span>
+<span class="gray">&nbsp; &nbsp; string function = wallType.get_Parameter( bip ).AsString();</span>
+<span class="gray">&nbsp; &nbsp; Parameter p = newWallType.get_Parameter( bip );</span>
+<span class="gray">&nbsp; &nbsp; p.Set( function );</span>
+<span class="blue">#endif</span> <span class="green">// COPY_INDIVIDUAL_PARAMETER_VALUE</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> p2 <span class="blue">in</span> newWallType.Parameters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Definition</span> d = p2.Definition;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p2.IsReadOnly )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter '{0}' is read-only.&quot;</span>, d.Name ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = wallType.get_Parameter( d );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter '{0}' not found on source wall type.&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d.Name ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p.StorageType == <span class="teal">StorageType</span>.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Here you have to find the corresponding </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// element in the target document. </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter '{0}' is an element id.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d.Name ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p.StorageType == <span class="teal">StorageType</span>.Double )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p2.Set( p.AsDouble() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( p.StorageType == <span class="teal">StorageType</span>.String )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p2.Set( p.AsString() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( p.StorageType == <span class="teal">StorageType</span>.Integer )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p2.Set( p.AsInteger() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Parameter '{0}' copied.&quot;</span>, d.Name ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Note: </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// If a shared parameter parameter is attached, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// you need to create the shared parameter first, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// then copy the parameter value.</span>
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If the system family type has some other properties, </span>
+&nbsp; &nbsp; <span class="green">// you need to copy them as well here. Reflection can</span>
+&nbsp; &nbsp; <span class="green">// be used to determine the available properties.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] memberInfos = newWallType.GetType()
+&nbsp; &nbsp; &nbsp; .GetMembers( <span class="teal">BindingFlags</span>.GetProperty );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">MemberInfo</span> m <span class="blue">in</span> memberInfos )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Copy the writable property values here.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// As there are no property writable for </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Walltype, I ignore this process here.</span>
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>It prints out some of its actions in the debug output window.
+
+<p>As you can see from the following list, some properties cannot be copied without adding more intelligence, so there is not even a guarantee that the resulting wall style will work as expected:
+
+<pre>
+New wall type 'NewWallType' created.
+Parameter 'Description' copied.
+Parameter 'URL' copied.
+Parameter 'Type Comments' copied.
+Parameter 'Fire Rating' copied.
+Parameter 'Cost' copied.
+Parameter 'Assembly Code' copied.
+Parameter 'Structure' not found on source wall type.
+Parameter 'Coarse Scale Fill Pattern' is an element id.
+Parameter 'Wrapping at Inserts' copied.
+Parameter 'Function' copied.
+Parameter 'Model' copied.
+Parameter 'Manufacturer' copied.
+Parameter 'Type Mark' copied.
+Parameter 'Coarse Scale Fill Color' copied.
+Parameter 'Assembly Description' is read-only.
+Parameter 'Keynote' copied.
+Parameter 'Width' is read-only.
+Parameter 'Wrapping at Ends' copied.
+</pre>
+
+<p>As said, this is just an idea and a starting point for further exploration. 
+It is a long way removed from providing the full functionality to transfer project standards.
+
+<p>Here is
+
+<a href="zip/bc_12_92.zip">
+version 2012.0.92.0</a> of
+
+The Building Coder samples including both the command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/filledregion-corrdinates.html">
+CmdFilledRegionCoords</a> that 
+
+I presented last week and the new command CmdCopyWallType.
+

@@ -1,0 +1,388 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>OBJ Model Export Considerations</h3>
+
+<p>As I already said, I am 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/getting-going-with-the-cloud.html">
+getting going with the cloud</a>,
+
+and my first project is to export a Revit model to the 
+
+<a href="http://en.wikipedia.org/wiki/Wavefront_.obj_file">
+Wavefront OBJ</a> file
+
+format, which seems to be pretty standard and compact.
+
+<p>My exploration so far led to a number of observations and other issues:
+
+<ul>
+<li><a href="#2">Cloud and mobile DevBlog</a>
+<li><a href="#3">Selecting model elements</a>
+<li><a href="#4">OBJ file format</a>
+<li><a href="#5">Eliminating duplicate vertices</a>
+<li><a href="#6">XYZ vertex lookup</a>
+<li><a href="#7">Integer-based vertex lookup</a>
+<li><a href="#8">Next steps</a>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Cloud and Mobile DevBlog</h4>
+
+<p>Talking about cloud and mobile, we have another addition to our growing list of ADN DevBlogs:
+
+<p>The 
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile">
+Cloud and Mobile Development DevBlog</a> has now been launched.
+
+<p>For more background information on it and an overview of the other ADN DevBlogs, please refer to 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/06/cloud-mobile-devblog.html">
+Kean's announcement</a>.
+
+
+
+<a name="3"></a>
+
+<h4>Selecting Model Elements</h4>
+
+<p>Before we can start exporting the Revit model geometry, we need to determine which elements to extract the data from.
+
+<p>We took a couple of stabs at this in the past; an early one was
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html">
+for Revit 2010</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2009/06/category-comparison-and-model-element-selection-revisited.html">revisited</a>), 
+
+selecting each element that:
+
+<ul>
+<li>Is not a family or a family symbol
+<li>Has a valid category
+<li>Has non-empty geometry
+</ul>
+
+<p>This proved to be too simple, and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+further tests</a> were required to eliminate unwanted elements.
+
+<p>We revisited the topic using filtered element collectors to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/selecting-model-elements.html">
+retrieve all model elements in Revit 2011</a> 
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">updated</a>).
+
+<p>Here are some other possible criteria to apply besides the three listed above:
+
+<ul>
+<li>Category HasMaterialQuantities property 
+<li>FilteredElementCollector WhereElementIsNotElementType and WhereElementIsViewIndependent methods
+</ul>
+
+<p>You may also find that you need to define detailed lists of categories or other criteria to satisfy for your specific requirements in selecting the elements to export.
+
+
+<a name="4"></a>
+
+<h4>OBJ File Format</h4>
+
+<p>Back to the OBJ format, one of its main advantages is its extremely succinct 
+
+<a href="http://www.eg-models.de/formats/Format_Obj.html">
+file format specification</a>.
+
+As you can see, the only data that absolutely needs to be specified is the vertices and faces. 
+Optionally, texture coordinates and normals can also be defined.
+
+The slightly more extensive 
+
+<a href="http://en.wikipedia.org/wiki/Wavefront_.obj_file#File_format">
+Wikipedia version</a> also
+
+explains how parameter space vertices can be specified, and how colours are defined using a material library.
+
+<p>Here is a sample OBJ file 
+
+<a href="zip/wavefront_obj/cube.obj.txt">
+cube.obj</a> representing
+
+a cube, with an associated material library 
+
+<a href="zip/wavefront_obj/material.mtl.txt">
+material.mtl</a>,
+
+that I found in the 
+
+<a href="http://sourceforge.net/projects/objloaderforand">
+.obj Loader for Android</a> distribution.
+
+<p>The cube definition is rather sub-optimal, though, listing and making use of 24 vertices, although we all know that a cube only has a total of eight corners.
+Here is an optimised OBJ representation of a cube:
+
+<pre>
+v 1 1 1
+v 1 1 -1
+v 1 -1 1
+v 1 -1 -1
+v -1 1 1
+v -1 1 -1
+v -1 -1 1
+v -1 -1 -1
+f 1 3 4 2
+f 5 7 8 6
+f 1 5 6 2
+f 3 7 8 4
+f 1 5 7 3
+f 2 6 8 4
+</pre>
+
+
+
+<a name="5"></a>
+
+<h4>Eliminating Duplicate Vertices</h4>
+
+<p>As the trivial example above shows, you can significantly reduce the size of an OBJ by eliminating duplicate vertex definitions.
+
+<!--
+file smaller and you know, a cube has six faces, so the last section of the file listing exactly six faces makes sense:
+
+<pre>
+f 1//1 2//2 3//3 4//4 
+f 5//5 6//6 7//7 8//8 
+f 9//9 10//10 11//11 12//12 
+f 13//13 14//14 15//15 16//16 
+f 17//17 18//18 19//19 20//20 
+f 21//21 22//22 23//23 24//24
+</pre>
+
+<p>The normal vectors are presumably superfluous, since a cube has planar faces anyway, so every sensible renderer will default to the correct normal vector pointing straight out of the face anyway.
+
+<p>Strangely enough, though, the faces are refencing 24 different points.
+As we all know, a cube has 8 distinct vertices, not 24.
+-->
+
+The generator of the larger cube sample file above defined 24 points, i.e. 4 * 6.
+It probably simply iterated over all six cube faces and output a new vertex definition for each face corner encountered, regardless of repetition.
+
+<p>This is very wasteful.
+In Revit it also incurs the additional risk of defining vertices which are supposed to specify corners of adjacent faces, but may be slightly off, as we discussed in obtaining the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/top-faces-of-wall.html">
+top faces of sloped walls</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#2">
+retrieving unique geometry vertices</a> from 
+
+a selected element, and most recently in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html#3">
+geometry traversal to retrieve unique vertices</a> from 
+
+concrete structural elements.
+
+<p>If we collect all unique vertices in the Revit model and use the resulting list to avoid any duplicate definitions in the OBJ file, we can drastically reduce the number of vertex definitions, in this case from 24 to 8, and improve precision at the same time.
+
+
+
+
+<a name="6"></a>
+
+<h4>XYZ Vertex Lookup</h4>
+
+<p>According to the observations above, I implemented a vertex lookup class providing a method AddVertex taking an XYZ input argument specifying a new triangle vertex to store for exporting.
+
+<p>It looks up the given XYZ point and either returns the index of a previously defined point, if possible, or creates a new entry for it and returns that index.
+
+<p>As discussed so many times in the past, the point comparison has to include some fuzz.
+
+<p>Here is the full implementation of my VertexLookupXyz class with its own built-in XyzEqualityComparer:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A vertex lookup class to eliminate duplicate </span>
+<span class="gray">///</span><span class="green"> vertex definitions</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">VertexLookupXyz</span> : <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="blue">int</span>&gt;
+{
+<span class="blue">&nbsp; #region</span> XyzEqualityComparer
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define equality for Revit XYZ points.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Very rough tolerance, as used by Revit itself.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">XyzEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">XYZ</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> _sixteenthInchInFeet
+&nbsp; &nbsp; &nbsp; = 1.0 / ( 16.0 * 12.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> p.IsAlmostEqualTo( q,
+&nbsp; &nbsp; &nbsp; &nbsp; _sixteenthInchInFeet );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.PointString( p ).GetHashCode();
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// XyzEqualityComparer</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> VertexLookupXyz()
+&nbsp; &nbsp; : <span class="blue">base</span>( <span class="blue">new</span> <span class="teal">XyzEqualityComparer</span>() )
+&nbsp; {
+&nbsp; }
+
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the index of the given vertex,</span>
+&nbsp; <span class="gray">///</span><span class="green"> adding a new entry if required.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> AddVertex( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ContainsKey( p )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">this</span>[p]
+&nbsp; &nbsp; &nbsp; : <span class="blue">this</span>[p] = Count;
+&nbsp; }
+}
+</pre>
+
+<p>The XYZ points that I consider here are in the original Revit model coordinate system, i.e. in feet.
+
+
+
+<a name="7"></a>
+
+<h4>Integer-based Vertex Lookup</h4>
+
+<p>Thinking about the issue a bit further, though, I discovered several enhancement possibilities.
+
+<p>On one hand, it might be more useful for me to create the OBJ files in millimetres instead of feet.
+
+<p>Secondly, if you don't require floating-point precision, using integers is always more efficient, and mostly simpler as well.
+
+<p>This led me to define my own integer-based point class for storing the vertex coordinates in millimetres instead of feet, and in whole numbers instead of floating point.
+
+<p>The rest of my algorithm remained completely unchanged, and the resulting OBJ file also only differed in the actual vertex coordinate values.
+
+<p>Here is the implementation of my VertexLookupInt class with its own built-in integer based point class PointInt and PointIntEqualityComparer:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">PointInt</span> : <span class="teal">IComparable</span>&lt;<span class="teal">PointInt</span>&gt;
+{
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> X { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Y { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Z { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _feet_to_mm = 25.4 * 12;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> ConvertFeetToMillimetres( <span class="blue">double</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">int</span>) ( _feet_to_mm * d + 0.5 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> PointInt( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; X = ConvertFeetToMillimetres( p.X );
+&nbsp; &nbsp; Y = ConvertFeetToMillimetres( p.Y );
+&nbsp; &nbsp; Z = ConvertFeetToMillimetres( p.Z );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> CompareTo( <span class="teal">PointInt</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> d = X - a.X;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = Y - a.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; d = Z - a.Z;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A vertex lookup class to eliminate duplicate </span>
+<span class="gray">///</span><span class="green"> vertex definitions</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">VertexLookupInt</span> : <span class="teal">Dictionary</span>&lt;<span class="teal">PointInt</span>, <span class="blue">int</span>&gt;
+{
+<span class="blue">&nbsp; #region</span> PointIntEqualityComparer
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define equality for integer-based PointInt.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">PointIntEqualityComparer</span> : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">PointInt</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">PointInt</span> p, <span class="teal">PointInt</span> q )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0 == p.CompareTo( q );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">PointInt</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> (p.X.ToString() 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;,&quot;</span> + p.Y.ToString() 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;,&quot;</span> + p.Z.ToString())
+&nbsp; &nbsp; &nbsp; &nbsp; .GetHashCode();
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// PointIntEqualityComparer
+&nbsp;
+&nbsp; <span class="blue">public</span> VertexLookupInt()
+&nbsp; &nbsp; : <span class="blue">base</span>( <span class="blue">new</span> <span class="teal">PointIntEqualityComparer</span>() )
+&nbsp; {
+&nbsp; }
+
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the index of the given vertex,</span>
+&nbsp; <span class="gray">///</span><span class="green"> adding a new entry if required.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> AddVertex( <span class="teal">PointInt</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ContainsKey( p )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">this</span>[p]
+&nbsp; &nbsp; &nbsp; : <span class="blue">this</span>[p] = Count;
+&nbsp; }
+}
+</pre>
+
+
+<a name="8"></a>
+
+<h4>Next steps</h4>
+
+<p>I would dearly love to complete the entire discussion right here and now, but I guess that is enough for one go.
+
+<p>Here is an example of how far I have come with my implementation so far, exporting the rac_advanced_sample_project.rvt to OBJ and viewing it in a Windows-based 
+
+<a href="http://mview.sourceforge.net">
+mesh viewer</a>, 
+
+still in mono-chrome, I'm afraid:</p>
+
+<center>
+<img src="img/obj_export_entire_model.png" alt="Sample model OBJ file"/>
+</center>
+
+<p>Here are some of the next steps I plan to take in the coming days:
+
+<ul>
+<li>Discuss the rest of the OBJ export implementation in its current state
+<li>Add support for colour
+<li>Upload to the cloud
+<li>View on mobile device
+</ul>
+
+<p>It will be interesting to see where this leads us.
+As always, feedback and suggestions are more than welcome.

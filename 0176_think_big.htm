@@ -1,0 +1,168 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!--
+
+  1242628 [Exception from NewLineBound function in Create]
+  SPR #153261 [API wish: document exceptions raised by API functions and minimum length of model line]
+
+  1250992 [Variuos Revit API questions]
+  1251602 [Scaling Annotation families in views with scale 1:100, 1:200, 1:500]
+
+-->
+
+<h3>Think Big in Revit</h3>
+
+<p>A couple of cases dealing with issues concerning small dimensions in Revit were recently raised by
+Toste Wallmark of 
+
+<a href="http://www.i-tecton.com">
+Tecton Limited</a> 
+
+and
+
+Henrik Bengtsson of
+
+<a href="http://www.lindab.se">
+Lindab</a>:</p>
+
+<ul>
+<li><a href="#1">Minimal length required when calling NewLineBound</a>.</li>
+<li><a href="#2">Minimal possible family component dimension</a>.</li>
+<li><a href="#3">Minimum scaling factor for annotation family symbol</a>.</li>
+</ul>
+
+<a name="1"></a>
+
+<h4>Minimal Length in NewLineBound</h4>
+
+<p><strong>Question:</strong>
+I have discovered that NewLineBound throws System.ArgumentException "Value does not fall within the expected range" when the values are close or very close. 
+Is that an expected behaviour in this case? 
+How close can the line endpoints be for NewLineBound?
+
+<p><strong>Answer:</strong> I wrote an external command with the following implementation of its Execute method and was able to verify your assertion with it:</p>
+
+<pre class="code">
+<span class="blue">double</span> length = 1; <span class="green">// foot</span>
+<span class="blue">try</span>
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">XYZ</span> p = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; <span class="teal">XYZ</span> q = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; <span class="teal">Line</span> line;
+&nbsp; <span class="blue">while</span>( 0 &lt; length )
+&nbsp; {
+&nbsp; &nbsp; length = 0.5 * length;
+&nbsp; &nbsp; p.X = q.X = q.Y = length;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Creating model line of length {0}...&quot;</span>, 
+&nbsp; &nbsp; &nbsp; length );
+&nbsp;
+&nbsp; &nbsp; line = app.Create.NewLineBound( p, q );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+<span class="blue">catch</span>( <span class="teal">Exception</span> e )
+{
+&nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; <span class="maroon">&quot;Creating model line of length {0} &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;threw exception '{1}'&quot;</span>, 
+&nbsp; &nbsp; length, e.Message );
+&nbsp;
+&nbsp; message = e.Message;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>This is the result of running this command in a new Revit model:
+
+<pre>
+Creating model line of length 0.5...
+Creating model line of length 0.25...
+Creating model line of length 0.125...
+Creating model line of length 0.0625...
+Creating model line of length 0.03125...
+Creating model line of length 0.015625...
+Creating model line of length 0.0078125...
+Creating model line of length 0.00390625...
+Creating model line of length 0.001953125...
+
+A first chance exception of type 
+'System.ArgumentException' occurred in RevitAPI.dll
+
+Creating model line of length 0.001953125 threw 
+exception 'Value does not fall within the expected range.'
+</pre>
+
+<p>So apparently, you should not try to create any model lines with a length below about 0.004 feet, i.e. ca. 0.05 inches or 1.2 millimetres.</p>
+
+<p>This makes pretty good sense to me in the context of an architectural model.</p>
+
+
+<a name="2"></a>
+
+<h4>Minimal Family Component Dimension</h4>
+
+<p><strong>Question:</strong>
+When building families, the smallest parametric dimension that can be created is about 0.7 mm.
+Why?
+This is causing a great deal of problems for us.
+We are designing profiles whose thicknesses range from 0.4 mm to 3.0 mm.
+Is there any workaround to lower the minimal allowable dimension limit?</p>
+
+<p>To be exact, our thin metal profiles are produced in different thicknesses. The range is between 0.4 mm and 3.0 mm. 
+When I am designing my product, I want the geometries to be exactly as the physical product.</p>
+
+<p>In the same way, if someone is designing a hot rolled beam like an IPE270, it would really have been a problem if it was created 200 mm high or 300 mm instead of 270 mm. 
+This is the same type of issue. 
+The difference is big for us if you talk about 0.4 mm to 0.5 mm compared to 270 and 300.</p>
+
+<p>With the current limitations in Revit, when I am designing our profile which is 0.7 mm, I have to artificially make it 0.8 mm instead. 
+I will need to create a dummy parameter for the real thickness which is simple text, and then an extra parameter that controls the thickness of the profile. 
+These cannot be the same and that slows me down, as well as having the problem that the profiles are designed with an inaccurate thickness. 
+People will get confused.</p>
+
+<p>Some things in the building process are quite thin and small and that has nothing to do with tolerances really. 
+The tolerances are much smaller than this, but there is no need to express that. 
+There is a very big difference between a profile that is 0.5 mm and 0.7 mm. 
+The load bearing capacity will be twice as big and that is important if someone analyses the drawing in detail. 
+Users will wonder why it is 0.8 instead of 0.7, especially since 0.8 mm might be available from some producers.</p>
+
+<p><strong>Answer:</strong>
+Revit in general is not intended to work with very thin elements of ca. 1 mm. 
+We may have something like that to support surfaces for massing functionality, but it is not possible throughout the product.</p>
+
+<p>The reason is that Revit is tuned up to address building scale modelling. 
+Small details are incompatible with such scale, primary because they interfere with tolerances and it requires much more memory to combine in the same model very small and very large geometrical entities, with side effect of increased processing times.</p>
+
+<p>One approach to such cases is to model the external shape of the object, such as a column, and use interior layers for thin materials.</p>
+
+<p>Currently no such concept is applied to column, but only to wall, ceiling, floor, and roof, unless a column is joined geometry with a wall, in which case the column takes on the layer structure of the wall.</p>
+
+<p>Meanwhile, detail components could be added to such columns in views in which they are cut. 
+Certainly this can be done through the user interface, not sure if it is possible via the API as well.</p>
+
+
+<a name="3"></a>
+
+<h4>Minimum Annotation Family Symbol Scaling Factor</h4>
+
+<p><strong>Question:</strong>
+Annotation families cannot scale down in size when placed in views with 1:100 or smaller-sized items, e.g. 1:200, 1:500, etc. 
+After setting a parameter of the annotation family which makes it too small, Revit says 'Can't make type xxx", with error in Generic Annotation.</p>
+
+<p>The error seems to happen when the line is shorter than 1 mm.</p>
+
+<p>Is there any way to use the API to circumvent this, e.g. to scale down the annotation to an even smaller size in the view?</p>
+
+<p><strong>Answer:</strong>
+Unfortunately, there is no known way to achieve this. 
+Revit is not designed to function with elements of that size.</p>
+

@@ -1,0 +1,254 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08655588 [Transparency of Graphic Display]
+08641132 [Questions about Revit]
+08644968 [Stacked walls composition]
+08655146 [Is it possible to "Bind link" with api, like from the user interface]
+
+colour setting:
+  0745_get_element_type.htm
+  http://thebuildingcoder.typepad.com/blog/2012/04/getelement-method-and-get-element-type.html#2 -- Element Display Overrides
+  there are many ways to control the colour in revit:
+  http://revitclinic.typepad.com/my_weblog/2012/02/revit-visibility-hierarchy.html
+  http://adndevblog.typepad.com/aec/2012/06/revit-visibility-hierarchy.html
+  http://www.aecbytes.com/tipsandtricks/2010/issue54-revit2.html
+  http://blogs.rand.com/support/2011/10/revit-graphic-overrides.html
+  you need to know which method you want to make use of before trying to code it.
+
+no geometry in template views -- do you really want to cause an exception?
+  08659473 [SEHException when trying to retrieve a bounding box]
+
+-->
+
+<h3>Attributes, Relationships and Other Stuff</h3>
+
+<p>Before entering this wonderful new week, I have some unfinished business left over from the last one.</p>
+
+<p>Last week I returned from a short holiday and was inundated with developer cases, some of which I would still like to report on, or the results will presumably be lost forever, or at least until the next person runs into the same issue.
+I hope to prevent this here and now before starting with anything new.</p>
+
+<p>Let us therefore take a quick look at the following topics:</p>
+
+<ul>
+<li><a href="#2">View transparency setting</a></li>
+<li><a href="#3">Determine BIM element masses</a></li>
+<li><a href="#4">Stacked wall component relationships</a></li>
+<li><a href="#5">Bind a link</a></li>
+<li><a href="#6">Determine the colour of an element</a></li>
+<li><a href="#7">Exception retrieving a bounding box</a></li>
+<li><a href="#8">Happy week to all!</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>View Transparency Setting</h4>
+
+<p><strong>Question:</strong> The graphic display options provide the following transparency setting:</p>
+
+<center>
+<img src="img/graphic_display_options_transparency.jpg" alt="Graphic display options transparency setting" width="300"/>
+</center>
+
+<p>How can I control that setting programmatically, please?</p>
+
+
+<p><strong>Answer:</strong> This is documented in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+Revit 2014 API 'What's New'</a> section:
+
+<h4 style="color: darkblue">Views &amp; Display</h4>
+
+<h5 style="color: darkblue">Graphic Display options</h5>
+
+<p style="color: darkblue">These new members expose read and write of graphic display options:</p>
+
+<ul style="color: darkblue">
+<li>View.GetBackground()</li>
+<li>View.SetBackground()</li>
+<li>View.ShadowIntensity</li>
+<li>View.SunlightIntensity</li>
+<li>View.SurfaceTransparency</li>
+<li>View.ShowEdges</li>
+<li>View.ShowSilhouettes</li>
+<li>View.SilhouetteLineStyleId</li>
+</ul>
+
+<p>The View.SurfaceTransparency property provides an integer value controlling the amount of transparency applied to all surfaces, with 0 = opaque, 100 = fully transparent.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Determine BIM Element Mass</h4>
+
+<p><strong>Question:</strong> I need to extract the masses of my various building elements and am having difficulties accessing the geometry information to achieve this.
+
+<p>I'm using a method similar to the ObjectViewer SDK sample.
+In the project I am working on, this is only returning the roof and floor geometry.</p>
+
+<p>What do I need to do to retrieve the window frame geometry as well?</p>
+
+<p>Is there is a specific Mass class I can make use of?</p>
+
+<p><strong>Answer:</strong> You can query any Revit element for its geometry, extract the solids from that, and query them for their volume.
+This should work just as well for windows and other family instances as for roofs and floors.</p>
+
+<p>In some cases, you need to traverse the geometry instances as well as the main geometry object.</p>
+
+<p>This is demonstrated by many samples, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html#2">
+OBJ viewer</a>.</p>
+
+<p>However, it is probably simpler for you to use the Element methods GetMaterialIds, GetMaterialArea and GetMaterialVolume to determine the masses for different materials for any given element.
+Look at the discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+material quantity extraction</a> and
+
+the MaterialQuantities SDK sample for an example of using this.</p>
+
+
+<a name="4"></a>
+
+<h4>Stacked Wall Component Relationships</h4>
+
+<p><strong>Question:</strong> How can I find the basic WallTypes composing a stacked wall?</p>
+
+<p>I tried using the RevitLookup application and can see an unspecified "structure", but no further information.</p>
+
+<p><strong>Answer:</strong> I am glad you are using RevitLookup.
+This important tool is a must-have for any Revit developer, and very useful for end users as well.</p>
+
+<p>Currently, however, the Revit API provides no direct support for determining the relationship between a stacked wall and its subcomponent members.
+There are a couple of workarounds, though.</p>
+
+<p>One method to determine the relationship between a stacked wall and it basic wall components is described in the blog post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">
+curtain wall geometry</a>,
+
+using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">
+undocumented sequential element id relationships</a>.</p>
+
+<p>A more reliable and useful method to determine this relationship is to delete the stacked wall and see which child walls go with it, a method used in a totally general way by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+object relationship analyser</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">VB</a>).</p>
+
+<p>Pointers to several uses of that utility and the associated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+temporary transaction trick</a> are
+
+provided in this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">
+purging elements</a>.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Bind Link</h4>
+
+<p><strong>Question:</strong> Is it possible to use the Revit API to "Bind Link", like from the user interface?</p>
+
+<p>I searched for a method to achieve this, but with no luck.</p>
+
+<p><strong>Answer:</strong> I am not aware of any direct API support for this functionality.</p>
+
+<p>However, I can imagine two different approaches to achieving it anyway.</p>
+
+<ul>
+<li>Make use of the existing built-in 'bind link' Revit command;
+you can check whether this command can be launched programmatically using the UIApplication.CanPostCommand method and then post it using the PostCommand method.</li>
+
+<li>Make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/copy-and-paste-api-applications-and-modeless-assertion.html">
+copy and paste API</a>.</li>
+</ul>
+
+
+
+<a name="6"></a>
+
+<h4>Determine the Colour of an Element</h4>
+
+<p><strong>Question:</strong> I want to change the colour of a specific family instance.</p>
+
+<p>How can I achieve that, please?</p>
+
+<p><strong>Answer:</strong> Before you can affect the colour of a Revit element, you need to choose which method to use, and at what level this control should take place.
+There are numerous choices, as we mentioned discussing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/getelement-method-and-get-element-type.html#2">
+element display overrides</a>, e.g.:</p>
+
+<ul>
+<li><a href="http://revitclinic.typepad.com/my_weblog/2012/02/revit-visibility-hierarchy.html">
+Visibility hierarchy 1</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2012/06/revit-visibility-hierarchy.html">
+Visibility hierarchy 2</a></li>
+<li><a href="http://www.aecbytes.com/tipsandtricks/2010/issue54-revit2.html">
+Controlling the graphical representation</a></li>
+<li><a href="http://blogs.rand.com/support/2011/10/revit-graphic-overrides.html">
+Graphic overrides</a></li>
+</ul>
+
+
+<a name="7"></a>
+
+<h4>Exception Retrieving a Bounding Box</h4>
+
+<p><strong>Question:</strong> I am using the following three lines of code with hard-coded element ids to retrieve the bounding box of a panel element in my BIM:</p>
+
+<pre class="code">
+  View view = doc.GetElement(
+    new ElementId(231354)) as View;
+
+  Panel panel = doc.GetElement(
+    new ElementId(4944423)) as Panel;
+
+  var bb = panel.get_BoundingBox( view );
+</pre>
+
+<p>However, this pretty trivial operation is throwing a SEHException:</p>
+
+<center>
+<img src="img/bb_exception.png" alt="Bounding box exception" width="350"/>
+</center>
+
+<p>What is going wrong here, please?</p>
+
+<p><strong>Answer:</strong> You are requesting the bounding box of an element in a template view, as you can immediately see exploring the view using RevitLookup:</p>
+
+<center>
+<img src="img/bb_exception_snoop.png" alt="Template view property" width="700"/>
+</center>
+
+<p>Note the true 'Is Template' property.
+Elements do not have any geometry in template views, so this is a nonsensical operation.</p>
+
+<p>Please test the View.IsTemplate property before using a view to query element geometry.
+If it returns true, then elements cannot return any geometry in that view.
+
+
+<a name="8"></a>
+
+<h4>Happy Week to All!</h4>
+
+<p>So, that wraps up a couple of things, and I feel free to enter my new week.
+I wish you a happy week as well!</p>

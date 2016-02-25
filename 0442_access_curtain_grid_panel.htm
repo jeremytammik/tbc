@@ -1,0 +1,205 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+  Daren Thomas 
+  Re: Why does accessing Wall.CurtainGrid.Panels need a transaction?
+-->
+
+<h3>Access to Curtain Grid Panels</h3>
+
+<p>Here is some strange behaviour noted by Daren Thomas of the
+
+<a href="http://www.gt.arch.ethz.ch">Professur f&uuml;r Geb&auml;udetechnik, Institut f&uuml;r Hochbautechnik</a> at
+
+the technical university ETH Z&uuml;rich and author of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/revit-python-shell.html">
+Revit Python shell</a> which
+
+led to the discovery and quick fix of a problem in the curtain grid API.
+Since Daren also provides a workaround for the problem for immediate use, I think it worthwhile to note it here.
+
+<p><strong>Question:</strong> I just came by some strange behaviour in Autodesk Revit Architecture 2011: It seems that reading a Wall.CurtainGrid.Panels requires a transaction.
+
+<p>Here is a repro (using RevitPythonShell to avoid having to create a new project etc.):
+
+<ul>
+<li>Create a new Revit project.
+<li>Add a wall.
+<li>Change the wall type to CurtainGrid.
+<li>Remember the element ID of wall (Manage &gt; Inquiry &gt; IDs of Selection), in my case 127699.
+<li>Go to Add-Ins &gt; Open Python Shell.
+<li>Type following sequence of commands (this can be translated to C# pretty easily, as it is mainly about the API); copy to a text editor to see the truncated lines:
+</ul>
+
+<pre class="code">
+&gt;&gt;&gt;import clr
+
+&gt;&gt;&gt;clr.AddReference('RevitAPI')
+
+&gt;&gt;&gt;from Autodesk.Revit.DB import *
+
+&gt;&gt;&gt;doc = __revit__.ActiveUIDocument.Document
+
+&gt;&gt;&gt;cw = doc.get_Element(ElementId(127699)) # substitute actual ID here
+
+&gt;&gt;&gt;cw
+
+&lt;Autodesk.Revit.DB.Wall object at
+  0x000000000000002B [Autodesk.Revit.DB.Wall]&gt;
+
+&gt;&gt;&gt;cw.CurtainGrid
+
+&lt;Autodesk.Revit.DB.CurtainGrid object at
+  0x000000000000002C [Autodesk.Revit.DB.CurtainGrid]&gt;
+
+&gt;&gt;&gt;cw.CurtainGrid.Panels
+
+IronTextBoxControl error: Attempt to modify the model outside of transaction.
+
+&gt;&gt;&gt;
+</pre>
+
+<p>By the way, this little script also amply demonstrates how extremely easy and powerfully a Revit model can be accessed programmatically and interactively through the Python shell.</p>
+
+<p>This dialog with RevitPythonShell shows that accessing the wall and its CurtainGrid property is ok, but accessing the Panels property triggers the exception.
+The RevitPythonShell runs with TransactionMode.Manual.
+This behaviour is not restricted to RevitPythonShell scripts &ndash; this is only for the repro.
+I came across this behaviour with a C# plug-in that also uses TransactionMode.Manual.
+
+<p>What is the rationale behind this behaviour?
+
+<p><strong>Answer:</strong> Several of the CurtainGrid APIs were ensuring that they had write access to the underlying objects, even when only read  access was required.
+
+<p>This behaviour has now been reported and corrected.
+
+<p><strong>Response:</strong> I'm not sure how fixes are deployed with Revit, but assume they are just included in the annual release &ndash; so for your readers, you might want to mention a workaround:
+
+<p>Starting a transaction and then calling the method Transaction.Rollback for tasks that don't need transactions but do read curtain wall panels.
+
+<p>Ideally, you want to place the transaction code as close to the curtain wall code as possible, but not inside an inner loop as that can slow things down considerably (been there, done that, getting t-shirts printed to prove).
+
+<p><strong>Answer:</strong> Yes, I would love to mention this in the blog and provide a workaround for those who run into this issue.
+
+<p>Do you happen to have some sample code ready to demonstrate exactly what you mean?
+
+<p>Or even (miraculously?) a reproducible sample project with one external command showing the problem and another one showing the solution?
+
+<p><strong>Response:</strong> I went through the trouble to build such a project.
+
+<p>You will find attached a C# solution (Visual Studio 2010) that creates the two external commands requested.
+Inside the solution is also a sample Revit project file SingleCurtainWall.rvt containing four walls, one of which is a CurtainWall with one panel.
+A sample add-in file can also be found inside the solution.
+
+<p>Also, here are some screenshots of the output of said external commands; first the exception being thrown when the transaction workaround is not implemented:</p>
+
+<center>
+<img src="img/CurtainGridPanelsTransactionBug.png" alt="CurtainGrid Panels transaction bug"/>
+</center>
+
+<p>With the workaround in place, the panels become accessible:</p>
+
+<center>
+<img src="img/CurtainGridPanelsWorkAround.png" alt="CurtainGrid Panels transaction workaround"/>
+</center>
+
+<p>For completeness sake, here is the source code of the initial command causing the problem for comparison with the workaround listed below:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">TriggerCurtainGridPanelsTransactionBug</span>
+&nbsp; : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> walls = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Wall</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> wall <span class="blue">in</span> walls )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wall.WallType.Kind == <span class="teal">WallKind</span>.Curtain )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CurtainGridPanelsTransactionBug&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CurtainWall has {0} panels.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.CurtainGrid.Panels.Size ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>This is the updated code with the added transaction required to access the curtain grid panel data, which can be discarded after use:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">WorkAroundCurtainGridPanelsTransactionBug</span>
+&nbsp; : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> walls = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Wall</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// workaround: create a transaction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CurtainGridPanelsTransactionBug&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; transaction.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> wall <span class="blue">in</span> walls )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wall.WallType.Kind == <span class="teal">WallKind</span>.Curtain )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CurtainGridPanelsTransactionBug&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CurtainWall has {0} panels.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.CurtainGrid.Panels.Size ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// we don't really want to change the document!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; transaction.RollBack();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>For yet more completeness sake, here is
+
+<a href="zip/CurtainGridPanelsTransaction.zip">
+CurtainGridPanelsTransaction.zip</a> containing
+
+the entire source code, Visual Studio 2008 and 2010 solution, and a sample file SingleCurtainWall.rvt to test it on.
+
+<p>I guess I got carried away on this task...
+
+<p>Many thanks to Daren for all his research, workaround, and complete documentation of this issue!

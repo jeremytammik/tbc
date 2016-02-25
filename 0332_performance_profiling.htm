@@ -1,0 +1,426 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Performance Profiling</h3>
+
+<p>I should be preparing my Revit API training in Warsaw, which is coming up next week, and instead I still find myself working on other more interesting topics such as performance profiling at the same time.
+I hope the training participants will find this interesting as well.
+
+<h4>New Filtering Motivates Benchmarking</h4>
+
+<p>The reason why I am so urgently interested in this right now is that the Revit 2011 API provides a whole new filtering API, i.e. for extracting certain specific groups of elements from the Revit database.
+This is a task that almost every application faces.
+The new API is extremely powerful and flexible and provides a huge number of classes and methods that can be used and put together in many different ways to achieve the same result.
+I am very interested in discovering how to make optimal use of this, and you should probably be too.
+One important tool in order to be able to measure and compare the performance of different approaches is a profiler, which leads me to this post.
+
+<h4>Quick and Slow Filters</h4>
+
+<p>Actually, I am rather getting ahead of myself here, because there are so many basic issues that should really be addressed and discussed first.
+One of the most fundamental ones is that the Revit 2011 filtering API provides a number of filter classes, and they are divided into quick and slow filters.
+A quick filter is fast and can process an element without fully expanding it in memory, whereas a slow filter needs to read in the entire element data into memory before it can be processed and thus requires more time.
+Obviously, the trick in performant filtering in Revit 2011 is to apply as many and specific quick filters as possible before resorting to the slow ones, if your search requires them at all.
+Once the filter has done its job, you have a collection of elements, and in some cases, you may want to postprocess these further to search for characteristics that are not directly supported by any filters, or harder to implement using them.
+Anyway, we will discuss these topics more in depth real soon now.
+
+<p>To give you a quick first impression of what Revit 2011 API filters can look like, here are two helper methods used in the code presented below.
+The first one returns the first family symbol found with a built-in category OST_StructuralColumns, which we use to create lots of new column instances in the model:
+
+<pre class="code">
+<span class="teal">FamilySymbol</span> GetColumnType()
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> columnTypes 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( m_document );
+&nbsp;
+&nbsp; columnTypes.OfCategory( 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralColumns );
+&nbsp;
+&nbsp; columnTypes.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp; <span class="blue">return</span> columnTypes.FirstElement() <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+}
+</pre>
+
+<p>The second returns a list of all levels in the model:
+
+<pre class="code">
+<span class="teal">IList</span>&lt;<span class="teal">Level</span>&gt; GetLevels()
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> a 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( m_document );
+&nbsp;
+&nbsp; a.OfCategory( <span class="teal">BuiltInCategory</span>.OST_Levels );
+&nbsp; a.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+&nbsp; <span class="blue">return</span> a.ToElements().Cast&lt;<span class="teal">Level</span>&gt;().ToList&lt;<span class="teal">Level</span>&gt;();
+}
+</pre>
+
+<p>Both of these use quick filters exclusively.
+
+<h4>Profiling Tool</h4>
+
+<p>So in order to enable you to immediately do some research on and profiling of the new filtering on your own, I want to get this basic profiling tool set up and available to you as soon as possible.
+This post was prompted by Marcelo Quevedo of
+
+<a href="http://www.hsb-cad.com">
+hsbSOFT</a>, 
+
+starting with the following conversation:
+
+<p><strong>[M]</strong> I am investigating performance, because we received a huge Revit file and our framing Revit command is spending too much time on it.
+
+<p>I am using a very manual mode to identify the delays. 
+I created a timer by using the QueryPerformanceCounter and QueryPerformanceFrequency methods from the Windows Kernel32.dll.
+
+<p>I call the timer and add the seconds for each call to some of the Revit API functions.
+
+<p>I tried to use the JetBrains dotTrace  profiling tool for .Net, but it doesn’t work with Revit 2011.
+If you know of a profiling tool that works with Revit 2011, please let me know.
+
+<p><strong>[J]</strong> Thank you very much for your nice manual profiling tools and examples!
+
+<p>No, I do not know of a profiling tool that works for Revit, which is why I was curious.
+
+<p>By the way, I am sure that you can simplify the calling and usage of the timer very significantly 
+by some clever use of constructors and destructors.
+
+<p><strong>[M]</strong> I followed your recommendations and changed the timer. 
+Instead of using a clever destructor, I am using the System.IDisposable interface so that you can use the using statement to identify the delay of a source code 
+portion. 
+
+<p>I attached a C# project in which this manual profiling tool is used. 
+This project defines a simple Revit command that creates hundreds of structural columns and groups them in order to test the delay in various Revit API methods.
+Here are the resulting two groups:</p>
+
+<center>
+<img src="img/profiling_model_groups.png" alt="Profiling model groups"/>
+</center>
+
+<p>Here are the columns, which are only visible individually when we zoom in a bit closer:</p>
+
+<center>
+<img src="img/profiling_columns.png" alt="Profiling columns"/>
+</center>
+
+<p>The performance timer implementation makes use of the CodeProject
+
+<a href="http://www.codeproject.com/KB/cs/highperformancetimercshar.aspx">
+High-Performance Timer in C#</a>.
+
+<p><strong>[J]</strong> I cleaned it up a bit more:
+
+<ul>
+<li>Modified the collection to use a dictionary instead of manually searching for entries by key.
+<li>Rewrote the GetColumnType and GetLevels methods.
+<li>Sorted the output by percentage of time.
+</ul>
+
+<p>Here is the implementation of the basic Timer class that we use:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Timer</span>
+{
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;Kernel32.dll&quot;</span> )]
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> QueryPerformanceCounter(
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">long</span> lpPerformanceCount );
+&nbsp;
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;Kernel32.dll&quot;</span> )]
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> QueryPerformanceFrequency(
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">long</span> lpFrequency );
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">long</span> startTime, stopTime;
+&nbsp; <span class="blue">private</span> <span class="blue">long</span> freq;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Constructor</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> Timer()
+&nbsp; {
+&nbsp; &nbsp; startTime = 0;
+&nbsp; &nbsp; stopTime = 0;
+&nbsp; &nbsp; <span class="blue">if</span>( !QueryPerformanceFrequency( <span class="blue">out</span> freq ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Win32Exception</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;high-performance counter not supported&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Start the timer</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Start()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( 0 ); <span class="green">// let waiting threads work</span>
+&nbsp; &nbsp; QueryPerformanceCounter( <span class="blue">out</span> startTime );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green">Stop the timer </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Stop()
+&nbsp; {
+&nbsp; &nbsp; QueryPerformanceCounter( <span class="blue">out</span> stopTime );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the duration of the timer in seconds</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> Duration
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> ( <span class="blue">double</span> ) ( stopTime - startTime )
+&nbsp; &nbsp; &nbsp; &nbsp; / ( <span class="blue">double</span> ) freq;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Marcelo implemented a PerfTimer class add some syntactic sugar and the IDisposable wrapper to the Timer class and make it easier and more automatic to start and stop for a specific call with a minimum of effort and coding. Here is the PerfTimer implementation:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">PerfTimer</span> : <span class="teal">IDisposable</span>
+{
+&nbsp; <span class="blue">private</span> <span class="blue">string</span> _key;
+&nbsp; <span class="blue">private</span> <span class="teal">Timer</span> _timer;
+&nbsp; <span class="blue">private</span> <span class="blue">double</span> _duration = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Gets time in seconds</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> Duration
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _duration; }
+&nbsp; }
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Performance timer</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;what_are_we_testing_here&quot;&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Key describing code to be timed</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> PerfTimer( <span class="blue">string</span> what_are_we_testing_here )
+&nbsp; {
+&nbsp; &nbsp; _key = what_are_we_testing_here;
+&nbsp; &nbsp; _timer = <span class="blue">new</span> <span class="teal">Timer</span>();
+&nbsp; &nbsp; _timer.Start(); <span class="green">//starts the time</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> <span class="teal">IDisposable</span>.Dispose()
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// When the using statement block finishes, </span>
+&nbsp; &nbsp; <span class="green">// the timer is stopped, and the time is </span>
+&nbsp; &nbsp; <span class="green">// registered</span>
+&nbsp;
+&nbsp; &nbsp; _timer.Stop();
+&nbsp; &nbsp; _duration = _timer.Duration;
+&nbsp; &nbsp; <span class="teal">TimeRegister</span>.AddTime( _key, _duration );
+&nbsp; }
+}
+</pre>
+
+<p>After preparing all this, I noticed the following comment on the CodeProject Timer class: "System.Diagnostics.Stopwatch class: .NET 2.0 now provides this functionality as part of the framework. See class: System.Diagnostics.Stopwatch in System.dll."
+I rewrote the PerfTimer class to make use of the built-in stopwatch instead of reinventing the wheel, and it now looks like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">PerfTimer</span> : <span class="teal">IDisposable</span>
+{
+<span class="grey">&nbsp; #region Internal TimeRegistry class
+&nbsp; // . . .
+&nbsp; #endregion // Internal TimeRegistry class</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> _key;
+&nbsp; <span class="teal">Stopwatch</span> _timer;
+&nbsp; <span class="blue">double</span> _duration = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Performance timer</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;what_are_we_testing_here&quot;&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Key describing code to be timed</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> PerfTimer( <span class="blue">string</span> what_are_we_testing_here )
+&nbsp; {
+&nbsp; &nbsp; _key = what_are_we_testing_here;
+&nbsp; &nbsp; _timer = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Automatic disposal when the the using statement </span>
+&nbsp; <span class="gray">///</span><span class="green"> block finishes: the timer is stopped and the </span>
+&nbsp; <span class="gray">///</span><span class="green"> time is registered.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> <span class="teal">IDisposable</span>.Dispose()
+&nbsp; {
+&nbsp; &nbsp; _timer.Stop();
+&nbsp; &nbsp; _duration = _timer.Elapsed.TotalSeconds;
+&nbsp; &nbsp; <span class="teal">TimeRegistry</span>.AddTime( _key, _duration );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Report()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TimeRegistry</span>.WriteResults( _duration );
+&nbsp; }
+}
+</pre>
+
+<p>The internal TimeRegistry class was initially defined by Marcelo  and manages a collection of individual timer instances for measuring the time required by the various different Revit API methods.
+I pretty much rewrote it from scratch in various iterations.
+At the end of the session, it reports the total times of the various operations, for instance like this:
+
+<pre>
+-----------------------------------------------------------
+ Percentage   Seconds   Calls   Process
+-----------------------------------------------------------
+      2.76%      0.90    7200   Parameter.Set
+      3.29%      1.07    1200   NewFamilyInstance
+     15.44%      5.04       1   Creation.Document.NewGroup
+     18.02%      5.89    1200   Document.Rotate
+     59.19%     19.33    1201   Document.Regenerate
+    100.00%     32.67       1   TOTAL TIME
+-----------------------------------------------------------
+</pre>
+
+<p>The command mainline Execute method driving the whole operation now looks like this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message, 
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Result</span> result = <span class="teal">Result</span>.Failed;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; m_document = commandData.Application.ActiveUIDocument.Document;
+&nbsp; &nbsp; m_createDoc = m_document.Create;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Keep track of the total time used:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PerfTimer</span> ptTotalTime = <span class="blue">new</span> <span class="teal">PerfTimer</span>( <span class="maroon">&quot;TOTAL TIME&quot;</span> );
+&nbsp; &nbsp; <span class="blue">using</span>( ptTotalTime )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ModelColumns();
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">PerfTimer</span> pt = <span class="blue">new</span> <span class="teal">PerfTimer</span>( <span class="maroon">&quot;Document.Regenerate&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_document.Regenerate();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Report all resulting time delays in a text file:</span>
+&nbsp;
+&nbsp; &nbsp; ptTotalTime.Report();
+&nbsp; &nbsp; result = <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> e )
+&nbsp; {
+&nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; result = <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p>As you can see, it defines a top level performance time measuring the total time, which includes all the detailed time measurements for the individual methods.
+
+<p>All the real action takes place in the ModelColumns method.
+
+<p>Some of the actions performed and timed by ModelColumns include:
+
+<ul>
+<li>Creating a large number of column instances.
+<li>Setting parameters on the column instances.
+<li>Rotating the column instances.
+<li>Creating groups.
+</ul>
+
+<p>You can see some of the others from the performance report displayed above.
+
+<p>Here is an example showing how easy it is to add a performance timer for a specific method and which generates the corresponding entry for Document.Rotate in the report listed above:
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">PerfTimer</span> profiler 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PerfTimer</span>( <span class="maroon">&quot;Document.Rotate&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; rotated = m_document.Rotate( 
+&nbsp; &nbsp; &nbsp; element, axis, dAngle );
+&nbsp; }
+</pre>
+
+
+<a name="manual_regen"></a>
+
+<h4>Manual Regeneration Mode</h4>
+
+<p>Another interesting issue that Marcelo encountered concerns the regeneration mode.
+The regeneration mode for this command is set to Manual, which implies that Revit does not automatically regenerate the model after each modification.
+Instead, we are responsible for doing this ourselves manually by calling doc.Regenerate when required from within our plug-in:
+
+<p><strong>[M]</strong> If I set the regeneration mode to Manual, I need to call SetLocationPoint a second time after the call to Rotate, otherwise the column is modelled in a wrong position. 
+
+<p><strong>[J]</strong> Try calling doc.Regenerate after modifying things before trying to read the results, or use automatic regeneration.
+
+<p><strong>[M]</strong> If I call doc.Regenerate after creating each column it works fine, so it is not necessary to set the start point twice anymore.
+
+<p>I cleaned it up bit more and deleted the unused SetLocationPoint method.
+
+But doc.Regenerate is now called hundreds of times which causes a new delay. Is it ok to do this, or do you suggest some other alternative?
+
+<p><strong>[J]</strong> Yes, of course you should avoid calling doc.Regenerate hundreds of times if possible.
+You should only call it at all if you have the following situation:
+
+<ol>
+<li>You have modified the model AND
+<li>You need to query the modified model.
+</ol>
+
+<p>I would assume that it is better to avoid this, or, if not possible, to make all the modifications in one go, then call doc.Regenerate once only, and then perform all the queries at once in a single second step.
+This is a pure untested assumption at this time and needs testing and benchmarking.
+
+<h4>Generic Programming with Anonymous Methods</h4>
+
+<p>I am really getting into these neat little anonymous methods that go so well with the new LINQ and generic methods.
+If you look at the little report above, you will note that I print the percentage of the total time used at the beginning of the line.
+I put it in that order to make it easy to sort the lines by percentage, since that is the most important aspect of the profiling results.
+I also wanted to add those separator lines and make them long enough to span the longest lines, but not too long.
+So what is the maximum line length? 
+How can I ask the compiler to calculate the longest line length for me?
+Using a generic template algorithm and an anonymous method, this is really easy:
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> header = 
+&nbsp; &nbsp; <span class="maroon">&quot; Percentage&nbsp;&nbsp; Seconds&nbsp;&nbsp; Calls&nbsp;&nbsp; Process&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = <span class="teal">Math</span>.Max( header.Length, 
+&nbsp; &nbsp; lines.Max&lt;<span class="blue">string</span>&gt;( x =&gt; x.Length ) );
+</pre>
+
+<p>Rather sweet, isn't it? The Max template algorithm takes a 
+
+<a href="http://en.csharp-online.net/CSharp_Coding_Solutions%E2%80%94Understanding_and_Using_Functors">
+functor</a> 
+
+which transforms each string element into an integer, and then returns the maximum integer value as its result.
+In this case, the functor is implemented using an 
+
+<a href="http://en.wikipedia.org/wiki/Anonymous_function">
+anonymous</a> or
+
+<a href="http://en.wikipedia.org/wiki/Anonymous_function">
+lambda function</a>.
+
+<p>You will be seeing a lot more of these in upcoming posts, since I like to use them for succinctly post-processing Revit API filter collector results.
+I have already benchmarked some variations and established that they are neither more nor less effective than other mechanisms.
+But once again I am getting ahead of myself and will slow down a bit.
+More on this anon.
+
+<h4>Download</h4>
+
+<p>Here is the complete 
+
+<a href="zip/ModelColumns.zip">
+ModelColumns</a>
+
+source code and Visual Studio solution after the numerous iterations back and forth between Marcelo and Jeremy to perfect various aspects.</p>
+
+<p>Very many thanks to Marcelo for initiating the topic, sharing his code, the fruitful discussion and the many code improvement iterations!
+
+<p>I am very much looking forward to making use of this system to benchmark and compare the numerous different approaches that can be chosen to make use of the new Revit 2011 API functionality.
+I hope it will be useful for you as well, and may all your solutions be optimal.

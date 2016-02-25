@@ -1,0 +1,46 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Adding Non-Commands to the Revit Ribbon</h3>
+
+<p>In between all the hullabaloo about the new version of Revit, here is some news dealing with the old one and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/revit-python-shell.html">
+Revit Python shell</a>
+
+implemented by Daren Thomas. 
+Daren now found a way to add new items such as command buttons to a Revit ribbon panel without actually having any real underlying external command implementation to hook them up to.
+He uses Reflection.Emit to simulate the missing IExternalCommand implementation. 
+Here is Daren's own description:
+
+<span style="color:darkblue">
+
+<p>I just published a post on a technique for 
+
+<a href="http://darenatwork.blogspot.com/2010/03/adding-canned-scripts-to-revit.html">
+adding IronPython scripts as commands to a Revit ribbon panel</a>. 
+
+I'm not sure if this technique could be used for other purposes, as it mainly allows dynamically created commands to be accessible by Revit, but you never know...
+
+<p>The technique uses Reflection.Emit to create types that subclasses IExternalCommand with an instance field set to a different value for each type in the parameterless constructor. 
+These types are added to a dynamic assembly, stored to disk and can then be instantiated by Revit in the usual fashion.
+
+<p>Thought you might be interested...
+
+<p>P.S.: This still doesn't solve the problem of dynamically adding commands after IExternalApplication.OnStartup to the Ribbon, but it's a start...
+
+</span>
+
+<p>P.P.S. from Jeremy on the topic of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/dynamically-load-and-debug-plugins.html">
+dynamically reloading and debugging Revit add-ins</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/addinmanager.html">
+AddInManager</a>, which takes us back to the hullabaloo around the new release:
+if you are interested in either of these two topics, you really must check out the new 2011 version of the Add-In Manager... it provides a solution! More on that soon...
+
+
+
+

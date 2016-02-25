@@ -1,0 +1,402 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Victor Chekalin New draft post about Parameter.DisplayUnitType
+
+-->
+
+<h3>Parameter DisplayUnitType Enhancement, Bretagne and Decompilers</h3>
+
+<p>After looking at several performance enhancement possibilities last week, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sweep-family-performance-enhancement.html">sweep family performance enhancement</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/loadfamily-and-collector-iteration-performance.html">LoadFamily and collector iteration performance</a>,
+
+here is another exciting and pretty sophisticated exploration of internal Revit API implementation details by
+
+<a href="http://www.facebook.com/profile.php?id=100003616852588">
+Victor Chekalin</a> that
+
+can be used to achieve a significant speed improvement when accessing large numbers of parameters and checking their DisplayUnitType property.</p>
+
+<a name="1"></a>
+
+<h4>Brittany and Konk Leon</h4>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-03-18_brest/jeremy_brest_rainbow.jpg" alt="Double rainbow in Le Conquet" width="200"/>
+
+&ndash;
+
+<img src="file:///j/photo/jeremy/2013/2013-03-18_brest/brest_view_1_cropped.jpg" alt="View over the Atlantic from the converted chapel meeting room window" width="200"/>
+</center>
+
+<p>Before getting to that, though, here is an update on my current whereabouts.
+
+<p>Yesterday I spent travelling to Brest and Le Conquet
+
+(<a href="http://br.wikipedia.org/wiki/Konk-Leon">Konk Leon</a> in Breton)
+
+for a meeting with my European DevTech colleagues.</p>
+
+<p>This is the western-most point of northern France, home of my boss Cyrille, and my first visit to the Bretagne.</p>
+
+<p>The weather is exciting and challenging, and the views spectacular.</p>
+
+<p>A quick rainfall in the east and simultaneous glorious evening sunlight from the west produced a beautiful double rainbow.</p>
+
+<p>We have a meeting room in a converted chapel with a view straight out onto the Atlantic.</p>
+
+
+<a name="2"></a>
+
+<h4>Parameter DisplayUnitType Enhancement and Research</h4>
+
+<p>Back to the DisplayUnitType enhancement, here is the description of the research leading up to it in Victor's own words:
+
+<p>Now I'm working with the element parameters again and I need to get all parameters of a lot of elements in the project including their DisplayUnitType.
+
+<p>The problem is that not all parameters have a display unit type.
+If I try to retrieve a display unit type for a parameter where it does not exist, an Autodesk.Revit.Exceptions.InvalidOperationException is thrown.
+Unfortunately, there is no direct way to determine beforehand whether a parameter has a DisplayUnitType defined or not, i.e. whether the call will succeed or fail.
+
+<p>The most obvious way would be to wrap the code where I retrieve the display unit type in a try... catch block.
+But throwing and catching an exception is a very expensive operation and greatly reduces the performance &ndash;
+
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">exceptions should be exceptional</a>.
+
+<p>I decided to go deeper and looked at the RevitAPI.dll using
+
+<a href="http://www.jetbrains.com/decompiler">
+dotPeek &ndash; free .NET decompiler</a>.
+
+<p>At first I went to the DisplayUnitType property of the Parameter class.
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">DisplayUnitType</span> DisplayUnitType
+{
+&nbsp; <span class="blue">get</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Definition</span> definition = <span class="blue">this</span>.Definition;
+&nbsp; &nbsp; ParamTypeSpec paramTypeSpec1;
+&nbsp; &nbsp; <span class="blue">if</span> ((ParamTypeEnum) *(<span class="blue">int</span>*)
+&nbsp; &nbsp; &nbsp; definition.getParamTypeSpec(&amp;paramTypeSpec1)
+&nbsp; &nbsp; &nbsp; != (ParamTypeEnum) 15)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span>(<span class="blue">new</span> FunctionId(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;n:\\build\\2013_ship_x64_inst_20120221_2030\\source\\api\\revitapi\\objects\\parameters\\APIParameter.cpp&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 581, <span class="maroon">&quot;Autodesk::Revit::DB::Parameter::DisplayUnitType::get&quot;</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Empty);
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ParamTypeSpec paramTypeSpec2;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> (<span class="teal">DisplayUnitType</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; \u003CModule\u003E.FormatOptions\u002EgetDisplayUnits(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; \u003CModule\u003E.AUnits\u002EgetFormatOptions(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; \u003CModule\u003E.ADocument\u002EgetAUnits(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (ADocument*) *(<span class="blue">long</span>*) <span class="blue">this</span>.m_pCDA),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">UnitType</span>.Enum) *(<span class="blue">int</span>*) ((<span class="teal">IntPtr</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; definition.getParamTypeSpec(&amp;paramTypeSpec2) + 8L)));
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The most interesting thing here is 'if ((ParamTypeEnum) *(int*) definition.getParamTypeSpec(&amp;paramTypeSpec1) != (ParamTypeEnum) 15)'.
+The first idea is to call this method via reflection.
+But getParamTypeSpec is an internal unsafe method.
+Unfortunately, I don't know how to use reflector with pointers and internal structures.
+So, I decided to go another way.
+
+<p>The next step is to look at the ParameterType property of the Definition class.
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">override</span> <span class="teal">ParameterType</span> ParameterType
+{
+&nbsp; <span class="blue">get</span>
+&nbsp; {
+&nbsp; &nbsp; REVIT_MAINTAIN_STATE revitMaintainState;
+&nbsp; &nbsp; \u003CModule\u003E.REVIT_MAINTAIN_STATE\u002E\u007Bctor\u007D(
+&nbsp; &nbsp; &nbsp; &amp;revitMaintainState);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterType</span> parameterType;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ParamDef* paramDefPtr = <span class="blue">this</span>.m_pParamDef;
+&nbsp; &nbsp; &nbsp; ParamTypeSpec paramTypeSpec;
+&nbsp; &nbsp; &nbsp; \u003CModule\u003E.paramDefToParamType(
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;paramTypeSpec, paramDefPtr);
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span> (^(<span class="blue">int</span>&amp;) @paramTypeSpec)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 1:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Text;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 6:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.URL;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 9:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.YesNo;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 11:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Integer;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 13:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Material;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 14:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.FamilyType;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 15:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">switch</span> (^(<span class="blue">int</span>&amp;) ((<span class="teal">IntPtr</span>) &amp;paramTypeSpec + 8))
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 0:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Length;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 1:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Area;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 2:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Volume;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 3:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Angle;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 4:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Number;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 26:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Force;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 27:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.LinearForce;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 28:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.AreaForce;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 29:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Moment;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = (<span class="teal">ParameterType</span>) (
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ^(<span class="blue">int</span>&amp;) ((<span class="teal">IntPtr</span>) &amp;paramTypeSpec + 8) + 100);
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 16:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.NumberOfPoles;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 24:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.FixtureUnit;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 30:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.LoadClassification;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; parameterType = <span class="teal">ParameterType</span>.Invalid;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; __fault
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; \u003CModule\u003E.___CxxCallUnwindDtor(
+&nbsp; &nbsp; &nbsp; &nbsp; (__FnPtr&lt;<span class="blue">void</span> (<span class="blue">void</span>*)&gt;) __methodptr(REVIT_MAINTAIN_STATE\u002E\u007Bdtor\u007D),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">void</span>*) &amp;revitMaintainState);
+&nbsp; &nbsp; }
+&nbsp; &nbsp; \u003CModule\u003E.REVIT_MAINTAIN_STATE\u002E\u007Bdtor\u007D(
+&nbsp; &nbsp; &nbsp; &amp;revitMaintainState);
+&nbsp; &nbsp; <span class="blue">return</span> parameterType;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here we can see that a parameter will have a DisplayUnitType only if the ParameterType is Length, Area, etc..
+So we can just check if the ParameterType is one of the  Length, Area, etc. ones.
+If so, its parameter has a DisplayUnitType, otherwise not.
+
+<p>It is necessary to pay attention to the line
+
+<pre class="code">
+&nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; parameterType = (<span class="teal">ParameterType</span>) (
+&nbsp; &nbsp; &nbsp; ^(<span class="blue">int</span>&amp;) ((<span class="teal">IntPtr</span>) &amp;paramTypeSpec + 8) + 100);
+&nbsp; &nbsp; <span class="blue">break</span>;
+</pre>
+
+<p>Looking at the ParameterType enumeration suggests that every parameter type whose integer value is greater than 100 belongs to paramTypeSpec = 15.
+
+<p>As a result, I created the following extension method for the Parameter class:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">ParameterExtensions</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> HasDisplayUnitType(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Parameter</span> parameter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> parameterType =
+&nbsp; &nbsp; &nbsp; &nbsp; parameter.Definition.ParameterType;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">switch</span>( parameterType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Length:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Area:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Volume:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Angle:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Number:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Force:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.LinearForce:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.AreaForce:
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">ParameterType</span>.Moment:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">/* At the reflector I can see the following code</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; default:</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameterType = (ParameterType) </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (^(int&amp;) ((IntPtr) &amp;paramTypeSpec </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + 8) + 100);</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;</span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; looking at the ParameterType enumeration </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; suggests that every parameter type whose </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; integer value is greater than 100 belongs </span>
+<span class="green">&nbsp; &nbsp; &nbsp; &nbsp; to paramTypeSpec = 15</span>
+<span class="green">&nbsp; &nbsp; */</span>
+&nbsp; &nbsp; <span class="blue">return</span> 100 &lt; (<span class="blue">int</span>) parameterType;
+&nbsp; }
+}
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Comparison Benchmarking</h4>
+
+<p>To wrap this up, here is a little benchmark comparing the two methods.</p>
+
+<p>The first one exercises the try... catch block:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Cancelled&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="teal">Stopwatch</span> sw = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> parameter <span class="blue">in</span> e.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DisplayUnitType</span> dut =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameter.DisplayUnitType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( dut.ToString() );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; sw.Stop();
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Benchmark result&quot;</span>,
+&nbsp; &nbsp; sw.Elapsed.ToString() );
+</pre>
+
+<p>Pick an element.
+The result is 0.41 seconds.</p>
+
+<p>Second measurement, with my new method:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; message = <span class="maroon">&quot;Canceled&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="teal">Stopwatch</span> sw = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> parameter <span class="blue">in</span> e.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( parameter.HasDisplayUnitType() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DisplayUnitType</span> dut =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameter.DisplayUnitType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( dut.ToString() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; sw.Stop();
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Benchmark result&quot;</span>,
+&nbsp; &nbsp; sw.Elapsed.ToString() );
+</pre>
+
+<p>The result is 0.029 seconds for the same element!</p>
+
+<p>You may say that 0.41 seconds is not so much, and users will not notice the difference between 0.41 seconds and 0.028.
+Of course the difference is not huge if you work with only one element.
+But note that the exception handling code works 15 times slower, repeatedly, ever single time it is called!</p>
+
+<p>If you retrieve parameters for 100 elements, it takes 41 seconds using try... catch instead of just 3 seconds with my new method.</p>
+
+<p>I hope this enhancement will be useful for other developers as well.</p>
+
+<p>Many thanks to Victor for his very professional analysis and valuable result!</p>
+
+<p>The best of luck to you in your new job, Victor, and congratulations on that achievement!</p>
+
+
+<a name="4"></a>
+
+<h4>IL Decompilation</h4>
+
+<p>I talked about
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/converting-between-vb-and-c-and-net-decompilation.html">
+Reflector</a> way
+
+back in the early days of the blog.
+It since became commercial.</p>
+
+<p>Victor mentions using
+
+<a href="http://www.jetbrains.com/decompiler">
+dotPeek</a> for
+
+his explorations above.</p>
+
+<p>When I brought this up with my colleagues, Adam added that he uses the
+
+<a href="http://ilspy.net">
+ILSpy .NET Decompiler</a> and
+
+is perfectly happy with that as well.</p>

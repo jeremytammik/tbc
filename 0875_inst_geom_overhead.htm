@@ -1,0 +1,80 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+07839857 [AddSpatialFieldPrimitive(face.Reference) throws exception when AddSpatialFieldPrimitive(face, Transform.Identity) is OK]
+SPR #232573 [AddSpatialFieldPrimitive(face.Reference) throws exception when face arg is OK]
+-->
+
+<h3>GetInstanceGeometry Overhead and Exceptions</h3>
+
+<p>I made it back safe and sound to Switzerland from the developer conferences, and I note that this special pivotal day &ndash; the
+
+<a href="http://en.wikipedia.org/wiki/Winter_solstice">
+winter solstice</a> &ndash;
+
+seems to be progressing normally and we all survived in spite of the end of an era in the
+
+<a href="http://en.wikipedia.org/wiki/Maya_calendar">
+Maya calendar</a>.</p>
+
+<p>Thus we can continue growing our understanding of the Revit API, as well as attending to other important business here on our lovely planet.
+
+<p>The GeometryInstance GetInstanceGeometry method returns the geometry of a family symbol.
+More precisely, according to the Revit API help file RevitAPI.chm documentation, it computes the geometric representation of the instance.
+
+<p>Computes really means computes, and incurs some significant overhead, as emphasised by the help file remarks, which state:</p>
+
+<p style="color:darkblue">The geometry will be in the coordinate system of the model that owns this instance.
+The context of the instance object (such as effective material) will be applied to the symbol.
+Note that this method involves extensive parsing or Revit's data structures, so try to minimize calls if performance is critical.
+Geometry will be parsed with the same options as those used when this object was retrieved.
+This method returns a copy of the Revit geometry.
+It is suitable for use in a tool which extracts geometry to another format or carries out a geometric analysis; however, because it returns a copy, the references found in the geometry objects contained in this element are not suitable for creating new Revit elements referencing the original element (for example, dimensioning).
+Only the geometry returned by GetSymbolGeometry with no transform can be used for that purpose.</p>
+
+<p>This is also covered by the Developer Guide section on
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00006-API_Developer%27s_Guide/0074-Revit_Ge74/0108-Geometry108/0110-Geometry110/GeometryInstances">
+geometry instances</a>.
+
+<p>Now a poor hapless (or not so hapless, in fact) developer ran into an example where the invalid references returned by this method cause a significant problem, providing a welcome opportunity to highlight the importance of avoiding use of this particular method for that kind of use:</p>
+
+<p><strong>Question:</strong> I am using the analysis visualisation framework AVF to paint some transient graphics a given face.
+
+<p>When I use the following line to apply the AVF to the face, the behaviour is correct:</p>
+
+<pre>
+  int idx = sfm.AddSpatialFieldPrimitive(
+    face, Transform.Identity );
+</pre>
+
+<p>When this call is used instead, however, Revit throws an exception saying that the reference must point to either a Face or a Curve visible in the view:</p>
+
+<pre>
+  int idx = sfm.AddSpatialFieldPrimitive(
+    face.Reference );
+</pre>
+
+<p>This message is incorrect, because the Face <b>is</b> visible in this view.</p>
+
+<p>I really need the face reference call to work so that the AddSpatialFieldPrimitive method overload taking a reference and SpatialFieldPrimitiveHideMode can be used, i.e.</p>
+
+<pre>
+  AddSpatialFieldPrimitive(
+    Reference,
+    SpatialFieldPrimitiveHideMode )
+</pre>
+
+<p><strong>Answer:</strong> The behaviour you observe is caused by your use of the GeometryInstance GetInstanceGeometry method, and then asking AVF to pull references from that geometry.</p>
+
+<p>As stated in the description quoted above, these references are invalid.</p>
+
+<p>If you simply change your macro to use GetSymbolGeometry instead, the AVF results will be correctly painted on the faces.</p>
+
+<p>Some other operations besides AVF that also need these references to be correctly obtained from GetSymbolGeometry include dimensioning, face based family creation, and sketch plane creation.</p>
+
+<p>GetInstanceGeometry is a shortcut to get 'in-place' geometry for operations like export to another format, Boolean operations with another solid, or other geometry tools that don't need the connection back to the original element.</p>
+
+<p>Many thanks to Scott Conover for clarifying this!</p>

@@ -1,0 +1,187 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1253648 [Co-ordinates] -->
+
+<h3>Unrotate North</h3>
+
+<p><strong>Update:</strong> A better algorithm than the one presented below is provided by the discussion on the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html">
+project location</a>.
+
+<p>I spent this weekend on the
+
+<a href="http://en.wikipedia.org/wiki/Rigi">
+Rigi Mountain</a> together 
+
+with seventy other people from the alpine club.
+
+Saturday it rained quite hard most of the day, unfortunately, but a couple of us still went on a very nice hike from Rigi Scheidegg across to and over the top of Rigi Hochflueh with a beautiful view down on the
+
+<a href="http://en.wikipedia.org/wiki/Lake_Lucerne">
+Lucerne Lake</a> and the
+
+<a href="http://en.wikipedia.org/wiki/R%C3%BCtli">
+R&uuml;tli Meadow</a>.
+
+In the evening, we also tested how many people can be shoehorned into a wood-heated hot tub outside in snow and rain, among other interesting pastimes.
+Sunday I went climbing with Angela.
+Considering the rain from the day before and the night and it still being quite cloudy on Sunday, we were maybe the only two crazy enough to even try it.
+It involved the same walk from Scheidegg to Hochflueh, then searching for the climbing area, doing the climbs, and, last but not least, getting back again safely.
+The climbing area is called 
+
+<a href="http://www.kley.ch/hansjoerg/2004/2004_4_1.html">
+Thedys G&auml;rtli</a>
+
+and is on the Hochflue slabs close to the summit, so we could all the time enjoy the same beautiful view as the day before.
+We were extremely pleased to be able to do two very nice climbs, among the easier ones, M&auml;nnertr&uuml; (4c) and F&uuml;rlinie (5c).
+Although we knew when we started the latter one that we would get back rather late, we actually ended up descending the mountain in total darkness and spending most of the night trying to get back to civilisation.
+Or, rather, all of the night, since I  missed the last train out of there.
+
+<p>Anyway, meanwhile, our inexorable exploration of the Revit API continues, and here is another question to address which expands on our analysis of the calculation of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/azimuth.html">
+azimuth</a>
+
+or Revit elements:
+
+<p><strong>Question:</strong> I am using the Element.Location property to query the X and Y coordinate values of an element.
+I also make use of the project location and project angle.
+I have a problem if the Project North has been rotated.
+How can I determine the 'real' X and Y coordinates of an element if the Project North has been rotated?
+
+<p><strong>Answer:</strong> Ok, I see what you mean.
+
+<p>To dive into this a little bit deeper, I implemented a new Building Coder sample command CmdUnrotateNorth to calculate the coordinates of the original unrotated element location for you.
+
+It transforms the element location back to the original coordinates to cancel effect of rotating the project north
+by simply determining the project north rotation angle 'a' and applying a similar transformation to the element coordinates like this:
+
+<pre>
+  Transform t = Transform.get_Rotation(
+    XYZ.Zero, XYZ.BasisZ, a );
+</pre>
+
+<p>To simplify testing, I implemented a helper method GetElementLocation which defines a location point for any given element having a non-null Location property:
+
+<pre class="code">
+<span class="blue">bool</span> GetElementLocation(
+  <span class="blue">out</span> <span class="teal">XYZ</span> p,
+  <span class="teal">Element</span> e )
+{
+  p = <span class="teal">XYZ</span>.Zero;
+  <span class="blue">bool</span> rc = <span class="blue">false</span>;
+  <span class="teal">Location</span> loc = e.Location;
+  <span class="blue">if</span>( <span class="blue">null</span> != loc )
+  {
+    <span class="teal">LocationPoint</span> lp = loc <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+    <span class="blue">if</span>( <span class="blue">null</span> != lp )
+    {
+      p = lp.Point;
+      rc = true;
+    }
+    <span class="blue">else</span>
+    {
+      <span class="teal">LocationCurve</span> lc = loc <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+
+      Debug.Assert( <span class="blue">null</span> != lc,
+        <span class="maroon">"expected location to be either point or curve"</span> );
+
+      p = lc.Curve.get_EndPoint( 0 );
+      rc = true;
+    }
+  }
+  <span class="blue">return</span> rc;
+}</pre>
+
+<p>In the main method, I check that one single element is selected and then list its location point as returned by the API, or rather by this method.
+I then iterate over all
+project locations, print each one's the project north angle and list the element location point rotated around the origin by that angle.
+
+<p>I tested this by selecting an element and running the command with it in its original unrotated position, which returns:
+
+<pre>
+Selected element location: (-23.64,1.64,0)
+Angle between project north and true north: 0 degrees
+Unrotated element location: (-23.64,1.64,0)
+</pre>
+
+<p>After applying a rotation to the project north by calling Manage > Project Location > Position > Rotate Project North > Align selected line or plane, invoking the same command again returns the following:
+
+<pre>
+Selected element location: (-21.66,9.62,0)
+Angle between project north and true north: 20 degrees
+Unrotated element location: (-23.64,1.64,0)
+</pre>
+
+<p>As you can see, the element location returned by the API is different, but the original value can easily be obtained by applying the rotation described.
+
+<p>Here is the code of the entire mainline of the sample command in its Execute method:
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+
+<span class="teal">ElementSet</span> els = doc.Selection.Elements;
+
+<span class="blue">if</span>( 1 != els.Size )
+{
+  message = "Please select a single element.";
+}
+<span class="blue">else</span>
+{
+  <span class="teal">ElementSetIterator</span> it = els.ForwardIterator();
+  it.MoveNext();
+
+  <span class="teal">Element</span> e = it.Current as <span class="teal">Element</span>;
+
+  <span class="teal">XYZ</span> p;
+  <span class="blue">if</span>( !GetElementLocation( <span class="blue">out</span> p, e ) )
+  {
+    message
+      = <span class="maroon">"Selected element has no location defined."</span>;
+
+    <span class="teal">Debug</span>.Print( message );
+  }
+  <span class="blue">else</span>
+  {
+    <span class="blue">string</span> msg
+      = <span class="maroon">"Selected element location: "</span>
+      + <span class="teal">Util</span>.PointString( p );
+
+    <span class="blue">double</span> pna = 0;
+
+    <span class="blue">foreach</span>( <span class="teal">ProjectLocation</span> location
+      <span class="blue">in</span> doc.ProjectLocations )
+    {
+      <span class="teal">ProjectPosition</span> projectPosition
+        = location.get_ProjectPosition( <span class="teal">XYZ</span>.Zero );
+
+      pna = projectPosition.Angle;
+
+      msg +=
+        <span class="maroon">"\nAngle between project north and true north: "</span>
+        + <span class="teal">Util</span>.AngleString( pna );
+
+      <span class="teal">Transform</span> t = <span class="teal">Transform</span>.get_Rotation(
+        <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisZ, pna );
+
+      msg +=
+        <span class="maroon">"\nUnrotated element location: "</span>
+        + <span class="teal">Util</span>.PointString( t.OfPoint( p ) );
+
+      <span class="teal">Util</span>.InfoMsg( msg );
+    }
+  }
+}
+return <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+</pre>
+
+<p>Here is
+
+<a href="zip/bc11050.zip">
+version 1.1.0.50</a>
+
+of the complete Building Coder sample source code and Visual Studio solution including the new command.</p>

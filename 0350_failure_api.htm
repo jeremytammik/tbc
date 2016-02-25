@@ -1,0 +1,200 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Failure API</h3>
+
+<p>A very frequent question from developers in the past has been about suppressing various warning and error messages in Revit.
+One of the many 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-is-coming.html">
+new Revit 2011 API features</a> specifically 
+
+targeted at allowing an add-in to integrate very tightly with Revit and its user interface is the new Failure API, providing the ability for an add-in to react to and suppress failures as well as define its own new ones and post them.
+This is the description in the What's New section of the Revit API help file RevitAPI.chm:
+
+<span style="color:darkblue">
+
+<h4>Failure API</h4>
+
+<p>There are two capabilities offered by the new failure API:
+
+<ol>
+<li>The ability to define and post failures from within API code when a user-visible problem has occurred. 
+<li>The ability to respond to failures posted by Revit and by API code through code in your application. 
+</ol>
+
+<p>This section offers a high level overview of both capabilities; more detail about the failures API is provided in the "Failure API" document in the Revit API help file.
+
+<p>As a part of exposing these new capabilities, all overloads accepting "PostedErrors" have been removed from the API.
+
+<h4>Failure posting</h4>
+
+<p>If you are using the failure posting mechanism to report your problem, all you need to do is:
+
+<ol>
+<li>If you are creating a new failure not already existing in Revit, define the new failure and register it in the FailureDefinitionRegistry during the OnStartup() call of your ExternalApplication (new failures must be registered at Revit startup).
+<li>Find the failure definition id, either from the BuiltInFailures classes or from your pre-registered custom failure using the class related to FailureDefinition.
+<li>Post a failure to a document that has a problem - using the classes related to FailureMessage to set options and details related to the failure.
+</ol>
+
+<h4>Failure handling</h4>
+
+<p>Normally posted failures are processed by Revit's standard failure resolution UI at the end of transaction. The user is presented information and options in the UI to deal with the failures.
+
+<p>However, if your operation (or set of operations) on the document requires some special treatment for certain errors (or even all possible errors), you can customize failure resolution. Custom failure resolution can be supplied:
+
+<ul>
+<li>For a given transaction using the interface IFailuresPreprocessor. 
+<li>For all possible errors using the FailuresProcessing event. 
+</ul>
+
+<p>Finally, the API offers the ability to completely replace the standard failure processing user interface using the interface IFailuresProcessor.
+
+</span>
+
+<h4>ErrorHandling SDK Sample</h4>
+
+<p>The use of the new failure API is demonstrated very comprehensively by the ErrorHandling Revit SDK sample, which shows how to create a failure definition id, failure definition, failure message and how to resolve failures in failure processing steps.
+It suppresses a warning message for overlapping walls.
+For more detailed information on that sample implementation, please refer to its read-me document ReadMe_ErrorHandling.rtf.
+
+<p>This sample is quite extensive and demonstrates many aspects of the failure API.
+When looking at it, one of my colleagues came up with some questions requesting clarification of its expected behaviour:
+
+<ol>
+<li>The command creates two overlapping walls without showing a warning message, which is clearly intended.
+<li>After the command is executed, manually creating walls also get no warning. Is this also expected? If so, do we need an additional command in order to restore the original UI behaviour? Just wondering whether this is intentional or the sample only shows how to set.
+<li>The sample creates several different walls in various steps.  What does the second wall between (0, 10, 0) and (20, 10, 0) demonstrate?  Is it intended to show how to delete it after regeneration?  
+<li>Also, I kind of expected to see an error dialogue with some information. Am I missing something?  
+</ol>
+
+<p>Leo Lu, the author of the sample, responded to these questions:
+
+<ol>
+<li>Creating two overlapping walls without a warning message is only a small part of the sample. 
+It also demonstrates how to create failure definition id, failure definitions, and failure messages. 
+These parts are basic.
+It demonstrates that there are different ways to handle the warnings and errors: in the FailuresPreprocessor, FailuresProcessing event or FailuresProcessor. 
+Please also refer to the detailed notes in the sample's readme file. 
+These parts are more advanced and tricky:
+<ul>
+
+<li>FailuresPreprocessor is being set for one transaction and used only during finishing of this one transaction.
+
+<li>Once the FailuresProcessing event is subscribed to in line 195 of the code, it will be raised whenever it is needed. 
+You can unsubscribe from it with a -= operation so that the event won't be raised any more.
+
+<li>FailuresProcessor can be set up via a method of the Revit add-in. 
+If a new FailuresProcessor is set, any previously set one is completely removed.
+Once you set a FailuresProcessor, it will remain alive for the whole Revit session.
+</ul>
+
+<li>The behaviour is not expected if the sample only wants to solve the overlapping walls problem. 
+Then a FailuresPreprocessor for a single transaction can solve this problem &ndash; when the external command is over, you'll get back to original UI behaviour immediately. 
+The sample also uses FailuresProcessing and FailuresProcessor which remains alive after the external command to handle other warnings or errors. 
+When you draw some overlapping walls in the UI after the external command has returned, the warnings will be handled by the failures processor. 
+The solution is simple &ndash; just remove the codes which use FailuresProcessing and FailuresProcessor, then the sample won't affect the normal UI behaviour any longer.
+
+<li>The overlapping walls problem is just an example we chose to demonstrate how to handle a warning or error in the FailuresPreprocessor.  
+Of course one can do other things that may cause other expected warnings or errors that can also be handled in the FailuresPreprocessor similarly to the sample. 
+Use FailuresPreprocessor rather than FailuresProcessing or FailuresProcessor in this condition so that the codes will not affect the Revit UI behaviour.
+
+<li>Yes, that's an option. 
+Or you can choose to suppress some specified warnings you do not care in some projects. 
+Or you may want to quietly roll back all transactions if any error arises. 
+That is all completely up to you.
+</ol>
+
+<p>Here is another example of using the failure API which is less extensive and therefore much smaller and simpler:
+
+<h4>Minimal Room Warning Swallower Failure Processing Sample</h4>
+
+<p>Harry Mattison of the Revit development team provided this small and sweet sample of using the failure API to suppress a specific warning message.
+It includes the RoomWarningSwallower IFailuresPreprocessor implementation used as sample code for the IFailuresPreprocessor interface in the Revit API help file.
+
+<p>The command creates an unbounded room and suppresses the warning that would otherwise be given saying "Room is not in a properly enclosed region".
+   
+<p>The duration for this implementation is only for the transaction in the external command, so after the command is executed manually placed unbounded rooms do result in the warning again a usual.
+   
+<p>However, as mentioned above, it is also possible with the new failure API to suppress warnings for the entire Revit session.
+
+<p>Here is the implementation of the warning swallower class implementing the IFailuresPreprocessor interface:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RoomWarningSwallower</span> : <span class="teal">IFailuresPreprocessor</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">FailureProcessingResult</span> PreprocessFailures( 
+&nbsp; &nbsp; <span class="teal">FailuresAccessor</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// inside event handler, get all warnings</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; failures 
+&nbsp; &nbsp; &nbsp; = a.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> f <span class="blue">in</span> failures )
+&nbsp; &nbsp; { 
+&nbsp; &nbsp; &nbsp; <span class="green">// check failure definition ids </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// against ones to dismiss:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureDefinitionId</span> id 
+&nbsp; &nbsp; &nbsp; &nbsp; = f.GetFailureDefinitionId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">BuiltInFailures</span>.<span class="teal">RoomFailures</span>.RoomNotEnclosed
+&nbsp; &nbsp; &nbsp; &nbsp; == id )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; a.DeleteWarning( f );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue;
+&nbsp; }
+}
+</pre>
+
+<p>This is the mainline of the external command Execute method, which performs the following steps:
+
+<ul>
+<li>Determine an arbitrary level to use to place the room on.
+<li>Start a transaction, since we are using manual transaction mode.
+<li>Set up the room warning swallower failures pre-processor.
+<li>Create the unbounded room.
+</ul>
+
+<pre class="code">
+<span class="teal">Document</span> doc = commandData.Application
+&nbsp; .ActiveUIDocument.Document;
+&nbsp;
+<span class="teal">FilteredElementCollector</span> collector 
+&nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+<span class="teal">Level</span> level = collector.FirstElement() <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+<span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+t.Start( <span class="maroon">&quot;Create unbounded room&quot;</span> );
+&nbsp;
+<span class="teal">FailureHandlingOptions</span> failOpt 
+&nbsp; = t.GetFailureHandlingOptions();
+&nbsp;
+failOpt.SetFailuresPreprocessor( 
+&nbsp; <span class="blue">new</span> <span class="teal">RoomWarningSwallower</span>() );
+&nbsp;
+t.SetFailureHandlingOptions( failOpt );
+&nbsp;
+doc.Create.NewRoom( level, <span class="blue">new</span> <span class="teal">UV</span>( 0, 0 ) );
+&nbsp;
+t.Commit();
+&nbsp;
+<span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Many thanks to Harry for this nice little sample and to Leo for the extensive explanation of the ErrorHandling behaviour!
+
+<p>I have included the former as a new module and external command named CmdPreprocessFailure in The Building Coder samples.
+Here is 
+
+<a href="zip/bc_11_64.zip">
+version 2011.0.0.64</a>
+
+of the complete Visual Studio solution including the new command.</p>

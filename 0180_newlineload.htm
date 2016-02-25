@@ -1,0 +1,232 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<!-- 
+
+  1251154 [NewLineLoad] 
+  SPR #171908 [NewLineLoad fails on wall and floor analytical line reference]
+
+-->
+
+<h3>NewLineLoad</h3>
+
+<p>In Revit Structure, a new line load is created using the NewLineLoad method.
+It provides four different overloads, which we wish to explore here in a little more detail:</p>
+
+<ul>
+<li>NewLineLoad(XYZ, XYZ, XYZ, XYZ, XYZ, XYZ, Boolean, Boolean, Boolean, LineLoadType, SketchPlane): unhosted line load using data at two points.
+<li>NewLineLoad(XYZArray, XYZArray, XYZArray, Boolean, Boolean, Boolean, LineLoadType, SketchPlane): unhosted line load using data at an array of points.
+<li>NewLineLoad(Element, XYZArray, XYZArray, Boolean, Boolean, Boolean, LineLoadType, SketchPlane): hosted line load using data at an array of points. 
+<li>NewLineLoad(Reference, XYZArray, XYZArray, Boolean, Boolean, Boolean, LineLoadType, SketchPlane): hosted line load using data at an array of points. 
+</ul>
+
+<p>The first few arguments vary, and provide for the different methods of defining the line load location or host element. 
+The last five are always the same:</p>
+
+<ul>
+<li>Boolean uniform.
+<li>Boolean projected.
+<li>Boolean isReaction.
+<li>LineLoadType symbol.
+<li>SketchPlane.
+</ul>
+
+<p>The arguments differing between the overloads are:</p>
+
+<ul>
+<li>XYZ p1, XYZ f1, XYZ m1, XYZ p2, XYZ f2, XYZ m2: two points and the forces and moments at each to define an unhosted line load.
+<li>XYZArray points, XYZArray forces, XYZArray moments: arrays to define the points, forces and moments of an unhosted line load.
+<li>Element, XYZArray forces, XYZArray moments: an element and arrays of forces and moments to define a hosted line load.
+<li>Reference, XYZArray forces, XYZArray moments: a curve reference and arrays of forces and moments to define a hosted line load.
+</ul>
+
+<p>The first one takes two triples of XYZ arguments for the point coordinates, force and moment at each of two given points.</p>
+
+<p>The three others take XYZArray arguments to define the forces and moments.
+The overload taking three arrays, one each for the points, forces and moments, is the only one that can accommodate an arbitrary number greater than one of points, forces and moments.</p>
+
+<p>The last two overloads define hosted line loads.
+Here, these arrays are expected to have exactly two entries, which can then be distributed evenly from start to end point along the host element or curve.
+An attempt to add a third entry to the force array, for example, will cause an exception to be thrown.</p>
+
+<p>Jiri Smerak of 
+
+<a href="http://dlubal.de">
+Ing.-Software Dlubal GmbH</a>
+
+has done some further research on how to use these methods.
+He implemented an external command for testing the various overloads and their parameter combinations.
+I used his code as a basis to implement a new Building Coder sample command CmdNewLineLoad.
+It successfully creates:</p>
+
+<ul>
+<li>An unhosted line load defined by two points.</li>
+<li>A hosted line load on a beam element.</li>
+<li>A hosted line load on a beam's analytical curve.</li>
+</ul>
+
+<p>Jiri tested creating hosted line loads on braces and columns and confirms that that works as well.
+He also tested the overloads taking a reference parameter, and that works fine on a beam or column's analytical line reference, including arc and nurbs beams.
+</p>
+
+<p>Here is the code for the external command Execute method:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Application</span> ca
+&nbsp; = app.Create;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Document</span> cd
+&nbsp; = doc.Create;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = ca.Filter;
+&nbsp;
+<span class="green">// determine line load symbol to use:</span>
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; symbols = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+<span class="teal">Filter</span> f1 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">LineLoadType</span> ) );
+<span class="blue">int</span> n = doc.get_Elements( f1, symbols );
+&nbsp;
+<span class="teal">LineLoadType</span> loadSymbol 
+&nbsp; = symbols[0] <span class="blue">as</span> <span class="teal">LineLoadType</span>;
+&nbsp;
+<span class="green">// sketch plane and arrays of forces and moments:</span>
+&nbsp;
+<span class="teal">Plane</span> plane = ca.NewPlane( <span class="teal">XYZ</span>.BasisZ, <span class="teal">XYZ</span>.Zero );
+<span class="teal">SketchPlane</span> skplane = cd.NewSketchPlane( plane );
+&nbsp;
+<span class="teal">XYZ</span> forceA = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 5 );
+<span class="teal">XYZ</span> forceB = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 10 );
+<span class="teal">XYZArray</span> forces = <span class="blue">new</span> <span class="teal">XYZArray</span>();
+forces.Append( forceA );
+forces.Append( forceB );
+&nbsp;
+<span class="teal">XYZ</span> momentA = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+<span class="teal">XYZ</span> momentB = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+<span class="teal">XYZArray</span> moments = <span class="blue">new</span> <span class="teal">XYZArray</span>();
+moments.Append( momentA );
+moments.Append( momentB );
+&nbsp;
+<span class="teal">BuiltInCategory</span> bic 
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_StructuralFraming;
+&nbsp;
+f1 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+<span class="teal">Filter</span> f2 = cf.NewCategoryFilter( bic );
+<span class="teal">Filter</span> f3 = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; beams = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+n = doc.get_Elements( f3, beams );
+&nbsp;
+<span class="teal">XYZ</span> p1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+<span class="teal">XYZ</span> p2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 3, 0, 0 );
+<span class="teal">XYZArray</span> points = <span class="blue">new</span> <span class="teal">XYZArray</span>();
+points.Append( p1 );
+points.Append( p2 );
+&nbsp;
+<span class="green">// create a new unhosted line load on points:</span>
+&nbsp;
+<span class="teal">LineLoad</span> lineLoadNoHost = cd.NewLineLoad( 
+&nbsp; points, forces, moments, 
+&nbsp; <span class="blue">false</span>, <span class="blue">false</span>, <span class="blue">false</span>, 
+&nbsp; loadSymbol, skplane );
+&nbsp;
+<span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unhosted line load works.&quot;</span> );
+&nbsp;
+<span class="green">// create new line loads on beam:</span>
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> beams )
+{
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">LineLoad</span> lineLoad = cd.NewLineLoad(
+&nbsp; &nbsp; &nbsp; e, forces, moments,
+&nbsp; &nbsp; &nbsp; <span class="blue">false</span>, <span class="blue">false</span>, <span class="blue">false</span>,
+&nbsp; &nbsp; &nbsp; loadSymbol, skplane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Hosted line load on beam works.&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Hosted line load on beam fails: &quot;</span>
+&nbsp; &nbsp; &nbsp; + ex.Message );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> i = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="teal">AnalyticalModelFrame</span> amFrame 
+&nbsp; &nbsp; = i.AnalyticalModel <span class="blue">as</span> <span class="teal">AnalyticalModelFrame</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> amFrame.Curves )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">LineLoad</span> lineLoad = cd.NewLineLoad( 
+&nbsp; &nbsp; &nbsp; &nbsp; curve.Reference, forces, moments, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">false</span>, <span class="blue">false</span>, <span class="blue">false</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; loadSymbol, skplane );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Hosted line load on &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;AnalyticalModelFrame curve works.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Hosted line load on &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;AnalyticalModelFrame curve fails: &quot;</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>The command creates one free-standing line load on a pair of given points.
+It also picks up all family instances with the structural framing category and creates line loads on both the elements and their analytical model curves.
+I ran it this minimal project containing one single beam on a work plane grid:</p>
+
+<img src="img/newlineloadbeam1.png" alt="One beam on a work plane grid"/>
+
+<p>This is the report resulting from running the command in this minimal sample project:</p>
+
+<pre>
+Unhosted line load works.
+Hosted line load on beam works.
+Hosted line load on AnalyticalModelFrame curve works.
+</pre>
+
+<p>Here you see the line loads added, one on the given points and the other two hosted by the beam:</p>
+
+<img src="img/newlineloadbeam2.png" alt="Line loads added"/>
+
+<p>Here is
+
+<a href="zip/bc11041.zip">
+version 1.1.0.41</a>
+
+of the complete Visual Studio solution including the new command.</p>
+
+<p>Thank you very much Jiri for all your research!</p>

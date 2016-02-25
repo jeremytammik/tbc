@@ -1,0 +1,74 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+  1259548 [RevitLookup]
+  1259869 [SDK Revit Lookup Errors]
+  SPR #190906 [RevitLookup: RevitLookup crashes on analytical model]
+
+-->
+
+<h3>RevitLookup Update</h3>
+
+<p>I recently mentioned
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitlookup-and-textnote-alignment.html">
+RevitLookup</a>,
+
+the new incarnation of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">
+RvtMgdDbg</a>,
+
+which is now included in the Revit SDK, and so did
+
+<a href="http://cadappdev.blogspot.com/2010/04/revit-2011-api-series-revitlookup-new.html">
+Matt Mason</a>.
+
+<p>The version provided in the initial release of the Revit 2011 SDK had several pretty fundamental problems.
+We are in a continuous process of improving it, and now have a version available with the following enhancements:</p>
+
+<ul>
+<li>ElementType instances
+<li>Revit MEP connectors
+<li>Revit Structure analytical model
+</ul>
+
+<h4>Retrieving all Revit Database Elements</h4>
+
+<p>Regarding the ElementType instances, the initial version for Revit 2011 employed the FilteredElementCollector method WhereElementIsNotElementType, so no ElementType instances were displayed, including all family symbols.
+This has now been fixed by using the following algorithm to retrieve all Revit database elements by creating a Boolean union of the non-element-type instances with the element type ones:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> elemTypeCtor
+&nbsp; &nbsp; = ( <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc ) )
+&nbsp; &nbsp; &nbsp; .WhereElementIsElementType();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> notElemTypeCtor
+&nbsp; &nbsp; = ( <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc ) )
+&nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> allElementCtor
+&nbsp; &nbsp; = elemTypeCtor.UnionWith( notElemTypeCtor );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; founds
+&nbsp; &nbsp; = allElementCtor.ToElements();
+</pre>
+
+<p>Please be aware that RevitLookup is always distributed including the full source code, so you can easily fix any problem that you run into yourself.
+
+<p>I did that and described the detailed procedure for some
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/fixing-rvtmgddbg-for-mep-connectors.html">
+MEP specific properties</a>
+
+back in the Revit 2010 timeframe.
+
+<p>Here is today's snapshot of the
+
+<a href="zip/RevitLookup_2010-05-19.zip">
+updated RevitLookup</a>,
+
+including its full source code and Visual Studio solution.

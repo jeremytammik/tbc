@@ -1,0 +1,114 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262544 [speeding up selection groups] -->
+
+<h3>Speed Up Selection</h3>
+
+<p>I am now back in Switzerland again after all my various travels, and looking forward to diving into the Revit API in depth again...
+
+<p>Here is a really surprising result on how to speed up programmatic selection of a large number of elements, triggered by a question from Joe Offord of
+
+<a href="http://www.enclos.com">
+Enclos Corp</a>:
+
+
+<p><strong>Question:</strong> I have a situation where I'd like to select a large number of curtain panels (over 1000) and add them to my UIDocument.Selection set.
+These curtain panel families have a number of nested, shared components in them, numbers ranging from 5 to 30.
+I'm using the following code in a loop:
+
+<pre class="code">
+&nbsp; Selection.Elements.Add(Panel)
+
+&nbsp; <span class="blue">If</span> Panel.SubComponents <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> subComp <span class="blue">As</span> FamilyInstance _
+&nbsp; &nbsp; &nbsp; <span class="blue">In</span> Panel.SubComponents
+
+&nbsp; &nbsp; &nbsp; Selection.Elements.Add(subComp)
+
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+</pre>
+
+<p>This process is very time-consuming and is taking about 5-10 minutes for just this portion of the code (including looping) to run.
+Is there a better way to create my selection that would speed up things?
+
+<p>What I want when it's all done is to be able to see what elements I've selected.
+I would normally select just the panel and not the subcomponents, but for some reason Revit will not highlight the subcomponents when I tried this.
+When I click on the panel outside the API it will highlight the nested components too but I can't replicate this behaviour using the API.
+
+<p><strong>Answer:</strong> Generally, the way to speed up the addition of a large number of elements to a collection consists of trying
+
+to add all of them or as many as possible at once.
+
+<p>Unfortunately, the only methods I can see on the SelElementSet class to add elements to the collection just
+
+take one element at a time:
+
+<ul>
+<li>Add to add an element into the selected element set.
+<li>Insert to insert the specified element into the set.
+</ul>
+
+<p>There are no other useful methods that I can see on the ElementSet base class either, unfortunately.
+
+<p>One thing that you might be able to try would be to create your own ElementSet instance, let's say in a
+
+variable 'a', and add the desired elements to that one by one using the Add method, but keeping the
+
+ElementSet 'a' independent, not associated with the Revit user interface or current selection for the time
+
+being.
+
+<p>Once you have populated 'a' with the elements you are interested in, you might be able to say
+
+<pre class="code">
+&nbsp; app.ActiveUIDocument.Selection.Elements = a;
+</pre>
+
+<p>This may possibly avoid some overhead performed by the Revit application when you manipulate the current
+
+selection set directly, element by element. Or it may optimise that overhead by doing whatever it is doing
+
+to all of them in one go. Or it may make no difference at all.
+
+<p>I cannot think of anything else to suggest, though.
+
+<p><strong>Response:</strong> I tried passing in a new ElementSet into the Selection.Elements as you suggested but it got rejected.
+
+However, I found a way to create a new SelElementSet and used that to modify the Selection.
+The code looks something like this:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> newCollection <span class="blue">As</span> Selection.SelElementSet _
+&nbsp; &nbsp; = Selection.SelElementSet.Create
+
+&nbsp; <span class="green">' ~ code to add elements to newCollection ~</span>
+
+&nbsp; m_selection.Elements = newCollection
+</pre>
+
+<p>It is remarkable how much time this saves.
+My selection of 1000+ panels went from roughly 5 minutes to 15 seconds.
+
+<p>Thanks for the excellent advice, as always.
+
+<p><strong>Answer:</strong> A colleague of mine asked a relevant question in this context, although I don't really have an idea of whether his assumption is correct or not:
+
+<p>"I guess this was using AUTO transaction, right? I wonder if in case of manual transaction, placing the update/regenerate at the very end would have the same fast result even when adding the entities to the selection set one by one?"
+
+<p>So, just to clarify, what transaction mode and regeneration options are you actually using?
+
+<p>Did you do any experiments with these settings before asking us for a solution?
+
+<p>Thank you in advance for the clarification!
+
+<p><strong>Response:</strong> I used Manual Transactions for both methods I tried.  I made a new Transaction specifically for this selection routine and called Document.Regenerate only once, right before the call toTransaction.Commit.  This was the same for both the single addition method (using Selection.Elements.Add) and the group selection method (using new SelElementSet).
+
+<p>In my biggest selection experiment I had 15,294 Generic Model elements with 1706 Curtain Panel elements selected.  The fast way took about 15 seconds.  The slow way (using the code I posted first) was about 15% complete after 3 minutes before I shut it down.  I was running both commands in a 3D view of the entire model.
+
+<p><strong>Answer:</strong> Thank you very much for the clarification! It does indeed help a lot, since it indicates that the improvement we discovered cannot be achieved by simply optimising the transaction and regeneration approaches.
+
+<p>Very many thanks to Joe for raising this interesting question!

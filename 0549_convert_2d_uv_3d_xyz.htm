@@ -1,0 +1,45 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266845 [UV coordinates] -->
+
+<h3>Converting Between 2D UV and 3D XYZ Coordinates</h3>
+
+<p>I have been busy the last couple of days preparing for the upcoming Revit API training in Saudi Arabia.
+First it was the challenging issue of obtaining a visa on short notice.
+That happily worked out fine.
+The last couple of days I spent getting training material ready.
+It will be interesting to see how it goes, both the training itself and also the visit to this inaccessible country, which according to Wikipedia
+
+<a href="http://wikitravel.org/en/Saudi_Arabia">
+has some of the most restrictive travel policies in the world</a>.
+
+<p>Meanwhile, here is an interesting little question on converting between the two-dimensional UV coordinates of a face and the three dimensional XYZ coordinates in space:
+
+<p><strong>Question:</strong> How can I get the UV coordinates corresponding to the X,Y,Z coordinates of a vertex on a plane?
+For example, I have the XYZ coordinates of a vertex on a cylindrical plane and want to get the UV coordinates of the point. 
+I want to get the normal to the plane using the UV coordinates.
+
+<p><strong>Answer:</strong> I thought it would give me a welcome chance to implement some sample code for you, but unfortunately it seems easy enough to answer just looking at the documentation, with no need for any code or testing.
+
+<p>You ask how to obtain the UV coordinates of the parameterisation of a point on a face, given the XYZ coordinates of the point in 3D space.
+
+<p>Before getting into that, let me mention that some background information on Revit geometry faces and their parameterisations is presented in the discussion of
+
+<!-- 286_abg05_faces.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/faces.html">
+faces and their methods and parameterisation</a>.
+
+<p>Also, for completeness sake, the inverse of what you are asking for, obtaining the XYZ 3D space coordinates from a given UV parameterisation point on the face, is quite trivial and provided by both the Face Evaluate and ComputeDerivatives methods. 
+The former takes the UV point and returns the XYZ, whereas the second returns an entire transform whose origin represents the same XYZ point on the face, the X and Y basis vectors are the tangents in the U and V directions, and the BasisZ vector the face normal at the given point.
+
+<p>Now to address your question: one way that I see to solve it is to use the Face.Project method. 
+It takes an XYZ point in 3D space, which could presumably also be a point on the face itself, and projects it onto the face. 
+If it already lies on the face, I would expect the resulting intersection will be identical to the input point. 
+
+<p>The point of this, though (please excuse the pun) is that the method returns an IntersectionResult instance. 
+That in turn provides a UVPoint property, which gives you the 2D UV parameters on the face of the point of intersection. 
+The IntersectionResult may also be used to return intersection results for curves, in which case the UVPoint property information may even just be one-dimensional instead of two-dimensional.
+

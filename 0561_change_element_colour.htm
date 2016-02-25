@@ -1,0 +1,60 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1267940 [Changing the color of annotation] -->
+
+<h3>Change Element Colour</h3>
+
+<p>We once looked at 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/model-and-detail-curve-colour.html">
+changing the colour of model or detail curves</a> by 
+
+setting their category line style.
+
+<p>Here is another simple little question, on setting the colour of an element, with a clear and simple answer, also by Joe Ye:
+
+<p><strong>Question:</strong> How can I programmatically change the colour of an annotation symbol, e.g. a tag, in a Revit project? 
+
+<p><strong>Answer:</strong> You can change the colour of individual elements in a specified view using the View class ProjColorOverrideByElement property.
+It takes a collection of elements as an argument and overrides their projection lines' colour in the given view.
+
+<p>Here is a VSTA code snippet showing how it can be used:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> ChangeElementColor()
+{
+&nbsp; <span class="teal">Application</span> app = <span class="blue">this</span>.ActiveUIDocument
+&nbsp; &nbsp; .Application.Application;
+&nbsp;
+&nbsp; <span class="teal">UIDocument</span> uidoc = <span class="blue">this</span>.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Color</span> color = app.Create.NewColor();
+&nbsp; color.Blue = ( <span class="blue">byte</span> ) 150;
+&nbsp; color.Red = ( <span class="blue">byte</span> ) 200;
+&nbsp; color.Green = ( <span class="blue">byte</span> ) 200;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> ref1 = sel.PickObject( 
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, 
+&nbsp; &nbsp; <span class="maroon">&quot;Pick element to change its colour&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> elem = ref1.Element;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; ids.Add( elem.Id );
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;ChangeColor&quot;</span> );
+&nbsp;
+&nbsp; doc.ActiveView.set_ProjColorOverrideByElement( 
+&nbsp; &nbsp; ids, color );
+&nbsp;
+&nbsp; trans.Commit();
+}
+</pre>
+
+<p>Many thanks to Joe for providing this solution!

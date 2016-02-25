@@ -1,0 +1,274 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Iteration and Springtime &ndash; Change is the Only Constant</h3>
+
+<p>I am back again from a wonderful relaxing Easter holiday with beautiful weather and an almost obscene wealth of blossoming trees and flowers in the Swiss 
+
+<a href="http://en.wikipedia.org/wiki/Emmental">Emmental</a> region:</p>
+
+<center>
+<img src="img/emmental_in_bloom.jpg" alt="Emmental in bloom"/>
+</center>
+
+<p>Spring time really gives us an overwhelming impression of nature's capacity for rapid change!
+And change is the only constant...
+And, as we see below, change is a constant challenge in programming as well...
+
+<p>Meanwhile, here are quick pointers to two of the many noteworthy items that cropped up during the past week:
+
+<ul>
+<li>Jose Guia'S bimKICKS <a href="http://blog.bimkicks.com/post/2011/04/01/REVIT-COMMAND-PROMPT-aww-yeah!!!!!!!.aspx">Revit command prompt</a>.
+<li><a href="http://www.revitappstore.com">Revit AppStore</a> updated for Revit 2012.
+</ul>
+
+<p>For my own contribution on my first official day back at work and in the blogosphere, here is a summary of an issue I was dealing with just before Easter:
+
+<p>I heard of several different developers struggling with iterations over collections returned by properties of the Revit API classes.
+The last one we looked into was related to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/iterating-over-an-unordered-set-property.html">
+iteration over an unordered set</a> returned 
+
+by the CurtainGrid Cells property.
+
+<p>Now the question was encountered again, in a seemingly different form, yet with a similar answer.
+In this case, both the question and the solution to it were found by Winston Yaw of 
+
+<a href="http://www.risatech.com">
+RISA Technologies</a>:
+
+<!-- <p>How in heaven's name can we ensure that people don't continue running into this issue again and again in ever different guises? -->
+
+<p><strong>Question:</strong> I ran the following code on a simple Revit Structure model that only has one structural wall and I got an index of -1 for the first layer in the wall's compound structure. 
+That makes no sense.
+I probably overlooked something simply, but what?
+
+<pre class="code">
+&nbsp; FilteredElementIterator ^elementsIter;
+&nbsp;
+&nbsp; FilteredElementCollector ^filteredCollection 
+&nbsp; &nbsp; = <span class="blue">gcnew</span> FilteredElementCollector(
+&nbsp; &nbsp; &nbsp; pApplication-&gt;ActiveUIDocument-&gt;Document );
+&nbsp;
+&nbsp; filteredCollection-&gt;OfClass( Wall::<span class="blue">typeid</span> );
+&nbsp;
+&nbsp; elementsIter = filteredCollection
+&nbsp; &nbsp; -&gt;GetElementIterator();
+&nbsp;
+&nbsp; Wall ^testWall = <span class="blue">nullptr</span>;
+&nbsp;
+&nbsp; <span class="green">// Get a wall</span>
+&nbsp;
+&nbsp; <span class="blue">while</span>( elementsIter-&gt;MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; testWall = <span class="blue">dynamic_cast</span>&lt;Wall^&gt;(
+&nbsp; &nbsp; &nbsp; elementsIter-&gt;Current );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( testWall )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Look at compound structure</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; CompoundStructure^ pCompound 
+&nbsp; &nbsp; &nbsp; &nbsp; = testWall-&gt;WallType-&gt;GetCompoundStructure();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pCompound )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look at first layer</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; System::Collections::IEnumerator ^layerIter 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = pCompound-&gt;GetLayers()-&gt;GetEnumerator();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">while</span>( layerIter-&gt;MoveNext() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CompoundStructureLayer^ pLayer 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">dynamic_cast</span>&lt;CompoundStructureLayer^&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; layerIter-&gt;Current );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get index of first layer</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Int32 index = pCompound-&gt;GetLayers()-&gt;IndexOf(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pLayer );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Display in MessageBox</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; MessageBox::Show( index.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+</pre>
+
+<p>In this case, I was expecting a zero-valued index to be displayed. 
+Can you tell me what's wrong, please? 
+Thanks.
+
+<p><strong>Answer:</strong> I found the problem myself. 
+The code above is calling the GetLayers method twice: once to get the Enumerator, and again to use IndexOf. 
+
+<p>In summary, the code is doing something like this:
+
+<ul>
+<li>GetLayers()->GetEnumerator();
+<li>GetLayers()->IndexOf(layer);
+</ul>
+
+<p>The problem doesn't occur when an intermediate variable to store the collection returned is introduced as follows:
+
+<ul>
+<li>IList<> ^layers = GetLayers();
+<li>layers->GetEnumerator();
+<li>layers->IndexOf();
+</ul>
+
+<p>Jeremy responds: Yes, exactly. 
+Congratulations on finding the root of the problem!
+As said, we have seen similar issues in the past, e.g. related to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/iterating-over-an-unordered-set-property.html">
+iteration over an unordered set property</a>.
+
+<h4>Accessing the Compound Layer Structure in Revit 2012</h4>
+
+<p>For completeness sake, I tested accessing the compound layer structure and the IndexOf method using C# on both an architectural wall in Revit Architecture 2012 and a structural wall in Revit Structure 2012.
+Since I store the layer collection returned by the GetLayers method in an intermediate variable, just as suggested in your solution, I obviously don't see the problem you describe.
+Here is the code that I used, which includes comments to highlight the differences between the Revit 2011 and 2012 APIs, excerpted from the external command CmdWallLayers in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/iterating-over-an-unordered-set-property.html">
+The Building Coder samples migrated to Revit 2012 API</a> and
+
+with a call added to exercise the IndexOf method instead of using an additional variable 'i' for the index:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+<span class="blue">class</span> <span class="teal">CmdWallLayers</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// retrieve selected walls, or all walls,</span>
+&nbsp; &nbsp; <span class="green">// if nothing is selected:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; &nbsp; walls, uidoc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;Please select some wall elements.&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;No wall elements found.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">//int i; // 2011</span>
+&nbsp; &nbsp; <span class="blue">int</span> n;
+&nbsp; &nbsp; <span class="blue">double</span> halfThickness, layerOffset;
+&nbsp; &nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+&nbsp; &nbsp; <span class="teal">XYZ</span> lcstart, lcend, v, w, p, q;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> curve
+&nbsp; &nbsp; &nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == curve )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = desc + <span class="maroon">&quot;: No wall curve found.&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// wall centre line and thickness:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; lcstart = curve.Curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; lcend = curve.Curve.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; halfThickness = 0.5 * wall.WallType.Width;
+&nbsp; &nbsp; &nbsp; v = lcend - lcstart;
+&nbsp; &nbsp; &nbsp; v = v.Normalize(); <span class="green">// one foot long</span>
+&nbsp; &nbsp; &nbsp; w = <span class="teal">XYZ</span>.BasisZ.CrossProduct( v ).Normalize();
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wall.Flipped ) { w = -w; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = lcstart - 2 * v;
+&nbsp; &nbsp; &nbsp; q = lcend + 2 * v;
+&nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; &nbsp; q = p + halfThickness * w;
+&nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// exterior edge</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; p = lcstart - v + halfThickness * w;
+&nbsp; &nbsp; &nbsp; q = lcend + v + halfThickness * w;
+&nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//CompoundStructure structure = wall.WallType.CompoundStructure; // 2011</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">CompoundStructure</span> structure = wall.WallType.GetCompoundStructure(); <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//CompoundStructureLayerArray layers = structure.Layers; // 2011</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">CompoundStructureLayer</span>&gt; layers = structure.GetLayers(); <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//i = 0; // 2011</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//n = layers.Size; // 2011</span>
+&nbsp; &nbsp; &nbsp; n = layers.Count; <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} with thickness {1}&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; has {2} layer{3}{4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; desc,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.MmString( 2 * halfThickness ),
+&nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// interior edge</span>
+&nbsp; &nbsp; &nbsp; &nbsp; p = lcstart - v - halfThickness * w;
+&nbsp; &nbsp; &nbsp; &nbsp; q = lcend + v - halfThickness * w;
+&nbsp; &nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; layerOffset = halfThickness;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CompoundStructureLayer</span> layer
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> layers )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; Layer {0}: function {1}, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;thickness {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//++i, // 2011</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; layers.IndexOf( layer ), <span class="green">// 2012</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; layer.Function,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.MmString( layer.Width ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//layerOffset -= layer.Thickness; // 2011</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; layerOffset -= layer.Width; <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p = lcstart - v + layerOffset * w;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; q = lcend + v + layerOffset * w;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is the result of running this on a structural wall:
+
+<pre>
+Walls <246407 Generic - 8"> with thickness 203.2 mm has 1 layer:
+  Layer 0: function Structure, thickness 203.2 mm
+</pre>
+
+<p>As said, there is no problem with the IndexOf method itself.
+As you noted yourself, the issue you observed was due to the repeated call to GetLayers to retrieve the collection multiple times while iterating over it at the same time.
+

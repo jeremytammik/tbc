@@ -1,0 +1,361 @@
+﻿<h1 style="font-weight:bold; font-size:large">What's New in the Revit 2010 API</h1>
+
+<p>I am in vacation in Italy, and trying not to work.</p>
+
+<p>There is one project that I had in mind for quite a while, though, and will start addressing now anyway during this break: I plan to publish the contents of the Revit API documentation 'What's New' sections from the previous few releases of the Revit API help file RevitAPI.chm here, so that they become included in future Internet searches.</p>
+
+<p>The reason for this is that I have found them to be a very valuable source of information.
+I regularly look for answers in these document sections myself first of all when I encounter a question in an API area that I am not familiar with.</p>
+
+<p>So let's start chronologically, with the Revit 2010 API news.
+
+<p>Well, on second thoughts, the Revit 2008 and 2009 API releases also included some 'What's New' information in the form of an 'API Changes' folder containing XML files listing the additions and removals, which I will simply provide for download right here:
+
+<ul>
+<li><a href="zip/2008_API_Changes.zip">Revit 2008 API Changes</a></li>
+<li><a href="zip/2009_API_Changes.zip">Revit 2009 API Changes</a></li>
+</ul>
+
+<p>For Revit the 2010 API, I actually extracted the following from the document 'Revit Platform API Changes and Additions.doc' provided in the Revit 2010 SDK, which lists the same information as the help file.</p>
+
+<p>I plan to follow up with the corresponding information for the Revit
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">2011</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">2012</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">2013</a> APIs
+
+by and by.</p>
+
+
+<h1 style="font-weight:bold; font-size:large">Major Enhancements and Modifications Affecting the Revit 2010 API</h1>
+
+<h2 style="font-weight:bold; font-size:large">New Revit user interface</h2>
+
+<p>Autodesk Revit 2010 offers a new user-interface system based on Ribbons.  The API has been modified to support customization of the Ribbon user-interface in a similar manner to what was supported in previous releases for toolbars and menus.
+<p>External commands registered directly to Revit via the Revit.ini file are now located on the “Add-ins” tab under the “External commands” pulldown.  No code changes are required to move the buttons to this location.  The Add-ins tab will be automatically displayed if any external command is registered with Revit.
+<p>External applications can register and lay out panels on the Add-ins tab of the Ribbon.  Custom panels may be given an application-specified name, and may contain:
+
+<ul>
+<li>Pushbuttons &ndash; a single button with label and icon that invokes a command when pressed.
+<li>Pulldown buttons &ndash; a button with label and icon that opens a menu with different choices when pressed.
+<li>Separators &ndash; a vertical line separating panel components.
+</ul>
+
+<p>Pushbuttons and Pulldown buttons may be created as large size, or stacked in sets of 2 or 3.
+<p>The API for creating Ribbon Panels is completely different from the Toolbar and Menubar API.  External applications which added content to the toolbars and menus will need to be modified to create Ribbon panel(s) instead.
+
+<h2 style="font-weight:bold; font-size:large">Family Creation API</h2>
+
+<p>The Family Creation API provides programmatic access for creation and modification of the contents of Revit Family documents. Geometric data, Family Types, and other information that can be specified through the Revit Family Editor can now be specified via the API.  As a result of this project, API external commands are now displayed while editing a family document in the Family Editor.  API access to in-place family editing is still restricted.  The project introduces the class Autodesk.Revit.FamilyManager, which allows access to family types and parameters.  Using this class you can add and remove types, add and remove family and shared parameters, set the value for parameters in different family types, and define formulas to drive parameter values.
+<p>The Category and Categories classes have been enhanced and a new GraphicsStyle class has been created to provide control of the appearance of Revit families.
+<p>The new class FamilyItemFactory provides the ability to create elements in families.  Access this class through the Document.FamilyCreate property.  It includes the following methods:
+
+<ul>
+<li>NewBlend
+<li>NewDimension
+<li>NewDuctConnector (in Revit MEP only)
+<li>NewElectricalConnector (in Revit MEP only)
+<li>NewExtrusion
+<li>NewFamilyInstance
+<li>NewModelText
+<li>NewPipeConnector (in Revit MEP only)
+<li>NewRevolution
+<li>NewSketchPlane
+<li>NewSweep
+<li>NewSweptBlend
+<li>NewSymbolicCurve
+<li>NewTextNote
+</ul>
+
+<p>The new class ItemFactoryBase provides the ability to create elements both in project and family documents and includes the NewAlignment method.
+
+<p>New document methods &ndash; Document.LoadFamily and Document.EditFamily &ndash; are introduced to bring families from the Family Editor to the Project environment and vice versa.  These methods can be used to examine the contents of the family in terms of its elements, parameters and types; as a result, the properties of Family which access the contents have been removed (Family.SolidForms, Family.VoidForms, Family.Components, Family.LoadedSymbols, Family.Others).
+
+<h2 style="font-weight:bold; font-size:large">New Events </h2>
+
+<p>The Revit API offers totally revamped events that allow an application to subscribe to events taking place in the Revit user interface or in API workflows.  In all of the new events, events now occur before and after various triggering actions (known as "pre" and "post" events).  Many of the new pre-events are cancellable, offering the API application the ability to prevent the event from taking place based on criteria it cares about.  (It is the responsibility of the event subscriber to inform the user of the reason for the cancellation).
+<p>Events that existed before release 2010 have been marked Obsolete.  You should use the new events added in this release to cover situations like:
+
+<ol type="a">
+<li>Document creation
+<li>Document opening
+<li>Document saving
+<li>Document saving as (new filename)
+<li>Document closing
+<li>Dialog box showing
+</ol>
+
+<p>The dialog box showing event has been restructured to support notification by Revit when task dialogs are shown.
+
+<p>The new events added in Revit 2010 are:
+
+<ol type="a">
+<li>File export
+<li>File import
+<li>View printing
+<li>Document printing
+<li>View activating
+<li>Document synchronize with central
+</ol>
+
+<h2 style="font-weight:bold; font-size:large">API for new Massing functionality</h2>
+
+<p>Revit 2010 introduces new conceptual design functionality for creation of complex geometry.  Intuitive and flexible form-making is supported by the addition of new objects: points and spline curves that pass through these points. The resulting surfaces can be divided, patterned, and panelized to create buildable forms with persistent parametric relationships.
+
+<p>The following classes provide the API user with access to this functionality:
+
+<ul>
+<li>CurveByPoints
+<li>CurveByPointsArray
+<li>DividedSurface
+<li>DividedSurfaceData
+<li>Form
+<li>ReferencePoint
+<li>ReferencePointArray
+<li>TilePatterns
+<li>TilePattern
+</ul>
+
+<p>Other methods and properties added to support this functionality are:
+
+<ul>
+<li>ModelCurve.ChangeToReferenceLine()
+<li>FamilyCreate.NewLevel(double)
+<li>Family.IsCurtainPanelFamily
+<li>Family.CurtainPanelHorizontalSpacing
+<li>Family.CurtainPanelVerticalSpacing
+<li>Family.CurtainPanelTilePattern
+<li>SketchPlane.PlaneReference
+<li>Level.PlaneReference
+</ul>
+
+<p>The following classes cannot be used in 2010 Mass families. Instead, equivalent geometry can be created with the Form class.
+
+<ul>
+<li>Blend
+<li>Extrusion
+<li>Revolution
+<li>Sweep
+<li>SweptBlend
+</ul>
+
+<h2 style="font-weight:bold; font-size:large">MEP API for ducts and pipes</h2>
+
+<p>This project provides read/write access to HVAC and Piping data in a Revit model including:
+
+<ol type="a">
+<li>Traversing ducts, pipes, fittings, and connectors in a system
+<li>Adding, removing, and changing ducts, pipes, and other equipment
+<li>Getting and setting system properties
+<li>Determining if the system is well-connected
+</ol>
+
+<p>The following classes have new methods and properties related to duct and pipes:
+
+<ul>
+<li>Autodesk.Revit.MEP.Connector
+<li>Autodesk.Revit.Elements.MechanicalSystem
+<li>Autodesk.Revit.Elements.PipingSystem
+</ul>
+
+<p>Elements related to duct and pipe systems can be created using new methods on Autodesk.Revit.Creation.Document:
+
+<ul>
+<li>NewCrossFitting
+<li>NewDuct
+<li>NewElbowFitting
+<li>NewFlexDuct
+<li>NewFlexPipe
+<li>NewMechanicalSystem
+<li>NewPipe
+<li>NewPipingSystem
+<li>NewTakeoffFitting
+<li>NewTeeFitting
+<li>NewTransitionFitting
+<li>NewUnionFitting
+</ul>
+
+<p>All MEP-related classes have been moved into the MEP namespace from namespaces such as Elements and Symbols.
+
+<h2 style="font-weight:bold; font-size:large">Upgrade to .NET Framework version 3.5</h2>
+
+<p>Revit now uses Microsoft .NET Framework version 3.5. Applications compiled using .NET 2.0 should continue to work unless they are affected by other changes in the Revit 2010 API.
+
+<h1 style="font-weight:bold; font-size:large">Small enhancements &amp; API interface changes</h1>
+
+<h3 style="font-weight:bold; font-size:large">Parameters</h3>
+<p>The new property Autodesk.Revit.Parameters.InternalDefinition.BuiltInParameter provides access to the enumerated type for the parameter, if it is a built-in parameter.  The property makes it easier to locate a built-in parameter value based on the name of the parameter shown in the Revit UI.
+
+<h3 style="font-weight:bold; font-size:large">Rooms and Spaces</h3>
+<p>The new method Autodesk.Revit.Elements.Room.IsPointInRoom determines if a 3D point is in the volume of a room.
+<p>The new method Autodesk.Revit.Elements.Space.IsPointInSpace determines if a 3D point is in the volume of a space.
+<p>The new methods Autodesk.Revit.Document. GetRoomAtPoint() and GetSpaceAtPoint() find the Room or Space that encloses a given 3D point within the project.
+<p>The new property Autodesk.Revit.Elements.FamilyInstance.Space allows an API application to determine what in which Space an air terminal or other family instance exists in Revit MEP.
+
+<h3 style="font-weight:bold; font-size:large">Grids</h3>
+<p>The new method Autodesk.Revit.Elements.Grid.ExtendToAllLevels() method allows grids to intersect all levels of a project.
+<p>The method Autodesk.Revit.Creation.Document.NewGrid will throw an exception if given an unbounded line.
+
+<h3 style="font-weight:bold; font-size:large">Batch creation methods (NewWalls, NewGrids, etc.)</h3>
+<p>If one of the elements which is supposed to be created can't be created the entire the operation will be properly rolled back.
+
+<h3 style="font-weight:bold; font-size:large">Rebar</h3>
+<p>NewRebar:StartHookOrientation and EndHookOrientation arguments were changed to an enum.  Rebar.SetLayoutRuleWithoutExaminingHost value type was changed to an enum.
+
+<h3 style="font-weight:bold; font-size:large">Structural framing</h3>
+<p>Beams created with an offset from their level now have their analytical model aligned with the physical geometry of the beam.
+<p>Curved beams can be created in the vertical plane.
+
+<h3 style="font-weight:bold; font-size:large">Categories</h3>
+<p>Internal categories that are not directly exposed through the Revit UI can be accessed via the API. This makes it possible to add shared parameters to Materials using Revit API.
+<p>The new Category.AllowsBoundParameters property indicates if a category can have shared or project parameter.  When category.AllowsBoundParameters is false, it may not be bound to shared parameters using the BindingMap.
+<p>Category. AllowsVisibilityControl(view) indicates if the visibility of a category can be controlled in a given view.
+<h3 style="font-weight:bold; font-size:large">Sketch</h3>
+<p>Autodesk.Revit.Elements.Sketch.CurveLoop now returns CurveArrayArray instead of CurveArray.  If the sketch contains multiple loops, the output will be segregated into separate CurveArrays within the output.
+<h3 style="font-weight:bold; font-size:large">Revit session properties</h3>
+<p>The new Autodesk.Revit.Application.Language property identifies the language used in the current session of Revit.
+<p>The new Autodesk.Revit.Application.Product property identifies the Revit vertical application (Building, Structure, MEP) via an enumerated type.
+<h3 style="font-weight:bold; font-size:large">External Commands and Applications</h3>
+<p>Revit now offers improved diagnostics when Revit is unable to run an external application or command listed in the Revit.ini file.  A popup message will explain the problem.  If the problem is related to an exception caught from the application, the popup will include the exception stack trace.
+<p>Revit no longer silently renumbers the Revit.ini file entries when they fail to load or start.  An option in the popup message will allow a user to permanently disable a failed API application.
+<h3 style="font-weight:bold; font-size:large">HostedSweep</h3>
+<p>In the Autodesk.Revit.Elements.HostedSweep class the new abstract method AddSegment() allows applications to write generic code that operates upon all hosted sweep types (gutter, fascia, or slab edge).
+<h3 style="font-weight:bold; font-size:large">VolumeCalculationOptions </h3>
+<p>The Autodesk.Revit.VolumeCalculationOptions.VolumeComputationEnbale field was removed.  Use the property VolumeComputationEnable instead.
+<h3 style="font-weight:bold; font-size:large">Curtain Systems</h3>
+<p>Autodesk.Revit.Elements.CurtainGridLine new property ExistingSegmentCurves allows access to the existing segments in the grid line (excluding those which have been removed).
+<p>Autodesk.Revit.Elements.Mullion now provides access to its location via the LocationCurve property.
+<h3 style="font-weight:bold; font-size:large">Output Arguments from API methods</h3>
+<p>Output arguments are now marked with the [Out] attribute. Methods changed include:
+
+<ul>
+<li>Application.GetAllTopMenus
+<li>ControlledApplication.GetAllTopMenus
+<li>Document.Import - both overloads
+<li>Face.Intersect
+<li>Curve.Intersect
+<li>Curve.IsInside
+<li>Face.IsInside
+<li>Document.LoadFamily
+<li>Document.LoadFamilySymbol
+</ul>
+
+<p>Where previously these output arguments were declared as “reference”.  In C#, where these arguments were passed using the “ref” keyword, this should now be “out”.
+<h3 style="font-weight:bold; font-size:large">Visual Studio Tools for Applications (VSTA) 2.0</h3>
+<p>Revit's macro functionality is now based on VSTA 2.0. More information about VSTA and version 2.0 are available on Microsoft's
+
+<a href="http://msdn.microsoft.com/en-us/vsx2008/products/bb933739.aspx">
+MSDN Developer Center</a>.
+
+<h3 style="font-weight:bold; font-size:large">Find references in the direction of a ray</h3>
+<p>This new method returns a reference array of all references found when moving through the Revit model from a specified point at a specified direction.
+<p>Syntax:
+<p>public ReferenceArray FindReferencesByDirection(XYZ origin, XYZ direction, View3D view)
+<h3 style="font-weight:bold; font-size:large">Reference parsing</h3>
+<p>The Autodesk.Revit.Geometry.Reference class now offers properties to extract the element, geometry object, transform, point, and parameters of the referenced item.
+<h3 style="font-weight:bold; font-size:large">Element Hiding</h3>
+<p>To allow hiding and un-hiding of elements via the API, the methods View.Hide(ElementSet) and View.Unhide(ElementSet) have been added. The properties Element.IsHidden(View) and Element.CanBeHidden(View) return a boolean value that indicates if an element is current hidden and if it can be hidden.
+<h3 style="font-weight:bold; font-size:large">Parameter.Set return value when value is unchanged</h3>
+<p>Previously, Revit returned False if the input value for Parameter.Set was the same as the current value. Revit now returns True in this case.
+<h3 style="font-weight:bold; font-size:large">NoConditionType removed for Spaces</h3>
+<p>The NoConditionType enum has been removed as an option for Spaces. All spaces must have a ConditionType value and the default is HeatedAndCooled. A user wishing to specify an unconditioned space may use the value ConditionType::Unconditioned.
+<h3 style="font-weight:bold; font-size:large">Detail Curves use sketch plane of their view</h3>
+<p>NewDetailCurve and NewDetailCurveArray no longer require specification of a sketch plane. The sketch plane of the view is used.
+<h3 style="font-weight:bold; font-size:large">SketchPlane property added to View class</h3>
+<p>The property View.SketchPlane has been created to return a view's sketch plane.
+<h3 style="font-weight:bold; font-size:large">Export family data to XML for Autodesk Seek integration</h3>
+<p>The method ExtractPartAtomFromFamilyFile will open a family file and create an XML file with data used by Autodesk Seek for content search.
+<h3 style="font-weight:bold; font-size:large">Exceptions when parameters are disabled</h3>
+<p>Set and Get for the following parameters may now result in exceptions when the parameter is disabled for the specified object: View.Scale, RoofBase.FasciaDepth, FootPrintRoof.SlopeAngle
+<h3 style="font-weight:bold; font-size:large">New options for export to DWF</h3>
+<p>The new option DWF2DExportOptions.ExportFormat allows specification of the paper format for the DWF.
+<p>The new option DWF2DExportOptions.PortraitLayout allows specification of the layout for the DWF.
+<p>The new option DWF2DExportOptions.ImageFormat allows specification of the format for the exported image in the DWF.
+<p>The new option DWF2DExportOptions.ImageQuality allows specification of the format for the exported image in the DWF.
+<p>The new option DWF2DExportOptions.StopOnError and DWF3DExportOptions.StopOnError controls whether or not the export process stops when an error is generated during export of one view, or whether Revit attempts to continue the export for other pending views.
+<h3 style="font-weight:bold; font-size:large">New option for export to FBX</h3>
+<p>The new option FBXExportOptions.StopOnError controls whether or not the export process stops when an error is generated during export of one view, or whether Revit attempts to continue the export for other pending views.
+<h3 style="font-weight:bold; font-size:large">New method for export to DGN</h3>
+<p>The new method Document.Export(String, String, ViewSet, DGNExportOptions) exports a Revit project exports a model into DGN format.
+<h3 style="font-weight:bold; font-size:large">New method for export to Civil3D</h3>
+<p>The new method Document.Export(String, String, View3D, ViewPlan, BuildingSiteExportOptions) exports a Revit project exports a model in the format of Civil Engineering design applications.
+<h3 style="font-weight:bold; font-size:large">New method for import from gbXML</h3>
+<p>The new method Document.Import(String, GBXMLImportOptions) imports a Green-Building XML file into Revit.
+<h3 style="font-weight:bold; font-size:large">New method for import from Inventor</h3>
+<p>The new method Document.Import(String, InventorImportOptions) imports an Inventor file into Revit.  The Inventor file must be a .adsk file exported from Inventor for the purposes of transfer to Revit.
+<h3 style="font-weight:bold; font-size:large">Document.Application property</h3>
+<p>The new property Document.Application returns the Application object which contains this document.
+<h3 style="font-weight:bold; font-size:large">New element collector properties</h3>
+<p>Two new methods for collecting elements have been added.
+
+<ul>
+<li>int Elements[Filter, ElementArray] &ndash; Collects all elements which satisfy specified filter within the document.
+<li>int Elements[Type, ElementArray] &ndash; Collects all elements which satisfy specified type within the document.
+</ul>
+
+<p>These methods are similar to previously existing methods accepting a System.Collection.Generics.ICollection<Element>.
+<h3 style="font-weight:bold; font-size:large">ImportInstance elements</h3>
+<p>A new element sub-type ImportInstance represents external geometry content such as DWG that has been imported to Revit.  This element type is also output from the Import() methods, however, those methods have not been updated to specific output this new type.  You can downcast the output to this sub-type.
+
+<p>The ImportInstance element types offer the ability to access and modify the Visibility and Pinned parameters.
+<h3 style="font-weight:bold; font-size:large">LocationCurve.ElementsAtJoin</h3>
+<p>This property has changed type since Revit release 2009.  The property now returns an ElementArray, instead of List<Element>.
+<h3 style="font-weight:bold; font-size:large">Element material quantities</h3>
+<p>The API provides access to the material quantities for a material in a given element.  These values are the same values calculated by Revit to show in material takeoff schedules. In some cases the value may be approximate.  Access these values through:
+
+<ul>
+<li>Category.HasMaterialQuantities
+<li>Element.Materials
+<li>Element.GetMaterialArea()
+<li>Element.GetMaterialVolume()
+</ul>
+
+<h3 style="font-weight:bold; font-size:large">Instance.Transformed and Geometry of Instances</h3>
+
+<p>This property has been removed.  Obtain the transformed geometry of the instance using Instance.GetInstanceGeometry(), Instance.GetSymbolGeometry(Transform) and Instance.GetInstanceGeometry(Transform)
+<h3 style="font-weight:bold; font-size:large">PlaceGroup()</h3>
+<p>The method Autodesk.Revit.Creation.Document.PlaceGroup() has been modified to correctly interpret the coordinates of the input point in the coordinates of the document.  Previously it interpreted the points in the coordinates of the group, which were not accessible.
+<h3 style="font-weight:bold; font-size:large">gbXMLParamElem.ShadingSurfaces</h3>
+<p>This property has been removed and replaced with gbXMLParamElem.ExportComplexity with a wider variety of options.
+<h3 style="font-weight:bold; font-size:large">Creating topography surfaces</h3>
+<p>The new methods
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewTopographySurface()
+<li>Autodesk.Revit.Elements.TopographySurface.AddPoints()
+</ul>
+
+<p>allow you to create and populate topography surface elements in projects.
+<h3 style="font-weight:bold; font-size:large">Changes to Printing</h3>
+<p>The workflows used to change print settings via the PrintManager class have changed.  Previously, changes to settings happened immediately and would be visible in the Revit Print dialogs and applicable to all API printing activities.  In the 2010 API, you must commit the changes you have made to the PrintManager, PrintSettings and PrintParameters classes by one of these methods:
+
+<ol type="1">
+<li>Calling PrintManager.SubmitPrint to execute a print job.
+<li>Calling PrintManager.Apply to save settings without executing a print job.
+</ol>
+
+<p>The properties PrintSetup.PaperSizes and PrintSetup.PaperSources have moved to the PrintManager class.
+<p>A new option has been added to PrintParameters: ReplaceHalftoneWithThinLines.
+
+<h3 style="font-weight:bold; font-size:large">Geometry extraction</h3>
+
+<p>A new option Autodesk.Revit.Geometry.Options.IncludeNonVisibleObjects has been added.  Use this option to instruct Revit to include GeometryObjects whose Visibility type is something other than ‘Visible’ when extracting geometry from Revit.  Objects which appear in this category include MEP Duct lining and insulation and joined geometry currently selected and highlighted in the Revit User Interface.  When this option is not set (the default) only visible geometry is extracted, the same as in Revit 2009.
+<p>The geometry extraction API uses new algorithms to extract the faces and edges from a solid.  The handles to these faces and edges are no longer maintained centrally (which means they are not suitable to be used as an index for collections like a Dictionary or Map).  The new algorithm also changes the order in which the faces are returned, thus they may not be returned in the same order as in Revit 2009.
+<h3 style="font-weight:bold; font-size:large">Additional enums</h3>
+<p>Several enums have been added to the Revit API to assist developers with interpretation of the values of certain BuiltInParameter types:
+
+<ul>
+<li>Autodesk.Revit.Enums.AnalyzesAsType &ndash; For the parameter STRUCTURAL_ANALYZES_AS
+<li>Autodesk.Revit.Enums.SlantedOrVerticalColumnType &ndash; For the parameter SLANTED_COLUMN_TYPE_PARAM
+<li>Autodesk.Revit.Enums.StickSymbolJustification &ndash; For the parameter STRUCTURAL_STICK_SYMBOL_LOCATION
+<li>Autodesk.Revit.Enums.StructuralReleaseType &ndash; For the parameter STRUCTURAL_END_RELEASE_TYPE
+<li>Autodesk.Revit.Enums.WallFunction &ndash; For the parameter WALL_ATTR_EXTERIOR
+</ul>
+
+<hr>
+<p style="text-align:center">End of document</p>
+<hr>
+
+<p>So that was the news in the Revit 2010 API back in 2009.</p>
+
+<p>Stay tuned for the next installments leading up to the current day.</p>

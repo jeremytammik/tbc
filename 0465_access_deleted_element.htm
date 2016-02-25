@@ -1,0 +1,110 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- http://thebuildingcoder.typepad.com/blog/2010/10/power-to-the-user-and-application.html?cid=6a00e553e1689788330133f5511cc1970b#comment-6a00e553e1689788330133f5511cc1970b -->
+
+<h3>Access Deleted Element</h3>
+
+<p>Here is a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/power-to-the-user-and-application.html?cid=6a00e553e1689788330133f5511cc1970b#comment-6a00e553e1689788330133f5511cc1970b">
+question</a> posted 
+
+by Kristian (Krispy5) Parsons, Systems Analyst - Design at
+
+<a href="http://www.westfield.com">
+Westfield Design & Construction Pty. Ltd.</a> on 
+
+accessing deleted element data in the DocumentChanged event handler:
+
+<p><strong>Question:</strong> How do I find the category of the deleted elements? 
+When I try to get the Element from the ElementId it fails since the element has already been deleted.
+
+<p>In my case I would like to warn users when they have deleted a floor.
+
+<p><strong>Answer:</strong> I was planning to test your assertion by looking at the Revit SDK ChangesMonitor sample which demonstrates the use of the DocumentChanged method.
+
+<p>I assume that your question is based on using that event to be notified of the deleted elements. Looking at the ChangesMonitor DocumentChanged event handler, I note that it calls a helper method AddChangeInfoRow to list the added, deleted and modified element information in its modeless form. That method includes the following statements and comments which clearly tell you that the deleted element information is no longer accessible:
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> AddChangeInfoRow(
+&nbsp; <span class="teal">ElementId</span> id,
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">string</span> changeType )
+{
+&nbsp; <span class="green">// retrieve the changed element</span>
+&nbsp; <span class="teal">Element</span> elem = doc.get_Element( id );
+&nbsp;
+&nbsp; <span class="teal">DataRow</span> newRow = m_ChangesInfoTable.NewRow();
+&nbsp;
+&nbsp; <span class="green">// set the relative information of </span>
+&nbsp; <span class="green">// this event into the table.</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( elem == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// this branch is for deleted element due </span>
+&nbsp; &nbsp; <span class="green">// to the deleted element cannot be retrieved </span>
+&nbsp; &nbsp; <span class="green">// from the document.</span>
+&nbsp;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;ChangeType&quot;</span>] = changeType;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Id&quot;</span>] = id.IntegerValue.ToString();
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Name&quot;</span>] = <span class="maroon">&quot;&quot;</span>;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Category&quot;</span>] = <span class="maroon">&quot;&quot;</span>;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Document&quot;</span>] = <span class="maroon">&quot;&quot;</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;ChangeType&quot;</span>] = changeType;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Id&quot;</span>] = id.IntegerValue.ToString();
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Name&quot;</span>] = elem.Name;
+&nbsp;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Category&quot;</span>] = (<span class="blue">null</span> == elem.Category)
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;&lt;null&gt;&quot;</span> 
+&nbsp; &nbsp; &nbsp; : elem.Category.Name; <span class="green">// added by jeremy</span>
+&nbsp;
+&nbsp; &nbsp; newRow[<span class="maroon">&quot;Document&quot;</span>] = doc.Title;
+&nbsp; }
+&nbsp; m_ChangesInfoTable.Rows.Add( newRow );
+}
+</pre>
+
+<p>So the answer to your question is presumably 'no way', and that is as designed.
+
+<p>There is an obvious workaround, though:
+
+<p>The DocumentChanged event is a very simple notification after the fact. The transaction in which the document was modified has already been closed, you cannot do anything more about it yourself, and as we have seen, you cannot even query the deleted elements for their data.
+
+<p>If you wish to access the document before the transaction is closed, there is a very powerful alternative possibility, the dynamic model update framework or DMU. It enables you to register an updater to be triggered by certain events, and also to react on these events within the same transaction that triggered them.
+It is demonstrated by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#2">
+DynamicModelUpdate and DistanceToSurfaces SDK samples</a> and
+
+Saikat's 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html">
+Structural DMU sample</a>.
+
+<p>In your case, you can easily implement an updater that simply brings up a message box as described above, and register a trigger for it which reacts to the deletion of floors and nothing else. 
+
+<!--
+<p>Your updater Execute method will be called while the transaction is still open, and you can analyse and even modify the elements being deleted before the transaction is terminated.
+-->
+
+<p>Your updater Execute method will be called while the transaction is still open.
+Unfortunately, even though the transaction is open, you can no longer access or modify the elements that have already been deleted.
+
+<p>The only information available to you at this point is the element id of the deleted element.
+If you are interested in floors only, you can maintain a list of all floor element ids and ensure that it is kept up to date using either DMU or the DocumentChanged event.
+
+<p><strong>Response:</strong> Yes that all looks good. 
+By the way, your assumption is correct that I was using the DocumentChanged event.
+
+<p>I looked into the 'dynamic model update framework'.
+This sounds like what I want.
+
+<p>Later: Thanks again, this solved my problem and was easy to implement.
+
+<p>I filter for floors and use the 'GetChangeTypeElementDeletion' in the 'AddTrigger' call, then in my 'IUpdater' class in the 'Execute' method I simply display a task dialog showing the number of floors being deleted.
+There is no need for any more filtering, I can just use 'data.GetDeletedElementIds().Count'.

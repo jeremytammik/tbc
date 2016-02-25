@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Python Shell for Revit 2012 and Vasari 2.1</h3>
+
+<p>I was so happy to tell you that work on Daren Thomas' 
+
+<a href="http://code.google.com/p/revitpythonshell">RevitPythonShell</a> was 
+
+recently intensified and endorsed by Zach Kron of 
+
+<a href="http://buildz.blogspot.com">
+buildz</a> to 
+
+support
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/python-shell-in-revit-and-vasari.html">
+running in Vasari</a>.
+
+Well, the project has been taken a step further:
+
+<a href="http://buildz.blogspot.com/2011/09/python-scripting-in-vasari-21.html">
+RevitPythonShell now runs in both Revit 2012 and Vasari 2.1</a>.
+
+<p>Zach's post includes simple yet detailed instructions for installing RevitPythonShell in Vasari in 5 minutes, and similar steps also work for Revit 2012.
+
+<p>Here are the modified steps I performed to use it on Revit instead of Vasari:
+
+<ul>
+<li>Install Revit 2012, any flavour (well, that may take a bit longer; let's assume that has already been done).
+<li>Install IronPython: <a href="http://ironpython.net">http://ironpython.net</a>.
+<li>Install RevitPythonShell for Revit 2012: <a href="http://code.google.com/p/revitpythonshell/downloads/detail?name=Setup_RevitPythonShell_2012.msi">http://code.google.com/p/revitpythonshell/downloads/detail?name=Setup_RevitPythonShell_2012.msi</a>.
+<li>Open Revit &gt; Add-Ins &gt; RevitPythonShell &gt; Configure...
+<li>In the Search Paths tab, add the Lib folder of your IronPython installation to enable the autocomplete feature. In my case, this is "C:\Program Files\IronPython 2.6 for .NET 4.0\Lib".
+</ul>
+
+<p>I actually have IronPython 2.6 installed, not the latest version 2.7.
+Similarly, I am still running an old version of Python itself, 2.6.2, from Apr 14 2009, no less.
+Still, all works well, as far as I can tell so far:</p>
+
+<center>
+<img src="img/revitpythonshell_console_2012.png" alt="RevitPythonShell console in Revit 2012"/>
+</center>
+
+<p>It shows a simple sample script that demonstrates that I have immediate interactive access to the Revit API functionality.
+In this trivial case, I just use it to display the document path and read the width of the first wall type in the document WallTypes collection:
+
+<pre>
+&gt;&gt;&gt;clr.AddReference('RevitAPI')
+&nbsp;
+&gt;&gt;&gt;from Autodesk.Revit.DB import *
+&nbsp;
+&gt;&gt;&gt;doc = __revit__.ActiveUIDocument.Document
+&nbsp;
+&gt;&gt;&gt;doc.PathName
+'C:\\Program Files\\Autodesk\\Revit Architecture 2012
+\\Program\\Samples\\rac_basic_sample_project.rvt'
+&nbsp;
+&gt;&gt;&gt;iter = doc.WallTypes.ForwardIterator()
+&nbsp;
+&gt;&gt;&gt;iter.MoveNext()
+True
+&nbsp;
+&gt;&gt;&gt;wt = iter.Current
+&nbsp;
+&gt;&gt;&gt;wt
+&lt;Autodesk.Revit.DB.WallType object at 
+0x000000000000002B [Autodesk.Revit.DB.WallType]&gt;
+&nbsp;
+&gt;&gt;&gt;wt.Width
+1.15625
+</pre>
+
+<p>Very many thanks to Daren Thomas, Aki Hogge and Zach Kron for all their effort in creating and improving this powerful tool!
+
+<p>Chatting with Zach, the issue of using this and increasing exposure and access to the Revit API came up. 
+We hope this is going to help bring new coders into the Revit API.
+Obviously, that is easier if you already know Python.
+Zach added:
+
+<p>My optimism comes from the big push to Python that is going on in the 
+
+<a href="http://www.rhino3d.com">
+Rhino</a> community, 
+
+since they moved from rhinoscripting.  
+They have really wonderful introductory documentation, the 
+
+<a href="http://python.rhino3d.com/content/130-RhinoPython-primer">
+Python for Rhino 101 Primer</a>,
+
+that actually helped me start to understand how to use the Revit API.
+
+<p>Rhino is the platform of choice in many architecture graduate schools in the US, but I always hear students sigh and say 'I GUESS I should really learn Revit so I can get a job'.
+
+<p>Sections from the primer include:
+
+<ol>
+<li>What is it all about?
+<li>Python Essentials
+<li>Script anatomy
+<li>Operators and functions
+<li>Conditional execution
+<li>Tuples, Lists and Dictionaries
+<li>Classes
+<li>Geometry
+<li>Notes
+</ol>
+
+<p>You might find this helpful to understand the Revit API and especially the use of the RevitPythonShell as well.
+
+<p>Talking about Rhino and Revit, here is a series of very interesting buildz posts on
+
+<a href="http://buildz.blogspot.com/2011/01/joe-k-working-with-rhino-and-revit-part.html">
+Revit interoperating with Rhino</a>.

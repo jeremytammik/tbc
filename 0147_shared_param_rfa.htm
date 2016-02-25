@@ -1,0 +1,141 @@
+<h3>Adding a Shared Parameter to an RFA File</h3>
+
+<p>Back again from my vacation in Avignon.
+We had a wonderful drive back up again through the gorges of the
+
+<a href="http://en.wikipedia.org/wiki/Buech">
+Bu&euml;ch river</a>
+
+with a beautiful camp near Rosans.
+I knew the place from last year, and here are two photos from that visit.
+Here is Cornelius at the camp fire in the evening:</p>
+
+<img src="img/rosans_cornelius_campfire.jpg" alt="Cornelius at the camp fire near Rosans" width="400"/>
+
+<p>Here is our camp site in the early morning dew:</p>
+
+<img src="img/rosans_morning_dew.jpg" alt="Our camp site in the morning dew" width="400"/>
+
+<p>We were lucky with the weather, sleeping outside with no roof, preferring the open sky to a tent, and it started raining just after we left but not before.</p>
+
+<p>Looking at old and new subjects to write about, I just discovered a rather overdue issue, a question raised quite a while ago by Arun Shankar of
+
+<a href="http://www.reedbusiness.com">
+Reed Business</a>
+
+in a comment on the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/adding-a-shared-parameter-to-a-dwg-file.html">
+adding a shared parameter to a DWG file</a>:</p>
+
+<p><strong>Question:</strong>
+Is it possible to add a shared parameter to an RFA file using the DotNet Revit API?
+The example for adding shared parameters to a DWG file does not work for RFA files.
+Can you please post some sample code for adding shared parameters to an RFA file?</p>
+
+<!--
+
+First answer, missing the point, as pointed out by Matt Mason:
+
+From: Matt Mason
+Sent: Thursday, June 11, 2009 05:35
+To: Jeremy Tammik
+Subject: Add Shared Parameter to Family
+
+Jeremy,
+
+Regarding your recent blog post - I think you perhaps misunderstood the original question.
+
+The developer wants to add a shared parameter to an RFA file as a type or instance parameter. This can be done with the FamilyManager.AddParameter() which takes an ExternalDefinition argument.
+
+While it still may be necessary to add it to a project bound to a category, the first step to having the shared parameter in content is to add it to the family itself.
+
+Best Regards,
+Matt
+
+<p><strong>Answer:</strong>
+To address this issue, we first need to understand that shared parameters are always added to some category.
+Is there any category that we can use to identify RFA files, or one specific RFA file?
+If not, then we will not be able to define any shared parameters for these files.</p>
+
+<p>To explore this issue a bit further, let me discuss a generic approach to analyse the elements added a given action in Revit.
+In this case, we will determine what elements are added to the model when an RFA file is loaded, i.e. a new family.</p>
+
+<p>We can explore this as follows using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20081117.zip">
+Revit API introduction labs</a>
+
+element lister tool implemented in the external command Lab2_1_Elements, which creates a text file listing all Revit database elements and some of their basic properties.
+Actually, we have already mentioned this approach in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploring element parameters</a>.
+
+<ul>
+<li>Start off by creating an empty Revit model.</li>
+<li>List all its elements into a text file RevitElementsBeforeLoadingFamily.txt.</li>
+<li>Load a new family, for instance the door family Loaded M_Double-Flush.rfa.</li>
+<li>List the elements again into RevitElementsAfterLoadingFamily.txt.</li>
+</ul>
+
+Now we can determine the elements added by loading the family by comparing the two files using a
+
+<a href="http://en.wikipedia.org/wiki/Diff">
+diff</a>
+
+tool:</p>
+
+<pre>
+C:\tmp\ > diff
+  RevitElementsBeforeLoadingFamily.txt
+  RevitElementsAfterLoadingFamily.txt
+
+2160a2161,2172
+> Id=127149; Class=Family; Category=Doors; Name=M_Double-Flush
+> Id=127705; Class=Element; Category=?; Name=M_Double-Flush
+> Id=127706; Class=FamilySymbol; Category=Doors; Name=1830 x 1981mm
+> Id=127707; Class=Element; Category=?; Name=1830 x 1981mm
+> Id=127708; Class=FamilySymbol; Category=Doors; Name=1830 x 2083mm
+> Id=127709; Class=Element; Category=?; Name=1830 x 2083mm
+> Id=127710; Class=FamilySymbol; Category=Doors; Name=1730 x 2134mm
+> Id=127711; Class=Element; Category=?; Name=1730 x 2134mm
+> Id=127712; Class=FamilySymbol; Category=Doors; Name=1730 x 2032mm
+> Id=127713; Class=Element; Category=?; Name=1730 x 2032mm
+> Id=127714; Class=FamilySymbol; Category=Doors; Name=1830 x 2134mm
+> Id=127715; Class=Element; Category=?; Name=1830 x 2134mm
+</pre>
+
+<p>From this, we see that one family, five family symbols, and five other elements were added.
+The family and family symbols all have the category 'Doors', the five other elements' category is undefined.
+Therefore, I do not see any way to add a shared parameter to the RFA file or the family itself.
+We could add a shared parameter for the Doors category, in which case it would become available on all door family instances as well.
+This is demonstrated by the Revit FireRating SDK sample and the Revit API introduction labs 4-1, 4-2 and 4-3, but that is probably not your intention.</p>
+
+-->
+
+<p><strong>Answer:</strong>
+As pointed out in a private note by
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a>,
+
+adding a shared parameter to an RFA file is a completely different issue from adding it to a DWG file instance in a project.
+In the latter case, we work in the project file and bind a shared parameter to a certain category specific to the inserted DWG file.
+For an RFA file, you wish to define the shared parameter in the content, and the first step is to add it to the family itself.</p>
+
+<p>You can add a shared parameter to an RFA file as a type or instance parameter by using the new Family API provided in Revit 2010.
+It provides the new method FamilyManager.AddParameter().
+Its use is demonstrated by the Revit SDK samples AutoParameter, DWGFamilyCreation and WindowWizard, which are located in the FamilyCreation subdirectory of the Samples folder.
+It provides the following overloads:</p>
+
+<ul>
+<li>AddParameter(ExternalDefinition, BuiltInParameterGroup, Boolean): Add a new shared parameter to the family.
+<li>AddParameter(String, BuiltInParameterGroup, Category, Boolean): Add a new family type parameter to control the type of a nested family within another family.
+<li>AddParameter(String, BuiltInParameterGroup, ParameterType, Boolean): Add a new family parameter with a given name.
+</ul>
+
+<p>To add a shared parameter, you would use the overload taking an ExternalDefinition argument.
+DWGFamilyCreation and WindowWizard both only add standard type parameters using the third overload with the fourth isInstance argument set to false, whereas AutoParameter uses both the first and third overloads to create instance, type and shared parameters.</p>
+
+<p>Very many thanks to Matt for pointing this out!</p>

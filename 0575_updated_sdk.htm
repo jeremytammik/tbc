@@ -1,0 +1,168 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Updated SDK and Colour Coding Source Code</h3>
+
+<p>Here are several miscellaneous news items that I would like to pass on before heading off for a week's vacation:
+
+<ul>
+<li><a href="#2">Updated Revit SDK</a>
+<li>AUGI <a href="#3">Autodesk 2012 product overviews</a>
+<li><a href="#4">HTML source code colourisation</a>
+<li><a href="#5">Easter greetings</a>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Updated Revit SDK on Developer Center</h4>
+
+<p>An updated version of the Revit SDK has been posted on the 
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Center</a>.
+
+The differences to the version included with the initial public release of the Revit 2012 product are negligible.
+
+Still, you can always rely on finding the most up-to-date version on the developer centre.
+
+<!-- <p>I installed the update, compared the files, and recompiled SDKSamples2012.sln, ExtensibleStorageManager.sln and RevitLookup.sln. -->
+
+
+<a name="3"></a>
+
+<h4>AUGI What's New in Autodesk 2012 Products</h4>
+
+<p>AUGI published their 
+
+<a href="http://augi.typepad.com/augi_news/2011/03/augiworld-march-2011-issue-has-been-released.html">
+AUGIWorld March 2011 Issue</a> with
+
+the topic 'What's New in Autodesk 2012 Products' &ndash; a very handy overview of the new product features in many or all of the Autodesk 2012 products.
+
+
+<a name="4"></a>
+
+<h4>The Building Coder Source Code Colour Coder</h4>
+
+<p>Easter is coming up, so colouring is important ... and now that debugging a Revit 2012 add-in requires Visual Studio 2010, and after 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">
+migrating The Building Coder samples</a>, 
+
+I obviously need to be able to copy and paste colour coded source code to HTML for the blog posts from that environment as well.
+
+<p>I have been successfully using 
+
+<a href="http://copysourceashtml.codeplex.com">
+CopySourceAsHtml</a> for 
+
+a long time now to copy and paste colour coded source code to the blog posts.
+
+<p>This utility is available for Visual Studio 2003, 2005 and 2008, but not for 2010.
+
+<p>Luckily, 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2011/03/finally-working-with-visual-studio-2010.html">
+Kean Walmsley recently pointed out</a> an article on 
+
+<a href="http://blogs.microsoft.co.il/blogs/applisec/archive/2010/02/25/copyashtml-in-visual-studio-2010.aspx">
+enabling CopySourceAsHtml in Visual Studio 2010</a>.
+
+Just like Kean, I was able to follow the steps described and get it working without problems.
+
+<p>By the way, Kean's article lists a couple of other useful Visual Studio utilities as well, for navigating large source code modules and driving multi-target C++ compiler versions, i.e. running the Visual Studio 2008 version of the C compiler from the 2010 version of the IDE.
+
+<p>CopySourceAsHtml can be set up to encode the HTML colourisation in various ways. 
+I leave the default settings and do not embed the styles in the code:</p>
+
+<center>
+<img src="img/copysourceashtml.png" alt="Copy source as HTML"/>
+</center>
+
+<p>Let's say I use CopySourceAsHtml to copy the following four lines of typical Revit add-in source code:
+
+<pre class="code">
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+</pre>
+
+<p>That produces the following HTML output with a prepended style definition header:
+
+<pre class="code">
+<style type="text/css">
+.cf { font-family: Courier New; font-size: 9pt; color: black; background: white; }
+.cl { margin: 0px; }
+.cb1 { color: blue; }
+.cb2 { color: maroon; }
+.cb3 { color: red; }
+</style>
+<div class="cf">
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">style</span> <span class="cb3">type</span><span class="cb1">=&quot;text/css&quot;&gt;</span></pre>
+<pre class="cl"><span class="cb2">.cf</span> { <span class="cb3">font-family</span>: <span class="cb1">Courier</span> <span class="cb1">New</span>; <span class="cb3">font-size</span>: <span class="cb1">9pt</span>; <span class="cb3">color</span>: <span class="cb1">black</span>; <span class="cb3">background</span>: <span class="cb1">white</span>; }</pre>
+<pre class="cl"><span class="cb2">.cl</span> { <span class="cb3">margin</span>: <span class="cb1">0px</span>; }</pre>
+<pre class="cl"><span class="cb2">.cb1</span> { <span class="cb3">color</span>: <span class="cb1">blue</span>; }</pre>
+<pre class="cl"><span class="cb2">.cb2</span> { <span class="cb3">color</span>: <span class="cb1">#2b91af</span>; }</pre>
+<pre class="cl"><span class="cb1">&lt;/</span><span class="cb2">style</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">div</span> <span class="cb3">class</span><span class="cb1">=&quot;cf&quot;&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">pre</span> <span class="cb3">class</span><span class="cb1">=&quot;cl&quot;&gt;</span><span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb1&quot;&gt;</span>public<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb2&quot;&gt;</span>Result<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> Execute(<span class="cb1">&lt;/</span><span class="cb2">pre</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">pre</span> <span class="cb3">class</span><span class="cb1">=&quot;cl&quot;&gt;</span><span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb2&quot;&gt;</span>ExternalCommandData<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> commandData,<span class="cb1">&lt;/</span><span class="cb2">pre</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">pre</span> <span class="cb3">class</span><span class="cb1">=&quot;cl&quot;&gt;</span><span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb1&quot;&gt;</span>ref<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb1&quot;&gt;</span>string<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> message,<span class="cb1">&lt;/</span><span class="cb2">pre</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">pre</span> <span class="cb3">class</span><span class="cb1">=&quot;cl&quot;&gt;</span><span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb3">&amp;nbsp;</span> <span class="cb1">&lt;</span><span class="cb2">span</span> <span class="cb3">class</span><span class="cb1">=&quot;cb2&quot;&gt;</span>ElementSet<span class="cb1">&lt;/</span><span class="cb2">span</span><span class="cb1">&gt;</span> elements )<span class="cb1">&lt;/</span><span class="cb2">pre</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;</span><span class="cb2">pre</span> <span class="cb3">class</span><span class="cb1">=&quot;cl&quot;&gt;</span><span class="cb3">&amp;nbsp;</span><span class="cb1">&lt;/</span><span class="cb2">pre</span><span class="cb1">&gt;</span></pre>
+<pre class="cl"><span class="cb1">&lt;/</span><span class="cb2">div</span><span class="cb1">&gt;</span></pre>
+</div>
+</pre>
+
+<p>I then run a little Python script 
+
+<a href="zip/pycolorize.py">pycolorize.py</a>
+
+of mine.
+It copies its input from the Windows clipboard, modifies it, and pastes the result back again.
+The modification removes the style definition header, since I have the required style definitions already present in my CSS style sheet:
+
+<pre class="code">
+<span class="maroon">.blue</span> { <span class="red">color</span>: <span class="blue">blue</span>; }
+<span class="maroon">.red</span> { <span class="red">color</span>: <span class="blue">red</span>; }
+<span class="maroon">.teal</span> { <span class="red">color</span>: <span class="blue">teal</span>; }
+<span class="maroon">.maroon</span> { <span class="red">color</span>: <span class="blue">maroon</span>; }
+<span class="maroon">.green</span> { <span class="red">color</span>: <span class="blue">green</span>; }
+<span class="maroon">.gray</span> { <span class="red">color</span>: <span class="blue">gray</span>; }
+</pre>
+
+<p>It also removes the extraneous div tag, the repetitions of the pre tag, and replaces the cb1, cb2 etc. classes by colour names which correspond to the names of my globally predefined styles, which results in the following much more legible output:
+
+<pre class="code">
+<span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;blue&quot;&gt;</span>public<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;teal&quot;&gt;</span>Result<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> Execute(
+<span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;teal&quot;&gt;</span>ExternalCommandData<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> commandData,
+<span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;blue&quot;&gt;</span>ref<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;blue&quot;&gt;</span>string<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> message,
+<span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="red">&amp;nbsp;</span> <span class="blue">&lt;</span><span class="maroon">span</span> <span class="red">class</span><span class="blue">=&quot;teal&quot;&gt;</span>ElementSet<span class="blue">&lt;/</span><span class="maroon">span</span><span class="blue">&gt;</span> elements )
+</pre>
+
+<p>That is my version of colouring eggs for Easter  :-)
+
+
+<a name="5"></a>
+
+<h4>Happy Easter!</h4>
+
+<p>I celebrated the beautiful full moon with some friends last Monday, which was the 
+
+<a href="http://en.wikipedia.org/wiki/Paschal_full_moon">paschal full moon</a> which actually determines the date of
+
+<a href="http://en.wikipedia.org/wiki/Easter">Easter</a> this year.
+
+<p>Anyway, starting tomorrow, 
+
+<a href="http://en.wikipedia.org/wiki/Good_Friday">
+Good Friday</a>, I will be away for the coming week, taking my Easter holidays, searching for eggs and other happy surprises.</p>
+
+<center>
+<img src="img/Easter_Bunny_Postcard_1907.jpg" alt="Easter bunny postcard"/>
+</center>
+
+<p>In the meantime, I wish you a wonderful time and much success with your Revit add-in development efforts and all other important aspects of life, such as love, peace, and happiness for all beings  :-)
+

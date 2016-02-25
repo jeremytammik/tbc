@@ -1,0 +1,57 @@
+<style>
+
+pre { 
+  font-size : 95%; 
+  line-height : 120%; 
+  background-color : lightgrey;
+  white-space : wrap;
+  color: darkblue;
+  background-color : linen;
+}
+
+pre.code { 
+  color: black;
+  background-color : white; 
+}
+
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+
+</style>
+
+<!-- 
+
+-->
+
+<h3>Debug Geometric Form Creation</h3>
+
+<p>Here is a useful hint on debugging the generation of geometric shapes from Harry Mattison.</p>
+
+<p><strong>Question:</strong>
+I am trying to create multiple swept blends in a family document.
+The first call to FamilyCreate.NewSweptBlendForm() succeeds, but the second call is failing with the following exception:</p>
+
+<center>
+<img src="img/swept_blend_creation_error.png" alt="Swept blend creation error"/>
+</center>
+
+<p><strong>Answer:</strong>
+For problems like this I suggest commenting out the code that creates the form so that the command creates only the lines being used to create the form. 
+Then you can run the command, verify the geometry of the lines, and use the Revit UI to select them and push the Create Form button. 
+If Create Form fails, then the bug probably has nothing to do with the API.</p>
+
+<p>In this case, there are many overlapping line warnings:</p>
+
+<center>
+<img src="img/swept_blend_creation_warnings.png" alt="Swept blend creation warnings"/>
+</center>
+
+<p>I'd expect that you will get better results if the geometry forms closed loops without overlaps.</p>
+
+<p>Finally, this will be easier to debug if the lines are created in the active document instead of a new document created in the external command that is not visible without saving and reopening the file. 
+Thin Lines mode might also be helpful because the lines are quite short.</p>
+
+<p>Thank you very much Harry for these valuable suggestions!</p>

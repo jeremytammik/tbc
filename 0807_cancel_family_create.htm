@@ -1,0 +1,118 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+07428966 [Is the even DocumentCreating not cancellable? Even though it says YES..] 
+SPR #226495 [cancelling DocumentCreating event causes fatal error]
+C:\a\j\adn\case\sfdc\07428966\src\CancelFamilyCreation\CancelFamilyCreation.sln
+
+Stephen Hamil Re: Revit linking with UK national specification system
+
+Revit Bloggers 
+
+http://www.linkedin.com/e/s8nad4-h5vmncnh-1c/ava/145968534/2298886/eml-anet_dig-b_nd-pst_ttle-cn/?hs=false&tok=2cEGQFNqp535o1
+
+http://www.linkedin.com/e/s8nad4-h5vmncnh-1c/ava/144731012/2298886/eml-anet_dig-b_nd-pst_ttle-cn/?hs=false&tok=1RUL56gNR535o1
+
+-->
+
+<h3>Cancel Family Creation and UK NBS and BIM News</h3>
+
+<p>Let me begin directly with some Revit API sample code today.
+
+<p>Here is a little external application showing how you can optionally prohibit family creation by subscribing to the cancellable DocumentCreating event:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">void</span> OnDocumentCreating(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentCreatingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DocumentType</span> typ = e.DocumentType;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DocumentType</span>.Family == typ )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span> d = <span class="blue">new</span> <span class="teal">TaskDialog</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Open Family Editor?&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.MainInstruction = <span class="maroon">&quot;Creating a new family &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;document... would you like to proceed?&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.MainContent = <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Document type: {0}\r\nCancellable: {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; typ, (e.Cancellable ? <span class="maroon">&quot;Yes&quot;</span> : <span class="maroon">&quot;No&quot;</span>) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.CommonButtons = <span class="teal">TaskDialogCommonButtons</span>.Yes 
+&nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TaskDialogCommonButtons</span>.No;
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.DefaultButton = <span class="teal">TaskDialogResult</span>.No;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">TaskDialogResult</span>.No == d.Show() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e.Cancel();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.ControlledApplication.DocumentCreating 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentCreatingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentCreating );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Surprisingly short and simple, isn't it, and the code speaks for itself, does it not?
+
+<p>Here is 
+
+<a href="zip/CancelFamilyCreation.zip">
+CancelFamilyCreation.zip</a> containing 
+
+the full source code, Visual Studio solution and add-in manifest of this little add-in.
+
+
+<a name="2"></a>
+
+<h4>The UK National BIM Library and NBS</h4>
+
+<p>For some little less hard-core UK-related BIM news, Stephen Hamil of 
+
+<a href="http://www.ribaenterprises.com">RIBA Enterprises</a> pointed 
+
+out a couple of interesting titbits related to NBS and the National BIM Library, a free resource for the UK construction industry:
+
+<ul>
+<li>The free <a href="http://constructioncode.blogspot.co.uk/2012/08/nbs-for-autodesk-revit-plug-in-now-live.html">NBS for Revit</a> tool has been released.
+<li>Report from the first <a href="http://www.thenbs.com/topics/BIM/articles/feedbackOnTheNBL.asp">BIM user day</a> with a number of big Autodesk users such as HOK, BDP, LOR, Balfour Beatty, Ryder, Ramboll...
+</ul>
+
+<p>Thank you, Stephen, for the note.
+
+
+<a name="3"></a>
+
+<h4>dbStuff Add-ins</h4>
+
+<p>Finally, I took a quick look at the free dbStuff Revit add-ins
+
+<a href="http://feedproxy.google.com/~r/DpStuff/~3/cw4HYzzxgMs/changetextcase-alter-case-of-your-revit.html">
+ChangeTextCase</a> and 
+
+<a href="http://dimak1999.blogspot.de/2012/08/numberstuffbydirection-revit-api-plugin.html">
+NumberStuffByDirection</a>,
+
+which look both useful and interesting.
+Thank you, Dima Chiriacov, for sharing these!

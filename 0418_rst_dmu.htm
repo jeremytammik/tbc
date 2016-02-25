@@ -1,0 +1,395 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Saikat Bhattacharya: Write up on DMU sample in RST context -->
+
+<h3>Structural Dynamic Model Update Sample</h3>
+
+<p>I am away again on the next leg of my extensive vacations this summer, travelling a bit further afield this time.
+After one night in a plane and another night in a bus I find myself on the island of 
+
+<a href="http://en.wikipedia.org/wiki/Ko_Tao">
+Ko Tao</a> in 
+
+Thailand, where I completed my first open sea water dive in the 
+
+<a href="http://en.wikipedia.org/wiki/Diving_in_Ko_Tao">
+Japanese Garden</a> with Boris of
+
+<a href="http://www.divingcourseskohtao.com">
+Alvaro Diving</a>.
+
+<p>Since I will be away for the whole month of August, I decided to take the computer with me this time.
+
+I have a couple of interesting questions lined up that I have been wanting to discuss for quite a while now, and hope to finally get around to doing that now.
+
+<p>Here is the first one, a neat sample of using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#2">
+dynamic model update</a> 
+
+features in the context of Revit Structure created by and presented at the recent 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/api-training-and-aec-devcamp-material.html">
+AEC DevCamp</a> in Boston by Saikat Bhattacharya.
+
+<!-- at the Revit Structure API session at the -->
+
+<p>It causes all concrete beam rebars in the model to automatically resize every time the beam geometry changes.
+
+<p>Here is Saikat's description:
+
+<h4>Dynamic Model Update Sample in the Structural Context</h4>
+
+<p>This sample was written to illustrate one of the many possible uses of the new platform API feature called Dynamic Model Update (DMU) in a Structural context in Revit Structure. For more on the basics of on DMU and how to use this new mechanism, we can refer to the chapter 25 (page 283) of the Revit API Developers Guide PDF document located in the SDK. It causes concrete beam rebars (included in the attached project) to automatically resize every time the beam geometry changes. 
+
+<p>This sample creates a new ribbon in the Analyze tab with two radio group button which can be used to enable the alignment functionality in the sample to be active or not. If the alignment option is on (or active), every resize of the beam in the model resizes the rebars in the beam to perfectly align it between the two opposite faces of the beam. 
+
+<p>This sample uses the IExternalApplication’s OnStartup event to create a ribbon with two radio buttons on the Analyze tab. It also registers the updater class and adds triggers to it. The trigger is set to work with implicit set of elements which are of Structural Framing category (beams) which is specified using an ElementCategoryFilter and is set to work with change of scope, specifically change in Geometry of the elements (beams). 
+
+<p>The sample implements two external commands called UIDynamicModelUpdateOn and UIDynamicModelUpdateOff which are executed when users click on the radio group buttons in the ribbon panel in the analyze tab. These commands internally just set a local variable which stores whether the alignment of the rebars functionality is activated or not. 
+
+<p>The sample also contains an Updater class called RebarUpdater which implements the IUpdater interface. This interface requires implementing certain methods to return the updater Id, updater name, additional (auxiliary) information and the execute method which gets informed of the change of scope (geometry) of the elements (beams). This Execute method is called when there is a change of geometry of the beam in the given set up in RebarUpdater class. In this Execute method, the code gets access to all the modified beams using the data.GetModifiedElementIds and then iterates through each beam. It uses the new element iteration API to create a collection of all the rebars and calculates the beam line of each beam. This beam line helps provide the start and end point of the beam which is the extent to which the rebars would be stretched or compressed to. Following this, the sample moves the rebar to one end of the beam using the doc.Move method and passing in a translational vector which is based on the beam and rebar start points. After the rebar has been moved, the beam line needs to be recalculated again and using the length from the beam line, we can set the corresponding length parameter of the rebar to get it in sync with the new length of the beam. In the included RVT file, the rebar parameter *B* refers to the length of the rebar which is used to set the new length. 
+
+<p>The intention of the sample is to show how the new Dynamic Model Update API can be used in a structural context inside Revit Structure. This sample assumes you are using only one beam which has single or multiple rebars contained in it and needs to be extensively tested and modified to work with broader types of beams and rebars. 
+
+<p>Here is the entire code:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">AlignRebar</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> On shutdown, unregister the updater</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">RebarUpdater</span> updater
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">RebarUpdater</span>( a.ActiveAddInId );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.UnregisterUpdater(
+&nbsp; &nbsp; &nbsp; updater.GetUpdaterId() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> On start up, add UI buttons, register </span>
+&nbsp; <span class="gray">///</span><span class="green"> the updater and add triggers</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Add the UI buttons on start up</span>
+&nbsp; &nbsp; AddButtons( a );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RebarUpdater</span> updater = <span class="blue">new</span> <span class="teal">RebarUpdater</span>(
+&nbsp; &nbsp; &nbsp; a.ActiveAddInId );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Register the updater in the singleton </span>
+&nbsp; &nbsp; <span class="green">// UpdateRegistry class</span>
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.RegisterUpdater( updater );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Set the filter; in this case we </span>
+&nbsp; &nbsp; <span class="green">// shall work with beams specifically</span>
+&nbsp; &nbsp; <span class="teal">ElementCategoryFilter</span> filter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add trigger </span>
+&nbsp; &nbsp; <span class="teal">UpdaterRegistry</span>.AddTrigger(
+&nbsp; &nbsp; &nbsp; updater.GetUpdaterId(), filter,
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span>.GetChangeTypeGeometry() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add UI buttons</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddButtons( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// create a ribbon panel on the Analyze tab</span>
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> panel = a.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; <span class="teal">Tab</span>.Analyze, <span class="maroon">&quot;RST Labs&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; AddDmuCommandButtons( panel );
+&nbsp; }
+&nbsp;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Control buttons for the Dynamic Model Update </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddDmuCommandButtons(
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> panel )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = GetType().Assembly.Location;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sDirectory
+&nbsp; &nbsp; &nbsp; = System.IO.<span class="teal">Path</span>.GetDirectoryName( path );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// create toggle buttons for radio button group </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ToggleButtonData</span> toggleButtonData3 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ToggleButtonData</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RSTLabsDMUOff&quot;</span>, <span class="maroon">&quot;Align Off&quot;</span>, path, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RstAvfDmu.UIDynamicModelUpdateOff&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; toggleButtonData3.LargeImage 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BitmapImage</span>( <span class="blue">new</span> <span class="teal">Uri</span>( sDirectory 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\\Images\\&quot;</span> + <span class="maroon">&quot;Families.ico&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ToggleButtonData</span> toggleButtonData4 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ToggleButtonData</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RSTLabsDMUOn&quot;</span>, <span class="maroon">&quot;Align On&quot;</span>, path, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RstAvfDmu.UIDynamicModelUpdateOn&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; toggleButtonData4.LargeImage 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BitmapImage</span>( <span class="blue">new</span> <span class="teal">Uri</span>( sDirectory 
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\\Images\\&quot;</span> + <span class="maroon">&quot;Families.ico&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// make dyn update on/off radio button group </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RadioButtonGroupData</span> radioBtnGroupData2 = 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">RadioButtonGroupData</span>( <span class="maroon">&quot;RebarAlign&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RadioButtonGroup</span> radioBtnGroup2 
+&nbsp; &nbsp; &nbsp; = panel.AddItem( radioBtnGroupData2 ) 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">RadioButtonGroup</span>;
+&nbsp;
+&nbsp; &nbsp; radioBtnGroup2.AddItem( toggleButtonData3 );
+&nbsp; &nbsp; radioBtnGroup2.AddItem( toggleButtonData4 );
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RebarUpdater</span> : <span class="teal">IUpdater</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> m_updateActive = <span class="blue">false</span>;
+&nbsp; <span class="teal">AddInId</span> addinID = <span class="blue">null</span>;
+&nbsp; <span class="teal">UpdaterId</span> updaterID = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> RebarUpdater( <span class="teal">AddInId</span> id )
+&nbsp; {
+&nbsp; &nbsp; addinID = id;
+&nbsp; &nbsp; <span class="green">// UpdaterId that is used to register and </span>
+&nbsp; &nbsp; <span class="green">// unregister updaters and triggers</span>
+&nbsp; &nbsp; updaterID = <span class="blue">new</span> <span class="teal">UpdaterId</span>( addinID, <span class="blue">new</span> <span class="teal">Guid</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;63CDBB88-5CC4-4ac3-AD24-52DD435AAB25&quot;</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Align rebar to updated beam </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( <span class="teal">UpdaterData</span> data )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( m_updateActive == <span class="blue">false</span> ) { <span class="blue">return</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get access to document object</span>
+&nbsp; &nbsp; <span class="teal">Document</span> doc = data.GetDocument();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Loop through all the modified elements</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> 
+&nbsp; &nbsp; &nbsp; &nbsp; data.GetModifiedElementIds() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam = doc.get_Element( id ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Create a filter to retrieve all rebars</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> rebars 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; rebars.OfCategory( <span class="teal">BuiltInCategory</span>.OST_Rebar );
+&nbsp; &nbsp; &nbsp; &nbsp; rebars.OfClass( <span class="blue">typeof</span>( <span class="teal">Rebar</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Rebar</span> rebar <span class="blue">in</span> rebars )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Calculate the beam line</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> beamStartPoint = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> beamEndPoint = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = CalculateBeamLine( beam );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get the start and end point </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != line )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; beamStartPoint = line.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; beamEndPoint = line.get_EndPoint( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// To align the rebar to the new beam's </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// length, we split the tasks in two stages</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Step 1: Move the rebar to align with one </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// of the end of the beam</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// For this we first access the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// rebar line geometry</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> rebarLine = rebar.Curves.get_Item( 0 ) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Calculate the translation vector </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// (the extent of the move)</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> transVec = <span class="blue">new</span> <span class="teal">XYZ</span>( beamStartPoint.X 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; - rebarLine.get_EndPoint( 0 ).X, 0.0, 0.0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Perform the move </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Move( rebar, transVec );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This move causes the beam line to change </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and so recalculating the beam line</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line = CalculateBeamLine( beam );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Step 2: Set the new length of the rebar </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// based on new beam length. For this, we </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// can set the relevant parameter after </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// checking at UI</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rebar.get_Parameter( <span class="maroon">&quot;B&quot;</span> ).Set( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetLength( line ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Exception&quot;</span>, ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Calculate the beam line </span>
+&nbsp; <span class="blue">private</span> <span class="teal">Line</span> CalculateBeamLine( 
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geoElement 
+&nbsp; &nbsp; &nbsp; = beam.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == geoElement 
+&nbsp; &nbsp; &nbsp; || 0 == geoElement.Objects.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Can't get the geometry of selected element.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> beamLine = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geoObject 
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> geoElement.Objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// get the driving path and vector of the beam </span>
+&nbsp; &nbsp; &nbsp; beamLine = geoObject <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != beamLine )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> beamLine;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the length of the given line</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> GetLength( <span class="teal">Line</span> line )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = line.get_EndPoint( 1 ) - line.get_EndPoint( 0 );
+&nbsp; &nbsp; <span class="blue">return</span> v.GetLength();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the auxiliary string</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetAdditionalInformation()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;Automatically align rebar to match beam&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set the priority</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">ChangePriority</span> GetChangePriority()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">ChangePriority</span>.Rebar;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the updater Id</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">UpdaterId</span> GetUpdaterId()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> updaterID;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the updater name</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetUpdaterName()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;Rebar alignment updater&quot;</span>;
+&nbsp; }
+}
+&nbsp;
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">UIDynamicModelUpdateOff</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">RebarUpdater</span>.m_updateActive = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+&nbsp;
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">UIDynamicModelUpdateOn</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">RebarUpdater</span>.m_updateActive = <span class="blue">true</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The sample model included with the application includes two point loads, a rectangular concrete beam, and a rebar.
+Here are the selected point loads:</p>
+
+<center>
+<img src="img/rst_dmu_loads.png" alt="Point loads"/>
+</center>
+
+<p>This is the beam itself:</p>
+
+<center>
+<img src="img/rst_dmu_beam.png" alt="Concrete rectangular beam"/>
+</center>
+
+<p>These are the rebar elements:</p>
+
+<center>
+<img src="img/rst_dmu_rebar.png" alt="Rebar"/>
+</center>
+
+<p>On selecting and dragging the beam around, the add-in automatically updates the rebar to follow it:</p>
+
+<center>
+<img src="img/rst_dmu_updated.png" alt="Moving the beam automatically updates the rebar"/>
+</center>
+
+<p>Here is 
+
+<!-- C:\a\j\adn\train\RstAvfDmu.zip -->
+
+<a href="zip/RstAvfDmu.zip">
+RstAvfDmu.zip</a>
+
+including the complete source code and Visual Studio solution for this sample.
+
+<p>This solution actually includes another additional sample, which demonstrates a use of the analysis visualisation framework in a structural context, to simulate a visual display a load distribution.
+We might get around to presenting that in detail as well one of these days, or you can just go ahead and explore it for yourself.
+

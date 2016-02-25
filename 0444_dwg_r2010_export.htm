@@ -1,0 +1,60 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1262950 [DWG Export Format] -->
+
+<h3>AutoCAD 2010 DWG Export</h3>
+
+<p>Today is a public holiday in Neuchâtel, the 
+
+<a href="http://en.wikipedia.org/wiki/Je%C3%BBne_genevois">
+jeûne fédéral</a> or 
+
+<a href="http://en.wikipedia.org/wiki/Store_Bededag">
+Federal Fast holiday</a>.
+
+I will use that for a hike in the Swiss mountains, that I so sorely neglected and missed this summer.
+
+<p>Meanwhile, here is a simple question on the AutoCAD file format version used for DWG export.
+
+<p><strong>Question:</strong> How can I set the AutoCAD 2010 version as the destination file format for DWG export?
+
+<p>The ACADVersion enumeration only has options for 2000, 2004, and 2007. 
+
+<p>In the user interface, it is possible to select 2010 as well.
+
+<p><strong>Answer:</strong> Looking at the ACADVersion enumeration, I see the following entries:
+
+<ul>
+<li>Default: The Autodesk Revit application's default export format. 
+<li>R2000: AutoCAD 2000 file format. 
+<li>R2004: AutoCAD 2004 file format. 
+<li>R2007: AutoCAD 2007 file format. 
+</ul>
+
+<p>The AutoCAD 2010 file format was recently added as another format in the DWG export options. 
+It is currently created by specifying the 'Default' value.
+
+<p>Because this is a simple enum wrapper, you can also cause Revit to export the AutoCAD 2010 file format by passing in '4' to the options settings. 
+Using Reflector, you can see that the numerical values of the existing entries are 0-3, which makes it very probable that 4 is the next one. 
+In any case it worked, for example, using the following code:
+
+<pre class="code">
+&nbsp; <span class="teal">DWGExportOptions</span> options = <span class="blue">new</span> <span class="teal">DWGExportOptions</span>();
+&nbsp;
+&nbsp; options.FileVersion = ( <span class="teal">ACADVersion</span> ) ( 4 );
+&nbsp;
+&nbsp; <span class="teal">ViewSet</span> views = <span class="blue">new</span> <span class="teal">ViewSet</span>();
+&nbsp;
+&nbsp; views.Insert( uiDoc.Document.ActiveView );
+&nbsp;
+&nbsp; uiDoc.Document.Export( <span class="maroon">@&quot;d:\temp&quot;</span>, <span class="maroon">@&quot;junk.dwg&quot;</span>, 
+&nbsp; &nbsp; views, options );
+</pre>
+
+<p>This creates a resulting DWG file in AutoCAD 2010 file format with a header of ac1024, equal to the ObjectARX enum value kDHL_1024 = 29, which stands for '2010 final'.
+
+<p>As said, ACADVersion.Default also results in an AutoCAD 2010 file format DWG, but that will obviously change in future releases. 
+
+<p>Casting an integer to an enum value to pass into the settings is obviously not an officially supported way of using the Revit API, but it might help you get around this in the short term.

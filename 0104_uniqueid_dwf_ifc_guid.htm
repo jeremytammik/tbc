@@ -1,0 +1,269 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1247719 [Algorithm to get ifc GUID] -->
+
+<h3>UniqueId versus DWF and IFC GUID</h3>
+
+<p>One frequent question from developers has been on how to correlate the GUIDs or globally unique identifiers used when exporting models to DWF and IFC from Revit with the element ids and unique ids used internally in the Revit model.<p>
+
+<h4>GUID and UniqueId</h4>
+
+<p>A
+
+<a href="http://en.wikipedia.org/wiki/Guid">
+GUID</a>
+
+is a 16-byte, i.e. 128 bit number.
+It is commonly split up into several fields of varying lengths and written in groups of 8-4-4-4-12 hexadecimal characters,
+i.e. 32 characters to represent the 16 bytes or 128 bits.</p>
+
+<p>On the other hand, we have the Revit UniqueId.
+Every element has such a unique identifier, which is returned through the API as a string.
+This string is formatted in groups of 8-4-4-4-12-8 hexadecimal characters.
+It is thus similar to the standard GUID format, but has 8 additional characters at the end.
+These 8 additional hexadecimal characters are large enough to store 4 bytes or a 32 bit number, which is exactly the size of a Revit element id.</p>
+
+<p>If I create a couple of walls in a row, I note that the GUID part of the UniqueId is the same for all of them, and the last 8 bytes differ and exactly represent their individual element ids.
+Here are the various ids of two walls, exported to both DWF and IFC:</p>
+
+<pre>
+Id=130315; Class=Wall; Category=Walls; Name=Generic - 200mm;
+  UniqueId = 60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b;
+  Dwf Guid = 60f91daf-3dd7-4283-a86d-24137b720ed1;
+  Ifc Guid = 1W_HslFTT2WwXj91DxSWxH
+
+Id=130335; Class=Wall; Category=Walls; Name=Generic - 200mm;
+  UniqueId = 60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd1f;
+  Dwf Guid = 60f91daf-3dd7-4283-a86d-24137b720ec5
+  Ifc Guid = 1W_HslFTT2WwXj91DxSWx5
+</pre>
+
+<p>You can see that the first 16 bytes or 32 hex characters of the unique identifiers are identical.
+This portion is apparently internally called EpisodeId in Revit.
+The unique ids only differ in the 4 byte or 8 hex character suffix at the end.
+In the case above, the two differing suffixes for the walls are indeed their element ids in hexadecimal representation: 130315 decimal equals 0x1fd0b, and 130335 equals 0x1fd1f.</p>
+
+<p>There are several items of interest in the data displayed for these two walls:</p>
+
+<ul>
+<li>The UniqueId does not adhere to the standard GUID format.</li>
+<li>The DWF GUID does.</li>
+<li>The IFC GUID looks completely different from both.</li>
+</ul>
+
+<p>Obviously, it would be useful to convert between the three different formats.
+The following two sections discuss exactly that:</p>
+
+<ul>
+<li>Converting back and forth between the DWF and IFC GUID formats.</li>
+<li>How to convert from the Revit UniqueId to the standard GUID form used in DWF.</li>
+</ul>
+
+<h4>IFC GUID Encoding</h4>
+
+<p>First of all, it is important to understand that the IFC GUID is completely identical to the DWF GUID.
+It is simply encoded in a different format to create a shorter text representation to save a few bytes in the text-based IFC files.</p>
+
+<p>I was actually involved in the original definition of this approach, as well as once being the secretary of the
+
+<a href="http://www.iai-tech.org">IAI</a>,
+
+and to my surprise I see my name is still listed in the source code history of CreateGuid_64.c, the module implementing this encoding algorithm.</p>
+
+<p>To demonstrate the encoding and decoding process, I made use of the original CreateGuid_64.c C module and compiled it into a stand-alone DLL named IfcGuid.dll. Further down, we discuss this as well as a stand-alone .NET console application written in C# to test it.</p>
+
+<h4>UniqueId to GUID Encoding</h4>
+
+<p>Now we know that the DWF and IFC GUIDs are in fact identical, we can use the term GUID to refer to both of them.</p>
+
+<p>The next question is how the GUID used for exporting a Revit element is defined from its internal Revit database properties such as element id and UniqueId.</p>
+
+<p>Four different rules are used for various groups of Revit elements to generate their GUID used for DWF and IFC export.
+They may combine data from the Revit element id and the UniqueId both of the element itself and some other element:</p>
+
+<ol>
+<li>If the element is being exported after an IFC import, we preserve the GUID originally contained in the IFC Entity. This is a rare case.</li>
+<li>If there is a one-to-one correspondence between a Revit Element and an IFC entity, we create the GUID by taking the GUID in the EpisodeId of the element and XORing it with the element id.</li>
+<li>For special IFC Entities that have no corresponding element in Revit, such as IfcBuilding and IfcProject, and for some elements that are duplicated, such as an opening for a window or door instance, we create the GUID by taking the Detach GUID of the project and XORing it with the element id.</li>
+<li>For other IFC Entities, we create a GUID on the fly.</li>
+</ol>
+
+<p>Given the string representation of a Revit UniqueId in the variable 'a', the following code implements the GUID creation:</p>
+
+<pre class="code">
+Print( <span class="maroon">"Revit UniqueId: "</span> + a );
+&nbsp;
+<span class="teal">Guid</span> episodeId = <span class="blue">new</span> <span class="teal">Guid</span>( a.Substring( 0, 36 ) );
+&nbsp;
+<span class="blue">int</span> elementId = <span class="blue">int</span>.Parse( a.Substring( 37 ),
+&nbsp; <span class="teal">NumberStyles</span>.AllowHexSpecifier );
+&nbsp;
+Print( <span class="maroon">"&nbsp; &nbsp;  EpisodeId: "</span> + episodeId.ToString() );
+Print( <span class="blue">string</span>.Format( <span class="maroon">"&nbsp; &nbsp;  ElementId: {0} = {1}"</span>,
+&nbsp; elementId.ToString(), elementId.ToString( <span class="maroon">"x8"</span> ) ) );
+&nbsp;
+<span class="blue">int</span> last_32_bits = <span class="blue">int</span>.Parse( a.Substring( 28, 8 ),
+&nbsp; <span class="teal">NumberStyles</span>.AllowHexSpecifier );
+&nbsp;
+<span class="blue">int</span> xor = last_32_bits ^ elementId;
+&nbsp;
+a = a.Substring( 0, 28 ) + xor.ToString( <span class="maroon">"x8"</span> );
+&nbsp;
+Print( <span class="maroon">"&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Guid: "</span> + a + <span class="maroon">"\n"</span> );
+</pre>
+
+<p>For the first wall listed above, the result of executing this is:</p>
+
+<pre>
+Revit UniqueId: 60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b
+     EpisodeId: 60f91daf-3dd7-4283-a86d-24137b73f3da
+     ElementId: 130315 = 0001fd0b
+          Guid: 60f91daf-3dd7-4283-a86d-24137b720ed1
+</pre>
+
+<p>So we now know how to calculate the GUID of a Revit element, and the previous section explained that it is possible to convert back and forth between the GUID and the IFC format.</p>
+
+<p>The time has come to make use of all this and put together a utility to exercise and test all the possible conversions.</p>
+
+<h4>IFC GUID and UniqueId Encoder and Decoder</h4>
+
+<p>To demonstrate the Revit element GUID generation and IFC GUID encoding and decoding process, I wrote a little stand-alone program that implements both. It provides the following functionality:</p>
+
+<ul>
+<li>Convert Revit UniqueId to GUID.</li>
+<li>Encode GUID to IFC format.</li>
+<li>Decode IFC format GUID to standard representation.</li>
+</ul>
+
+<p>It makes use of the original IFC CreateGuid_64.c C module, compiled it into a stand-alone DLL named IfcGuid.dll.
+The rest of the program is written in .NET.
+Therefore, we need a C# client interface for the unmanaged C code to test the encoding and decoding from the standard GUID into the IFC format and back again.
+The two important functions defined in CreateGuid_64.c for achieving this are</p>
+
+<pre class="code">
+<span class="blue">char</span> * getString64FromGuid( <span class="blue">const</span> GUID *pGuid, <span class="blue">char</span> * buf, <span class="blue">int</span> len );
+BOOL getGuidFromString64( <span class="blue">const</span> <span class="blue">char</span> *string, GUID *pGuid );
+</pre>
+
+<p>I will spare you the C code. 
+It is included in the complete solution available below.
+The C# statements used to provide access to these two functions from .NET look like this:</p>
+
+<pre class="code">
+[<span class="teal">DllImport</span>( <span class="maroon">"IfcGuid.dll"</span> )]
+<span class="blue">static</span> <span class="blue">extern</span> <span class="blue">void</span> getString64FromGuid(
+&nbsp; <span class="blue">ref</span> <span class="teal">Guid</span> guid,
+&nbsp; <span class="teal">StringBuilder</span> s64 );
+&nbsp;
+[<span class="teal">DllImport</span>( <span class="maroon">"IfcGuid.dll"</span> )]
+<span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> getGuidFromString64(
+&nbsp; <span class="blue">string</span> s64,
+&nbsp; <span class="blue">ref</span> <span class="teal">Guid</span> guid );
+</pre>
+
+<p>I implemented two little wrapper methods in C# to provide more comfortable access to the two functions:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Guid</span> String64ToGuid( <span class="blue">string</span> s64 )
+{
+&nbsp; <span class="teal">Guid</span> guid = <span class="blue">new</span> <span class="teal">Guid</span>();
+&nbsp; getGuidFromString64( s64.ToString(), <span class="blue">ref</span> guid );
+&nbsp; <span class="blue">return</span> guid;
+}
+&nbsp;
+<span class="blue">static</span> <span class="blue">string</span> GuidToString64( <span class="teal">Guid</span> guid )
+{
+&nbsp; <span class="teal">StringBuilder</span> s = <span class="blue">new</span> <span class="teal">StringBuilder</span>(
+&nbsp; &nbsp; <span class="maroon">"&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; "</span> );
+&nbsp; getString64FromGuid( <span class="blue">ref</span> guid, s );
+&nbsp; <span class="blue">return</span> s.ToString();
+}
+</pre>
+
+<p>Here is the mainline of the program:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+{
+&nbsp; Print( <span class="maroon">"IfcGuid by Jeremy Tammik."</span> );
+&nbsp; <span class="blue">if</span>( 0 == args.Length )
+&nbsp; {
+&nbsp; &nbsp; Print( <span class="maroon">"Do you have a GUID for me?"</span> );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> a = args[0];
+&nbsp; &nbsp; <span class="blue">int</span> n = a.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 45 == n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"Revit UniqueId: "</span> + a );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> episodeId = <span class="blue">new</span> <span class="teal">Guid</span>( a.Substring( 0, 36 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> elementId = <span class="blue">int</span>.Parse( a.Substring( 37 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NumberStyles</span>.AllowHexSpecifier );
+&nbsp;
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp; &nbsp;  EpisodeId: "</span> + episodeId.ToString() );
+&nbsp; &nbsp; &nbsp; Print( <span class="blue">string</span>.Format( <span class="maroon">"&nbsp; &nbsp;  ElementId: {0} = {1}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; elementId.ToString(), elementId.ToString( <span class="maroon">"x8"</span> ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> last_32_bits = <span class="blue">int</span>.Parse( a.Substring( 28, 8 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NumberStyles</span>.AllowHexSpecifier );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> xor = last_32_bits ^ elementId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; a = a.Substring( 0, 28 ) + xor.ToString( <span class="maroon">"x8"</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Guid: "</span> + a + <span class="maroon">"\n"</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 22 == a.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> guid = String64ToGuid( a );
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = GuidToString64( guid );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"Ifc base64 encoding: "</span> + a );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp; &nbsp; decoded to GUID: "</span> + guid.ToString() );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp;  reencoded to IFC: "</span> + s );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( s.Equals( a ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected decode + encode to return original guid"</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> guid = <span class="blue">new</span> <span class="teal">Guid</span>( a );
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s1 = ToBase64.<span class="teal">ToBase64</span>.GetId( guid );
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s2 = <span class="teal">Convert</span>.ToBase64String( guid.ToByteArray() );
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s3 = <span class="blue">new</span> ShortGuid.<span class="teal">ShortGuid</span>( guid ).ToString();
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s4 = GuidToString64( guid );
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> guid2 = String64ToGuid( s4 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"Original 128-bit GUID: "</span> + guid.ToString() );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp; &nbsp; ToBase64 encoding: "</span> + s1 );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">" .NET base64 encoding: "</span> + s2 );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">"&nbsp;  ShortGuid encoding: "</span> + s3 );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">" IFC base 64 encoding: "</span> + s4 );
+&nbsp; &nbsp; &nbsp; Print( <span class="maroon">" decoded back to GUID: "</span> + guid2.ToString() );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( guid2.Equals( guid ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected encode + decode to return original guid"</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>It checks whether an argument is given.
+If not, it asks you to provide a GUID of some kind.
+If the string length of the argument provided is 45, we can assume that it is a Revit UniqueId and generate a standard GUID from it using the algorithm described above.
+If its string length is 22, we can assume that it is an IFC encoded GUID and decode it.
+Otherwise, it is assumed to be a standard GUID and we encode it into IFC format.
+In both cases, we apply the inverse operation to the result and ensure that the original data is restored.
+</p>
+
+<p>Here is the complete
+
+<a href="zip/ifcguid.zip">
+Visual Studio 2005 solution</a>.</p>

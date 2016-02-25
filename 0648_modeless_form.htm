@@ -1,0 +1,104 @@
+<!-- 
+
+Find all "http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html", Subfolders, Find Results 1, "C:\a\j\adn\case\bsd", "*.txt"
+  C:\a\j\adn\case\bsd\1259369\1259369.txt(46):- http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1259683\1259683.txt(56):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1261653\1261653.txt(16):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1261746\1261746.txt(16):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1264281\1264281.txt(15):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1265557\1265557.txt(38):- http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1266558\1266558.txt(38):- http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1266773\1266773.txt(30):- http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1266810\1266810.txt(32):- http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1270251\1270251.txt(17):Strictly speaking, Revit API is not multi-thread safe. On some specific scenarios and conditions it can work. I would recommend you read the overview posted here: http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1270808\1270808.txt(61):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1271135\1271135.txt(26):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1271184\1271184.txt(51):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  C:\a\j\adn\case\bsd\1271476\1271476.txt(31):http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html
+  Matching lines: 15    Matching files: 14    Total files searched: 2154
+
+1271845 [Windows Form with Revit]
+
+-->
+
+<h3>Modeless Forms in Revit</h3>
+
+<p>Today the moon is full. 
+I celebrated it last night already, sitting with a friend and having a fire on a hill with a 270 degree view to the east, west and south. 
+Very beautiful!
+
+<p>This full moon is special, because it is the occasion of the Chinese 
+
+<a href="http://en.wikipedia.org/wiki/Mid-Autumn_Festival">
+Mid-Autumn Festival</a>. 
+It "parallels the autumnal equinox of the solar calendar, when the moon is at its fullest and roundest".</p>
+
+<center>
+<img src="img/mid-autumn_full_moon_festival_2011.jpg" alt="Mid-autumn full moon festival 2011"/>
+</center>
+
+<p>This Chinese festival will even be celebrated in Switzerland tonight, as the 
+
+<a href="http://www.basel.ch/mondfest_plakat_web2.pdf">
+Mondefest Basel 2011</a>, 
+
+to honour the city partnership of Basel and Shanghai.
+
+
+<a name="1"></a>
+
+<h4>Accessing Revit from Outside an API Call-back Context</h4>
+
+<p>Back to the Revit API, here is a question that keeps cropping up again and again, prompting a summary of some basic aspects of interacting with Revit from a modeless form or external application, with an overview and pointers back to some of the previous posts and samples concerning this.
+
+<p><strong>Question:</strong> How can I interact with Revit from a modeless form or external application?
+I need to be able to switch back and forth between Revit and my form without closing it.
+
+<p><strong>Answer:</strong> The Revit API is entirely designed to work only within pre-defined call-backs issued by Revit.
+
+<p>Therefore, you can only keep your form open while continuing to work in Revit in either one of two ways:
+
+<ul>
+<li>Display your form from a Revit external command, but make it modeless. Then the command can complete and return control to Revit, while the form remains visible. As soon as the command has returned, though, you can no longer make use of the Revit API.
+<li>Display your form from an external application, not from a Revit external command. In that case you obviously also have no access to the Revit API.
+</ul>
+
+<p>The reasons and more background information on the current situation are given in the discussions of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">
+asynchronous API calls and idling</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">
+modeless door lister flaws</a>, and
+
+the further posts that they point to.
+
+<p>As explained there, you cannot make use of the Revit API from an external application or a modeless context. 
+
+<p>However, the API also provides the possibility to implement a workaround for this limitation, the Idling event.
+It enables you to drive Revit from outside indirectly by posting an event to your Idling event handler, which has full access to the API and complete read and write access to the entire application object and all its documents.
+
+<p>To use this, subscribe to the Revit Idling event and raise a signal from your external application or modeless dialogue. In the Idling event handler, check for the raised signal and execute whatever functionality you need. How this can be done is demonstrated and described in full detail in my sample to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/display-webcam-image-on-building-element-face.html">
+display a live webcam image on a building element face</a>.
+
+<p>Another example, where Revit is driven from a modeless dialogue box, e.g. from a context outside of any Revit API call-back, also using the Idling event to "get back in" to the Revit API context, is given by my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">
+modeless loose connector navigator</a> sample.
+
+<p>The original version was written for Revit 2011. I recently 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/modeless-loose-connector-navigator-update.html">
+updated and improved it for Revit 2012</a> as 
+
+well.
+
+<p>Additionally, a generic pattern for this process is described in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-api-access.html">
+pattern for semi asynchronous idling API access</a>.
+
+<p>Unfortunately, like any other call-back, Idling costs time and should therefore obviously be used with great care.
+Use it sparingly and cautiously.

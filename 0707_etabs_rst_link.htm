@@ -1,0 +1,345 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Nasser Marafi Re: Floor Approximated Analytical Lines
+
+Hello Jeremy,
+
+Excellent blog you have going. I built up my programming in C# skills and Revit API knowledge mostly from your website.
+
+I am currently working on this plug-in that exports your Revit analytical model to ETABS (a structural analysis software). I am constantly trying to improve it, and currently stuck trying to get the analytical lines for floor (slabs) elements exported using the Approximate Method. I can't seem to find an example on your website of you using this API. If you don't mind can you post some examples? I am also starting to think they may be an error from Autodesk's side.
+
+FYI, My plug-in is available online for free at www.nassermarafi.com
+
+Thanks!
+
+Nasser Marafi
+
+I also copy pasted the part of my script where I am using this.
+
+    //Convert Floors
+    public void ConvertFloors(Document document, IList<Element> Floors)
+    {
+      List<EtabsElements.EtabsFrame> Frames = new List<EtabsElements.EtabsFrame>();
+
+      int count = 1;
+
+      foreach (Element element in Floors)
+      {
+        try
+        {
+          form.UpdateProgressElementBar(Floors.Count, count);
+          form.UpdateElementName("Floor Element ID: " + element.Id.ToString());
+          count++;
+
+          //Set Element As Wall
+          Floor floor = element as Floor;
+
+          //Get Analytical Model Line
+          Autodesk.Revit.DB.Structure.AnalyticalModel analyticalmodel;
+
+          IList<Curve> curves;
+
+          analyticalmodel = element.GetAnalyticalModel();
+
+          //If No Analytical Model Then Skip
+          if (analyticalmodel == null)
+          {
+            continue;
+          }
+
+          //Set Approximation for Curved Slab Edge
+          if (analyticalmodel.CanApproximate() == true)
+          {
+            analyticalmodel.Approximate(true);
+          }
+
+          //Gets you the Lines you Modelled In Revit
+          //curves = analyticalmodel.GetCurves(Autodesk.Revit.DB.Structure.AnalyticalCurveType.ActiveCurves);
+
+
+          curves = analyticalmodel.GetCurves(Autodesk.Revit.DB.Structure.AnalyticalCurveType.ApproximatedCurves);
+
+          //Get Heighest Elevation
+          double elevation = curves[0].get_EndPoint(0).Z;
+          foreach (Curve curve in curves)
+          {
+            elevation = Math.Max(elevation, Math.Max(curve.get_EndPoint(0).Z, curve.get_EndPoint(1).Z));
+          }
+
+          //Get Story
+          EtabsElements.EtabsStory Story = GetClosestStoryByElevation(elevation);
+
+          //Find End Points
+          List<XYZ> points = new List<XYZ>();
+          foreach (Curve curve in curves)
+          {
+            points.Add(new XYZ(curve.get_EndPoint(0).X, curve.get_EndPoint(0).Y, curve.get_EndPoint(0).Z));
+            points.Add(new XYZ(curve.get_EndPoint(1).X, curve.get_EndPoint(1).Y, curve.get_EndPoint(1).Z));
+          }
+
+          //Get Only the Slab Points
+          points = GetAreaPoints(curves);
+
+          //Get Rid of Dublicates Points
+          List<XYZ> pointsrefined = new List<XYZ>();
+          foreach (XYZ point in points)
+          {
+            bool Copy = true;
+            foreach (XYZ pointref in pointsrefined)
+            {
+              if (Math.Round(pointref.X, Round) == Math.Round(point.X, Round) & Math.Round(pointref.Y, Round) == Math.Round(point.Y, Round) &
+                Math.Round(pointref.Z, Round) == Math.Round(point.Z, Round))
+              {
+                Copy = false;
+              }
+            }
+            if (Copy == true)
+            {
+              pointsrefined.Add(point);
+            }
+          }
+          points = pointsrefined;
+
+          //Add Points
+          List<EtabsElements.EtabsPoint> etabspoints = new List<EtabsElements.EtabsPoint>();
+          foreach (XYZ point in points)
+          {
+            if (!(ElevationMatchesLevel(point.Z)))
+            {
+              etabspoints.Add(EtabsPoints.GenerateSecondID(point.X, point.Y, GetClosestStoryByElevation(point.Z).RevitElevation - point.Z, GlobalRotation));
+            }
+            else
+            {
+              etabspoints.Add(EtabsPoints.GenerateID(point.X, point.Y, GlobalRotation));
+            }
+          }
+
+          //Calculate NoOfLevels
+          List<int> NoOfStories = new List<int>();
+          EtabsElements.EtabsStory EndStory = Story;
+          foreach (XYZ point in points)
+          {
+            double StartZ = point.Z;
+            EtabsElements.EtabsStory StartStory = GetClosestStoryByElevation(StartZ);
+            NoOfStories.Add(GetNumberOfStoriesInBetween(StartStory, EndStory));
+          }
+
+          //Create Material
+          EtabsElements.EtabsMaterial Material = GetMaterial(floor.Materials);
+
+          //Extract Floor Thickness
+          double thickness = 0;
+
+          //CompoundStructureLayerArray floorlayers = floor.FloorType.CompoundStructure.Layers;2011
+          //foreach (CompoundStructureLayer layer in floorlayers)
+          //{
+          //  thickness = layer.Thickness;
+          //}
+
+          CompoundStructure floorlayers = floor.FloorType.GetCompoundStructure();
+
+          thickness = floorlayers.GetWidth();
+
+
+          //Create AreaProperties
+          EtabsElements.EtabsShellProperties ShellProperties = new EtabsElements.EtabsShellProperties(floor.Name, Material, "SLAB", "SHELL", "THIN", thickness, thickness);
+
+          AddSlabAreaElement(document, element, Story, etabspoints, NoOfStories, Material, ShellProperties);
+
+          //Create Openings Area Properties
+          List<XYZ>[] SlabOpenings = GetAreaOpenings(curves);
+          foreach (List<XYZ> opening in SlabOpenings)
+          {
+            List<int> NoOfStoriesOpenings = new List<int>();
+            foreach (XYZ point in opening)
+            {
+              double StartZ = point.Z;
+              EtabsElements.EtabsStory StartStory = GetClosestStoryByElevation(StartZ);
+              NoOfStoriesOpenings.Add(GetNumberOfStoriesInBetween(StartStory, EndStory));
+            }
+
+            List<EtabsElements.EtabsPoint> etabspointsopenings = new List<EtabsElements.EtabsPoint>();
+            foreach (XYZ point in opening)
+            {
+              if (!(ElevationMatchesLevel(point.Z)))
+              {
+                etabspointsopenings.Add(EtabsPoints.GenerateSecondID(point.X, point.Y, GetClosestStoryByElevation(point.Z).RevitElevation - point.Z, GlobalRotation));
+              }
+              else
+              {
+                etabspointsopenings.Add(EtabsPoints.GenerateID(point.X, point.Y, GlobalRotation));
+              }
+            }
+
+            AddOpeningAreaElement(document, element, Story, etabspointsopenings, NoOfStoriesOpenings);
+          }
+
+        }
+        catch (Exception e)
+        {
+          errorlog.AddError("Floor Element #: " + element.Id.ToString() + "\r\n" + e.ToString());
+        }
+      }
+    }
+
+
+
+From: Nasser Marafi
+Sent: 4 January 2012 13:47
+To: Jeremy Tammik
+Subject: Re: Floor Approximated Analytical Lines
+
+Hello Jeremy,
+
+Happy New Year. I took a look at the skeleton file; I hope you can change the link of my website to www.nassermarafi.com instead of what you have. I made a couple of changes to the website over the last couple of weeks which hopefully can show the user what the tool actually does before downloading it.
+
+I also took the time to release a couple of versions of the tool since we last spoke. I am constantly fixing errors and adding new features as I work with the tool and get feedback from colleagues and friends.
+
+I was thinking your post can go like this:
+
+"Nasser's Revit Tools are custom plug-ins created to enhance Revit Structure's Integration with the Structural Analysis Software ETABS. The tool has the capability to export the following elements to ETABS: Columns, Braces, Beams, Walls, Slabs, Openings, Grids, Levels and Rigid Links. The tools would recognize most family elements, but in the case of custom created structural families, it will export the elements as null (And the properties of that element can later be adjusted in ETABS). Learn more about the tools or download it for free at www.nassermarafi.com. Feel free to contact Nasser at me@nassermarafi.com for any questions or if you discover any bugs with the plug-in."
+
+Let me know if this sounds good. If you wish for me to write more/less also let me know. Also Feel free to edit it as you please.
+
+I also attached a screen shot of the tool which maybe you can put into your blog.
+
+Regards,
+
+Nasser
+
+-->
+
+<h3>Curved Analytical Model Approximation and Etabs Structural Link</h3>
+
+<p>Here is a note on how to retrieve approximate straight line segments for the analytical model of curved structural elements, and on a free Revit Structural link tool to the
+
+<a href="http://www.csiberkeley.com">
+Computers and Structures, Inc. (CSI)</a>
+
+<a href="http://www.csiberkeley.com/etabs">
+ETABS</a>
+
+building analysis and design environment.
+
+<p>A couple of weeks ago Nasser emailed me about a method he was trying to use for his Revit Structure link add-in.
+He was trying to export floor elements with curved edges to the structural analysis software ETABS.
+Like many other structural analysis applications, ETABS does not handle arcs and splines, so linear segmentation of curved elements is required.
+
+<p>The Revit API AnalyticalModel class provides an Approximate method which promises to achieve exactly that.
+Unfortunately, it is not yet implemented for this case.
+
+<p>A simple workaround is to use the Tessellate method instead.
+In addition, by skipping some of the intermediate points, the precision of the approximation can be lowered if needed.
+
+<p>Here is an example of how the Tessellate method can be used instead of the Approximate.
+The minimum line segment length required is defined by the LineSegmentLength argument:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt;
+&nbsp; &nbsp; GetStraightLineCurvesFromFloorAnalyticalModel(
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalyticalModel</span> analyticalmodel,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> lineSegmentLength )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; Curves;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; SegmentedCurves = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If no analytical model then skip</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( analyticalmodel == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; Curves = analyticalmodel.GetCurves(
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalyticalCurveType</span>.ActiveCurves );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// This does not work:</span>
+&nbsp; &nbsp; <span class="green">//Curves = analyticalmodel.GetCurves(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; AnalyticalCurveType.ApproximatedCurves);</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> Curves )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = curve.Tessellate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> ibefore = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; pts.Count; i++ )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> distance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = GeometryUtility.Get3DDistance(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts[ibefore], pts[i] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pts.Count - 1 == i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SegmentedCurves.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Application.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts[ibefore], pts[i] ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( distance &lt; lineSegmentLength )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SegmentedCurves.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Application.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts[ibefore], pts[i] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ibefore = i;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> SegmentedCurves;
+&nbsp; }
+</pre>
+
+<p>This method is part of
+
+<a href="http://www.nassermarafi.com/?page_id=69">
+Nasser's Revit Tools</a>,
+
+a Revit Structural link add-in to integrate with the
+
+<a href="http://www.csiberkeley.com">
+Computers and Structures, Inc. (CSI)</a>
+
+<a href="http://www.csiberkeley.com/etabs">
+ETABS</a>
+
+building analysis and design environment.
+
+<p>Nasser's add-in exports the following elements to ETABS: Columns, Braces, Beams, Walls, Slabs, Openings, Grids, Levels and Rigid Links.
+It recognizes most family elements.
+Custom created structural family instance elements will be exported as null, and their properties can later be adjusted in ETABS.</p>
+
+<p>Here is a sample model in Revit:<p>
+
+<center>
+<img src="img/nasser_example_revit.png" alt="Revit sample model"/>
+</center>
+
+<p>This is the result of exporting it to ETABS:<p>
+
+<center>
+<img src="img/nasser_example_etabs.png" alt="Revit model exported to ETABS"/>
+</center>
+
+<p>Visit
+
+<a href="http://www.nassermarafi.com">www.nassermarafi.com</a> for
+
+more information or to access the free download.
+
+Feel free to
+
+<a href="mailto:me@nassermarafi.com">contact Nasser directly</a> for
+
+any questions or other issues.</p>

@@ -1,0 +1,345 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Jeremiah Farmer [placing Site Components into Revit] 
+C:\a\j\adn\case\bsd\1263227\src\Insert2dDraftingInstance\Insert2dDraftingInstance\Command.cs
+
+-->
+
+<h3>Place Detail Instance</h3>
+
+<p>After several discussions on placing family instances, such as the use of 
+
+<!-- 402_place_family_instance.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+PromptForFamilyInstancePlacement</a> and placing
+
+<!-- 450_place_detail_inst.htm -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/place-detail-instance.html">
+detail instances in 2D</a>, 
+
+here is a another question in a similar vein on placing trees and site components from Jeremiah Farmer of
+
+<a href="http://www.landfx.com">
+Land F/X</a>.
+
+<p>And by the way, I am hoping (ever so slightly) that this discussion and the tools presented below may help Kristoffer with his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html?cid=6a00e553e168978833013488b40382970c#comment-6a00e553e168978833013488b40382970c">
+furniture insertion problem</a> as well.
+
+<p><strong>Question:</strong> I am trying to automate the placement of trees into the Revit model.
+I can't seem to find the appropriate NewFamilyInstance overload to call, or call it correctly.
+And <strong>nowhere</strong> can I locate an example of placing a Site Component through the API.  
+This is killing me!
+Please, please help with this, or if you can direct me somewhere.
+Know that this will greatly speed Disney's adoption of Revit, as well as many of our other clients.
+
+<p><strong>Answer:</strong> What have you tried so far?
+ 
+Have you seen the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/place-detail-instance.html">
+placing a detail instance</a>?
+ 
+<p>Two snippets of code that may be useful for testing that cropped up since I published that:
+
+<ol>
+<li><a href="#1">PlaceInstancesOnViews</a>: This method tests placing a specific family instance in all views, to ensure that a detail instance can indeed be placed in a detail view using the NewFamilyInstance overload taking the arguments XYZ, targetFamily, view.
+
+<li><a href="#2">TestAllOverloads</a>: This method calls all possible overloads of NewFamilyInstance in order to find one that works.
+</ol>
+
+<p>Here is the code for these two:
+
+<a name="2"></a>
+
+<h4>1. PlaceInstancesOnViews</h4>
+
+<p>Test placing a specific family instance in all views, to ensure that a detail instance can indeed be placed in a detail view using the NewFamilyInstance overload taking the arguments XYZ, targetFamily, view:
+
+<pre class="code">
+<span class="blue">void</span> PlaceInstancesOnViews( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">FamilySymbol</span>, <span class="blue">bool</span>&gt; isTargetFamily 
+&nbsp; &nbsp; = famSym =&gt; famSym.Name.Contains( <span class="maroon">&quot;Rowlock&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> targetFamily 
+&nbsp; &nbsp; = collector.OfType&lt;<span class="teal">FamilySymbol</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">FamilySymbol</span>&gt;( isTargetFamily )
+&nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">FamilySymbol</span>&gt;();
+&nbsp;
+&nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">View</span> ) );
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">View</span>, <span class="blue">bool</span>&gt; isPossibleView 
+&nbsp; &nbsp; = v =&gt; !v.IsTemplate &amp;&amp; !( v <span class="blue">is</span> <span class="teal">View3D</span> );
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt; possibleViews 
+&nbsp; &nbsp; = collector.OfType&lt;<span class="teal">View</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">View</span>&gt;( isPossibleView );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> view <span class="blue">in</span> possibleViews )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Add instance to &quot;</span> + view.Name );
+&nbsp;
+&nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> result 
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, targetFamily, view );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<a name="2"></a>
+
+<h4>2. TestAllOverloads</h4>
+
+<p>Test calling all possible NewFamilyInstance overloads on the given symbol in order to find one that works:
+<pre class="code">
+<span class="blue">void</span> TestAllOverloads(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">XYZ</span> startPoint,
+&nbsp; <span class="teal">XYZ</span> endPoint,
+&nbsp; <span class="teal">FamilySymbol</span> familySymbol )
+{
+&nbsp; <span class="teal">StructuralType</span> stNon = <span class="teal">StructuralType</span>.NonStructural;
+&nbsp; <span class="teal">StructuralType</span> stBeam = <span class="teal">StructuralType</span>.Beam;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> cd
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp; <span class="teal">SketchPlane</span> sk = view.SketchPlane;
+&nbsp; <span class="teal">Level</span> level = view.Level;
+&nbsp;
+&nbsp; <span class="green">// Create line from user points</span>
+&nbsp;
+&nbsp; <span class="teal">Curve</span> curve = doc.Application.Create.NewLineBound( startPoint, endPoint );
+&nbsp;
+&nbsp; <span class="green">// Create direction vector from user points</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> dirVec = endPoint - startPoint;
+&nbsp;
+&nbsp; <span class="blue">bool</span> done = <span class="blue">false</span>;
+&nbsp; <span class="blue">int</span> index = 1;
+&nbsp; <span class="blue">while</span>( !done )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> instance = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Try different insert methods</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( index )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance( </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ location, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 1:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 2:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance( </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ origin, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; View specView );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 3:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 4:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, view );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ location, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; Element host, StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 5:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, sk, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 6:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, sk, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ location, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ referenceDirection, Element host, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 7:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, dirVec, sk, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 8:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, dirVec, sk, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; Curve curve, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; Level level, StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 9:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve, familySymbol, <span class="blue">null</span>, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 10:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve, familySymbol, <span class="blue">null</span>, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 11:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve, familySymbol, level, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 12:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve, familySymbol, level, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ location, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; Level level, StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 13:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, <span class="blue">null</span>, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 14:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, <span class="blue">null</span>, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 15:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, level, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 16:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, level, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// public FamilyInstance NewFamilyInstance(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; XYZ location, FamilySymbol symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; Element host, Level level, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp;&nbsp; StructuralType structuralType );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 17:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, <span class="blue">null</span>, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 18:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, <span class="blue">null</span>, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 19:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, sk, stNon );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> 20:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; instance = cd.NewFamilyInstance( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; startPoint, familySymbol, sk, stBeam );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; done = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; { }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If instance was created, mark with identifier so I can see which instances were created</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != instance )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> param = instance.get_Parameter( <span class="maroon">&quot;InstanceIndex&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != param )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; param.Set( index );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; index++;
+&nbsp; }
+}
+</pre>
+
+<p>I hope that this will be of use in you further research.
+ 
+<p>Please let me know how you fare and what you come up with!
+ 
+<p><strong>Response:</strong> I had not seen that example, but that is very similar to what I finally got working last night.
+
+<p>It seems Site Components need to be attached to the Topo Surface, so I end up calling NewFamilyInstance with XYZ, FamilySymbol, TopoSurface, StructuralType.
+
+<p>It turns out the Z coordinate can be zero, by specifying TopoSurface it will be anchored correctly. 
+
+<p>I also had to come up with two helper functions, one to locate the TopoSurface, and one to locate the FamilySymbol reference (as LoadFamilySymbol only returns a Boolean, not a reference to the FamilySymbol!  
+How crazy is that?).
+
+<p>So I think I'm on my way.  
+I can't tell you how much I appreciate you getting back to me!
+
+<p>I'd be happy to share!
+Here is 
+
+<a href="zip/placeplant.vb">
+placeplant.vb</a> containing
+
+the basic outline of what I have so far, representing the first portion of our Revit add-on.
+I should inform you that this is to be part of a commercial application, Land F/X.  
+
+<p>The hurdles I have cleared so far were finding the appropriate overload of NewFamilyInstance to use for Site Components, as well as the creation of the two helper functions (which I'm positive can be simplified or optimized in some fashion, but at least they work!).
+You can see I have also figured out how to set various parameters of the Family Symbol, as well as the Instance, and have marked up my findings on later creating custom Parameters for these values.
+
+<!-- 
+<p>Today I will be placing this routine within a loop, to have it process multiple Trees.
+I'll send over that version no later than early next week, and it should also include ample comments. 
+-->
+
+<p>Very many thanks to Jeremiah for his enthusiasm and this solution and sample code for placing site components!

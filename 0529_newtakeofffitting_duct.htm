@@ -1,0 +1,189 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1266201 [How to use NewTakeOffFitting] -->
+
+<h3>Use of NewTakeOffFitting on a Duct</h3>
+
+<p>Here is a simple question on how to create a new MEP takeoff on a duct using the NewTakeOffFitting method:
+
+<p><strong>Question:</strong> I have a duct in my Revit MEP model and I want to create a takeoff fitting at its midpoint.
+I see that the method NewTakeOffFitting takes two arguments, a connector and an MEP curve, and returns a new family instance.
+My question is:
+
+<p>How can I create the connector and curve?
+Can you show me some code on how to do so and use this method?
+Thanks!
+
+<p><strong>Answer:</strong> To begin with, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html#6">
+AutoRoute</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html#6">
+AvoidObstruction</a> Revit 
+
+SDK samples show you how to handle the programmatic creation of pipes, ducts and fittings.
+
+<p>I also analysed the creation and positioning of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/cable-tray-orientation-and-fittings.html">
+cable tray fittings</a> in 
+
+some depth.
+
+<p>None of these samples explicitly demonstrate the use of the NewTakeOffFitting method, however.
+
+<p>The Document.NewTakeoffFitting method adds a new family instance representing a takeoff fitting into the model, using one connector and one MEP curve:
+
+<center>
+<img src="img/takeoff_curve_connector.png" alt="NewTakeOffFitting method arguments"/>
+</center>
+
+<p>The MEP curve is the base pipe or duct, and the connector belongs to the element that is to be attached to it.
+
+<p>I created a little sample application 
+
+<a href="zip/CreateTakeoff.zip">
+CreateTakeoff</a> to 
+
+demonstrate its use in real life.
+
+It was interesting to do so, because I did have to struggle with one or two issues, such as what duct elements to use and how to position them.
+
+<p>Here is the mainline of the external command Execute method implementing this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Result</span> result = <span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">null</span>;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> creDoc
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// determine duct type to use:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.OfCategory(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctCurves );
+&nbsp;
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DuctType</span> ductType
+&nbsp; &nbsp; &nbsp; = collector.FirstElement() <span class="blue">as</span> <span class="teal">DuctType</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ductType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;No duct types found.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, _caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// create duct1 along X axis </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// from (0,0,0) to (6,0,0):</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> start = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> end = start + 6 * <span class="teal">XYZ</span>.BasisX;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> mid = 0.5 * ( start + end );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Duct</span> duct1 = creDoc.NewDuct(
+&nbsp; &nbsp; &nbsp; &nbsp; start, end, ductType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// create duct2 parallel to Y </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// axis from (1,2,0) to (1,4,0):</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; start = mid + 2 * <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; &nbsp; end = start + 2 * <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Duct</span> duct2 = creDoc.NewDuct(
+&nbsp; &nbsp; &nbsp; &nbsp; start, end, ductType );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// pick closest connector on duct2:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> duct2_start = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// just picking the first one is unreliable!</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the order of connector returned by the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// connector manager may change!</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// always use a location (or even more </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// information if 2 connectors are at </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the same location) to get the right</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// connector!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> dist = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; duct2.ConnectorManager.Connectors )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = c.Origin;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> d = p.DistanceTo( mid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; dist )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dist = d;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; duct2_start = c;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// create takeoff from duct1 to duct2:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> takeoff
+&nbsp; &nbsp; &nbsp; &nbsp; = creDoc.NewTakeoffFitting(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; duct2_start, duct1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; result = <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != t )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; message = ex.Message;
+&nbsp; }
+&nbsp; <span class="blue">return</span> result;
+}
+</pre>
+
+<p>One important thing to note here is that you cannot rely on the order of the connectors returned by the connector manager, since it may change. Therefore, you cannot simply pick the first connector, for instance, but have to rely on some other criteria such as the location. In the code above, I checked the distance of the second duct's connectors to the midpoint of the first duct and selected the closest one.
+
+<p>Instead, I loop through all the connectors of duct2 and select the one with a minimum distance to the midpoint of the first duct.
+Since I am searching for the minimum distance, I initialise the variable 'dist' to the maximal possible value and then loop through all connectors, always picking the new one if its distance to the midpoint is smaller than the previous value.
+
+<p>Alternatively, I could probably position the second duct so that its connector is very close to the midpoint and then use XYZ.IsAlmostEqualTo.
+
+<p>Here is the result of running this command in a new Revit MEP project:</p>
+
+<center>
+<img src="img/takeoff_rect_duct.png" alt="New takeoff fitting on a rectangular duct"/>
+</center>
+
+<p>Out of interest, I tried running it in Revit Architecture as well, but the very first call to create a new duct element fails and reports that this functionality is only available in Revit MEP.
+
+<p>Here is 
+
+<a href="zip/CreateTakeoff.zip">
+CreateTakeoff.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this add-in.

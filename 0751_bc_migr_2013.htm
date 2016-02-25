@@ -1,0 +1,306 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Migrate Building Coder Samples to Revit 2013</h3>
+
+<p>I migrated The Building Coder samples to Revit 2013.
+
+<h4>Revit Onebox</h4>
+
+<p>Before diving into that, however, a short note on Revit Onebox.
+Here is a 
+
+<a href="http://www.cadac.com/nl/brochures/Documents/autodesk-revit-mep-2013-comparison-matrix-en.pdf">
+comparison matrix</a> of
+
+the features provided by the different flavours, all of which are available in the Onebox version.
+There is even a short 1.5 minute 
+
+<a href="http://www.youtube.com/watch?v=ryuAPnIhiO8">
+youtube video</a> on
+
+the topic.
+
+<p><strong>Question:</strong> I would like to install the Revit 2013 Onebox product which contains Revit Architecture, Structure and MEP as one product. 
+Where can I find it?
+
+<p><strong>Answer:</strong> Revit Onebox is included in Autodesk Building Design Suite 2013 Premium and Ultimate, and not in Standard.
+For 
+
+<a href="http://www.autodesk.com/joinadn">
+ADN members</a>, 
+
+the Autodesk Building Design Suites are now available for download from the 
+
+<a href="http://adn.autodesk.com/adn">
+ADN extranet</a>
+
+at 
+
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&id=9923886">
+Software & Support</a> &gt; 
+
+<a href="http://adn.autodesk.com/adn/servlet/autoindex?siteID=4814862&id=4832864&linkID=16829826">
+Autodesk Building Design Suite</a> &gt; 
+
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&id=16829938&linkID=16829826">
+Downloads</a>.
+
+
+<a name ="0"></a>
+
+<h4>The Building Coder Samples Migration to Revit 2013</h4>
+
+<p>Back to the API related topics.
+
+<p>Migrating from one release of Revit to the next is an exercise we have gone through several times in the past, of course.
+
+<p>This time I was especially well prepared, since I recently intentionally eliminated the Revit 2012 API 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/eliminating-compiler-warnings-and-deprecated-calls.html">
+compiler warnings and deprecated calls</a>.
+
+<p>Look at that post for links back to the previous migration efforts.
+
+<p>Here are the main issues I had to tackle:
+
+<ul>
+<li><a href="#1">.NET framework</a> update
+<li><a href="#2">Materials collection</a> update
+<li>New Document <a href="#3">GetElement method</a>
+<li>Remaining <a href="#4">errors</a>
+<li><a href="#5">Enumerable GeometryElement</a>
+<li>Updated <a href="#6">Group and Ungroup methods</a>
+<li><a href="#7">Revit 2012 comparison</a>
+<li>Final initial <a href="#8">Revit 2013 version</h4>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>.NET Framework Update</h4>
+
+<p>The first thing that strikes one this time around when migrating an add-in from the previous version is the message displayed by Visual Studio on changing the Revit API assemblies, telling us that the add-in project now needs to reference the .NET framework version 4:</p>
+
+<center>
+<img src="img/bc_migr_2013_1.png" alt=".NET Framework version update message"/>
+</center>
+
+<p>Trying to rebuild now without updating the framework version causes 1545 errors and 94 warnings:
+
+<p>The primary reference "RevitAPI" could not be resolved because it has an indirect dependency on the .NET Framework assembly "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" which has a higher version "4.0.0.0" than the version "2.0.0.0" in the current target framework.
+
+<p>Go to Solution Explorer &gt; BuildingCoder &gt; [right click] &gt; Properties &gt; Application &gt; Target Framework and change it to version 4.0 to remove them all again:</p>
+
+<center>
+<img src="img/bc_migr_2013_2.png" alt="Set .NET Framework version"/>
+</center>
+
+
+<a name="2"></a>
+
+<h4>Materials Collection Update</h4>
+
+<p>After that, recompiling causes one single error:
+
+<p>The type or namespace name 'Materials' could not be found (are you missing a using directive or an assembly reference?) in CmdGetMaterials.cs, line 460.
+
+<p>The Materials collection class, derived from the MaterialSet class, was defined in the Revit 2012 API to provide access to the materials used in the Revit project.
+Instances of this class were returned by the Settings.Materials property.
+
+<p>This class no longer exists in the Revit 2013 API, a fact not mentioned in the What's New section of the Revit API help file RevitAPI.chm, to my surprise.
+It does however mention that its creation members have been replaced by the new static Material.Create method:
+
+<ul>
+<li>AddConcrete
+<li>AddGeneric
+<li>AddOther
+<li>AddSteel
+<li>AddWood
+</ul>
+
+<p>Just seeing one single error reported was of course too good to be true.
+There are actually many more than one errors relating to materials.
+They are caused in various places in the module CmdGetMaterials, which we used to compare different ways to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/materials-collection-and-filtering.html">
+retrieve materials</a> using
+
+either the obsolete Materials collection property or directly via filtered element collectors.
+
+<p>Commenting out the initial offending usage of the Materials class in the GetMaterialByName extension class caused lots of other errors and warnings to be listed, 
+
+<a href="zip/bc_migr_2013_1.txt">
+13 errors and 52 warnings</a>,
+
+to be precise.
+
+
+<a name="3"></a>
+
+<h4>New Document GetElement method</h4>
+
+<p>Most of the warnings refer to the obsolete Document.Element property taking an element id argument, which has now been converted to a method named
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/getelement-method-and-get-element-type.html">
+GetElement, as I recently explained</a>.
+
+<p>I globally replaced ".get_Element(" by ".GetElement(" to fix that, reducing the count to 
+
+<a href="zip/bc_migr_2013_2.txt">
+13 errors and 33 warnings</a>.
+
+<p>Most of the errors are still related to the removal of the Materials collection class in the CmdGetMaterials.cs module, so I fixed that next by simply encapsulating all the offending the code in an '#if BEFORE_REVIT_2013' pragma, effectively removing it, reducing the count to 
+
+<a href="zip/bc_migr_2013_3.txt">
+5 errors and 33 warnings</a>.
+
+
+<a name="4"></a>
+
+<h4>Remaining Errors</h4>
+
+<p>The five remaining errors look pretty trivial:
+
+<ul>
+<li>Replace ConnectorProfileType.RectProfile by ConnectorProfileType.Rectangular in CmdRectDuctCorners.cs.
+<li>Replace DetailLevels.Fine by ViewDetailLevel.Fine, also in CmdRectDuctCorners.cs.
+<li>Remove the references to ParameterType.TemperalExp and UnitType.UT_TemperalExp in ParameterUnitConverter.cs.
+</ul>
+
+<p>One single error remains:
+
+<p>The type 'System.Windows.Markup.IUriContext' is defined in an assembly that is not referenced. You must add a reference to assembly 'System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089' in line 73 of CmdPreviewImage.cs.
+
+<p>So I did what the man says and added the required reference, resulting in 
+
+<a href="zip/bc_migr_2013_4.txt">
+zero errors and 33 warnings</a>.
+
+<p>Rebuild all now succeeds, so I could in fact load and test my little baby at this point.
+
+
+<a name="5"></a>
+
+<h4>Enumerable GeometryElement</h4>
+
+<p>However, since most of the warnings are caused by the obsolete GeometryElement Objects property returning a GeometryObjectArray, I decided to address that as well first.
+
+<p>The Obsolete attribute on this property actually states that "This property will be obsolete from 2013; Call GetEnumerator() instead."
+Strictly taken, this is only true if I interpret "from" as "after", as far as I can tell.
+
+<p>The fix is very simple and reduces the number of lines of code, since the GeometryElement class is now in itself enumerable.
+Here is a code snippet from CmdSlabBoundary.cs using the obsolete Objects property:
+
+<pre class="code">
+&nbsp; <span class="teal">GeometryElement</span> geo = floor.get_Geometry( opt );
+
+&nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; GetBoundary( polygons, solid );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>This can now be replaced by a shorter version iterating over the geometry element itself directly, like this:
+ 
+<pre class="code">
+&nbsp; <span class="teal">GeometryElement</span> geo = floor.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; GetBoundary( polygons, solid );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Put differently, we used to access a GeometryObjectArray containing the geometry objects from the geometry element using its Objects property:
+
+<pre class="code">
+&nbsp; <span class="teal">GeometryObjectArray</span> objs = ge.Objects; <span class="green">// 2012</span>
+</pre>
+
+<p>Nowadays, the geometry element itself is an enumeration of the contained objects, and derived from the appropriate interface to access them:
+
+<pre class="code">
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">GeometryObject</span>&gt; objs = ge; <span class="green">// 2013</span>
+</pre>
+
+<p>I did not replace the use of the Objects property in those places that query the number of elements contained, since the new enumerator interface does not return that information directly, whereas the GeometryObjectArray provides a Size property returning the total count of collection members.
+
+<p>After this cleanup, I am left with 
+
+<a href="zip/bc_migr_2013_5.txt">
+zero errors and 13 warnings</a>,
+
+which I am happy to live with for the moment, since I have other things to do besides this.
+
+
+
+<a name="6"></a>
+
+<h4>Updated Group and Ungroup Methods</h4>
+
+<p>Well, actually, since its return value is not used anywhere, it costs me little effort to replace the two calls to the obsolete Group.Ungroup method by calls to the replacement method UngroupMembers in CmdDuplicateElement.cs.
+
+<p>Oh, and in the same module, it is also easy to fix the call to the obsolete overload of NewGroup taking an ElementSet argument:
+
+<pre class="code">
+&nbsp; <span class="teal">Group</span> group = doc.Create.NewGroup(
+&nbsp; &nbsp; uidoc.Selection.Elements );
+</pre>
+
+<p>The Selection class already provides a method GetElementIds returning a collection of element ids, so we can simply plug that in instead to invoke the other overload:
+
+<pre class="code">
+&nbsp; <span class="teal">Group</span> group = doc.Create.NewGroup(
+&nbsp; &nbsp; uidoc.Selection.GetElementIds() );
+</pre>
+
+<p>Now we are down to 
+
+<a href="zip/bc_migr_2013_6.txt">
+zero errors and ten warnings</a>.
+
+<p>Phew.
+
+
+<a name="7"></a>
+
+<h4>Pre-Release Revit 2013 Version for Revit 2012 Comparison</h4>
+
+<p>Here is 
+
+<a href="zip/bc_13_98_0.zip">
+version 2013.0.98.0</a>,
+
+the pre-release version of The Building Coder samples for Revit 2013.
+To compare it with the last Revit 2012 release, please refer to the version 2012.0.98.0, which introduced the command
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/remove-dwf-links.html">
+CmdRemoveDwfLinks</a>.
+
+
+<a name="8"></a>
+
+<h4>Final Initial Revit 2013 Version</h4>
+
+<p>At long last, to wrap this up, here is the final
+
+<a href="zip/bc_13_98_1.zip">
+version 2013.0.98.1</a> of 
+
+The Building Coder samples for Revit 2013.
+The difference to the previous one is a global update of all the copyright comments from 2011 to 2012, which makes just about every single file different from the Revit 2012 version.
+I postponed this to allow for easier comparison between the last Revit 2012 version 2012.0.98.0 and the pre-release Revit 2013 version 2013.0.98.0.
+
+<p>Phew again, and enjoy.

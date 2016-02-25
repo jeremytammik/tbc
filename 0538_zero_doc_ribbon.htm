@@ -1,0 +1,200 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1264959 [How to Enable Menu Panels and Menu Items in Zero Document Mode]
+1266417 [Enable ribbon buttons wtih no active document]
+Saikat Bhattacharya Re: enable ribbon items in zero document state 
+
+-->
+
+<h3>Enable Ribbon Items in Zero Document State</h3>
+
+<p>Several people have asked about how to activate their custom add-in panel items when Revit is in zero document state, i.e. when no document has been opened in the Revit user interface:</p>
+
+<center>
+<img src="img/zero_doc_state.png" alt="Zero document state" width="400"/>
+</center>
+
+<p>For an external command, it is no big deal: if you set both its transaction mode and regeneration option to Manual, it will appear in the Revit ribbon panel under Add-Ins > External > External Tools and also be available in zero document state:</p>
+
+<center>
+<img src="img/zero_doc_state_external_tools.png" alt="Zero document state external tools" width="400"/>
+</center>
+
+<p>However, as you can see, all of the panels defined by external applications are disabled in this state.
+
+<p>Here is the code of an initial version of the external application ZeroDocPanel creating the right-most ribbon panel and push button that you see above and which is disabled in zero document state:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption = <span class="maroon">&quot;Zero Doc Panel&quot;</span>;
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption2 = <span class="maroon">&quot;Zero Doc Button&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _path 
+&nbsp; &nbsp; = System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; .GetExecutingAssembly().Location;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> p = a.CreateRibbonPanel( Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PushButton</span> b = p.AddItem(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PushButtonData</span>( Caption2, Caption2,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Path</span>.GetDirectoryName( _path ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ZeroDocPanel.Command&quot;</span> ) ) <span class="blue">as</span> <span class="teal">PushButton</span>;
+&nbsp;
+&nbsp; &nbsp; b.ToolTip = <span class="maroon">&quot;This is the zero doc panel button tooltip&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>This leads to the following question:
+
+<p><strong>Question:</strong> I want to enable the ribbon items in a panel defined by my external application in zero document state. 
+How can I achieve that, please?
+
+<p>In the Revit API help file RevitAPI.chm, I see a statement saying that "The push button will be disabled when there is no active document unless availability class of that button returns true". 
+Could you please elaborate on this?
+
+<p><strong>Answer:</strong> Yes, this statement is correct. 
+Buttons defined by an external application are disabled by default in zero document state. 
+If you provide an appropriate external command availability class implementation and return true, they will be enabled. Have you tried this?
+
+<p>We discussed the availability class in the presentation of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">
+RevitAddInUtility</a>, 
+
+and also touched on it briefly when looking at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-product-guids.html#1">
+Revit 2011 product GUIDs</a>, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#2">
+add-in manifest tags</a>, and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/pipe-to-conduit-converter.html">
+pipe to conduit converter</a>
+
+<p>Besides being applied to external commands, you can also use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/simulating-a-ribbon-textbox-label.html">
+PushButton AvailabilityClassName property</a> to
+
+control visibility of individual buttons.
+
+<p>By the way, you have to read the documentation of the IExternalCommandAvailability interface pretty carefully. 
+One of the statements it makes is "This interface should share the same assembly with add-in External Command".
+
+<p>Let's enhance the external application presented above to enable its panel in zero document state.
+As said, we need to implement the IExternalCommandAvailability interface.
+Here is a very trivial implementation that simply always returns true:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Availability</span> 
+&nbsp; : <span class="teal">IExternalCommandAvailability</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsCommandAvailable(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> a, 
+&nbsp; &nbsp; <span class="teal">CategorySet</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>Here is the enhanced code of the ZeroDocPanel external application making use of the command availability class:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption = <span class="maroon">&quot;Zero Doc Panel&quot;</span>;
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption2 = <span class="maroon">&quot;Zero Doc Button&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _path 
+&nbsp; &nbsp; = System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; .GetExecutingAssembly().Location;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> d = <span class="blue">new</span> <span class="teal">PushButtonData</span>( 
+&nbsp; &nbsp; &nbsp; Caption2, Caption2, _path, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ZeroDocPanel.Command&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; d.AvailabilityClassName 
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;ZeroDocPanel.Availability&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> p = a.CreateRibbonPanel( Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PushButton</span> b = p.AddItem( d ) <span class="blue">as</span> <span class="teal">PushButton</span>;
+&nbsp;
+&nbsp; &nbsp; b.ToolTip 
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;This is the zero doc panel button tooltip&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//b.AvailabilityClassName </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; = &quot;ZeroDocPanel.Availability&quot;;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( 
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>One important thing to note is that the AvailabilityClassName property must be set on the PushButtonData instance before adding the push button to the panel, i.e. before calling the AddItem method with the PushButtonData information.
+
+<p>Setting this property afterwards will have no effect!
+
+<p>Alternatively, one can set the AvailabilityClassName property on the resulting PushButton instance itself after it has been added.
+
+<p>And, as said, the command availability class and external command implementation must live in the same .NET assembly.
+In our case, both of them and the external application implementation as well all share the same assembly.
+
+<p>Here is the ZeroDocPanel external application showing its activated push button in zero document state:
+
+<center>
+<img src="img/zero_doc_state_panel_enabled.png" alt="Zero document state ribbon panel enabled" width="400"/>
+</center>
+
+<p>Here is 
+
+<!-- 
+
+C:\a\j\adn\case\bsd\1266417\src\ZeroDocPanel
+C:\a\doc\revit\blog\zip\ZeroDocPanel.zip
+
+-->
+
+<a href="zip/ZeroDocPanel.zip">
+ZeroDocPanel.zip</a> containing 
+
+the entire source code and Visual Studio solution implementing this add-in.
+
+<a name="addendum"></a>
+
+<p><strong>Addendum:</strong> As Arno&scaron;t points out in his comment below, the Transaction attribute shown above is unnecessary and will be ignored.
+I discuss this issue in more detail in an updated note on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/external-application-attributes.html">
+external application attributes</a>, 
+
+and removed the attribute in the zip file above.

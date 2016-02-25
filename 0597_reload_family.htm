@@ -1,0 +1,259 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1270038 [changing family type]
+199_family_api.htm
+302_ifamilyloadoptions.htm
+
+-->
+
+<h3>Reloading a Family</h3>
+
+<p>Here is an impressively complete list of pretty fundamental beginner's issues that you might potentially run into when reloading a family, starting from scratch, from a recent case handled by my colleague Joe Ye.
+One of the interesting points that Joe ends up making is that in order to reload a family that has already been loaded into the document, you can use the LoadFamily overload taking an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/ifamilyloadoptions-and-gemini.html">
+IFamilyLoadOptions</a> argument.
+
+Before and after getting to that stage, here are some other issues that you can potentially run into and need to resolve:
+
+<ol>
+<li><a href="#1">Replacing the family type or symbol of a family instance with another type</a>.
+<li><a href="#2">Setting up an appropriate transaction</a>.
+<li><a href="#3">Reloading an already loaded family</a>.
+<li><a href="#4">Creating a new family type</a>.
+</ol>
+
+<a name="1"></a>
+
+<h4>1. Changing the Symbol of a Family Instance</h4>
+
+<p><strong>Question:</strong> How can I replace the family type or symbol of a family instance with some other type via the API?
+
+<p><strong>Answer:</strong> The type of a family instance can be changed by modifying its Symbol property. 
+You can simply assign a new FamilySymbol instance to FamilyInstance.Symbol property.
+Here is some pseudo code to illustrate this:
+
+<pre class="code">
+  // the code to retrieve the new family symbol:
+
+  FamilySymbol newSymbol = ... ;
+
+  // the code to access the family instance:
+
+  FamilyInstance famInstance = ... ;
+
+  // change the family instance type:
+
+  famInstance.Symbol = symbol1;
+</pre>
+
+<p>By the way, the Revit SDK provides the Revit Developer Guide PDF file, which can guide you to the knowledge of programming on Revit and also provides some real sample code to achieve exactly what you need.
+
+
+
+<a name="2"></a>
+
+<h4>2. Setting up an Appropriate Transaction</h4>
+
+<p><strong>Question:</strong> I followed your advice, but now I am facing an exception saying "A sub-transaction can only be active inside an open Transaction" in the following line:
+
+<pre class="code">
+  // add a new type and edit its parameters 
+  FamilyType newFamilyType 
+    = familyManager.NewType("2X2"); 
+</pre>
+
+<p>I am trying to add a new type to the family in order to assign that as a replacement symbol to the family instance.
+What could be going wrong here?
+
+<p><strong>Answer:</strong> The reason might be that you have set up a manual transaction mode for your command. 
+You have to specify either manual or automatic transaction mode for you command.
+You probably set up manual mode but omitted to explicitly start a transaction.
+You can either change the mode to Automatic, or leave it as Manual and add the code to start and commit the transaction.
+
+<p>Here is an example of automatic transaction mode: 
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Automatic )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; EditFamilyTypes( doc, famInstance );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is an example of retaining the manual transaction model: start your own transaction first, and then commit it after executing the code to change the model:
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute( 
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData, 
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages, 
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, <span class="maroon">&quot;ExComm&quot;</span> );
+&nbsp; &nbsp; trans.Start();
+&nbsp;
+&nbsp; &nbsp; EditFamilyTypes( doc, famInstance );
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+} 
+</pre>
+
+
+<a name="3"></a>
+
+<h4>3. Reloading an Already Loaded Family</h4>
+
+<p><strong>Question:</strong> The transaction handling improved matters.
+Now the execution stops at the line
+
+
+<pre class="code">
+  family = familyDoc.LoadFamily(doc); 
+</pre>
+
+It returns an error saying "Family loading failed".
+
+<p><strong>Answer:</strong> The error occurs because the family is already present in the current model. 
+If you use the Document.LoadFamily method overload taking a Document argument only to reload an existing family document, it will always fail.
+Instead, you should use the LoadFamily overload that accepts an argument implementing the IFamilyLoadOptions interface.
+Here is a simple implementation of such a class:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">FamilyOption</span> : <span class="teal">IFamilyLoadOptions</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> OnFamilyFound(
+&nbsp; &nbsp; <span class="blue">bool</span> familyInUse,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">bool</span> overwriteParameterValues )
+&nbsp; {
+&nbsp; &nbsp; overwriteParameterValues = <span class="blue">true</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> OnSharedFamilyFound(
+&nbsp; &nbsp; <span class="teal">Family</span> sharedFamily,
+&nbsp; &nbsp; <span class="blue">bool</span> familyInUse,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="teal">FamilySource</span> source,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">bool</span> overwriteParameterValues )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>With the IFamilyLoadOptions implementation in place, you can call the appropriate LoadFamily overload:
+
+<pre class="code">
+  family = familyDoc.LoadFamily(
+    doc, new FamilyOption() );
+</pre>
+
+<!--
+
+<p>Using this complicated sample to show the usage of changing a family type is not necessary, so I also wrote a simple command that changes a selected family instance symbol/type. 
+It retrieves all available family symbols that can be used for the picked family instance, and assigns one of them to the family instance:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command1</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">UIApplication</span> app;
+&nbsp; <span class="blue">public</span> <span class="teal">Document</span> doc;
+&nbsp; <span class="blue">public</span> <span class="teal">UIDocument</span> uidoc;
+&nbsp;
+&nbsp; <span class="teal">Result</span> <span class="teal">IExternalCommand</span>.Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; app = commandData.Application;
+&nbsp; &nbsp; doc = app.ActiveUIDocument.Document;
+&nbsp; &nbsp; uidoc = <span class="blue">new</span> <span class="teal">UIDocument</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; &nbsp; trans.Start( <span class="maroon">&quot;changeSymbol&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> ref1 = sel.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a family instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> famInstance = ref1.Element <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> famSymbol = famInstance.Symbol;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; symbols = famSymbol.GetSimilarTypes();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> famSymbolOther = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">false</span> == id.Equals( famSymbol.Id ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; famSymbolOther = doc.get_Element( id ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( famSymbolOther != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; famInstance.Symbol = famSymbolOther;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+-->
+
+
+
+<a name="4"></a>
+
+<h4>4. Creating a New Family Type</h4>
+
+<p><strong>Question:</strong> The updated code works fine when I only select one object.
+If I select more than one object, it gives me error in the following line:
+
+<pre class="code">
+  newFamilyType = familyManager.NewType("xx"); 
+</pre>
+
+The error says "The type name xx is already in use".
+I need to able to select and modify the type of more than one object, and assign all of them the new type "xx".
+How can I achieve that, please?
+
+<p><strong>Answer:</strong> If you are trying to change the type of more than one family instance, the new type does not need to be created repeatedly. 
+For the second family instance, you can bypass the code creating a new type using an 'if' conditional statement.
+
+<p>For completeness sake, here is <a href="zip/ReloadFamily.zip">ReloadFamily.zip</a> containing the complete Revit 2011 source code and Visual Studio solution of these various code snippets.
+
+<p>Many thanks to Joe for this exhaustive explanation.

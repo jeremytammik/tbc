@@ -1,0 +1,78 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Create a Mass from 3D Points</h3>
+
+<p>This post unfortunately does not provide a complete solution to an interesting task, just a couple of ideas.
+
+<p>In his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html?cid=6a00e553e1689788330163036ac734970d#comment-6a00e553e1689788330163036ac734970d">
+comment</a>
+
+on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a>
+
+Ammar asks:
+
+
+<p><strong>Question:</strong> Is there a way to generate a mass from a list of X, Y, Z points?
+
+
+<p><strong>Answer:</strong> Unfortunately I do not see any way to achieve this through the Revit API directly.
+
+<p>I can imagine using some external tool such as ACIS or AutoCAD, feed it the points, generate a SAT file, create a family definition from that, and insert an instance of it into your model.
+
+<p>Here are a couple of ideas that colleagues of mine came up with, though:
+
+<p><strong>1.</strong> You cannot make a surface directly from the points &ndash; you will need to first make curves that pass through the points and then can use NewLoftForm with the curves.
+
+<p><strong>2.</strong> I think it would be a pretty difficult task to do this directly in Revit, based on the limitations of the form element.  
+
+<p>Conceptually, I think you could do it, but it would be some heavy lifting.  
+In order to insure not having self intersecting forms, you would need to do something like Nathan Miller's crazy redundant lines in his 
+
+<a href="http://theprovingground.wikidot.com/vasari-python-supershape">
+Vasari RevitPythonShell 3D supershape</a>.
+
+<p>In order to make the splines themselves, you would need to make groupings of points that were sequential layers and also reasonably well ordered sequences of points, as the spline by points and loft operations both just derive a shortest path in order to create surfaces and splines.  
+
+<p><strong>3.</strong> Given an arbitrary number of 3D points that describe a convex hull, you could pass them through a 
+
+<a href="http://en.wikipedia.org/wiki/Delaunay_triangulation">
+Delaunay triangulation</a> algorithm 
+
+and then create 2D FormElement surfaces to patch between each set of 3 points. 
+I don't see the reason why you would want to start with points though. 
+Starting with curves or some higher-order structure would probably be better.
+
+<p>Looking at it the other way around, perhaps you are not looking to just make a surface or a form. 
+You could easily place mass family instances on the points, or use an adaptive component to thread between multiple points like a truss, for example. 
+
+<p>By the way, we have created a new set of SDK samples that show more things you can do with Massing and the Revit API on the 
+
+<a href="http://www.revitnet.blogspot.com">
+Revit .NET Development</a> blog.
+
+<p>Take a look at this highly interesting blog and its collection of exciting Revit and Vasari .NET samples.
+
+<p><strong>4.</strong> The point with Don Rudder's new samples is that there is much more you can do with the conceptual design environment and it's API than simply creating surfaces and solids. 
+
+<p>Often users wish to place family instances in certain spots defined by XYZ coords. 
+Don's examples do that, as do Ian Keogh's
+
+<a href="http://wikihelp.autodesk.com/Vasari/enu/Community/Work_in_Progress/Dynamo_for_Vasari">
+Dynamo Visual Programming for Vasari</a> ones. 
+
+<p><strong>5.</strong> If you are interesting in making raw form from points, I also suggest taking a look at this really slick new 
+
+<a href="http://theprovingground.wikidot.com/revit-api-py-parametric">
+Mobius surface parametric form</a> sample by
+
+Nathan Miller, just posted.
+
+<p>I am quite surprised and very impressed by the amount of exciting samples available in this realm.
+I was previously not aware of that at all.

@@ -1,0 +1,80 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Deeper Parameter Exploration</h3>
+
+<p>We already discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploring element parameters</a>
+
+in some depth.
+Nicholas raised a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html?cid=6a00e553e16897883301156fc3e679970b#comment-6a00e553e16897883301156fc3e679970b">
+question</a>
+
+on this that prompted me to take the discussion one step further:</p>
+
+<p><strong>Question:</strong>
+I noticed for certain special parameters I can't access the value.
+For example with Lighting Fixtures, there are parameters like Light Loss Factor, Initial Intensity and Initial Color. The value field is a button, which opens a special window.
+Do you think it's possible to access the value of these parameters?
+These parameters are available when there is a Light Source Definition in the family and can be found under the Type parameters.
+When I check the ParameterType property on them, the result is "Invalid".
+Their value is "0" and its StorageType is Integer.</p>
+
+<p><strong>Answer:</strong>
+I found a component that has the parameters that you are interested in.
+It is the studio light, which I can insert using Modelling &gt; Component CM &gt; Load &gt; Lighting Fixtures &gt; M_Studio Light.rfa.
+In the Revit user interface element properties dialogue, I see these properties, and I see that their value field is a button which opens a special custom dialogue to edit their settings.</p>
+
+<p>Looking at the element instance parameters using the built-in parameter checker that is part of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20081117.zip">
+Revit API introduction labs</a>,
+
+I see that several different parameters seem to be related to these.
+They all seem to be associated with FBX and rendering.
+Here is a partial list, as obtained from the built-in parameter checker (copy and paste to an editor to see complete text of truncated over-long lines):</p>
+
+<pre>
+FBX_LIGHT_LOSS_FACTOR_CTRL : Light Loss Factor : Integer
+FBX_LIGHT_INITIAL_COLOR_CTRL : Initial Color : Integer
+FBX_LIGHT_LOSS_FACTOR_METOD : Light Loss Input Method : Integer/Integer
+FBX_LIGHT_INITIAL_COLOR_NAME : Temperature Color : Integer
+FBX_LIGHT_INITIAL_INTENSITY_INPUT_METOD : Initial Light Intensity Input Method : Integer/Integer
+FBX_LIGHT_SURFACE_LOSS : Surface Depreciation Loss : Double
+FBX_LIGHT_LAMP_TILT_LOSS : Lamp Tilt Loss : Double
+FBX_LIGHT_VOLTAGE_LOSS : Voltage Loss : Double
+FBX_LIGHT_TEMPERATURE_LOSS : Temperature Loss : Double
+FBX_LIGHT_COLOR_FILTER : Color Filter : Integer
+FBX_LIGHT_INITIAL_COLOR_TEMPERATURE : Initial Color Temperature : Double
+FBX_LIGHT_INITIAL_INTENSITY : Initial Intensity : Integer
+FBX_LIGHT_BALLAST_LOSS : Ballast Loss : Double
+FBX_LIGHT_TOTAL_LIGHT_LOSS : Total Light Loss Factor : Double
+</pre>
+
+<p>As you say, most of these have the storage type Integer, although some have Double, their values are all zero, and they are all marked as read-write.</p>
+
+<p>Notice that a few of these have a rather strange value type of Integer/Integer, and their built-in parameter enumeration name has the suffix METOD. I assume this is a misspelling of 'method', and that these parameters internally provide access to some event handling routines which display the dialogues you are seeing for inputting the values.</p>
+
+<p>Exploring these further, I found out how to read two of the parameter values that you are asking for.
+As you say, these are type parameters, not instance ones.</p>
+
+<p>I first set up my own values for the parameters I am exploring through the Revit user interface element properties dialogue, and then use the built-in parameter checker to see how to access the values through the API.</p>
+
+<p>Select the studio light instance &gt; Right click context menu &gt; Element properties... &gt; Edit/New to access the type properties. Type Properties &gt; Light Loss Factor &gt; a dialogue appears. Drag the slider or enter a value in the edit box, such as 3.45. Click OK twice. Select the instance again, open the built-in parameter checker, and select the type parameters by answering 'No' to  the question:
+
+<i>"This element is a family instance, so it has both type and instance parameters. By default, the instance parameters are displayed. If you select 'No', the type parameters will be displayed instead. Would you like to see the instance parameters?"</i></p>
+
+<p>Look at the value of the parameter FBX_LIGHT_TOTAL_LIGHT_LOSS 'Total Light Loss Factor'. It contains the Light Loss Factor value you just entered.</p>
+
+<p>Similarly, I set the values of Initial Intensity to 4567.00 lm and used the built-in parameter checker to find its value in the parameter FBX_LIGHT_LIMUNOUS_FLUX 'Luminous Flux'.</p>
+
+<p>I hope this answers your question, and also explains better what use we can make of the built-in parameter checker to explore the Revit model and its data. It also shows that we really do have pretty good access to the data we are interested in.</p>

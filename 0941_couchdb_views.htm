@@ -1,0 +1,371 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+<!-- <script src="google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<h3>My Cloud-Based 2D Editor Implementation Status</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+here are some issues I tackled since my last report:
+
+<ul>
+<li><a href="#2">Updated project description and status</a></li>
+<li><a href="#4">CouchDB SVG editor implementation</a></li>
+<li><a href="#5">Home page: list all models and select one</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Updated Project Description</h4>
+
+<p>I originally thought I would be implementing three cooperating components: the Revit add-in, a cloud-based data repository, and a browser-based JavaScript SVG viewer and editor client for the mobile devices.</p>
+
+<p>After struggles with and resolution of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#4">
+same origin policy</a>,
+
+I discover that I need to use
+
+<a href="http://en.wikipedia.org/wiki/Server-side_scripting">
+server-side scripting</a> instead,
+
+which moves all the JavaScript and SVG handling to the cloud-based data repository component as well.</p>
+
+<p>I updated my proposal accordingly as follows:</p>
+
+
+<a name="3"></a>
+
+<h5>Cloud-based Round-trip 2D Revit Model Editing on any Mobile Device using Server-side Scripting, CouchDB and SVG</h5>
+
+<p>I demonstrate round-trip editing a 2D rendering of a Revit model on any mobile device with no need for installation of any additional software whatsoever beyond a browser.</p>
+
+<p>How can this be achieved?</p>
+
+<p>A Revit add-in exports polygon renderings of room boundaries and other elements such as furniture and equipment to a cloud-based repository implemented using a CouchDB NoSQL database.</p>
+
+<p>On the mobile device, the repository is queried and the data is rendered in a standard browser using server-side generated JavaScript and SVG.</p>
+
+<p>The rendering supports graphical editing, specifically translation and rotation of the furniture and equipment.</p>
+
+<p>Modified transformations are saved back to the cloud database.</p>
+
+<p>The Revit add-in picks up these changes and updates the Revit model in real-time.</p>
+
+<p>All of the components used except Revit are completely open source.</p>
+
+<p>This round-trip editing workflow is based on the following main components:</p>
+
+<ul>
+<li>A Revit add-in that determines room boundary and furniture and equipment family instance polygons for a simplified 2D plan view rendering.</li>
+<li>A cloud-based database repository managing the models, levels, rooms, furniture, equipment meta- and polygon data.</li>
+<li>A server hosted JavaScript SVG editor running in the browser on any device, rendering the model and supporting simple geometric modification of the model.</li>
+</ul>
+
+<!--
+Intended Audience and Prerequisites
+
+Intended audience is programmers with interest in cloud-based and mobile computing, specifically interest in round-trip editing of a Revit model using a cloud-based data repository and editing a 2D model on an arbitrary mobile device with no additional software beyond a browser.  Knowledge of .NET, JavaScript and REST programming is helpful but not required. Revit add-in experience is not a prerequisite.
+-->
+
+<p>The presentation outline, the final proof of the pudding, looks like this:</p>
+
+<ul>
+<li>Show a Revit model.</li>
+<li>Export the model to a cloud-based data repository.</li>
+<li>Query and display the repository contents as a 2D rendering on a mobile device.</li>
+<li>Edit the model in the browser on the mobile device, updating the data repository.</li>
+<li>Watch the BIM in Revit auto-update.</li>
+</ul>
+
+<p>I have now completed the implementation of all these steps with the single minute exception of the prefix 'auto'.</p>
+
+<p>In other words, I currently have two commands in my Revit add-in:</p>
+
+<ul>
+<li>CmdUpload uploads the room and equipment boundary data to the cloud repository, either from a manually selected set of rooms, or all rooms in the model.</li>
+<li>CmdUpdate retrieves the changes applied to furniture and equipment on the mobile device. This is currently a command triggered by the user.</li>
+</ul>
+
+<p>The next step for me will be adding the 'auto' to the update, i.e. the implementation of an external event that subscribes to changes in the cloud database caused by the user editing the furniture and equipment transforms on the mobile device and automatically applies real-time updates to the BIM.</p>
+
+<p>Before I get to that, though, I have a huge backlog of information to share about all that has already been achieved, and how.</p>
+
+<p>Without further ado, here is a little two-minute film demonstrating the current functionality to give you the idea:</p>
+
+<!-- http://youtu.be/-FjXWokH1Ss -->
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/-FjXWokH1Ss" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<a name="4"></a>
+
+<h4>CouchDB SVG Editor Implementation</h4>
+
+<p>I described the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#2">
+room editor database structure</a> consisting
+
+of the model, level and room hierarchy.</p>
+
+<p>Furniture and equipment instances are placed within the room and refer to separate symbol objects that store their geometry.</p>
+
+<p>Two of the main tasks listed in my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#10">
+last to-do list</a> were:</p>
+
+<ul>
+<li>Implement the rendering and editing of the 2D plan view in SVG on the mobile device.</li>
+<li>Reflect the modifications made back to the cloud-based CouchDB data repository.</li>
+</ul>
+
+<p>Let's look at how I achieved that.</p>
+
+<p>First, I must admit that I struggled quite a bit and burnt a significant amount of night oil on this.
+Maybe it would have been more efficient to do some reading up on basics before starting.
+Instead, I found various tutorials that did "almost" what I wanted that I tried to reproduce and tweak.
+Each and every one finally turned into a dead end, and I was thrown back to square one, or sometimes square 1.15 or so.</p>
+
+<p>One impressive little sample application that really did help was
+
+<a href="http://mauget.cloudant.com/opto3/_design/opto/index.html">Opto3</a>,
+
+a small CouchDB application entirely hosted within CouchDB.
+It uses JQuery Mobile to serve a single-page mobile application that presents a four-panel drill-down approach to find an optometrist in a desired US location.</p>
+
+<center>
+<img src="img/eyes26.gif" alt="Optometrician CouchDB app"/>
+</center>
+
+<p>All the information stems from one single CSV file of US optometrician addresses.
+Here is its
+
+<a href="https://github.com/mauget/opto3-couchapp#readme">description</a>,
+
+<a href="https://github.com/mauget/opto3-couchapp">GitHub project repository</a> and
+
+<a href="http://www.codeproject.com/Articles/499988/AplusMobileplusApplicationplusServedplusFromplusCo">
+CodeProject article</a> that
+
+also provides a useful list of additional references.</p>
+
+<p>As
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html#6">
+said</a>,
+
+I can use <a href="http://kan.so">Kanso</a> to maintain and install the database, push the views and upload my documents in JSON format to the local CouchDB database 'roomedit' using commands such as these:</p>
+
+<pre class="code">
+$ kanso install
+
+$ kanso push http://localhost:5984/roomedit
+
+$ kanso upload mydata.json http://localhost:5984/roomedit
+</pre>
+
+<p>I ended up implementing my totally own version of a CouchDB application, unlike anything I saw in any of the samples.</p>
+
+<p>Basically, I only use a couple of CouchDB views and a rather heavy-weight index.html file that renders them for various contexts, guiding the user through the model and room selection process and finally displaying the SVG editor page.</p>
+
+<p>The selection logic is simple:</p>
+
+<ul>
+<li>Home page: list all models and prompt to select one of them.</li>
+<li>Model selected: list all levels in model and prompt to select one of them.</li>
+<li>Level selected: list all rooms on the level and prompt to select one of them.</li>
+<li>Room selected: display the room boundary and the furniture and equipment instances graphically and enable editing their location and rotation.</li>
+</ul>
+
+<p>The first three steps were not so hard once I understood about CouchDB views and discovered how to render them in index.htm.</p>
+
+<p>Integrating the SVG editor posed some really tough problems, but ended up being really simple as well.</p>
+
+<p>For a while I was unsure whether I would be able to use the <a href="http://raphaeljs.com">Raphaël</a> JavaScript SVG library as is, or whether it needed to be packaged as a Kanso package.
+As it turned out, that was not necessary.
+Until I discovered that the hard way, though, I tried to avoid the use of any non-Kanso libraries at all, and struggled with SVG editing issues instead.</p>
+
+<p>So let's start by looking at the simplest step first, how to list all models and prompt the user to select one of them.</p>
+
+
+<a name="5"></a>
+
+<h4>Home Page: List all Models and Select One</h4>
+
+<p>The initial home page of my application is very simple.
+It looks like this, listing the available models and prompting the user to select one of them:</p>
+
+<center>
+<img src="img/roomedit_home_screen.png" alt="Roomedit home page populated by JavaScript from CouchDB view"/>
+</center>
+
+<p>I represent each Revit model as a separate CouchDB document.
+All the data it carries is inherited from the DbObj base class, which specifies its type "model", description and name.
+I populate the two latter with information from the Revit ProjectInfo singleton object, and I use the Revit UniqueId as the CouchDB document identifier as well.</p>
+
+<p>The resulting CouchDB JSON representation of my sample model looks like this (copy to an editor or view the HTML source to see the truncated lines in full):</p>
+
+<pre class="prettyprint">
+{
+  "_id": "bf0552b6-b7f7-4331-96d5-b19843262895-00015084",
+  "_rev": "14-4e1c947c3d3e354117a1f016f2e23f63",
+  "type": "model",
+  "description": "ProjectInfo Project Information &lt;86148 Project Information&gt;",
+  "name": "room_with_hole.rvt"
+}
+</pre>
+
+<p>CouchDB implements and extremely scalable architecture and can host millions of documents.</p>
+
+<p>Views are used to efficiently extract the ones required.
+A view can implement a map and a reduce function.
+The map function identifies the documents of interest and maps them to a key-value pair.
+The optional reduce function can be applied to reduce the results by accumulation or other means.
+I have no use for reduce in my application.</p>
+
+<p>To list all available models, I use an utterly trivial view function that does not even create real key-value pairs.
+All I need is to extract all model documents and list the model document information itself, so I just emit all model documents as keys directly:</p>
+
+<pre class="prettyprint">
+exports.models = {
+  map: function (doc) {
+    if( 'model' == doc.type ) {
+      emit(doc, null);
+    }
+  }
+};
+</pre>
+
+<p>To render the results of the view into my HTML target file, I define the following scaffolding:</p>
+
+<pre class="prettyprint">
+  &lt;h1&gt;Room Editor&lt;/h1&gt;
+
+  &lt;div id="content"&gt;&lt;/div&gt;
+
+  &lt;ul id="navigatorlist"&gt;&lt;/ul&gt;
+</pre>
+
+<p>In the JavaScript section, I require the Kanso db and jquery packages:</p>
+
+<pre class="prettyprint">
+  var db = require('db').current();
+  var $ = require('jquery');
+</pre>
+
+<p>The db package provides access to the current CouchDB database, and jquery is a Kanso wrapper for the standard jquery library.</p>
+
+<p>Oh, and what is Kanso itself?
+Kanso is a framework enabling me to maintain my CouchDB views and other bits and pieces in standard file system files on the hard disk and upload them easily to the CouchDB database.</p>
+
+<p>With that in place, the following JavaScript code queries the 'models' view and populates the HTML placeholder tags:</p>
+
+<pre class="prettyprint">
+// display a menu of all available models
+
+db.getView('room_loops', 'models',
+  function (err, data) {
+    if (err) {
+      return alert(err);
+    }
+    var n = data.rows.length;
+    for (var i = 0; i &lt; n; ++i) {
+      var doc = data.rows[i].key;
+      var s = url + '?modelid=' + doc._id;
+      $('&lt;li/&gt;').append($('&lt;a&gt;')
+        .attr('href',s)
+        .text(doc.name))
+      .appendTo('#navigatorlist');
+    }
+    var p = $('&lt;p/&gt;').appendTo('#content');
+    p.append( $('&lt;a/&gt;').text('Home').attr('href',url) );
+    p.append( document.createTextNode( three_spaces ) );
+    p.append( $('&lt;a/&gt;').text('Back').attr('href',url) );
+
+    $('&lt;p/&gt;')
+      .text( 'Please select a model in the list below.' )
+      .appendTo('#content');
+
+    var prompt = n.toString() + ' model'
+      + pluralSuffix( n ) + dotOrColon( n );
+
+    $('&lt;p/&gt;').text( prompt ).appendTo('#content');
+  }
+);
+</pre>
+
+<p>As you can see, the db.getView method is provided with three arguments: the database name, the view name, and a call-back function.</p>
+
+<p>Understanding how the call-back function works was another big stumbling block for me.</p>
+
+<p>In this simple case, all is clear, of course.</p>
+
+<p>We submit the query to get the view and return immediately.</p>
+
+<p>CouchDB processes the request and invokes the call-back function when completed.</p>
+
+<p>The call-back function processes the resulting data rows, extracting the model document data from the key provided with each row and populating the HTML scaffolding accordingly.</p>
+
+<p>Again, here is the final result with two models listed, just as you can see in the video above:</p>
+
+<center>
+<img src="img/roomedit_home_screen.png" alt="Roomedit home page populated by JavaScript from CouchDB view"/>
+</center>
+
+<p>Well, I am spending much too much time documenting this for you, and really need to get on with the implementation and my real day work, so I will call it wraps for today now.</p>
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+
+<h3>2D Mobile Revit Model Editing Update</h3>
+
+<p>By
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/jeremy-tammik.html">
+Jeremy</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">
+Tammik</a>.</i></p>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I updated the project description to emphasise more strongly that I am using pure client-side scripting to display and edit my graphical data, so there is nothing to implement or install at all on the mobile device, beyond testing that my server-side scripts really do their job.
+
+<p>The presentation outline looks like this:</p>
+
+<ul>
+<li>Show a Revit model.</li>
+<li>Export the model to a cloud-based data repository.</li>
+<li>Query and display the repository contents as a 2D rendering on a mobile device.</li>
+<li>Edit the model in the browser on the mobile device, updating the data repository.</li>
+<li>Watch the BIM in Revit auto-update.</li>
+</ul>
+
+<p>I have completed the implementation of all these steps with the single minute exception of the prefix 'auto'.</p>
+
+<p>In other words, I currently have two commands in my Revit add-in:</p>
+
+<ul>
+<li>CmdUpload uploads the room and equipment boundary data to the cloud repository, either from a manually selected set of rooms, or all rooms in the model.</li>
+<li>CmdUpdate retrieves the changes applied to furniture and equipment on the mobile device. This is currently a command triggered by the user.</li>
+</ul>
+
+<p>Here is a little two-minute film demonstrating the current functionality to give you the idea:</p>
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/-FjXWokH1Ss" frameborder="0" allowfullscreen></iframe>
+</center>

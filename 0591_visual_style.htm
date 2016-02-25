@@ -1,0 +1,88 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1263079 [API Load Family]
+1269885 [Create new view and set the visual style]
+
+-->
+
+<h3>Set the Visual Style of a View</h3>
+
+<p>Today is the day of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/chinese-revit-2012-api-webcast.html">
+Chinese Revit API webcast</a>, 
+
+and also the holiday of 
+
+<a href="http://en.wikipedia.org/wiki/Ascension_Day">
+Ascension Day</a> in
+
+many part of Europe.
+
+Just like last year, it is raining cats and dogs again.
+
+<p>Anyway, here is a useful answer to a little question that arises from time to time:
+
+<p><strong>Question:</strong> I'm creating a new 3D view of a family instance like this:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> v <span class="blue">As</span> <span class="teal">View3D</span> = doc.Create.NewView3D( _
+&nbsp; &nbsp; famInst.FacingOrientation)
+
+&nbsp; v.SectionBox = famInst.BoundingBox(v)
+</pre>
+
+<p>Now I would like to set its visual style to 'Shaded' or 'Shaded with Edges'. 
+
+<p>Is there any way to achieve this using the API? 
+
+<p><strong>Answer:</strong> The view style can be changed by modifying the value of the 'Visual Style' parameter, which corresponds to the built-in parameter MODEL_GRAPHICS_STYLE.
+
+Each option in the 'Visual Style' property drop-down list in the property dialog corresponds to an integer value from 0 to 6:
+
+<ol>
+<li>Wireframe
+<li>Hidden line
+<li>Shaded
+<li>Shaded with Edges
+<li>Consistent Colors
+<li>Realistic
+</ol>
+
+<p>In order to change the visual style to 'Shaded with edges', please set the parameter value to 4, for instance like this:
+
+<pre class="code">
+&nbsp; view.get_Parameter( 
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.MODEL_GRAPHICS_STYLE )
+&nbsp; &nbsp; .set( 4 );
+</pre>
+
+<p>These numbers may have changed since they were first established.
+You can determine the correct numbers to use yourself by simply cycling through all the styles manually and checking the current parameter value as an integer each time, e.g. using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">
+RevitLookup</a> tool.
+ 
+
+
+<h4>Project Vasari 2</h4> 
+
+<p>The 
+
+<a href="http://labs.autodesk.com/utilities/vasari/">
+technology preview 2</a> of 
+
+the conceptual design and analysis tool Project Vasari, which includes access to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/project-vasari-api.html">
+Revit API</a>,
+
+is now available in an updated version compatible with Revit 2012:</p>
+
+<center>
+<iframe width="440" height="275" src="http://www.youtube.com/embed/EnxEuFhTx-c" frameborder="0" allowfullscreen></iframe>
+</center>

@@ -1,0 +1,147 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1259133 [Curve must be in the plane] -->
+
+<h3>Detail Curve Must be in Plane</h3>
+
+<p>Here is a recent case concerning some Revit API behaviour that changed in the new release.
+
+<p><strong>Question:</strong> Were any major changes applied to the NewDetailCurve method?
+
+<p>In the Revit2011 API, I am getting an error saying "Curve must be in the plane". 
+Do I now have to project the curve object onto the plane myself, or is it still taken care of automatically like in Revit 2010?
+The code I am calling looks like this:
+
+<pre class="code">
+&nbsp; <span class="teal">DetailCurve</span> detailCurve
+&nbsp; &nbsp; = doc.Create.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, curve );
+</pre>
+
+<p><strong>Answer:</strong> When I look at the Revit 2011 API documentation information in RevitAPI.chm on the ItemFactoryBase.NewDetailCurve method, I see that it is designed to throw an ArgumentException when the curve is not in plane of the view.
+
+<p>In the Revit 2010 API, this exception is not documented. 
+
+<p>So there does indeed appear to be a change in behaviour between the two versions, and it does seem that you have to ensure that the geometry curve is projected onto the proper plane before calling this method.
+
+<p><strong>Response:</strong> So I will have to project the curve onto the plane before I draw a detail line. 
+This was previously done automatically.
+No problem. 
+Do you have any code showing how to project points to the plane?
+
+<p><strong>Answer:</strong> I demonstrate some simple projection of points in the discussions of
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygons</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">2D polygon areas</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">Polygon transformation</a>
+</ul>
+
+<p>Some basic info on the Transform class is provided in:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/03/transform.html">Transform class</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/transformations.html">Transformations</a>
+</ul>
+
+<p>Applying a transform to a curve is also discussed in:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/scale-a-curve.html">Scaling a curve</a>
+</ul>
+
+<p>Here is another example of a curve input argument that must reside in a specific plane:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/newsweptblend.html">NewSweptBlend</a>
+</ul>
+
+<p>I would suggest that you split the algorithm into two parts and implement separate independent methods for each of them:
+
+<ul>
+<li>Determine the plane that a curve lies in.
+<li>Rotate a curve from a given plane to the XY plane.
+</ul>
+
+<p>For the first step, you could ask the curve for its start and end points and some point in the middle that does not lie on the same line as the other two. 
+The latter can possibly be obtained by asking the curve for its parameter range and evaluating it in the middle, or by tessellation. In case of tessellation, you could iterate through the tessellation points and use each one together with the start and end points to try and determine a valid plane. 
+
+<p>In the case of the line, the tessellation only returns two points. 
+I once heard that that is the only element that does that, all non-linear curves return at least three. 
+So you could use this property to determine that the curve is a line (and add an assertion as well, if you like).
+
+<p>Once you have three points that are not in a line, you can use those to determine the normal vector of the plane in which the curve lies, assuming that it is planar.
+
+<p>If you are working with tessellation points, you can add debug assertions to ensure that the other tessellation points (if there are any more) are all in the same plane.
+
+<p>Actually, I went ahead and implemented what I describe above:
+
+<pre class="code">
+<span class="teal">XYZ</span> GetCurveNormal( <span class="teal">Curve</span> curve )
+{
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = curve.Tessellate();
+&nbsp; <span class="blue">int</span> n = pts.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 1 &lt; n, 
+&nbsp; &nbsp; <span class="maroon">&quot;expected at least two points &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;from curve tessellation&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p = pts[0];
+&nbsp; <span class="teal">XYZ</span> q = pts[n - 1];
+&nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp; <span class="teal">XYZ</span> w, normal = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 2 == n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( curve <span class="blue">is</span> <span class="teal">Line</span>, 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected non-line element to have &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;more than two tessellation points&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// for non-vertical lines, use Z axis to </span>
+&nbsp; &nbsp; <span class="green">// span the plane, otherwise Y axis:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dxy = <span class="teal">Math</span>.Abs( v.X ) + <span class="teal">Math</span>.Abs( v.Y );
+&nbsp;
+&nbsp; &nbsp; w = ( dxy &gt; <span class="teal">Util</span>.TolPointOnPlane )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">XYZ</span>.BasisZ
+&nbsp; &nbsp; &nbsp; : <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; normal = v.CrossProduct( w ).Normalize();
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp; &nbsp; <span class="blue">while</span>( ++i &lt; n - 1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; w = pts[i] - p;
+&nbsp; &nbsp; &nbsp; normal = v.CrossProduct( w );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !normal.IsZeroLength() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = normal.Normalize();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">#if</span> DEBUG
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal2;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( ++i &lt; n - 1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; w = pts[i] - p;
+&nbsp; &nbsp; &nbsp; &nbsp; normal2 = v.CrossProduct( w );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( normal2.IsZeroLength() 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">Util</span>.IsZero( normal2.AngleTo( normal ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected all points of curve to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;lie in same plane&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+<span class="blue">#endif</span> <span class="green">// DEBUG</span>
+&nbsp;
+&nbsp; }
+&nbsp; <span class="blue">return</span> normal;
+}
+</pre>
+
+<p>The second step is demonstrated in the <a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">polygon transformation</a> post I mentioned above.

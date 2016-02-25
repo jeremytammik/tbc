@@ -1,0 +1,196 @@
+﻿<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+Mikako Harada Re: Helper functions FindFamilyType and FindElement
+
+-->
+
+<h3>FindElement and Collector Optimisation</h3>
+
+<p>As I recently 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/video-animated-ribbon-item-tooltip.html#2">
+mentioned</a>, 
+
+Mikako Harada published a very nice article on
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/adjusting-cutback-programmatically-.html">
+programmatically adjusting beam cutback</a>.
+
+<p>It was followed it up by a description of some commonly used 
+
+<a href="http://adndevblog.typepad.com/aec/2012/09/helper-functions-findfamilytype-and-findelement.html">
+helper methods</a> to 
+
+find certain named elements and family symbols in a project.
+One of them is FindElement, implemented as follows in that post:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> FindElement(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Type</span> targetType,
+&nbsp; &nbsp; <span class="blue">string</span> targetName )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Get the elements of the given class </span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.WherePasses( 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( targetType ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Parse the collection for the </span>
+&nbsp; &nbsp; <span class="green">// given name using LINQ query.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; targetElems =
+&nbsp; &nbsp; &nbsp; <span class="blue">from</span> element <span class="blue">in</span> collector
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name.Equals( targetName )
+&nbsp; &nbsp; &nbsp; <span class="blue">select</span> element;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; elems = targetElems.ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( elems.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// We should have only one with the given name.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> elems[0];
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Cannot find it.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>It is important to be aware that this method can be optimised further in some aspects and should not be used indiscriminately.
+
+<p>Here are some points I would like to highlight:
+
+<ol>
+<li>Language dependence: should be avoided if possible.
+<li>Speed: could be improved by using a 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">
+parameter filter instead of LINQ</a>.
+
+<li>Conversion from a filtered element collector to .NET collections can often be avoided.
+</ol>
+
+<p>I avoid using the helper methods in this form wherever I can if performance is a factor.
+When is it not?
+
+<p>It is not always possible to avoid the language dependence.
+In any case, it is definitely important to be aware of the issue.
+
+<p>In detail:
+
+<ol>
+<li>Language dependence: if there is any way to identify the target element except by name, it is normally preferable to do so.
+
+<li>Speed: using a parameter filter to find a name may be complicated by the fact that different Revit element types store their names in different parameter values. 
+The LINQ query can mostly be replaced by a parameter filter, though, which normally halves the execution time, since the marshalling of all the non-target data from internal Revit memory to external .NET and LINQ space is eliminated.
+
+<li>A filtered element collector is already iterable, so the conversion to an <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; and to <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; is often unnecessary.
+If all filtering can be achieved using filtered element collector functionality, the instantiation of additional lists and consequent duplication and copying of all contained data members can be completely avoided.
+This is obviously especially important for large collections.
+</ol>
+
+<p>I mentioned performance hints such as these numerous times in the past between the lines.
+Maybe the time is ripe now to bring them up as a topic of their own.
+
+<p>Mikako underlines that the main intention of the helper method above is to make it as easy as possible for the reader to copy and paste these code snippets to quickly run the test command instead of having to download, explore and install the whole ADN training material zip file, and performance is a completely secondary consideration.
+
+<p>If performance becomes a bottleneck, each developer needs examine it and implement her own optimised version. 
+Accessing a wall type, for example, does not require this kind of filtering from the whole element list.  
+
+
+
+<a name="2"></a>
+
+<h4>Collector Optimisation</h4>
+
+<p>While we are on the topic of efficient coding, here is another snippet of typical add-in code presenting a surprising number of opportunities for improvement in a very few lines.
+
+<p>It retrieves all family symbols in the document, uses them to find door families, and processes each one in turn:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementIterator</span> itor = collector
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) )
+&nbsp; &nbsp; .GetElementIterator();
+&nbsp;
+&nbsp; itor.Reset();
+&nbsp;
+&nbsp; <span class="blue">while</span>( itor.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = itor.Current
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> Autodesk.Revit.DB.<span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine family category</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Category</span> cat = symbol.Category;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Process family if doors category</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( cat != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( cat.Name == <span class="maroon">&quot;Doors&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Family</span> family = symbol.Family;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Process reference to doors family</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Can you spot three possibilities for improvement, either a more succinct formulation, performance enhancement, or both?
+And manage not to peek?
+
+<p>Here are the ones I found, which is not to say that there are no others:
+
+<ul>
+<li>The code can be significantly shortened by using foreach directly on the collector instead of explicitly setting up and using an iterator.
+
+<li>You should avoid explicit string comparison when you can, both for reasons of performance and language independence, e.g. use the built-in category for doors instead of the category name, which might be localised.
+
+<li>In this case, you could let the collector handle the category selection for you, making the code significantly more efficient.
+
+<!--
+<li>It is redundant to say 'if(something==true)', because 'if(something)' is exactly synonymous: 
+The 'something' being evaluated by the if statement already is a Boolean expression. 
+Using the equality operator to produce another Boolean expression by comparing its value with the literal bool true is unnecessary.
+-->
+</ul>
+
+<p>Applying these suggestions produces this instead:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Doors )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Family</span> family = symbol.Family;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Process reference to doors family</span>
+&nbsp; }
+</pre>
+
+<!--
+&nbsp; &nbsp; <span class="blue">if</span>( family.IsExternalFileReference() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Process reference to doors family</span>
+&nbsp; &nbsp; }
+-->
+
+<p>Shorter, more readable, and more performant.
+
+<p>Since each family can contain more than one symbol, you should obviously keep track of the families already processed and skip those when looping over the symbols.

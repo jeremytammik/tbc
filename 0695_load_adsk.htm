@@ -1,0 +1,251 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+From: Scott Reinemann 
+Sent: 15 December 2011 13:28
+To: Harry Mattison; Jeremy Tammik; Revit API
+Cc: Martin Schmid
+Subject: RE: load adsk via api?
+
+Check out Application.OpenBuildingComponentDocument(). That creates a family doc which you can then save out or do what you want with it.
+
+Scott
+
+From: Harry Mattison 
+Sent: Thursday, December 15, 2011 7:08 AM
+To: Jeremy Tammik; Revit API
+Cc: Martin Schmid
+Subject: RE: load adsk via api?
+
+Hi Jeremy,
+
+Application..::..OpenDocumentFile and/or UIApplication..::..DoDragDrop might work.
+
+Harry
+
+From: Jeremy Tammik 
+Sent: Thursday, December 15, 2011 4:42 AM
+To: Revit API
+Cc: Martin Schmid
+Subject: load adsk via api?
+
+hi guys,
+
+is there any way to load an ADSK file programmatically via the Revit API?
+
+if not, maybe we can use the 2013 drag and drop api to achieve this?
+
+thank you!
+
+cheers
+
+jeremy
+
+
+-->
+
+<h3>Loading an Inventor ADSK Component</h3>
+
+<p>We held the DevLab in Munich yesterday before rushing off to get to Milano in the evening.
+
+<p>I slept a little bit in the taxi and plane on the way here.
+I was still dead tired on arrival at the hotel just before ten, but thought I absolutely must get out and have a teeny weeny little sniff of Italy anyway before going to bed.
+I went to a bar right next door and committed the deadly foreigner sin of having a cappuccino, which it is almost a criminal offence to drink except at breakfast time.
+Quite soon the very friendly couple at the neighbouring table, Agn&egrave;s and Max, informed me that a free concert was going to start shortly next door.
+Agn&egrave;s and Max are both a photographers, just like Dima, whom I met in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/rex-content-generator.html">
+Jerusalem last Thursday</a>,
+
+so Thursday seems to be my meet-a-photographer day right now. 
+Check out 
+
+<a href="http://www.penombre.it">
+Agn&egrave;s' site</a> and
+
+<a href="http://agnesweber.blogspot.com">
+blog</a> and
+
+<a href="http://www.msvphoto.altervista.org">
+Max' photos</a> and
+
+<a href="http://msvphoto.wordpress.com">blog</a>.</p>
+
+
+<center>
+<img src="img/penombre.jpg" alt="Penombre"/>
+</center>
+
+
+<p>The concert was really great, by the Italian singer
+
+<a href="http://it.wikipedia.org/wiki/Folco_Orselli">
+Folco</a>
+
+<a href="http://www.myspace.com/folcoorselli">
+Orselli</a>.
+
+I liked it so much I bought his CD, asked for the very first autograph of my life, and ended up in bed rather late, or early, depending on your point of view  :-)
+
+
+
+
+
+<h4>Loading an Inventor Component ADSK File</h4>
+
+<p>One of the many interesting topics raised at the DevLab came from Martin Schmid, our MEP expert, working with both AutoCAD and Revit.
+He brought an ADSK component file created in Inventor with the goal of loading it into Revit.
+
+<p>I tried one or two things to achieve this which 
+
+<a href="#2">
+failed</a>
+
+before finding a 
+
+<a href="#3">
+successful solution</a>, 
+
+so you might want to skip straight to that if you are not interested in the blather.
+
+
+<a name="2"></a>
+
+<h4>Failed Attempts</h4>
+
+<p>The first thing we tried was the LoadFamily method, which simply does not work at all and is not intended to do so either:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> filename 
+&nbsp; &nbsp; = <span class="maroon">&quot;C:/a/doc/revit/blog/src/LoadAdsk/Part1.adsk&quot;</span>;
+&nbsp;
+&nbsp; <span class="green">// Load ADSK using LoadFamily does not work;</span>
+&nbsp; <span class="green">// rc is false, and f is null:</span>
+&nbsp;
+&nbsp; t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; t.Start( <span class="maroon">&quot;Load Adsk&quot;</span> );
+&nbsp; <span class="teal">Family</span> f = <span class="blue">null</span>;
+&nbsp; <span class="blue">bool</span> rc = doc.LoadFamily( filename, <span class="blue">out</span> f );
+&nbsp; t.Commit();
+</pre>
+
+<p>This does not cause any error, but 'rc' is false and 'f' remains null.
+
+<p>The second attempt was trying to open the component as a document using OpenDocumentFile:
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> adsk_doc = app.OpenDocumentFile( filename );
+</pre>
+
+<p>This should achieve the same result as dragging and dropping the component onto the Revit window, which opens it in the family editor.
+It does actually successfully open the ADSK in the family editor but it also displays an error saying "Attempted to read or write protected memory. This is often an indication that other memory is corrupt."</p>
+
+<center>
+<img src="img/adsk_openDocumentFile_error.png" alt="Error message on opening ADSK file"/>
+</center>
+
+<p>I am not yet sure whether this message is erroneous.
+Maybe you can simply ignore it and automatically dismiss it through the API.
+
+<p>Anyway, after those two failed attempts, we went on to find a solution which really works:
+
+
+
+<a name="3"></a>
+
+<h4>Successful Workflow using OpenBuildingComponentDocument</h4>
+
+
+<p>Scott Reinemann pointed out that we should try the OpenBuildingComponentDocument method, and that works fine.
+
+<p>Here is the code that achieves exactly what we want:
+
+<ul>
+<li>Open the ADSK component family file.
+<li>Load the component family into the project.
+<li>Retrieve a family symbol from it.
+<li>Place an instance of the symbol.
+</ul>
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> adsk_doc 
+&nbsp; &nbsp; = app.OpenBuildingComponentDocument( filename );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; <span class="maroon">&quot;Opened component document {0} with path '{1}'&quot;</span>,
+&nbsp; &nbsp; adsk_doc.Title, adsk_doc.PathName );
+&nbsp;
+&nbsp; t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; t.Start( <span class="maroon">&quot;Load ADSK component document&quot;</span> );
+&nbsp; <span class="teal">Family</span> f = adsk_doc.LoadFamily( doc );
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">&quot;Loaded component family {0}&quot;</span>,
+&nbsp; &nbsp; f.Name );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> symbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> f.Symbols )
+&nbsp; {
+&nbsp; &nbsp; symbol = s;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; t.Start( <span class="maroon">&quot;Place ADSK component document&quot;</span> );
+&nbsp; <span class="teal">FamilyInstance</span> i = doc.Create.NewFamilyInstance( 
+&nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, symbol, <span class="teal">StructuralType</span>.NonStructural );
+&nbsp; t.Commit();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">&quot;Placed component family instance {0}&quot;</span>,
+&nbsp; &nbsp; i.Name );
+</pre>
+
+<p>Here is the Part1 symbol defined by the component family appearing in the project browser after being loaded:
+
+<center>
+<img src="img/adsk_part1_project_browser.png" alt="Part1 family symbol in project browser"/>
+</center>
+
+<p>This is the family instance placed in the project origin:</p>
+
+<center>
+<img src="img/adsk_part1_instance.png" alt="Part1 family instance"/>
+</center>
+
+<!-- SPR #217150 [OpenBuildingComponentDocument error setting PathName property] -->
+
+<p>Right now the PathName property remains empty, but the Title property is set as expected, so the messages printed to the Visual Studio debug output window say:
+
+<pre>
+Opened component document Part1 with path ''
+Loaded component family Part1
+Placed component family instance Part1
+</pre>
+
+<p>This implementation automatically places the family instance hardwired at the origin and does not mimic the placement of a family when using the user interface, which displays a preview of the symbol at the cursor.  
+
+<p>To have that, you can make a call to 
+
+<!-- 
+
+402_place_family_instance.htm:&nbsp; &nbsp; uidoc.PromptForFamilyIns
+471_place_site_component.htm:PromptForFamilyInstancePlacement</a> an
+475_place_furniture.htm:PromptForFamilyInstancePlacement</a>, placin
+479_launch_command.htm:<p><strong>Question:</strong> In the Revit AP
+614_point_cloud_snap_freeze.htm:<span class="blue">public</span> <sp
+
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+PromptForFamilyInstancePlacement</a> instead.
+
+<p>Here is 
+
+<a href="zip/LoadAdsk.zip">LoadAdsk.zip</a> containing 
+
+the source code and complete Visual Studio solution for this command as well as a sample component file Part1.adsk to play around with.

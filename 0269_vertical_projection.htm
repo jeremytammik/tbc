@@ -1,0 +1,103 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255842 [Beam Analytical Model - Vertical Projection - Center of Beam] -->
+
+<h3>Vertical Projection of Beam Analytical Model</h3>
+
+<p>We tried to fly from Milano to Paris this evening for the last DevDays conference, but unfortunately our flight was cancelled due to snow in Paris.
+Now we are stuck at the Milano airport and hoping that the first flight in the morning will not be cancelled as well.
+If it is, we will not be able to make it at all.
+Otherwise, we will arrive rather late and have to reschedule the agenda, but at least then we will not be forced to cancel the whole conference.
+Fervently hoping for the best...
+
+<p>Since I am not sleeping anyway, I may as well post.
+
+<p>First, here are some more titbits from AU:
+
+<p>Kean posted an
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2009/12/post-au-wrap-up.html">
+AU wrap-up</a> with
+
+a short video and some snapshots from various Autodesk University experiences.
+
+<p>As part of AUv, Jim Quanci gave a very informative
+
+<a href="http://www.youtube.com/AutodeskUniversity#p/u/11/4c9RPYBOBj4">
+virtual interview</a>
+
+on the
+
+<a href="http://www.autodesk.com/joinadn">
+Autodesk Developer Network ADN</a>
+
+which is the part of Autodesk that provides developer support and that I work in.
+It has now been posted on the AU YouTube channel and...
+
+<ul>
+<li>Provides an overview of and helps better understand the ADN.
+<li>Shows the wide variety of applications being created by our partners.
+<li>Describes the benefits of being a member of the network.
+<li>Raises interest in ADN and our partners.
+</ul>
+
+<p>Getting back to the Revit API, here is a recent case handled by my colleagues Joe Ye and Saikat Bhattacharya which shows how to handle the setting of the vertical projection of the analytical model of a beam.
+An interesting aspect of this is that the parameter data type is an element id, and yet we are actually storing an enumeration value in it.
+This is not uncommon in Revit parameters; there are a few of them that can take both element ids to refer to other database objects as well as a fixed set of enumeration values for specific exceptional cases.
+
+<p><strong>Question:</strong> How can I set the 'Vertical Projection' parameter of a beam to the 'Center of Beam' value?"
+
+<p><strong>Answer:</strong> Here is a description on how to set the vertical projection parameter of a beam.
+
+<p>Start by defining the following enumeration:
+
+<pre class="code">
+<span class="blue">enum</span> <span class="teal">AnalyticalVerticalProjection_e</span>
+{
+&nbsp; AVP_AUTODETECT = -1,
+&nbsp; AVP_TOP_OF_PHYSICAL = -2,
+&nbsp; AVP_CENTER_OF_PHYSICAL = -3,
+&nbsp; AVP_BOTTOM_OF_PHYSICAL = -4,
+};
+
+</pre>
+
+<p>This can be used as follows:
+
+<ul>
+<li>Construct an ElementId object, for instance, id.
+<li>Set id.Value to one of the enumeration member values.
+<li>Set the vertical projection parameter value to id.
+</ul>
+
+<p>Note that the parameter value can be set successfully to the value, even though it is not a real element id.
+
+<p>Here is a code snippet showing how to set value to top of the slab:
+
+<pre class="code">
+<span class="teal">Element</span> e = SelectSlab( <span class="maroon">&quot;Please select a slab&quot;</span>, 
+&nbsp; commandData, <span class="blue">typeof</span>( <span class="teal">Floor</span> ) );
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> != e )
+{
+&nbsp; <span class="teal">Floor</span> floor = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip = <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; .STRUCTURAL_ANALYTICAL_PROJECT_FLOOR_PLANE;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> p = floor.get_Parameter( bip );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> id = p.AsElementId();
+&nbsp;
+&nbsp; <span class="green">// id.Value is negative if the parameter </span>
+&nbsp; <span class="green">// value is not a real element id:</span>
+&nbsp;
+&nbsp; id.Value = -2; <span class="green">// top of the slab</span>
+&nbsp;
+&nbsp; p.Set( <span class="blue">ref</span> id );
+}
+</pre>
+
+<p>Thank you Joe and Saikat for this illuminating answer!

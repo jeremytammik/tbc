@@ -1,0 +1,165 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Idling Event</h3>
+
+<p>One of the most exciting of the many 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/revit-2011-is-coming.html">
+new Revit 2011 API features</a> which 
+
+opens up completely new possibilities for applications to interact with Revit is the Idling event.
+The What's New section of the Revit API help file RevitAPI.chm describes it as follows:
+
+<span style="color:darkblue">
+
+<p>The new event
+
+<ul>
+<li>UIApplication.Idling 
+</ul>
+
+<p>is raised when it is safe for the API application to access the active document between user interactions. 
+This event is raised only when the Revit UI is in a state where the user could successfully click on an API command button. 
+The event allows changes to a document if a new transaction is opened.
+
+<p>Because this event is invoked between user actions in the Revit UI, if the handler for this event requires a significant amount of processing time, users will perceive a slowdown in the responsiveness of Revit. 
+If the execution for updates can be safely split across multiple calls to this event, the user perception of Revit responsiveness will be improved.
+
+</span>
+
+<p>In the detailed description of the event itself, it says further:
+
+<span style="color:darkblue">
+
+<p>Subscribe to the Idling event to be notified when Revit is not in an active tool or transaction. 
+
+<p>This event is raised when it is safe for the API application to access the active document between user interactions. The event is raised only when the Revit UI is in a state where the user could successfully click on an API command button.
+
+<p>Handlers of this event are permitted to make modifications to any document (including the active document), except for documents that are currently in read-only mode. 
+
+<p>In order to change a document, you must begin a new transaction for that document. This transaction will appear in the Revit undo stack and may be undone by the Revit user.
+
+<p>This event is invoked between user actions in the Revit UI. If the handler for this event requires a significant amount of processing time, users will perceive a slowdown in the responsiveness of Revit. If the execution for updates can be safely split across multiple calls to this event, the user perception of Revit responsiveness will be improved. 
+
+<p>Event is not cancellable. 
+
+</span>
+
+<p>As far as I can tell, there is no Revit SDK sample demonstrating its use.
+
+<p>The reason why this is so exciting is because it makes it a little bit more feasible to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+control Revit from an external application</a> or a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/modeless-dialogues-in-revit.html">
+modeless dialogue</a>,
+
+topics that have always been very high on the developer wish list and frequently discussed in this blog.
+The fact still remains in Revit 2011 that Revit insists on being the boss and cannot be driven from outside by any direct API calls, but at least this new event makes it possible to set up a pair of an external application wishing to do something from outside and an internal Revit plug-in that supports it in doing so.
+
+<p>The scenario that I envision would be that the external application raises some kind of signal letting the plug-in know that it would like to do something and possibly provide detailed data on what that is.
+The internal plug-in registers to the Idling event, and every time it is raised, it checks whether the external application has queued up some task for it and then performs it.
+
+<p>I implemented a new little minimal Building Coder sample command CmdIdling to demonstrate how to subscribe to this event.
+
+<p>The event handler for this event takes two arguments, the sender and the event arguments, as defined by the 
+
+<a href="http://msdn.microsoft.com/en-us/library/db0etb8x">
+standard .NET event model</a>.
+
+The Revit API defines a new class IdlingEventArgs for it, derived from the PreEventArgs and RevitEventArgs classes without adding any extra functionality, so it does not provide any useful members for us to access the application or documents through.
+
+<p>Happily, the sender argument is in fact the Revit application instance, a fact that is currently not documented anywhere, as far as I can tell.
+This obviously provides access to the documents and the active document, enabling us to open a transaction and perform any required actions on the Revit model.
+
+<p>In my minimalistic first sample, I do nothing but demonstrate the access to the active document and log a message with a time stamp using the following little helper method:
+
+<pre class="code">
+<span class="blue">void</span> Log( <span class="blue">string</span> msg )
+{
+&nbsp; <span class="blue">string</span> dt = <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;u&quot;</span> );
+&nbsp; <span class="teal">Debug</span>.Print( dt + <span class="maroon">&quot; &quot;</span> + msg );
+}
+</pre>
+
+<p>Here is my event handler implementation demonstrating how to access the Revit application instance from the sender argument, obtain and query the active document, and log a message to the Visual Studio debug output window:
+
+<pre class="code">
+<span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> e )
+{
+&nbsp; <span class="green">// access active document from sender:</span>
+&nbsp;
+&nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != app, 
+&nbsp; &nbsp; <span class="maroon">&quot;expected a valid Revit application instance&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( app != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; Log( <span class="maroon">&quot;OnIdling with active document &quot;</span> 
+&nbsp; &nbsp; &nbsp; + doc.Title );
+&nbsp; }
+}
+</pre>
+
+<p>The command implementation is simpler still, basically just one single line of code to register my event handler and subscribe to the UI application event:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; Log( <span class="maroon">&quot;Execute begin&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp;
+&nbsp; uiapp.Idling 
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp;
+&nbsp; Log( <span class="maroon">&quot;Execute end&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Since I am not modifying the database in any way whatsoever, I use the most restrictive 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">
+regeneration option</a> and 
+
+transaction mode:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+</pre>
+
+<p>As soon as I launch this command, it prints out its initial two log messages specified in the Execute method.
+From that moment onwards, the Idling event fires almost continuously as long as no other Revit commands are invoked, so my event handler method is called with great frequency:
+
+<pre>
+2010-04-22 12:04:18Z Execute begin
+2010-04-22 12:04:18Z Execute end
+2010-04-22 12:04:18Z OnIdling with active document wall.rvt
+2010-04-22 12:04:18Z OnIdling with active document wall.rvt
+2010-04-22 12:04:18Z OnIdling with active document wall.rvt
+. . .
+</pre>
+
+<p>This is yet another addition to the Revit API which really opens up completely new doors, so it will be very exciting to see what use can be made of this in the coming months!
+
+<p>Here is 
+
+<a href="zip/bc_11_65.zip">
+version 2011.0.0.65</a>
+
+of the complete Visual Studio solution including the new command.</p>

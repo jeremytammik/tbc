@@ -1,0 +1,95 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 08659092 [Can't delete extensiblestorage in a revit project with links] -->
+
+<h3>Deleting and Updating Extensible Storage Schema</h3>
+
+<p>We discussed a number of extensible storage schema topics in the past.</p>
+
+<p>Once you've started using it, you may run into the need to <a href="#3">update</a> or <a href="#2">delete</a> something.</p>
+
+<p>Discussing that also provides an opportunity to summarise the other results we already have:</p>
+
+
+<a name="2"></a>
+
+<h4>Deleting an Extensible Storage Schema</h4>
+
+<p><strong>Question:</strong> I am unable to delete my extensible storage schema if the RVT project contains a linked project with the same schema.</p>
+
+<p>First I thought I was doing something wrong, but the ExtensibleStorageUtility SDK sample project DeleteStorage command has the same problem.</p>
+
+
+<p><strong>Answer:</strong> Please be aware that all extensible storage schemata are held in memory and shared between all open projects in the current Revit session.</p>
+
+<p>Therefore, if any of the currently open projects is making use of a specific schema, that will prevent it from being deleted.</p>
+
+<p>I hope this is clear and explains the behaviour you are observing.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Updating an Extensible Storage Schema</h4>
+
+<p><strong>Question:</strong> I need to add some additional fields to an existing extensible storage schema.
+How can I achieve this?</p>
+
+<p>Right now, I am deleting the schema and creating a new one with all the required fields.</p>
+
+<p>My current workaround to delete successfully is to unload the Revit links before deleting the schema.</p>
+
+<p>Another solution I have been considering is to just leave the existing schema and create a new one. That seems a bit messy, though, so I have avoided that so far.</p>
+
+<p>What is the best practice if you have an existing extensible storage scheme and you want to add more fields to it?
+A far as I can see, it is impossible to change existing schema fields.</p>
+
+<p><strong>Answer:</strong> Yes, indeed, schema fields cannot be modified, nor can new fields be added.</p>
+
+<p>Once you publish a schema it is there, immutable, for the rest of the life of the universe.</p>
+
+<p>If you wish to add new fields or modify existing ones, you have to create a new schema.</p>
+
+<p>The old one remains untouched.</p>
+
+<p>You can easily implement an update handler in your add-in that automatically updates all instances of the old schema that it encounters to the new one.</p>
+
+<p>This is demonstrated by the UpgradeSchema sample provided by my extensible storage
+
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9263&amp;jid=1725932">
+class</a> and
+
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9726&amp;jid=1725932">
+lab</a> at
+
+Autodesk University 2011, which include the complete background information on the topic.</p>
+
+<p>The full
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html#3">
+handouts and sample material</a> are
+
+also available directly from The Building Coder.</p>
+
+<p>Some additional topics that we covered since then include:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#4">
+Project wide data storage</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html#5">
+The DataStorage element</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/effortless-extensible-storage.html">
+Extensible storage extension</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/sydney-revit-api-training-and-vacation.html#8">
+Custom tagging and extensible storage</a></li>
+</ul>
+
+<p><strong>Response:</strong> I might change my mind on my current solution unloading and loading Revit links to be able to delete the schema, because it might still not solve problem in all cases.
+For instance, if users have two Revit projects open and both use the schema, I guess it will not work. All projects have the schema, because I add it on project open.</p>
+
+<p><strong>Answer:</strong> Yes, I think you can and certainly sooner or later <b>will</b> run into problems modifying an existing schema.</p>
+
+<p>Creating a new one is the only safe way to go.</p>

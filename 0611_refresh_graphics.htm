@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1270365 [Problems with AutoCAD CAD import (colors and categories)] -->
+
+<h3>Refresh Element Graphics Display</h3>
+
+<p>Here is a little issue with an interesting workaround that I encountered in the past in similar incarnations in other CAD software packages besides Revit, so it is worthwhile making a note of this for potential future use almost anywhere.
+
+<p>The issue has to do with refreshing the graphics display of individual elements in the Revit user interface.
+
+<p>Committing the transaction, explicit regeneration, and even calling RefreshActiveView does not help.
+One additional thing that sometimes does help in similar situations is saving the document, but that is obviously a last recourse.
+
+<p>The interesting workaround presented in this case suggests moving the affected elements by a certain amount using ElementTransformUtils.MoveElement, and then moving them back again.
+
+<p>One place where I used similar tricks in the past was in the AutoCAD ARX API, where you could trigger a regeneration of an entity by calling transformBy with an identity matrix on it, if nothing else helped.
+
+<p>Here is the context of the issue:
+
+<p><strong>Question:</strong> I'm importing a DWG into a Revit family. 
+It contains a solid filled polygon on one layer.
+
+<p>I am trying to change its line colour via its sub-category.
+
+<p>Using the following code in VSTA changes the Object Style properly, and I can see the change in the Object Styles dialog:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> ObjectStyleTest()
+{
+&nbsp; <span class="teal">UIDocument</span> uiDoc = <span class="blue">this</span>.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = <span class="blue">this</span>.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> tr = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; tr.Start( <span class="maroon">&quot;ObjectStyles&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat = doc.Settings.Categories.get_Item( 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_ImportObjectStyles );
+&nbsp;
+&nbsp; <span class="teal">Category</span> subCat = cat.SubCategories.get_Item( 
+&nbsp; &nbsp; <span class="maroon">&quot;A--A28--_F-2--&quot;</span> );
+&nbsp;
+&nbsp; subCat.LineColor = <span class="blue">new</span> <span class="teal">Color</span>( 0, 0, 255 );
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; tr.Commit();
+&nbsp;
+&nbsp; uiDoc.RefreshActiveView();
+}
+</pre>
+
+<p>However, the already existing ImportInstance does not change colour as expected. 
+If I change the ObjectStyle colour in the user interface, then the ImportInstance does change colour.
+
+<p>I tried calling Regenerate and RefreshActiveView, but they have no effect. 
+Once I move the ImportInstance in the user interface, its colour updates properly. 
+
+
+<p><strong>Answer:</strong> You can solve this programmatically, but you need to use a little workaround.
+One possible workaround is to move the elements back and forth a bit.
+Here is your sample code enhanced to show how to do this:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> ChangeImportedCategoryColor( 
+&nbsp; <span class="teal">UIDocument</span> uiDoc )
+{
+&nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> tr = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; tr.Start( <span class="maroon">&quot;ObjectStyles&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat = doc.Settings.Categories.get_Item( 
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_ImportObjectStyles );
+&nbsp;
+&nbsp; <span class="teal">Category</span> subCat = cat.SubCategories.get_Item( 
+&nbsp; &nbsp; <span class="maroon">&quot;A--A28--_F-2--&quot;</span> );
+&nbsp;
+&nbsp; subCat.LineColor = <span class="blue">new</span> <span class="teal">Color</span>( 0, 0, 255 );
+&nbsp;
+&nbsp; <span class="green">// &lt;workaround&gt;</span>
+&nbsp; <span class="teal">FilteredElementCollector</span> coll 
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ImportInstance</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> coll )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement( 
+&nbsp; &nbsp; &nbsp; doc, e.Id, <span class="teal">XYZ</span>.BasisX );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement( 
+&nbsp; &nbsp; &nbsp; doc, e.Id, <span class="teal">XYZ</span>.BasisX.Negate() );
+&nbsp; }
+&nbsp; <span class="green">// &lt;/workaround&gt;</span>
+&nbsp;
+&nbsp; tr.Commit();
+}
+</pre>
+
+<p>As said, in a similar situation in AutoCAD, it was sufficient to call transformBy with an identity transformation.
+I tried out whether it works making just one single call to MoveElement with a XYZ.Zero argument, instead of two, but that is not the case.
+I also tested changing some element parameter values back and forth, but since that does not change the geometry (I guess) it did not do the trick.
+
+<p>Many thanks to Harry Mattison and Adam Nagy for providing this idea!
+
+<p><strong>Addendum:</strong> As Rudolf points out in his 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/refresh-element-graphics-display.html?cid=6a00e553e16897883301538fb68718970b#comment-6a00e553e16897883301538fb68718970b">
+comment</a> below, 
+
+this workaround may need to be adjusted for hosted elements:
+
+<p>Moving windows or doors may cause errors if the translation is too large, causing the element to leave its host boundaries, or if the moving direction is locked for the element. For example, windows cannot be moved in the Wall.Orientation direction.
+
+<p>Therefore, it would be safer to move the elements by just a tiny amount instead of a whole foot, and also ensure that the movement direction is parallel to the host face. For example, for a window in a vertical wall, you might use XYZ.BasisZ.Multiply(tinyAmount) instead of XYZ.BasisX.

@@ -1,0 +1,319 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- PressKey sample -- 1264440 [placing system families] -->
+
+<h3>Launching a Revit Command</h3>
+
+<p>One question that I frequently hear is how to launch a built-in Revit command programmatically.
+
+<p>We recently discussed a specific case related to this issue in some depth,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">
+how to close the active document</a>
+
+and especially pointed out
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#2">
+why this is risky, undesirable and not supported</a>.
+
+<p>To close the active document, we used the SendKeys.SendWait method provided in the .NET framework System.Windows.Forms namespace.
+Many of the other attempts that I have seen in the past to launch a Revit command were also based on this method, but unsuccessful.
+
+<p>Here is now a solution that actually does work, suggested by Robert Pleysier of
+
+<a href="http://www.alfadevelopment.nl">
+ALFA Development</a> in the Netherlands.
+
+Instead of SendKeys, he uses the native Windows API PostMessage call to send the Windows messages WM_KEYDOWN and WM_KEYUP for each required keystroke to the Revit process main window handle.
+
+<p>The reason for Robert to launch a Revit command at all is the requirement to predefine which wall type should be active when the user enters the new wall creation command.
+Since there is no API method available to programmatically predefine the current wall type to be used by this command, Robert selects an existing wall with the desired type and then uses the 'Create Similar' command to set up its type as the new default user interface wall type.
+If no wall with the desired type exists yet in the model, a temporary wall is created and then deleted again.
+
+<p>Here is the question initially raised by Robert, and his own answer and solution:
+
+<p><strong>Question:</strong> In the Revit API you can use the function PromptForFamilyInstancePlacement to place family symbols.
+
+<p>Is it possible to place a Wall with this function or another function from code?
+
+<p>I want to change the wall or other system family type by code in the property dialog.
+
+<p>After that I want to activate the Revit wall or stair function by code, so a user can draw his or her own wall or stair with the right wall or stair type.
+
+<p><strong>Answer:</strong> I solved the issue by using a key press function "cs" for "create similar".
+
+<p>Based on Robert's example code showing how he did this, I implemented a new Building Code sample command CmdPressKey which illustrates his solution.
+
+<p>First of all, here is the helper class Press which accesses the Windows API methods and implements the public method Keys to actually send keystrokes using PostMessage. It requires the namespace System.Runtime.InteropServices:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Press</span>
+{
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;USER32.DLL&quot;</span> )]
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> PostMessage(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, <span class="blue">uint</span> msg, <span class="blue">uint</span> wParam, <span class="blue">uint</span> lParam );
+&nbsp;
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">uint</span> MapVirtualKey(
+&nbsp; &nbsp; <span class="blue">uint</span> uCode, <span class="blue">uint</span> uMapType );
+&nbsp;
+&nbsp; <span class="blue">enum</span> <span class="teal">WH_KEYBOARD_LPARAM</span> : <span class="blue">uint</span>
+&nbsp; {
+&nbsp; &nbsp; KEYDOWN = 0x00000001,
+&nbsp; &nbsp; KEYUP = 0xC0000001
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">enum</span> <span class="teal">KEYBOARD_MSG</span> : <span class="blue">uint</span>
+&nbsp; {
+&nbsp; &nbsp; WM_KEYDOWN = 0x100,
+&nbsp; &nbsp; WM_KEYUP = 0x101
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">enum</span> <span class="teal">MVK_MAP_TYPE</span> : <span class="blue">uint</span>
+&nbsp; {
+&nbsp; &nbsp; VKEY_TO_SCANCODE = 0,
+&nbsp; &nbsp; SCANCODE_TO_VKEY = 1,
+&nbsp; &nbsp; VKEY_TO_CHAR = 2,
+&nbsp; &nbsp; SCANCODE_TO_LR_VKEY = 3
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Post one single keystroke.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> OneKey( <span class="teal">IntPtr</span> handle, <span class="blue">char</span> letter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">uint</span> scanCode = MapVirtualKey( letter,
+&nbsp; &nbsp; &nbsp; ( <span class="blue">uint</span> ) <span class="teal">MVK_MAP_TYPE</span>.VKEY_TO_SCANCODE );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">uint</span> keyDownCode = ( <span class="blue">uint</span> )
+&nbsp; &nbsp; &nbsp; <span class="teal">WH_KEYBOARD_LPARAM</span>.KEYDOWN
+&nbsp; &nbsp; &nbsp; | ( scanCode &lt;&lt; 16 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">uint</span> keyUpCode = ( <span class="blue">uint</span> )
+&nbsp; &nbsp; &nbsp; <span class="teal">WH_KEYBOARD_LPARAM</span>.KEYUP
+&nbsp; &nbsp; &nbsp; | ( scanCode &lt;&lt; 16 );
+&nbsp;
+&nbsp; &nbsp; PostMessage( handle,
+&nbsp; &nbsp; &nbsp; ( <span class="blue">uint</span> ) <span class="teal">KEYBOARD_MSG</span>.WM_KEYDOWN,
+&nbsp; &nbsp; &nbsp; letter, keyDownCode );
+&nbsp;
+&nbsp; &nbsp; PostMessage( handle,
+&nbsp; &nbsp; &nbsp; ( <span class="blue">uint</span> ) <span class="teal">KEYBOARD_MSG</span>.WM_KEYUP,
+&nbsp; &nbsp; &nbsp; letter, keyUpCode );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Post a sequence of keystrokes.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> Keys( <span class="blue">string</span> command )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> revitHandle = System.Diagnostics.<span class="teal">Process</span>
+&nbsp; &nbsp; &nbsp; .GetCurrentProcess().MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">char</span> letter <span class="blue">in</span> command )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; OneKey( revitHandle, letter );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>With this in place, we can go ahead and implement the external command.
+It requires two helper methods: GetFirstWallTypeNamed retrieves the appropriate wall type for a given wall type name, and GetFirstWallUsingType retrieves the first wall element encountered in the model making use of a given wall type.
+Both of these obviously use filtered element collectors, and both of them even use parameter filters.
+GetFirstWallTypeNamed uses the built-in parameter SYMBOL_NAME_PARAM and a string equality filter to do its job, i.e. to return the first wall type with the given name:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">WallType</span> GetFirstWallTypeNamed(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">string</span> name )
+{
+&nbsp; <span class="green">// built-in parameter storing this </span>
+&nbsp; <span class="green">// wall type's name:</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.SYMBOL_NAME_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; provider, evaluator, name, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">WallType</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector.FirstElement() <span class="blue">as</span> <span class="teal">WallType</span>;
+}
+</pre>
+
+<p>GetFirstWallUsingType uses the built-in parameter ELEM_TYPE_PARAM and a numerical equality filter to retrieve all walls using the required wall type, because their corresponding parameter value will equal the wall type element id.
+We don't care which wall is used to launch the "Create Similar" command, so we simply return the first one encountered:
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">Wall</span> GetFirstWallUsingType(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">WallType</span> wallType )
+{
+&nbsp; <span class="green">// built-in parameter storing this </span>
+&nbsp; <span class="green">// wall's wall type element id:</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.ELEM_TYPE_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>(
+&nbsp; &nbsp; provider, evaluator, wallType.Id );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector.FirstElement() <span class="blue">as</span> <span class="teal">Wall</span>;
+}
+</pre>
+
+<p>With the support class and helper methods in place, the external command mainline Execute method implementation is short and sweet:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// name of target wall type that we want to use:</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> wallTypeName = <span class="maroon">&quot;Generic - 203&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">WallType</span> wallType = GetFirstWallTypeNamed(
+&nbsp; &nbsp; doc, wallTypeName );
+&nbsp;
+&nbsp; <span class="teal">Wall</span> wall = GetFirstWallUsingType(
+&nbsp; &nbsp; doc, wallType );
+&nbsp;
+&nbsp; <span class="green">// select the wall in the UI</span>
+&nbsp;
+&nbsp; uidoc.Selection.Elements.Add( wall );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 == uidoc.Selection.Elements.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// no wall with the correct wall type found</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Level</span> ll = collector
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// place a new wall with the </span>
+&nbsp; &nbsp; <span class="green">// correct wall type in the project</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> geomLine = app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 0, 0 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;Create dummy wall&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> nw = doc.Create.NewWall( geomLine,
+&nbsp; &nbsp; &nbsp; wallType, ll, 1, 0, <span class="blue">false</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Select the new wall in the project</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Add( nw );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Start command create similar. In the </span>
+&nbsp; &nbsp; <span class="green">// property menu, our wall type is set current</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Press</span>.Keys( <span class="maroon">&quot;CS&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// select the new wall in the project, </span>
+&nbsp; &nbsp; <span class="green">// so we can delete it</span>
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Add( nw );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// erase the selected wall (remark: </span>
+&nbsp; &nbsp; <span class="green">// doc.delete(nw) may not be used, </span>
+&nbsp; &nbsp; <span class="green">// this command will undo)</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Press</span>.Keys( <span class="maroon">&quot;DE&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// start up wall command</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Press</span>.Keys( <span class="maroon">&quot;WA&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// the correct wall is already selected:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Press</span>.Keys( <span class="maroon">&quot;CS&quot;</span> ); <span class="green">// start &quot;create similar&quot;</span>
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>As you see, an arbitrary dummy wall of the required type is created if none previously exists.
+For this, we start up a transaction of our own, so we are obviously using manual transaction mode.
+And so we have to, since we have to close our transaction again before the Revit commands are invoked.
+
+<p>Robert says the following about this code:
+Here is a part or our code to start a Revit command.
+The aim of the code is to set a wall type current in the Revit property window.
+We only start up the wall command with the API and let the user do the drawing of the wall.
+This solution can also be used to launch other Revit commands.
+
+<p>When I start up the standard sample project rac_basic_sample_project.rvt, switch to Level 1, and launch this command from the Revit ribbon, I immediately enter the standard Revit wall command.
+The desired wall type is active, in this case the type named "Generic - 203", and I can immediately start placing new walls of that type.
+
+<p>There have been many other queries on how to programmatically set up the type before launching a Revit command, and this looks as if it could solve them.
+
+<p>I have to repeat the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#2">
+warning about the risks involved with using this</a>, though,
+
+and also point back to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#3">
+disclaimer</a> accompanying that warning.
+
+<p>Still, if this is just for your personal use, you might find it pretty handy.
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_80.zip -->
+
+<a href="zip/bc_11_80.zip">
+version 2011.0.80.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with the new command.

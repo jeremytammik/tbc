@@ -1,0 +1,605 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>GeoSnoop .NET Boundary Curve Loop Visualisation</h3>
+
+<p>Continuing the research and development for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a>,
+
+I explained how I use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+ExtrusionAnalyzer</a>
+
+to create a plan view boundary profile for the furniture and equipment family instances,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">
+sort and orient its output curves</a>, and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/curve-following-face-and-bounding-box-implementation.html">
+determine their bounding box</a> for
+
+visualisation.
+
+<p>Today let's look at a simple loop visualisation implementation in a dynamically generated .NET form.</p>
+
+<p>The components of interest are:</p>
+
+<ul>
+<li><a href="#2">Point2dInt</a> &ndash; an integer-based 2D point</a></li>
+<li><a href="#3">JtLoop</a> &ndash; a closed polygon boundary loop</a></li>
+<li><a href="#4">JtLoops</a> &ndash; a list of boundary loops</a></li>
+<li><a href="#5">JtBoundingBox2dInt</a> &ndash; a bounding box for 2D integer points</a></li>
+<li><a href="#6">GeoSnoop</a> &ndash; display a collection of curves in a .NET form</a></li>
+<li><a href="#7">Validation of results</a> &ndash; reality check</a></li>
+<li><a href="#8">Next steps</a> &ndash; where to go from here</a></li>
+<li><a href="#9">Download</a> &ndash; try this yourself at home</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Point2dInt &ndash; an Integer-based 2D Point</h4>
+
+<p>I introduced this class in the initial discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html">
+retrieving plan view room boundary polygon loops</a>.</p>
+
+<p>The main idea is to have a robust lightweight data container for passing 2D point information back and forth between my Revit add-in, the cloud and mobile devices.</p>
+
+<p>The later development motivated the addition of a couple of convenience methods since the first publication:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> An integer-based 2D point class.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">Point2dInt</span> : <span class="teal">IComparable</span>&lt;<span class="teal">Point2dInt</span>&gt;
+{
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> X { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Y { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _feet_to_mm = 25.4 * 12;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> ConvertFeetToMillimetres( <span class="blue">double</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">int</span>) ( _feet_to_mm * d + 0.5 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a 3D Revit XYZ to a 2D millimetre </span>
+&nbsp; <span class="gray">///</span><span class="green"> integer point by discarding the Z coordinate</span>
+&nbsp; <span class="gray">///</span><span class="green"> and scaling from feet to mm.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> Point2dInt( <span class="blue">int</span> x, <span class="blue">int</span> y )
+&nbsp; {
+&nbsp; &nbsp; X = x;
+&nbsp; &nbsp; Y = y;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a 3D Revit XYZ to a 2D millimetre </span>
+&nbsp; <span class="gray">///</span><span class="green"> integer point by discarding the Z coordinate</span>
+&nbsp; <span class="gray">///</span><span class="green"> and scaling from feet to mm.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> Point2dInt( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; X = ConvertFeetToMillimetres( p.X );
+&nbsp; &nbsp; Y = ConvertFeetToMillimetres( p.Y );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Comparison with another point, important</span>
+&nbsp; <span class="gray">///</span><span class="green"> for dictionary lookup support.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> CompareTo( <span class="teal">Point2dInt</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> d = X - a.X;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = Y - a.Y;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Display as a string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1})&quot;</span>, X, Y );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add two points, i.e. treat one of </span>
+&nbsp; <span class="gray">///</span><span class="green"> them as a translation vector.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Point2dInt</span> <span class="blue">operator</span>+(
+&nbsp; &nbsp; <span class="teal">Point2dInt</span> a,
+&nbsp; &nbsp; <span class="teal">Point2dInt</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>(
+&nbsp; &nbsp; &nbsp; a.X + b.X, a.Y + b.Y );
+&nbsp; }
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>JtLoop &ndash; a Closed Polygon Boundary Loop</h4>
+
+<p>This class consists of a simple list of 2D integer points representing a closed boundary loop.</p>
+
+<p>When a new point is added to the collection, it is compared to the last and ignored if they evaluate equal.
+This automatically suppresses too small boundary segment fragments.</p>
+
+<p></p>
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A closed polygon boundary loop.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtLoop</span> : <span class="teal">List</span>&lt;<span class="teal">Point2dInt</span>&gt;
+{
+&nbsp; <span class="blue">public</span> JtLoop( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Display as a string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, <span class="blue">this</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add another point to the collection.</span>
+&nbsp; <span class="gray">///</span><span class="green"> If the new point is identical to the last,</span>
+&nbsp; <span class="gray">///</span><span class="green"> ignore it. This will automatically suppress</span>
+&nbsp; <span class="gray">///</span><span class="green"> really small boundary segment fragments.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">new</span> <span class="blue">void</span> Add( <span class="teal">Point2dInt</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == Count
+&nbsp; &nbsp; &nbsp; || 0 != p.CompareTo( <span class="blue">this</span>[Count - 1] ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">base</span>.Add( p );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p></p>
+
+
+
+<a name="4"></a>
+
+<h4>JtLoops &ndash; a List of Boundary Loops</h4>
+
+<p>Each room produces a collection of loops, since it may include holes.
+For the furniture and equipment, I am expecting to manage just one external boundary contour loop each.
+On the other hand, for the furniture, this class enables me to easily collect all the individual furniture loops together into one single object.</p>
+
+<p>The addition operator + is used to unite the room and furniture loops into a single container to pass to the visualisation method.</p>
+
+<p>The conversion to a list of Point instances is used to feed the System.Drawing.Drawing2D.GraphicsPath class AddLines method to display the loops in a form.</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A list of boundary loops.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtLoops</span> : <span class="teal">List</span>&lt;<span class="teal">JtLoop</span>&gt;
+{
+&nbsp; <span class="blue">public</span> JtLoops( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Unite two collections of boundary </span>
+&nbsp; <span class="gray">///</span><span class="green"> loops into one single one.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">JtLoops</span> <span class="blue">operator</span>+( <span class="teal">JtLoops</span> a, <span class="teal">JtLoops</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> na = a.Count;
+&nbsp; &nbsp; <span class="blue">int</span> nb = b.Count;
+&nbsp; &nbsp; <span class="teal">JtLoops</span> sum = <span class="blue">new</span> <span class="teal">JtLoops</span>( na + nb );
+&nbsp; &nbsp; sum.AddRange( a );
+&nbsp; &nbsp; sum.AddRange( b );
+&nbsp; &nbsp; <span class="blue">return</span> sum;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return suitable input for the .NET </span>
+&nbsp; <span class="gray">///</span><span class="green"> GraphicsPath.AddLines method to display the </span>
+&nbsp; <span class="gray">///</span><span class="green"> loops in a form. Note that a closing segment </span>
+&nbsp; <span class="gray">///</span><span class="green"> to connect the last point back to the first</span>
+&nbsp; <span class="gray">///</span><span class="green"> is added.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt; GetGraphicsPathLines()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt; loops
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt;( Count );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">JtLoop</span> jloop <span class="blue">in</span> <span class="blue">this</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; n = jloop.Count;
+&nbsp; &nbsp; &nbsp; <span class="teal">Point</span>[] loop = <span class="blue">new</span> <span class="teal">Point</span>[n + 1];
+&nbsp; &nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point2dInt</span> p <span class="blue">in</span> jloop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; loop[i++] = <span class="blue">new</span> <span class="teal">Point</span>( p.X, p.Y );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; loop[i] = loop[0];
+&nbsp; &nbsp; &nbsp; loops.Add( loop );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> loops;
+&nbsp; }
+}
+</pre>
+
+
+
+<a name="5"></a>
+
+<h4>JtBoundingBox2dInt &ndash; a Bounding Box for 2D Integer Points</h4>
+
+<p>I discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/curve-following-face-and-bounding-box-implementation.html#4">
+2D integer-based bounding box implementation</a> last week.
+
+<p>As you can see there, it already includes a handy constructor taking a collection of loops to return their entire bounding box.</p>
+
+<p>I now added properties to return the aspect ratio and a System.Drawing.Rectangle to easily define the visualisation target rectangle and coordinate system transformation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> A bounding box for a collection </span>
+<span class="gray">///</span><span class="green"> of 2D integer points.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtBoundingBox2dInt</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Minimum and maximum X and Y values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">int</span> xmin, ymin, xmax, ymax;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Initialise to infinite values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> JtBoundingBox2dInt()
+&nbsp; {
+&nbsp; &nbsp; xmin = ymin = <span class="blue">int</span>.MaxValue;
+&nbsp; &nbsp; xmax = ymax = <span class="blue">int</span>.MinValue;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current lower left corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> Min
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>( xmin, ymin ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current upper right corner.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> Max
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>( xmax, ymax ); }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current center point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Point2dInt</span> MidPoint
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Point2dInt</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>)(0.5 * ( xmin + xmax )),
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>)(0.5 * ( ymin + ymax )) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current width.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Width
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> xmax - xmin; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return current height.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> Height
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> ymax - ymin; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return aspect ratio, i.e. Height/Width.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> AspectRatio
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">double</span>) Height / (<span class="blue">double</span>) Width;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a System.Drawing.Rectangle for this.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Rectangle</span> Rectangle
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">Rectangle</span>( xmin, ymin,
+&nbsp; &nbsp; &nbsp; &nbsp; Width, Height );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Expand bounding box to contain </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given new point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ExpandToContain( <span class="teal">Point2dInt</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &lt; xmin ) { xmin = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &lt; ymin ) { ymin = p.Y; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.X &gt; xmax ) { xmax = p.X; }
+&nbsp; &nbsp; <span class="blue">if</span>( p.Y &gt; ymax ) { ymax = p.Y; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Instantiate a new bounding box containing</span>
+&nbsp; <span class="gray">///</span><span class="green"> the given loops.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> JtBoundingBox2dInt( <span class="teal">JtLoops</span> loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">JtLoop</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point2dInt</span> p <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ExpandToContain( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+
+
+
+<a name="6"></a>
+
+<h4>GeoSnoop &ndash; Display a Collection of Curves in a .NET Form</h4>
+
+<p>Now comes the exciting part: extracting the loop information from my own data structures, setting up an appropriate .NET form and infrastructure, and passing the information across with a minimum of fuss.</p>
+
+<p>I had some fiddling to do to set this up optimally, I can tell you.</p>
+
+<p>I am very satisfied with the end result, though:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Display a collection of loops in a .NET form.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">GeoSnoop</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Pen size.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _pen_size = 1;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Pen colour.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Color</span> _pen_color = <span class="teal">Color</span>.Black;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Margin around graphics.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _margin = 10;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Draw loops on graphics with the specified</span>
+&nbsp; <span class="gray">///</span><span class="green"> transform and graphics attributes.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> DrawLoopsOnGraphics(
+&nbsp; &nbsp; <span class="teal">Graphics</span> graphics,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Point</span>[]&gt; loops,
+&nbsp; &nbsp; <span class="teal">Matrix</span> transform )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Pen</span> pen = <span class="blue">new</span> <span class="teal">Pen</span>( _pen_color, _pen_size );
+&nbsp;
+&nbsp; &nbsp; graphics.Clear( System.Drawing.<span class="teal">Color</span>.White );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point</span>[] loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GraphicsPath</span> path = <span class="blue">new</span> <span class="teal">GraphicsPath</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; transform.TransformPoints( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; path.AddLines( loop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; graphics.DrawPath( pen, path );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Display loops in a temporary form generated</span>
+&nbsp; <span class="gray">///</span><span class="green"> on the fly.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;owner&quot;&gt;</span><span class="green">Owner window</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;caption&quot;&gt;</span><span class="green">Form caption</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;loops&quot;&gt;</span><span class="green">Boundary loops</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> DisplayLoops(
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> owner,
+&nbsp; &nbsp; <span class="blue">string</span> caption,
+&nbsp; &nbsp; <span class="teal">JtLoops</span> loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">JtBoundingBox2dInt</span> bb
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtBoundingBox2dInt</span>( loops );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Adjust target rectangle height to the </span>
+&nbsp; &nbsp; <span class="green">// displayee loop height.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> width = 400;
+&nbsp; &nbsp; <span class="blue">int</span> height = (<span class="blue">int</span>) (width * bb.AspectRatio + 0.5);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Specify transformation target rectangle </span>
+&nbsp; &nbsp; <span class="green">// including a margin.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> bottom = height - (_margin + _margin);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Point</span>[] parallelogramPoints = <span class="blue">new</span> <span class="teal">Point</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( _margin, bottom ), <span class="green">// upper left</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( width - _margin, bottom ), <span class="green">// upper right</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point</span>( _margin, _margin ) <span class="green">// lower left</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Transform from native loop coordinate system</span>
+&nbsp; &nbsp; <span class="green">// to target display coordinates.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Matrix</span> transform = <span class="blue">new</span> <span class="teal">Matrix</span>(
+&nbsp; &nbsp; &nbsp; bb.Rectangle, parallelogramPoints );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Bitmap</span> bmp = <span class="blue">new</span> <span class="teal">Bitmap</span>( width, height );
+&nbsp; &nbsp; <span class="teal">Graphics</span> gr = <span class="teal">Graphics</span>.FromImage( bmp );
+&nbsp;
+&nbsp; &nbsp; DrawLoopsOnGraphics( gr,
+&nbsp; &nbsp; &nbsp; loops.GetGraphicsPathLines(), transform );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Form</span> form = <span class="blue">new</span> <span class="teal">Form</span>();
+&nbsp; &nbsp; form.Text = caption;
+&nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( width + 7, height + 13 );
+&nbsp; &nbsp; form.FormBorderStyle = <span class="teal">FormBorderStyle</span>
+&nbsp; &nbsp; &nbsp; .FixedToolWindow;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PictureBox</span> pb = <span class="blue">new</span> <span class="teal">PictureBox</span>();
+&nbsp; &nbsp; pb.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; pb.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; pb.Size = bmp.Size;
+&nbsp; &nbsp; pb.Parent = form;
+&nbsp; &nbsp; pb.Image = bmp;
+&nbsp;
+&nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; }
+}
+</pre>
+
+<p>I bet you expected more than this, didn't you?</p>
+
+<p>To quote
+
+<a href="http://en.wikipedia.org/wiki/Antoine_de_Saint-Exup%C3%A9ry">Antoine de Saint-Exupéry</a>:
+
+<i>Il semble que la perfection soit atteinte non quand il n'y a plus rien à ajouter, mais quand il n'y a plus rien à retrancher
+(Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away)</i>.
+
+
+<a name="7"></a>
+
+<h4>Validation of Results</h4>
+
+<p>Actually, this is the really exciting part.</p>
+
+<p>I mentioned that I was worried for a moment about the large number of loop vertices in the plan view of the desk.
+I was initially hoping for only four vertices, to represent a simple rectangle.
+After all, the plan view of a desk and chair looks like this in Revit:</p>
+
+<center>
+<img src="img/desk_and_chair_plan.png" alt="Plan view of desk and chair in Revit" width="200"/>
+</center>
+
+<p>In my visualisation, the same desk and chair loops are displayed like this instead:</p>
+
+<center>
+<img src="img/desk_and_chair_loops.png" alt="Desk and chair loops in GeoSnoop"/>
+</center>
+
+<p>The good news is:</p>
+
+<ul>
+<li>We have indeed produced closed loops.</li>
+<li>Their shape and location is correct.</li>
+</ul>
+
+<p>Where do all those bumps come from, though?</p>
+
+<p>The answer is easy and completely reassuring: the bumps are the desk drawer handles that stick out a little bit beyond the desktop surface.
+Looking at a 3D view in Revit from the top, the desk looks like this:</p>
+
+<center>
+<img src="img/desk_3d_top_view.png" alt="Desk 3D top view with drawer handles sticking out" width="200"/>
+</center>
+
+<p>My results reproduce this exactly.
+
+<p>Looking at the chairs, I mentioned that some of the chair solids cause extrusion analyser failures, and I skip those.
+To be precise, I have two failures on each chair.
+
+<p>Comparing the chair 3D view from the top in Revit with my results shows that the armrests are the components causing trouble:</p>
+
+<center>
+<img src="img/chair_3d_top_view.png" alt="Chair 3D top view with armrests on each side"/>
+</center>
+
+<p>The rest matches up perfectly, once again validifying my approach.
+The bumps on the sides of the chairs are the armrest supports.
+
+<p>I also cleaned up the form generation as much as possible.
+Resizing, zooming and panning are not supported.
+The form aspect ratio is adjusted up front to adapt to the loops to display:</p>
+
+<center>
+<img src="img/display_loops_form3.png" alt="Auto-generated .NET form"/>
+</center>
+
+<p>Once again, here is the same view in Revit:</p>
+
+<center>
+<img src="img/room_with_furniture2.png" alt="Room with some furniture"/>
+</center>
+
+
+<a name="8"></a>
+
+<h4>Next Steps</h4>
+
+<p>Actually, the next steps are the really, really exciting part.
+
+<p>Now I can turn to the implementation of my data repository and the task of hosting it in the cloud.
+
+<p>I already discussed my tentative plans and high hopes for this.
+Let's see if I can live up to them.
+
+<p>Adventure!
+Who knows what will come, and where this will lead?</p>
+
+
+<a name="9"></a>
+
+<h4>Download</h4>
+
+<p>To wrap this up for the moment, here is
+
+<a href="zip/GeoSnoopLoops.zip">GeoSnoopLoops.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the current state of this external command.

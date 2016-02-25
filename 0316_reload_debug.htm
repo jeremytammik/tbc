@@ -1,0 +1,45 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- http://darenatwork.blogspot.com/2010/03/using-revitpythonshell-to-dynamically.html -->
+
+<h3>Dynamically Load and Debug Plug-ins</h3>
+
+<p>I have two little updates on the article on John Morse's technique for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/reload-an-addin-to-debug.html">
+dynamically loading a Revit add-in</a> without
+
+having to restart Revit.
+
+<h4>Debugging an Assembly Loaded from a Byte Array</h4>
+
+<p>First, the initial comments posted by Guy Robinson and John Morse on the topic led to some further insights, the gist of
+which seems to be that if you compile an add-in targeting AnyCPU then you should have not problems using this technique on x64 or x32 systems.
+The problem comes when either you are trying to use it like 'Edit and Continue' or compiling to x64 specific assemblies.
+Some important background information on the issue is provided
+
+<a href="http://blogs.msdn.com/habibh/archive/2009/10/12/how-to-edit-code-when-debugging-a-64-bit-application.aspx">here</a>.
+
+<p>Another point to note is that it is not necessary to define a custom interface like John did, because you can use the predefined IExternalCommand one just as it is as well.
+
+<p>Furthermore, Load(Bytes b) is just one method of loading assemblies, and you can also use LoadFrom in the right context and LoadFile.
+All these methods have their advantages and disadvantages.
+For example, using Load, any out of the box use of Assembly.ExecutingAssembly().Location will return the location of the loader assembly instead of the add-in.
+The bottom line is that John's solution is not allencompassingly complete, as one might expect.
+
+<h4>Dynamically Load RevitPythonShell Plug-in for Debugging</h4>
+
+<p>Secondly, Daren Thomas, the author of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/revit-python-shell.html">
+Revit Python shell</a>,
+
+just wrote and let me know that he was able to make use of John's technique to
+
+<a href="http://darenatwork.blogspot.com/2010/03/using-revitpythonshell-to-dynamically.html">
+dynamically load plug-ins for debugging in RevitPythonShell</a> as well.
+
+Congratulations, Daren, and I am very glad to hear that it is working for you!
+

@@ -1,0 +1,398 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+  1259776 [ElementLevelFilter?]
+  1259927 [Find Elements in a room]
+  Kevin Vandecar, re: ElementParameterFilter...
+-->
+
+<h3>Parameter Filter</h3>
+
+<p>AEC DevCamp begins here in Boston today.
+I started writing this on Sunday evening, before it begins, waiting in the lobby for my colleagues.
+
+<p>Later on: finishing it off after a nice dinner with Mikako, Saikat, Partha amd Miro...
+
+<p>Later still: posting it first thing in the morning before breakfast...
+
+<p>One area that several people have recently been struggling with is the use of parameter filters.
+As shown by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+filtered element collector benchmarking</a>,
+
+the use of a parameter filter is significantly more efficient than manually postprocessing the results, even though the parameter filter is a slow filter, as opposed to quick filters such as OfClass and OfCategory.
+
+<p>Of course, you should always apply as many quick filters as possible first to narrow down the set of candidate elements before applying any slow or manual filtering.
+
+<p>We already looked at a few parameter filtering examples in the past, for instance to retrieve specific elements based on their
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+element name</a> in
+
+the filtered element collector benchmark, their
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html">
+element id</a>,
+
+and stair elements
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html">
+on a specific level</a>.
+
+Below are some other samples showing different ways to use parameter filters:
+
+<ul>
+<li><a href="#1">Retrieving beams on a specific level</a>.
+<li><a href="#2">Retrieving elements in a specific room</a>.
+<li><a href="#3">Retrieving levels by name</a>.
+<li><a href="#4">ElementId parameter</a>.
+<li><a href="#5">Boolean parameter</a>.
+<li><a href="#6">Double parameter</a>.
+<li><a href="#7">String parameter</a>.
+</ul>
+
+<p>In hindsight, and analysing the differences and similarities between the different examples below, you will notice that it all boils down to ensuring that you know exactly what values you are looking for and which built-in parameters can be used to determine them.
+In some cases, there may be exceptions and surprises lying in wait there for you, such as different built-in parameters being used to hold analogous data on different elements...
+
+
+<a name="1"></a>
+
+<h4>Retrieving beams on a specific level</h4>
+
+<p><strong>Question:</strong> My model contains various elements such as walls, beams, slabs and columns on Level 1, and I am trying to retrieve them all using an ElementLevelFilter like this:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; levels
+&nbsp; &nbsp; = collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; levels.Count; i++ )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> levelId = levels.ElementAt( i ).Id;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementLevelFilter</span> levelFilter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementLevelFilter</span>( levelId );
+&nbsp;
+&nbsp; &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; allOnLevel
+&nbsp; &nbsp; &nbsp; = collector.WherePasses( levelFilter )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+</pre>
+
+<p>I am expecting all elements on Level 1 to be returned in this collection, but in fact I see that while the walls, slabs and columns are present, all the beam elements are missing.
+
+<p>Why are the beams not included?
+
+<p>How can I set up the filtered element collector to retrieve them as well?
+
+
+<p><strong>Answer:</strong> The elements returned by your collector are of wall, column and slab type.
+These elements all have a valid value in their Level property.
+
+<p>However, the beams' Level property value is null, because the beam is not a level based component.
+A beam does not have a Base Level or Base Constraint parameter.
+
+<p>It does have a Reference Level parameter, however.
+You can therefore retrieve beams on a specific Level using a parameter filter that checks its reference level.
+
+<p>Here is a code snippet to set up a filtered element collector and an appropriate parameter filter.
+You can add the beams returned by this to the original collection:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfCategory(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip = <span class="teal">BuiltInParameter</span>
+&nbsp; &nbsp; .INSTANCE_REFERENCE_LEVEL_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idRuleValue = level.Id;
+&nbsp;
+&nbsp; <span class="teal">FilterElementIdRule</span> rule
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>(
+&nbsp; &nbsp; &nbsp; provider, evaluator, idRuleValue );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; collector.WherePasses( filter );
+</pre>
+
+
+
+<a name="2"></a>
+
+<h4>Retrieving Elements in a Specific Room</h4>
+
+<p><strong>Question:</strong> I have been able to scan a model manually to select elements, such as Furniture, and determine which room each item is in.
+I would like to efficiently find all the elements that are associated with a specific room, without manually scanning through all the elements in the model.
+Is there a structure in the API that will find me a list of elements that are in a room?
+
+<p><strong>Answer:</strong> The Revit 2011 API filtered element collector functionality includes parameter filters which can be used to conveniently retrieve all components located in a specified room.
+The parameter filter can be used because the room location is available through the built-in parameter ELEM_ROOM_NUMBER.
+Here is a complete external command example demonstrating this:
+
+<pre class="code">
+[<span class="teal">TransactionAttribute</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+[<span class="teal">RegenerationAttribute</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">RevitCommand</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> messages,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ELEM_ROOM_NUMBER );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sRoomNumber = <span class="maroon">&quot;1&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; &nbsp; provider, evaluator, sRoomNumber, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> elem <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s += elem.Name + elem.Category.Name.ToString() + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show( s );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Retrieving levels by name</h4>
+
+<p>As mentioned above, we already looked at examples of retrieving
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+elements by element name</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html">
+stairs on a specific level</a>.
+
+Here is a slightly different issue, retrieving levels by name, encountered by Kevin Vandecar:
+
+<p><strong>Question:</strong> I am covering the parameter filter in my DevCamp presentation and I have to admit I have not used it before.
+I checked out the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+benchmarking code</a> which
+
+uses a parameter filter to find level by name.
+However, when I ran it, it did not work for me and GetFirstNamedElementOfTypeUsingParameterFilter always returned null.
+
+I then moved on to trying some other examples, which are appended below.
+I got them working ok...
+
+<p><strong>Answer:</strong> So then I went back to the benchmarking code to see why I was not getting anything back.
+It took some debugging, but for whatever reason, it appears that a Level object stores its Name parameter in the built-in parameter DATUM_TEXT parameter instead of ELEM_NAME_PARAM.
+
+<p>That leads me to another question:
+How does an API user typically figure out which parameter to use?
+If I use RevitLookup on Level, I can also see a parameter named 'Name' there, but...
+
+<p>WOW, hold on!
+I just tried RevitLookup again, and it does show the built-in parameter API name as well!
+COOL!
+I clicked Level, selected a level, then clicked Parameters, then selected Name, then Definition, and then the dialog shows an entry: Built in Param = DATUM_TEXT.
+So I guess that confirms it.
+
+<p>Wow, I wish I had known that last night!
+
+<p>Anyway, here
+s the final code I used to test to find all Levels containing the string "Level" in their Name parameter, i.e. in the built-in parameter DATUM_TEXT:
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+&nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.DATUM_TEXT );
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>( id );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringContains</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; provider, evaluator, <span class="maroon">&quot;Level&quot;</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+</pre>
+
+<p>Ok, I am on my way again, and hope this bit of research helps.
+
+<p>Here are the other examples that Kevin mentioned:
+
+
+<a name="4"></a>
+
+<h4>ElementId Parameter</h4>
+
+<p>Use numeric evaluator and integer rule to test ElementId parameter;
+Filter levels whose id is greater than specified id value:
+
+<pre class="code">
+&nbsp; <span class="teal">BuiltInParameter</span> testParam
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.ID_PARAM;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> pvp
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ( <span class="blue">int</span> ) testParam ) );
+&nbsp;
+&nbsp; <span class="teal">FilterNumericRuleEvaluator</span> fnrv
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; <span class="green">// filter elements whose Id is greater than 99</span>
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> ruleValId = <span class="blue">new</span> <span class="teal">ElementId</span>( 99 );
+&nbsp;
+&nbsp; <span class="teal">FilterRule</span> paramFr = <span class="blue">new</span> <span class="teal">FilterElementIdRule</span>(
+&nbsp; &nbsp; pvp, fnrv, ruleValId );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> epf
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( paramFr );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(&nbsp; doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; .WherePasses( epf ); <span class="green">// only deal with ViewPlan</span>
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Boolean Parameter</h4>
+
+<p>Use numeric evaluator and integer rule to test Boolean parameter;
+Filter levels whose crop view is false:
+
+<pre class="code">
+&nbsp; <span class="blue">int</span> ruleValInt = 0;
+&nbsp;
+&nbsp; testParam = <span class="teal">BuiltInParameter</span>.VIEWER_CROP_REGION;
+&nbsp;
+&nbsp; pvp = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ( <span class="blue">int</span> ) testParam ) );
+&nbsp;
+&nbsp; fnrv = <span class="blue">new</span> <span class="teal">FilterNumericEquals</span>();
+&nbsp;
+&nbsp; paramFr = <span class="blue">new</span> <span class="teal">FilterIntegerRule</span>(
+&nbsp; &nbsp; pvp, fnrv, ruleValInt );
+&nbsp;
+&nbsp; epf = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( paramFr );
+&nbsp;
+&nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; .WherePasses( epf ); <span class="green">// only deal with ViewPlan</span>
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Double Parameter</h4>
+
+<p>Use numeric evaluator and double rule to test double parameter;
+Filter levels whose top offset is greater than specified value:
+
+<pre class="code">
+&nbsp; <span class="blue">double</span> ruleValDb = 10;
+&nbsp;
+&nbsp; testParam =
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.VIEWER_BOUND_OFFSET_TOP;
+&nbsp;
+&nbsp; pvp = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ( <span class="blue">int</span> ) testParam ) );
+&nbsp;
+&nbsp; fnrv = <span class="blue">new</span> <span class="teal">FilterNumericGreater</span>();
+&nbsp;
+&nbsp; paramFr = <span class="blue">new</span> <span class="teal">FilterDoubleRule</span>(
+&nbsp; &nbsp; pvp, fnrv, ruleValDb, <span class="blue">double</span>.Epsilon );
+&nbsp;
+&nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; .WherePasses( epf ); <span class="green">// only deal with ViewPlan</span>
+</pre>
+
+
+<a name="7"></a>
+
+<h4>String Parameter</h4>
+
+<p>use string evaluator and string rule to test string parameter;
+Filter all elements whose view name contains level:
+
+<pre class="code">
+&nbsp; <span class="teal">String</span> ruleValStr = <span class="maroon">&quot;Level&quot;</span>;
+&nbsp;
+&nbsp; testParam = <span class="teal">BuiltInParameter</span>.VIEW_NAME;
+&nbsp;
+&nbsp; pvp = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( ( <span class="blue">int</span> ) testParam ) );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> fnrvStr
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringContains</span>();
+&nbsp;
+&nbsp; paramFr = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; pvp, fnrvStr, ruleValStr, <span class="blue">false</span> );
+&nbsp;
+&nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; .WherePasses( epf ); <span class="green">// only deal with ViewPlan</span>
+</pre>
+
+<p>Many thanks to Joe Ye and Kevin Vandecar for these new examples!
+
+<p>I hope we have collected and presented enough parameter filter samples now to cover all possible cases!
+If not, I would not be surprised, and just let me know, please...

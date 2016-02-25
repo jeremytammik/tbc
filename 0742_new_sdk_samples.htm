@@ -1,0 +1,123 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>New Revit 2013 SDK Samples</h3>
+
+<p>Revit 2013 has been released, and I presented an overview of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html">
+Revit 2013 API</a> two
+
+days ago.
+
+<p>As always, the use of most of the API features is demonstrated by various SDK samples.
+For a better understanding of the use and contents of the Revit SDK in general, please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/getting-started-with-the-revit-2012-api.html">
+getting started</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+self-preparation</a> guides.
+
+<p>Here is an overview of the new samples:
+
+<ul>
+<li><a href="#1">ModelessForm_ExternalEvent and ModelessForm_IdlingEvent (ModelessDialog)</a>
+<li><a href="#2">ProgressNotifier (Events)</a>
+<li><a href="#3">RoutingPreferenceTools</a>
+<li><a href="#4">UIAPI</a>
+<li><a href="#5">WorkThread (MultiThreading)</a>
+</ul>
+
+<p>These samples are all related to the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+add-in integration</a> functionality, 
+
+except for the RoutingPreferenceTools which obviously demonstrate some of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#3">
+MEP related enhancements</a>.
+
+<!-- i.e. use of the new Idling functionality and external events, the progress bar notifications and general -->
+
+
+<p>By the way, the 'VSTA Samples' folder was renamed to 'Macro Samples' since 
+
+<a href="http://en.wikipedia.org/wiki/Visual_Studio_Tools_for_Applications">
+VSTA</a> was 
+
+replaced by the open source 
+
+<a href="http://en.wikipedia.org/wiki/SharpDevelop">
+SharpDevelop</a> IDE.
+
+
+<a name="1"></a>
+
+<h4>ModelessForm_ExternalEvent and ModelessForm_IdlingEvent</h4>
+
+<p>Both of these display and show how to interact with a modeless form.
+One way to do this is to use the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling event</a> initially provided in Revit 2012, 
+
+which we have discussed so much and in such depth in the past. 
+
+<p>The ModelessForm_IdlingEvent sample should clarify many of the issues we dealt with, and is also related the material presented by Arno&scaron;t L&ouml;bel in his Autodesk University 2011 class
+
+<a href="http://au.autodesk.com/?nd=event_class&session_id=9879&jid=1763185">
+CP5381</a> on 
+
+asynchronous interactions and managing modeless UI.
+
+<p>The ModelessForm_ExternalEvent sample demonstrates an easier way to implement this interaction using the new external event interface.
+
+
+
+
+<a name="2"></a>
+
+<h4>ProgressNotifier</h4>
+
+<p>The ProgressNotifier sample displays progress information for an action in a stack data structure for easier analysis. It demonstrates how to subscribe to the ProgressNotify related events, access properties in the event handler arguments, and organize the subtransaction progress information into a stack.
+
+
+
+<a name="3"></a>
+
+<h4>RoutingPreferenceTools</h4>
+
+<p>The RoutingPreferenceTools sample provides a number of MEP pipe routing preference tools.
+
+<p>This sample contains three commands, one for analysis and reporting purposes, two for importing and exporting routing preferences to XML:
+
+<ul>
+<li>Routing Preference Analysis: Analyze the routing preferences of a given pipe type to check for common problems, using the routing preferences API to look at all rules and criteria for a given PipeType.
+
+<li>Routing Preference Builder with its two commands CommandReadPreferences and CommandWritePreferences: Set pipe type, fitting, and routing preferences in a project from data in an XML file and export these preferences to XML for archival, documentation, and collaboration purposes, allowing a user to work with routing preference data in a shareable XML format suitable for reuse in a wide variety of BIM management environments.
+</ul>
+
+
+
+<a name="4"></a>
+
+<h4>UIAPI</h4>
+
+<p>The UIAPI sample demonstrates a number of the new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+add-in integration API features</a> that 
+
+I already listed, including embedding a Revit view as WPF control inside its own dialogue, the new drag and drop API, and the Options dialogue support for custom extensions using arbitrary WPF components.
+This sample was also shown at the DevDays 2011 conferences.
+
+
+
+<a name="5"></a>
+
+<h4>WorkThread</h4>
+
+<p>The WorkThread sample demonstrates utilizing the Idling event in a multi-threaded application to communicate with the Revit API from an external work thread.

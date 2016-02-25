@@ -1,0 +1,230 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+  Autodesk University 2009
+  CP222-3 Analyze Geometry of Buildings Using the Autodesk Revit API -- Scott Conover
+  C:\a\doc\revit\au\2009\doc2\AU09_CP222-3_Analyze_Geometry_Revit_API.pdf
+
+-->
+
+<h3>Faces</h3>
+
+<p>This is part 5 of Scott Conover's AU 2009 class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html">
+analysing building geometry</a>.
+
+<p>Faces in the Revit API can be described as mathematical functions of two input parameters 'u' and 'v', where the location of the face at any given point in XYZ space is a function of the parameters.
+The U and V directions are automatically determined based on the shape of the given face.
+Lines of constant U or V can be represented as gridlines on the face:</p>
+
+<center>
+<img src="img/abg5_uv_gridlines.png" alt="U and V gridlines on a cylindrical face"/>
+</center>
+
+<p>You can use the UV parameters to evaluate a variety of properties of the face at any given location:</p>
+
+<ul>
+<li>Whether the parameter is within the boundaries of the face, using Face.IsInside.
+<li>The XYZ location of the given face at the specified UV parameter value. This is returned from Face.Evaluate. If you are also calling ComputeDerivatives, this is also the .Origin property of the Transform returned by that method.
+<li>The tangent vector of the given face in the U direction. This is the BasisX property of the Transform returned by Face.ComputeDerivatives.
+<li>The tangent vector of the given face in the V direction. This is the BasisY property of the Transform returned by Face.ComputeDerivatives.
+<li>The normal vector of the given face. This is the BasisZ property of the Transform returned by Face.ComputeDerivatives.
+</ul>
+
+<p>All of the vectors returned are non-normalized.</p>
+
+<h4>Face types</h4>
+
+<p>Revit uses a variety of curve types to represent face geometry in a document, including the following with their corresponding Revit API representation classes:</p>
+
+<ul>
+<li>Plane &ndash; PlanarFace</li>
+<li>Cylinder &ndash; CylindricalFace</li>
+<li>Cone &ndash; ConicalFace</li>
+<li>Revolved face &ndash; RevolvedFace</li>
+<li>Ruled surface &ndash; RuledFace</li>
+<li>Hermite face &ndash; HermiteFace</li>
+</ul>
+
+<p>Here is the definition and some notes on each of these:</p>
+
+<ul>
+<li>Plane: A plane defined by the origin and unit vectors in U and V.
+
+<li>Cylinder: A face defined by extruding a circle along an axis.
+The Radius property provides the 'radius vectors' – the unit vectors of the circle multiplied by the radius value.
+
+<li>Cone: A face defined by rotation of a line about an axis.
+The Radius property provides the 'radius vectors' – the unit vectors of the circle multiplied by the radius value.
+
+<li>Revolved face: A face defined by rotation of an arbitrary curve about an axis.
+The Radius property provides the unit vectors of the plane of rotation, there is no 'radius' involved.
+
+<li>Ruled surface: A face defined by sweeping a line between two profile curves, or one profile curve and one point.
+Both curve(s) and point(s) can be obtained as properties.
+
+<li>Hermite face: A face defined by Hermite interpolation between points.
+</ul>
+
+<h4>Mathematical representation</h4>
+
+<p>Mathematical representations of all of the Revit face types are given in Appendix B of Scott's
+
+<a href="http://au.autodesk.com/?nd=material&session_material_id=5337">handout document</a>,
+
+and we include them here as well for easy online access.
+This section describes the face types encountered in Revit geometry, their properties, and their mathematical representations.
+
+<h5>PlanarFace</h5>
+
+<p>A plane defined by origin and unit vectors in U and V. Its parametric equation is</p>
+
+<div align="center">P(u,v) = P<sub>0</sub> + u n<sub>u</sub> + v n<sub>v</sub></div>
+
+<h5>CylindricalFace</h5>
+
+<p>A face defined by extruding a circle along an axis. The Revit API provides the following properties:</p>
+
+<ul>
+<li>The origin of the face.
+<li>The axis of extrusion.
+<li>The 'radius vectors' in X and Y.
+These vectors are the circle's unit vectors multiplied by the radius of the circle.
+Note that the unit vectors may represent either a right handed or left handed control frame.
+</ul>
+
+<p>The parametric equation for this face is:</p>
+
+<div align="center">
+P(u,v) = P<sub>0</sub> + r<sub>x</sub> cos(u) + r<sub>y</sub> sin(u) + v n<sub>axis</sub>
+</div>
+
+<h5>ConicalFace</h5>
+
+<p>A face defined by rotation of a line about an axis. The Revit API provides the following properties:</p>
+
+<ul>
+<li>The origin of the face.
+<li>The axis of the cone.
+<li>The 'radius vectors' in X and Y.
+These vectors are the unit vectors multiplied by the radius of the circle formed by the revolution.
+Note that the unit vectors may represent either a right handed or left handed control frame.
+<li>The half angle of the face.
+</ul>
+
+<p>The parametric equation for this face is:</p>
+
+<div align="center">
+P(u,v) = P<sub>0</sub> + v [sin(&alpha;) (r<sub>x</sub> cos(u) + r<sub>y</sub> sin(u)) + cos(&alpha;) n<sub>axis</sub>]
+</div>
+
+<h5>RevolvedFace</h5>
+
+<p>A face defined by rotation of an arbitrary curve about an axis. The Revit API provides the following properties:</p>
+
+<ul>
+<li>The origin of the face.
+<li>The axis of the face.
+<li>The profile curve.
+<li>The unit vectors for the rotated curve (incorrectly called 'Radius').
+</ul>
+
+<p>The parametric equation for this face is:</p>
+
+<div align="center">
+P(u,v) = P<sub>0</sub> + C(v) [r<sub>x</sub> cos(u) + r<sub>y</sub> sin(u) + n<sub>axis</sub>]
+</div>
+
+<h5>RuledFace</h5>
+
+<p>A ruled surface is created by sweeping a line between two profile curves or between a curve and a point.
+The Revit API provides the curve(s) and point(s) as properties.</p>
+
+<p>If both curves are valid, the parametric equation for this surface is:</p>
+
+<div align="center">
+P(u,v) = C<sub>1</sub>(u) + v (C<sub>2</sub>(u) - C<sub>1</sub>(u) )
+</div>
+
+<p>If one of the curves is replaced with a point, the equations simplify to one of:</p>
+
+<div align="center">
+P(u,v) = P<sub>1</sub> + v (C<sub>2</sub>(u) - P<sub>1</sub> )
+<br/>P(u,v) = C<sub>1</sub>(u) + v (P<sub>2</sub> - C<sub>1</sub>(u) )
+</div>
+
+<p>A ruled face with no curves and two points is degenerate and will not be returned.</p>
+
+<h5>HermiteFace</h5>
+
+<p>A cubic Hermite spline face. The Revit API provides:</p>
+
+<ul>
+<li>Arrays of the u and v parameters for the spline interpolation points.
+<li>An array of the 3D points at each node (the array is organized in increasing u, then increasing v).
+<li>An array of the tangent vectors at each node.
+<li>An array of the twist vectors at each node.
+</ul>
+
+<p>The parametric representation of this surface between nodes (u1, v1) and (u2, v2) is:</p>
+
+<div align="center">
+P(u,v) = U<sup>T</sup> [M<sub>H</sub>] [B} [M<sub>H</sub>]<sup>T</sup> V
+</div>
+
+<p>Here, U = [u<sup>3</sup> u<sup>2</sup> u 1]<sup>T</sup>, V = [v<sup>3</sup> v<sup>2</sup> v 1]<sup>T</sup>, and M<sub>H</sub> is the Hermite matrix:</p>
+
+<div align="center">
+<table>
+<tr><td rowspan="4">[M<sub>H</sub>] =</td><td>
+
+<table>
+<tr><td style="border-color: black; border-width: 1px 0 0 1px; border-style: solid">&nbsp;</td><td align="right"> 2</td><td align="right">-2</td><td align="right"> 1</td><td align="right"> 1</td><td style="border-color: black; border-width: 1px 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="border-color: black; border-width:   0 0 0 1px; border-style: solid">&nbsp;</td><td align="right">-3</td><td align="right"> 3</td><td align="right">-2</td><td align="right">-1</td><td style="border-color: black; border-width:   0 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="border-color: black; border-width:   0 0 0 1px; border-style: solid">&nbsp;</td><td align="right"> 0</td><td align="right"> 0</td><td align="right"> 1</td><td align="right"> 0</td><td style="border-color: black; border-width:   0 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="border-color: black; border-width: 0 0 1px 1px; border-style: solid">&nbsp;</td><td align="right"> 1</td><td align="right"> 0</td><td align="right"> 0</td><td align="right"> 0</td><td style="border-color: black; border-width: 0 1px 1px 0; border-style: solid">&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+</div>
+
+<p>B is the coefficient matrix obtained from the face properties at the interpolation points:</p>
+
+<div align="center">
+<table>
+<tr><td rowspan="4">[B] =</td><td>
+
+<table>
+<tr><td style="padding: 4px; border-color: black; border-width: 1px 0 0 1px; border-style: solid">&nbsp;</td><td align="center">P<sub>u<sub>1</sub>v<sub>1</sub></sub></td><td align="center" style="padding: 4px">P<sub>u<sub>1</sub>v<sub>2</sub></sub></td><td align="center" style="padding: 4px">P'<sub>v(u<sub>1</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>v(u<sub>1</sub>v<sub>2</sub>)</sub></td><td style="padding: 4px; border-color: black; border-width: 1px 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="padding: 4px; border-color: black; border-width:   0 0 0 1px; border-style: solid">&nbsp;</td><td align="center">P<sub>u<sub>2</sub>v<sub>1</sub></sub></td><td align="center" style="padding: 4px">P<sub>u<sub>2</sub>v<sub>2</sub></sub></td><td align="center" style="padding: 4px">P'<sub>v(u<sub>2</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>v(u<sub>2</sub>v<sub>2</sub>)</sub></td><td style="padding: 4px; border-color: black; border-width:   0 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="padding: 4px; border-color: black; border-width:   0 0 0 1px; border-style: solid">&nbsp;</td><td align="center">P'<sub>u(u<sub>1</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>u(u<sub>1</sub>v<sub>2</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>uv(u<sub>1</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>uv(u<sub>1</sub>v<sub>2</sub>)</sub></td><td style="padding: 4px; border-color: black; border-width:   0 1px 0 0; border-style: solid">&nbsp;</td></tr>
+<tr><td style="padding: 4px; border-color: black; border-width: 0 0 1px 1px; border-style: solid">&nbsp;</td><td align="center">P'<sub>u(u<sub>2</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>u(u<sub>2</sub>v<sub>2</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>uv(u<sub>2</sub>v<sub>1</sub>)</sub></td><td align="center" style="padding: 4px">P'<sub>uv(u<sub>2</sub>v<sub>2</sub>)</sub></td><td style="padding: 4px; border-color: black; border-width:   0 1px 1px 0; border-style: solid">&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+</div>
+
+<h4>Face analysis and processing</h4>
+
+<p>Several Face member methods provide tools suitable for use in geometric analysis:</p>
+
+<ul>
+<li>Intersect: computes the intersection between the face and a curve.
+<li>Project: projects a point on the input face, and returns information on the projection point, the distance to the face, and the nearest edge to the projection point.
+<li>Triangulate: returns a triangular mesh approximating the face. Similar to Curve.Tessellate, this mesh's points are accurate within the input tolerance used by Revit (slightly larger than 1/16').
+</ul>
+
+<p>The Intersect method can be used in to identify:</p>
+
+<ul>
+<li>The intersection point(s) between the two objects.
+<li>The edge nearest the intersection point, if there is an edge close to this location.
+<li>Curves totally coincident with a face.
+<li>Curves and faces which do not intersect.
+</ul>
+
+<p>The next instalment of this series will look at face edges and their directions and parametrisation.

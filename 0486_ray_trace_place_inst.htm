@@ -1,0 +1,75 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Jeremiah Farmer Re: placing Site Components into Revit -->
+
+<h3>Ray Tracing to Place Family Instance</h3>
+
+<p>Jeremiah Farmer of 
+
+<a href="http://www.landfx.com">
+Land F/X</a> recently 
+
+presented his solution for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-detail-instance.html">
+placing a site component</a> on 
+
+a topo surface.
+
+<p>One important issue in addition to the information presented there is that the family instance insertion point needs to be located on the surface.
+One way to find a suitable point is to use the Revit API method 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">
+FindReferencesByDirection</a> to 
+
+shoot a ray through the model to determine a suitable point, i.e. the intersection point between the ray and the surface. 
+If the desired X and Y position is known, one can use a vertical ray, so that its job is just to determine the appropriate Z coordinate.
+
+<p>Here is Jeremiah's short explanation and sample code demonstrating this:
+
+<p>An update on the Import Site Components, it does seem that a ray trace is necessary to get it correctly anchored at the right Z elevation.  So I've added the following:
+
+<pre class="code">
+&nbsp; <span class="blue">Dim</span> surface <span class="blue">As</span> TopographySurface _
+&nbsp; &nbsp; = GetSurface(commandData)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> boundingbox <span class="blue">As</span> BoundingBoxXYZ _
+&nbsp; &nbsp; = surface.BoundingBox(<span class="blue">Nothing</span>)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> minZ <span class="blue">As</span> <span class="blue">Double</span> = boundingbox.Min.Z
+&nbsp;
+&nbsp; <span class="blue">Dim</span> UP <span class="blue">As</span> XYZ = XYZ.BasisZ
+&nbsp;
+&nbsp; <span class="blue">Dim</span> view <span class="blue">As</span> View = doc.ActiveView
+&nbsp;
+&nbsp; <span class="green">' for each point to insert component on surface:</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> p0 <span class="blue">As</span> XYZ
+&nbsp; <span class="green">' p1 is our X and Y for that component</span>
+&nbsp; p0 = <span class="blue">New</span> XYZ(p1.X, p1.Y, minZ)
+&nbsp;
+&nbsp; <span class="blue">Dim</span> test <span class="blue">As</span> ReferenceArray _
+&nbsp; &nbsp; = doc.FindReferencesByDirection(p0, UP, view)
+&nbsp;
+&nbsp; <span class="blue">If</span> test.Size &gt; 0 <span class="blue">Then</span> <span class="green">' found a surface point</span>
+&nbsp; &nbsp; <span class="green">' from our desired X,Y, looking Up </span>
+&nbsp; &nbsp; <span class="green">' from minimum Z to Surface</span>
+&nbsp; &nbsp; p0 = test.Item(0).GlobalPoint
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="green">' note if we don't match a surface point, </span>
+&nbsp; <span class="green">' the call to loadfamilyinstance will fail</span>
+</pre>
+
+<p>The GetSurface method is not listed here. 
+It is a basic helper function similar to ones I've seen previous Building Coder blog posts; it creates a filter, loops through the members, calls TryCast to the element type desired, and returns that element. 
+
+<p>Also, it might make sense to add some error handling, since the FindReferenceByDirection method requires a 3D view to be active.
+The routine as it now stands will generate an error if a plan view is active.
+
+<p>Note that if no surface point is matched, the subsequent call to insert the family instance will fail.
+
+<p>Many thanks to Jeremiah for his research and sharing this!
+
+<p>By the way, a similar approach is probably also useful for placing furniture family instances onto a floor in the model.

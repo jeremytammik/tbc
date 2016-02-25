@@ -1,0 +1,55 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1267135 [Comparing ElementIds] and Adam Nagy Re: Comparing ElementId's directly instead of using their IntegerValue -->
+
+<h3>Comparing Element Id for Equality</h3>
+
+<p>Here is a very fundamental question that I was uncertain about myself, but happily Adam Nagy now clarified together with the development team:
+
+<p><strong>Question:</strong> Is it safe to compare two element ids directly, or is it better to compare their integer values using the IntegerValue property instead? 
+
+<p>In other words, given two ElementId variables id and id2, can I safely and reliably compare them using the following code?
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> equal = ( id == id2 );
+</pre>
+
+Or should I better use the following?
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> equal = ( id.IntegerValue == id2.IntegerValue ); 
+</pre>
+
+<p><strong>Answer:</strong> The ElementId comparison operator was added in the Revit 2011 API, so you can safely use both versions, and they should always return the same result.
+
+<p>By the way, I am uncertain but vaguely remember that unlike the == operator, the Equals method worked even before 2011.
+
+<p>Here is a quick test that I created and ran in Revit 2011 which shows that (id1 == id2) works correctly. 
+If the first created wall is picked, the dialogue box is displayed, otherwise not:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> IdTest( <span class="teal">UIDocument</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc.Document )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = collector.ToElementIds().First();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> selRef = doc.Selection.PickObject( 
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( id == selRef.Element.Id )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Same Wall&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Just saying...&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Many thanks to Adam, Scott Conover and Miroslav Schonauer for chipping in on this subject.
+
+<p>It is a relief for me to know for sure as well!
+I have still been using the IntegerValue property until now, to be on the safe side, which adds unnecessary verbal and optical overload to my source code.

@@ -1,0 +1,102 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>New 2010 Events</h3>
+
+<p>The Event API in Revit has been completely rewritten in 2010 to be compliant to the .NET event standard. 
+The old events are still available but have been deprecated. 
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a>
+
+already posted an overview of some of the new 
+
+<a href="http://cadappdev.blogspot.com/2009/03/whats-new-in-revit-2010-api-events.html">
+event handling</a>
+
+features.
+Transitioning from the old events to the new ones can include some pitfalls, and one has now been uncovered.</p>
+
+<p><strong>Question:</strong>
+My application connects to a database when a project is opened.
+It uses the following code which is called when a document is opened:</p>
+
+<pre>
+void revitApp_OnDocumentOpened( Document doc )
+{
+  try {
+    doc.BeginTransaction();
+    // . . .
+    doc.EndTransaction();
+  }
+  catch (Exception ex)
+  {
+    MessageBox.Show( ex.Message );
+  }
+}
+</pre>
+
+<!-- In Revit 2010, this produces the following error message when doc.BeginTransaction() is called: -->
+
+<p>In Revit 2009, this occasionally produces the following error message when doc.BeginTransaction() is called, especially when work sharing is enabled in a project:
+<i>"Attempted to read or write protected memory. This is often an indication that other memory is corrupt."</i>
+This worked fine in the past. What is going wrong now?</p>
+
+<p><strong>Answer:</strong>
+The OnDocumentOpened event is one of the old pre-2010 events.
+In these, an API transaction can be started, but it is not guaranteed whether it will be successful or not.
+This is one reason why the old events have been declared obsolete in 2010.
+The Revit development team recommends moving on to the new 2010 events instead.
+
+<p>In this case, you can use the application.DocumentOpened event.
+In this new event, you can modify the document directly without having to call BeginTransaction to open your own transaction.
+The transaction required has already been created by the event framework before calling the event handler, so the document is immediately modifiable.
+Thus, the calls to begin, end and abort a transaction are not allowed in the new event handlers and an InvalidOperationException is thrown if one of them is called during the event.
+Here is what the Revit API documentation on the DocumentOpened event has to say about this:</p>
+
+<!-- <span style="background-color:lightgrey"> -->
+
+<span style="color:darkslateblue">
+
+<p>This event is raised immediately after Revit has finished opening a document. It is raised even when document opening failed or was cancelled (during DocumentOpening event).
+
+<p>Check the 'Status' field in event’s argument to see whether the action itself was successful or not.
+
+<p>This event is not cancellable, for the process of opening document has already been finished.
+
+<p>If the action was successful, the document may be modified during this event.
+A transaction is already created at the time of the event and will be automatically closed at the end of the event.
+There is no need to create another transaction during this event and it is, in fact, prohibited.
+
+<p>Please be aware that the following API functions are not available for the current document during this event:
+
+<ul>
+<li>Close()
+<li>BeginTransaction()
+<li>AbortTransaction()
+<li>EndTransaction()
+<li>Save()
+<li>SaveAs()
+</ul>
+
+<p>Exception InvalidOperationException will be thrown if any of the above methods is called during this event.
+
+<p>The DocumentOpened event is meant to replace the older OnDocumentOpened event, which is now Obsolete.
+
+</span>
+
+<p>Many thanks to Saikat Bhattacharya for handling this case!</p>
+
+<h4>Revit 2010 API Webcast</h4>
+
+<p>Don't forget to register for the upcoming 
+
+<a href="http://www.adskconsulting.com/adn/cs/api_course_sched.php">
+Revit 2010 API webcast</a>
+
+Wednesday next week, April 29 2009.
+The course name is Revit API, the language is English, and the location is 'Webcast'.</p>

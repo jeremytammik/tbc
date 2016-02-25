@@ -1,0 +1,179 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Revit API Cases 1</h3>
+
+<p>Here are the summaries of some of the Revit API ADN cases handled by me and my colleagues Joe Ye and Saikat Bhattacharya in the past few days:</p>
+
+<ol>
+<li><a href=#1>Set the display colour of a line.</a></li>
+<li><a href=#2>Split walls and lines, or ducts and pipes.</a></li>
+<li><a href=#3>Change colour of a family instance.</a></li>
+<li><a href=#4>Export family symbols from a project and save in an external RFA file.</a></li>
+</ol>
+
+<a name="1"></a>
+
+<h4>1. Set the display colour of a line</h4>
+
+<!-- 1249123 [How can I set the display colour of a line?] -->
+
+<p><strong>Question:</strong>
+How can I set the display colour of a line?</p>
+
+<p><strong>Answer:</strong>
+In Revit 2009, I do not see any way to access the color settings in the line styles which in turn affects the color of lines.
+The line style Color property is not exposed to enable us to change the color.</p>
+
+<p>Revit 2010 offers a new possibility to modify the line colour via the new LineColor property on the Category class.
+Thus, for any given line, one can access its category and its line color property, which is read and write enabled.</p>
+
+<a name="2"></a>
+
+<h4>2. Split walls and lines, or ducts and pipes</h4>
+
+<!-- 1249115 [Split Walls and Lines function] -->
+
+<p><strong>Question:</strong>
+I would like to split ducts and pipes in Revit MEP.
+Can I call the 'Split Walls and Lines' functionality somehow from the Revit 2009 API and
+apply it to Ducts and Pipes?
+If not, is this feature going to be available in the 2010 API?
+I have heard that duct and pipe creation will be included.</p>
+
+<p><strong>Answer:</strong>
+The Revit 2010 API does not provide any API method to cut or split any of the duct, pipe or wall elements.
+Methods to create ducts and pipes are indeed provided in 2010.
+Thus you could use the NewDuct, NewPipe and NewWall methods to create a new element, shorten the original one accordingly, and
+set the properties and parameters obtained from the original to the newly created one.
+This might provide a possibility to mimic the splitting effect.</p>
+
+<a name="3"></a>
+
+<h4>3. Change colour of a family instance</h4>
+
+<!-- 1248878 [Change color of one instance] -->
+
+<p>This is a continuation of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/more-questions.html#change_colour_of_one_instance">
+previous post</a>
+
+on this topic:</p>
+
+<p><strong>Question:</strong>
+Could you provide the code to illustrate the approach you described to change the colour of a family instance?</p>
+
+<p><strong>Answer:</strong>
+Since the colour of an instance is defined by the material assigned to the type or symbol referenced by the instance, this involves duplicating the family symbol it references, assigning a different material colour to the newly created type, and then assigning the new type to the object that you want to colour differently. Here is the code to illustrate this approach.</p>
+
+<p>For simplicity, it works with only one family instance, say a column, in the Revit model.
+A material has been applied through the user interface, and then the following piece of code is executed to create a duplicate symbol and access the material from the symbol. In this case, for now, it directly changes the colour of the material instead of selecting another material with a different colour or duplicating the colour. Finally, it applies the duplicated symbol to the family instance:</p>
+
+<pre class="code">
+<span class="teal">ElementSet</span> elemset = doc.Selection.Elements;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> elemset )
+{
+&nbsp; <span class="teal">FamilyInstance</span> inst = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="green">// get the symbol and duplicate it:</span>
+&nbsp; <span class="teal">FamilySymbol</span> dupSym = inst.Symbol.Duplicate(
+&nbsp; &nbsp; <span class="maroon">"D1"</span> ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; <span class="green">// access the material:</span>
+&nbsp; <span class="teal">ElementId</span> matId = dupSym.get_Parameter(
+&nbsp; &nbsp; <span class="maroon">"Material"</span> ).AsElementId();
+&nbsp;
+&nbsp; <span class="teal">Material</span> mat = doc.get_Element( <span class="blue">ref</span> matId )
+&nbsp; &nbsp; <span class="blue">as</span> Autodesk.Revit.Elements.<span class="teal">Material</span>;
+&nbsp;
+&nbsp; <span class="green">// change the color of this material:</span>
+&nbsp; mat.Color = <span class="blue">new</span> <span class="teal">Color</span>( 255, 0, 0 );
+&nbsp;
+&nbsp; <span class="green">// assign the new symbol to the instance:</span>
+&nbsp; inst.Symbol = dupSym;
+}
+</pre>
+
+<a name="4"></a>
+
+<h4>4. Export family symbols from a project and save as RFA files</h4>
+
+<!-- 1249124 [Journal commands of Revit 2009 do not work in 2010] -->
+
+<p><strong>Question:</strong>
+I would like to use the beta version of Revit 2010 and the new family API to save out all family symbols in an existing project to external RFA files.
+I am trying to use Document.EditFamily to open the family document, and then use the SaveAs method on that to export the family definition. Unfortunately, EditFamily throws an exception, System.InvalidOperationException, with the message 'Loaded Family Editing failed.'</p>
+
+<p><strong>Answer:</strong>
+Some families can be edited and saved to an external file, and others cannot.
+If the family can be edited in the Revit user interface, it should also be possible to open it through the API.
+Here is the result of logging the calls to EditFamily on all the families contained in a simple project named one_door.rvt containing one door symbol and an instance of it and very little else:</p>
+
+<pre>
+Error processing 'System Panel': Loaded Family Editing failed.
+Error processing 'Rectangular Mullion': Loaded Family Editing failed.
+Error processing 'Circular Mullion': Loaded Family Editing failed.
+Error processing 'L Corner Mullion': Loaded Family Editing failed.
+Error processing 'V Corner Mullion': Loaded Family Editing failed.
+Error processing 'Trapezoid Corner Mullion': Loaded Family Editing failed.
+Error processing 'Quad Corner Mullion': Loaded Family Editing failed.
+Success processing 'M_Single-Flush'
+</pre>
+
+<p>As you can see, a number of built-in system families are impossible to edit, and calling EditFamily on those throws an exception of type System.InvalidOperationException.</p>
+
+<p>The door symbol is defined through a standard family and can be edited and saved.
+After running the command, the family file for the door symbol is stored on disk:</p>
+
+<pre>
+2009-04-06  13:37   192,512 M_Single-Flush.rfa
+2009-02-24  10:41   294,912 one_door.rvt
+</pre>
+
+<p>Here is the code for the external command which iterates through all the families in the project and tries to save each to a separate RFA file on disk:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _path = <span class="maroon">&quot;C:/tmp/extract/&quot;</span>;
+&nbsp;
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">Filter</span> filter = app.Create.Filter.NewTypeFilter(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; fams = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; doc.get_Elements( filter, fams );
+&nbsp;
+&nbsp; <span class="blue">foreach</span> ( <span class="teal">Family</span> f <span class="blue">in</span> fams )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> name = f.Name;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> famDoc = doc.EditFamily( f );
+&nbsp; &nbsp; &nbsp; famDoc.SaveAs( _path + name + <span class="maroon">&quot;.rfa&quot;</span> );
+&nbsp; &nbsp; &nbsp; famDoc.Close( <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Success processing '{0}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; name );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Error processing '{0}': {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; name, ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+}
+</pre>
+

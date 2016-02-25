@@ -1,0 +1,220 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<!--
+
+  C:\a\j\adn\case\bsd\1249926\_form_creation.zip
+  C:\a\j\adn\train\revit\2010\doc\form_creation.rtf
+  2010 form creation, and
+  C:\a\src\revit\make_loft\make_loft.htm
+
+-->
+
+<h3>The Revit Form Creation API</h3>
+
+<p>Here is an overview of the Revit form creation API written by Saikat Bhattacharaya.</p>
+<p>The form creation and conceptual design API can be seen as a subset of the new Revit 2010 family API. It includes new point and curve objects, form making tools, and new surfaces that can be divided, patterned and panelised. You can use it to create schematic studies for curtain system designs and structural framing layouts, and even apply real curtain panels to your form with these new and easy-to-use tools.</p>
+<ul>
+<li>New point and curve objects</li>
+<li>New form-making tools</li>
+<li>Resulting surfaces can be divided, patterned, and panelised</li>
+</ul>
+<center>
+<img src="img/form_creation.jpg" alt="Revit conceptual form creation"/>
+</center>
+<h4>Form Creation Topics</h4>
+<p>The form creation API provides the following main areas of functionality: points, curves created using these points, forms defined by the curves, divided surfaces placed on faces of a form, and curve panel components placed on that surface:</p>
+<ul>
+<li>Points</li>
+<li>Curve by points</li>
+<li>Forms: extrusion, loft, revolve, swept blend</li>
+<li>Divided surface and panel components</li>
+</ul>
+<h4>Reference Point and Curve by Points</h4>
+<ul>
+<li>Reference points can be created using XYZ, Transform, on edge, at edge/edge or edge/face intersection, on a face or on a plane</li>
+<li>ReferencePointArray, an array of reference points for curve creation</li>
+<li>NewCurveByPoints( ReferencePointArray )</li>
+</ul>
+<p>One can start with the reference point class. An instance can be created using a simple XYZ location. This point can be modified using a transformation. The five subclasses of the PointElementReference class allow a point to be defined in relation to some part of the model geometry, such as at the centre of an edge. In that case, the point will update its location if the edge is modified.</p>
+<p>The reference point array is an array to store reference points, which is then used to create a curve.</p>
+<p>The curve by points method creates a curve using a reference points array.</p>
+<h4>Forms</h4>
+<p>Various forms can be created using the following methods provided by the conceptual design API:</p>
+<ul>
+<li>Extrusion: NewExtrusionForm( bool isSolid, ReferenceArray profile, XYZ direction )</li>
+<li>Revolve	: NewRevolveForm( bool isSolid, ReferenceArray profile, Reference axis, double startAngle, double endAngle )</li>
+<li>Swept Blend: NewSweptBlendForm( bool isSolid, ReferenceArray path, ReferenceArray profiles )</li>
+<li>Loft: NewLoftForm( bool isSolid, ReferenceArray profiles )</li>
+<li>Cap Surface: NewFormByCap( bool isSolid, ReferenceArray profile )</li>
+<li>Thicken Single Surface: NewFormByThickenSingleSurface( bool isSolid, Form singleSurfaceForm, XYZ thickenDir )</li>
+</ul>
+<p>One of the simplest methods is the extrusion method. It creates an extrusion based on a single planar curve loop profile and the extrusion height, which should be perpendicular to the profile plane.</p>
+<center>
+<img src="img/form_creation_extrusion.jpg" alt="Extrusion"/>
+</center>
+<p>The NewRevolveForm method creates a form by revolving a single planar curve loop profile around an axis. The axis should be in the same plane as the profile.</p>
+<center>
+<img src="img/form_creation_revolve.jpg" alt="Revolve"/>
+</center>
+<p>A swept blend form can be created using a set of two reference arrays: one to determine the path and another to determine the profiles. The start and the end profile should be perpendicular to the path and all the profiles and the paths should be planar and each comprised of one single loop.</p>
+<center>
+<img src="img/form_creation_swept_blend.jpg" alt="Swept blend"/>
+</center>
+<p>Loft is a new surface that can be created using a set of curves, all of which must be planar and each comprised of one single curve. The loft is created by specifying whether it is a solid or void and by the profiles used to create the form.</p>
+<center>
+<img src="img/form_creation_loft.jpg" alt="Loft"/>
+</center>
+<p>A cap surface is a flat two-dimensional surface bounded by a single planar loop profile.</p>
+<center>
+<img src="img/form_creation_cap.jpg" alt="Cap"/>
+</center>
+<p>The ThickenSingleSurface method can be used to provide a depth to a cap surface, similar to an extrusion. This creates a three dimensional form using a single two dimensional surface.</p>
+<center>
+<img src="img/form_creation_thicken.jpg" alt="Thicken"/>
+</center>
+<h4>Modifying Forms</h4>
+<p>Once a form is created, you can modify its specific sub-elements, using four methods for delete, move, rotate and scale.</p>
+<p>Each of the form elements discussed above is defined using profiles. The form element exposes a profile count property called ProfileCount and a method to access each reference on the profile, CurveLoopReferencesOnProfile. You can modify the form at the desired profile by passing in the profile reference to one of the four form modification methods provided on the form element.</p>
+<pre class="code">
+<span class="blue">while</span>( i &lt; formLoft.ProfileCount )
+{
+&nbsp; <span class="blue">int</span> move = 3;
+&nbsp;
+&nbsp; <span class="teal">ReferenceArray</span> ref_Array
+&nbsp; &nbsp; = formLoft.get_CurveLoopReferencesOnProfile(
+&nbsp; &nbsp; &nbsp; i, iCurveLoopIndex );
+&nbsp;
+&nbsp; <span class="teal">Reference</span> loft_ref = ref_Array.get_Item( 0 );
+&nbsp;
+&nbsp; <span class="blue">while</span>( move &lt; 14 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> XYZmove = <span class="blue">new</span> <span class="teal">XYZ</span>( move, 0, 0 );
+&nbsp; &nbsp; formLoft.MoveSubElement( loft_ref, XYZmove );
+&nbsp; &nbsp; doc.Save();
+&nbsp;
+&nbsp; &nbsp; XYZmove = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, move, 0 );
+&nbsp; &nbsp; formLoft.MoveSubElement( loft_ref, XYZmove );
+&nbsp; &nbsp; doc.Save();
+&nbsp;
+&nbsp; &nbsp; XYZmove = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, move );
+&nbsp; &nbsp; formLoft.MoveSubElement( loft_ref, XYZmove );
+&nbsp; &nbsp; doc.Save();
+&nbsp;
+&nbsp; &nbsp; move = move + 2;
+&nbsp; }
+&nbsp; move = 0;
+&nbsp; i = i + 1;
+}
+</pre>
+<h4>Divided Surface</h4>
+<p>The divided surface functionality places a grid of parallelograms on the surface of a form. You can use the method FamilyItemFactory.NewDividedSurface() to create a divided surface. The appearance of the grid is controlled by the grid rotation angle and spacing rules and U and V direction. The figure shows an example of divided surface application and it values in the property dialog.</p>
+<p>The divided surface information can be obtained from a given divided surface object, using the GetDividedSurfaceData method. This method returns the DividedSurfaceData class, which is a container of the divided surface data. From the DividedSurfaceData, you can use GetReferencesWithDividedSurfaces() method to access to references to the divided surface. The following code snippet illustrates the access to DividedSurfaceData from the given form reference with divided surfaces.</p>
+<pre class="code">
+form = e <span class="blue">as</span> Autodesk.Revit.Elements.<span class="teal">Form</span>;
+&nbsp;
+<span class="teal">DividedSurfaceData</span> dsData 
+&nbsp; = form.GetDividedSurfaceData();
+&nbsp;
+<span class="blue">if</span>( dsData != <span class="blue">null</span> )
+{
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> 
+&nbsp; &nbsp; dsData.GetReferencesWithDividedSurfaces() )
+&nbsp; {
+&nbsp; &nbsp; dsRefs.Append( r );
+&nbsp; }
+}
+</pre>
+<p>Here is a grid of parallelograms defined by AllGridRotation, USpacingRule, and VSpacingRule:</p>
+<center>
+<img src="img/form_creation_grid.jpg" alt="Grid"/>
+</center>
+<h4>Tile Pattern</h4>
+<p>Once we have a divided surface, the next thing to be done is to apply set of patterns to it. A set of pre-defined patterns is built into the Revit product. The figure below shows an image of these patterns as displayed in the user interface. This set of pre-defined built-in tiling patterns is hard-coded and cannot be modified, nor can new ones be created in 2010.</p>
+<center>
+<img src="img/form_creation_tile_patterns_1.jpg" alt="Tile patterns"/>
+<img src="img/form_creation_tile_patterns_2.jpg" alt="Tile patterns"/>
+</center>
+<p>Tile patterns can be placed on divided surfaces and used as a framework for placing panels.</p>
+<p>The following code snippet shows an iteration through the built-in tile pattern enumeration, available from the Document.Settings property.  With each of the TilePatternBuiltIn enumeration items, we can get and set a specific pattern to the object type of the divided surface. The call to save the document updates the graphics display, so that the modification becomes visible:</p>
+<pre class="code">
+<span class="teal">TilePatterns</span> tilepatterns 
+&nbsp; = doc.Settings.TilePatterns;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">TilePatternsBuiltIn</span> x <span class="blue">in</span> 
+&nbsp; <span class="teal">Enum</span>.GetValues( 
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">TilePatternsBuiltIn</span> ) ) )
+{
+&nbsp; divSurface.ObjectType 
+&nbsp; &nbsp; = tilepatterns.GetTilePattern( x );
+&nbsp; doc.Save();
+}
+</pre>
+<h4>Curtain Panel</h4>
+<p>A curtain panel is a special mass family hosted by a grid, similar to window and door families hosted in a curtain wall. When curtain panels are applied to a divided surface, Revit creates family instances of the panel on the surface grid nodes. In the API, the divided surface has an ObjectType property that can be set to the panel to be used on the surface. Setting the ObjectType defines which panel family instances to create for the grid. Each node in the grid has a marker indicating if it is a seed node or not. There is a seed node associated with every panel, but depending on the tile pattern and layout, there will be nodes that are not seed nodes.</p>
+<ul>
+<li>Special mass families built on a sample grid, similar to the host wall in a window or door family</li>
+<li>Applied to a divided surface, Revit creates family instances of the panel on the surface grid nodes</li>
+</ul>
+<p>Here are some new family properties that were added to support this functionality:</p>
+<ul>
+<li>Family.IsCurtainPanelFamily</li>
+<li>Family.CurtainPanelHorizontalSpacing</li>
+<li>Family.CurtainPanelVerticalSpacing</li>
+<li>Family.CurtainPanelTilePattern</li>
+</ul>
+<p>Once the curtain panel is in place, you can iterate through the grid and access each panel to perform a certain action. The code snippet below demonstrates how to iterate through the grid, access each node, and change the type of panel.</p>
+<p>To iterate through the nodes, you can use the GridNode class that encapsulates UV indices to node calculation. You can obtain the number of divisions in UV directions through the DividedSurface properties NumberOfUGridlines and NumberOfVGridlines, respectively. You can access each tile or panel using the GetTileFamilyInstance method on the divided surface. This method accepts an instance of a grid node object holding the U and V index values and a rotation parameter. From this, the desired action can be applied to each of the panel. For example, in the sample below, the symbol of the family instance is changed to a glazed type.</p>
+<pre class="code">
+GridNode gn = <span class="blue">new</span> GridNode();
+&nbsp;
+<span class="blue">int</span> u = 0;
+<span class="blue">while</span>( u &lt; ds.NumberOfUGridlines )
+{
+&nbsp; gn.UIndex = u;
+&nbsp;
+&nbsp; <span class="blue">int</span> v = 0;
+&nbsp; <span class="blue">while</span>( v &lt; ds.NumberOfVGridlines )
+&nbsp; {
+&nbsp; &nbsp; gn.VIndex = v;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( ds.IsSeedNode( gn ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; FamilyInstance fi
+&nbsp; &nbsp; &nbsp; &nbsp; = ds.GetTileFamilyInstance( gn, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( fi != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// implement logic here with each tile,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// for example change the type to glazing</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fi.Symbol = pFamilySymbol.glazed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; v = v + 1;
+&nbsp; }
+&nbsp; u = u + 1;
+}
+</pre>
+<h4>Form Creation SDK Samples</h4>
+<p>The Revit SDK provides the following samples illustrating various aspects of the form creation API:</p>
+<ul>
+<li>DistanceToPanels: Measure the distance from a selected object to all divided surface panels</li>
+<li>MeasurePanelArea: Divided surface panel measurement and modification</li>
+<li>NewForm: Create ExtrusionForm, CapForm, RevolveForm, SweptBlendForm and Loft Form</li>
+<li>PanelEdgeLengthAngle: Divided surface panel measurement</li>
+</ul>
+<h4>Form Creation Labs</h4>
+<p>We implemented three new commands demonstrating the form creation API in a new Labs7 module of the 
+<a href="zip/rac_labs_2009-06-24.zip">Revit API introduction labs</a>:</p>
+<ul>
+<li>Lab7_1_CreateForm: Create a loft form using reference points and curve by points. </li>
+<li>Lab7_2_CreateDividedSurface: Create a divided surface using reference of a face of the form.</li>
+<li>Lab7_3_ChangeTilePattern: Change the tiling pattern of the divided surface using the built-in TilePattern enumeration.</li>
+</ul>
+<p>Thank you very much Saikat for this great overview!</p>

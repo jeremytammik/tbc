@@ -1,0 +1,226 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Emmanuel Weyermann RE: excited about rex content generator -->
+
+<h3>REX Content Generator</h3>
+
+<p>I had an absolutely magical experience in Israel before leaving Tel Aviv Thursday afternoon.
+Among many others at the developer conference on Wednesday, we met with 
+
+<a href="http://www.dimabrickman.com">Dima Brickmann</a> of
+
+<a href="http://www.omnitech.co.il">Omnitech</a>,
+
+and he suggested going for a short visit to Jerusalem before returning to the airport, which is located between Tel Aviv and Jerusalem.
+Partha and I decided to join him.
+Dima has a very special relationship with the city and a deep philosophical and photographical view of it, so he was a unique and wonderful guide.
+His tour focused more on feeling and experiencing the magic of this deeply religious place, which brings out so many extremes in all the different religions, and yet simultaneously enables them to coexist in an extremely confined area.
+
+<p>By the way, Dima has more recent photos with some short philosophical texts on the Russian photoreporting news web site 
+
+<a href="http://www.newsru.co.il">newsru.co.il</a>, 
+
+e.g. this beautiful photo series on 
+
+<a href="http://www.newsru.co.il/photo/21nov2011/jerusalem2.html">Jerusalem between black and white</a>:</p>
+
+<center>
+<img src="http://newsru.co.il/pict/id/480783_20111121113039.jpg" alt="Jerusalem between black and white"/>
+</center>
+
+<p>I went and installed a translation add-on for my browser to be able to read the Russian text.
+It works very well, and the photos are really and truly deep and beautiful.
+
+<p>Click on the link at the bottom saying '&#1055;&#1056;&#1054;&#1044;&#1054;&#1051;&#1046;&#1045;&#1053;&#1048;&#1045; &#1060;&#1054;&#1058;&#1054;&#1056;&#1045;&#1055;&#1054;&#1056;&#1058;&#1040;&#1046;&#1040;' to proceed to the rest of the photos in the series.
+
+<p>Thank you, Dima!
+
+
+<p>I would never have believed you could experience so much in such a short time, both in the three hours that we spent with Dima in Jerusalem and in the two days we spent in Israel.
+
+<p>On Friday we held another developer conference in Paris, and today we are already en route to Gothenburg in Sweden.
+
+<p>And my backlog of interesting blog posts is growing far faster than I can publish them.
+
+
+<a name="2"></a>
+
+<h4>REX Content Generator</h4>
+
+<p>One really astounding revelation at the DevLab at AU was the REX content generator sample.
+
+<p>It is provided with the REX framework and its other samples as part of the standard Revit SDK.
+I had not looked at it previously in any depth, since I have not used REX myself yet.
+I tend to avoid any additional frills, and the plain vanilla Revit API keeps me fully occupied all on its own.
+But this sample really bowled me over!
+
+<p>A DevLab participant showed me some of its features, and it looks like an astonishingly powerful tool.
+Here are a few notes I made from his demo:
+
+<p>The content generator provides the following functionality:
+
+<ul>
+<li>Read existing families into a data structure.
+<li>Create families from the data structure.
+<li>Determine the section of a beam or column and display a shaded 3D preview of its solid extrusion.
+<li>Interface to external structural databases to generate sections and families with these objects.
+<li>Recognition which tries to match the current element to an existing database entry. If the user accepts the match, the content generator can switch the types by creating a new family based on the database record and replace all of the old instances by the new family.
+</ul>
+
+<p>Impressed?
+
+<p>I was!
+
+<p>The family API enables us to create new families step by step.
+In contrast, the content generator allows you to load an existing family, tweak and change it, and immediately generate a new family.
+
+<p>There is no need to install the Revit extensions to ensure that the basic REX framework is in place and the REX API is available.
+The content generator can be used even without Revit Extensions installed, since the framework is part of the regular Revit installation and is installed in a way transparent for the user.
+
+<p>To run the content generator sample, simply select a structural element, e.g. a column, and launch the command.
+It takes a little while to start up, because it reads the three databases: standard, steel and structural.
+
+<!--
+element break down of current element
+
+section generation, sample shows that nicely
+
+ to have the 
+-->
+
+<p>I asked Emmanuel Weyermann for a short description, and he provided the following brief yet full picture of Content Generator and this sample application:
+
+<h4>What is Content Generator?</h4>
+
+<p>The Content Generator is a component which is part of the Revit Extensions Framework installed with Revit 2012. 
+<p>It provides tools for content management. This component is strongly connected with standard databases shipped with Revit (over 130 databases).
+
+<p>Advantages of the Content Generator:
+
+<ul>
+<li>Generation of Revit families: database sections, parametric sections, materials, user generic types.
+<li>Interpretation of Revit families: database sections, parametric sections, materials. 
+<li>Getting data from standard databases.
+<li>Searching elements in standard databases. 
+<li>Standard database browser dialogue. 
+<li>A mapping system. 
+</ul>
+
+<p>More information may be found in the "User Manual for Extensions SDK.pdf".
+
+
+<h4>Content Generator basic types</h4>
+
+<p>The idea of Content Generator is very simple. 
+It provides its own representations of specific types (e.g. sections) and two converters which communicate with each other via these types:
+
+<ul>
+<li>RVT Converter &ndash; responsible for communication with Revit
+<li>REX Converter &ndash; responsible for communication with standard databases
+</ul>
+
+<center>
+<img src="img/rex_converter_pipeline.png" alt="REX Converter Pipeline"/>
+</center>
+
+         
+<p>Content Generator provides 4 types:
+
+<ul>
+<li>Database section
+<li>Parametric section
+<li>Material
+<li>Generic &ndash; defined by the user.
+</ul>
+
+<h4>Code sample</h4>
+
+<p>The code below presents how to generate a particular section taken from the Rcatpro database:
+
+<pre class="code">
+&nbsp; <span class="green">// Initializing the rex converter.</span>
+&nbsp;
+&nbsp; REXFamilyConverter rex = <span class="blue">new</span> REXFamilyConverter();
+&nbsp;
+&nbsp; <span class="green">// Database identification data.</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> alias = <span class="maroon">&quot;HEA 100&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> directory = rex.GetDatabaseDirectory(
+&nbsp; &nbsp; ECategoryType.SECTION_DB );
+&nbsp;
+&nbsp; <span class="blue">string</span> dbName = <span class="maroon">&quot;Rcatpro&quot;</span>;
+&nbsp;
+&nbsp; <span class="green">// Getting the REXFamilyType from the database.</span>
+&nbsp;
+&nbsp; REXFamilyType_DBSection famDBSection
+&nbsp; &nbsp; = rex.GetFamilyDBSection( EElementType.BEAM,
+&nbsp; &nbsp; &nbsp; EMaterial.STEEL, alias, dbName, directory );
+&nbsp;
+&nbsp; <span class="green">// Initializing the RVT converter.</span>
+&nbsp;
+&nbsp; RVTFamilyConverter rvt = <span class="blue">new</span> RVTFamilyConverter(
+&nbsp; &nbsp; m_CommandData, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="green">// Getting Revit element.</span>
+&nbsp;
+&nbsp; Autodesk.Revit.Element el = rvt.GetElement(
+&nbsp; &nbsp; famDBSection );
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> famSymbol = el <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+</pre>
+
+<p>Over twenty further samples are provided in the "User Manual for Extensions SDK.pdf".
+
+
+<h4>ContentGeneratorWPF SDK sample</h4>
+
+<p>In Extensions SDK may be found the ContentGeneratorWPF sample. 
+It allows examining a selected beam or column and changing its type to a new one (generated by Content Generator). 
+
+<p>The sample demonstrates some of Content Generator key features:
+
+<ul>
+<li>Revit FamilySymbol interpretation as:
+<ul>
+<li>Parametric section &ndash; shape is recognized and dimensions are calculated.
+<li>Database section &ndash; the element is recognized and match with appropriate section from database.
+</ul>
+<li>Revit FamilySymbol generation:
+<ul>
+<li>Parametric section &ndash; there are three types available (in CG there are over 22): rectangle, angle and I section.
+<li>Database section &ndash; the user is able to point section from available databases.
+</ul>
+<li>Database browsing.
+</ul>
+
+<p>The sample runs database browser which allows exploring available databases:</p>
+
+<center>
+<img src="img/rex_converter_sample.png" alt="REX Converter Sample Form"/>
+</center>
+
+ 
+<h4>Where is Content Generator used?</h4>
+
+<ul>
+<li>As a standalone application which generates different types of Revit content  (part of Revit Extension for RAC and RST - Extensions ribbon->Tools).
+
+<li>In different integration tools: 
+
+Revit &ndash; Cloud computation (<a href="http://labs.autodesk.com/utilities/revit_storm">Storm</a>), 
+
+links Revit &ndash; RSA, Revit &ndash; ASD, and for some files import/export extensions Revit &ndash; CIS, Revit &ndash; SDNF.
+
+<li>In different Revit Extensions: steel connections, reinforcements, timber framing,
+
+<a href="http://labs.autodesk.com/utilities/revit_structure_generator">structure generator</a> 
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2011/11/project-structure-generator-on-autodesk-labs.html">recently mentioned</a>) etc.
+</ul>
+
+<p>Many thanks to Emmanuel for this overview!
+
+<p>If you are interested in Revit Structure and structural databases, I strongly encourage you to take a deep look at this if you have not already done so.

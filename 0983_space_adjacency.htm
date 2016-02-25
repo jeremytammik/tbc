@@ -1,0 +1,570 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Jasper Desmet
+RE: [The Building Coder] space adjacency and geometry problem
+Testproject Heat Load Calculation - Data Collection.rvt
+/a/rvt/jd_heat_load_calculation_space_adjacency.rvt
+
+-->
+
+<h3>Football and Space Adjacency for Heat Load Calculation</h3>
+
+<p>Here is a summary of a discussion with Jasper Desmet, who is studying engineering and working on a research project for his master thesis concerning heat load calculation using BIM software, proving that it is possible for a novice programmer to extract the required information from the model using the Revit API.</p>
+
+
+<a name="2"></a>
+
+<h4>Football Tournament, Fleece and Shard</h4>
+
+<p>First, though,  let me mention that I visited the UK this weekend to participate in the Autodesk European soccer tournament, which took place on Saturday at the
+
+<a href="http://www.rhul.ac.uk">Royal Holloway</a> University in Egham:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-14_london/1360.jpg" alt="Neuch&acirc;tel Eagles at the Royal Holloway in Egham" width="300"/>
+</center>
+
+<p>Sunday I took a walk along the Thames from Waterloo to London Bridge on the way to the airport, and happened to pass by the
+
+<a href="http://southbanklondon.com/bargehouse">Bargehouse</a> exhibition space, currently housing the
+
+<a href="http://fleeceshow.com">Fleece</a> photography exhibition including 'Climax' by
+
+<a href="http://fleeceshow.com/artists/Holly_Buckle.html">Holly Buckle</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-14_london/1457.jpg" alt="'Climax' by Holly Buckle in the Bargehouse" width="300"/>
+</center>
+
+<p>Among the many other fascinating images, I also discovered a poem by
+
+<a href="http://en.wikipedia.org/wiki/Lord_Byron">
+Lord Byron</a>, from
+
+<a href="http://en.wikipedia.org/wiki/Childe_Harold%27s_Pilgrimage">
+Childe Harold's Pilgrimage</a>, Canto iv, Verse 178, which reflects my opinion of nature and society quite nicely:</p>
+
+<!-- <h4 style="padding-left:10%">There Is Pleasure In The Pathless Woods</h4> -->
+
+<p style="padding-left:10%">There is a pleasure in the pathless woods,
+<br/>There is a rapture on the lonely shore,
+<br/>There is society, where none intrudes,
+<br/>By the deep sea, and music in its roar:
+<br/>I love not man the less, but Nature more ...</p>
+
+<p>Finally, here is a close-up of the 72-storey
+
+<a href="http://the-shard.com">Shard</a> skyscraper,
+
+currently the tallest building in the European Union, from the London Bridge station platform, just before boarding the train for Gatwick:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-07-14_london/1470.jpg" alt="Shard" width="300"/>
+</center>
+
+<p>I think those are more than enough impressions from this eventful weekend, so let's return to the heat load calculation space adjacency discussion with Jasper:</p>
+
+
+<a name="3"></a>
+
+<h4>Space Adjacency for Heat Load Calculation</h4>
+
+<p><strong>Question:</strong> I'm doing my master thesis concerning heat load calculation using BIM-software (obviously I use Revit).
+As a part of this thesis I'm writing an application to extract all necessary information from Revit, and calculate the heat load using Belgian standards. This is mainly to show the possibilities of automation using the Revit API.</p>
+
+<p>As I am studying engineering: construction, programming is not my strong suit (although I love it very much), and your site has been invaluable for my efforts to making this application work. Thanks for all the help already (through the blog), but I write with a question:</p>
+
+<p>To implement the calculation I need a lot of data about the spaces and their bounding elements.
+I use the SpatialElementGeometryCalculator to calculate the geometry, and get the SpatialBoundaryElements, as shown in the Developer Guide wiki page on
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00006-API_Developer's_Guide/0074-Revit_Ge74/0108-Geometry108/Room_and_Space_Geometry.">
+Room and Space Geometry</a> to
+
+calculate a room's geometry and find its boundary faces.
+This works great.</p>
+
+<p>Apart from that I also need to know the space adjacencies, and I adapted the code you provided for determining
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/space-adjacency.html">
+space adjacencies</a> to
+
+retrieve the segments and the adjacent space for each segment.</p>
+
+<p>What I want to do now is merge these two different data sets into a single component class MySurface.</p>
+
+<p>Here is a schematic view of the data I am collecting from the model that makes it easier to understand how I defined the MyComponents class to manage the data:</p>
+
+<center>
+<img src="img/jd_heat_load_calculation_data_schema.jpeg" alt="Heat load calculation data schema" width="800"/>
+</center>
+
+<p>Right now I can't find the link I need between the faces/subfaces of the SpatialElementGeometryCalculator and the segments from the BoundarySegments.</p>
+
+<p>So basically my question is how to know which segment and which (sub)face go together.
+Is there a way to achieve this?
+Is there a way to get the boundary segments through the SpatialElementGeometryCalculator?</p>
+
+
+<p><strong>Answer:</strong> Thank you for raising this interesting topic.</p>
+
+<p>Some questions back:</p>
+
+<ul>
+<li>What exact data have you already retrieved?</li>
+<li>2D space boundaries + adjacent spaces on each side?</li>
+<li>SpatialElementGeometryCalculator faces and sub-faces?</li>
+<li>Do the SpatialElementGeometryCalculator not tell you the originating element producing each face?</li>
+</ul>
+
+<p>You can ask a space to return its 3D volume and all its bounding elements in 3D.</p>
+
+
+
+<p><strong>Response:</strong> Here is some clarification on what I already have and the paths I’m considering next:</p>
+
+<p>Certain assumptions are made to simplify the project:</p>
+
+<ul>
+<li>All boundary curves are linear and coincident with the possible calculated segments.</li>
+<li>The floor type is defined by the level (1 level, 1 floor).</li>
+</ul>
+
+
+<!--
+<p>What I’m trying to do:</p>
+
+<p>I’m trying to extract geometric and boundary-element data from spaces in order to perform heat load calculation. As heat load calculation constitutes mainly of transmission losses, the space adjacency is important and should also be considered.</p>
+
+<p>What I have:</p>
+
+<p>First off, I tried to get the geometric data for each space, using the following method. It uses the SpatialElementGeometryCalculator to calculate the geometry for each space, and I try to extract the data needed for my project.</p>
+
+<p>I calculate and store the edge-points of the face for possible use with the 2D-boundaries, and the normal-vector for possible implementation of an adjacency system using faces instead of 2D-boundaries.</p>
+
+<p>I’m bearing in mind that the faces given by this method don’t take into consideration the openings (windows, doors, etc.), which is a problem that will have to be handled later on.</p>
+
+<p>As my project progressed I needed to data about the space adjacencies.
+I stumbled upon the command
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/space-adjacency.html">
+CmdSpaceAdjacency</a> and
+
+adapted it a little to fit my project.</p>
+
+-->
+
+<p>As said, I made use of your
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/space-adjacency.html">
+CmdSpaceAdjacency</a> command
+
+and added the adjacent space (_adjSpace) to the Segment class, so that both the space of origin and the adjacent space (null for exterior walls) are available for each given segment, not only for the space.</p>
+
+<pre class="code">
+<span class="blue">&nbsp; #region</span> Adjacencies
+<span class="blue">&nbsp; #region</span> Segment Class
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Segment</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> _sp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> _ep;
+&nbsp; &nbsp; <span class="teal">Space</span> _space;
+&nbsp; &nbsp; <span class="teal">Space</span> _adjSpace = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="green">// . . .
+</pre>
+
+<p>So this is what I have at the moment.
+A list of segments that give me access to the adjacencies of spaces at the given 2D-boundaries, and a list of surfaces containing geometric and thermal information about the spaces.</p>
+
+<p>One problem is that the adjacencies at the moment are only in 2D (on the same level). For a correct heat load calculation you would need surface division for the floors (e.g. a bathroom [at 24°C for calculation], above an entrance hall [at 20°C for calculation] will need transmission calculation, whereas two rooms at the same temperature will not need that, so that surface information is necessary => see plan views in attachment). The SpatialElementGeometryCalculator does not take the layout of spaces above or below into consideration though (this I derived from the printed info of the faces). However much I would like to puzzle out how to implement this, that would take me too far, as this application is not the main focus of my master-thesis.</p>
+
+<p>What I’m considering:</p>
+
+<p>Now I’m looking for how to link both data together.
+I’m considering one of two following options:</p>
+
+<ul>
+<li>Using the segments (2D boundaries) to find the corresponding face edge inside a space (comparing XYZ-points). Although this might work, it doesn’t solve the fact that only adjacency on the same level is considered.</li>
+<li>Implementing a similar adjacency system using the faces instead of the 2D-boundaries, using the normal vector as direction for the testing point (as this always points outward).</li>
+</ul>
+
+<p>I think the second option is the more widely usable option, as it takes adjacency directly from the same calculated data, taking away certain problems. It might not be the most performant of the two, but I have no way of knowing this.</p>
+
+<p>The first option might be the fastest to implement with what I have so far.</p>
+
+
+<p><strong>Later:</strong> I’ve been trying to get the adjacency system to work, and here’s what I got.
+It works for the horizontal adjacencies (on the same level), but vertical adjacencies are still an issue as the SpatialElementGeometryCalculator does not divide floor/ceiling faces to reflect the adjacent level space layout (for differences in internal design temperature between different spaces).
+I have an idea on how to solve that issue later.</p>
+
+<p>Here is what I do:</p>
+
+<p>My method for retrieving the Space data from a given Space in Revit is implemented by the GetSpaceData method below.</p>
+
+<p>For the given Space I retrieve the Geometry through the SpatialElementGeometryCalculator.
+For each face of the Space I do the following:</p>
+
+<ul>
+<li>Create a personal Surface component to store the data retrieved for later use.</li>
+<li>Retrieve the defining points of the edges of the face, for calculation of a point inside the face (if necessary).</li>
+<li>Retrieve the normal-vector of the face (which according to the information I found always points outwards of the Solid the Face is part of), for retrieval of the adjacent Space.</li>
+<li>Retrieve the adjacent Space through the method FindAdjacentSpaceFromSurface, which takes the following arguments: the considered Face, a list of XYZ points defining the polygon, and the normal-vector of the face.</li>
+<ul>
+<li>At first I tried to use a Ray Projection (ReferenceIntersector) to retrieve the adjacent space (to ‘poke’ into a certain direction), but this resulted in a failure, and my guess is that it’s because the Space element is not considered 3D-geometry and is not ‘visible’ in the 3D-view, and can thereby not be found by intersection.</li>
+<li>As an adjacent Space has a certain proximity to the other space I construct a test point from a point on the Face, using the normal and a MaxWallThickness-constant to make sure the test point surpasses the bounding Element responsible for the Space-face creation.</li>
+<li>Then I test if this point is inside a Space of the Project (using a List of spaces constructed earlier on in the application), and if it is I assign this space as the adjacent Space to the considered Space in GetSpaceData-method.</li>
+</ul>
+<li>Through the subfaces I then retrieve the necessary data for the calculations, as through these subfaces I can access the boundary element responsible for the surface creation. Floors however don’t have a boundary element (and as I have come to notice, nor has my second floor upper surface (my roof is not considered a bounding element, and I don’t see why…).
+The method FindAdjacentSpaceFromSurface listed below to retrieve the underlying Floor, but it currently causes a fatal error and closes the Revit session as soon as it hits the second floor Spaces.</li>
+</ul>
+
+<p>So, in conclusion, I successfully asses the space adjacency for horizontal adjacencies (although maybe not totally fool proof), but still have an issue with the vertical adjacencies, as to which space is adjacent for which portion of the surface. I also have an issue with determining the floor of a space, as my attempt to use Ray Projection to do so results in a fatal error. Also I don’t understand why the RoofBase-element is not a bounding element for my Spaces on the top-most floor, have you got an idea as to why this is?</p>
+
+
+<p><strong>Answer:</strong> The issue with the SpatialElementGeometryCalculator may be due to modelling errors.
+I cannot say for sure, of course, just offer this as a wild guess.</p>
+
+<p>You say that you suspect that the ReferenceIntersector does not consider the Space element as 3D-geometry and it is therefore not ‘visible’ in the 3D-view.
+Yes, I agree.</p>
+
+<p>The other issues you report are not surprising.
+I run into similar issues when I try new things.
+It is often an unclear mix between imperfect modelling and rather sensitive API methods with detailed input requirements.</p>
+
+<p>By the way, the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">
+CustomExporter class</a>,
+
+for which I just published a couple of samples, provides another completely different way to access surfaces which may be of interest to you as well.</p>
+
+
+<p><strong>Response:</strong> Your wild (educated) guess was right.
+The problem with the Roof not being a BoundingElement of the Space was due to a modelling error.
+The space top constraint was ‘level 2’, which was also the level the roof was drawn on, so the space did not run totally up to the roof.
+
+<p>After fixing this, the Roof became a BoundingElement and the output was correct.</p>
+
+<p>Even better, because I took away this modelling error, the fatal error concerning the ReferenceIntersector was also gone, and now I’m able to implement this to determine the floor type of a Space.
+Thanks a lot for this helpful input, it saved me a lot of time (and sweat :-).</p>
+
+<p>That fixed the most important issues.
+For now I’ve got what I need to get my small thesis-application to work.
+As to the issue with vertical adjacency (the only one left), I will try to look into that, but I don’t think I’ll have time to do so before the end of august (which is when my thesis is due). It’s an interesting issue though, and an important one for Energy Analysis, I think.</p>
+
+<p>Here is the code in its current state, and working for me in my test project:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> GetSpaceData(
+&nbsp; <span class="teal">MySpace</span> mySpace, <span class="teal">Space</span> revitSpace )
+{
+&nbsp; mySpace.surfaces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">MySurface</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">SpatialElementGeometryCalculator</span> calculator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementGeometryCalculator</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">SpatialElementGeometryResults</span> results
+&nbsp; &nbsp; = calculator.CalculateSpatialElementGeometry(
+&nbsp; &nbsp; &nbsp; revitSpace );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> spaceSolid = results.GetGeometry();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> spaceSolid.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//Creating personal Surface component</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="teal">MySurface</span> surf = <span class="blue">new</span> <span class="teal">MySurface</span>();
+&nbsp; &nbsp; surf.area = SQFeetToSQMeter( face.Area );
+&nbsp; &nbsp; mySpace.surfaces.Add( surf );
+&nbsp;
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//Get the edgePoints of the face</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="teal">UV</span> px = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; edgesPoints = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> a <span class="blue">in</span> face.EdgeLoops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nEdges = a.Size;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; curves = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;( nEdges );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = e.AsCurveFollowingFace( face );
+&nbsp; &nbsp; &nbsp; &nbsp; curves.Add( curve );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curves )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = curve.get_EndPoint( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; edgesPoints.Add( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; px = <span class="blue">new</span> <span class="teal">UV</span>( p.X, p.Y );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; surf.edges = edgesPoints;
+&nbsp; &nbsp; surf.normal = face.ComputeNormal( px );
+&nbsp; &nbsp; <span class="teal">Space</span> adjacentSpace = FindAdjacentSpaceFromSurface(
+&nbsp; &nbsp; &nbsp; face, edgesPoints, surf.normal );
+&nbsp; &nbsp; surf.adjSpace = adjacentSpace;
+&nbsp; &nbsp; <span class="blue">if</span>( adjacentSpace != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; surf.adjSpaceTemperature = adjacentSpace
+&nbsp; &nbsp; &nbsp; &nbsp; .get_Parameter( <span class="maroon">&quot;BE_SpaceTemperature&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; surf.space = revitSpace;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//Getting the subfaces to determine the BoundaryElement</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="blue">var</span> subfaceList = results.GetBoundaryFaceInfo( face );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( subfaceList.Count != 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SpatialElementBoundarySubface</span> subface
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> subfaceList )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> elemid = subface.SpatialBoundaryElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .HostElementId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> typeid = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subface.SpatialBoundaryElement.HostElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetTypeId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Determine the 'assembly' of the bounding Element</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( myAssemblies.ContainsKey( typeid ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surf.assembly = myAssemblies[typeid];
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve the openings in the considered bounding element</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> elem = doc.GetElement( elemid );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elem <span class="blue">is</span> <span class="teal">Wall</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Wall</span> wall = elem <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; op = wall.FindInserts(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span>, <span class="blue">false</span>, <span class="blue">true</span>, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> elid <span class="blue">in</span> op )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> opening = doc.GetElement( elid );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> openingTypeId = opening.GetTypeId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( opening <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; openingTypes.ContainsKey( openingTypeId ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = opening <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> facingDirection = fi.FacingOrientation.Normalize();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = fi.get_BoundingBox( <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> midpoint = ( bb.Min + bb.Max ) / 2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> testPoint1 = midpoint + facingDirection
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * MaxWallThickness;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> testpoint2 = midpoint + -facingDirection
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * MaxWallThickness;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( revitSpace.IsPointInSpace( testPoint1 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || revitSpace.IsPointInSpace( testpoint2 ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> height = fi.get_Parameter( <span class="maroon">&quot;Height&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( height == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; height = fi.Symbol.get_Parameter( <span class="maroon">&quot;Height&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> width = fi.get_Parameter( <span class="maroon">&quot;Width&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( width == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; width = fi.Symbol.get_Parameter( <span class="maroon">&quot;Width&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> area = SQFeetToSQMeter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; height.AsDouble() * width.AsDouble() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MyOpeningType</span> myOpeningType
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = openingTypes[openingTypeId];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MyOpening</span> myOpening = <span class="blue">new</span> <span class="teal">MyOpening</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; area, elid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myOpening.type = myOpeningType;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surf.openings.Add( myOpening );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// The floor has no subfaces (and no boundary-element) </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// from the geometrycalculator</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// We use ray projection to determine the floortype</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Find a 3D view to use for the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// ReferenceIntersector constructor</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> coll
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">View3D</span>, <span class="blue">bool</span>&gt; isNotTemplate
+&nbsp; &nbsp; &nbsp; &nbsp; = v3 =&gt; !( v3.IsTemplate );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">View3D</span> view3D = coll.OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">View3D</span>&gt;().First&lt;<span class="teal">View3D</span>&gt;( isNotTemplate );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// set originPoint just above the floor</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxUV</span> bb = face.GetBoundingBox();
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> startPoint = FindPointOnFace( bb, edgesPoints, face );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> originPoint = startPoint + -( surf.normal ) * D2mm;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// set the filter to floor</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementClassFilter</span> filter
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Floor</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ReferenceIntersector</span> refint
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( filter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Face, view3D );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( refint != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ReferenceWithContext</span> refwithcont
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = refint.FindNearest( originPoint,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surf.normal );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( refwithcont != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> foundElem = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; refwithcont.GetReference().ElementId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> typeid = foundElem.GetTypeId();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surf.assembly = myAssemblies[typeid];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( surf.assembly.FloorOnGround
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; foundElem.get_Parameter( <span class="maroon">&quot;BE_B U waarde&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surf.Uequiv = foundElem
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_Parameter( <span class="maroon">&quot;BE_B U waarde&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">Space</span> FindAdjacentSpaceFromSurface(
+&nbsp; <span class="teal">Face</span> originFace,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; edgesPoints,
+&nbsp; <span class="teal">XYZ</span> normalVector )
+{
+&nbsp; <span class="teal">Space</span> foundSpace = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Find a suitable point on the face to 'poke' into the nearby space</span>
+&nbsp; <span class="green">// We then propagate by direction of the normal, and poke 1,35 feet into the wall</span>
+&nbsp; <span class="green">// to see if the testpoint is in another space</span>
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxUV</span> bb = originFace.GetBoundingBox();
+&nbsp;
+&nbsp; <span class="green">// We determine the point by bounding box or by the points of the face polygon</span>
+&nbsp; <span class="teal">XYZ</span> startPoint = FindPointOnFace(
+&nbsp; &nbsp; bb, edgesPoints, originFace );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> testPoint = startPoint + ( normalVector )
+&nbsp; &nbsp; * MaxWallThickness;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Space</span> space <span class="blue">in</span> revitSpaceList )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( space.IsPointInSpace( testPoint ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; foundSpace = space;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> foundSpace;
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">XYZ</span> FindPointOnFace(
+&nbsp; <span class="teal">BoundingBoxUV</span> bb,
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; edgesPoints,
+&nbsp; <span class="teal">Face</span> originFace )
+{
+&nbsp; <span class="teal">UV</span> midPoint = ( bb.Min + bb.Max ) / 2;
+&nbsp; <span class="teal">IntersectionResult</span> result;
+&nbsp; <span class="teal">XYZ</span> startPoint = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; <span class="blue">if</span>( originFace.IsInside( midPoint, <span class="blue">out</span> result ) )
+&nbsp; {
+&nbsp; &nbsp; startPoint = originFace.Evaluate( midPoint );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> isInside = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="blue">while</span>( !isInside )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// This is not a fool-proof method, but it gets the work done for a simple enough case</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// (it will have to be an intricate face-polygon for this method not to work)</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> sumPoint = <span class="blue">new</span> <span class="teal">XYZ</span>();
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> start = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = start; i &lt; start + 3; i++ )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sumPoint = sumPoint.Add( edgesPoints[i] );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; startPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( sumPoint.X / 3,
+&nbsp; &nbsp; &nbsp; &nbsp; sumPoint.Y / 3, sumPoint.Z / 3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> intersect = originFace.Project( startPoint );
+&nbsp; &nbsp; &nbsp; <span class="teal">UV</span> startp = intersect.UVPoint;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( originFace.IsInside( startp, <span class="blue">out</span> result ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; isInside = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; start++;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> startPoint;
+}
+</pre>
+
+<p>Here is the complete
+
+<a href="/a/rvt/jd_heat_load_calculation_space_adjacency.rvt">
+Revit 2013 project file</a> containing
+
+the calculation macros and simple sample model:</p>
+
+<center>
+<img src="img/jd_heat_load_calculation_house_3d.png" alt="Sample model 3D" width="200"/>
+</center>
+
+<p>Here is a cut through the 3D model:</p>
+
+<center>
+<img src="img/jd_heat_load_calculation_house_3d_cut.png" alt="Sample model 3D cut" width="200"/>
+</center>
+
+<p>The first level floor plan looks like this:</p>
+
+<center>
+<img src="img/jd_heat_load_calculation_house_2d.png" alt="Sample model 2D" width="300"/>
+</center>
+
+<p>There is no Visual Studio solution, since I am working entirely in the SharpDevelop macro environment available within Revit.
+As an inexperienced programmer (just started this year, learning it on my own) I found this made it easier to debug, and after getting it to work as a macro, I found the cleaning-up process to make it work as add-in using Visual Studio express minimal.
+So actually the code is inside the project file, embedded as a project-level Macro:</p>
+
+<center>
+<img src="img/jd_heat_load_calculation_macros.png" alt="Sample model macros" width="200"/>
+</center>
+
+<p>I am already working on the calculations and the export to XML and PDF, but I cleaned up the project to only reflect the data collection part.
+If you are interested in the rest too, I can send the whole project over once it is complete.</p>
+
+<p>Many thanks to Jasper for this fruitful discussion, your research and hard work, and the best of luck to you with the rest of the thesis!</p>

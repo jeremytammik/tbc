@@ -1,0 +1,248 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07524021 [tags/newtag affairs]
+554_mep_element_shape.htm:He
+578_mep_element_shape_2.htm:
+07553354 [family reloading]
+
+-->
+
+<h3>Extra Transaction or Regeneration Required</h3>
+
+<p>Whenever your add-in modifies the model in any way and you wish to query the Revit database, you need to pay careful attention to ensure that you do not retrieve stale or invalid data.
+
+<p>If anything unexpected whatsoever happens, one of the first things to consider is the possible need for a document regeneration or additional separate transactions between steps.
+
+<p>These kinds of issues arise frequently.
+
+<p>I discussed adding an extra transaction to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/extra-transaction-required.html">
+modify beam parameters and add openings</a> to
+
+it and to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/creating-an-opening.html">
+create an opening</a> in
+
+a slab.
+
+<p>Sometimes a simple
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html">
+document regeneration</a> is
+
+also sufficient, e.g. to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/setting-text-width-requires-regen.html">
+set the width of a newly created TextNote</a>.
+
+<p>Here are two more typical examples:</p>
+
+<ul>
+<li><a href="#2">Extra transaction required after loading tag</a></li>
+<li><a href="#3">Extra regeneration required to populate materials</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Extra Transaction Required After Loading Tag</h4>
+
+<p>Here is an issue raised by Max, <a href="http://maciejszlek.pl">Maciej Szlek</a>, who already contributed code to help
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html">
+distinguish</a>
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html">
+MEP fitting shapes</a>:
+
+<p><strong>Question:</strong> I have a duct system and want to attach my tag to its elements, using the code to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/set-tag-type.html">
+set a tag type</a>.
+
+I tried something like this:
+
+<pre class="code">
+  doc.LoadFamilySymbol(
+    [my_tag_family.rfa],
+    [type_name],
+    out tagType);
+
+  IndependentTag tag = doc.Create.NewTag(
+    doc.ActiveView,
+    element,
+    true,
+    TagMode.TM_ADDBY_CATEGORY,
+    TagOrientation.Horizontal,
+    XYZ.Zero);
+
+  tag.ChangeTypeId(tagType.Id);
+</pre>
+
+<!--
+<p>When I run this code in Revit MEP, the call to NewTag throws an InvalidOperationException saying that there is no tag available.
+
+<p>However, it works fine on Revit Architecture.
+
+<p>Experimenting more with the NewTag function, I noticed the following weird behaviour:
+
+<ul>
+<li>In Revit Architecture:
+<ul>
+<li>for doors/walls: works fine.
+<li>for mechanical equipment/duct: works fine.
+</ul>
+
+<li>In Revit MEP:
+<ul>
+<li>for doors/walls: works fine.
+<li>for mechanical equipment/duct: throws InvalidOperationException saying there is no tag available.
+</ul>
+</ul>
+-->
+
+<p>This code works fine in some projects, whereas in others Revit throws an InvalidOperationException saying that there is no tag available in the call to the NewTag method.
+The behaviour seems to vary between different projects and on different elements.
+
+<p>How can that be?
+
+<p><strong>Answer:</strong> Have you tried either regenerating the document or placing the tag symbol loading and the tag creation calls in separate transaction, committed individually?
+
+<p><strong>Response:</strong> Problem solved.
+As it turns out, the Revit project needs to have some suitable tag type loaded before calling NewTag.
+Your transaction hint was very helpful.
+My earlier code was not enough as it stands.
+It actually requires separate transactions to load the tag type and add a new tag if there was no other tag loaded before.
+I did not previously know what Revit meant by 'there is no tag available'.
+
+<p>Furthermore, I was initially using automatic transaction mode for this command, thinking that would free me from worrying about any transaction handling myself at all.
+I now learned that the automatic transaction mode does not enclose each action in a separate transaction, but wraps all executed functions in the whole external command into one single one.
+In this case, such an approach is not usable at all.
+
+<p>Thank you for a very useful API lesson :))
+
+<!--
+<p><strong>Response:</strong> Actually, in some cases, Revit was still throwing that exception.
+After further experimenting it seems that the LoadFamilySymbol method sometimes is not enough.
+Sometimes LoadFamily seems to work better, and separate transactions or regeneration is not needed after all.</p>
+-->
+
+<p><strong>Answer:</strong> Yes, I already mentioned that automatic transaction mode is unofficially deprecated, and manual mode is recommended for all cases nowadays.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/read-only-and-automatic-transaction-modes.html">
+Automatic transaction mode is considered obsolete</a>.
+
+<p>Arno&scaron;t L&ouml;bel's AU class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-python-ui-server-and-framework-apis.html#4">
+Core Frameworks in the Revit API</a> provides
+
+more details on this topic.
+
+<p>Many thanks to Max for raising this issue and verifying that the solution works!
+
+
+
+<a name="3"></a>
+
+<h4>Extra Regeneration Required to Populate Materials</h4>
+
+<p>One of the issues we took a look at during the DevLab at AU last Tuesday was the list of materials attached to a newly duplicated symbol.</p>
+
+<p>At first glance, it appeared that a duplicated family symbol had zero entries in its list of materials, whereas the original symbols material list was correctly populated.
+
+<p>On further exploration, we discovered that this is another case of retrieving stale data after a model modification.
+
+<p>The behaviour is easily rectified by a call to regenerate the model after the symbol duplication.
+
+<p>Here is the final implementation of the external command implementing to test the issue.
+It expects a structural steel column to be pre-selected, which is a family instance whose associated symbol has exactly one entry in its materials list.
+We duplicate the symbol.
+This requires defining a new name.
+To simplify repeated testing, we generate a new name by simply appending the clock tick counter to the original one.
+Directly after the call to Duplicate, the new symbol's material list has zero entries, which makes no sense for this kind of symbol.
+A call to Regenerate fixes that:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> inst = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 == sel.Elements.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; inst = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select one &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;single structural column&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Duplicate Symbol&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = inst.Symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> name = symbol.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">DateTime</span>.Now.Ticks.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nMaterialsBefore
+&nbsp; &nbsp; &nbsp; &nbsp; = symbol.Materials.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; symbol = inst.Symbol.Duplicate( name )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The model is in a temporary state that does </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// not make sense. Regenerate to clean this up.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nMaterialsAfter
+&nbsp; &nbsp; &nbsp; &nbsp; = symbol.Materials.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; nMaterialsAfter = symbol.Materials.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; &nbsp; nMaterialsAfter.Equals( nMaterialsBefore ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;why does the material get lost, please?&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>For completeness' sake, here is
+
+<a href="zip/DuplicatedSymbolLosesMaterial.zip">
+DuplicatedSymbolLosesMaterial.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of this little test command.</p>

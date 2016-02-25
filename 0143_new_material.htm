@@ -1,0 +1,38 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>New Material</h3>
+
+<p>A quick post from my vacation in sunny and windy 
+
+<a href="http://en.wikipedia.org/wiki/Avignon">
+Avignon</a>.</p>
+
+<p><strong>Question:</strong>
+How can I create a new material in Revit?
+I have searched in vain for something like Document.Create.NewMaterial.</p>
+
+<p><strong>Answer:</strong>
+Searching in the Revit API help file for NewMaterial does indeed yield no results at all.
+However, searching for the two separate words "new material" returns a number of hits. 
+In my case, the third is the Duplicate method, and the fourth the AddOther method.
+As far as I can see, those two represent the two different possible approaches to create new materials:</p>
+
+<p>One is the use of the Material.Duplicate method, which is demonstrated by the Revit SDK sample Materials.</p>
+
+<p>The other is to use one of the material adding methods on the Materials class, which provides access to the set of materials in a Revit project.
+It provides the following methods for adding new materials:
+
+<ul>
+<li>AddConcrete to add a concrete material. 
+<li>AddGeneric to add a generic material. 
+<li>AddOther to add an other material. 
+<li>AddSteel to add a steel material. 
+<li>AddWood to add a wood material. 
+</ul>
+
+<p>Once a material has been duplicated or added, you can modify its properties to suit your needs.</p>

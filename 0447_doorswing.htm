@@ -1,0 +1,130 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Eric Wigren Re: Bug in Revit 2011 SDK? -->
+
+<h3>DoorSwing Fix</h3>
+
+<p>I am spending this week in the UK.
+We are having a long-awaited EMEA DevTech team meeting today.
+We finally succeeded in creating a possibility for all ADN engineers working in the European region to get together face to face.
+I met some of my colleagues for the first time, for instance Marat, who is based in Moscow, and Kristine from Toronto (not really part of Europe).
+The rest of the week I will be attending an internal training course, so expect a bit less blogging activity than usual.
+I do hope to be able to present at least something anyway, though, beginning with the following little item that cropped up a week or two ago:
+
+<p>Eric Wigren of <a href="http://www.cadspecialisten.se">CAD Specialisten</a> brought a little problem with the DoorSwing SDK sample to my attention.
+
+<p>Since the fix is simple, I will publish my version of it here, in case anyone needs it urgently, like Eric did.
+The public SDK will also be fixed, of course, the next time an update becomes available.
+
+<p>It started out with Eric's raising the following issue:
+
+<p><strong>Question:</strong> I am trying to use the Revit 2011 SDK DoorSwing sample.
+If I flip a door in the user interface without clicking 'Update Door Properties' and then save the project, I get the following error message:
+
+<p>"Attempt to modify the model outside of transaction."
+
+<p>Do you have a solution for this?
+
+<p>I need the DoorSwing add-in because in Sweden when ordering doors for a new building, the factory needs to know for every door whether its leaf is on the left or right. 
+This swing direction feature is available in AutoCAD Architecture, but not in Revit.
+
+<p><strong>Answer:</strong> I looked at this sample and discovered two unrelated problems with it:
+
+<ul>
+<li>The external application is missing from the add-in manifest file.
+<li>The external application call-back event handlers lack the required transactions.
+</ul>
+
+<p>Put differently, with a little more detail:
+
+<ul>
+<li>The add-in manifest file lists the three commands, but not the external application implemented by this sample.
+<li>The external application implements event handlers for the DocumentSaving and DocumentSavingAs, and these do not set up the transactions that they require.
+</ul>
+
+<p>The latter issue is causing the problem you describe.
+
+<p>Adding the external application to the add-in manifest can be achieved by including the following lines to DoorSwing.addin immediately before the final line with the closing RevitAddIns tag (copy to a text editor to see the truncated lines):
+
+<pre class="code">
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>DoorSwing<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>C:\...\DoorSwing.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>ad10ff26-34a5-4186-8142-3619264e0833<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>Revit.SDK.Samples.DoorSwing.CS.ExternalApplication<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+</pre>
+
+<p>To add the transaction required to the event handlers, I implemented a common helper function 'f' called by both of them in the module ExternalApplication.cs.
+The resulting code looks like this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> This event is fired whenever a document </span>
+<span class="gray">///</span><span class="green"> is saved. Update door's information </span>
+<span class="gray">///</span><span class="green"> according to door's current geometry.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;sender&quot;&gt;</span><span class="green">The source of the event.</span><span class="gray">&lt;/param&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;args&quot;&gt;</span><span class="green">An DocumentSavingEventArgs </span>
+<span class="gray">///</span><span class="green"> that contains the DocumentSaving event data.</span><span class="gray">&lt;/param&gt;</span>
+<span class="blue">private</span> <span class="blue">void</span> DocumentSavingHandler( 
+&nbsp; <span class="teal">Object</span> sender, 
+&nbsp; <span class="teal">DocumentSavingEventArgs</span> args )
+{
+&nbsp; f( args.Document );
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> This event is fired whenever a document </span>
+<span class="gray">///</span><span class="green"> is saved as. Update door's information </span>
+<span class="gray">///</span><span class="green"> according to door's current geometry.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;sender&quot;&gt;</span><span class="green">The source of the event.</span><span class="gray">&lt;/param&gt;</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;args&quot;&gt;</span><span class="green">An DocumentSavingAsEventArgs </span>
+<span class="gray">///</span><span class="green"> that contains the DocumentSavingAs event data.</span><span class="gray">&lt;/param&gt;</span>
+<span class="blue">private</span> <span class="blue">void</span> DocumentSavingAsHandler( 
+&nbsp; <span class="teal">Object</span> sender, 
+&nbsp; <span class="teal">DocumentSavingAsEventArgs</span> args )
+{
+&nbsp; f( args.Document );
+}
+&nbsp;
+<span class="blue">void</span> f( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">string</span> message = <span class="maroon">&quot;&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc, 
+&nbsp; &nbsp; <span class="maroon">&quot;Door Swing&quot;</span> );
+&nbsp;
+&nbsp; t.Start();
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DoorSwingData</span>.UpdateDoorsInfo( 
+&nbsp; &nbsp; &nbsp; doc, <span class="blue">false</span>, <span class="blue">false</span>, <span class="blue">ref</span> message );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; t.RollBack();
+&nbsp;
+&nbsp; &nbsp; message = ex.Message;
+&nbsp; }
+&nbsp; <span class="blue">if</span>( 0 &lt; message.Length )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( message, <span class="maroon">&quot;Door Swing&quot;</span> );
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<!-- C:\a\lib\revit\2011\SDK\Samples\DoorSwing\CS\DoorSwingUpdateJeremy.zip -->
+
+<a href="zip/DoorSwingUpdateJeremy.zip">
+DoorSwingUpdateJeremy.zip</a> containing the two modified files DoorSwing.addin and ExternalApplication.cs.
+
+

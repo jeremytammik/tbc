@@ -1,0 +1,204 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Cloud-Based Restaurant Seating Arrangement and Cleaning</h3>
+
+<p>I hope you had a successful
+
+<a href="http://en.wikipedia.org/wiki/Egg_hunt">Easter egg hunt</a>.</p>
+
+<img src="img/easter_eggs_2013.jpg" alt="Easter eggs" width="200"/>
+
+<p>As you probably noticed, I have been focusing on the research and implementation of my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html#3">
+cloud-based round-trip 2D Revit model editing project</a> for
+
+the upcoming Autodesk internal tech summit in June as much as my day-to-day tasks will allow.
+
+
+<a name="2"></a>
+
+<h4>Current Project Overview</h4>
+
+<p>To recap, the basic idea is simple: implement an example of round-trip minimal simple editing of a 2D rendering of a Revit model on any mobile device with no need for installation of any additional software whatsoever beyond a browser.</p>
+
+<p>To keep the editing task as minimal and simple as possible, I just envision changing the 2D location and orientation of the furniture and equipment within the boundaries of the selected room.</p>
+
+<p>Such an editor can be realised on any mobile device using JavaScript and <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a>, scalable vector graphics, as I showed in my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/2d-svg-editing-on-mobile-device-with-rapha%C3%ABl.html">
+prototype room polygon editor</a> using
+
+the
+
+<a href="http://raphaeljs.com">Raphaël</a> JavaScript SVG library.</p>
+
+<center>
+<a href="http://thebuildingcoder.typepad.com/svg/08-button.htm"><img class="asset  asset-image at-xid-6a00e553e168978833017d40f2e881970c" alt="Room layout editor" title="Room layout editor" src="http://thebuildingcoder.typepad.com/.a/6a00e553e168978833017d40f2e881970c-320wi"></a><br>
+<a href="http://thebuildingcoder.typepad.com/svg/08-button.htm">Room layout editor</a>
+</center>
+
+<p>Aside from the editing component, this workflow will also require:</p>
+
+<ul>
+<li>A cloud-based database repository managing the Revit model, level, room, furniture and equipment data.</li>
+<li>A Revit add-in retrieving the data from the Revit project and populating the data repository.</li>
+</ul>
+
+<p>The data repository is fed from the Revit model and queried by the mobile device editor.
+It also manages changes to the furniture and equipment location and orientation.</p>
+
+<p>The editor displays the room, furniture and equipment and enables translation and rotation of the latter, which updates the repository data.</p>
+
+<p>The Revit add-in can optionally be expanded to automatically query and update the Revit model based on new furniture and equipment locations, resulting in the following workflow:</p>
+
+<ul>
+<li>Show a Revit model.</li>
+<li>Export the model to a cloud-based data repository.</li>
+<li>Query and display the repository contents in a 2D rendering on any mobile device.</li>
+<li>Edit the model in the browser on the mobile device, updating the data repository.</li>
+<li>Pick up and display the modified model in Revit. </li>
+</ul>
+
+<p>I already discussed my current candidate for the cloud database using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html#4">
+CouchDB NoSQL database implementation</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/relax-simple-free-cloud-based-data-repository-with-nosql-couchdb-and-iriscouch.html#5">
+IrisCouch free hosting</a> service.</p>
+
+<p>Regarding the Revit add-in retrieving the room and furniture 2D boundary polygons, I also looked at the retrieval of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#3">
+plan view room boundary loops</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/filter-for-family-instances-in-a-room.html">
+family instances in a given room</a>.
+
+<p>Next steps will include enhancing the Revit add-in to extract suitable boundary loops to represent the furniture and equipment in the mobile editor, and above all the data repository implementation.</p>
+
+
+<a name="3"></a>
+
+<h4>Project Expansion for Cloud-Based Restaurant Seating and Cleaning</h4>
+
+<p>As a very happy surprise, I now found a beta site to test the existing functionality and add even more, by hooking up the mobile device furniture layout editing functionality with a restaurant cash register to implement a fully automated restaurant seating layout and floor cleaning system.
+
+<p>The basic idea is to equip the restaurant furniture with unobtrusive mobility support and link the virtual model of the restaurant and its furniture with the real-world objects.
+
+
+<p>All that is required to provide real-world control over the furniture position are concealed wheels and locking devices inside the table base.
+The wheels are normally locked in position, and their existence goes unnoticed.
+They can be unlocked and driven by motors for displacement.
+
+<p>The entire restaurant layout can thus be rearranged via the 2D layout editor on the mobile device, with no manual intervention whatsoever required.</p>
+
+<p>Each piece of furniture also includes location detection support.
+Besides the automatic rearrangement triggered by updating the virtual model, the inverse is also supported: moving the furniture around manually can trigger the virtual model to be updated instead to reflect the new real-world positions.</p>
+
+<p>Here is a snapshot of the restaurant cash register showing the original layout before editing:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_3.jpg" alt="Restaurant cash register screen" width="400"/>
+</center>
+
+<p>The cash register lives in the pillar in the centre of the restaurant.
+The pillar is not displayed on the cash register screen snapshot above:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_1.jpg" alt="Original restaurant layout" width="400"/>
+</center>
+
+<p>The bar in the corner is marked in red on the screen snapshot, and its position cannot be edited:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_2.jpg" alt="Unmodifiable bar in red" width="400"/>
+</center>
+
+<span style="color:pink">
+
+<p>This layout is stored in a Revit model and processed fully automatically via the following steps:</p>
+
+<ul>
+<li>Export to cloud-based data repository using CouchDB and an IrisCouch host, including model, level, room and furniture metadata and room and furniture plan view boundary polygons.</li>
+<li>Display on mobile device using <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a> and the <a href="http://raphaeljs.com">Raphaël</a> JavaScript SVG library.</li>
+<li>Edit furniture location and rotation on any mobile device, anywhere.</li>
+<li>Every modification immediately updates the cloud-based data repository furniture transform.</li>
+<li>Optionally, the Revit model is auto-updated as well, making use of the external event functionality to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">
+drive Revit through a WCF service</a>.</li>
+</ul>
+
+<p>Here is the same model in Revit:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_5.jpg" alt="Restaurant layout in Revit" width="400"/>
+</center>
+
+<p>The SVG editor displays it like this in the browser on any mobile device:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_6.jpg" alt="Restaurant layout in SVG" width="400"/>
+</center>
+
+</span>
+
+<p>Rotating and moving the tables in SVG triggers the synchronisation chain and drives the real-world furniture to its new position:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_0.jpg" alt="Updated real-world restaurant layout" width="400"/>
+</center>
+
+<p>As you can see, the table base looks completely normal and can easily contain the required motors, wheels, locking and location devices:</p>
+
+<center>
+<img src="img/restaurant_layout/restaurant_layout_0_zoom.jpg" alt="Ample table base housing movement devices" width="400"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Fully Automated Restaurant Cleaning</h4>
+
+<p>Mobile autonomous furniture obviously also vastly facilitates the restaurant cleaning.
+
+<p>The furniture is programmed to flock together at one end of the room each night, making space for a
+
+<a href="http://www.irobot.com/en/us/robots/home/Mint.aspx">
+cleaning robot</a>  to
+
+roam freely, and moves over to the other end of the room after the first half has been covered.</p>
+
+<p>This obviously enables much more effective and thorough cleaning than if the furniture is left in place:</p>
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/wpj0DV-inCs" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<!--
+<center>
+<script src="http://player.ooyala.com/player.js?height=236&embedCode=c2ZWdlMjqOGBdUB61_AMhtVt84ou6riC&width=420&deepLinkEmbedCode=c2ZWdlMjqOGBdUB61_AMhtVt84ou6riC&video_pcode=lzd2M6gn6_xbh1SdfpmZTpNqLKuu"></script>
+</center>
+-->
+
+<p>It is fascinating to see BIM expanding into new hitherto unexpected areas, and unbelievably exciting to participate in the process!</p>
+
+<p>I trust you will find similar opportunities to embrace this paradigm and successfully use the Revit API to support expanding your applications and ideas into other new niches.</p>
+
+<p>I am looking forward to keeping you posted on the further progress of this ongoing project!</p>
+
+
+<a name="5"></a>
+
+<h4>JavaScript Physics Sample</h4>
+
+<p>By the way, talking about new niches and programming in and for the cloud, here is an utterly cool
+
+<a href="http://codepen.io/stuffit/pen/KrAwx">JavaScript physics sample</a> simulating ripping a curtain of tearable cloth.
+
+<p>It provides an incredibly compelling and sheer unbelievably compact example use of HTML5, Canvas, CSS and JavaScript for an interactive graphical physical simulation in just three hundred lines of code.

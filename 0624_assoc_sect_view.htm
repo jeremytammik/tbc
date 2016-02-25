@@ -1,0 +1,143 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+C:\a\doc\revit\blog\zip\DynamicModelUpdateJt.zip
+340_element_events.htm:<img src="img/SdkD
+385_devcamp_whats_new.htm:<li><a href="ht
+418_rst_dmu.htm:<p>The sample implements
+465_access_deleted_element.htm:DynamicMod
+501_vsta_and_updater.htm:DynamicModelUpda
+624_assoc_sect_view.htm
+
+-->
+
+<h3>Associative Section View Fix and Greece</h3>
+
+<p>Here I am back from a very pleasant break.
+
+<h4>Break in Greece</h4>
+
+<p>As mentioned, I gave a Revit API training in Athens last week.
+I was able to extend my stay to visit the 
+
+<a href="http://en.wikipedia.org/wiki/Acropolis_of_Athens">Acropolis</a> and 
+
+spend a wonderful extended weekend on the beaches of 
+
+<a href="http://en.wikipedia.org/wiki/Limni,_Euboea">
+Limni</a> or 
+
+<a href="http://en.wikipedia.org/wiki/Limni,_Euboea">
+&Lambda;&iota;&mu;&nu;&iota;</a>, on the island of 
+
+<a href="http://en.wikipedia.org/wiki/Euboea">
+Euboea</a>.
+
+Very impressive, how the ancient Greeks built things that last for thousands of years, even though some renovation is required...</p>
+
+<center>
+<img src="img/jeremy_acropolis.jpg" alt="Acropolis renovation" width="400"/>
+</center>
+
+<h4>Mastic Liqueur and Masticate</h4>
+
+<p>One interesting thing that I learned and was able to explore through first-hand experience during the training is the etymology of the English word 
+
+<a href="http://en.wiktionary.org/wiki/masticate">masticate</a>.
+
+I went out for a meal with my mainly Lebanese training participants, so we were speaking English and they spoke Arabic in this Greek environment.
+We had fish, salad,
+
+<a href="http://en.wikipedia.org/wiki/Tzatziki">
+tzatsiki</a>, 
+
+water and 
+
+<a href="http://en.wikipedia.org/wiki/Ouzo">
+ouzo</a> (&tau;&zeta;&alpha;&&tau;&zeta;&iota;&kappa;&iota;, &omicron;&upsilon;&zeta;&omicron;)
+
+all very typical Greek, or rather Eastern Mediterranean.
+
+For dessert, as a present from the Egyptian chef, came a 
+
+<a href="http://en.wikipedia.org/wiki/Mastika">
+mastica liqueur</a>,
+
+&mu;&alpha;&sigma;&tau;&iota;&chi;&alpha;.
+
+This is produced from 
+
+<a href="http://en.wiktionary.org/wiki/mastic">
+mastic</a>,
+
+the resin of the 
+
+<a href="http://en.wiktionary.org/w/index.php?title=Pistacia_lentiscus&action=edit&redlink=1">
+Pistacia lentiscus</a> shrub native to the Mediterranean.
+
+The really interesting point for me was that the same word 'mastic' is used in Arabic as well.
+I was surprised.
+
+<a name="2"></a>
+
+<h4>Dynamic Model Update Associative Section View SDK Sample</h4>
+
+<p>The training was unconventional, since these guys were all unusually experienced programmers, so I never needed to explain anything, just point out briefly how things works and they would immediately say 'ok, fine; next, please'.
+Mostly, in my trainings, I would like to go faster, and spend much too much time explaining .NET programming basics instead of the Revit API.
+This time, as soon as I got into any .NET related details, they got impatient and urged me to get on with the next topic.
+Great fun!
+
+<p>One thing we ended up looking at was the DynamicModelUpdate sample, which demonstrates an example of making use of the DMU or Dynamic Model Update framework.
+The version in the SDK does not work out of the box right now due to a mismatch between the namespace prefix of the class implementing the external application loaded by Revit.
+The add-in manifest file specifies the full class name 'Revit.SDK.Samples.DynamicModelUpdate.CS.AssociativeSectionUpdater'.
+
+<p>The two source files Application.cs and SectionUpdater.cs define the namespace 'DynamicModelUpdate' instead.
+
+<p>To fix the problem, simply replace the line 
+
+<pre class="code">
+namespace DynamicModelUpdate
+</pre>
+
+<p>The correct specification in both files should be 
+
+<pre class="code">
+namespace Revit.SDK.Samples.DynamicModelUpdate.CS
+</pre>
+
+<p>Once that is done, the sample works fine.
+
+<h4>More Pictures of Beaches</h4>
+
+<p>To return to the unbelievably unpopulated beaches of Limni, obviously mainly due to the current economic crisis, here are some final pictures; here is Limni itself and its beach:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-08-01_greece_athens_limni/617.jpg" alt="Limni and its beach" width="400"/>
+</center>
+
+<p>A pier and beach all to ourselves:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-08-01_greece_athens_limni/648.jpg" alt="A pier and beach all to ourselves" width="400"/>
+</center>
+
+<p>Totally clear water:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-08-01_greece_athens_limni/668.jpg" alt="Totally clear water" width="400"/>
+</center>
+
+<p>Another nice lonesome beach to sleep on:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2011/2011-08-01_greece_athens_limni/679.jpg" alt="Another nice lonesome beach to sleep on" width="400"/>
+</center>
+
+<p>Here are <a href="http://www.facebook.com/media/set/?set=a.2162481814488.122318.1019863650&l=7167da5cad&type=1">yet more pictures</a>.
+
+<p>A wonderful place to be, I must say.
+I really am overwhelmed by the beauty and friendliness of Greece!
+

@@ -1,0 +1,360 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1263071 [Revit 2011 Dimension Wall]
+1263303 [Case Number 1263071 [Revit 2011 Dimension Wall]]
+1266872 [Create Dimensions]
+
+-->
+
+<h3>Dimension Walls using FindReferencesByDirection</h3>
+
+<p>On Monday I presented a new Building Coder sample command
+
+<a href="">
+CmdDimensionWallsIterateFaces</a>
+
+demonstrating how to create dimensioning between two opposing wall faces by explicitly iterating over their solid geometry and its faces, asking the Revit geometry library to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/geometry-options.html">
+compute stable references</a> to 
+
+attach the dimensioning elements to.
+The explicit iteration over geometry, searching for the right faces, and extraction of their references can all be simplified by making use of the higher-level specialised 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">
+FindReferencesByDirection</a> method
+
+provided for this purpose by the Revit API.
+
+<p>I continued working on the topic and implemented the alternative approach using FindReferencesByDirection as well in a second Building Coder sample external command implementation named CmdDimensionWallsFindRefs.
+
+<p>It removes the following limitations of the previous sample:
+
+<ul>
+<li>The dimension line was defined from wall midpoint to wall midpoint: In the new solution, there is no limitation on the location of the dimension line relative to the walls. The user selects the location of the dimension line somewhere on the second wall. The two walls must be parallel, and the projection of the first wall onto the second wall's location line must intersect with the point picked for the dimension line location.
+<li>The array of references required for the creation of the dimension element is created directly from the references returned by the high-level FindReferencesByDirection method. It shoots a ray through the Revit model and reports the elements and their faces and the points on the faces intersected by the ray. We pick out all references which refer to surfaces on the two selected walls and use those directly to create the dimension element.
+</ul>
+
+<p>The resulting command is more robust and foolproof than the first solution.
+
+<p>The new sample also demonstrates use of the PickObject method to select the walls in conjunction with a selection filter implementation of the ISelectionFilter interface. It also demonstrates that this method returns a pick point which can be evaluated to ask the user to select the dimension line location at the same time as selecting the second wall.
+
+<p>Here is the selection filter implementation that only allows the  user to pick a point on a wall:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">WallSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Wall</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>The call to FindReferencesByDirection requires a 3D view to be provided.
+We assume that a suitable 3D view exists in the document and implement the following simple helper method making a call to a filtered element collector to retrieve the first 3D view encountered:
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">View3D</span> Get3DView( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View3D</span> v <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// skip view templates here because they</span>
+&nbsp; &nbsp; <span class="green">// are invisible in project browsers:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( v != <span class="blue">null</span> &amp;&amp; !v.IsTemplate &amp;&amp; v.Name == <span class="maroon">&quot;{3D}&quot;</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> v;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>With these two methods in place and making use of the CreateDimensionElement helper method used in the previous CmdDimensionWallsIterateFaces command, the new external command implementation looks like this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Dimension two opposing parallel walls.</span>
+<span class="gray">///</span><span class="green"> Prompt user to select the first wall, and</span>
+<span class="gray">///</span><span class="green"> the second at the point at which to create </span>
+<span class="gray">///</span><span class="green"> the dimensioning. Use FindReferencesByDirection</span>
+<span class="gray">///</span><span class="green"> to determine the wall face references.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdDimensionWallsFindRefs</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; &nbsp; = <span class="maroon">&quot;Please select two parallel straight walls&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; with a partial projected overlap.&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// select two walls and the dimension line point:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">ReferenceArray</span> refs = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">WallSelectionFilter</span> f 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">WallSelectionFilter</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; refs.Append( sel.PickObject( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, f,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select first wall&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; refs.Append( sel.PickObject( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, f,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick dimension line &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;point on second wall&quot;</span> ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No two walls selected&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// ensure the two selected walls are straight and </span>
+&nbsp; &nbsp; <span class="green">// parallel; determine their mutual normal vector </span>
+&nbsp; &nbsp; <span class="green">// and a point on each wall for distance </span>
+&nbsp; &nbsp; <span class="green">// calculations:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span>[] walls = <span class="blue">new</span> <span class="teal">Wall</span>[2];
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;( 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[2];
+&nbsp; &nbsp; <span class="teal">Line</span>[] lines = <span class="blue">new</span> <span class="teal">Line</span>[2];
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> ir;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> refs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Wall</span> wall = r.Element <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; &nbsp; walls[i] = wall;
+&nbsp; &nbsp; &nbsp; ids.Add( wall.Id.IntegerValue );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// obtain location curve and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// check that it is straight:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = wall.Location 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = lc.Curve;
+&nbsp; &nbsp; &nbsp; lines[i] = curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == lines[i] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// obtain normal vectors</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and ensure that they are equal,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// i.e. walls are parallel:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == normal )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = <span class="teal">Util</span>.Normal( lines[i] );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsParallel( normal, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Normal( lines[i] ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// obtain pick points and project</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// onto wall location lines:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = r.GlobalPoint;
+&nbsp; &nbsp; &nbsp; ir = lines[i].Project( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ir )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to project pick point {0} &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;onto wall location line.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; pts[i] = ir.XYZPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Wall {0} id {1} at {2}, {3} --&gt; point {4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; i, wall.Id.IntegerValue,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( lines[i].get_EndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( lines[i].get_EndPoint( 1 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[i] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// project dimension point selected on second wall</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// back onto first wall, and ensure that normal </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// points from second wall to first:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ir = lines[0].Project( pts[1] );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ir )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to project selected dimension &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;line point {0} on second wall onto &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;first wall's location line.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[1] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; pts[0] = ir.XYZPoint;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = pts[0] - pts[1];
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; v.DotProduct( normal ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; normal = -normal;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// invoke FindReferencesByDirection, shooting ray</span>
+&nbsp; &nbsp; <span class="green">// back from second picked wall towards first:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view = Get3DView( doc );
+&nbsp;
+&nbsp; &nbsp; refs = doc.FindReferencesByDirection( 
+&nbsp; &nbsp; &nbsp; pts[1], normal, view );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Shooting ray from {0} direction &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{1} returns {2} references&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[1] ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ),
+&nbsp; &nbsp; &nbsp; refs.Size );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// store the references to the wall surfaces:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span>[] surfrefs = <span class="blue">new</span> <span class="teal">Reference</span>[2] { 
+&nbsp; &nbsp; &nbsp; <span class="blue">null</span>, <span class="blue">null</span> };
+&nbsp;
+&nbsp; &nbsp; <span class="green">// find the two closest intersection </span>
+&nbsp; &nbsp; <span class="green">// points on each of the two walls:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span>[] minDistance = <span class="blue">new</span> <span class="blue">double</span>[2] {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span>.MaxValue,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span>.MaxValue };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> refs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = r.Element;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Wall</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; i = ids.IndexOf( e.Id.IntegerValue );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( -1 &lt; i
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ElementReferenceType</span>.REFERENCE_TYPE_SURFACE
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == r.ElementReferenceType )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryObject</span> g = r.GeometryObject;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( g <span class="blue">is</span> <span class="teal">PlanarFace</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> face = g <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = ( e.Location <span class="blue">as</span> <span class="teal">LocationCurve</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Wall {0} at {1}, {2} surface {3} &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;normal {4} proximity {5}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Id.IntegerValue,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( line.get_EndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( line.get_EndPoint( 1 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( face.Origin ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( face.Normal ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r.ProximityParameter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// first reference: assert it is a face on this wall </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and the distance is half the wall thickness</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// second reference: the first reference on the other </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// wall; assert the distance between the two references</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// equals the distance between the wall location lines </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// minus half of the sum of the two wall thicknesses.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r.ProximityParameter &lt; minDistance[i] )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; surfrefs[i] = r;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; minDistance[i] = r.ProximityParameter;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == surfrefs[0] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No suitable face intersection &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;points found on first wall.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == surfrefs[1] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No suitable face intersection &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;points found on second wall.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CmdDimensionWallsIterateFaces</span>
+&nbsp; &nbsp; &nbsp; .CreateDimensionElement( doc.ActiveView, 
+&nbsp; &nbsp; &nbsp; pts[0], surfrefs[0], pts[1], surfrefs[1] );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is a slightly less horrible example than the previous one of a horizontal and a vertical dimensioning element created by this command:
+
+<center>
+<img src="img/DimensionTwoWallsFindReferencesByDirection.png" alt="Dimensioning two opposing walls using FindReferencesByDirection"/>
+</center>
+
+<p>Here is
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_86.zip -->
+
+<a href="zip/bc_11_86.zip">
+version 2011.0.86.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution with both of the two new commands.

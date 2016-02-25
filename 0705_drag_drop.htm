@@ -1,0 +1,125 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06851703 [Emulating drag drop from explorer]
+C:\a\j\adn\case\sfdc\06851703\attach\DragDropRevitExample.zip
+
+-->
+
+<h3>Drag and Drop to Revit</h3>
+
+<p>Tim Hoffeller of 
+
+<a href="http://www.cad-development.de">
+CAD-Development Tim Hoffeller</a>
+
+presents DragDropRevitExample, a nice little stand-alone sample application which prompted us to document how to populate the suitable drag and drop data to cause Revit to load a family and prompt the user to place instances of it.
+
+<p>It has one limitation, unfortunately, or rather the Revit behaviour is currently limited in one respect: it only loads and prompts for instance placement if the family has not previously been loaded. 
+Not reloading an already loaded family obviously makes sense, but not repeating the prompt for instance placement when the same family is dragged and dropped repeatedly is a problem for actual production use.
+
+<p>In that case, of course, a Revit add-in could simply call the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+PromptForFamilyInstancePlacement</a> instead, 
+
+but this stand-alone drag and drop sample is an external Windows application which makes no use of the Revit API at all; it just populates the drag and drop data appropriately and initiates the drag and drop sequence.
+
+<p>Let's start with the good news, though, the initial question and solution:
+
+<p><strong>Question:</strong> I'm trying to mimic the drag & drop from Explorer to load families inside of my custom control.
+
+<p>My application is a stand-alone Windows app, running outside of Revit. 
+Now I want to drag an item from a list view into Revit and load the family represented by this list view item.
+
+<p>In general the drag & drop seems to work fine, but Revit doesn't load the file. 
+What kind of data needs to be passed by the DoDragDrop method of my list view to force Revit to load the RFA file?
+
+
+<p><strong>Answer:</strong> Revit expects a standard Explorer shell file drop, specifically CF_HDROP, and processes it through CWnd::OnDropFiles() and DragQueryFile().  
+Therefore, you just need to construct a CF_HDROP data object with a DROPFILES structure.
+
+<p>Here are some useful pointers for this:
+
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb776902(v=vs.85).aspx#CF_HDROP">Shell Clipboard Formats</a>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773269(v=vs.85).aspx">DROPFILES</a>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/62zys01d(v=vs.80).aspx">CWnd::OnDropFiles</a>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb776408(v=vs.85).aspx">DragQueryFile</a>
+</ul>
+
+<p>In addition, here is an untested CodeProject article and sample on
+
+<a href="http://www.codeproject.com/KB/shell/explorerdragdrop.aspx">how to implement Drag and Drop between your program and Explorer</a>
+
+which might also be of interest.
+
+<p><strong>Question:</strong> Thank you for the feedback.
+Now I have a working version.
+I have used the DataObject and passed it to my Listview DoDragDrop method.
+Here is 
+
+<a href="DragDropRevitExample.zip"> DragDropRevitExample.zip</a> containing
+
+the entire source code and Visual Studio solution, but without the families.
+You can place your own families into the Families subfolder provided in the project files.
+
+<p>This is its minimalistic user interface:</p>
+
+<center>
+<img src="img/DragDropRevitExample_ui.png" alt="DragDropRevitExample user interface"/>
+</center>
+
+<p>The application automatically populates the list view with all families found in a specific subdirectory.
+They are listed in the ListView user interface and can be dragged and dropped into Revit to intiate the family load and family instance placement.
+
+<p>As said above, only the first drag and drop operation has any effect.
+All following repetitions simply do nothing, since Revit determines that the family has already been loaded and decides that it has nothing further to do.
+
+<p>You possibly work around this limitation by implementing an additional Revit add-in that does catches this situation somehow and does something with the PromptForFamilyInstancePlacement method to achieve the same effect, if you like.
+
+<p>Here is the code of the MouseMove event handler which initiates the drag and drop operation and populates the DataObject appropriately: 
+
+<pre class="code">
+<span class="blue">void</span> _listViewTestFamilies_MouseMove( 
+&nbsp; <span class="blue">object</span> sender, 
+&nbsp; <span class="teal">MouseEventArgs</span> e )
+{
+&nbsp; <span class="blue">if</span>( ( e.Button &amp; <span class="teal">MouseButtons</span>.Left ) == <span class="teal">MouseButtons</span>.Left )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Proceed with the drag-and-drop, </span>
+&nbsp; &nbsp; <span class="green">// passing in the list item.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FileInfo</span> finf 
+&nbsp; &nbsp; &nbsp; = (<span class="teal">FileInfo</span>) _listViewTestFamilies.Items[
+&nbsp; &nbsp; &nbsp; &nbsp; indexOfItemUnderMouseToDrag].Tag;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( finf.Exists )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DataObject</span> myDataObject = <span class="blue">new</span> <span class="teal">DataObject</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// You have to set up the FileDropList, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// otherwise nothing will happen ;-)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">StringCollection</span> coll 
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">StringCollection</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; coll.Add( finf.FullName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; myDataObject.SetFileDropList( coll );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DragDropEffects</span> dropEffect 
+&nbsp; &nbsp; &nbsp; &nbsp; = _listViewTestFamilies.DoDragDrop( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myDataObject, <span class="teal">DragDropEffects</span>.Copy );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to Tim for exploring this issue and providing this nice little sample!

@@ -1,0 +1,523 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Melbourne DevLab</h3>
+
+<p>The last few days I started walking on foot from Flinder Station to Queen's Road.
+I can enjoy lush green grass, beautiful huge trees and strange birdsong in morning sunlight all the way past the Shrine of Remembrance.
+It takes just ten minutes longer than waiting for the overfilled noisy slow tram, in which I am forced to stand and therefore can't look out through the windows due to my height.
+
+<p>The Melbourne Revit API training 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-one.html">
+day one</a> and 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html">
+day two</a> were 
+
+followed by a DevLab.
+
+<p>A DevLab is an open event where developers roll up bringing their current work and issues and continue developing side by side with one or more ADN DevTech engineers, in this case poor old me.
+
+<p>We had three days to play with and achieved some quite exciting and impressive results.
+Here are some of them:
+
+<ul>
+<li>Delete all 3D views.
+<li><a href="#1">Retrieve specific views</a>: GetNicksViews.
+<li>Find unnamed reference planes using a parameter filter.
+<li><a href="#2">Delete reference planes not hosting any elements</a>: DeleteUnnamedNonHostingReferencePlanes.
+<li>Find elements which have had certain information added, so they can be deleted and updated.
+<li><a href="#3">Automatically create setout points</a> for on-site location and construction of structural elements.
+</ul>
+
+<p>The first couple of items were things I worked on with Nicholas Broadbent of 
+
+<a href="http://www.coxarchitecture.com.au">
+COX Architecture</a>, 
+
+who is also involved in a whole bunch of other exciting projects, such as:
+
+<ul>
+<li>A Navisworks clash detection data importer for Revit.
+<ul>
+<li>Save Navisworks clash detection data into the clashing elements in Revit.
+</ul>
+<li>A link between Rhino (using the Grasshopper plug-in) and Revit.
+<ul>
+<li>Draw Revit straight and arced beams from points exported from Rhino.
+<li>Place family instances and adaptive components using the same exported data.
+<li>Avoid using SAT files. A known issue is that they can crash Revit.
+</ul>
+<li>Exporting a Revit model to the Unity Gaming engine.
+<ul>
+<li>Looking up Revit data in an Access database based on a Revit element id.
+<li>Display Revit data in the Unity gaming engine when you click on an element.
+</ul>
+<li>FBX C++ API
+<ul>
+<li>Modify an FBX file, renaming and merging nodes.
+</ul>
+</ul>
+
+<p>The second and third days I spent most of the time together with Paul Hellawell of 
+
+<a href="http://www.ghd.com">
+GHD</a> working
+
+on a full-blown end-user-capable little application for the automatic creation of setout points for on-site location and construction of structural elements.
+I'll say a little bit about it 
+
+<a href="#3">
+below</a> and
+
+we plan to post the full description, add-in and support files sometime soon.
+
+<p>After DevLab, we went off on a visit to a pub or two which is right now starting to turn into a crawl.
+Here are The DevLab Boys at the 
+
+<a href="http://www.looponline.com.au">
+Loop</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-03-23_pub_melbourne/loop_the_devlab_boys.jpg" alt="The DevLab boys in the Loop" width="400"/>
+</center>
+
+<p>This place calls itself an architectural and experimental space and used to be the venue of 
+
+<a href="http://www.revic.org.au">
+Revic</a>, 
+
+the Revit Users Group of Victoria.
+
+<p>From there we moved on to 
+
+<a href="http://www.theage.com.au/news/bar-reviews/siglo-bar/2008/05/12/1210444319156.html">
+Siglo</a>, 
+
+in the same house as the 
+
+<a href="http://www.theage.com.au/news/bar-reviews/the-melbourne-supper-club/2006/04/03/1143916451849.html">
+Supper Club</a> that 
+
+I visited 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html">
+just a few days ago</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2012/2012-03-23_pub_melbourne/siglo.jpg" alt="Siglo" width="400"/>
+</center>
+
+
+
+<a name="1"></a>
+
+<h4>Retrieving Specific Views</h4>
+
+<p>Actually, we have had a couple of beers by now, and both Nick and Paul are enjoying 40 dollar cigars (credit: Nick bought), so I will simply post this with no further comment:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt; a
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementFilter</span>&gt;( 4 );
+&nbsp;
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) ) );
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">ViewDrafting</span> ) ) );
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) ) );
+&nbsp; &nbsp; a.Add( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">ViewSection</span> ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LogicalOrFilter</span> f = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( a );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> col 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( f );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> view <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//Debug.WriteLine( view.IsTemplate.ToString() </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// + &quot;:&quot; + view.ViewType.ToString() + &quot;:&quot; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// + view.ViewName.ToString() + &quot;:&quot; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// + view.Id.ToString() );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} : {1} : {2} : {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; view.IsTemplate, view.ViewType, 
+&nbsp; &nbsp; &nbsp; &nbsp; view.ViewName, view.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !view.IsTemplate ) 
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="2"></a>
+
+<h4>Delete Reference Planes Not Hosting Any Elements</h4>
+
+<p>A complex model can contain a pretty huge number of useless reference planes.
+
+<p>Nick proposed deleting all reference planes that 
+
+<ol type="a">
+<li>Have not been assigned a name, and
+<li>Do not host any elements.
+</ol>
+
+<p>To maximise performance, we use a parameter filter to check that the reference plane name is non-empty.
+That is about twice as efficient as just filtering for all reference planes and then using LINQ or an explicit loop in .NET to check for a non-empty name.
+
+<p>Once we have found all the reference planes with a non-empty name, we need to check for each whether it hosts any elements.
+This topic has been covered several times in the past, e.g. looking for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships.html">
+generic object relationships</a> (also
+
+available for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/object-relationships-in-vb.html">
+VB</a>).
+
+<p>The simplest approach that I am aware of is to delete it and check the number of element returned by the Delete method.
+This list should include at least the element id of the reference plane itself, if the deletion succeeded.
+If its length is larger than one, other elements were affected, which in this case probably means that they were hosted by the plane.
+
+<p>So, if the number of deleted elements equals one, we are happy and have deleted a reference plane hosting no other elements.
+If the number is larger than one, it probably hosts something.
+In that case, we can simply abort the transaction to undo the deletion attempt.
+
+<p>The deletion including the commit or rollback is achieved by the DeleteIfNotHosting method:
+
+<pre class="code">
+<span class="blue">bool</span> DeleteIfNotHosting( <span class="teal">ReferencePlane</span> rp )
+{
+&nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = rp.Document;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; tx.Start( <span class="maroon">&quot;Delete ReferencePlane &quot;</span> 
+&nbsp; &nbsp; + (++_i).ToString() );
+&nbsp;
+&nbsp; <span class="green">// Deletion simply fails if the reference plane </span>
+&nbsp; <span class="green">// hosts anything. If so, the return value ids </span>
+&nbsp; <span class="green">// is null:</span>
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = doc.Delete( rp );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids || 1 &lt; ids.Count )
+&nbsp; {
+&nbsp; &nbsp; tx.RollBack();
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; rc = <span class="blue">true</span>;
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>If you look carefully, you'll notice that we number the transactions that we generate so that they can be differentiated in the user interface undo list.
+
+<P>Actually, during debugging, I noticed that the deletion simply fails if the reference plane is hosting any elements, so the approach that I originally envisaged is not working.
+However, the failed deletion attempt returns a null collection of element ids instead of one containing more than one element.
+I added the null check and roll back the transaction in that case also, and all is fine.
+
+<p>Since the deletion fails anyway for a reference plane hosting anything, we could just as well commit the transaction, I suppose, but I prefer to roll it back.
+Given more time to play, I could check which is faster or uses less resources, rolling back or committing.
+In AutoCAD ObjectARX, rolling back is significantly more expensive than committing, but I assume that is a special case.
+
+<p>This method is driven by the mainline Execute method which implements the parameter filtering for non-empty reference plane names:
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Construct a parameter filter to get only </span>
+&nbsp; &nbsp; <span class="green">// unnamed reference planes, i.e. reference </span>
+&nbsp; &nbsp; <span class="green">// planes whose name equals the empty string:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.DATUM_TEXT;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilterStringRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; &nbsp; provider, evaluator, <span class="maroon">&quot;&quot;</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> col 
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ReferencePlane</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = 0;
+&nbsp; &nbsp; <span class="blue">int</span> nDeleted = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// No need to cast ... this is pretty nifty,</span>
+&nbsp; &nbsp; <span class="green">// I find ... grab the elements as ReferencePlane</span>
+&nbsp; &nbsp; <span class="green">// instances, since the filter guarantees that </span>
+&nbsp; &nbsp; <span class="green">// only ReferencePlane instances are selected.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ReferencePlane</span> rp <span class="blue">in</span> col )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++n;
+&nbsp; &nbsp; &nbsp; nDeleted += DeleteIfNotHosting( rp ) ? 1 : 0;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} unnamed reference plane{1} examined, {2} of them were deleted.&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, (1==n?<span class="maroon">&quot;&quot;</span>:<span class="maroon">&quot;s&quot;</span>), nDeleted );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Here is 
+
+<a href="zip/DeleteUnnamedNonHostingReferencePlanes.zip"</a> containing
+
+the source code, manifest file, and Visual Studio solution.
+
+
+<a name="3"></a>
+
+<h4>Automatic Setout Points</h4>
+
+<p>Why are we doing this?
+
+<p>It has been known to mankind for the following kind of situation to occur:
+
+<p>A large complex structure is constructed off-site.
+When assembled on site, it does not fit.
+The workers continue nonetheless and force it into place.
+The error is discovered later and corrected using brute force and post adaption.
+Overall cost of exercise: several days of delay and tens of thousands in cost overruns.
+
+<p>Here is Paul's description of this:
+
+<p><strong>The Challenge:</strong> Provide a way to find the real world coordinates, for the corners of potential elements we want to set out in the field, automatically from the model. 
+In this example, concrete structural elements. 
+Ideally display these points in a Revit schedule, so that they can be formatted and placed on a drawing sheet. 
+Then define which of the points could be used as set out points list them in a schedule, preferably numbered sequentially for readability.
+
+<p><strong>In Practice:</strong> Initially we could get the points listing, all from the API, but transferring this information into a schedule proved to be not possible. 
+Instead we created a family that contained shared parameters to hold the data we required for scheduling. 
+Then we place the created family at the points we have extracted from the geometry. 
+Through the API it is then possible to populate the parameters with the X, Y, Z coordinates we have extracted from the geometry, and then add these values to the extracted project location, to convert the values to real world coordinates.
+
+<p>Initially one type was used in the set out point family. 
+However this did not enable the ability to select which points we want as scheduled set out points. 
+For this two types were created within the family, SetoutPoint_Major and SetoutPoint_Minor. 
+This allowed two separate schedules to be created, one capturing all the points, another to capture points defined as major points for use on a drawing sheet for set out. 
+The 'all points' schedule is useful for export to a CSV file for import into a surveying device such as a 
+
+<a href="http://www.trimble.com">
+Trimble</a>
+
+allowing site set-out directly from the model.
+
+<p>To be continued...
+
+<!--
+
+<h5>Nitty-Gritty</h5>
+
+<p>The setout point add-in performs the following steps:
+
+<ul>
+<li>Select all structural elements of interest in the model.
+<li>Extract and analyse their geometry.
+<li>Automatically define setout points based on the geometry analysis and place family instances to mark all of them.
+<li>Support manual marking of key setout points, to differentiate the (few) important major ones from the (many) less important minor ones.
+<li>Implement the setout point family definition.
+<li>Create Revit schedules listing all minor and key setout points for export to CSV, automatic trimble point population, on-site viewing.
+
+<li>apply project location transform as described in 
+
+http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html
+
+</ul>
+
+<p>It populates the following shared parameters which are used to create the schedules:
+
+<ul>
+<li>Key_Setout_Point
+<li>Host_Type
+<li>Host_Id 
+<li>Point_Number
+<li>X
+<li>Y
+<li>Z
+</ul>
+
+<p>We classify the possible setup point host geometry types that we support.
+The host types are one of the following:
+
+<pre class="code">
+&nbsp; <span class="blue">enum</span> <span class="teal">HostType</span>
+&nbsp; {
+&nbsp; &nbsp; Floors,
+&nbsp; &nbsp; Ramps,
+&nbsp; &nbsp; StructuralColumns,
+&nbsp; &nbsp; StructuralFraming,
+&nbsp; &nbsp; StructuralFoundations,
+&nbsp; &nbsp; Walls
+&nbsp; }
+</pre>
+
+<p>This is what the schedule ends up looking like this, ready to be sent and used on-site:</p>
+
+<center>
+<img src="img/" alt=""/>
+</center>
+
+
+<ul>
+<li><a href="zip/shared_parameters.txt">shared_parameters.txt</a>, the shared parameter definition file.
+<li><a href="zip/SetoutPoint2012.rfa">SetoutPoint2012.rfa</a>, the setout point family file including the relevant shared parameter definitions.
+<li><a href=""></a> 
+<li><a href=""></a> 
+</ul>
+
+
+we calculate all setout points on structural concrete geometry
+
+we thought to schedule these points directly, but cannot add more than one X, Y, Z shared param per element
+
+solution: create setout point family instances for each individual setout point and use those for scheduling
+
+you could actually use DMU to regen the points automatically every time the geometry changes, but easier might be to regenerate the whole thing each time you need it and delete them immediately afterwards
+
+C:\tmp\Revit\SetoutPoints\test\rst_basic_sample_project_with_location.rvt
+
+Schedule setout points.
+
+We calculate all setout points on structural concrete geometry.
+
+We thought to schedule these points directly, but cannot add more than one X, Y, Z shared parameter per element.
+
+Solution: create setout point family instances for each individual setout point and use those for scheduling.
+
+You could actually use DMU to regenerate the points automatically every time the geometry changes, but easier might be to regenerate the whole thing each time you need it and delete them immediately afterwards
+
+    /// <summary>
+    /// Classify the possible setup point 
+    /// host geometry types that support.
+    /// </summary>
+    enum HostType
+    {
+      Floors,
+      Ramps,
+      StructuralColumns,
+      StructuralFraming,
+      StructuralFoundations,
+      Walls
+    }
+
+Return all the "corner" vertices of a given solid. Note that a circle in Revit consists of two arcs and will return a "corner" at each of the two arc end points.
+
+Retrieve all structural elements that we are interested in using to define setout points. We are looking at concrete for the moment. This includes: columns, framing, floors, foundations, ramps, walls. 
+
+Shared parameter GUIDs retrieved from the shared parameter file.
+
+Observe the project location transform.
+
+Two symbols, major (key) and minor. Expecting major (key) setout point first, minor setout point second.
+
+Retrieve the first non-empty solid found for the given element. In case the element is a family instance, it may have its own non-empty solid, in which case we use that. Otherwise we search the symbol geometry. If we use the symbol geometry, we have to keep track of the instance transform to map it to the actual instance project location.
+
+Some columns have no solids, and we have to retrieve the geometry from the symbol; others do have solids on the instance itself and no contents in he instance geometry (e.g. in rst_basic_sample_project.rvt).
+
+Renumber key setout points. We remove the "SOP" prefix and restart numbering from one.
+
+Filter for key setout points. They are family instances with the generic model category whose Key_Setout_Point shared parameter is set to true. 
+
+To get the key points only, we initially set up a parameter filter. For that, we need a parameter definition to set up the parameter filter.
+
+Later, we decided to switch type when we promote a setout point to a major or key point, so there is no need to filter for a parameter value at all; we can just filter for the major setout point type instead.
+
+
+
+<ul>
+<li>
+</ul>
+
+
+<a href="">
+</a> 
+
+
+<center>
+<img src="img/" alt=""/>
+</center>
+
+<hr>
+
+<pre class="code">
+</pre>
+
+<a name=""></a>
+
+<h4></h4>
+
+<a href="">
+</a> 
+
+<a name="3"></a>
+
+<h4>Determine Revit Demo Mode</h4>
+
+<p>Rudolf Honke 
+
+<a href="">
+commented</a> on 
+
+the approach I suggested to 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/determine-revit-demo-mode.html">
+determine-revit-demo-mode</a> and
+
+proposed using the OptionalFunctionalityUtils IsDWGExportAvailable method instead of using my much more complex try-catch method.
+
+<p>This method is documented to check whether the DWG export functionality is available in the installed version of Revit. 
+The DWG export requires presence of certain modules that are optional and may not be part of the installed Revit. 
+-->
+

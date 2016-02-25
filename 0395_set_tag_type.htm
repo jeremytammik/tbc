@@ -1,0 +1,358 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1260577 [where can I set the tag I want] -->
+
+<h3>Set Tag Type</h3>
+
+<p>The exploration of a question on setting the tag type for a newly created tag prompted me to put together a new little Building Coder sample command which may be useful for other purposes as well, since it can be started in an empty architectural project and performs the following steps:
+
+<ul>
+<li>Determine bottom and top level for placing a wall.
+<li>Create a new wall element and set its top bounding level.
+<li>Retrieve the wall thickness to later calculate an offset for the tag.
+<li>Retrieve a door symbol to use to insert a door in the wall.
+<li>Create a new door element at the wall midpoint.
+<li>Create a new door tag element associated with the door.
+<li>Retrieve an existing door tag type to duplicate.
+<li>Create a new door tag type by calling the Duplicate method.
+<li>Change the door tag's type to the new door tag type.
+</ul>
+
+<p>The code to implement the first six steps has been extracted from the Revit API introduction Lab2_0_CreateLittleHouse external command, which we used repeatedly in the past to demonstrate various aspects, such as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/selecting-all-w.html">
+selecting all walls</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/wall-dimensions.html">
+determining wall dimensions</a>, 
+
+creating 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/walls-and-doors-on-two-levels.html">
+walls and doors on two levels</a>, 
+
+and in Revit 2011 showing the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/xyz-immutable.html">
+immutability of the XYZ class</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">
+risks of the manual regeneration option</a>,
+
+and a temporary problem requiring an explicit call to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/autojoinelements.html">
+AutoJoinElements</a> method.
+
+<p>We already looked at the use of the Duplicate method to create a new family symbol for 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/creating-a-new-family-symbol.html">
+walls and columns</a>,
+
+later again for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+columns</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-beam.html">
+beams</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-api-cases-1.html#3">
+family instances</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/12/distinguish-different-dimension-types.html">
+dimensioning</a>,
+
+and to create a new 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/new-material.html">
+material</a>.
+
+<p>The code also demonstrates some neat little element filtering collector usages.
+
+<p>So it is well worth extracting it and placing it into a self-contained Building Coder sample for easy immediate access.
+
+<p>Here is the question that prompted this update:
+
+<p><strong>Question:</strong> I am writing some code to automatically tag an element.  
+Here is the line I am using to create the new tag:
+
+<pre class="code">
+&nbsp; doc.Create.NewTag(
+&nbsp; &nbsp; doc.ActiveView,
+&nbsp; &nbsp; elem,
+&nbsp; &nbsp; False,
+&nbsp; &nbsp; <span class="teal">TagMode</span>.TM_ADDBY_CATEGORY,
+&nbsp; &nbsp; <span class="teal">TagOrientation</span>.TAG_HORIZONTAL,
+&nbsp; &nbsp; panelCenter );
+</pre>
+
+<p>This method allows me to choose the tagging mode, but not the type of tag that I want.
+
+<p>How can I specify the tag type to be used for the newly created tag?
+
+<p>In the user interface, I can define it in this dialogue:</p>
+
+<center>
+<img src="img/tag_list.png" alt="Default tag type per category"/>
+</center>
+
+<p><strong>Answer:</strong> You can set the tag type by calling ChangeTypeId with the desired tag type element id on the tag returned by the NewTag method.
+
+<p>I implemented a new Building Coder sample command CmdSetTypeTag to answer this and provide an executable example of implementing it.
+It executes all of the steps listed in the introduction above, the last four of which address your specific question:
+
+<ul>
+<li>Create a door tag.
+<li>Retrieve an existing door tag type.
+<li>Duplicate it to create a new door tag type.
+<li>Assign the new type to the door tag.
+</ul>
+
+<p>The command makes use of a couple of constants and helper methods.
+
+<p>First of all, we define a conversion unit for converting meters to feet, since all length measurements within the Revit database make use of the latter.
+Our recent exploration of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/voltage-units.html">
+voltage units</a> includes 
+
+an extensive list of back pointers to posts on this subject:
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> MeterToFeet = 3.2808399;
+</pre>
+
+<p>This geometric helper method returns the midpoint between two points:
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> Midpoint( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+{
+&nbsp; <span class="blue">return</span> p + 0.5 * ( q - p );
+}
+</pre>
+
+<p>Then we have a group of filtered element collector routines to effectively retrieve the following sets of elements from the Revit database:
+
+<ul>
+<li>GetElementsOfType:
+     Return all elements of the requested class,
+     i.e. System.Type, matching the given built-in
+     category in the given document.
+<li>GetFamilySymbols:
+     Return all family symbols in the given document
+     matching the given built-in category.
+<li>GetFirstFamilySymbol:
+     Return the first family symbol found in the given document
+     matching the given built-in category, or null if none is found.
+<li>GetBottomAndTopLevels:
+     Determine bottom and top levels for creating walls.
+     In a default empty Revit Architecture project,
+     'Level 1' and 'Level 2' will be returned.
+     Returns true if the two levels are successfully determined.
+</ul>
+
+<pre class="code">
+<span class="blue">static</span> <span class="teal">FilteredElementCollector</span>
+&nbsp; GetElementsOfType(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Type</span> type,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfCategory( bic );
+&nbsp; collector.OfClass( type );
+&nbsp;
+&nbsp; <span class="blue">return</span> collector;
+}
+&nbsp;
+<span class="blue">static</span> <span class="teal">FilteredElementCollector</span>
+&nbsp; GetFamilySymbols(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+{
+&nbsp; <span class="blue">return</span> GetElementsOfType( doc,
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ), bic );
+}
+&nbsp;
+<span class="blue">static</span> <span class="teal">FamilySymbol</span> GetFirstFamilySymbol(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">BuiltInCategory</span> bic )
+{
+&nbsp; <span class="teal">FamilySymbol</span> s = GetFamilySymbols( doc, bic )
+&nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != s, <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;expected at least one {0} symbol in project&quot;</span>,
+&nbsp; &nbsp; bic.ToString() ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> s;
+}
+&nbsp;
+<span class="blue">static</span> <span class="blue">bool</span> GetBottomAndTopLevels(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">ref</span> <span class="teal">Level</span> levelBottom,
+&nbsp; <span class="blue">ref</span> <span class="teal">Level</span> levelTop )
+{
+&nbsp; <span class="teal">FilteredElementCollector</span> levels
+&nbsp; &nbsp; = GetElementsOfType( doc, <span class="blue">typeof</span>( <span class="teal">Level</span> ),
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Levels );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> levels )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == levelBottom )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; levelBottom = e <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == levelTop )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; levelTop = e <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( levelTop.Elevation &lt; levelBottom.Elevation )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Level</span> tmp = levelTop;
+&nbsp; &nbsp; levelTop = levelBottom;
+&nbsp; &nbsp; levelBottom = tmp;
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> != levelBottom &amp;&amp; <span class="blue">null</span> != levelTop;
+}
+</pre>
+
+<p>Putting these all together, here is the implementation of the external command mainline Execute method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> createApp
+&nbsp; &nbsp; = app.Application.Create;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> createDoc
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="green">// determine the wall endpoints:</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> length = 5 * MeterToFeet;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> [] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[2];
+&nbsp;
+&nbsp; pts[0] = <span class="teal">XYZ</span>.Zero;
+&nbsp; pts[1] = <span class="blue">new</span> <span class="teal">XYZ</span>( length, 0, 0 );
+&nbsp;
+&nbsp; <span class="green">// determine the levels where </span>
+&nbsp; <span class="green">// the wall will be located:</span>
+&nbsp;
+&nbsp; <span class="teal">Level</span> levelBottom = <span class="blue">null</span>;
+&nbsp; <span class="teal">Level</span> levelTop = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !GetBottomAndTopLevels( doc,
+&nbsp; &nbsp; <span class="blue">ref</span> levelBottom, <span class="blue">ref</span> levelTop ) )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Unable to determine &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;wall bottom and top levels&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// create a wall:</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> topLevelParam
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.WALL_HEIGHT_TYPE;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> topLevelId = levelTop.Id;
+&nbsp;
+&nbsp; <span class="teal">Line</span> line = createApp.NewLineBound(
+&nbsp; &nbsp; pts[0], pts[1] );
+&nbsp;
+&nbsp; <span class="teal">Wall</span> wall = createDoc.NewWall(
+&nbsp; &nbsp; line, levelBottom, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> param = wall.get_Parameter(
+&nbsp; &nbsp; topLevelParam );
+&nbsp;
+&nbsp; param.Set( topLevelId );
+&nbsp;
+&nbsp; <span class="green">// determine wall thickness for tag </span>
+&nbsp; <span class="green">// offset and profile growth:</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> wallThickness = wall.WallType
+&nbsp; &nbsp; .CompoundStructure.Layers.get_Item( 0 )
+&nbsp; &nbsp; .Thickness;
+&nbsp;
+&nbsp; <span class="green">// add door to wall;</span>
+&nbsp; <span class="green">// note that the NewFamilyInstance method </span>
+&nbsp; <span class="green">// does not automatically add a door tag, </span>
+&nbsp; <span class="green">// like the ui command does:</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> doorSymbol = GetFirstFamilySymbol(
+&nbsp; &nbsp; doc, <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doorSymbol )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;No door symbol found.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> midpoint = Midpoint( pts[0], pts[1] );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> door = createDoc
+&nbsp; &nbsp; .NewFamilyInstance( midpoint, doorSymbol,
+&nbsp; &nbsp; &nbsp; wall, levelBottom,
+&nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; <span class="green">// create door tag:</span>
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; <span class="blue">double</span> tagOffset = 3 * wallThickness;
+&nbsp;
+&nbsp; midpoint += tagOffset * <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; <span class="teal">IndependentTag</span> tag = createDoc.NewTag(
+&nbsp; &nbsp; view, door, <span class="blue">false</span>, <span class="teal">TagMode</span>.TM_ADDBY_CATEGORY,
+&nbsp; &nbsp; <span class="teal">TagOrientation</span>.TAG_HORIZONTAL, midpoint );
+&nbsp;
+&nbsp; <span class="green">// create and assign new door tag type:</span>
+&nbsp;
+&nbsp; <span class="teal">FamilySymbol</span> doorTagType
+&nbsp; &nbsp; = GetFirstFamilySymbol(
+&nbsp; &nbsp; &nbsp; doc, <span class="teal">BuiltInCategory</span>.OST_DoorTags );
+&nbsp;
+&nbsp; doorTagType = doorTagType.Duplicate(
+&nbsp; &nbsp; <span class="maroon">&quot;New door tag type&quot;</span> ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; tag.ChangeTypeId( doorTagType.Id );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The result of running this in a new empty project is a wall, door, and door tag with the newly created door tag type assigned to it, looking like this:</p>
+
+<center>
+<img src="img/new_door_tag_type.png" alt="New door tag type"/>
+</center>
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_73.zip -->
+
+<a href="zip/bc_11_73.zip">
+version 2011.0.73.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution and the new command.

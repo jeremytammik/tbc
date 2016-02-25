@@ -1,0 +1,58 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1255445 [Support for automated testing] -->
+
+<h3>AU and Automated Testing</h3>
+
+<p>AU has been as exciting as ever, with lots of fascinating news and good meetings and discussions with developers and colleagues that I never get to meet except here. Here are some 
+
+<a href="http://www.solidsmack.com/autodesk-university-2009-quick-fact-photo-smack-up-au2009/2009-12-02">
+quick facts and photos</a>.
+
+<p>I visited two great classes yesterday on the Revit API by Harry Mattison and Scott Conover, 
+who both work with the internal development of the Revit API and really know what they are talking about:
+
+<ul>
+<li><a href="http://au.autodesk.com/?nd=class&session_id=5252">
+CP214-2</a> Creating and Analyzing New Conceptual Massing Geometry With the Autodesk® Revit® API</li>
+
+<li><a href="http://au.autodesk.com/?nd=class&session_id=5256">
+CP222-3</a> Analyze Geometry of Buildings Using the Autodesk® Revit® API
+</li>
+</ul>
+
+<p>I am very much looking forward to presenting some of the contents of these classes in upcoming posts.
+
+<p>Meanwhile, here is a great idea from Saikat Bhattacharya on how to automatically trigger automated testing, or perform any other action on a regular basis or at a specified time.
+
+<p><strong>Question:</strong> Is there a way to call an add-in application from the command line? 
+We would like to create and run an automated test for our export tool. 
+This should run during the night, to provide the results the next morning. 
+
+<p><strong>Answer:</strong> We have looked at this and related issues several times in the past:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+Driving Revit from outside</a></li> <!-- 51 -->
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/revit-window-handle-and-modeless-dialogues.html">
+Accessing Revit from a modeless dialogue</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/vb-samples-and-other-questions.html#1">
+Programmatically triggering a command</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/journal-file-replay.html">
+Journal file replay</a></li>
+</ul>
+
+<p>Besides this, another workaround that comes to mind is to make use of the Revit auto-save mechanism.
+You could set up an external application which registers a DocumentSaving event handler.
+In this event handler, you could check to see if the system time is beyond midnight.
+In that case you can implement the functionality to export the data from your active Revit model. 
+Revit can perform an auto-save of the model based on any interval you choose.
+Every time it does so, this mechanism will check the system time and run your custom export logic accordingly. 
+I hope this helps.
+
+<p>Thank you Saikat for this brilliant idea to add to our growing arsenal of Revit automation tools!

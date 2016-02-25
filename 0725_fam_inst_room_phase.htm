@@ -1,0 +1,195 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1273070 [FamilyInstance.Room == null] patrick rosendahl -->
+
+<h3>Family Instance Room Phase</h3>
+
+<p>We already looked at some examples of confusion due to the interaction of phases with the room property on family instances.
+Here is a new aspect of this encountered and solved by Patrick Rosendahl of
+
+<a href="http://www.solar-computer.de">
+SOLAR-COMPUTER GmbH</a>,
+
+who kindly explains the issue and its resolution like this:
+
+<p><strong>Problem:</strong> I am having a problem with the FamilyInstance Room property.
+I looked at the discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/unreliable-room-properties.html">
+issues with the Room property</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/phase-dependent-room-properties.html">
+its phase dependency</a> but
+
+have not been able to solve it yet.
+
+<p>This is the situation:
+
+<ul>
+<li>Customer makes use of design options and phasing.
+<li>Most rooms are in the main model, some rooms are in design options.
+<li>There are three phases: phase_A, phase_B, phase_C.
+<li>Phase_C is not used, have not checked the impact if deleted.
+<li>Most architecture is created in phase_A and located in the main model.
+<li>Some architecture is created in phase_B and located in design options.
+<li>All family instances and all rooms are created in phase_B.
+<li>Room volume computation is turned on.
+<li>Revit's schedules work correctly, i.e. show the correct room-wise list of family instances.
+</ul>
+
+<p>These are the problems encountered:
+
+<ul>
+<li>Sometimes, the family instance Room property returns null, even though the family instance is clearly within a room.
+<li>Even worse: sometimes, the family instance method get_Room( familyinstance.CreationPhase ) returns null.
+</ul>
+
+<p>Questions:
+
+<ul>
+
+<li>Might there be a problem with the design options?
+
+<li>Is there any better workaround than the two approaches mentioned above?
+
+<li>What function is the Revit schedule using to successfully determine the room property of family instances?
+</ul>
+
+<p>As a workaround, I thought of calling the get_Room method on the family instance in a loop over all available phases in the project, and making use of the document PointInRoom method if that fails.
+
+
+<p><strong>Solution:</strong> Here is a promising start for a solution that I am currently exploring:
+
+<ul>
+<li>Obviously, first try using the family instance Room property directly.
+<li>If that fails, try
+<br><pre>foreach(Phase p) { familyinstance.get_Room(p) }</pre>
+<li>Hard part: determine primary options;
+<br><pre>foreach(Room r where r.DesignOption.IsPrimary) {
+  r.IsPointInRoom( fi.Location ) }</pre>
+<li>Emergency:
+<br><pre>foreach( Room r ) { r.IsPointInRoom( fi.Location ) }</pre>
+</ul>
+
+<p>Here is the actual method implementating this that I am currently working with, including some todo items left as an exercise for the reader ;)
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">Room</span> DetermineRoom( <span class="teal">Element</span> el )
+{
+&nbsp; <span class="teal">FamilyInstance</span> fi = el <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( fi == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// As simple as that?</span>
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( fi.Room != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//Debug.WriteLine(&quot;fi.Room != null&quot;);</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> fi.Room;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Try phasing</span>
+&nbsp;
+&nbsp; <span class="teal">Room</span> r = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Phase</span> p <span class="blue">in</span> el.Document.Phases )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// TODO should check fi.GetPhaseStatus </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// instead of provoking an exception</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; r = fi.get_Room( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.WriteLine(&quot;fi.get_Room( &quot; </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; + p.Name + &quot;) != null&quot;);</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> r;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">LocationPoint</span> lp = el.Location <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( lp != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Try design options</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; roomlst = get_Elements(
+&nbsp; &nbsp; &nbsp; el.Document, <span class="blue">typeof</span>( <span class="teal">Room</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Try rooms from primary design option</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> roomel <span class="blue">in</span> roomlst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Room</span> priroom = roomel <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( priroom == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( priroom.DesignOption == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( priroom.DesignOption.IsPrimary )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// TODO should check whether priroom </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and el phasing overlaps</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( priroom.IsPointInRoom( lp.Point ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.WriteLine(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &quot;priroom.IsPointInRoom != null&quot;);</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> priroom;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Emergency: try any room</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> roomel <span class="blue">in</span> roomlst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Room</span> room = roomel <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( room == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// TODO should check whether room </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and el phasing overlaps</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( room.IsPointInRoom( lp.Point ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.WriteLine(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &quot;room.IsPointInRoom != null&quot;);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> room;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Nothing found</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+}
+</pre>
+
+<p>I think this approach provides is a good starting point.
+A more complete solution might possibly take the phase and design option as arguments.
+In my context, the function above rarely returns a non-primary design option room.
+
+<p>Many thanks to Patrick for his research and sharing this solution!

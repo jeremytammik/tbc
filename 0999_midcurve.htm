@@ -1,0 +1,397 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2010/01/curves.html#comment-6a00e553e16897883301901ddf72df970b
+http://thebuildingcoder.typepad.com/blog/2010/01/curves.html?cid=6a00e553e16897883301901de2f9a6970b#comment-6a00e553e16897883301901de2f9a6970b
+
+-->
+
+<h3>Generating a MidCurve Between Two Curve Elements</h3>
+
+<p>Here is a fun little geometric issue raised by Bang in his or her
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curves.html#comment-6a00e553e16897883301901ddf72df970b">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/curves.html">
+Revit curves</a> and
+
+their parameterisation, and also discussed quite extensively in this discussion thread on how to
+
+<a href="http://www.coe.org/p/fo/et/thread=18887">
+create middle/centre curve between two curves</a>:</p>
+
+
+<p><strong>Question:</strong> How to determine the curve centre between two curves, e.g. between:</p>
+
+<ul>
+<li>Arc &ndash; Arc</li>
+<li>Circle &ndash; Arc</li>
+<li>Elliptical arc &ndash; Ellipse</li>
+<li>Ellipse &ndash; Ellipse</li>
+<li>NURBS &ndash; NurbSpline</li>
+<li>Hermite &ndash; HermiteSpline </li>
+</ul>
+
+
+<p><strong>Answer:</strong> That is a nice geometrical question you have.</p>
+
+<p>The Revit Geometry API does not provide direct support for that functionality, so you would have to implement it yourself.</p>
+
+<p>The Revit curve class does however provide some very nice completely generic features to access the underlying curve parameterisation.</p>
+
+<p>That makes it very easy to implement this by generating approximating straight line segments between the two curves.</p>
+
+<p>You can query the two original curves for their underlying parametric definition data, calculate matching pairs of intermediate points along the two curves, and then generate straight line segments between the midpoints of matching pairs.
+
+<p>It is much more difficult to calculate an exact non-approximating curve between the two given ones, though.</p>
+
+<p>This approximation approach is also suggested and used in the discussion thread on how to
+
+<a href="http://www.coe.org/p/fo/et/thread=18887">
+create middle/centre curve between two curves</a>.</p>
+
+<p>Seeing as I love little geometrical issues like this, I decided to go ahead and tackle it myself, and add it as a new command CmdMidCurve to The Building Coder samples.</p>
+
+<p>This is the first new command added in the Revit 2014 time frame.</p>
+
+<p>The command basically consists of three parts:</p>
+
+<ul>
+<li><a href="#2">User interface to select two curve elements</a>.</li>
+<li><a href="#3">Determine curve parameterisation data</a>.</li>
+<li><a href="#4">Generate approximating midcurve model line segments</a>.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>User Interface to Select Two Curve Elements</h4>
+
+<p>As usual, the user interface takes up more code than the real processing functionality.</p>
+
+<p>In this case, we request the selection of the two curve elements to start out from.</p>
+
+<p>I always like to implement my user interface in a manner that simplifies testing as far as possible.</p>
+
+<p>For instance, it helps if no interactive selection is required in my testing model.</p>
+
+<p>This led me to implement the following selection algorithm:</p>
+
+<ul>
+<li>Retrieve all curve elements in the entire model.</li>
+<li>If there are exactly two, use those directly with no further questions asked.</li>
+<li>If there are less than two, there is nothing we can do, so bail out.</li>
+<li>If there are more than two, and two or more have been pre-selected before launching the command, use the first two encountered in the selection set.</li>
+<li>Otherwise, prompt for interactive post-selection of the two curve elements using an appropriate selection filter.</li>
+</ul>
+
+<p>Here is what this looks like in my implementation:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdMidCurve</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Number of approximation segments to generate.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _nSegments = 64;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; &nbsp; = <span class="maroon">&quot;Please run this in a model containing &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;exactly two curve elements, and they will be &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;automatically selected. Alternatively, pre-&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;select two curve elements before launching &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;this command, or post-select them when &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;prompted.&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Allow selection of curve elements only.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">CurveElementSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">CurveElement</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Select all model curves in the entire model.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveElement</span>&gt; curves = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveElement</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">CurveElement</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">CurveElement</span>&gt;() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = curves.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are less than two, </span>
+&nbsp; &nbsp; <span class="green">// there is nothing we can do.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 &gt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are exactly two, pick those.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Else, check for a pre-selection.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; curves.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} pre-selected elements.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If two or more model curves were pre-</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// selected, use the first two encountered.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CurveElement</span> c = e <span class="blue">as</span> <span class="teal">CurveElement</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != c )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves.Add( c );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 == curves.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Found two model curves, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;ignoring everything else.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Else, prompt for an </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// interactive post-selection.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 != curves.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; curves.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveElementSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick first model curve.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves.Add( doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">CurveElement</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveElementSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick second model curve.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves.Add( doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">CurveElement</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+
+&nbsp; &nbsp; <span class="green">// . . .</span>
+
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Determine Curve Parameterisation Data</h4>
+
+<p>The generic curve parameterisation data that we need is simple: just the start and end parameter defining the range interval and the step size to traverse it, depending on the number of segments to generate, for each of the two curves:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Extract data from the two selected curves.</span>
+
+&nbsp; <span class="teal">Curve</span> c0 = curves[0].GeometryCurve;
+&nbsp; <span class="teal">Curve</span> c1 = curves[1].GeometryCurve;
+
+&nbsp; <span class="blue">double</span> sp0 = c0.GetEndParameter( 0 );
+&nbsp; <span class="blue">double</span> ep0 = c0.GetEndParameter( 1 );
+&nbsp; <span class="blue">double</span> step0 = ( ep0 - sp0 ) / _nSegments;
+
+&nbsp; <span class="blue">double</span> sp1 = c1.GetEndParameter( 0 );
+&nbsp; <span class="blue">double</span> ep1 = c1.GetEndParameter( 1 );
+&nbsp; <span class="blue">double</span> step1 = ( ep1 - sp1 ) / _nSegments;
+
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Two curves' step size [start, end]:&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot; {0} [{1},{2}] -- {3} [{4},{5}]&quot;</span>,
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( step0 ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( sp0 ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( ep0 ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( step1 ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( sp1 ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( ep1 ) );
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Generate Approximating Midcurve Model Line Segments</h4>
+
+<p>We use the curve Evaluate method to determine matching pairs of intermediate curve points on each of the two curves.</p>
+
+<p>We determine the midpoint between each pair, and connect those with line segments to approximate the midcurve.</p>
+
+<p>An assertion verifies that the result of Evaluate at the start parameter value equals the curve start point returned by GetEndPoint(0).</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Modify document within a transaction.</span>
+
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;MidCurve&quot;</span> );
+
+&nbsp; &nbsp; <span class="green">// Current segment start points.</span>
+
+&nbsp; &nbsp; <span class="blue">double</span> t0 = sp0;
+&nbsp; &nbsp; <span class="blue">double</span> t1 = sp1;
+
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = c0.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = c1.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = <span class="teal">Util</span>.Midpoint( p0, p1 );
+
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; p0.IsAlmostEqualTo( c0.Evaluate( t0, <span class="blue">false</span> ) ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal start points&quot;</span> );
+
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; p1.IsAlmostEqualTo( c1.Evaluate( t1, <span class="blue">false</span> ) ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal start points&quot;</span> );
+
+&nbsp; &nbsp; <span class="green">// Current segment end points.</span>
+
+&nbsp; &nbsp; t0 += step0;
+&nbsp; &nbsp; t1 += step1;
+
+&nbsp; &nbsp; <span class="teal">XYZ</span> q0, q1, q;
+&nbsp; &nbsp; <span class="teal">Line</span> line;
+
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; _nSegments; ++i, t0 += step0, t1 += step1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; q0 = c0.Evaluate( t0, <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; q1 = c1.Evaluate( t1, <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; q = <span class="teal">Util</span>.Midpoint( q0, q1 );
+
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} {1} {2} {3}-{4} {5}-{6} {7}-{8}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; i,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( t0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( t1 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p1 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q1 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( q ) );
+
+&nbsp; &nbsp; &nbsp; <span class="green">// Create approximating curve segment.</span>
+
+&nbsp; &nbsp; &nbsp; line = <span class="teal">Line</span>.CreateBound( p, q );
+&nbsp; &nbsp; &nbsp; creator.CreateModelCurve( line );
+
+&nbsp; &nbsp; &nbsp; p0 = q0;
+&nbsp; &nbsp; &nbsp; p1 = q1;
+&nbsp; &nbsp; &nbsp; p = q;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Test Model</h4>
+
+<p>Here is a sample model to test this in:</p>
+
+<center>
+<img src="img/midcurve1.png" alt="Test model with two model curves"/>
+</center>
+
+<p>The top curve is a spline, and the bottom one a simple arc.</p>
+
+<p>The two selected curve parameterisations are completely different in this case, generating the following start to end intervals and step sizes for 64 segments:</p>
+
+<table border="0" align="center"> <!-- style="border-width:1px; border-style: solid" -->
+<tr><th style="text-align: right;">Start</th><th style="text-align: right;">&nbsp; &nbsp; &nbsp; End</th><th style="text-align: right;">&nbsp; &nbsp; Step size</th></tr>
+<tr><td style="text-align: right;">0.0</td><td style="text-align: right;">444.1</td><td style="text-align: right;">6.94</td></tr>
+<tr><td style="text-align: right;">4.18</td><td style="text-align: right;">5.94</td><td style="text-align: right;">0.03</td></tr>
+</table>
+
+<p>Executing the command generates a warning message before it terminates, which can be ignored:</p>
+
+<center>
+<img src="img/midcurve2.png" alt="Warning message"/>
+</center>
+
+<p>The resulting midcurve approximation looks all right to me:</p>
+
+<center>
+<img src="img/midcurve3.png" alt="Resulting midcurve approximation"/>
+</center>
+
+
+
+<a name="6"></a>
+
+<h4>Download</h4>
+
+<p>Here is
+
+<a href="zip/bc_14_101_0.zip">
+version 2014.0.101.0</a> of
+
+The Building Coder samples source code, Visual Studio solution and RvtSamples include file including the new CmdMidCurve command.</p>
+
+<p>I hope you find this useful and thank Bang for raising this issue.</p>

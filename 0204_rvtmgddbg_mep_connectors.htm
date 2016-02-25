@@ -1,0 +1,421 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Fixing RvtMgdDbg for MEP Connectors</h3>
+
+<p>Still working on preparations for the MEP webcast mentioned 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/mep-sample-ribbon-panel.html">
+last week</a>, 
+
+I notice that RvtMgdDbg is having trouble displaying the connectors on electrical components, throwing an exception saying 
+
+<pre>
+Angle is available only for connectors of DomainHavc and DomainPiping.
+</pre>
+
+<p>The method I describe here to fix this problem can be used by anyone who runs into a problem with RvtMgdDbg.
+It is not limited to the case of MEP connectors, and intended more as an example and a how-to on how to fix RvtMgdDbg to display specific information that you are interested in.
+
+<p>Luckily, RvtMgdDbg is provided in source code format, and everybody can debug it and fix problems for themselves as they see fit.
+In my case, I debugged the RvtMgdDbg code and traced the problem to the implementation of the overloaded method Stream( ArrayList data, Connector connector ) in the module 
+Snoop &gt; CollectorExts &gt; CollectorExtMEP.cs.
+The fix is to add an exception handler to the offending property.
+In this case, the original code simply went ahead and blindly accessed the Angle property:</p>
+
+<pre class="code">
+data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Angle&quot;</span>, connector.Angle ) );
+</pre>
+
+<p>As the exception message says, this access is prohibited unless the connector is defined for the HVAC or piping domain.
+I therefore added a check to test the connector domain before accessing it, and the updated code now reads:
+
+<pre class="code">
+<span class="blue">if</span>( <span class="teal">Domain</span>.DomainHvac == connector.Domain 
+&nbsp; || <span class="teal">Domain</span>.DomainPiping == connector.Domain )
+{
+&nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Angle&quot;</span>, 
+&nbsp; &nbsp; connector.Angle ) );
+}
+</pre>
+
+<p>That solves that little problem.
+
+<p>Another way to handle this would be to simply encapsulate the offending line of code into its own individual little exception handler, but that would add considerable unnecessary execution overhead.
+Remember, an exception should be used only for unexpected, exceptional circumstances.
+If a property is expected to fail under certain circumstances, then these should be caught using traditional and more effective means.
+
+<p>Unfortunately, there are quite a few more properties on the connector class which are similarly limited and throw exceptions if called under invalid circumstances, so the method Stream(ArrayList data, Connector connector) could use quite a few additional corrections.
+For instance, the Radius property may only be queried in the case of a connector with a round cross section.
+
+<p>Since there are so many properties and I do not want to add individual checks for each of them, I have actually resorted to adding the individual exception handlers I mentioned above to each property for the time being, simply in order to use RvtMgdDbg for electrical connectors right away with no further ado.
+
+<p>I encapsulated each line of code accessing a property into an exception handler using the Visual Studio regular expression replacement feature, searching for a regular expression like this:
+
+<pre>
+{data\.Add.*, connector\.}{[^\.\)]*}{[\)\.].*}\n
+</pre>
+
+<p>The replacement code looks like this:
+
+<pre>
+try\n{\n\1\2\3\n}\ncatch\n{\nDebug.Print( "\2: "+ex.Message );\n}\n
+</pre>
+
+<p>Visual Studio automatically adds the proper indenting for me if I cut out the generated code and then paste it right back into the same place again.
+
+<p>For example, here is the unprotected call to access the AssignedDuctFlowConfiguration property:
+
+<pre class="code">
+&nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( 
+&nbsp; &nbsp; <span class="maroon">&quot;Duct flow configuration type&quot;</span>, 
+&nbsp; &nbsp; connector.AssignedDuctFlowConfiguration.ToString() ) );
+</pre>
+
+<p>The result of executing the regular expression search and replace operation on that single line of code is to convert the unprotected property access to one encapsulated within its own exception handler.
+Here is the resulting protected AssignedDuctFlowConfiguration property access:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Duct flow configuration type&quot;</span>, 
+&nbsp; &nbsp; &nbsp; connector.AssignedDuctFlowConfiguration.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedDuctFlowConfiguration: &quot;</span> 
+&nbsp; &nbsp; &nbsp; + ex.Message );
+&nbsp; }
+</pre>
+
+<p>Here is the complete code of my modified version of the overloaded method Stream( ArrayList data, Connector connector ):</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span>
+Stream(<span class="teal">ArrayList</span> data, <span class="teal">Connector</span> connector)
+{
+&nbsp; data.Add(<span class="blue">new</span> Snoop.Data.<span class="teal">ClassSeparator</span>(<span class="blue">typeof</span>(<span class="teal">Connector</span>)));
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Enumerable</span>( <span class="maroon">&quot;All refs&quot;</span>, connector.AllRefs ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AllRefs: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="teal">Domain</span>.DomainHvac == connector.Domain 
+&nbsp; &nbsp; || <span class="teal">Domain</span>.DomainPiping == connector.Domain )
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Angle&quot;</span>, connector.Angle ) );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Duct flow configuration type&quot;</span>, connector.AssignedDuctFlowConfiguration.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedDuctFlowConfiguration: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Duct loss method type&quot;</span>, connector.AssignedDuctLossMethod.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedDuctLossMethod: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned fixture units&quot;</span>, connector.AssignedFixtureUnits ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedFixtureUnits: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned flow&quot;</span>, connector.AssignedFlow ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedFlow: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Assigned flow direction&quot;</span>, connector.AssignedFlowDirection.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedFlowDirection: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned flow factor&quot;</span>, connector.AssignedFlowFactor ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedFlowFactor: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned K coefficient&quot;</span>, connector.AssignedKCoefficient ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedKCoefficient: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned loss coefficient&quot;</span>, connector.AssignedLossCoefficient ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedLossCoefficient: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Assigned pipe flow configuration&quot;</span>, connector.AssignedPipeFlowConfiguration.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedPipeFlowConfiguration: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Assigned pipe loss method&quot;</span>, connector.AssignedPipeLossMethod.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedPipeLossMethod: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Assigned pressure drop&quot;</span>, connector.AssignedPressureDrop ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;AssignedPressureDrop: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Coefficient&quot;</span>, connector.Coefficient ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Coefficient: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Object</span>( <span class="maroon">&quot;Connector manager&quot;</span>, connector.ConnectorManager ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ConnectorManager: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Connector type&quot;</span>, connector.ConnectorType.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ConnectorType: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Object</span>( <span class="maroon">&quot;Coordinate system&quot;</span>, connector.CoordinateSystem ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;CoordinateSystem: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Demand&quot;</span>, connector.Demand ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Demand: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Direction&quot;</span>, connector.Direction.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Direction: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Domain&quot;</span>, connector.Domain.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Domain: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Duct system type&quot;</span>, connector.DuctSystemType.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;DuctSystemType: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Electrical system type&quot;</span>, connector.ElectricalSystemType.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;ElectricalSystemType: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Flow&quot;</span>, connector.Flow ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Flow: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Height&quot;</span>, connector.Height ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Height: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Bool</span>( <span class="maroon">&quot;Is connected&quot;</span>, connector.IsConnected ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;IsConnected: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Bool</span>( <span class="maroon">&quot;Is movable&quot;</span>, connector.IsMovable ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;IsMovable: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Object</span>( <span class="maroon">&quot;MEP system&quot;</span>, connector.MEPSystem ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;MEPSystem: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Xyz</span>( <span class="maroon">&quot;Origin&quot;</span>, connector.Origin ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Origin: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Pipe system type&quot;</span>, connector.PipeSystemType.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;PipeSystemType: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Pressure drop&quot;</span>, connector.PressureDrop ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;PressureDrop: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Velocity pressure&quot;</span>, connector.VelocityPressure ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;VelocityPressure: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Width&quot;</span>, connector.Width ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Width: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Double</span>( <span class="maroon">&quot;Radius&quot;</span>, connector.Radius ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Radius: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">String</span>( <span class="maroon">&quot;Shape&quot;</span>, connector.Shape.ToString() ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Shape: &quot;</span> + ex.Message );
+&nbsp; }
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; data.Add( <span class="blue">new</span> Snoop.Data.<span class="teal">Object</span>( <span class="maroon">&quot;Owner&quot;</span>, connector.Owner ) );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( System.<span class="teal">NotSupportedException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Owner: &quot;</span> + ex.Message );
+&nbsp; }
+}
+</pre>
+
+<p>If you wish to examine the truncated overly long lines, you can copy and paste them to an editor.
+
+<p>Running the modified version of RvtMgdDbg and selecting an electrical connector produces the following list in the Visual Studio debug output window of all the properties that are throwing exceptions:</p>
+
+<pre>
+AssignedDuctFlowConfiguration: Assigned duct flow configuration is available only for connectors of DomainPiping.
+AssignedDuctLossMethod: Assigned duct loss method is available only in connectors of DomainHvac.
+AssignedFixtureUnits: Assigned fixture units available only for connectors of DomainPiping.
+AssignedFlow: Assigned flow is available only for connectors of DomainHavc or DomainPiping.
+AssignedFlowDirection: Assigned flow direction is available only for connectors of DomainHavc and DomainPiping.
+AssignedFlowFactor: Assigned flow factor is available only for connectors of DomainPiping or DomainHvac.
+AssignedKCoefficient: Assigned KCoefficient is available only for connectors of DomainPiping.
+AssignedLossCoefficient: Assigned loss coefficient is available only for connectors of DomainHavc.
+AssignedPipeFlowConfiguration: Assigned pipe flow configuration is available only for connectors of DomainPiping.
+AssignedPipeLossMethod: Assigned pipe loss method is available only for connectors of DomainPiping.
+AssignedPressureDrop: Assigned pressure drop is available only for connectors of DomainHavc and DomainPiping.
+Coefficient: Coefficient is available only for connectors of DomainHavc and DomainPiping.
+CoordinateSystem: Coordinate System is available only for connectors of PhysicalConn.
+Demand: Demand is available only for connector of DomainPiping.
+Direction: Direction is available only for connectors of DomainHvac and DoaminPiping.
+DuctSystemType: Duct system type is available only for connectors of DomainHvac.
+ElectricalSystemType: Electrical system type is available only for connectors of DomainElectrical.
+Flow: Flow is available only for connectors of DomainHavc and DomainPiping.
+Height: The shape of the connector is not rectangular.
+IsConnected: Connection status is available only for connectors of PhysicalConn type.
+Origin: Origin is available only for connectors of PhysicalConn type.
+PipeSystemType: Pipe system type is available only for connectors of DomainPiping.
+PressureDrop: Pressure drop is available only for connectors of DomainHavc and DomainPiping.
+VelocityPressure: Velocity pressure is available only for connectors of DomainHavc and DomainPiping.
+Width: The shape of the connector is not rectangular.
+Radius: The shape of the connector is not round.
+</pre>
+
+<p>Again, copy and paste to an editor to see the complete truncated lines.
+
+<p>Since each exception caught by an invalid property access is caught individually and processing can continue with an attempt at the next property, the other desired result is that the property window is now successfully populated and displayed with the remaining properties that have not thrown an exception:</p>
+
+<img src="img/rvtmgddbg_connector_1.jpg" alt="RvtMgdDbg connector properties"/>
+
+<p>As pointed out above, this is only a partial and temporary fix.
+In the long run, the individual exception handlers should be replaced by if clauses, as done for the Angle property.</p>

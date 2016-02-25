@@ -1,0 +1,240 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Getting Going with the Cloud</h3>
+
+<p>I am now the proud owner of an Android tablet and happily thinking about things to do with it.
+The first idea that comes to mind is working through something similar to Adam's 
+
+<a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-1.html">
+Revit model viewer for iOS</a> that
+
+Jim Quanci showed at the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-one.html">
+AEC DevCamp</a>.
+
+<p>Before getting into that, though, I should address some of the issues brought up by Senthil in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html?cid=6a00e553e1689788330168ebd5548e970c#comment-6a00e553e1689788330168ebd5548e970c">
+his</a> 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html?cid=6a00e553e168978833016767cacd01970b#comment-6a00e553e168978833016767cacd01970b">
+comment</a> 
+
+on the discussion on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/serviceoriented-architecture.html">
+service-oriented architecture</a>, 
+
+asking for information about Revit cloud development, e.g. a step by step process for cloud beginners.
+Senthil also mentions the 
+
+<a href="http://download.autodesk.com/media/adn/cloudcomputing/3_DevTV_Cloud_Computing_Revit_Demo/DevTV_Cloud_Computing_Revit_Demo.html">
+cloud computing Revit demo</a> on the
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=17136545">
+ADN cloud computing page</a>,
+
+its add-in manifest, assembly DLL file location, how to deploy it, how to interact with Revit through web services, and developing a service application in general.
+
+<p>Here are a couple of starting points for addressing these issues:
+
+<ul>
+<li><a href="#2">DevCamp cloud and mobile track</a>
+<li><a href="#3">The Apollonian gasket cloud service</a>
+<li><a href="#4">The AEC cloud demo</a>
+<li><a href="#5">Revit model viewer</a>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>DevCamp Cloud and Mobile Track</h4>
+
+<p>All of these topics are addressed in depth by Gopinath Taget's cloud and mobile presentation, both at Autodesk University last year and most recently at the AEC and Manufacturing DevCamps earlier this month, each of which boasted a separate track on cloud and mobile technologies.
+Gopi's four sessions at the AEC DevCamp covered:
+
+<ul>
+<li><strong>An Overview of Cloud Computing:</strong>
+Learn what cloud computing is all about, what kind of applications can be written for and run on the cloud, when it is suitable to use the cloud, when it is not. Learn about the popular commercial cloud service providers including Amazon Web Services (AWS), Microsoft Azure and Google App Engine and how to use them. Learn the similarities and differences between the cloud services they provide, the advantages of using one over the others and the coverage and sophistication of the APIs provided to use their cloud services. The class includes demonstrations and code review of sample cloud applications for Autodesk Revit, AutoCAD Civil 3D, AutoCAD and AutoCAD WS.
+
+<li><strong>State of the Art of Autodesk Cloud and Mobile Apps:</strong>
+Learn about current Autodesk cloud services, their capabilities and APIs. We will talk about and demonstrate AutoCAD WS, Autodesk 360, and Autodesk Photofly web services in depth. Demonstrations and instruction will be based on Microsoft Windows, Apple's iOS and Google's Android. The class will end on an exploration where these web services are going and - at a high level - where Autodesks web services are headed.
+
+<li><strong>Introduction to Mobile app development &ndash; Apple's iOS:</strong>
+Learn about programming on iOS devices. Learn where you need to go and what you need to do to start programming on iOS. Learn about the SDKs important for graphics intensive software development including WebGL and OpenGL ES and how to get started working with them. This class includes a detailed "start to finish" look at development of a simple iOS mobile App with a basic user interface.
+
+<li><strong>Introduction to Mobile app development &ndash; Google's Android:</strong>
+Learn about programming on Android devices. Learn where you need to go and what you need to do to start programming on Android. Learn about the SDKs that would be important to a CAD developer like WebGL and OpenGL ES and how to get started on them. This class will also demonstrate creating a simple Android mobile App with simple user interface from start to finish.
+</ul>
+
+<p>Gopi's presentations and samples are currently publicly available from Buzzsaw together with all the rest of the AEC and Manufacturing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/aec-devcamp-2012-material.html">
+DevCamp 2012 material</a>.
+
+
+
+<a name="3"></a>
+
+<h4>The Apollonian Gasket Cloud Service</h4>
+
+<p>Probably the greatest and deepest exploration of using cloud services over a wide variety of technologies and devices was created by Kean Walmsley. 
+He explores making use of just about all imaginable combinations of cloud service providers and clients.
+The 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/06/cloud-mobile-series-summary.html">
+Apollonian gasket cloud &amp; mobile series summary</a> boasts
+
+the following impressive table of contents:
+
+<h5>Creating the core desktop functionality</h5>
+<ul>   
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/02/circle-packing-in-autocad-creating-an-apollonian-gasket-using-f-part-1.html">
+Circle packing in AutoCAD: creating an Apollonian gasket using F# &ndash; Part 1</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/02/circle-packing-in-autocad-creating-an-apollonian-gasket-using-f-part-2.html">
+Circle packing in AutoCAD: creating an Apollonian gasket using F# &ndash; Part 2</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/02/sphere-packing-in-autocad-creating-an-apollonian-packing-using-f-part-1.html">
+Sphere packing in AutoCAD: creating an Apollonian packing using F# &ndash; Part 1</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/02/sphere-packing-in-autocad-creating-an-apollonian-packing-using-f-part-2.html">
+Sphere packing in AutoCAD: creating an Apollonian packing using F# &ndash; Part 2</a> </li> 
+</ul>  
+
+<h5>Moving it to the cloud</h5>  
+<ul>   
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/03/moving-to-the-cloud.html">Moving to the Cloud</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/exposing-a-restful-web-service-for-use-inside-autocad-using-the-aspnet-web-api-part-1.html">
+Exposing a RESTful web service for use inside AutoCAD using the ASP.NET Web API &ndash; Part 1</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/exposing-a-restful-web-service-for-use-inside-autocad-using-the-aspnet-web-api-part-2.html">
+Exposing a RESTful web service for use inside AutoCAD using the ASP.NET Web API &ndash; Part 2</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/architecting-for-the-cloud.html"><span style="font-family: calibri;">
+Architecting for the Cloud</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/consuming-data-from-a-restful-web-service-inside-autocad-using-net.html">
+Consuming data from a RESTful web-service inside AutoCAD using .NET</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/hosting-our-aspnet-web-api-project-on-windows-azure-part-1.html">
+Hosting our ASP.NET Web API project on Windows Azure &ndash; Part 1</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/hosting-our-aspnet-web-api-project-on-windows-azure-part-2.html">
+Hosting our ASP.NET Web API project on Windows Azure &ndash; Part 2</a> </li>    
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/using-windows-azure-caching-with-our-aspnet-web-api-project.html">
+Using Windows Azure Caching with our ASP.NET Web API project</a> </li> 
+</ul>  
+
+<h5>Using the web-service from various clients</h5>  
+<ul>   
+<li>AutoCAD       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/calling-a-cloud-based-web-service-from-autocad-using-net.html">
+Calling a cloud-based web-service from AutoCAD using .NET</a> </li>     
+</ul>   
+</li>    
+<li>Unity3D       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/calling-a-web-service-from-a-unity3d-scene.html">
+Calling a web-service from a Unity3D scene</a> </li>     
+</ul>   
+</li>    
+<li>Android       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/04/creating-a-3d-viewer-for-our-apollonian-service-using-android-part-1.html">
+Creating a 3D viewer for our Apollonian service using Android &ndash; Part 1</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-android-part-2.html">
+Creating a 3D viewer for our Apollonian service using Android &ndash; Part 2</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-android-part-3.html">
+Creating a 3D viewer for our Apollonian service using Android &ndash; Part 3</a> </li>     
+</ul>   
+</li>    
+<li>iOS       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-ios-part-1.html">
+Creating a 3D viewer for our Apollonian service using iOS &ndash; Part 1</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-ios-part-2.html">
+Creating a 3D viewer for our Apollonian service using iOS &ndash; Part 2</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/06/creating-a-3d-viewer-for-our-apollonian-service-using-ios-part-3-1.html">
+Creating a 3D viewer for our Apollonian service using iOS &ndash; Part 3</a> </li>     
+</ul>   
+</li>    
+<li>HTML5/WebGL       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-html5.html">
+Creating a 3D viewer for our Apollonian service using HTML5 &ndash; Part 1</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-html5-part-2.html">
+Creating a 3D viewer for our Apollonian service using HTML5 &ndash; Part 2</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-html5-part-3.html">
+Creating a 3D viewer for our Apollonian service using HTML5 &ndash; Part 3</a> </li>     
+</ul>   
+</li>    
+<li>WinRT       
+<ul>       
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-winrt-part-1.html">
+Creating a 3D viewer for our Apollonian service using WinRT &ndash; Part 1</a> </li>        
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2012/05/creating-a-3d-viewer-for-our-apollonian-service-using-winrt-part-2.html">
+Creating a 3D viewer for our Apollonian service using WinRT &ndash; Part 2</a>
+</ul>
+</ul>
+
+<p>This really is a huge wealth of material and should provide ample words of wisdom for any brave seeker venturing out on these now no longer unmapped paths.</p>
+
+
+<a name="4"></a>
+
+<h4>AEC Cloud Demo</h4>
+
+<p>Returning to my own much more modest efforts in this realm so far based on the Revit API, Senthil mentions the 
+
+<a href="http://download.autodesk.com/media/adn/cloudcomputing/3_DevTV_Cloud_Computing_Revit_Demo/DevTV_Cloud_Computing_Revit_Demo.html">
+AEC cloud demo</a> on the
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=17136545">
+ADN cloud computing page</a>.
+
+That is an eleven minute recording of a very simple add-in running on Revit 2012, originally created for the DevDays conferences in the end of 2010.
+
+<p>I recently migrated the sample add-in to Revit 2013.
+Here is 
+
+<a href="zip/AecMatInfoClientRevit2013.zip">
+AecMatInfoClientRevit2013.zip</a> containing 
+
+its entire source code, Visual Studio solution and add-in manifest.
+
+<p>As explained in the recording, it simply defines two commands to read data from certain Revit element parameters and store them in a simple cloud-hosted database, and vice versa to read data from the database and populate it back into the Revit parameters again.
+
+
+<a name="5"></a>
+
+<h4>Revit Viewer via OBJ</h4>
+
+<p>As said, the next thing I would like to look at is a Revit model viewer.
+
+<p>Instead of using Adam's approach via a custom geometry file format, I thought I might make use of the 
+
+<a href="http://en.wikipedia.org/wiki/Wavefront_.obj_file">
+Wavefront OBJ</a> file
+
+format, which seems to be pretty standard and compact.
+
+<p>My current tentative outline looks like this:
+
+<ol>
+<li>Describe Adam's Revit cloud and mobile demo (well, Adam is doing this himself): 
+<ol type="a">
+<li>
+<a href="http://adndevblog.typepad.com/aec/2012/06/revit-model-viewer-for-ios-part-1.html">
+RVT add-in</a> exporting triangulated geometry faces via custom ASCII file format, uploading to cloud
+<li>Mobile device accessing cloud data, custom iOS viewer reading and displaying 3D view of custom format
+</ol>
+<li>Implement a RVT add-in that exports OBJ file format instead
+<ol type="a">
+<li>Standard format, can be used ubiquitously
+<li>Optimise that file format to significantly reduce file size and increase speed and efficiency
+</ol>
+<li>View OBJ file format on mobile
+<ol type="a">
+<li>Using standard viewer
+<li>Implement custom Android viewer
+</ol>
+</ol>
+
+<p>It will be interesting to see how I do during the next few days... especially for me  :-)

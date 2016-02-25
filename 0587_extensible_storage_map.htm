@@ -1,0 +1,328 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1269562 [AddMapField] -->
+
+<h3>Extensible Storage of a Map</h3>
+
+<p>I already discussed the important new and powerful
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">
+extensible storage</a> mechanism, 
+
+and we also explained and demonstrated it in both the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/devdays-2010-online-with-revit-2012-api-news.html">
+DevHelp Online</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/revit-2012-api-webcast.html">
+Revit 2012 API webcast</a> presentations, 
+
+both of which were recorded.
+
+<p>I updated the sample code for the latter webcast. 
+Here is the mainline of the Execute method:
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// pick an element and define the XYZ </span>
+&nbsp; &nbsp; <span class="green">// data to store at the same time</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject( 
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, 
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WallFilter</span>(), 
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a wall at a point on one of its faces&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> wall = doc.get_Element( r.ElementId ) <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> dataToStore = r.GlobalPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Create Extensible Storage Schemata and Store Data&quot;</span> ); 
+&nbsp;
+&nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// store the data, and also </span>
+&nbsp; &nbsp; <span class="green">// demonstrate reading it back</span>
+&nbsp;
+&nbsp; &nbsp; StoreDataInWall( wall, dataToStore );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// list all schemas in memory across all documents</span>
+&nbsp;
+&nbsp; &nbsp; ListSchemas();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+<p>It prompts you to select a wall at a specific point. 
+The PickObject method can return both the selected wall and the picked point from one single user click.
+It also takes a WallFilter instance, an implementation of the ISelectionFilter interface, to restrict the user selection to walls only:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">WallFilter</span> : <span class="teal">ISelectionFilter</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Wall</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; }
+}
+</pre>
+
+<p>The selected point is stored on the wall in a newly created extensible storage schema by the following helper method:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create an extensible storage schema, </span>
+<span class="gray">///</span><span class="green"> attach it to a wall, populate it with data, </span>
+<span class="gray">///</span><span class="green"> and retrieve the data back from the wall.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> StoreDataInWall(
+&nbsp; <span class="teal">Wall</span> wall,
+&nbsp; <span class="teal">XYZ</span> dataToStore )
+{
+&nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder = <span class="blue">new</span> <span class="teal">SchemaBuilder</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;720080CB-DA99-40DC-9415-E53F280AA1F0&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// allow anyone to read the object</span>
+&nbsp;
+&nbsp; schemaBuilder.SetReadAccessLevel(
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Public );
+&nbsp;
+&nbsp; <span class="green">// restrict writing to this vendor only</span>
+&nbsp;
+&nbsp; schemaBuilder.SetWriteAccessLevel(
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Vendor );
+&nbsp;
+&nbsp; <span class="green">// required because of restricted write-access</span>
+&nbsp;
+&nbsp; schemaBuilder.SetVendorId( <span class="maroon">&quot;ADNP&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// create a field to store an XYZ</span>
+&nbsp;
+&nbsp; <span class="teal">FieldBuilder</span> fieldBuilder = schemaBuilder
+&nbsp; &nbsp; .AddSimpleField( <span class="maroon">&quot;WireSpliceLocation&quot;</span>,
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">XYZ</span> ) );
+&nbsp;
+&nbsp; fieldBuilder.SetUnitType( <span class="teal">UnitType</span>.UT_Length );
+&nbsp;
+&nbsp; fieldBuilder.SetDocumentation( <span class="maroon">&quot;A stored &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;location value representing a wiring &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;splice in a wall.&quot;</span> );
+&nbsp;
+&nbsp; schemaBuilder.SetSchemaName( <span class="maroon">&quot;WireSpliceLocation&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// register the schema</span>
+&nbsp;
+&nbsp; <span class="teal">Schema</span> schema = schemaBuilder.Finish(); 
+&nbsp;
+&nbsp; <span class="green">// create an entity (object) for this schema (class)</span>
+&nbsp;
+&nbsp; <span class="teal">Entity</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; <span class="green">// get the field from the schema</span>
+&nbsp;
+&nbsp; <span class="teal">Field</span> fieldSpliceLocation = schema.GetField(
+&nbsp; &nbsp; <span class="maroon">&quot;WireSpliceLocation&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// set the value for this entity</span>
+&nbsp;
+&nbsp; entity.Set&lt;<span class="teal">XYZ</span>&gt;( fieldSpliceLocation, dataToStore,
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span>.DUT_METERS );
+&nbsp;
+&nbsp; <span class="green">// store the entity on the element</span>
+&nbsp;
+&nbsp; wall.SetEntity( entity );
+&nbsp;
+&nbsp; <span class="green">// read back the data from the wall</span>
+&nbsp;
+&nbsp; <span class="teal">Entity</span> retrievedEntity = wall.GetEntity( schema );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> retrievedData = retrievedEntity.Get&lt;<span class="teal">XYZ</span>&gt;(
+&nbsp; &nbsp; schema.GetField( <span class="maroon">&quot;WireSpliceLocation&quot;</span> ),
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span>.DUT_METERS );
+}
+</pre>
+
+<p>The mainline also calls another little method ListSchemas which shows how all schemas currently loaded into Revit memory can be accessed and listed:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> List all schemas in Revit memory across all documents.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> ListSchemas()
+{
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Schema</span>&gt; schemas = <span class="teal">Schema</span>.ListSchemas();
+&nbsp;
+&nbsp; <span class="blue">int</span> n = schemas.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} schema{1} defined:&quot;</span>, 
+&nbsp; &nbsp; &nbsp; n, PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Schema</span> s <span class="blue">in</span> schemas )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Field</span>&gt; fields = s.ListFields();
+&nbsp;
+&nbsp; &nbsp; n = fields.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( 
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;Schema '{0}' has {1} field{2}:&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; s.SchemaName, n, PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Field</span> f <span class="blue">in</span> fields )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Field '{0}' has value type {1}&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; and unit type {2}&quot;</span>, f.FieldName, 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f.ValueType, f.UnitType ) );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<h4>Storing a Dictionary Mapping in Extensible Storage</h4>
+
+<p>In the sample so far, only a simple XYZ data field is added and stored.
+
+<p>Here is a new question on making use of extensible storage to store a more complex data type, a dictionary mapping keys to values, in this case both represented by strings.
+
+<p><strong>Question:</strong> I have added simple data to Revit elements using Extensible Storage. 
+Now I need a schema containing a field which is a map of strings. 
+I added a field by using 
+
+<pre class="code">
+  FieldBuilder.AddMapField( MyMappedField, 
+    typeof( string ), typeof( string ) );
+</pre>
+
+<p>Now comes my problem: how can I set a mapped value to such a field by using Entity.Set&lt;???&gt;(???)?
+
+<p>Similarly, how can I retrieve a mapped value from such a field? 
+
+<p>How can I remove a mapped value? 
+
+<p>Please can you implement such a sample?
+
+<p><strong>Answer:</strong> The key, no pun intended, is to use IDictionary&lt;&gt; as the type you pass to the Set&lt;&gt; method, even though your actual implementation concrete type is Dictionary&lt;&gt;.
+
+<p>This is document in the Revit API help file entry on the Entity.Set method, but I admit that it is tricky.  
+
+<p>By the way, this is also demonstrated by the ExtensibleStorageManager SDK sample. 
+For instance, it includes the following code snippet:
+
+<pre class="code">
+&nbsp; <span class="green">// Note that we use IDictionary&lt;&gt; for </span>
+&nbsp; <span class="green">// map types and IList&lt;&gt; for array types</span>
+&nbsp;
+&nbsp; mySchemaWrapper
+&nbsp; &nbsp; .AddField&lt;<span class="teal">IDictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;&gt;(
+&nbsp; &nbsp; &nbsp; map0Name, <span class="teal">UnitType</span>.UT_Undefined, <span class="blue">null</span> );
+&nbsp;
+&nbsp; mySchemaWrapper
+&nbsp; &nbsp; .AddField&lt;<span class="teal">IList</span>&lt;<span class="blue">bool</span>&gt;&gt;(
+&nbsp; &nbsp; &nbsp; array0Name, <span class="teal">UnitType</span>.UT_Undefined, <span class="blue">null</span> );
+</pre>
+
+<p>Here is a new method StoreStringMapInElement that I added to the sample above to demonstrate this:
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Create an extensible storage schema specifying </span>
+<span class="gray">///</span><span class="green"> a dictionary mapping keys to values, both using </span>
+<span class="gray">///</span><span class="green"> strings,&nbsp; populate it with data, attach it to the </span>
+<span class="gray">///</span><span class="green"> given element, and retrieve the data back again.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> StoreStringMapInElement( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">SchemaBuilder</span> schemaBuilder = <span class="blue">new</span> <span class="teal">SchemaBuilder</span>(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;F1697E22-9338-4A5C-8317-5B6EE088ECB4&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="green">// allow anyone to read or write the object</span>
+&nbsp;
+&nbsp; schemaBuilder.SetReadAccessLevel(
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Public );
+&nbsp;
+&nbsp; schemaBuilder.SetWriteAccessLevel(
+&nbsp; &nbsp; <span class="teal">AccessLevel</span>.Public );
+&nbsp;
+&nbsp; <span class="green">// create a field to store a string map</span>
+&nbsp;
+&nbsp; <span class="teal">FieldBuilder</span> fieldBuilder
+&nbsp; &nbsp; = schemaBuilder.AddMapField( <span class="maroon">&quot;StringMap&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="blue">string</span> ), <span class="blue">typeof</span>( <span class="blue">string</span> ) );
+&nbsp;
+&nbsp; fieldBuilder.SetDocumentation(
+&nbsp; &nbsp; <span class="maroon">&quot;A string map for Tobias.&quot;</span> );
+&nbsp;
+&nbsp; schemaBuilder.SetSchemaName(
+&nbsp; &nbsp; <span class="maroon">&quot;TobiasStringMap&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// register the schema</span>
+&nbsp;
+&nbsp; <span class="teal">Schema</span> schema = schemaBuilder.Finish();
+&nbsp;
+&nbsp; <span class="green">// create an entity (object) for this schema (class)</span>
+&nbsp;
+&nbsp; <span class="teal">Entity</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp;
+&nbsp; <span class="green">// get the field from the schema</span>
+&nbsp;
+&nbsp; <span class="teal">Field</span> field = schema.GetField(
+&nbsp; &nbsp; <span class="maroon">&quot;StringMap&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// set the value for this entity</span>
+&nbsp;
+&nbsp; <span class="teal">IDictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt; stringMap
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; stringMap.Add( <span class="maroon">&quot;key1&quot;</span>, <span class="maroon">&quot;value1&quot;</span> );
+&nbsp; stringMap.Add( <span class="maroon">&quot;key2&quot;</span>, <span class="maroon">&quot;value2&quot;</span> );
+&nbsp;
+&nbsp; entity.Set&lt;<span class="teal">IDictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;&gt;(
+&nbsp; &nbsp; field, stringMap );
+&nbsp;
+&nbsp; <span class="green">// store the entity on the element</span>
+&nbsp;
+&nbsp; e.SetEntity( entity );
+&nbsp;
+&nbsp; <span class="green">// read back the data from the wall</span>
+&nbsp;
+&nbsp; <span class="teal">Entity</span> retrievedEntity = e.GetEntity( schema );
+&nbsp;
+&nbsp; <span class="teal">IDictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt; stringMap2
+&nbsp; &nbsp; = retrievedEntity
+&nbsp; &nbsp; .Get&lt;<span class="teal">IDictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;&gt;(
+&nbsp; &nbsp; &nbsp; schema.GetField( <span class="maroon">&quot;StringMap&quot;</span> ) );
+}
+</pre>
+
+<p>Here is the full updated sample application <a href="zip/ExtensibleStorage.zip">ExtensibleStorage.zip</a> including the Visual Studio solution and full source.
+
+<p>Many thanks to our local Revit extensible storage expert Steven Mycynek for help resolving this issue!

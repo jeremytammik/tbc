@@ -1,0 +1,84 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+06817882 [object model]
+06815592 [Revit API]
+
+-->
+
+<h3>No Revit API Class Diagram</h3>
+
+<p>Quite a few people have asked for a Revit API class diagram in the past, and the request continues to pop up every now and then, so here is a post that I can point to in future when that happens.
+
+<p><strong>Question:</strong> I am looking for a graphical diagram of the Revit API object model, because I cannot find it in the SDK. 
+Where can I obtain that, please?
+
+<p><strong>Answer:</strong> Unfortunately, I do not have any very satisfying answer for you.
+
+<p>Once upon a time, the Revit SDK included a class diagram such as you are looking for. 
+The last version was the 
+
+<a href="zip/">
+Revit API Class Diagram.png</a> provided 
+
+in the Revit 2010 SDK:</p>
+
+<center>
+<img src="file:///C:/a/lib/revit/2010/SDK/Revit API Class Diagram.png" alt="Revit 2010 API Class Diagram" width="400"/>
+</center>
+
+That is of course rather outdated by now.
+
+<p>The class diagram has not been updated for the Revit 2011 or 2012 API, nor are there currently any plans to do so. 
+
+<p>I personally find the interactive navigation in the Visual Studio object browser and the runtime code analysis and Intellisense more useful for my everyday needs, anyway.
+
+<p>Here is what the development team responded regarding the current situation:
+
+<p>Our tools for creating this diagram would have needed extensive updating to work with the new version and we did not think it was worth the effort. 
+We also questioned how useful this diagram was to our customers. 
+If you file a request for this to be reinstated, please include an explanation of you plan to use it, as there might be other ways for us to provide the needed information.
+
+<p>The most reliable browsable information on the Revit object model is available by using the object browser built into Visual Studio: 
+
+<p>In the solution explorer, open the 'References' node of your project and right click on 'RevitAPI', then select 'View in Object Browser'.
+
+<p>You can also open the class view node Project References > RevitAPI, navigate to various classes, right click on them and select 'View Class Diagram'. Doing this step by step assembles a partial class diagram for you.
+
+<p>It would theoretically also be possible to use .NET reflection to automatically generate a complete diagram of all classes defined by the Revit API. 
+
+<p>An example of such a tool including complete source code is presented in the Code Project article on the <i>100% Reflective Class Diagram Creation Tool</i> 
+
+<a href="http://www.codeproject.com/csharp/AutoDiagrammer.asp">
+AutoDiagrammer</a> and 
+
+its updated version
+
+<a href="http://www.codeproject.com/KB/WPF/AutoDiagrammerII.aspx">
+AutoDiagrammerII</a>.
+
+<p>I tried to apply this tool to RevitAPI.dll years ago, and it did not work right out of the box back then.
+On the other hand, it has been updated since then.
+In any case, it might be possible to adapt the source code provided so that it works and completes. 
+I am sure there are many other solutions out there to try, as well.
+
+<p>Regarding the relationship of object types to one another, the derivation relationships of all classes are explicitly noted in the Revit API help file RevitAPI.chm, and the Visual Studio object browser can provide them to you as well.
+The developer guide is a good source of background information including other dependencies between the different classes.
+
+<p>What I myself use most of all is the F12 key in the Visual Studio IDE.
+It takes me to the definition source code of any variable, method or class, and from there I can continue using F12 to navigate further upwards through the hierarchy graph to its parent and more distant ancestors.
+
+
+<h4>Happy Birthday, Autodesk!</h4>
+
+<p>Autodesk is 30 years old this month!
+
+<p><a href="http://www.fourmilab.ch">Fourmilab</a> provides 
+
+all the information from the horse's mouth, sorry, from the founder John Walker, and here is some 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2012/02/happy-nfy.html">
+more detailed info on it from Kean</a>.

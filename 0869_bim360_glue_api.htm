@@ -1,0 +1,198 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The BIM 360 Glue Viewer and REST API</h3>
+
+<p>As you certainly know by now, Autodesk provides a range of powerful cloud-based solutions, specifically
+
+<a href="https://360.autodesk.com">
+Autodesk 360</a>,
+
+<a href="http://www.autodeskplm360.com">
+PLM 360</a> and
+
+<a href="https://bim360.autodesk.com">
+BIM 360 Glue</a>
+
+(<a href="http://wikihelp.autodesk.com/BIM_360_Glue/enu/Help/Help">reference</a>).
+
+
+<p>Of special interest to AEC developers, the BIM 360 Glue platform includes support for programming interfaces and a software development kit, the
+
+<a href="http://bim360.autodesk.com/api/doc/index.shtml">
+BIM 360 Glue SDK</a>,
+
+providing a set of tools for developers to interface with it.</p>
+
+<p>The programming support consists of two distinct components:</p>
+
+<ol>
+<li><a href="#1">Display component</a>: embeddable 3D viewer to provide visual access to models within custom third party web applications.</li>
+<li><a href="#2">Web services API</a>: REST based service data access to users, projects, models, etc.</li>
+</ol>
+
+
+
+
+<a name="1"></a>
+
+<h4>Display Component</h4>
+
+<p>The Glue Viewer is an embeddable component used to show 3D models from the Glue platform
+
+<p>Viewer parameters allow control of the GUI, i.e. application controls such as navigation, display lists, etc., so the viewer experience can be customised by developers.
+
+<center>
+<img src="img/glue_viewer.png" alt="Glue viewer" width="400"/>
+</center>
+
+<p>The viewer currently supports Windows 32 and 64 bit platforms, just like the Glue web application.</p>
+
+
+
+
+<a name="2"></a>
+
+<h4>Web Services API</h4>
+
+<p>The Glue web services API provides a RESTful data access interface to query and modify data and return JSON or XML.
+
+<p>It enables developers to integrate external applications, e.g., project management systems, accounting systems and custom developed solutions with the BIM 360 Glue platform.
+
+<p>Glue stores information about user interactions within the system.
+These operations are referred to as 'Actions'.
+Typical Actions can be:
+
+<ul>
+<li>Uploading a model
+<li>Creating a view
+<li>Adding mark-ups
+<li>Creating a clash report
+</ul>
+
+<center>
+<img src="img/glue_actions.png" alt="Glue actions" width="400"/>
+</center>
+
+<p>The Glue Web Service API returns many of these actions in API responses.
+
+<p>Actions can be loaded to the viewer to show the user the exact view and state of a model when the action was performed.
+
+<!-- <p>This functionality enables an application to show exact views of a 3D model using the web services API and viewer. -->
+
+
+<a name="21"></a>
+
+<h4>Structure of a Client Request</h4>
+
+<p>For a typical REST API request, the client sends a HTTP/HTTPS request, POST or GET, depending on the particular service call.
+Required parameters are sent to the server for authentication.
+An example URL for a login request could be something like:
+
+<pre>
+https://bim360.autodesk.com/api/security/v1/login.json
+</pre>
+
+<p>The server responds with an HTTP Status of 200 for success and appropriate other codes for failures.
+
+<p>The Glue web service API provides the following service groups:
+
+<ul>
+<li>Security Service: Responsible for security management of Glue user accounts.
+<li>Project Service: Manage projects within the Glue platform.
+<li>Model Service: Manage 3D models within the Glue platform.
+<li>User Service: Manage user information.
+<li>Action Service: Access and manage action records.
+<li>System Service: Retrieve information and check availability.
+</ul>
+
+<p>Here is an example of a web services API call to the Model Service to retrieve information of a given model specified by the model_id:
+
+<pre>
+https://bim360.autodesk.com/api/model/v1/info.json?
+&nbsp; &amp;company_id=autodesk_jt
+&nbsp; &amp;api_key=c7e595c69a35422c8414e51736f67761
+&nbsp; &amp;auth_token=f79462fc5a5346ba9dbd4f395781f9b4
+&nbsp; &amp;timestamp=1349801232
+&nbsp; &amp;sig=de4c1771541d4789a1e63762c60b34f1
+&nbsp; &amp;model_id=53c41451-49e7-4b0a-919c-1499604d10c6
+&nbsp; &amp;sterm=
+&nbsp; &amp;pretty=1
+</pre>
+
+
+<a name="22"></a>
+
+<h4>So what can we do with this?</h4>
+
+<p>With the SDK, partners and customers can build a variety of fully interactive web based custom applications and integrations taking advantage of the Glue platform.
+
+<p>A simple call flow for a custom application might be:
+
+<ul>
+<li>Perform user authentication.
+<li>Query and list available models.
+<li>Use the Glue viewer to display the model within the custom application.
+</ul>
+
+<p>This enables tasks like system integration, project management, accounting, etc.
+The web services API provides full data access to system objects:
+
+<ul>
+<li>Users
+<li>Projects
+<li>Models
+<li>Actions
+</ul>
+
+<p>An application can automatically update projects, models, etc. with information from external systems.
+
+<p>Basically, we are looking at the following architectural hierarchy, from bottom to top:
+
+<ul>
+<li>BIM 360 Glue Platform @ Amazon
+<li>Internet Connectivity
+<li>BIM 360 Glue API Server
+<li>BIM 360 Glue API
+<li>System Integrations Enabled via Glue API
+</ul>
+
+
+<a name="23"></a>
+
+<h4>Where do I start?</h4>
+
+<p>Download the
+
+<a href="http://bim360.autodesk.com/api/doc/index.shtml">
+BIM 360 Glue SDK</a>,
+
+<p>You will need an API Key and an API Secret.
+These are unique identifiers assigned for each user, company, or partner.
+
+<p>Furthermore, a Glue developer account is required, a user name and password.
+A normal user account can be converted to a developer one on request.
+
+<p></p>There are even further levels: a default developer account works within the privileges of normal glue user, whereas a privileged developer account can perform requests on behalf of other users as well.
+
+<p>The authentication to the BIM 360 Glue Platform starts with an API key and secret assigned by Autodesk.
+Once you have these two pieces of information, API calls can be authenticated to the BIM 360 Glue Platform in one of two ways:
+
+<ul>
+<li>User name and password; using the API key and secret, a signed request including the user name and password is sent to the BIM 360 Glue Service, which returns an authorisation token.
+<li>The authorisation token is used for all subsequent calls.
+</ul>
+
+<p>Here is a quick reference to further sources of information and two examples:
+
+<ul>
+<li><a href="http://bim360.autodesk.com/api/doc/index.shtml">SDK overview</a></li>
+<li>Detailed <a href="https://bim360.autodesk.com/api/doc/doc_api.shtml">web service API documentation</a></li>
+<li><a href="https://bim360.autodesk.com/file_compatibility.html">Viewer support &ndash; file formats</a></li>
+<li><a href="http://youtu.be/LSeJd6ioHC0">Integration with project management system &ndash; CMIC</a></li>
+<li><a href="http://www.youtube.com/watch?v=EZaCSKdIHto">Glue embedded within a web application &ndash; Maximo</a></li>
+</ul>
+
+<p>I am looking forward to hearing what you come up with using this, and to exploring it in more depth myself anon.
+Have fun!</p>

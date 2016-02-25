@@ -1,0 +1,158 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 1260540 [Find elements created by PromptForFamilyInstancePlacement] -->
+
+<h3>Place Family Instance</h3>
+
+<p>The Revit SDK does not include any example of calling the new PromptForFamilyInstancePlacement method, which prompts the user to interactively and graphically place instances of a specified family symbol, so I am creating a new Building Coder sample command to demonstrate its use.
+
+<p>At the same time, I can answer an interesting follow-on question:
+
+<p><strong>Question:</strong> I am starting to use PromptForFamilyInstancePlacement to get the user to place one or more instances of a family symbol.  
+This method returns void.
+It would be nice if it returned the instances that were placed instead.
+
+<p>Anyway, how can I find the new instances after this call?
+Does the Revit API provide anything like the (entlast) idea in good old AutoLISP?
+
+<p>For example, I would like to call the PromptForFamilyInstancePlacement method and then assign some parameter values to the new family instances immediately afterwards.
+
+<p><strong>Answer:</strong> I already discussed 
+
+<!-- 
+172_newly_created_elements.htm
+344_mirror_new_elements.htm
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html#4">
+retrieval of newly added elements</a> to 
+
+the database.
+
+It presents one approach making use of the element ids, which grow monotonously as new elements are added.
+However, the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html#comments">
+comment by Guy Robinson</a>
+
+to that suggestion points out a much more reliable and officially supported method to obtain the newly added elements using the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html#1">
+DocumentChanged event</a>
+
+and the newly added element id collection provided to its event handler.
+Before we get to that, though, let's look at the call to PromptForFamilyInstancePlacement itself.
+
+<h4>PromptForFamilyInstancePlacement</h4>
+
+<p>The Revit API help file RevitAPI.chm makes the following remark about this method:
+
+
+<p style="color:darkblue">This method opens its own transaction, so it's not permitted to be invoked in an active transaction. In a single invocation, the user can place multiple instances of the input family type until they finish the placement (with Cancel or ESC or a click elsewhere in the UI). The user will not be permitted to change the type to be placed. Users are not permitted to change the active view during this placement operation (the operation will be completed).
+
+<p>In case you wonder, if you do try to run it in a command with automatic transaction mode, i.e. with a transaction opened automatically by Revit for the external command, the following exception is thrown:
+
+<ul>
+<li>Autodesk.Revit.Exceptions.InvalidOperationException: "It's not permitted to run this API method in an active transaction."
+</ul>
+
+<p>In other words, if you wish to make use of this method, you are forced to use the new and improved manual transaction mode.
+
+<p>The method takes a family symbol argument to define the component being placed in the model, and there is no other input required or possible.
+
+<h4>Retrieving Newly Created Elements</h4>
+
+<p>As suggested above, to retrieve the newly created elements added to the model by the call to PromptForFamilyInstancePlacement, one can simply subscribe to the DocumentChanged event.
+The event handler is called with a DocumentChangedEventArgs instance which includes a method GetAddedElementIds to return all newly added element ids.
+
+<p>One thing to be aware of is that this method is called each time a placement is made, i.e. repeated calls are made for repeated placements within one single call to PromptForFamilyInstancePlacement.
+In the sample presented below, each call will report one single element added.
+If you want to collect all the element ids added, you need to append them to some global collection.
+
+<p>As always, every single event handler or other reactor added to a system will cause additional overhead, so it makes sense to minimise the use of event handlers.
+In this case, this can be easily achieved by adding the handler immediately before prompting for the instance placement, and removing it immediately afterwards.
+
+<h4>CmdPlaceFamilyInstance</h4>
+
+<p>I implemented a new Building Coder sample command CmdPlaceFamilyInstance to demonstrate the issues outlined above:
+
+<ul>
+<li>Use manual transaction mode.
+<li>Define a variable _added_element_ids to collect the newly added element ids in the DocumentChanged call-back method.
+<li>Use a filtered element collector to retrieve a symbol defining the type of family instances to be placed, in this case doors.
+<li>Subscribe to the DocumentChanged event immediately before prompting for placement.
+<li>Call PromptForFamilyInstancePlacement to interactively place one or more instances.
+<li>Unsubscribe from the DocumentChanged event.
+<li>Report the number of instances placed in the model.
+</ul>
+
+<p>The OnDocumentChanged event handler at the end is trivial, because it just adds all newly created element ids to our local global collection:
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+[<span class="teal">Regeneration</span>( <span class="teal">RegenerationOption</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdPlaceFamilyInstance</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _added_element_ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.OfCategory( <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = collector.FirstElement() <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; _added_element_ids.Clear();
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; uidoc.PromptForFamilyInstancePlacement( symbol );
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = _added_element_ids.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Place Family Instance&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} added.&quot;</span>, n,
+&nbsp; &nbsp; &nbsp; &nbsp; ( ( 1 == n ) ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDocumentChanged( <span class="blue">object</span> sender, <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; _added_element_ids.AddRange( e.GetAddedElementIds() );
+&nbsp; }
+}
+</pre>
+
+<p>Note that it is always important to unsubscribe from events as soon as possible to minimise the overhead that all your callbacks will cause.
+
+<p>Here is 
+
+<!-- C:\a\doc\revit\blog\zip\bc_11_74.zip -->
+
+<a href="zip/bc_11_74.zip">
+version 2011.0.74.0</a>
+
+of The Building Coder samples including the complete source code and Visual Studio solution and the new command.
+

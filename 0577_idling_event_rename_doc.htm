@@ -1,0 +1,264 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- 
+
+1267419 [Exiting a user initiated transaction?] 
+SPR204219 [API wish: access Save As functionality which terminates open transaction and running command]
+
+-->
+
+<h3>Cascaded Events and Renaming the Active Document</h3>
+
+<p>I waxed philosophical on the topic of 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/iteration-and-springtime-change-is-the-only-constant.html">change</a> yesterday, 
+
+and here is another issue that can be related to that.
+In fact, almost anything can be associated with change somehow or other, can't it?
+
+<p>A developer trying to trap the SaveAs command and rename the active document in order to force users to comply with certain naming conventions was attempting a convoluted solution and running into problems with that scenario.
+
+<p>Scott Conover, Software Development Manager in the Revit API team, came up with an elegant and effective alternative solution making use of "cascaded events", i.e. an event handler which in turn temporarily subscribes to another event.
+
+<p>In this case, we obviously make use of the SavingAs and SavedAs pre- and post-event notifications.
+They cannot be used to rename a document.
+The pre-event can however cancel the event if desired, and subscribe temporarily to the Idling event, in which you have full freedom to make any changes you like.
+
+<p>We already discussed a number of aspects of the Idling event, which was one of the most exciting new features provided by the Revit 2011 API:
+
+<ul>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">Idling event</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/asynchronous-api-calls-and-idling.html">Asynchronous API Calls and Idling</a>.
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">Modeless loose connectors</a> Idling sample.
+<li>A <a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-api-access.html">pattern for Idling access</a>.
+<li>Another <a href="http://thebuildingcoder.typepad.com/blog/2010/12/modeless-door-lister-and-deleter.html">modeless sample using Idling</a> and a <a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">critique of its flaws</a>.
+</ul>
+
+<p>The reason the convoluted workaround failed and this succeeds is the fact that save can be invoked while an editor transaction is open.  
+That is one of the useful features of the Idling event, to be told by Revit when it is OK to proceed because the session is not in an unsupported state.
+
+<p>Before we look at the steps involved, and because it is short and sweet, here is the entire source code, to make it easier to understand the description.
+Scott's original implementation was based on the Revit 2011 API, since that is what the developer was asking about.
+Here is a Revit 2012 version, with a few small interesting differences which I will discuss further down:
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.ControlledApplication.DocumentSavingAs 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentSavingAsEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentSavingAs );
+&nbsp;
+&nbsp; &nbsp; a.ControlledApplication.DocumentSavedAs 
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentSavedAsEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentSavedAs );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">bool</span> reentering = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDocumentSavingAs( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">DocumentSavingAsEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !reentering )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; e.Cancel();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; reentering = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">UIApplication</span>( doc.Application );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; uiApp.Idling 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;( 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnIdling );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Exception in SavingAs&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; ex.ToString() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDocumentSavedAs( 
+&nbsp; &nbsp; <span class="blue">object</span> sender, 
+&nbsp; &nbsp; <span class="teal">DocumentSavedAsEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Status != <span class="teal">RevitAPIEventStatus</span>.Cancelled )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; reentering = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Exception in SavedAs&quot;</span>, 
+&nbsp; &nbsp; &nbsp; &nbsp; ex.ToString() );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//Application app = (Application) sender; // 2011</span>
+&nbsp; &nbsp; <span class="green">//UIApplication uiApp = new UIApplication( app ); // 2011</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp = sender <span class="blue">as</span> <span class="teal">UIApplication</span>; <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uiApp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> filename = <span class="maroon">@&quot;C:\foo.rvt&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// warning CS0618: </span>
+&nbsp; &nbsp; <span class="green">// Autodesk.Revit.DB.Document.SaveAs(string, bool) is obsolete: </span>
+&nbsp; &nbsp; <span class="green">// This method is obsolete, use SaveAs(String, SaveAsOptions) instead.</span>
+&nbsp; &nbsp; <span class="green">//doc.SaveAs( filename, true );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// SaveAsOptions.Rename essentially does what the old option did </span>
+&nbsp; &nbsp; <span class="green">// &#8211; it either kept the document in memory with the original name, </span>
+&nbsp; &nbsp; <span class="green">// or renamed it in memory.&nbsp; If the latter, the UI is one place </span>
+&nbsp; &nbsp; <span class="green">// where the new name appears.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SaveAsOptions</span> options = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>();
+&nbsp; &nbsp; options.OverwriteExistingFile = <span class="blue">true</span>;
+&nbsp; &nbsp; options.Rename = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; doc.SaveAs( filename, options );
+&nbsp;
+&nbsp; &nbsp; uiApp.Idling -= OnIdling;
+&nbsp; }
+}
+&nbsp;
+</pre>
+
+<p>Here is a top-level description of the functionality and execution sequence of the code:
+
+<ul>
+<li>We implement an external application subscribing to the SavingAs and SavedAs pre- and post-event notification.
+
+<li>Within the pre-event notification, we cancel the save to the user selected file name, set a flag named 'reentering', and register to the Idling event.
+
+<li>The post-event is used to reset the 'reentering' flag, but only if the save operation has not been cancelled.
+
+<li>The document cannot be renamed in either of these events, nor can an additional SaveAs call be made, which is why we need to register to the Idling event instead.
+
+<li>When the Idling event handler is notified, Revit has terminated the cancelled attempt to save the file and is in quiescent state.
+
+<li>Now SaveAs can be called with a valid filename that cannot be modified by the user.
+
+<li>We can also immediately unsubscribe from the Idling event right there in the Idling event handler.
+
+<li>The two pre- and post-event handlers will both be called again.
+
+<li>Because 'reentering' is still true, the pre-event knows that this save event should not be cancelled and it has nothing to do.
+
+<li>The post-event handler determines that in this call the operation is not being cancelled and resets the 'reentering' flag.
+</ul>
+
+<p>I made the following additional notes while running the application and stepping through these steps one by one in the debugger:
+
+<ul>
+<li>Select Big R &gt; SaveAs &gt; file naming dialogue &gt; specify a new name &gt; OK.
+<li>OnDocumentSavingAs is called, cancels the save operation, sets the 'reentering' flag, and subscribes to the Idling event.
+<li>OnDocumentSavedAs is called; the status is already cancelled, so it has nothing to do.
+<li>A 'file not saved' dialogue is displayed:
+<p><img src="img/file_not_saved.png" alt="File not saved"/>
+<p>... that needs to be caught and dismissed, I guess.
+<li>On clicking OK, the save operation is terminated and the Idling event fires, saving the document to a new name.
+<li>OnDocumentSavingAs is called again; this time, 'reentering' is true, so the operation is not cancelled and the save as operation completes.
+<li>OnDocumentSavedAs is called; the status is not cancelled this time, and the reentering flag is reset to false.
+<li>The document is renamed as desired.
+</ul>
+
+<p>Here are two interesting little differences between the code for Revit 2011 and Revit 2012:
+
+<ul>
+<li>In Revit 2011, the sender argument to the Idling event handler was an Application instance and we had to instantiate our own UIApplication instance from it.
+<li>In Revit 2011, we used the SaveAs overload taking a Boolean argument 'changeDocumentFilename' to change the document title in Revit as well as specify the name of the external file on the hard disk; in 2012, we use the SaveAsOptions.Rename property to achieve the same thing.
+</ul>
+
+<p>Both SaveAsOptions.Rename and the obsolete 'changeDocumentFilename' argument choose between either keeping the document in memory with the original name, or renaming it in memory.  
+
+<p>For completeness' sake, here is the original Revit 2011 version 
+
+<a href="zip/RenDocOnSave2011.zip">RenDocOnSave2011.zip</a>
+
+and the cleaned up Revit 2012 migration 
+
+<a href="zip/RenDocOnSave2012.zip">RenDocOnSave2012.zip</a>.
+
+
+<a name="2"></a>
+
+<h4>Idling Event Handler Sender Argument Changed</h4>
+
+<p>The second change above actually affects the migration of every single Revit 2011 add-in subscribing to the Idling event and using the event handler 'sender' argument to access the Revit application, for example to retrieve the active document from it.
+
+<p>The Building Coder sample command 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/idling-event.html">CmdIdling</a> used the following code in the Revit 2011 API:
+
+<pre class="code">
+<span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> e )
+{
+&nbsp; <span class="green">// access active document from sender:</span>
+&nbsp;
+&nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != app, 
+&nbsp; &nbsp; <span class="maroon">&quot;expected a valid Revit application instance&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( app != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; Log( <span class="maroon">&quot;OnIdling with active document &quot;</span> 
+&nbsp; &nbsp; &nbsp; + doc.Title );
+&nbsp; }
+}
+</pre>
+
+<p>This will fail in Revit 2012, since the sender argument is no longer an Application instance, but an UIApplication one.
+The updated code is much simpler and looks like this:
+
+<pre class="code">
+<span class="blue">void</span> OnIdling( <span class="blue">object</span> sender, <span class="teal">IdlingEventArgs</span> e )
+{
+&nbsp; <span class="green">// access active document from sender:</span>
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = sender <span class="blue">as</span> <span class="teal">UIApplication</span>;
+&nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; Log( <span class="maroon">&quot;OnIdling with active document &quot;</span> 
+&nbsp; &nbsp; + doc.Title );
+}
+&nbsp;
+</pre>
+
+<p>Here is an updated 
+
+<a href="zip/bc_12_87_2.zip">
+version 2012.0.87.2</a> of 
+
+The Building Coder sample code including this change.
+
+<p><strong>Disclaimer:</strong> Please note that the code presented here is just a test showing one possible workaround for the originally stated problem with the customized SaveAs. 
+It is by no means a production-level solution, and even the concept of using the Idling event in the suggested way is not optimal, as it could lead to potentially undesired results. 
+A more detailed discussion and analysis of the above presented workaround will be published in a future post.

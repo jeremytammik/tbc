@@ -1,0 +1,94 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Create an Area</h3>
+
+Sebastian recently submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/more-questions.html?cid=6a00e553e16897883301156f20ba0d970c#comment-6a00e553e16897883301156f20ba0d970c">
+question</a>
+
+on creating a new area element:</p>
+
+<p><strong>Question:</strong>
+I would like to create an area element overlaid on a room in an area plan view.</p>
+
+<p><strong>Answer:</strong>
+The Revit API provides one method on the Document class in the Autodesk.Revit.Creation namespace for creating new areas,</p>
+
+<pre>
+Area NewArea( ViewPlan areaView, UV point );
+</pre>
+
+It is similar to one of the overloads of the NewRoom method mentioned in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/create-room-on-level-in-phase.html">
+how to create a room</a>:
+
+<pre>
+Room NewRoom( Level level, UV point );
+</pre>
+
+<p>An area can only be created in an area plan view.
+The determination of the area boundaries is automatic, given a point in its interior.<p>
+
+<p>Therefore, if a room already exists, you just need to determine a point in its interior and feed that and the area plan view to the NewArea method.
+One easy way to obtain a point in the interior of a room is to use its location point.
+That returns an XYZ instance.
+I checked that the returned Z coordinate was zero and simply discarded that to create the UV point required by the NewArea method.
+Of course, there may be more complex situations where some kind of transformation is required, but I am not sure.</p>
+
+<p>Here is the implementation of the Execute method of a new external command class CmdNewArea which demonstrates this.
+First, it checks that the current view is an area plan view.
+It then checks whether a single room has been selected, or prompts you to do so interactively.
+Once these preliminaries have been completed, the following code creates a new area element based on the selected room boundaries:</p>
+
+<pre class="code">
+<span class="teal">CmdResult</span> rc = <span class="teal">CmdResult</span>.Failed;
+&nbsp;
+<span class="teal">ViewPlan</span> view = commandData.View <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == view
+&nbsp; || view.ViewType != <span class="teal">ViewType</span>.AreaPlan )
+{
+&nbsp; message = <span class="maroon">"Please run this command in an area plan view."</span>;
+&nbsp; <span class="blue">return</span> rc;
+}
+&nbsp;
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">Element</span> room = <span class="teal">Util</span>.GetSingleSelectedElement( doc );
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == room || !(room <span class="blue">is</span> <span class="teal">Room</span>) )
+{
+&nbsp; room = <span class="teal">Util</span>.SelectSingleElement( doc, <span class="maroon">"a room"</span> );
+}
+&nbsp;
+<span class="blue">if</span>( <span class="blue">null</span> == room || !( room <span class="blue">is</span> <span class="teal">Room</span> ) )
+{
+&nbsp; message = <span class="maroon">"Please select a single room element."</span>;
+}
+<span class="blue">else</span>
+{
+&nbsp; <span class="teal">Location</span> loc = room.Location;
+&nbsp; <span class="teal">LocationPoint</span> lp = loc <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp; <span class="teal">XYZ</span> p = lp.Point;
+&nbsp; <span class="teal">UV</span> q = <span class="blue">new</span> <span class="teal">UV</span>( p.X, p.Y );
+&nbsp; <span class="teal">Area</span> area = doc.Create.NewArea( view, q );
+&nbsp; rc = <span class="teal">CmdResult</span>.Succeeded;
+}
+<span class="blue">return</span> rc;
+</pre>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10030.zip">
+version 1.0.0.30</a>
+
+of the complete Visual Studio solution with the new command.</p>

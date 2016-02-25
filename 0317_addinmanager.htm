@@ -1,0 +1,58 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- Joe Ye, RE: using RvtSamples to load all SDK + ADN samples -->
+
+<h3>AddInManager</h3>
+
+<p>We have had a lot of discussion lately on effectively loading and debugging Revit add-ins.
+John Morse suggested a technique to be able 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/reload-an-addin-to-debug.html">
+dynamically reload an already loaded add-in</a> for 
+
+debugging purposes, and we posted some 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/dynamically-load-and-debug-plugins.html">
+updates</a> on that yesterday.
+
+We also had an internal discussion on how to effectively manage the many SDK samples.
+As I have mentioned in the past, I use 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">
+RvtSamples</a> to 
+
+load all the existing SDK samples plus all the ADN and Building Coder ones. 
+The ADN samples include collections for the Revit API Introduction labs, tips and tricks, geometry, RME and RST.
+That system is extremely easy to maintain and effective to use, because I have one single file which I reuse unmodified for all versions and flavours of Revit and never have to touch again once it is set up.
+
+<p>My colleague Joe Ye is a fan of a different approach using AddInManager, and provides another solution for reloading an add-in to debug it without restarting Revit.
+Here is his explanation of its advantages:
+
+<p>I am surprised that you rarely use the great tool AddInManager.  
+Maybe you don't know what I meant by saving me a lot of time. 
+I am pleased to share how to save time when programming for Revit. 
+It can save time in two scenarios:
+
+<ol>
+<li>Load and run quickly:
+<ol style="list-style-type:lower-alpha">
+<li>We often create samples for a developer query. After creating and compiling the code, Revit.exe may already be running. We often have a Revit.exe running, right? If not, just start it. I launch the AddInManager command in the External Tools drop list, click the Loading... button in the interaction dialogue, find the command in the commands list box, and finally click Run to start it. 
+<li>Why this saves time: there is no need to modify the Revit.ini file. Configuring Revit.ini file takes time and needs carefulness. No need to restart Revit.exe to run new external command. 
+</ol>
+<li>Quickly change code and run the revised external command again.
+<ol style="list-style-type:lower-alpha">
+<li>If our already loaded external command doesn't work as we anticipate, we need to change the code and test the command again. I often encounter this scenario. I think this it is the same to many developers. It is painful to close Revit, compile the revised project, restart Revit, open the target model file, and restart the external command. This process takes at least 2 minutes, for Revit takes time to start. If the model size is big, that takes even longer and requires patience. If we are working in a virtual machine, this is even more obvious. 
+<li>I have this solution to do it quickly. I first change the code (this cannot be avoided, :-), then change the assembly name in the current project properties application tab. I rebuild the project, click the AddInManager command in External Tools to show the interaction dialog, find and click the previous expired command, unload it and load the revised plug-in, find and click the revised command, click 'Run' to run the revised command. See the new result of new command. We can also debug the revised command by attaching the process to Revit.exe.
+<li>How can this work? Revit thinks that the renamed plug-in is a new plug-in. It won't reject loading the revised plug-in. So after renaming the plug-in, the new plug-in can be loaded successfully again.
+<li>Why this save time: We avoid closing and restarting Revit and reload the testing model file, only need to click the three buttons to unload, load and run. 
+</ol>
+</ol>
+
+<p>With this great tool, we can do all kinds of normal command test work, for instance code changing or debugging, without restarting Revit at all.  
+I often share this solution in the Chinese Revit API training.
+Seems attractive, right? 
+
+<p>Many thanks to Joe for this nice overview!
+

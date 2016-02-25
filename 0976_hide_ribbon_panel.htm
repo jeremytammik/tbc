@@ -1,0 +1,76 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08547447 [ribbon panel visibility according to discipline]
+
+Rudolf Honke Re: hide ribbon panel -- 08547447
+
+-->
+
+<h3>Dynamically Hide and Display a Ribbon Panel</h3>
+
+<p>Here is a quick little question on dynamically toggling the display of a custom ribbon panel, e.g. depending on the currently activated Revit disciplines.</p>
+
+<p>First, however, let me share this nice and wise little quote regarding the current weather situation and actually life and happiness in general from the German humourist
+
+<a href="http://en.wikipedia.org/wiki/Karl_Valentin">Karl Valentin</a> (1882-1948):
+
+<p><i>I am happy if it rains &ndash; because if I am unhappy, it still goes on raining
+
+<br/>(Ich freue mich, wenn es regnet &ndash; denn wenn ich mich nicht freue, regnet es auch).</i></p>
+
+<a name="2"></a>
+
+<h4>Toggle Ribbon Panel Visibility</h4>
+
+<p><strong>Question:</strong> Is there an easy way to dynamically turn a specific user ribbon panel on or off depending on the currently active Revit disciplines?</p>
+
+<p>For instance, I have implemented these two separate Structure and MEP ribbon panels within our company's ribbon tab, and I would like them to automatically reflect the changes in discipline option.</p>
+
+<center>
+<img src="img/rst_rme_active.jpg" alt="Structure and MEP ribbon panels" width="700"/>
+</center>
+
+<p>When the structural and systems disciplines are disabled in the Revit user interface, these two panels should disappear:</p>
+
+<center>
+<img src="img/rst_rme_inactive.jpg" alt="Structure and systems inactive" width="700"/>
+</center>
+
+<p>I am aware of the dedicated
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">
+VisibilityMode tag</a> defined
+
+by the add-in manifest XML format, but that only enables and disables individual buttons depending on the discipline.
+
+<p>The command
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">
+availability class</a> provides
+
+even greater control and also only affects individual buttons.
+
+<p>I already made use of both these two options for other purposes.
+
+<p>The Revit 2013 API provides new properties like Application.IsStructureEnabled, etc.
+I would like the information returned by that property to dynamically turn the entire corresponding ribbon panel on and off, not just a single command.</p>
+
+
+<p><strong>Answer:</strong> Yes, the Revit API actually does provide complete and simple support for this functionality, as you can discover by exploring the methods and properties provided by the respective classes.
+The Revit API documentation always has some new little surprise to offer, if you study it carefully.</p>
+
+<p>In this case, you can make use of the read-write RibbonPanel.Visible property, which can be set to false to hide a panel.</p>
+
+<p>You can save the RibbonPanel instance in a global variable in your application class to switch its state at will.</p>
+
+<p>You can also make use of a self-implemented
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html">
+toggle button</a> in
+
+one panel to control another panel's visibility.</p>
