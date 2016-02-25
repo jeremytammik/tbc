@@ -1,0 +1,154 @@
+Imports System
+Imports System.Collections.Generic
+Imports System.Linq
+Imports System.Text
+
+Imports Autodesk.Revit.DB
+Imports Autodesk.Revit.DB.Architecture
+Imports Autodesk.Revit.DB.Structure
+Imports Autodesk.Revit.UI
+Imports Autodesk.Revit.UI.Selection
+Imports Autodesk.Revit.ApplicationServices
+Imports Autodesk.Revit.Attributes
+
+
+<TransactionAttribute(TransactionMode.Manual), _
+ RegenerationAttribute(RegenerationOption.Manual)> _
+Public Class Lab2PlaceGroup
+    Implements IExternalCommand
+    Public Function Execute(ByVal commandData As ExternalCommandData,
+                            ByRef message As String,
+                            ByVal elements As ElementSet) As Result Implements IExternalCommand.Execute
+
+        Dim App As UIApplication = commandData.Application
+        Dim doc As Document = App.ActiveUIDocument.Document
+        Dim uidoc As UIDocument = New UIDocument(doc)
+        Dim pickedRef As Reference = Nothing
+
+        Dim trans As Transaction = New Transaction(doc, "ExComm")
+        trans.Start()
+
+        Dim collection As Autodesk.Revit.UI.Selection.SelElementSet = uidoc.Selection.Elements
+        ''Dim collection As Selection = App.ActiveUIDocument.Selection
+        ''pickedRef = collection.PickObject(ObjectType.Element, "Please select a Family Instance")
+        ''Dim elem As FamilyInstance = doc.GetElement(pickedRef)
+        ''Call EditFamilyTypes(document, elem)
+        'Dim e As FamilyInstance
+        ' example works best when familyInstance is a rectangular concrete element
+
+        For Each e As FamilyInstance In collection
+            If e.Symbol IsNot Nothing Then
+
+                ' Get family associated with this
+                Dim family As Family = e.Symbol.Family
+                Dim symbolSet As FamilySymbolSet = family.Symbols
+                Dim bTypeXXExist As Boolean = False
+                For Each symbol As FamilySymbol In symbolSet
+
+                    If symbol.Name.Equals("xx") = True Then
+                        bTypeXXExist = True
+                        Exit For 
+                    End If
+                Next
+                If bTypeXXExist = False Then
+
+                    ' Get Family document for family
+                    Dim familyDoc As Document = doc.EditFamily(family)
+                    If familyDoc IsNot Nothing Then
+                        Dim transfamdoc As Transaction = New Transaction(familyDoc)
+                        transfamdoc.Start("EditFamily")
+                        Dim familyManager As FamilyManager = familyDoc.FamilyManager
+
+                        ' add a new type and edit its parameters
+                        Dim newFamilyType As FamilyType = familyManager.NewType("xx")
+
+                        ' look for 'b' and 'h' parameters and set them to 2 feet
+                        Dim familyParam As FamilyParameter = familyManager.Parameter("b")
+                        
+                        If familyParam IsNot Nothing Then
+                            familyManager.[Set](familyParam, 100)
+                        End If
+                        familyParam = familyManager.Parameter("h")
+                        If familyParam IsNot Nothing Then
+                            familyManager.[Set](familyParam, 1600)
+                        End If
+                        transfamdoc.Commit()
+
+                        ' now update the Revit project with Family which has a new type
+                        family = familyDoc.LoadFamily(doc, New FamilyOption())
+                        
+                    End If
+                    ' find the new type and assign it to FamilyInstance
+                    Dim symbolsItor As FamilySymbolSetIterator = family.Symbols.ForwardIterator()
+                    symbolsItor.Reset()
+                    While symbolsItor.MoveNext()
+                        Dim familySymbol As FamilySymbol = symbolsItor.Current
+                        If familySymbol.Name = "xx" Then
+                            e.Symbol = familySymbol
+                            Exit While
+                        End If
+                    End While
+                End If
+            End If
+        Next
+        trans.Commit()
+        Return Autodesk.Revit.UI.Result.Succeeded
+    End Function
+End Class
+
+Class FamilyOptionremoveme
+    Implements IFamilyLoadOptions
+
+    Public Function OnFamilyFound(familyInUse As Boolean, ByRef overwriteParameterValues As Boolean) As Boolean Implements Autodesk.Revit.DB.IFamilyLoadOptions.OnFamilyFound
+        overwriteParameterValues = True
+        Return True
+    End Function
+
+    Public Function OnSharedFamilyFound(sharedFamily As Autodesk.Revit.DB.Family, familyInUse As Boolean, ByRef source As Autodesk.Revit.DB.FamilySource, ByRef overwriteParameterValues As Boolean) As Boolean Implements Autodesk.Revit.DB.IFamilyLoadOptions.OnSharedFamilyFound
+        Return True
+    End Function
+End Class
+<TransactionAttribute(TransactionMode.Manual), _
+ RegenerationAttribute(RegenerationOption.Manual)> _
+Public Class command1removeme
+    Implements IExternalCommand
+    Public app As UIApplication
+    Public doc As Document
+    Public uidoc As UIDocument
+
+    Public Function Execute(commandData As Autodesk.Revit.UI.ExternalCommandData, ByRef message As String, elements As Autodesk.Revit.DB.ElementSet) As Autodesk.Revit.UI.Result Implements Autodesk.Revit.UI.IExternalCommand.Execute
+        app = commandData.Application
+        doc = app.ActiveUIDocument.Document
+        uidoc = New UIDocument(doc)
+
+        Dim trans As Transaction = New Transaction(doc)
+        trans.Start("changeSymbol")
+        Dim sel As Selection = uidoc.Selection
+        Dim refl As Reference = sel.PickObject(ObjectType.Element, "Please pick a family instance")
+        Dim famInstance As FamilyInstance = refl.Element
+        Dim famSymbol As FamilySymbol = famInstance.Symbol
+        Dim symbols As ICollection(Of ElementId) = famSymbol.GetSimilarTypes()
+        Dim famSymbolOther As FamilySymbol = Nothing
+
+        For Each id As ElementId In symbols
+            If id.Equals(famSymbol.Id) = False Then
+                famSymbolOther = doc.Element(id)
+                Exit For
+            End If
+        Next
+        If famSymbolOther IsNot Nothing Then
+            famInstance.Symbol = famSymbolOther
+        End If
+        trans.Commit()
+        Return Result.Succeeded
+    End Function
+End Class
+
+
+
+
+
+
+
+
+

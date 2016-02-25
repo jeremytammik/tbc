@@ -1,0 +1,42 @@
+Step 1: Replaced the RevitAPI.dll and RevitAPIUI.dll references.
+Step 2: Changed the .NET framework from 4.0 to 4.5
+Step 3: Rebuild all works, successful compilation, 0 errors, 24 warnings:
+
+------ Rebuild All started: Project: RevitLookup, Configuration: Debug (For Release build of Revit) Any CPU ------
+C:\a\vs\RevitLookup\CS\Test\ExIm\Importer.cs(248,41,248,55): warning CS0618: 'Autodesk.Revit.DB.Family.Symbols' is obsolete: 'This property is obsolete in Revit 2015.  Use Family.GetFamilySymbolIds() instead.'
+C:\a\vs\RevitLookup\CS\Snoop\CollectorExts\CollectorExtElement.cs(999,55,999,66): warning CS0618: 'Autodesk.Revit.DB.Family.Symbols' is obsolete: 'This property is obsolete in Revit 2015.  Use Family.GetFamilySymbolIds() instead.'
+C:\a\vs\RevitLookup\CS\Snoop\CollectorExts\CollectorExtElement.cs(1621,54,1621,84): warning CS0618: 'Autodesk.Revit.DB.Structure.AreaReinforcement.GetCurveElementIds()' is obsolete: 'This method is obsolete in Autodesk Revit 2015. Call getBoundaryCurveIds instead.'
+C:\a\vs\RevitLookup\CS\Snoop\CollectorExts\CollectorExtMisc.cs(608,49,608,62): warning CS0618: 'Autodesk.Revit.DB.FormatOptions.GetName()' is obsolete: 'This method is deprecated in Revit 2015.  Use UnitUtils.GetTypeCatalogString(DisplayUnitType) instead.'
+C:\a\vs\RevitLookup\CS\TestCmds.cs(169,32,169,87): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\FireRating\SharedParam.cs(74,45,74,136): warning CS0618: 'Autodesk.Revit.DB.Definitions.Create(string, Autodesk.Revit.DB.ParameterType, bool)' is obsolete: 'This method is deprecated in Revit 2015. Use Create(Autodesk.Revit.DB.ExternalDefinitonCreationOptions) instead'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\SDKTestFuncs.cs(78,42,78,88): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\SDKTestFuncs.cs(107,42,107,88): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\SDKTestFuncs.cs(126,29,126,75): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\SDKTestFuncs.cs(158,76,158,122): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\SharedParams\Create.cs(79,41,79,119): warning CS0618: 'Autodesk.Revit.DB.Definitions.Create(string, Autodesk.Revit.DB.ParameterType, bool)' is obsolete: 'This method is deprecated in Revit 2015. Use Create(Autodesk.Revit.DB.ExternalDefinitonCreationOptions) instead'
+C:\a\vs\RevitLookup\CS\Test\SDKSamples\TypeSelector\TypeSelectorForm.cs(168,47,168,78): warning CS0618: 'Autodesk.Revit.DB.Family.Symbols' is obsolete: 'This property is obsolete in Revit 2015.  Use Family.GetFamilySymbolIds() instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(88,72,88,118): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(111,72,111,118): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(514,70,514,116): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(890,70,890,116): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(938,37,938,49): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(1032,37,1032,83): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(1083,37,1083,83): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(1656,57,1656,72): warning CS0618: 'Autodesk.Revit.DB.ViewSheet.Views' is obsolete: 'This property is obsolete in Revit 2015.  Use GetAllPlacedViews() instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(1697,38,1697,51): warning CS0618: 'Autodesk.Revit.UI.Selection.SelElementSet' is obsolete: 'This class is deprecated in Revit 2015. Use Selection.SetElementIds() and Selection.GetElementIds() instead.'
+C:\a\vs\RevitLookup\CS\Test\TestElements.cs(1697,62,1697,108): warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+C:\a\vs\RevitLookup\CS\Utils\Elements.cs(460,46,460,100): warning CS0618: 'Autodesk.Revit.Creation.Document.NewViewDrafting()' is obsolete: 'This method is obsolete in Revit 2015.  Use ViewDrafting.Create() instead.'
+C:\a\vs\RevitLookup\CS\Utils\FamilyUtil.cs(45,53,45,64): warning CS0618: 'Autodesk.Revit.DB.Family.Symbols' is obsolete: 'This property is obsolete in Revit 2015.  Use Family.GetFamilySymbolIds() instead.'
+  RevitLookup -> C:\a\vs\RevitLookup\CS\bin\Debug\RevitLookup.dll
+          1 file(s) copied.
+          1 file(s) copied.
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+
+Step 4:
+
+// jeremy migrated from Revit 2014 to 2015:
+
+- rewrote FamilyUtil.GetFamilySymbol using GetFamilySymbolIds instead of Symbols
+- ditto in TypeSelectorForm.GetAvailableSymbols
+- ditto in Importer.UpdateFamilySymbol
+- rewrote TestElements.ViewToNewSheetHardwired to use ViewSheet.GetAllPlacedViews instead of ViewSheet.Views

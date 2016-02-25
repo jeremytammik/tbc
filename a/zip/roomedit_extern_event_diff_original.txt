@@ -1,0 +1,488 @@
+commit 088c023baa51cd7912fb4fff32d67fbaf216f75f
+Author: Jeremy Tammik <jeremy.tammik@eur.autodesk.com>
+Date:   Fri Dec 6 09:09:44 2013 -0800
+
+    derive DbUpdater from external event and replace Idling
+
+diff --git a/RoomEditorApp/App.cs b/RoomEditorApp/App.cs
+index f978911..77693e5 100644
+--- a/RoomEditorApp/App.cs
++++ b/RoomEditorApp/App.cs
+@@ -36,7 +36,8 @@ namespace RoomEditorApp
+     /// <summary>
+     /// Store the Idling event handler when subscribed.
+     /// </summary>
+-    static EventHandler<IdlingEventArgs> _handler = null;
++    //static EventHandler<IdlingEventArgs> _handler = null;
++    static ExternalEvent _event = null;
+ 
+     /// <summary>
+     /// Executing assembly namespace
+@@ -200,7 +201,7 @@ namespace RoomEditorApp
+         bool rc = _buttons[3].ItemText.Equals(
+           _unsubscribe );
+ 
+-        Debug.Assert( ( _handler != null ) == rc, 
++        Debug.Assert( ( _event != null ) == rc, 
+           "expected synchronised handler and button text" );
+ 
+         return rc;
+@@ -211,14 +212,15 @@ namespace RoomEditorApp
+     /// Toggle on and off subscription to 
+     /// automatic cloud updates.
+     /// </summary>
+-    public static void ToggleSubscription(
+-      EventHandler<IdlingEventArgs> handler )
++    public static ExternalEvent ToggleSubscription(
++      IExternalEventHandler handler ) // EventHandler<IdlingEventArgs>
+     {
+       if( Subscribed )
+       {
+         Debug.Print( "Unsubscribing..." );
+-        _uiapp.Idling -= _handler;
+-        _handler = null; 
++        //_uiapp.Idling -= _handler; _handler = null; 
++        _event.Dispose();
++        _event = null;
+         _buttons[3].ItemText = _subscribe;
+         _timer.Stop();
+         _timer.Report( "Subscription timing" );
+@@ -228,12 +230,14 @@ namespace RoomEditorApp
+       else
+       {
+         Debug.Print( "Subscribing..." );
+-        _uiapp.Idling += handler;
+-        _handler = handler;
++        //_uiapp.Idling += handler;
++        //_handler = handler;
++        _event = ExternalEvent.Create( handler );
+         _buttons[3].ItemText = _unsubscribe;
+         _timer = new JtTimer( "Subscription" );
+         Debug.Print( "Subscribed." );
+       }
++      return _event;
+     }
+ 
+     public Result OnStartup(
+@@ -251,7 +255,8 @@ namespace RoomEditorApp
+     {
+       if( Subscribed )
+       {
+-        _uiapp.Idling -= _handler;
++        //_uiapp.Idling -= _handler;
++        _event.Dispose();
+       }
+       return Result.Succeeded;
+     }
+diff --git a/RoomEditorApp/CmdSubscribe.cs b/RoomEditorApp/CmdSubscribe.cs
+index 7a9c5c8..ab42190 100644
+--- a/RoomEditorApp/CmdSubscribe.cs
++++ b/RoomEditorApp/CmdSubscribe.cs
+@@ -16,6 +16,7 @@ namespace RoomEditorApp
+   [Transaction( TransactionMode.ReadOnly )]
+   class CmdSubscribe : IExternalCommand
+   {
++    #region Obsolete Idling event handler replaced by external event
+     /// <summary>
+     /// How many Idling calls to wait before acting
+     /// </summary>
+@@ -52,9 +53,9 @@ namespace RoomEditorApp
+         {
+           if( 0 == ( _counter % _message_interval ) )
+           {
+-            Debug.Print( "{0} OnIdling called {1} times",
+-              DateTime.Now.ToString( "HH:mm:ss.fff" ),
+-              _counter );
++            Util.Log( string.Format(
++              "OnIdling called {0} times",
++              _counter ) );
+           }
+ 
+           // Have we waited long enough since the last attempt?
+@@ -68,11 +69,10 @@ namespace RoomEditorApp
+           if( rdb.LastSequenceNumberChanged(
+             DbUpdater.LastSequence ) )
+           {
+-            UIApplication uiApp = sender as UIApplication;
+-            Document doc = uiApp.ActiveUIDocument.Document;
++            UIApplication uiapp = sender as UIApplication;
++            Document doc = uiapp.ActiveUIDocument.Document;
+ 
+-            Debug.Print( "Start furniture update: {0}",
+-              DateTime.Now.ToString( "HH:mm:ss.fff" ) );
++            Util.Log( "furniture update begin" );
+ 
+             //FilteredElementCollector rooms
+             //  = new FilteredElementCollector( doc )
+@@ -108,19 +108,18 @@ namespace RoomEditorApp
+             //  CmdUpdate.LastSequence = result.Sequence;
+             //}
+ 
+-            DbUpdater updater = new DbUpdater( doc );
++            DbUpdater updater = new DbUpdater( uiapp );
+ 
+             updater.UpdateBim();
+ 
+-            Debug.Print( "End furniture update: {0}",
+-              DateTime.Now.ToString( "HH:mm:ss.fff" ) );
++            Util.Log( "furniture update end" );
+ 
+             //  _stopwatch = new Stopwatch();
+             //  _stopwatch.Start();
+             //}
+             //catch( Exception ex )
+             //{
+-            //  //uiApp.Application.WriteJournalComment
++            //  //uiapp.Application.WriteJournalComment
+ 
+             //  Debug.Print(
+             //    "Room Editor: an error occurred "
+@@ -133,6 +132,7 @@ namespace RoomEditorApp
+         }
+       }
+     }
++    #endregion // Obsolete Idling event handler replaced by external event
+ 
+     public Result Execute(
+       ExternalCommandData commandData,
+@@ -145,7 +145,10 @@ namespace RoomEditorApp
+         DbUpdater.SetLastSequence();
+       }
+ 
+-      App.ToggleSubscription( OnIdling );
++      //App.ToggleSubscription( OnIdling );
++
++      DbUpdater.ToggleSubscription(
++        commandData.Application );
+ 
+       return Result.Succeeded;
+     }
+diff --git a/RoomEditorApp/CmdUpdate.cs b/RoomEditorApp/CmdUpdate.cs
+index 35fccd7..7b2253f 100644
+--- a/RoomEditorApp/CmdUpdate.cs
++++ b/RoomEditorApp/CmdUpdate.cs
+@@ -96,7 +96,9 @@ namespace RoomEditorApp
+       //  LastSequence = result.Sequence;
+       //}
+ 
+-      DbUpdater updater = new DbUpdater( doc );
++      //DbUpdater updater = new DbUpdater( doc );
++
++      DbUpdater updater = new DbUpdater( uiapp );
+ 
+       updater.UpdateBim();
+ 
+diff --git a/RoomEditorApp/DbUpdater.cs b/RoomEditorApp/DbUpdater.cs
+index 1ec6e53..4ca3c30 100644
+--- a/RoomEditorApp/DbUpdater.cs
++++ b/RoomEditorApp/DbUpdater.cs
+@@ -3,14 +3,17 @@ using System;
+ using System.Collections.Generic;
+ using System.Diagnostics;
+ using System.Linq;
++using System.Threading;
++using Autodesk.Revit.ApplicationServices;
+ using Autodesk.Revit.DB;
++using Autodesk.Revit.UI;
+ using DreamSeat;
+ #endregion
+ 
+ namespace RoomEditorApp
+ {
+ 
+-  class DbUpdater
++  class DbUpdater : IExternalEventHandler
+   {
+     static public int LastSequence
+     {
+@@ -24,8 +27,8 @@ namespace RoomEditorApp
+     /// </summary>
+     static public int SetLastSequence()
+     {
+-      LastSequence
+-        = new RoomEditorDb().LastSequenceNumber;
++      LastSequence = new RoomEditorDb()
++        .LastSequenceNumber;
+ 
+       Util.InfoMsg( string.Format(
+         "Last sequence number set to {0}."
+@@ -38,7 +41,12 @@ namespace RoomEditorApp
+     /// <summary>
+     /// Current Revit project document.
+     /// </summary>
+-    Document _doc = null;
++    //Document _doc = null;
++
++    /// <summary>
++    /// Revit UI application.
++    /// </summary>
++    UIApplication _uiapp = null;
+ 
+     /// <summary>
+     /// Revit creation application for 
+@@ -47,6 +55,23 @@ namespace RoomEditorApp
+     Autodesk.Revit.Creation.Application _creapp = null;
+ 
+     /// <summary>
++    /// Delegate to raise a database modified event.
++    /// </summary>
++    //public delegate ExternalEventRequest EventRaiser();
++
++    /// <summary>
++    /// External event to raise event 
++    /// for pending database changes.
++    /// </summary>
++    static ExternalEvent _event = null;
++
++    /// <summary>
++    /// Separate thread running loop to
++    /// check for pending database changes.
++    /// </summary>
++    static Thread _thread = null;
++
++    /// <summary>
+     /// Store the unique ids of all room in this model
+     /// in a dictionary for fast lookup to check 
+     /// whether a given piece of furniture or 
+@@ -54,12 +79,13 @@ namespace RoomEditorApp
+     /// </summary>
+     Dictionary<string, int> _roomUniqueIdDict = null;
+ 
+-    public DbUpdater( Document doc )
++    public DbUpdater( UIApplication uiapp )
+     {
+       using( JtTimer pt = new JtTimer( "DbUpdater ctor" ) )
+       {
+-        _doc = doc;
+-        _creapp = doc.Application.Create;
++        //_doc = doc;
++        _uiapp = uiapp;
++        _creapp = _uiapp.Application.Create;
+       }
+     }
+ 
+@@ -67,9 +93,11 @@ namespace RoomEditorApp
+     /// Update a piece of furniture.
+     /// Return true if anything was changed.
+     /// </summary>
+-    bool UpdateBimFurniture( 
++    bool UpdateBimFurniture(
+       DbFurniture f )
+     {
++      Document doc = _uiapp.ActiveUIDocument.Document;
++
+       bool rc = false;
+ 
+       if( !_roomUniqueIdDict.ContainsKey( f.RoomId ) )
+@@ -82,7 +110,7 @@ namespace RoomEditorApp
+         return rc;
+       }
+ 
+-      Element e = _doc.GetElement( f.Id );
++      Element e = doc.GetElement( f.Id );
+ 
+       if( null == e )
+       {
+@@ -131,24 +159,24 @@ namespace RoomEditorApp
+       if( .01 < translation.GetLength()
+         || .01 < Math.Abs( rotation ) )
+       {
+-        using( Transaction tx = new Transaction( 
+-          _doc ) )
++        using( Transaction tx = new Transaction(
++          doc ) )
+         {
+           tx.Start( "Update Furniture and "
+             + "Equipmant Instance Placement" );
+ 
+           if( .01 < translation.GetLength() )
+           {
+-            ElementTransformUtils.MoveElement( 
+-              _doc, e.Id, translation );
++            ElementTransformUtils.MoveElement(
++              doc, e.Id, translation );
+           }
+           if( .01 < Math.Abs( rotation ) )
+           {
+-            Line axis = Line.CreateBound( lp.Point, 
++            Line axis = Line.CreateBound( lp.Point,
+               lp.Point + XYZ.BasisZ );
+ 
+-            ElementTransformUtils.RotateElement( 
+-              _doc, e.Id, axis, rotation );
++            ElementTransformUtils.RotateElement(
++              doc, e.Id, axis, rotation );
+           }
+           tx.Commit();
+           rc = true;
+@@ -165,10 +193,12 @@ namespace RoomEditorApp
+     {
+       using( JtTimer pt = new JtTimer( "UpdateBim" ) )
+       {
++        Document doc = _uiapp.ActiveUIDocument.Document;
++
+         // Retrieve all room unique ids in model:
+ 
+         FilteredElementCollector rooms
+-          = new FilteredElementCollector( _doc )
++          = new FilteredElementCollector( doc )
+             .OfClass( typeof( SpatialElement ) )
+             .OfCategory( BuiltInCategory.OST_Rooms );
+ 
+@@ -225,5 +255,133 @@ namespace RoomEditorApp
+         }
+       }
+     }
++
++    public void Execute( UIApplication a )
++    {
++      //Document doc = a.ActiveUIDocument.Document;
++
++      //Debug.Assert( doc.Title.Equals( _doc.Title ),
++      //  "oops ... different documents ... test this" );
++
++      UpdateBim();
++    }
++
++    public string GetName()
++    {
++      return string.Format(
++        "{0} DbUpdater", App.Caption );
++    }
++
++    /// <summary>
++    /// Count total number of checks for
++    /// database updates made so far.
++    /// </summary>
++    static int _nLoopCount = 0;
++
++    /// <summary>
++    /// Count total number of checks for
++    /// database updates made so far.
++    /// </summary>
++    static int _nCheckCount = 0;
++
++    /// <summary>
++    /// Count total number of database 
++    /// updates requested so far.
++    /// </summary>
++    static int _nUpdatesRequested = 0;
++
++    /// <summary>
++    /// Wait far a moment before requerying database.
++    /// </summary>
++    //static Stopwatch _stopwatch = null;
++
++    /// <summary>
++    /// Number of milliseconds to wait and relinquish
++    /// CPU control before next check for pending
++    /// database updates.
++    /// </summary>
++    const int _timeout = 100;
++
++    /// <summary>
++    /// Repeatedly check database status and raise 
++    /// external event when updates are pending.
++    /// Relinquish control and wait for timeout
++    /// period between each attempt. Run in a 
++    /// separate thread.
++    /// </summary>
++    static void CheckForPendingDatabaseChanges()
++    {
++      while( true )
++      {
++        ++_nLoopCount;
++
++        Debug.Assert( null != _event,
++        "expected non-null external event" );
++
++        if( _event.IsPending )
++        {
++          Util.Log( string.Format(
++            "CheckForPendingDatabaseChanges loop {0} - "
++            + "database update event is pending",
++            _nLoopCount ) );
++        }
++        else
++        {
++          using( JtTimer pt = new JtTimer(
++            "CheckForPendingDatabaseChanges" ) )
++          {
++            ++_nCheckCount;
++
++            Util.Log( string.Format(
++              "CheckForPendingDatabaseChanges loop {0} - "
++              + "check for changes {1}",
++              _nLoopCount, _nCheckCount ) );
++
++            RoomEditorDb rdb = new RoomEditorDb();
++
++            if( rdb.LastSequenceNumberChanged(
++              DbUpdater.LastSequence ) )
++            {
++              _event.Raise();
++
++              ++_nUpdatesRequested;
++
++              Util.Log( string.Format(
++                "database update pending event raised {0} times",
++                _nUpdatesRequested ) );
++            }
++          }
++        }
++
++        // Wait a moment and relinquish control before
++        // next check for pending database updates.
++
++        Thread.Sleep( _timeout );
++      }
++    }
++
++    public static void ToggleSubscription(
++      UIApplication uiapp )
++    {
++      _event = App.ToggleSubscription(
++        new DbUpdater( uiapp ) );
++
++      if( null == _event )
++      {
++        _thread.Abort();
++        _thread = null;
++      }
++      else
++      {
++        // Start new thread to regularly check 
++        // database status and raise external event
++        // when updates are pending.
++
++        _thread = new Thread(
++          CheckForPendingDatabaseChanges );
++
++        _thread.Start();
++      }
++    }
+   }
+ }
+diff --git a/RoomEditorApp/Util.cs b/RoomEditorApp/Util.cs
+index 4ebd828..97b4d6c 100644
+--- a/RoomEditorApp/Util.cs
++++ b/RoomEditorApp/Util.cs
+@@ -191,6 +191,18 @@ namespace RoomEditorApp
+       dlg.MainInstruction = msg;
+       dlg.Show();
+     }
++
++    /// <summary>
++    /// Print a debug log message with a time stamp
++    /// to the Visual Studio debug output window.
++    /// </summary>
++    public static void Log( string msg )
++    {
++      string timestamp = DateTime.Now.ToString(
++        "HH:mm:ss.fff" );
++
++      Debug.Print( timestamp + " " + msg );
++    }
+     #endregion // Messages
+ 
+     #region Browse for directory

@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Reflection;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.ApplicationServices; 
+
+namespace GGYM
+{
+	[Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+	[Obfuscation(Feature = "renaming", Exclude = true, ApplyToMembers = false)]
+	public class ImportIFCGeomGym : IExternalCommand
+	{
+		internal static string mLog = ""; 
+		public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+		{
+			Document doc = commandData.Application.ActiveUIDocument.Document;
+			Transaction trn = new Transaction(doc,"ggFloor");
+			trn.Start();
+			mLog = "";
+			
+			Application app = commandData.Application.Application;
+			Level lvl = doc.Create.NewLevel(5);
+			lvl.Name = "Jon";
+			CurveArray ca = new CurveArray();
+			XYZ p1 = new XYZ(-10, -10, 5), p2 = new XYZ(-10, 10, 5);
+			XYZ s = p1;
+			ca.Append(app.Create.NewLineBound(p1,p2));
+			p1 = new XYZ(10,10,5);
+			ca.Append(app.Create.NewLineBound(p2,p1));
+			p2 = new XYZ(10,-10,5);
+			ca.Append(app.Create.NewLineBound(p1,p2));
+			ca.Append(app.Create.NewLineBound(p2,s));
+			FloorType ft = null; 
+			foreach (FloorType t in doc.FloorTypes)
+			{ 
+					ft = t;
+					break; 
+			}
+			
+			Floor f = doc.Create.NewFloor(ca, ft,lvl, true);
+			trn.Commit();
+			trn = new Transaction(doc, "ggOpening");
+			trn.Start();
+			ca = new CurveArray();
+			p1 = new XYZ(-5, -5, 5);
+			p2 = new XYZ(-5, 5, 5);
+			s = p1;
+			ca.Append(app.Create.NewLineBound(p1, p2));
+			p1 = new XYZ(5, 5, 5);
+			ca.Append(app.Create.NewLineBound(p2, p1));
+			p2 = new XYZ(5, -5, 5);
+			ca.Append(app.Create.NewLineBound(p1, p2));
+			ca.Append(app.Create.NewLineBound(p2, s));
+			doc.Create.NewOpening(f, ca, true);
+			trn.Commit();
+			return Result.Succeeded; 
+		}
+	}
+}
+
+ 

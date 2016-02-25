@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="init(evt)" width="380" height="100">
+
+  <style>
+    .caption{
+	font-size: 14px;
+	font-family: Georgia, serif;
+    }
+    .tooltip{
+	font-size: 12px;
+    }
+    .tooltip_bg{
+	fill: white;
+	stroke: black;
+	stroke-width: 1;
+	opacity: 0.85;
+    }
+  </style>
+
+  <script type="text/ecmascript">
+    <![CDATA[
+
+	function init(evt)
+	{
+	    if ( window.svgDocument == null )
+	    {
+		svgDocument = evt.target.ownerDocument;
+	    }
+
+	    tooltip = svgDocument.getElementById('tooltip');
+	    tooltip_bg = svgDocument.getElementById('tooltip_bg');
+
+	}
+
+	function ShowTooltip(evt, mouseovertext)
+	{
+	    tooltip.setAttributeNS(null,"x",evt.clientX+11);
+	    tooltip.setAttributeNS(null,"y",evt.clientY+27);
+	    tooltip.firstChild.data = mouseovertext;
+	    tooltip.setAttributeNS(null,"visibility","visible");
+
+	    length = tooltip.getComputedTextLength();
+	    tooltip_bg.setAttributeNS(null,"width",length+8);
+	    tooltip_bg.setAttributeNS(null,"x",evt.clientX+8);
+	    tooltip_bg.setAttributeNS(null,"y",evt.clientY+14);
+	    tooltip_bg.setAttributeNS(null,"visibility","visibile");
+	}
+
+	function HideTooltip(evt)
+	{
+	    tooltip.setAttributeNS(null,"visibility","hidden");
+	    tooltip_bg.setAttributeNS(null,"visibility","hidden");
+	}
+
+    ]]>
+  </script>
+
+  <text class="caption" x="10" y="35">Mouseover a square</text>
+  <text class="caption" x="10" y="50">to display a tooltip</text>
+
+  <rect id="rect1" x="160" y="10" width="60" height="60" fill="blue"
+   onmousemove="ShowTooltip(evt, 'The amazing blue box')"
+    onmouseout="HideTooltip(evt)"/>
+
+  <rect id="rect2" x="240" y="10" width="60" height="60" fill="green"
+   onmousemove="ShowTooltip(evt, 'Box')"
+    onmouseout="HideTooltip(evt)"/>
+
+  <rect class="tooltip_bg" id="tooltip_bg"
+      x="0" y="0" rx="4" ry="4"
+      width="55" height="17" visibility="hidden"/>
+  <text class="tooltip" id="tooltip"
+      x="0" y="0" visibility="hidden">Tooltip</text>
+</svg>

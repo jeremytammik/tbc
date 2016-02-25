@@ -1,0 +1,111 @@
+
+private void button2_Click(object sender, EventArgs e)
+{
+  List<int> sections = new List<int>();
+
+  string xmlAddress = textBox1.Text;
+
+  XmlToWoodenBeamList beamList = new XmlToWoodenBeamList(xmlAddress);
+
+  List<WoodenBeam> beams = beamList.WoodenBeamList;
+
+  foreach (WoodenBeam wb in beams)
+  {
+    if (!sections.Contains(wb.section))
+    {
+      sections.Add(wb.section);
+    }
+  }
+
+  foreach (int s in sections)
+  {
+    Document document = app.NewFamilyDocument(templateFileName);
+
+    Transaction transaction = new Transaction(document, s.ToString());
+
+    transaction.Start();
+
+    FailureHandlingOptions failureHandlingOptions = transaction.GetFailureHandlingOptions();
+    failureHandlingOptions.SetFailuresPreprocessor(new RoofWarningSwallower());
+    transaction.SetFailureHandlingOptions(failureHandlingOptions);
+
+    progressBar1.Maximum = beams.Count();
+    progressBar1.Minimum = 0;
+
+    int allNumber = 0;
+    int countName = 0;
+
+    foreach (WoodenBeam wb in beams)
+    {
+      if (wb.section == s)
+      {
+        wb.CreateSweep(document);
+        progressBar1.Increment(1);
+        allNumber++;
+      }
+    }
+
+    foreach (WoodenBeam wb in beams)
+    {
+      if (wb.section == s)
+      {
+        Sweep sw = wb.GenerateSweep();
+      }
+    }
+
+    transaction.Commit();
+
+    document.SaveAs(this.savedFileName + "Field" + s.ToString()+countName.ToString()+".rfa");
+
+    filePaths.Add(this.savedFileName + "Field" + s.ToString() + countName.ToString() + ".rfa");
+
+    countName++;
+  }
+
+  Document documentCurrent = app.NewFamilyDocument(templateFileName);
+
+  if (filePaths != null)
+  {
+    Thread th = new Thread(new ThreadStart(this.ShowProgress));
+    th.Start();
+    this.Dispose();
+
+    //initial the progressBar
+    progressBarForm.progressBar1.Maximum = filePaths.Count();
+    progressBarForm.progressBar1.Minimum = 0;
+
+    //begin the transaction
+    Transaction transaction = new Transaction(documentCurrent, "begin load");
+
+    transaction.Start();
+
+    foreach (string filePath in filePaths)
+    {
+      Family family = null;
+      if (!documentCurrent.LoadFamily(filePath, out family))
+      {
+        throw new Exception("Unable to load " + filePath);
+      }
+
+      // Loop through table symbols and add a new table for each
+      FamilySymbolSetIterator symbolItor = family.Symbols.ForwardIterator();
+
+      while (symbolItor.MoveNext())
+      {
+        FamilySymbol symbol = symbolItor.Current as FamilySymbol;
+        XYZ location = new XYZ(0, 0, 0);
+
+        FamilyInstance insta = documentCurrent.FamilyCreate.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
+        break;
+      }
+
+      progressBarForm.progressBar1.Increment(1);
+    }
+    transaction.Commit();
+
+    documentCurrent.SaveAs(this.savedFileName + ".rfa");
+
+    th.Abort();
+    progressBarForm.Dispose();
+  }
+}

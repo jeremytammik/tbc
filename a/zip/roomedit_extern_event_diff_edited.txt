@@ -1,0 +1,300 @@
+derive DbUpdater from external event and replace Idling
+
+diff --git a/RoomEditorApp/App.cs b/RoomEditorApp/App.cs
+--- a/RoomEditorApp/App.cs
++++ b/RoomEditorApp/App.cs
+@@ -36,7 +36,8 @@ namespace RoomEditorApp
+     /// <summary>
+     /// Store the Idling event handler when subscribed.
+     /// </summary>
+-    static EventHandler<IdlingEventArgs> _handler = null;
++    //static EventHandler<IdlingEventArgs> _handler = null;
++    static ExternalEvent _event = null;
+
+@@ -211,14 +212,15 @@ namespace RoomEditorApp
+     /// Toggle on and off subscription to
+     /// automatic cloud updates.
+     /// </summary>
+-    public static void ToggleSubscription(
+-      EventHandler<IdlingEventArgs> handler )
++    public static ExternalEvent ToggleSubscription(
++      IExternalEventHandler handler ) // EventHandler<IdlingEventArgs>
+     {
+       if( Subscribed )
+       {
+         Debug.Print( "Unsubscribing..." );
+-        _uiapp.Idling -= _handler;
+-        _handler = null;
++        //_uiapp.Idling -= _handler; _handler = null;
++        _event.Dispose();
++        _event = null;
+         _buttons[3].ItemText = _subscribe;
+         _timer.Stop();
+         _timer.Report( "Subscription timing" );
+@@ -228,12 +230,14 @@ namespace RoomEditorApp
+       else
+       {
+         Debug.Print( "Subscribing..." );
+-        _uiapp.Idling += handler;
+-        _handler = handler;
++        //_uiapp.Idling += handler;
++        //_handler = handler;
++        _event = ExternalEvent.Create( handler );
+         _buttons[3].ItemText = _unsubscribe;
+         _timer = new JtTimer( "Subscription" );
+         Debug.Print( "Subscribed." );
+       }
++      return _event;
+     }
+
+     public Result OnStartup(
+@@ -251,7 +255,8 @@ namespace RoomEditorApp
+     {
+       if( Subscribed )
+       {
+-        _uiapp.Idling -= _handler;
++        //_uiapp.Idling -= _handler;
++        _event.Dispose();
+       }
+       return Result.Succeeded;
+     }
+
+diff --git a/RoomEditorApp/CmdSubscribe.cs b/RoomEditorApp/CmdSubscribe.cs
+--- a/RoomEditorApp/CmdSubscribe.cs
++++ b/RoomEditorApp/CmdSubscribe.cs
+
+-      App.ToggleSubscription( OnIdling );
++
++      DbUpdater.ToggleSubscription(
++        commandData.Application );
+
+diff --git a/RoomEditorApp/CmdUpdate.cs b/RoomEditorApp/CmdUpdate.cs
+--- a/RoomEditorApp/CmdUpdate.cs
++++ b/RoomEditorApp/CmdUpdate.cs
+@@ -96,7 +96,9 @@ namespace RoomEditorApp
+-      DbUpdater updater = new DbUpdater( doc );
++
++      DbUpdater updater = new DbUpdater( uiapp );
+
+diff --git a/RoomEditorApp/DbUpdater.cs b/RoomEditorApp/DbUpdater.cs
+--- a/RoomEditorApp/DbUpdater.cs
++++ b/RoomEditorApp/DbUpdater.cs
+@@ -3,14 +3,17 @@ using System;
+ using System.Collections.Generic;
+ using System.Diagnostics;
+ using System.Linq;
++using System.Threading;
++using Autodesk.Revit.ApplicationServices;
+ using Autodesk.Revit.DB;
++using Autodesk.Revit.UI;
+ using DreamSeat;
+ #endregion
+
+ namespace RoomEditorApp
+ {
+
+-  class DbUpdater
++  class DbUpdater : IExternalEventHandler
+
+@@ -38,7 +41,12 @@ namespace RoomEditorApp
++    /// <summary>
++    /// Revit UI application.
++    /// </summary>
++    UIApplication _uiapp = null;
+
+@@ -47,6 +55,23 @@ namespace RoomEditorApp
++    /// <summary>
++    /// External event to raise event
++    /// for pending database changes.
++    /// </summary>
++    static ExternalEvent _event = null;
++
++    /// <summary>
++    /// Separate thread running loop to
++    /// check for pending database changes.
++    /// </summary>
++    static Thread _thread = null;
+
+@@ -54,12 +79,13 @@ namespace RoomEditorApp
+
+-    public DbUpdater( Document doc )
++    public DbUpdater( UIApplication uiapp )
+     {
+       using( JtTimer pt = new JtTimer( "DbUpdater ctor" ) )
+       {
+-        _doc = doc;
+-        _creapp = doc.Application.Create;
++        _uiapp = uiapp;
++        _creapp = _uiapp.Application.Create;
+       }
+     }
+
+@@ -67,9 +93,11 @@ namespace RoomEditorApp
+     /// Update a piece of furniture.
+     /// Return true if anything was changed.
+     /// </summary>
+-    bool UpdateBimFurniture(
++    bool UpdateBimFurniture(
+       DbFurniture f )
+     {
++      Document doc = _uiapp.ActiveUIDocument.Document;
++
+@@ -82,7 +110,7 @@ namespace RoomEditorApp
+
+-      Element e = _doc.GetElement( f.Id );
++      Element e = doc.GetElement( f.Id );
+
+@@ -131,24 +159,24 @@ namespace RoomEditorApp
+-        using( Transaction tx = new Transaction(
+-          _doc ) )
++        using( Transaction tx = new Transaction(
++          doc ) )
+
+-            ElementTransformUtils.MoveElement(
+-              _doc, e.Id, translation );
++            ElementTransformUtils.MoveElement(
++              doc, e.Id, translation );
+
+-            ElementTransformUtils.RotateElement(
+-              _doc, e.Id, axis, rotation );
++            ElementTransformUtils.RotateElement(
++              doc, e.Id, axis, rotation );
+
+@@ -165,10 +193,12 @@ namespace RoomEditorApp
+     {
+       using( JtTimer pt = new JtTimer( "UpdateBim" ) )
+       {
++        Document doc = _uiapp.ActiveUIDocument.Document;
++
+         // Retrieve all room unique ids in model:
+
+         FilteredElementCollector rooms
+-          = new FilteredElementCollector( _doc )
++          = new FilteredElementCollector( doc )
+             .OfClass( typeof( SpatialElement ) )
+             .OfCategory( BuiltInCategory.OST_Rooms );
+
+@@ -225,5 +255,133 @@ namespace RoomEditorApp
+
++    public void Execute( UIApplication a )
++    {
++      UpdateBim();
++    }
++
++    public string GetName()
++    {
++      return string.Format(
++        "{0} DbUpdater", App.Caption );
++    }
++
++    /// <summary>
++    /// Count total number of checks for
++    /// database updates made so far.
++    /// </summary>
++    static int _nLoopCount = 0;
++
++    /// <summary>
++    /// Count total number of checks for
++    /// database updates made so far.
++    /// </summary>
++    static int _nCheckCount = 0;
++
++    /// <summary>
++    /// Count total number of database
++    /// updates requested so far.
++    /// </summary>
++    static int _nUpdatesRequested = 0;
++
++    /// <summary>
++    /// Wait far a moment before requerying database.
++    /// </summary>
++    //static Stopwatch _stopwatch = null;
++
++    /// <summary>
++    /// Number of milliseconds to wait and relinquish
++    /// CPU control before next check for pending
++    /// database updates.
++    /// </summary>
++    const int _timeout = 100;
++
++    /// <summary>
++    /// Repeatedly check database status and raise
++    /// external event when updates are pending.
++    /// Relinquish control and wait for timeout
++    /// period between each attempt. Run in a
++    /// separate thread.
++    /// </summary>
++    static void CheckForPendingDatabaseChanges()
++    {
++      while( true )
++      {
++        ++_nLoopCount;
++
++        Debug.Assert( null != _event,
++        "expected non-null external event" );
++
++        if( _event.IsPending )
++        {
++          Util.Log( string.Format(
++            "CheckForPendingDatabaseChanges loop {0} - "
++            + "database update event is pending",
++            _nLoopCount ) );
++        }
++        else
++        {
++          using( JtTimer pt = new JtTimer(
++            "CheckForPendingDatabaseChanges" ) )
++          {
++            ++_nCheckCount;
++
++            Util.Log( string.Format(
++              "CheckForPendingDatabaseChanges loop {0} - "
++              + "check for changes {1}",
++              _nLoopCount, _nCheckCount ) );
++
++            RoomEditorDb rdb = new RoomEditorDb();
++
++            if( rdb.LastSequenceNumberChanged(
++              DbUpdater.LastSequence ) )
++            {
++              _event.Raise();
++
++              ++_nUpdatesRequested;
++
++              Util.Log( string.Format(
++                "database update pending event raised {0} times",
++                _nUpdatesRequested ) );
++            }
++          }
++        }
++
++        // Wait a moment and relinquish control before
++        // next check for pending database updates.
++
++        Thread.Sleep( _timeout );
++      }
++    }
++
++    public static void ToggleSubscription(
++      UIApplication uiapp )
++    {
++      _event = App.ToggleSubscription(
++        new DbUpdater( uiapp ) );
++
++      if( null == _event )
++      {
++        _thread.Abort();
++        _thread = null;
++      }
++      else
++      {
++        // Start new thread to regularly check
++        // database status and raise external event
++        // when updates are pending.
++
++        _thread = new Thread(
++          CheckForPendingDatabaseChanges );
++
++        _thread.Start();
++      }
++    }
