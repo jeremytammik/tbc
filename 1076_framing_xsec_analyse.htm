@@ -1,0 +1,680 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+1234743 [Section of a CHS-Circular Hollow Section-Column.rfa] -- cross section of hollow beam
+09012524 [Cross section _ Profile shape]
+06972592 [How to get the shape of Structural Framing objects] -- Pawel Wolski RE: determine structural framing cross section cavities
+08699569 [Profile geometries]
+xsec view section view
+geosnoop
+rex without rex
+xsec from rex
+other rex issues
+
+-->
+
+<h3>Security, Framing Cross Section Analyser and REX</h3>
+
+<p>My topic for today is structural cross section analysis, i.e. determination of the cross section profile of beam, columns, braces, etc., and the various completely different approaches one can take to achieve this.</p>
+
+<p>I also demonstrate how to make use of some of the powerful functionality provided by the REX toolkit without building my entire application on top of the REX framework.</p>
+
+<p>Before getting to that, though, let me mention where we are with the DevDays conference tour:
+
+<ul>
+<li><a href="#2">DevDays in Milano and security heads-up</a></li>
+<li><a href="#3">Five structural framing cross section analysis approaches</a></li>
+<li><a href="#4">Sample FramingXsecAnalyzer implementation for Revit 2012</a></li>
+<li><a href="#5">Pure Revit API approach</a></li>
+<li><a href="#6">Using REX without the REX framework</a></li>
+<li><a href="#7">Cross section analysis using REX</a></li>
+<li><a href="#8">Migrating from Revit 2012 to Revit 2014</a></li>
+<li><a href="#9">Obsolete GeoSnoop</a></li>
+<li><a href="#10">Download</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>DevDays in Milano and Security</h4>
+
+<p>We held our second West European Devday in Milano on Tuesday.</p>
+
+<p>Here is Jim Quanci entertaining his enthralled audience:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-12-10_milano/devday_cropped.jpeg" alt="Jim Quanci at the ADN DevDays Conference in Milano" width="400"/>
+</center>
+
+<p>One piece of Jim's presentation deals with security.
+This is an important topic in its own right, of course, and always has been, but the cloud and mobile discussion brings it to people's attention again, so this also discusses the Autodesk trust center and security in the 360 environment.
+Most of all, though, it highlights the fact that you and your customers need to have a basic understanding of the issue, and somebody in your organisation needs to know a bit more than just the basics.</p>
+
+<p>I think it is so important and Jim's ten-minute overview so effective and refreshing I decided to publish it right here and now:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/devday/2013/security_jim_quanci.pdf">Slide deck</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/devday/2013/security_jim_quanci.mp3">Audio</a></li>
+</ul>
+
+<p>Something else happened after the conference, travelling...</p>
+
+<p>On Monday, Jim and I were joking that I arrive at the airport gate at the last minute, and it was about time I get burned.</p>
+
+<p>The retribution for that hubris was immediate: I missed the plane from Milano to London, mistaking the gate closing time for the opening time.</p>
+
+<p>I arrived three minutes late, the gate was adamantly closed, and there was nothing I could do &ndash; in spite of this being Italy, after all.</p>
+
+<p>A long taxi ride from Linate to Malpensa and a hefty cancellation fee later, I am now gratefully sitting on a different plane, thanking the powers that be for not being harsher to me.</p>
+
+<p>Back to the topic at hand...</p>
+
+
+<a name="3"></a>
+
+<h4>Five Structural Framing Cross Section Analysis Approaches</h4>
+
+<p>This is actually a topic I have been wanting to write about for a long time now &ndash; how to determine the cross section of a structural framing member.</p>
+
+<p>In fact, I implemented a solution (two solutions!) addressing this several years ago, and never got around to publishing.</p>
+
+<p>There are quite a number of different possible approaches to take.</p>
+
+<p>Here is one of several developer queries that prompted this exploration:</p>
+
+<p><strong>Question:</strong> A Structural Framing or Structural Column object can be open shape such as T Shape, I Shape or L Shape, or an enclosed shape such as Rectangular Shape, Square Shape or Round Shape.</p>
+
+<p>Does the Revit API provide a way to find out whether a shape is open or enclosed, and what kind of shape it is?</p>
+
+
+<p><strong>Answer:</strong> The Revit API does not provide any direct API method to tell whether a cross section of a structural column or beam is open or closed, or extract its profile.</p>
+
+<p>There are, however, several reliable approaches you can implement yourself based on the functionality provided both by the Revit API itself and the Revit Extensions REX.</p>
+
+<p>You can always access the basic element geometry.
+The FamilyInstance.GetOriginalGeometry method returns the member geometry before joins, cuts, etc. are applied.
+There are various ways to calculate the cross section contour of the structural element from that and analyse it to find the best match according to pre-determined internal definitions.
+In some cases, it may be pretty simple, since you can check for rectangular and round shapes, existence of inner loops, etc.</p>
+
+<p>Here are a few different approaches that come to mind:</p>
+
+
+<p><b>1.</b> For structural extrusions, the REX content generator includes a cross section analysis tool providing automatic section recognition functionality:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/the-rex-sdk.html">
+The REX SDK</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/extensions-for-revit-2012.html">
+Extensions for Revit 2012</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/rex-content-generator.html">
+REX Content Generator</a></li>
+</ul>
+
+
+<p><b>2.</b> Some families such as gutter, fascia, slab edge, railings, etc., are based on profiles consisting of 2D elements, e.g., lines, arcs, circles, etc.
+You might be able to use some
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">
+unofficial element id relationships</a> to
+
+access those elements knowing the element id of the family symbol or its profile.
+They can be used, for example, to determine the relationship between a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">
+curtain wall and its panels</a> or
+
+between a stacked wall and it basic wall components.</p>
+
+
+<p><b>3.</b> From the element, you can retrieve its solid geometry and location line.
+The profile lines can be determined by intersecting a plane that is perpendicular to the element location line with its solid.
+I can imagine that the REX content generator does something like this internally, as well.</p>
+
+
+<p><b>4.</b> You can set up a section view cutting the framing element perpendicularly using a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/create-section-view-parallel-to-wall.html">
+view perpendicular to the element location line</a> and
+
+ask the element for its view-specific geometry, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/section-view-geometry.html">
+section view geometry</a> in
+
+that specific view.
+Then, just ignore all lines that are not lying on the view plane and analyse the face loops in the cut plane.</p>
+
+
+<p><b>5.</b> Use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.29">
+ExtrusionAnalyzer</a> &ndash;
+
+to do so, grab the FamilyInstance GetOriginalGeometry that returns the member geometry before joins, cuts, etc. are applied.
+For a linear member, using this and then an ExtrusionAnalyzer in the direction of the beam curve yields a reasonably accurate picture of the beam cross-section.
+An ExtrusionAnalyzer instance is a single-time use object that should be supplied a solid geometry, a plane, and a direction.
+Based on that input, it calculates a base boundary parallel to the input plane representing the outer boundary of the shadow cast by the solid onto the input plane along the extrusion direction.
+Note that only the outer boundary is calculated, so any cavities in the cross section will be ignored.</p>
+
+
+<a name="4"></a>
+
+<h4>Sample FramingXsecAnalyzer Implementation for Revit 2012</h4>
+
+<p>I implemented a sample application named FramingXsecAnalyzer based on Revit 2012 that demonstrates how to achieve the suggestions 1 and 3 above.</p>
+
+<p>As an example of a really simple analysis, it just determines whether a selected beam or column is hollow or not.</p>
+
+<p>The REX cross section analysis tool providing automatic section recognition functionality can be accessed from a 'pure' Revit add-in, in spite of the fact that it is not built on top of the REX framework.</p>
+
+<p>The direct analysis of the element geometry is quite simple, in this case: we simply grab the first best face we find that is perpendicular to the element extrusion direction, i.e. the framing element curve or location line, and check the number of curve edge loops it contains.
+If it has more than one, we assume it is hollow.
+Obviously, more complex test might be required, depending on your exact needs.</p>
+
+
+<a name="5"></a>
+
+<h4>Pure Revit API Approach</h4>
+
+<p>The cross section analysis based on the pure naked Revit API basically requires two steps:</p>
+
+<ol>
+<li>Set up a section view cutting the element in question.</li>
+<li>Retrieve the cut plane faces of the element geometry.</li>
+</ol>
+
+<p>This will give you a number of edge loops. As far as I understand your definition of 'open' and 'closed', all 'open' cross section shapes have one single loop, and 'closed' ones have more, since they consist of an outer and one or more inner loops.</p>
+
+<p>Here is a more detailed description of the steps and source code:</p>
+
+<p><b>1.</b> Set up a section view cutting the element in question.</p>
+
+<p>How this can be achieved is demonstrated by our venerable CreateViewSection SDK sample.
+It shows how to generate a section view through the mid point of a linear structural element such as a wall, floor or beam.</p>
+
+<p>Here is a hollow beam that I used to test it on:</p>
+
+<center>
+<img src="img/hss_hollow_beam_3d.png" alt="HSS hollow beam 3D view"/>
+</center>
+
+<p>It is horizontal and oriented parallel to the Y axis:</p>
+
+<center>
+<img src="img/hss_hollow_beam_plan.png" alt="HSS hollow beam plan view"/>
+</center>
+
+<p>The CreateViewSection creates the a section view for it:</p>
+
+<center>
+<img src="img/hss_hollow_beam_section.png" alt="HSS hollow beam section view"/>
+</center>
+
+<p>The section view displays its geometry including the internal loop for the hollow cavity:</p>
+
+<center>
+<img src="img/hss_hollow_beam_section2.png" alt="HSS hollow beam geometry with inner loop"/>
+</center>
+
+<p><b>2.</b> Retrieve and analyse the cut plane faces of the element geometry.</p>
+
+<p>Here is some code that demonstrates this, assuming the section view cutting the element is set up as described above:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; <span class="teal">Document</span> doc = <span class="teal">Util</span>.GetActiveDocument(
+&nbsp; &nbsp; uidoc, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Retrieve pre-selected or </span>
+&nbsp; <span class="green">// interactively select element </span>
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 1 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMessage( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} selected. Please select one &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;single framing element for cross section &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;analysis.&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 == n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;we already checked for 1 &lt; n above&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e2 <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = e2;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a framing element &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;for cross section analysis.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; e = doc.GetElement( r.ElementId );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">RvtOperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Set up section view</span>
+&nbsp;
+&nbsp; <span class="green">//ViewSection viewSection = GetFrontView( e );</span>
+&nbsp;
+&nbsp; <span class="green">// Retrieve element solid</span>
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="green">//opt.IncludeNonVisibleObjects = true;</span>
+&nbsp;
+&nbsp; <span class="green">// Cannot set both detail level and view:</span>
+&nbsp; <span class="green">// Autodesk.Revit.Exceptions.InvalidOperationException</span>
+&nbsp; <span class="green">// DetailLevel is already set. When DetailLevel is set </span>
+&nbsp; <span class="green">// view-specific geometry can't be extracted.</span>
+&nbsp;
+&nbsp; <span class="green">//opt.DetailLevel = DetailLevels.MAX;</span>
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp; opt.View = view;
+&nbsp;
+&nbsp; <span class="green">//opt.View = viewSection;</span>
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; {
+&nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == inst )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMessage( <span class="maroon">&quot;Sorry, I am unable to retrieve &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;the structural framing geometry instance &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;from the selected element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">//geo = inst.SymbolGeometry;</span>
+&nbsp; geo = inst.GetInstanceGeometry();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; {
+&nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &amp;&amp; 0 != solid.Faces.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Select the first planar face which is </span>
+&nbsp; <span class="green">// perpendicular to view direction, i.e. has</span>
+&nbsp; <span class="green">// same normal vector as the view plane.</span>
+&nbsp; <span class="green">// Assuming the cross section is constant,</span>
+&nbsp; <span class="green">// any one will do. We expect two of them.</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> viewDir = view.ViewDirection;
+&nbsp;
+&nbsp; <span class="teal">PlanarFace</span> crossSection = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( f <span class="blue">is</span> <span class="teal">PlanarFace</span>
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Util</span>.IsParallel( viewDir,
+&nbsp; &nbsp; &nbsp; &nbsp; ( f <span class="blue">as</span> <span class="teal">PlanarFace</span> ).Normal ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; crossSection = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == crossSection )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMessage( <span class="maroon">&quot;Sorry, I am unable to retrieve &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;the structural framing cross section.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">EdgeArrayArray</span> eaa = crossSection.EdgeLoops;
+&nbsp;
+&nbsp; n = eaa.Size;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">&quot;The selected structural framing element &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;cross section section view cut plane &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;face has {0} loop{1} and is thus '{2}'.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;open&quot;</span> : <span class="maroon">&quot;closed&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="teal">GeoSnoop</span>.ShowCurve( <span class="maroon">&quot;Solid face directly&quot;</span>,
+&nbsp; &nbsp; eaa, <span class="teal">AnalyticalDirection</span>.Y );
+</pre>
+
+<p>It performs the following steps:</p>
+
+<ul>
+<li>Retrieve a pre-selected element or prompt one to be selected.</li>
+<li>Retrieve its geometry and drill down to a non-empty solid.</li>
+<li>Pick the first best face whose normal is parallel to the view direction.</li>
+</ul>
+
+<p>The selected face represents the element cross section.</p>
+
+<p>The number of loops indicates its topology, as explained above.</p>
+
+<p>Here is a result of displaying the retrieved geometry in a custom 2D picture box using the GeoSnoop.ShowCurve method:</p>
+
+<center>
+<img src="img/hss_hollow_beam_xsec_snoop.png" alt="Cross section geometry snooping" width="250"/>
+</center>
+
+<p>Here is the output from the add-in in the Visual Studio debug output window:</p>
+
+<p><code>The selected structural framing element cross section section view cut plane face has 2 loops and is thus 'closed'.</code></p>
+
+
+
+<a name="6"></a>
+
+<h4>Cross Section Analysis Using REX without the REX Framework</h4>
+
+<p>The REX content generator analysis is based on faces taken directly from the geometry, not the ExtrusionAnalyzer.
+It takes the GeometryElement and gathers all PlanarFaces according to a specific normal vector, taking the origin into consideration.
+That determines all loops.
+Next, the relations between them are determined.</p>
+
+<p>The 'normal' way to use REX is to create a new Revit REX add-in from scratch using the REX add-in wizard.</p>
+
+<p>I chose a different approach, because I wished to add the method to the add-in I already had.</p>
+
+<p>Some additional steps are required to use this functionality independently of the REX module.
+In REX modules, they are performed automatically.</p>
+
+<p>The REX.ContentGenerator component is not placed in the GAC or Revit directory, so .NET doesn’t know from where it should be loaded.
+There are several solutions:</p>
+
+<ul>
+
+<li>Provide REX.ContentGenerator.LT.dll in the same directory as your ExternalCommand, e.g. by using CopyLocal = true &ndash; not recommended.</li>
+
+<li>Load REX.ContentGenerator.LT at the beginning of ExternalCommand Execution &ndash; doable, but you have to know the correct path, which may be problematic.</li>
+
+<li>Use the Autodesk.Revit.Framework component to resolve assembly &ndash; this is a GAC assembly so .NET has no problem finding it.</li>
+
+</ul>
+
+<p>The third solution is the most welcomed.
+Here what you should do:</p>
+
+<ol>
+<li>Add a reference to Autodesk.Revit.Framework.dll to your project (you can take it from GAC or from "\Program Files\Common Files\Autodesk Shared\Extensions 2014\Framework\Engine\AssemblyCache\Autodesk.REX.Framework.dll").
+
+<li>Set copy local to False.</li>
+
+<li>Add the code which resolves the assembly, e.g. in the external command Execute method:</li>
+</ol>
+
+<pre class="code">
+&nbsp; <span class="teal">AppDomain</span>.CurrentDomain.AssemblyResolve
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">ResolveEventHandler</span>( OnAssemblyResolve );
+</pre>
+
+<p>Here is the method definition:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> System.Reflection.<span class="teal">Assembly</span> OnAssemblyResolve(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ResolveEventArgs</span> args )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Assembly</span> a = <span class="teal">Assembly</span>.GetExecutingAssembly();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> Autodesk.REX.Framework.<span class="teal">REXAssemblies</span>
+&nbsp; &nbsp; &nbsp; .Resolve( sender, args, <span class="maroon">&quot;2014&quot;</span>, a );
+&nbsp; }
+</pre>
+
+<p>Note that the converter initialisation must reside in a different method than the subscription to the assembly resolver OnAssemblyResolve, because .NET investigates all methods before execution and will try to resolve the assembly before you register the resolving mechanism, which will cause a crash.
+The best way to avoid that is to create an additional method and call it separately, so you can register the resolve mechanism first.</p>
+
+
+
+
+<a name="7"></a>
+
+<h4>Cross Section Analysis Using REX</h4>
+
+<p>Once REX is up and running, you have access to its functionality, and you know what classes and properties to query, there is hardly anything at all left to do.</p>
+
+<p>Here is the entire RexXsecAnalyis method that identifies the framing member cross section type:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Use REX to analyse element cross section.</span>
+&nbsp; <span class="gray">///</span><span class="green"> This requires a reference to </span>
+&nbsp; <span class="gray">///</span><span class="green"> REX.ContentGeneratorLT.dll and prior</span>
+&nbsp; <span class="gray">///</span><span class="green"> initialisation of the REX framework.</span>
+&nbsp; <span class="gray">///</span><span class="green"> The converter initialisation must reside in</span>
+&nbsp; <span class="gray">///</span><span class="green"> a different method than the subscription to</span>
+&nbsp; <span class="gray">///</span><span class="green"> the assembly resolver OnAssemblyResolve.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> RexXsecAnalyis(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Initialise converter</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RVTFamilyConverter</span> rvt = <span class="blue">new</span> <span class="teal">RVTFamilyConverter</span>(
+&nbsp; &nbsp; &nbsp; commandData, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve family type</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">REXFamilyType</span> fam = rvt.GetFamily( e,
+&nbsp; &nbsp; &nbsp; <span class="teal">ECategoryType</span>.SECTION_PARAM );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve section data</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">REXFamilyType_ParamSection</span> paramSection = fam
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">REXFamilyType_ParamSection</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">REXSectionParamDescription</span> parameters
+&nbsp; &nbsp; &nbsp; = paramSection.Parameters;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Extract dimensions, section type, tapered</span>
+&nbsp; &nbsp; <span class="green">// predicate, etc.</span>
+&nbsp; &nbsp; <span class="green">// If different start and end sections are </span>
+&nbsp; &nbsp; <span class="green">// required, use DimensionsEnd as well.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">REXSectionParamDimensions</span> dimensions = parameters
+&nbsp; &nbsp; &nbsp; .Dimensions;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ESectionType</span> sectionType = parameters
+&nbsp; &nbsp; &nbsp; .SectionType;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> tapered = parameters.Tapered;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> start = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Contour_Section</span> contour = parameters.GetContour(
+&nbsp; &nbsp; &nbsp; start );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ContourCont</span>&gt; shape = contour.Shape;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The selected structural framing element &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;cross section REX section type is &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{0}.&quot;</span>, sectionType );
+&nbsp; }
+</pre>
+
+<p>In this case, it prints the following message to the Visual Studio debug output window:</p>
+
+<p><code>The selected structural framing element cross section REX section type is RECT_HOLLOW.</code></p>
+
+<p>The REX documentation provides more information, e.g. on how to retrieve instance characteristics like area or moment of inertia.
+Here is a table of the supported sections with dimensions:</p>
+
+<center>
+<img src="img/pawel_xsec_table.png" alt="REX cross section table" width="400"/>
+</center>
+
+<p>Note: In case of UNKNOWN, please use the contour directly, since no dimensions will be determined.</p>
+
+
+
+<a name="9"></a>
+
+<h4>Migrating from Revit 2012 to Revit 2014</h4>
+
+<p>As said, all of my initial exploration of this was based on Revit 2012.</p>
+
+<p>I easily migrated it to Revit 2014, though, and verified that it still works.</p>
+
+<p>Here are all the code differences required for the migration:</p>
+
+<pre>
+Command.cs:
+
+&lt; &nbsp; e = doc.get_Element( r.ElementId );
+&gt; &nbsp; e = doc.GetElement( r.ElementId );
+
+&lt; &nbsp; GeometryObjectArray objects = geo.Objects;
+&gt; &nbsp; //GeometryObjectArray objects = geo.Objects;
+
+&lt; &nbsp; foreach( GeometryObject obj in objects )
+&gt; &nbsp; foreach( GeometryObject obj in geo )
+
+&lt; &nbsp; objects = geo.Objects;
+&gt; &nbsp; //objects = geo.Objects;
+
+&lt; &nbsp; foreach( GeometryObject obj in objects )
+&gt; &nbsp; foreach( GeometryObject obj in geo )
+
+GeoSnoop.cs:
+
+&lt; &nbsp; XYZ p = e.AsCurve().get_EndPoint( 0 );
+&lt; &nbsp; XYZ p = e.AsCurve().GetEndPoint( 0 );
+</pre>
+
+<p>Not that much, is it?</p>
+
+<p>The harder part was to browse to the REX .NET assemblies that I need to reference.</p>
+
+<p>Here are all the Revit and REX .NET assembly references required for Revit 2014:</p>
+
+<ul>
+<li>Program Files\Autodesk\Revit 2014\RevitAPI.dll</li>
+<li>Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</li>
+<li>Program Files\Common Files\Autodesk Shared\Extensions 2014\Framework\Components\AREXContentGenerator\REX.ContentGeneratorLT.dll</li>
+<li>Program Files\Common Files\Autodesk Shared\Extensions 2014\Framework\Engine\AssemblyCache\Autodesk.REX.Framework.dll</li>
+</ul>
+
+<p>They can easily be listed by searching the C# project file for the DLL file name extension or the HintPath tag:</p>
+
+<pre>
+  grep -i DLL FramingXsecAnalyzer.csproj
+</pre>
+
+<p>The initial test run threw an exception saying "Could not load file or assembly 'REX.ContentGeneratorLT, Version=2014.0.0.2608, Culture=neutral, PublicKeyToken=null' or one of its dependencies. The system cannot find the file specified."</p>
+
+<p>That was resolved when I updated the crucial OnAssemblyResolve method, bumping the version number from 2012 to 2014:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> System.Reflection.<span class="teal">Assembly</span> OnAssemblyResolve(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ResolveEventArgs</span> args )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Assembly</span> a = <span class="teal">Assembly</span>.GetExecutingAssembly();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> Autodesk.REX.Framework.<span class="teal">REXAssemblies</span>
+&nbsp; &nbsp; &nbsp; .Resolve( sender, args, <span class="maroon">&quot;2014&quot;</span>, a );
+&nbsp; }
+</pre>
+
+<p>I tested it on the following tubular column in Revit 2014 instead of a beam:</p>
+
+<center>
+<img src="img/framing_xsec_hollow_column.png" alt="Hollow column" width="325"/>
+</center>
+
+<p>Here are the two resulting report messages from the pure Revit API and REX analysis, respectively:</p>
+
+<p><code>The selected structural framing element cross section section view cut plane face has 2 loops and is thus 'closed'.</code></p>
+
+<p><code>The selected structural framing element cross section REX section type is TUBE.</code></p>
+
+
+
+<a name="9"></a>
+
+<h4>Obsolete GeoSnoop</h4>
+
+<p>This is actually the origin of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html">
+GeoSnoop .NET boundary curve loop visualisation</a>,
+
+later
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html">
+updated for use with family symbols</a>,
+
+that I make use of in the RoomEditorApp add-in for the simplified cloud-based 2D Revit model editing.</p>
+
+<p>The RoomEditorApp version is significantly cleaned up, though, so please make sure to ignore the obsolete one provided here.</p>
+
+
+
+<a name="10"></a>
+
+<h4>Download</h4>
+
+<p>I created a new
+
+<a href="https://github.com/jeremytammik/FramingXsecAnalyzer">FramingXsecAnalyzer GitHub repository</a> to
+
+host this project, and published the following releases so far:</a>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/FramingXsecAnalyzer/releases/tag/2012.0.0.0">2012.0.0.0</a> &ndash;
+initial commit for Revit 2012</li>
+<li><a href="https://github.com/jeremytammik/FramingXsecAnalyzer/releases/tag/2014.0.0.0">2014.0.0.0</a> &ndash;
+initial untested migration from Revit 2012 to Revit 2014</li>
+<li><a href="https://github.com/jeremytammik/FramingXsecAnalyzer/releases/tag/2014.0.0.1">2014.0.0.1</a> &ndash;
+verified working functionality in Revit 2014</li>
+</ul>

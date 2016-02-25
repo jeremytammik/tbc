@@ -1,0 +1,342 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Joe Ye 
+RE: viewport position difference between Revit 2013 and 2014 [08444651]
+08444651 [viewport position difference between Revit 2013 and 2014]
+
+-->
+
+<h3>Viewport Positioning and Conceptual Design Automation</h3>
+
+<p>Not all location relevant properties of viewports are currently accessible through the Revit API, which makes it slightly challenging to precisely define their position.</p>
+
+<p>Let us look at a clever trick to
+
+<a href="2">
+align viewports exactly</a> that
+
+works around that limitation, sheds some light on their location calculation and the modification of it that was made between Revit 2013 and 2014.</p>
+
+<p>After that, I would like to briefly present a non-Revit-API BIM topic, a single-page MSc thesis overview on completely
+
+<a href="3">
+conceptual design automation</a>,
+
+and mention the new
+
+<a href="4">
+Graitec technology acqusition</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Exact Viewport Positioning</h4>
+
+<p><strong>Question:</strong> I want to programmatically place views on a sheet and align them exactly with each other.
+In Revit 2013, my code works perfectly.
+I calculate the position of the view on the sheet from its crop box.</p>
+
+<p>When I use the same calculation in Revit 2014, the insertion point is no longer correct.</p>
+
+<p>The view is placed centred according to the viewport instead of the view.
+The viewport location differs from the view one, because it depends on shown annotations and grid lines which extend the viewport, so my views are no longer aligned due to the different placing.</p>
+
+<p>Here is the code to reproduce and demonstrate this behaviour using hard-coded element ids, so it will obviously only work in the specific test model:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">ViewSheetTest1</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; test2( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> test2( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> typ = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 143899 ) ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewPlan</span> go1 = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205387 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ViewPlan</span> vg1 = doc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205424 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> vSheet = <span class="teal">ViewSheet</span>.Create( doc, typ.Id );
+&nbsp; &nbsp; vSheet.Name = <span class="maroon">&quot;test2&quot;</span>;
+
+&nbsp; &nbsp; <span class="teal">ElementId</span> vid = vSheet.Id;
+&nbsp; &nbsp; <span class="blue">var</span> p = <span class="teal">XYZ</span>.Zero;
+
+&nbsp; &nbsp; <span class="blue">var</span> v12 = <span class="teal">Viewport</span>.Create( doc, vid, go1.Id, p );
+&nbsp; &nbsp; <span class="blue">var</span> v22 = <span class="teal">Viewport</span>.Create( doc, vid, vg1.Id, p );
+&nbsp; }
+}
+</pre>
+
+<p>Here is the correct result produced in Revit 2013:</p>
+
+<center>
+<img src="img/viewport_position_difference_2013.jpeg" alt="Viewport positions in Revit 2013" width="600"/>
+</center>
+
+<p>In Revit 2014, the viewport position is offset, as you can see from the highlighted hatch overlaps and gaps:</p>
+
+<center>
+<img src="img/viewport_position_difference_2014.png" alt="Viewport positions in Revit 2014" width="600"/>
+</center>
+
+<p>How can I solve this, please?</p>
+
+<p>Is it possible to retrieve the coordinates of the view within the viewport, or is there some other possible solution for this?</p>
+
+
+<p><strong>Answer:</strong> The Viewport.Create method was fixed in 2014 to behave the way that was always documented &ndash; placement point being at the centre of the viewport.  This was fixed because it was very difficult to lay out multiple views on a sheet where the viewport locations were determined by world coordinates and the size of the related view.</p>
+
+<p>Unfortunately, you have encountered a drawback to this change &ndash; because many viewports will have a different centre relative to model coordinates, aligning them related to model coordinates is more difficult.</p>
+
+<p>There is currently a gap in the API related to converting between model and sheet coordinates.</p>
+
+<p>In the meantime, here is a workaround:</p>
+
+<ul>
+<li>Set the crop box for both views to be suitably large and identical.</li>
+<li>That will cause them to have identical viewport boundaries.</li>
+<li>You can therefore easily align them on the sheet.</li>
+<li>Then, restore the previous crop box settings.</li>
+</ul>
+
+<p>Here is a function that does this for the two views in the original code:</p>
+
+<pre class="code">
+<span class="blue">void</span> test4( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="teal">FamilySymbol</span> typ = doc.GetElement(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 143899 ) ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; <span class="teal">ViewPlan</span> go1 = doc.GetElement(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205387 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; <span class="teal">ViewPlan</span> vg1 = doc.GetElement(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 205424 ) ) <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; <span class="green">// Save current crop box values</span>
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> savedBox1 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( go1.CropBoxActive )
+&nbsp; &nbsp; savedBox1 = go1.CropBox;
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> savedBox2 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( vg1.CropBoxActive )
+&nbsp; &nbsp; savedBox2 = vg1.CropBox;
+&nbsp;
+&nbsp; <span class="blue">if</span>( savedBox1 != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Set crop box for 2nd view = 1st</span>
+&nbsp;
+&nbsp; &nbsp; vg1.CropBox = savedBox1;
+&nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Set both views to semi-random </span>
+&nbsp; &nbsp; <span class="green">// but large crop box</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> newBox = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp; &nbsp; newBox.set_MinEnabled( 0, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.set_MinEnabled( 1, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.set_MinEnabled( 2, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( -2000, -2000, 0 );
+&nbsp; &nbsp; newBox.set_MaxEnabled( 0, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.set_MaxEnabled( 1, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.set_MaxEnabled( 2, <span class="blue">true</span> );
+&nbsp; &nbsp; newBox.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( 2000, 2000, 0 );
+&nbsp;
+&nbsp; &nbsp; vg1.CropBox = newBox;
+&nbsp; &nbsp; go1.CropBox = newBox;
+&nbsp; &nbsp; doc.Regenerate();
+&nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; go1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; }
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// Create sheets and viewports</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> vSheet = <span class="teal">ViewSheet</span>.Create( doc, typ.Id );
+&nbsp; vSheet.Name = <span class="maroon">&quot;test3&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> vid = vSheet.Id;
+&nbsp; <span class="blue">var</span> p = <span class="teal">XYZ</span>.Zero;
+
+&nbsp; <span class="blue">var</span> v12 = <span class="teal">Viewport</span>.Create( doc, vid, go1.Id, p );
+&nbsp; <span class="blue">var</span> v22 = <span class="teal">Viewport</span>.Create( doc, vid, vg1.Id, p );
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// Align lower left - works </span>
+&nbsp; <span class="green">// because crop boxes are same</span>
+&nbsp;
+&nbsp; <span class="teal">Outline</span> outline1 = v12.GetBoxOutline();
+&nbsp; <span class="teal">Outline</span> outline2 = v22.GetBoxOutline();
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> min1 = outline1.MinimumPoint;
+&nbsp; <span class="teal">XYZ</span> min2 = outline2.MinimumPoint;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> diffToMove = min1 - min2;
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement(
+&nbsp; &nbsp; doc, v22.Id, diffToMove );
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; <span class="green">// Restore view crop boxes</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( savedBox1 == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; go1.CropBoxActive = <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; go1.CropBox = savedBox1;
+&nbsp; &nbsp; go1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; go1.CropBoxVisible = <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( savedBox2 == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">false</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; vg1.CropBox = savedBox2;
+&nbsp; &nbsp; vg1.CropBoxActive = <span class="blue">true</span>;
+&nbsp; &nbsp; vg1.CropBoxVisible = <span class="blue">false</span>;
+&nbsp; }
+}
+</pre>
+
+<p><strong>Response:</strong> The suggested workaround works like a charm. :-)</p>
+
+<p>I still have a question regarding your statement "... because many viewports will have a different centre relative to model coordinates": how does Revit internally calculate the centre of a viewport?
+Is that controlled by the CropBox property value?</p>
+
+<p><strong>Answer:</strong> The viewport size is governed by both the annotation crop box and the model crop box at different times, depending on which is larger.
+Currently, the API only provides access to the model crop box.</p>
+
+<p>Therefore, making the model crop box large enough (where 'enough' is not a very precise term) seems to help.
+When it is too small, the annotations in one of the views causes the mismatch you observed.</p>
+
+<p><strong>Response:</strong> I am happy to inform you that I have tested your workaround in a couple of scenarios in our main application and it continues to work</p>
+
+
+<a name="3"></a>
+
+<h4>Conceptual Design Automation Thesis</h4>
+
+<p>Ritchie Jackson of the
+
+<a href="http://www.aac.bartlett.ucl.ac.uk">
+Adaptive Architecture and Computation</a> programme
+
+at UCL, the
+
+<a href="http://en.wikipedia.org/wiki/University_College_London">
+University College London</a>,
+
+provided several valuable contributions to this blog in the past and now completed his MSc. thesis on Conceptual Design Automation including this single-page complete overview:</p>
+
+<center>
+<img src="img/MSc-AAC-2013-RitchieJackson.png" alt="Ritchie Jackson's MSc. AAC thesis overview" width="600"/>
+</center>
+
+<p>It was implemented using the
+
+<a href="http://www.unity3d.com">
+Unity game engine</a>,
+
+C# and a neural network to facilitate the automation of the conceptual design process, so with no Revit API involvement.</p>
+
+<p>Here is a short Q&A between me and Ritchie to gain better understanding:</p>
+
+<p><strong>Questions:</strong> After reading the text, I do not understand where the neural network enters into the picture, or what has been optimised or learned by the machine in the process. To me, it looks like random input and random output.</p>
+
+<ul>
+<li>What is the non-random part?</li>
+<li>What is the target or goal?</li>
+<li>What has been optimised or improved?</li>
+</ul>
+
+<p><strong>Answers:</strong></p>
+
+<ol>
+<li>Random input only &ndash; for modular assembly.</li>
+<li>Non-random is the concept categorisation process by the neural network into definable clusters &ndash; aesthetic in this case.</li>
+<li>Goal is to reconstitute similar unique concepts from a preferred cluster once unsupervised learning is complete.</li>
+<li>The network is able to produce viable concepts far more quickly than traditional 'manual' CAD techniques.</li>
+</ol>
+
+<p><strong>Questions:</strong></p>
+
+<ul>
+<li>How does the unsupervised learning work?</li>
+<li>Where is the supervised learning in this process?</li>
+<li>How do you identify viable concepts?</li>
+<li>What in an unviable concept?  </li>
+</ul>
+
+<p><strong>Answers:</strong></p>
+
+<ol>
+<li>Unsupervised learning works by finding patterns rather than matching them.</li>
+<li>There is no supervised learning as there are no specific pre-defined modular arrangements to be targeted.</li>
+<li>Viable concepts, in this particular case, are those that meet the designer's aesthetic preferences.</li>
+<li>Conversely, unviable concepts are those that don't.</li>
+</ol>
+
+<p>In addition: &ndash;</p>
+
+<ol start="5">
+<li>Machines are more capable than humans at <i>swiftly</i> producing serendipitous outcomes.</li>
+</ol>
+
+<p>Many thanks to Ritchie for sharing this, and especially for the nice wording of the final conclusion  :-)</p>
+
+
+<a name="4"></a>
+
+<h4>Autodesk Acquires Additional Structural Engineering Knowhow</h4>
+
+<p>To close, a piece of breaking news: Autodesk has signed an agreement to
+
+<a href="http://news.autodesk.com/press-release/corporate-sustainability/autodesk-signs-agreement-acquire-structural-fabrication-and-d">
+acquire</a>
+
+<a href="http://autode.sk/Graitec">
+Graitec</a>
+
+<a href="http://news.autodesk.com/press-release/corporate-sustainability/autodesk-signs-agreement-acquire-structural-fabrication-and-d">technology</a>,
+
+including the Advance Steel and Advance Concrete product lines, and associated employees, thus expanding its BIM portfolio for structural fabrication and detailing.</p>
+
+<p><strong>Addendum:</strong> Here are new links to the new Advance Steel and Advance Concrete product centers:</p>
+
+<ul>
+<li><a href="http://www.autodesk.com/products/advance-concrete/overview">Advance Concrete</a></li>
+<li><a href="http://www.autodesk.com/products/advance-steel/overview">Advance Steel</a></li>
+</ul>

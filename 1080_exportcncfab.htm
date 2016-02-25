@@ -1,0 +1,946 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Driving CNC Fabrication and Shared Parameters</h3>
+
+<!--
+
+Jimmy Plante just raised the following question:
+
+<p>For instance, a recent developer query...
+We met two years ago in Boston for the Autodesk DevCamp.
+I have developped few plugins in Revit since then and am an avid reader of The Building Coder.
+I will soon start my own business developing plugins in Revit for BIM.
+I have a lot of requests for that kind of development.
+One of my customers want to switch from solidworks to Revit &ndash; I think that is a great idea &ndash; and asks me about transferring to CNC.
+He will buy a Hundegger machine and work with Cambium software...
+Do you have any bookmarks, links or anything else on the subject of Revit to CNC and CAD/CAM)?</p>
+
+... You should probably look at that and potentialy contact William for further hints.
+
+-->
+
+<p>The topic of CNC fabrication of Revit BIM elements is continuing to grow in popularity.</p>
+
+<p>As you already know, I published the ExportWallboard add-in to automatically isolate and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html">
+export wall parts individually to DXF</a> for
+
+CNC fabrication,
+
+then enhanced, renamed and published it on GitHub as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/exportcncfab-on-github-and-revitlookup-update.html">
+ExportCncFab</a> for
+
+William Spier's Autodesk University class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html#3">
+Design to Fabrication</a>.</p>
+
+<p>Those discussions were explicitly related to CNC fabrication up front.
+Numerous other topics here are also useful in that context.</p>
+
+<p>I was unable to highlight and discuss the newly added CNC add-in enhancements in detail before AU, so let's make up for that now, as well as look at some funny examples of <a href="#7">genius problem simplifications</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>ExportCncFab Functionality</h4>
+
+<p>ExportCncFab now sports the following features:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html">Exporting wall parts individually to DXF:</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html##2">Exporting individual compound wall parts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html##3">Handling and dismissing a warning message</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html##4">Adding support for both pre- and post- part selection</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html##5">Handling temporary transactions and regeneration</a></li>
+</ul>
+<li>Support for <a href="#3">export to SAT</a> as well as DXF</li>
+<li>CNC fabrication export history tracking and creation of <a href="#4">shared parameters</a></li>
+<li>A beautiful little <a href="#5">external application</a> to define a nice user interface</li>
+</ul>
+
+<p>I already presented the details of the DXF export, so now let's take a look at the other three items.</p>
+
+<p>By the way, for the sake of completeness, let me also mention this previous example of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/export-walls-and-floors-to-sat.html">exporting walls and floors to SAT</a>,
+
+before the advent of parts, and this
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/saving-a-solid-to-a-sat-file-implementation.html">
+implementation of saving a solid to a SAT file</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Adding Export to SAT Functionality</h4>
+
+<p>Since I want to present the wall parts export to DXF or SAT functionality as two separate options in the user interface, they each need to be implemented as separate external commands.</p>
+
+<p>On the other hand, I obviously avoid duplicating the code, which is mostly identical.</p>
+
+<p>One way to achieve that is implement the common DXF and SAT export functionality in a separate method CmdDxf.Execute2 that can be called from both commands and takes an argument to toggle between the DXF and SAT export.</p>
+
+<p>With that in place, I can implement the new SAT export external command like this:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdSat</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdDxf</span>.Execute2( commandData, <span class="blue">true</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The DXF export command is almost identical, except for providing a 'false' argument to Execute2.</p>
+
+<p>Both commands are forced to use manual transaction mode instead of read-only for two reasons: (i) they perform temporary modifications in the database to isolate the parts to export one by one, and (ii) they save the export history in shared parameters, requiring database update for storage.</p>
+
+<p>Besides the pure export and history recording functionality, the Execute2 implementation is complicated further still, since it also handles a warning dialogue displayed by Revit to ask whether to "really print or export temp view modes".
+It does so by temporarily subscribing to the DialogBoxShowing event and providing the following OnDialogBoxShowing event handler for it:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> OnDialogBoxShowing(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DialogBoxShowingEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialogShowingEventArgs</span> e2
+&nbsp; &nbsp; &nbsp; = e <span class="blue">as</span> <span class="teal">TaskDialogShowingEventArgs</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e2 &amp;&amp; e2.DialogId.Equals(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TaskDialog_Really_Print_Or_Export_Temp_View_Modes&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> cmdLink
+&nbsp; &nbsp; &nbsp; &nbsp; = (<span class="blue">int</span>) <span class="teal">TaskDialogResult</span>.CommandLink2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; e.OverrideResult( cmdLink );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Besides suppressing and handling that message, the Execute2 method also has to jump through a hoop or two to store the export history in the shared parameters, and check that they exist before doing so.</p>
+
+<p>All together, it performs the following steps:</p>
+
+<ul>
+<li>Check we are in a valid document.</li>
+<li>Check we are in a valid 3D view.</li>
+<li>Check that parts visibility is turned on.</li>
+<li>Determine the elements to export, either via pre- or post-selection.</li>
+<li>Check that the export history shared parameters have been defined.</li>
+<li>Prompt to select the export target directory.</li>
+<li>Encapsulate the following actions in a transaction group that is ultimately rolled back, leaving the document unmodified by the part export.</li>
+<li>Within the transaction group, iterate over the selected parts one by one.</li>
+<li>For each part:</li>
+<ul>
+<li>Disable the view temporary isolate mode if it was previously active.</li>
+<li>Temporarily isolate the current element.</li>
+<li>Export the current view displaying only one element to DXF or SAT, respectively.</li>
+<li>Cache the export history for the current element.</li>
+</ul>
+<li>Roll back the transaction group.</li>
+<li>Store the export history in the shared parameters in a separate transaction that is obviously not rolled back and therefore needs to reside outside the previous transaction group.</li>
+</ul>
+
+<p>This slightly convoluted process evolved step by step as the needs expanded.
+Surprisingly, it works completely reliably.</p>
+
+<p>Here is the code implementing this in all its glory, including some interesting comments referring to the process itself and the migration from Revit 2013 to 2014:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Result</span> Execute2(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">bool</span> exportToSatFormat )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view || !( view <span class="blue">is</span> <span class="teal">View3D</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; 3D view.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">PartsVisibility</span>.ShowPartsOnly
+&nbsp; &nbsp; &nbsp; != view.PartsVisibility )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please run this command in a view&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; displaying parts and not source elements.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Define the list of views to export, </span>
+&nbsp; &nbsp; <span class="green">// including only the current 3D view</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; viewIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp;
+&nbsp; &nbsp; viewIds.Add( view.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Iterate over all pre-selected parts</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Part</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only gyp wallboard&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; parts before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">LinkElementId</span>&gt; lids
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 != lids.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Gyp wallboard part has multiple&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; source elements.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LinkElementId</span> lid = lids.First&lt;<span class="teal">LinkElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> hostId = lid.HostElementId;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> linkedId = lid.LinkedElementId;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> parentId = hostId;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> partId = e.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Determine parent category</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> parent = doc.GetElement( parentId );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = parent.Category;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; cids
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementOriginalCategoryIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 != cids.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Gyp wallboard part has multiple&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; source element categories.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> cid = cids.First&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//cat = doc.GetElement( id ) as Category;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Expected parent category is OST_Walls</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">BuiltInCategory</span>) cid.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">BuiltInCategory</span>.OST_Walls != bic )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; gyp wallboard parts.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ids.Add( partId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only gyp wallboard&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; parts before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If no parts were pre-selected, </span>
+&nbsp; &nbsp; <span class="green">// prompt for post-selection</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; refs = sel.PickObjects( <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">WallPartSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select wall parts.&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>, <span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.ElementId ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;No valid parts selected.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Check for shared parameters </span>
+&nbsp; &nbsp; <span class="green">// to record export history</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExportParameters</span> exportParameters
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExportParameters</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; doc.GetElement( ids[0] ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !exportParameters.IsValid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please initialise the CNC fabrication &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;export history shared parameters before &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;launching this command.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.BrowseDirectory( <span class="blue">ref</span> _folder, <span class="blue">true</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Register event handler for </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// &quot;TaskDialog_Really_Print_Or_Export_Temp_View_Modes&quot; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// dialogue</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uiapp.DialogBoxShowing
+&nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnDialogBoxShowing );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> opt = exportToSatFormat
+&nbsp; &nbsp; &nbsp; &nbsp; ? (<span class="blue">object</span>) <span class="blue">new</span> <span class="teal">SATExportOptions</span>()
+&nbsp; &nbsp; &nbsp; &nbsp; : (<span class="blue">object</span>) <span class="blue">new</span> <span class="teal">DXFExportOptions</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//opt.FileVersion = ACADVersion.R2000;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> txg = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; txg.Start( <span class="maroon">&quot;Export Wall Parts&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( e <span class="blue">is</span> <span class="teal">Part</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected parts only&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">LinkElementId</span>&gt; lids
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = part.GetSourceElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 == lids.Count,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;unexpected multiple part source elements.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LinkElementId</span> lid = lids.First&lt;<span class="teal">LinkElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> hostId = lid.HostElementId;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> linkedId = lid.LinkedElementId;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> parentId = hostId;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> partId = e.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename = <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}_{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parentId, partId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> host = doc.GetElement( hostId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != host, <span class="maroon">&quot;expected to be able to access host element&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert( ( host is Wall ), &quot;expected host element to be a wall&quot; ); </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( ( host <span class="blue">is</span> <span class="teal">Wall</span> ) || ( host <span class="blue">is</span> <span class="teal">Part</span> ), <span class="maroon">&quot;expected host element to be a wall or part&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != host.Category, <span class="maroon">&quot;expected host element to have a valid category&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert( host.Category.Id.IntegerValue.Equals( (int) BuiltInCategory.OST_Walls ), &quot;expected host element to have wall category&quot; );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( host.Category.Id.IntegerValue.Equals( (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Walls ) || host.Category.Id.IntegerValue.Equals( (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Parts ), <span class="maroon">&quot;expected host element to have wall or part category&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">ElementId</span>.InvalidElementId != host.LevelId, <span class="maroon">&quot;expected host element to have a valid level id&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ElementId</span>.InvalidElementId != host.LevelId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> level = doc.GetElement( host.LevelId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename = level.Name.Replace( <span class="maroon">' '</span>, <span class="maroon">'_'</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;_&quot;</span> + filename;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( view.IsTemporaryHideIsolateActive() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Disable Temporary Isolate&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view.DisableTemporaryViewMode(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TemporaryViewMode</span>.TemporaryHideIsolate );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( !view.IsTemporaryHideIsolateActive(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected to turn off temporary hide/isolate&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Export Wall Part &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + partId.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This call requires a transaction.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view.IsolateElementTemporary( partId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//List&lt;ElementId&gt; unhideIds = new List&lt;ElementId&gt;( 1 );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//unhideIds.Add( partId );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//view.UnhideElements( unhideIds );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//doc.Regenerate(); // this is insufficient</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( exportToSatFormat )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//ViewSet viewSet = new ViewSet();</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//foreach( ElementId vid in viewIds )</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; viewSet.Insert( doc.GetElement( vid ) </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; as View );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//doc.Export( _folder, filename, viewSet, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; (SATExportOptions) opt ); // 2013</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Export( _folder, filename, viewIds,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">SATExportOptions</span>) opt ); <span class="green">// 2014</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Export( _folder, filename, viewIds,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">DXFExportOptions</span>) opt );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Update CNC fabrication </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// export shared parameters -- oops, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// cannot do this immediately, since </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// this transaction group will be</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// rolled back ... just save the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// element id and do it later</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// searately.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//exportParameters.UpdateExportHistory( e );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; exportParameters.Add( e.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// We do not commit the transaction group, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// because no modifications should be saved.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The transaction group is only created and </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// started to encapsulate the transactions </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// required by the IsolateElementTemporary </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// method. Since the transaction group is not </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// committed, the changes are automatically </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// discarded.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//txg.Commit();</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uiapp.DialogBoxShowing
+&nbsp; &nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DialogBoxShowingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnDialogBoxShowing );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Update CNC Fabrication Export &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;History Shared Parameters&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; exportParameters.UpdateExportHistory();
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>CNC fabrication Export History Tracking and Creation of Shared Parameters</h4>
+
+<p>You probably noted above that the export history and shared parameter management is handled by a separate ExportParameters class.</p>
+
+<p>The following CNC fabrication export history data is tracked and used to populate the corresponding shared parameters on each exported part:</p>
+
+<ul>
+<li>CncFabIsExported &ndash; a Boolean value showing whether an individual part has ever been exported</li>
+<li>CncFabExportedFirst &ndash; timestamp of first export</li>
+<li>CncFabExportedLast &ndash; timestamp of most recent export</li>
+</ul>
+
+<p>The ExportParameters class implements the following functionality and public interface methods to fulfil this task:</p>
+
+<ul>
+<li>Define the user visible export history shared parameter names.</li>
+<li>Store the export history shared parameter definitions.</li>
+<li>GetDefinition &ndash; Retrieve the parameter Definition from the given element and parameter name.</li>
+<li>Constructor &ndash; Initialise the shared parameter definitions from a given sample element.</li>
+<li>IsValid &ndash; Check whether all CNC fabrication export parameter definitions were successfully initialised.</li>
+<li>Add &ndash; Add a part element id to the list of successfully exported parts.</li>
+<li>UpdateExportHistory &ndash; Update the CNC fabrication export history for the given element.</li>
+<li>UpdateExportHistory &ndash; Update the CNC fabrication export history for all stored element ids.</li>
+<li>Create &ndash; Create the shared parameters to keep track of the CNC fabrication export history:</li>
+<ul>
+<li>Retrieve shared parameter file name</li>
+<li>Retrieve shared parameter file object</li>
+<li>Create the category set for binding</li>
+<li>Retrieve or create shared parameter group</li>
+<li>Retrieve or create the three parameters</li>
+</ul>
+</ul>
+
+<p>Here is the entire class implementation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Shared parameters to keep track of </span>
+<span class="gray">///</span><span class="green"> the CNC fabrication export history.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">ExportParameters</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define the user visible export </span>
+&nbsp; <span class="gray">///</span><span class="green"> history shared parameter names.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _is_exported = <span class="maroon">&quot;CncFabIsExported&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _exported_first = <span class="maroon">&quot;CncFabExportedFirst&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _exported_last = <span class="maroon">&quot;CncFabExportedLast&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the export history </span>
+&nbsp; <span class="gray">///</span><span class="green"> shared parameter definitions.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Definition</span> _definition_is_exported = <span class="blue">null</span>;
+&nbsp; <span class="teal">Definition</span> _definition_exported_first = <span class="blue">null</span>;
+&nbsp; <span class="teal">Definition</span> _definition_exported_last = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Document</span> _doc = <span class="blue">null</span>;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the parameter definition from</span>
+&nbsp; <span class="gray">///</span><span class="green"> the given element and parameter name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Definition</span> GetDefinition(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; &nbsp; parameter_name );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Definition</span> d = ( <span class="blue">null</span> == p )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : p.Definition;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Initialise the shared parameter definitions</span>
+&nbsp; <span class="gray">///</span><span class="green"> from a given sample element.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> ExportParameters( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; _definition_is_exported = GetDefinition(
+&nbsp; &nbsp; &nbsp; e, _is_exported );
+&nbsp;
+&nbsp; &nbsp; _definition_exported_first = GetDefinition(
+&nbsp; &nbsp; &nbsp; e, _exported_first );
+&nbsp;
+&nbsp; &nbsp; _definition_exported_last = GetDefinition(
+&nbsp; &nbsp; &nbsp; e, _exported_last );
+
+&nbsp; &nbsp; <span class="blue">if</span>( IsValid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _doc = e.Document;
+&nbsp; &nbsp; &nbsp; _ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Check whether all CNC fabrication export </span>
+&nbsp; <span class="gray">///</span><span class="green"> parameter definitions were successfully </span>
+&nbsp; <span class="gray">///</span><span class="green"> initialised.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsValid
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != _definition_is_exported
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != _definition_exported_first
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != _definition_exported_last;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Add a part element id to the list of</span>
+&nbsp; <span class="gray">///</span><span class="green"> successfully exported parts.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Add( <span class="teal">ElementId</span> id )
+&nbsp; {
+&nbsp; &nbsp; _ids.Add( id );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Update the CNC fabrication export </span>
+&nbsp; <span class="gray">///</span><span class="green"> history for the given element.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> UpdateExportHistory(
+&nbsp; &nbsp; <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DateTime</span> now = <span class="teal">DateTime</span>.Now;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0:4}-{1:02}-{2:02}T{3:02}.{4:02}.{5:02}.{6:03}&quot;</span>,
+&nbsp; &nbsp; &nbsp; now.Year, now.Month, now.Day,
+&nbsp; &nbsp; &nbsp; now.Hour, now.Minute, now.Second, now.Millisecond );
+&nbsp;
+&nbsp; &nbsp; s = now.ToString( <span class="maroon">&quot;yyyy-MM-ddTHH:mm:ss.fff&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; e.get_Parameter( _definition_is_exported )
+&nbsp; &nbsp; &nbsp; .Set( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; &nbsp; _definition_exported_first );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s2 = p.AsString();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == s2 || 0 == s2.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p.Set( s );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; e.get_Parameter( _definition_exported_last )
+&nbsp; &nbsp; &nbsp; .Set( s );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Update the CNC fabrication export </span>
+&nbsp; <span class="gray">///</span><span class="green"> history for all stored element ids.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> UpdateExportHistory()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> _ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; UpdateExportHistory(
+&nbsp; &nbsp; &nbsp; &nbsp; _doc.GetElement( id ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create the shared parameters to keep track</span>
+&nbsp; <span class="gray">///</span><span class="green"> of the CNC fabrication export history.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> Create( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Shared parameters filename; used only in case</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> none is set and we need to create the export</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> history shared parameters.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _shared_parameters_filename
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;export_cnc_fab_shared_parameters.txt&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _definition_group_name = <span class="maroon">&quot;CncFab&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve shared parameter file name</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sharedParamsFileName
+&nbsp; &nbsp; &nbsp; = app.SharedParametersFilename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sharedParamsFileName
+&nbsp; &nbsp; &nbsp; || 0 == sharedParamsFileName.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Path</span>.GetTempPath();
+&nbsp;
+&nbsp; &nbsp; &nbsp; path = <span class="teal">Path</span>.Combine( path,
+&nbsp; &nbsp; &nbsp; &nbsp; _shared_parameters_filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">StreamWriter</span> stream;
+&nbsp; &nbsp; &nbsp; stream = <span class="blue">new</span> <span class="teal">StreamWriter</span>( path );
+&nbsp; &nbsp; &nbsp; stream.Close();
+&nbsp;
+&nbsp; &nbsp; &nbsp; app.SharedParametersFilename = path;
+&nbsp;
+&nbsp; &nbsp; &nbsp; sharedParamsFileName
+&nbsp; &nbsp; &nbsp; &nbsp; = app.SharedParametersFilename;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Retrieve shared parameter file object</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DefinitionFile</span> f
+&nbsp; &nbsp; &nbsp; = app.OpenSharedParameterFile();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create CNC Export Tracking &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Shared Parameters&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create the category set for binding</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CategorySet</span> catSet = app.Create.NewCategorySet();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = doc.Settings.Categories.get_Item(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Parts );
+&nbsp;
+&nbsp; &nbsp; &nbsp; catSet.Insert( cat );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Binding</span> binding = app.Create.NewInstanceBinding(
+&nbsp; &nbsp; &nbsp; &nbsp; catSet );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve or create shared parameter group</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionGroup</span> group
+&nbsp; &nbsp; &nbsp; &nbsp; = f.Groups.get_Item( _definition_group_name )
+&nbsp; &nbsp; &nbsp; &nbsp; ?? f.Groups.Create( _definition_group_name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve or create the three parameters;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// we could check if they are already bound, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// but it looks like Insert will just ignore </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// them in that case.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Definition</span> definition
+&nbsp; &nbsp; &nbsp; &nbsp; = group.Definitions.get_Item( _is_exported )
+&nbsp; &nbsp; &nbsp; &nbsp; ?? group.Definitions.Create( _is_exported,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.YesNo, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+&nbsp;
+&nbsp; &nbsp; &nbsp; definition
+&nbsp; &nbsp; &nbsp; &nbsp; = group.Definitions.get_Item( _exported_first )
+&nbsp; &nbsp; &nbsp; &nbsp; ?? group.Definitions.Create( _exported_first,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Text, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+&nbsp;
+&nbsp; &nbsp; &nbsp; definition
+&nbsp; &nbsp; &nbsp; &nbsp; = group.Definitions.get_Item( _exported_last )
+&nbsp; &nbsp; &nbsp; &nbsp; ?? group.Definitions.Create( _exported_last,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Text, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>External Application Implementation</h4>
+
+<p>There is nothing very special about the external application implementation.</p>
+
+<p>All it does is present the three buttons to trigger the external commands to create the shared parameters and perform the export to the two supported formats:</p>
+
+<center>
+<img src="img/export_cnc_fab_app.png" alt="Export to CNC fabrication add-in">
+</center>
+
+<p>In fact, it does do one thing more, namely read the bitmap images for the command button icons and tooltip images from embedded resources.</p>
+
+<p>Here is the complete implementation:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption
+&nbsp; &nbsp; = <span class="maroon">&quot;Export to CNC Fabrication&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _namespace_prefix
+&nbsp; &nbsp; = <span class="blue">typeof</span>( <span class="teal">App</span> ).Namespace + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _name = <span class="maroon">&quot;DXF&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _name2 = <span class="maroon">&quot;SAT&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _name3 = <span class="maroon">&quot;Create\r\nShared\r\nParameters&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _class_name = <span class="maroon">&quot;CmdDxf&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _class_name2 = <span class="maroon">&quot;CmdSat&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _class_name3 = <span class="maroon">&quot;CmdCreateSharedParameters&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _tooltip_format
+&nbsp; &nbsp; = <span class="maroon">&quot;Export to CNC Fabrication in {0} format&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _tooltip_long_description_format
+&nbsp; &nbsp; = <span class="maroon">&quot;Export Revit parts to CNC Fabrication in {0} format.&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Load a new icon bitmap from embedded resources.</span>
+&nbsp; <span class="gray">///</span><span class="green"> For the BitmapImage, make sure you reference </span>
+&nbsp; <span class="gray">///</span><span class="green"> WindowsBase and PresentationCore, and import </span>
+&nbsp; <span class="gray">///</span><span class="green"> the System.Windows.Media.Imaging namespace. </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">BitmapImage</span> NewBitmapImage(
+&nbsp; &nbsp; <span class="teal">Assembly</span> a,
+&nbsp; &nbsp; <span class="blue">string</span> imageName )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// to read from an external file:</span>
+&nbsp; &nbsp; <span class="green">//return new BitmapImage( new Uri(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; Path.Combine( _imageFolder, imageName ) ) );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Stream</span> s = a.GetManifestResourceStream(
+&nbsp; &nbsp; &nbsp; _namespace_prefix + imageName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BitmapImage</span> img = <span class="blue">new</span> <span class="teal">BitmapImage</span>();
+&nbsp;
+&nbsp; &nbsp; img.BeginInit();
+&nbsp; &nbsp; img.StreamSource = s;
+&nbsp; &nbsp; img.EndInit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> img;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Assembly</span> exe = <span class="teal">Assembly</span>.GetExecutingAssembly();
+&nbsp; &nbsp; <span class="blue">string</span> path = exe.Location;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create ribbon panel</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> p = a.CreateRibbonPanel( Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create DXF button</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> d = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; _name, _name, path,
+&nbsp; &nbsp; &nbsp; _namespace_prefix + _class_name );
+&nbsp;
+&nbsp; &nbsp; d.ToolTip = <span class="blue">string</span>.Format( _tooltip_format, _name );
+&nbsp; &nbsp; d.Image = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_16x16_size.png&quot;</span> );
+&nbsp; &nbsp; d.LargeImage = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_32x32_size.png&quot;</span> );
+&nbsp; &nbsp; d.LongDescription = <span class="blue">string</span>.Format( _tooltip_long_description_format, _name );
+&nbsp; &nbsp; d.ToolTipImage = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_full_size.png&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; p.AddItem( d );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create SAT button</span>
+&nbsp;
+&nbsp; &nbsp; d = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; _name2, _name2, path,
+&nbsp; &nbsp; &nbsp; _namespace_prefix + _class_name2 );
+&nbsp;
+&nbsp; &nbsp; d.ToolTip = <span class="blue">string</span>.Format( _tooltip_format, _name2 );
+&nbsp; &nbsp; d.Image = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_16x16_size.png&quot;</span> );
+&nbsp; &nbsp; d.LargeImage = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_32x32_size.png&quot;</span> );
+&nbsp; &nbsp; d.LongDescription = <span class="blue">string</span>.Format( _tooltip_long_description_format, _name2 );
+&nbsp; &nbsp; d.ToolTipImage = NewBitmapImage( exe, <span class="maroon">&quot;cnc_icon_full_size.png&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; p.AddItem( d );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create shared parameters button</span>
+&nbsp;
+&nbsp; &nbsp; d = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; _name3, _name3, path,
+&nbsp; &nbsp; &nbsp; _namespace_prefix + _class_name3 );
+&nbsp;
+&nbsp; &nbsp; d.ToolTip
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;Create shared parameters for tracking export history&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; d.LongDescription
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;Create and bind shared parameters to the &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Parts category for tracking export history:\r\n\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; * CncFabIsExported - Boolean\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; * CncFabExportedFirst - Text timestamp ISO 8601\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; * CncFabExportedLast - Text timestamp ISO 8601&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; d.ToolTipImage = NewBitmapImage( exe,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;cnc_icon_full_size.png&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; p.AddItem( d );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Download</h4>
+
+<p>To enable you explore this for yourself, the current version is available from the
+
+<a href="https://github.com/jeremytammik/ExportCncFab">
+ExportCncFab GitHub repository</a>,
+
+and the version discussed here is
+
+<a href="https://github.com/jeremytammik/ExportCncFab/releases/tag/2014.0.0.12">
+release 2014.0.0.12</a>.
+
+Enjoy!</p>
+
+
+<!--
+<a name="7"></a>
+
+<h4>AppStore Growth and Direction</h4>
+-->
+
+<a name="7"></a>
+
+<h4>Thinking Outside the Box</h4>
+
+<p>For some fabulous and hilarious examples of thinking outside the box, take a look at these
+
+<a href="http://distractify.com/fun/fails/test-answers-that-are-totally-wrong-but-still-genius">
+test answers that are 100% wrong and totally genius at the same time</a>.</p>
+

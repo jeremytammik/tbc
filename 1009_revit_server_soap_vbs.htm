@@ -1,0 +1,342 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+08697315 [Revit Server REST API and VBScript]
+08650337 [Automate Extraction of Revit data from file on Revit Server]
+
+Stone (Lei) Shi 
+RE: revit server rest api Endpoint not found
+
+-->
+
+<h3>Revit Server API Access and VBScript</h3>
+
+<p>I recently summarised the material describing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">
+Revit Server API</a>.</p>
+
+<p>Apparently, that still does not cover everything.</p>
+
+<p>You want more? Well, here is more!</p>
+
+<p>It led to the following two new queries and further clarification of this topic:</p>
+
+<ul>
+<li><a href="#2">SOAP API and no access to Admin service</a></li>
+<li><a href="#3">Accessing Revit Server using VBScript</a></li>
+</ul>
+
+<p>Here are the gory details in all their glory:</p>
+
+
+<a name="2"></a>
+
+<h4>SOAP API and No Access to Admin Service</h4>
+
+<p><strong>Question:</strong> Can you please let me know the cause for the 'Endpoint not found' error message?</p>
+
+<p>I'm trying to browse the AdminRestService.Svc through IIS(7.0):</p>
+
+<center>
+<img src="img/rs_AdminRestServices.jpg" alt="AdminRestService" width="600"/>
+</center>
+
+<p>It always reports 'Endpoint not found':</p>
+
+<center>
+<img src="img/rs_ep_not_found.png" alt="Endpoint Not Found" width="600"/>
+</center>
+
+<p>Am I missing some configuration setting?</p>
+
+<p>I tried both ways, using the Web request method in .NET and also through IIS.</p>
+
+<p>I searched the blog and Internet but couldn't find any resolution or articles on any Revit 2014 AdminRestService 'Endpoint not found' issues.</p>
+
+<p>Am I right in assuming that the Application.CopyModel method is one of the methods on the above AdminRestService.svc service?</p>
+
+<p>By browsing to
+
+<a href="http://localhost/RevitServerAdmin2014/default.aspx">
+http://localhost/RevitServerAdmin2014/default.aspx</a>,
+
+I am able to connect successfully through the user interface and can even see all the models available on the server:</p>
+
+<center>
+<img src="img/rs_revit_server_admin.png" alt="AdminRestService" width="600"/>
+</center>
+
+<p>As said, I'm just unable to use the
+
+<a href="http://Localhost/RevitServerAdminRESTService/AdminRESTService.svc">
+http://Localhost/RevitServerAdminRESTService/AdminRESTService.svc</a> URL.
+
+It always replies with 'Endpoint not found.'</p>
+
+<p>Currently I'm trying to use the RevitserverTool.exe utility and its createLocalRvt command to copy the Revit model to a different location within the server.
+I hope this works.</p>
+
+<p>My goal is to programmatically copy the model, e.g. Project-X.Rvt in the screen shot above, to a different location, open the file in a Revit MEP client and start the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">
+extraction process using the add-in</a> I
+
+developed.</p>
+
+
+<p><strong>Answer:</strong> Did you connect successfully through the user interface?</p>
+
+<p>Did you look at
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2013/Help/00005-More_Inf0/0315-Administ315/0319-Revit_Se319/0325-Revit_Se325/0326-Connecti326">
+Connecting to the Revit Server Administrator</a>?</p>
+
+<p>Have you implemented it along the lines of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/revit-server-rest-api.html">revitserverviewer.zip sample</a>?</p>
+
+<p>Does that sample work correctly for you, adapted to your server context?</p>
+
+<p>Good.
+That is all you have to worry about.</p>
+
+<p>The behaviour you are seeing where the admin service endpoint cannot be browsed is as expected.</p>
+
+<p>However, other endpoints, such as those available for the model service, should be just fine.</p>
+
+<p>Why did you try to access the admin service?</p>
+
+<p>The easiest and most efficient path for you will probably be to base your use of this API on the existing sample applications.</p>
+
+<p>If they have no need of the admin service, the you presumably will not either.</p>
+
+<p>Are you seeing any functional failures that lead you to believe there is an issue with your server?</p>
+
+<p>Or were you just surprised to note the behaviour described below?</p>
+
+<p>If you are running into some kind of blocking problem, it is not related to the inability to browse the admin service.
+This has never been possible.</p>
+
+<p>The Revit Server admin UI uses AdminService and not AdminRESTService.
+It is possible that the REST service is not working on your machine but AdminService is.</p>
+
+<p>Here are some important points to clarify about Revit Server:</p>
+
+<ol>
+<li>REST service:</li>
+
+<ul>
+<li>It is RevitServerAdminRESTService2014.</li>
+
+<li>As said, it is <b>not</b> used by the admin UI.</li>
+
+<li>It is normal that you see 'Endpoint Not Found' when you access its base address
+
+<a href="http://localhost/RevitServerAdminRESTService2014/AdminRESTService.svc">
+http://localhost/RevitServerAdminRESTService2014/AdminRESTService.svc</a>,
+
+because no resource corresponds to this base address.</li>
+
+<li>You can refer to the REST API help documentation for the detailed use.</li>
+</ul>
+
+<li>The RevitserverTool.exe tool also does <b>not</b> connect to the REST service; instead it communicates with the Model service, which is a SOAP service.</li>
+
+<li>Similarly, the Revit API call Application.CopyModel (as part of Revit) talks with the model service.</li>
+</ol>
+
+<p>That should take care of that issue.</p>
+
+<p>Next:</p>
+
+<a name="3"></a>
+
+<h4>VBScript Access to the Revit Server REST API</h4>
+
+<p>Here is an example by Jeff Campbell of
+
+<a href="http://www.burnsmcd.com">Burns & McDonnell</a> showing
+
+how to access Revit Server and download project files using both VBScript and AutoIT:</p>
+
+<p><strong>Question:</strong> Is it possible to access the REST API with VBScript?
+I tried running a small script using the Microsoft.XMLHTTP method but am unable to get a valid return.</p>
+
+<p><strong>Answer:</strong> The Revit Server API is simple, and so is REST.</p>
+
+<p>Basically, everything there is to say about it is listed (or pointed to) in the previous discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">
+Revit Server REST API</a>.</p>
+
+<p>Regarding the use of REST from VBScript, I would suggest a simple Google search, e.g. for
+
+<a href="http://lmgtfy.com/?q=rest+VBScript">'rest VBScript'</a>.</p>
+
+<p>I just tried it out, and the results look promising, so I think you are in luck.</p>
+
+<p><strong>Response:</strong> Thank you!
+I got it worked out last night.</p>
+
+<p>I was having an issue passing the headers after my initial open statement but I now have it working.</p>
+
+<p>I started with your blog post, and that gave me the idea to try this with REST.</p>
+
+<p>Here is the base that I am working from in both AutoIT and VBScript.</p>
+
+<p>First, the VBS version, RESTCall.vbs:</p>
+
+<pre class="prettyprint">
+'======================================================
+' NAME: RESTCall.vbs
+'
+' AUTHOR: Jeff Campbell , Burns and McDonnell
+' DATE  : 8/22/2013
+'
+' COMMENT:
+'  Proof of concept testing for using REST API
+'  calls to Revit server for addition
+'  into the BMCD local copy tool.
+'======================================================
+
+Option Explicit
+
+'Declare variable section
+
+Dim restReq
+Dim url
+Dim userName
+Dim userMachine
+Dim GUID
+Dim outData
+Dim StatusCode
+Dim CleanGUID
+Dim WshNetwork
+
+'Enviromental sets
+
+Set restReq = CreateObject ("Microsoft.XMLHTTP")
+Set WshNetwork = WScript.CreateObject("WScript.Network")
+
+'Setup header section
+
+userName = WshNetwork.UserName
+MsgBox userName,0,"This is the logged on user"
+userMachine = WshNetwork.ComputerName
+MsgBox userMachine,0,"This is the computer name"
+GUID = GetGuid
+
+'MsgBox GUID,0,"This is my GUID"
+
+GUID = Replace(GUID,"{","")
+GUID = Replace (GUID,"}","")
+MsgBox GUID,40,"This is me clean GUID"
+Set WshNetwork = Nothing
+
+'Create the headers that we will need to make the request
+
+url = "http://.../RevitServerAdminRESTService2013/AdminRESTService.svc/ /Contents"
+
+restReq.open "GET", url, False
+
+restReq.setRequestHeader "User-Name", userName
+restReq.setRequestHeader "User-Machine-Name", userMachine
+restReq.setRequestHeader "Operation-GUID", GUID
+
+restReq.send("")
+
+outData = restReq.ResponseText
+StatusCode = restReq.Status
+
+MsgBox StatusCode,0,"Status"
+MsgBox outData,0,"My Data"
+Set restReq = Nothing
+
+'------------User Function Section---------------------
+'GUID generator
+
+Function GetGuid()
+Set restGUID = CreateObject ("Scriptlet.TypeLib")
+	GetGuid = Left(CStr(restGUID.Guid), 38)
+	Set restGUID = Nothing
+End Function
+</pre>
+
+<p>I was originally headed down the VBScript path but once I figured out how to use the REST calls there, I applied the same principles in AutoIT and it worked fine for me.</p>
+
+<p>Here is that version, RESTcall.au3:</p>
+
+<pre class="prettyprint">
+;Includes
+
+#Include &lt;WinAPI.au3&gt;
+#include &lt;Array.au3&gt;
+#include "JSON.au3"
+#include "JSON_Translate.au3"
+
+$restReq = ObjCreate("winhttp.winhttprequest.5.1")
+$restGuid = _CreateGuid()
+
+;Dialogs for testing remark out for production use
+
+MsgBox (4096,"My Computer Name",@ComputerName)
+MsgBox (4096,"My Name",@UserName)
+MsgBox(4096, "Generate Guid", $restGuid)
+
+;REST Request Section
+
+$restReq.Open("GET", "http://.../RevitServerAdminRESTService2013/AdminRESTService.svc/ /Contents", False)
+
+$restReq.setRequestHeader ("User-Name", @UserName)
+$restReq.setRequestHeader ("User-Machine-Name", @ComputerName)
+$restReq.setRequestHeader ("Operation-GUID", $restGuid)
+
+$restReq.Send()
+
+$oReceived = $restReq.ResponseText
+$oStatusCode = $restReq.Status
+
+;Dialog box of status code for troubleshooting
+
+MsgBox(4096, "Status Code", $oStatusCode())
+
+If $oStatusCode == 200 then
+  ; The value of 2 overwrites the file if it already exists
+  $file = FileOpen("Received.txt", 2)
+  FileWrite($file, $oReceived)
+  FileClose($file)
+  MsgBox(4096, "My test for Nolan", $oReceived ())
+EndIf
+
+;-------Section for called functions-------------------
+
+Func _CreateGuid()
+  Local $Guid = DllStructCreate($tagGUID)
+
+  $Result = DllCall("OLE32.DLL", "dword", "CoCreateGuid", "ptr", DllStructGetPtr($Guid))
+  $Result = _WinAPI_StringFromGUID(DllStructGetPtr($Guid))
+
+  $strresult = StringTrimLeft($Result, 1)
+  $strresult = StringTrimRight($strresult, 1)
+
+  Return $strresult
+EndFunc
+</pre>
+
+<p>This is getting added to a 'copy down' tool that we created in AutoIT for our local copy creation.
+The original tool was based on INI files that we keyed around each office file server.
+When I moved to Revit Server I simply modified it and continued using the INI files.
+This has proven rather cumbersome since we need to track each filename for our projects.
+Using some of the information in your blog and an AU presentation from Rob Howarth I decided to make some improvements for our 2014 roll out.
+The new copy down tool will use the REST API to generate all of the information needed off of Revit Server.
+This eliminates the need for the INI files and streamlines the amount of time it was taking to manage the system.</p>
+
+<p>I am also using it to create various CMD files that we then use to automate some of our other processes.</p>
+
+<p>Many thanks to Jeff for sharing this!</p>

@@ -1,0 +1,341 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+Alex Hearn, P.Eng
+Applications Engineer- Systems CSG
+Armstrong Fluid Technology
+Alex Hearn 
+Subject: Revit API Bug ElementTransformUtils.RotateElement?
+Subject: SweptPath Along an Arc
+
+-->
+
+<h3>Rotation by &pi; and NewSweptBlend Using Arcs</h3>
+
+<p>Let me address two questions concerning form generation in family documents raised by Alex Hearn:</p>
+
+<ul>
+<li><a href="#2">Rotation by &pi;</a></li>
+<li><a href="#3">NewSweptBlend using arcs</a></li>
+</ul>
+
+<p>Among other things, the answers also demonstrate some trivial migration steps of the form generation code from Revit 2012 to 2015 and, yet again, the occasional
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">
+crucial importance of regeneration</a>.</p>
+
+<a name="2"></a>
+
+<h4>Rotation by &pi;</h4>
+
+<p><strong>Question:</strong> I am exploring and really enjoying your blog site.
+Thanks for all the detailed information.</p>
+
+<p>I have been attempting to build a Revit translator that takes in model data from SolidWorks (my usual programming environment) and redraws the elements in Revit. The idea is that I can then recreate SolidWorks models in Revit.</p>
+
+<p>I have come across a very odd behaviour in ElementTransformUtils.RotateElement and I was wondering if you have ever seen it or have any advice. I’m using Revit 2012 with C#. Here’s some sample code:</p>
+
+<pre class="code">
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; = fdoc.Application.Create;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> normal = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketchPlane
+&nbsp; &nbsp; = CreateSketchPlane( normal, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p0 = <span class="teal">XYZ</span>.Zero;
+&nbsp; <span class="teal">XYZ</span> p1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> p2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp; <span class="teal">XYZ</span> p3 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 10, 0 );
+&nbsp; <span class="teal">XYZ</span> p4 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 20, 0 );
+&nbsp; <span class="teal">Line</span> line1 = creapp.NewLineBound( p0, p1 );
+&nbsp; <span class="teal">Line</span> line2 = creapp.NewLineBound( p1, p2 );
+&nbsp; <span class="teal">Line</span> line3 = creapp.NewLineBound( p2, p3 );
+&nbsp; <span class="teal">Line</span> line4 = creapp.NewLineBound( p3, p0 );
+&nbsp; <span class="teal">Line</span> line5 = creapp.NewLineBound( p2, p4 );
+&nbsp; <span class="teal">CurveArray</span> curveArray1 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; curveArray1.Append( line1 );
+&nbsp; curveArray1.Append( line2 );
+&nbsp; curveArray1.Append( line3 );
+&nbsp; curveArray1.Append( line4 );
+&nbsp; <span class="teal">CurveArrArray</span> curveArrArray = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp; curveArrArray.Append( curveArray1 );
+&nbsp;
+&nbsp; <span class="teal">Revolution</span> aRevolution
+&nbsp; &nbsp; = fdoc.FamilyCreate.NewRevolution( <span class="blue">true</span>,
+&nbsp; &nbsp; &nbsp; curveArrArray, sketchPlane, line5,
+&nbsp; &nbsp; &nbsp; <span class="teal">Math</span>.PI / -2, 0 );
+&nbsp;
+&nbsp; <span class="green">// THE FOLLOWING DOES NOT WORK!</span>
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; fdoc, aRevolution.Id, line5, <span class="teal">Math</span>.PI );
+</pre>
+
+<p>The problem is apparently with the Math.PI value used by RotateElement. I have messed around with it and it seems that you <b><i>cannot</i></b> use a value that is greater than <b><i>or equal to</i></b> Math.PI for this argument. As a workaround, I am using Math.PI * 0.995 which means the resulting component is veeeery slightly off from the true square.</p>
+
+<p>Any suggestions welcome but don’t be too concerned because as I’ve said above I do have an acceptable (for now) workaround.</p>
+
+<p><strong>Answer:</strong> The following implementation based on your sample code migrated to Revit 2015 works perfectly well for me:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 0, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 10, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p3 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 10, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p4 = <span class="blue">new</span> <span class="teal">XYZ</span>( 10, 20, 0 );
+&nbsp; &nbsp; <span class="teal">Line</span> line1 = <span class="teal">Line</span>.CreateBound( p0, p1 );
+&nbsp; &nbsp; <span class="teal">Line</span> line2 = <span class="teal">Line</span>.CreateBound( p1, p2 );
+&nbsp; &nbsp; <span class="teal">Line</span> line3 = <span class="teal">Line</span>.CreateBound( p2, p3 );
+&nbsp; &nbsp; <span class="teal">Line</span> line4 = <span class="teal">Line</span>.CreateBound( p3, p0 );
+&nbsp; &nbsp; <span class="teal">Line</span> line5 = <span class="teal">Line</span>.CreateBound( p2, p4 );
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curveArray1 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; &nbsp; curveArray1.Append( line1 );
+&nbsp; &nbsp; curveArray1.Append( line2 );
+&nbsp; &nbsp; curveArray1.Append( line3 );
+&nbsp; &nbsp; curveArray1.Append( line4 );
+&nbsp; &nbsp; <span class="teal">CurveArrArray</span> curveArrArray = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp; &nbsp; curveArrArray.Append( curveArray1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Revolution and Rotate&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//XYZ normal = XYZ.BasisZ;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Plane plane = new Plane( normal, XYZ.Zero );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//SketchPlane sketchPlane = SketchPlane.Create( doc, plane );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SketchPlane</span> sketchPlane
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SketchPlane</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">SketchPlane</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">SketchPlane</span>&gt;( x
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; x.Name.Equals( <span class="maroon">&quot;Ref. Level&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">SketchPlane</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Revolution</span> aRevolution
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.FamilyCreate.NewRevolution(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span>, curveArrArray, sketchPlane,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line5, <span class="teal">Math</span>.PI / -2, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, aRevolution.Id, line5, <span class="teal">Math</span>.PI ); <span class="green">// WORKs FINE!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>There are only a few differences, besides the fact that I migrated the code from Revit 2012 to 2015.</p>
+
+<p>I also replaced the generation of a new geometric plane and sketch plane by a filtered element collector retrieving the existing sketch plane from the family document instead.</p>
+
+<p>Most significantly: I added a call to
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">
+regenerate the document</a> before
+
+calling the RotateElement method.</p>
+
+<p>Please note that it takes an element id as an argument. That is a hint that it relies on the element being a valid resident of the Revit database, which it does not become until after it has been regenerated.</p>
+
+<p>Here is the result of running this command:</p>
+
+<center>
+<img src="img/rotate_by_pi.png" alt="Revolution rotated by &pi;" width="223"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>NewSweptBlend Using Arcs</h4>
+
+<p>The next query comes from this
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/adva-webinar-free-student-software-and-au.html?cid=6a00e553e16897883301bb07a94cba970d#comment-6a00e553e16897883301bb07a94cba970d">
+comment</a>:</p>
+
+<p><strong>Question:</strong> Thank you for your response. I have another issue, this time with SweptBlend.</p>
+
+<p>Is it possible to have the sweep path be an arc?
+I would think yes, but I cannot get it to work.
+All the examples show the path as a line.</p>
+
+<p>Here’s my code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> pnt1 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, -1, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt2 = <span class="blue">new</span> <span class="teal">XYZ</span>( 1, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt3 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 1, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt4 = <span class="blue">new</span> <span class="teal">XYZ</span>( -1, 0, 0 );
+&nbsp; <span class="teal">Arc</span> aArc1 = creapp.NewArc( pnt1, pnt3, pnt2 );
+&nbsp; <span class="teal">Arc</span> aArc2 = creapp.NewArc( pnt3, pnt1, pnt4 );
+&nbsp; <span class="teal">CurveArrArray</span> arrarr1 = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp;
+&nbsp; <span class="teal">SweepProfile</span> bottomProfile
+&nbsp; &nbsp; = creapp.NewCurveLoopsProfile( arrarr1 );
+&nbsp;
+&nbsp; <span class="teal">CurveArray</span> arr1 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; arr1.Append( aArc1 );
+&nbsp; arr1.Append( aArc2 );
+&nbsp; <span class="teal">XYZ</span> pnt6 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, -2, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt7 = <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt8 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 2, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt9 = <span class="blue">new</span> <span class="teal">XYZ</span>( -2, 0, 0 );
+&nbsp; <span class="teal">Arc</span> aArc3 = creapp.NewArc( pnt6, pnt8, pnt7 );
+&nbsp; <span class="teal">Arc</span> aArc4 = creapp.NewArc( pnt8, pnt6, pnt9 );
+&nbsp; <span class="teal">CurveArrArray</span> arrarr2 = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp; <span class="teal">CurveArray</span> arr2 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; arr2.Append( aArc3 );
+&nbsp; arr2.Append( aArc4 );
+&nbsp; arrarr2.Append( arr2 );
+&nbsp;
+&nbsp; <span class="teal">SweepProfile</span> topProfile
+&nbsp; &nbsp; = creapp.NewCurveLoopsProfile( arrarr2 );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> pnt10 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt11 = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 5, 0 );
+&nbsp; <span class="teal">XYZ</span> pnt122 = <span class="blue">new</span> <span class="teal">XYZ</span>( 2.5, 2.5, 0 );
+&nbsp; <span class="teal">Arc</span> testArc = creapp.NewArc( pnt10, pnt11, pnt122 );
+&nbsp; <span class="teal">Curve</span> curve = (<span class="teal">Curve</span>) testArc;
+&nbsp;
+&nbsp; <span class="teal">Plane</span> geometryPlane = creapp.NewPlane(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> sketchPlane = doc.NewSketchPlane(
+&nbsp; &nbsp; geometryPlane );
+&nbsp;
+&nbsp; <span class="teal">SweptBlend</span> aSweptBlend = doc.NewSweptBlend(
+&nbsp; &nbsp; <span class="blue">true</span>, curve, sketchPlane, bottomProfile,
+&nbsp; &nbsp; topProfile );
+</pre>
+
+<p><strong>Answer:</strong> The curve defining the swept blend extrusion path can be any valid curve and is definitely not limited to just straight lines.</p>
+
+<p>Just ensure that you are not generating any self-intersecting solids.</p>
+
+<p>If you run into any problems, remove the final solid generation call, replace it by code to generate model curves instaed, and see what happens when you try to generate the same solid manually in the user interface, as described for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging geometric form creation</a>.</p>
+
+<p>The top and bottom profiles must be planar and lie in the XY plane.</p>
+
+<p>I added a new helper method CreateNewSweptBlendArc to the existing CmdNewSweptBlend external command in The Building Coder samples to create a second solid shape to answer your query.</p>
+
+<p>This external command implementation was still using automatic transaction mode until now, so I went ahead and converted it to use manual transaction mode, while I was at it anyway.</p>
+
+<p>Here is the new CreateNewSweptBlendArc method based on your sample code:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create a new swept blend form using arcs to</span>
+&nbsp; <span class="gray">///</span><span class="green"> define circular start and end profiles and an</span>
+&nbsp; <span class="gray">///</span><span class="green"> arc path. The NewSweptBlend method requires </span>
+&nbsp; <span class="gray">///</span><span class="green"> the input profiles to be in the XY plane.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> CreateNewSweptBlendArc( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( doc.IsFamilyDocument,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;this method will only work in a family document&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">FamilyItemFactory</span> credoc
+&nbsp; &nbsp; &nbsp; = doc.FamilyCreate;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> px = <span class="teal">XYZ</span>.BasisX;
+&nbsp; &nbsp; <span class="teal">XYZ</span> py = <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc1 = <span class="teal">Arc</span>.Create( -px, px, -py );
+&nbsp; &nbsp; <span class="teal">Arc</span> arc2 = <span class="teal">Arc</span>.Create( px, -px, py );
+&nbsp; &nbsp; <span class="teal">CurveArray</span> arr1 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; &nbsp; arr1.Append( arc1 );
+&nbsp; &nbsp; arr1.Append( arc2 );
+&nbsp; &nbsp; <span class="teal">CurveArrArray</span> arrarr1 = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp; &nbsp; arrarr1.Append( arr1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SweepProfile</span> bottomProfile
+&nbsp; &nbsp; &nbsp; = creapp.NewCurveLoopsProfile( arrarr1 );
+&nbsp;
+&nbsp; &nbsp; px += px;
+&nbsp; &nbsp; py += py;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc3 = <span class="teal">Arc</span>.Create( -px, px, -py );
+&nbsp; &nbsp; <span class="teal">Arc</span> arc4 = <span class="teal">Arc</span>.Create( px, -px, py );
+&nbsp; &nbsp; <span class="teal">CurveArray</span> arr2 = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; &nbsp; arr2.Append( arc3 );
+&nbsp; &nbsp; arr2.Append( arc4 );
+&nbsp; &nbsp; <span class="teal">CurveArrArray</span> arrarr2 = <span class="blue">new</span> <span class="teal">CurveArrArray</span>();
+&nbsp; &nbsp; arrarr2.Append( arr2 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SweepProfile</span> topProfile
+&nbsp; &nbsp; &nbsp; = creapp.NewCurveLoopsProfile( arrarr2 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p5 = 5 * <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pmid = <span class="blue">new</span> <span class="teal">XYZ</span>( 2.5, 2.5, 0 );
+&nbsp; &nbsp; <span class="teal">Arc</span> testArc = <span class="teal">Arc</span>.Create( p0, p5, pmid );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> geometryPlane = creapp.NewPlane(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, <span class="teal">XYZ</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> sketchPlane = <span class="teal">SketchPlane</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, geometryPlane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SweptBlend</span> aSweptBlend = credoc.NewSweptBlend(
+&nbsp; &nbsp; &nbsp; <span class="blue">true</span>, testArc, sketchPlane, bottomProfile,
+&nbsp; &nbsp; &nbsp; topProfile );
+&nbsp; }
+</pre>
+
+<p>This creates a swept blend with circular start and end profiles with radius one and two respectively, swept along an arc with a diameter of five.</p>
+
+<p>I added the call to this method to the existing one that generates a shape with straight edges, which I left unchanged from the original CmdNewSweptBlend implementation.</p>
+
+<p>I fixed a few obvious small but crucial errors in your code, such as mixing up the endpoint and the midpoint in the calls to generate some of the arcs and passing in an empty CurveArrArray arrarr1 as an argument to the NewCurveLoopsProfile method when defining the SweepProfile bottomProfile...</p>
+
+<p>Here is a screen snapshot of the two swept blends now generated by this command:</p>
+
+<center>
+<img src="img/newsweptblendarc.png" alt="New swept blend using arcs" width="274"/>
+</center>
+
+<p>Here is another snapshot from a different point of view:</p>
+
+<center>
+<img src="img/newsweptblendarc2.png" alt="New swept blend using arcs" width="400"/>
+</center>
+
+<p>As always, the most up to date version of The Building Coder samples is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version described above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.115.2">
+release 2015.0.115.2</a>.</p>

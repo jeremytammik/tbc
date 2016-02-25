@@ -1,0 +1,347 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+- http://soundofnoise.de
+
+- work in progress
+  View Depth Override macro from Codice Sorgente  http://puntorevit.blogspot.it/2013/10/view-depth-override-2014-codice-sorgente.html
+  also shows use of Project Chronicle to record the screen
+  source code ~/downloads/ViewDepthOverride2014.cs
+  http://puntorevit.blogspot.it/2013/11/3d-view-depth-override-update.html
+  3D View Depth Override - Update
+  running a macro in perspective mode
+  ~/downloads/3DViewDepthOverride-Write-Read_2014.cs
+
+-->
+
+<h3>DevDay@AU, Chronicle, Extensible Storage Removal with Linked Files, View Depth Override and Sound of Noise</h3>
+
+<h3>DevDay@au Chronicle Estorage View Depth Sound of Noise</h3>
+
+<p>Monday was the first day at Autodesk University in Las Vegas, dedicated to the forward-looking confidential DevDays conference with the main focus on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/back-and-preparing-the-au-and-devdays-conferences.html#2">
+rEvolution &ndash; where desktop meets the cloud</a>.</p>
+
+<p>In spite of the confidential nature of the information discussed, I am sure I can share an at least an outline of the content here in public with you.</p>
+
+<p>I'll also touch on a couple of other interesting topics that cropped up on the past few days, such as the need to
+
+<a href="#9">disconnect from central before removing an updater reference</a>, the
+
+<a href="#10">Autodesk Chronicle product launch</a>, a
+
+<a href="#11">view depth override macro</a> showing
+
+a nice example of making use of Chronicle, and last but not least the
+
+<a href="#12">sound of noise</a>.</p>
+
+<!--
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/invitation-to-autodesk-devdays-2013.html">
+invitation</a>
+-->
+
+<a name="2"></a>
+
+<h4>DevDay@AU</h4>
+
+<p>The Autodesk Developer Network conference discusses confidential future directions of the products and their APIs.</p>
+
+<p>I'll look in more detail at the following agenda items:</p>
+
+<ul>
+<li><a href="#3">General Design</a></li>
+<li><a href="#4">Cloud &amp; mobile platform web service APIs</a></li>
+<li><a href="#5">Afternoon breakout sessions</a> for AEC, Infrastructure &amp; Manufacturing, Media &amp; Entertainment</li>
+<li><a href="#6">BIM &ndash; Architecture, Engineering, Construction and Infrastructure breakout session</a></li>
+<!--
+<li><a href="#7">APPHACK contest</a></li>
+<li><a href="#8">Evening event</a></li>
+-->
+</ul>
+
+<p>This exciting day was wrapped up with the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/revit-2013-api-developer-guide-pdf.html#4">
+AppHack contest</a> final
+
+and a social evening event at
+
+<a href="http://www.elsegundosol.com">
+El Segundo Sol</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>General design</h4>
+
+<p>The warm welcome by Jim Quanci was followed by the keynote presentation by Amy Bunsell, VP AutoCAD Products, on AutoCAD evolution on the desktop and connecting to other platforms.
+We further discussed the Autodesk cloud &amp; mobile platforms, the future direction of AutoCAD and its APIs, and the full spectrum of the new Autodesk cloud &amp; mobile platform web service APIs.</p>
+
+<a name="4"></a>
+
+<h4>Cloud &amp; mobile platform web service APIs</h4>
+
+<p>Here are some of the different web API related topics we covered:</p>
+
+<ul>
+<li>Authorisation &ndash; <a href="https://github.com/ADN-DevTech/AutodeskOAuthSamples">ADN OAuth samples</a>.</li>
+<li>Federated Identity, e.g. for a customer to sign in to your web service using the Autodesk id.</li>
+<li>Viewing &ndash; web viewer demo</li>
+<li>Creation
+<ul>
+<li><a href="http://recap360-staging.autodesk.com">ReCap</a> web API to create 3D models from photos, used e.g. by
+
+<a href="http://us.kubit-software.com">kubit</a>,
+
+<a href="http://www.builditsoftware.com">BuildIT</a> for
+
+mold comparison and
+
+<a href="http://twnkls.com">twnkls</a> for
+
+elevator design based on photos of stairs. The REST API is in pilot right now.</li>
+<li>Stephen demonstrated a custom AutoCAD 360 app in an iPad using ReCap to generate a 3D model directly in AutoCAD 360 from photos via ReCap.</li>
+
+<li><a href="https://grabcad.com">GrabCad</a> hosting AutoCAD 360.</li>
+<li><a href="http://fusion360.autodesk.com">Fusion 360</a> &ndash; live on the stage, Jim and Stephen created a rotating link on an axle in one minute and a racing boat catamaran in another ten or so.</li>
+</ul>
+</li>
+<li>AutoCAD 360 mobile apps: jobshop building, dynamic attribute addition, live collaboration feeds.</li>
+<li>Rendering as a service (RaaS) with a REST API.</li>
+<li><a href="http://www.autodesk.com/products/bim-360">BIM 360 Glue</a> showing a stadium assembled from gigabytes of data from multiple CAD sources, navigate, access attributes, etc., cf. the
+
+<a href="http://adndevblog.typepad.com/aec/2013/05/a-new-glue-new-look-and-30-day-free-trial.html">
+Glue update</a> and
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/bim-360-glue-api-pilot-and-updated-samples.html">
+updated ADN DevBlog samples</a>,
+
+now also equipped with the dedicated
+
+<a href="http://the360view.typepad.com">
+360 View</a> technical blog by Manu Venugopal.</li>
+<li><a href="http://bim360field.com">BIM 360 Field</a> construction site web based communication and sharing of issues, checklists, tasks, models, photos etc.</li>
+
+<li>PLM 360 supporting simple processes to quickly and easily build tools for custom reports and administration, with sample code available from the ADN
+
+<a href="https://github.com/ADN-DevTech/PLM360-API-Samples">PLM360-API-Samples</a>.</li>
+</ul>
+
+<p>The OAuth, ReCap, Fusion 360, PLM 360, BIM 360 Field and Glue APIs are ready to use, and companies are out there in the AU exhibition hall demonstrating products based on them.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Afternoon Breakout Sessions</h4>
+
+<p>In the afternoon, we split up into three separate breakout sessions for:</p>
+
+<ul>
+<li>BIM &ndash; Architecture, Engineering, Construction and Infrastructure</li>
+<li>Manufacturing</li>
+<li>Media &amp; Entertainment</li>
+</ul>
+
+<p>Us Revit add-in developers are obviously most interested in the first of these.</p>
+
+
+<a name="6"></a>
+
+<h4>BIM &ndash; Architecture, Engineering, Construction and Infrastructure Breakout Session</h4>
+
+<p>The BIM and AEC session focused on three main topics:</p>
+
+<ul>
+<li>The future of Revit and its APIs &ndash;
+pushing the frontiers of BIM beyond building design and creating opportunities for increasingly complex models ready for detailing and fabrication.</li>
+<li>BIM for infrastructure platforms and new web services APIs &ndash;
+create and use intelligent 3D models to plan, design, build, and manage infrastructure.
+InfraWorks combines 3D modelling and visualisation technologies for desktop, web, and mobile to allow collaboration on infrastructure models in new, exciting and productive ways. Use the new InfraWorks APIs to integrate with your applications and enable fast and easy infrastructure data exchange and interoperability
+in InfraWorks, Civil 3D, Revit and other Autodesk products.</li>
+<li>BIM 360 Platforms and new web service APIs &ndash;
+BIM in the cloud provides access to common, up-to-date model information anywhere, any time.
+APIs available now for Autodesk BIM 360 Glue and Autodesk BIM 360 Field, including the new display component API, deep data-sharing between our BIM technologies, roadmap for the future of BIM in the cloud.</li>
+</ul>
+
+<!--
+<a name="7"></a>
+
+<h4>APPHACK Contest and Evening Event</h4>
+
+<p>
+Join the judge panel and the finalists for some sure-to-be awesome live demos, plus cocktails and hors d'oeuvres. The 3 winners will be announced at the event.</p>
+
+<a name="8"></a>
+
+<h4>Evening Event</h4>
+
+<p>ADN Evening Event at El Segundo Sol where you can connect with Autodesk software engineers and ADN members just like you. You'll be amazed by what you can learn informally over a drink or 2 at this fun party!</p>
+-->
+
+<p>Apart from this very full day of forward looking news and visions, here are some further little news items that also piled up in the last few days and I would like to share with you:</p>
+
+
+<!-- 08988024 [REX] -->
+
+<a name="9"></a>
+
+<h4>Disconnect from Central Before Removing Updater Reference</h4>
+
+<p>If you subscribe to a dynamic model updater in a BIM and later open the model in an environment lacking the add-in implementing the updater, Revit may display a warning message that may be confusing or disconcerting to the uninitiated.</p>
+
+<p>I explained how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/vsta-to-stay-and-updater-to-go.html#2">
+remove an updater reference</a> way
+
+back in the Revit 2011 timeframe, including
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/vsta-to-stay-and-updater-to-go.html#3">automating the removal process</a>.</p>
+
+<p>The process described there could be executed in batch mode over all your models, or at least over the ones that you wish to send to customers.</p>
+
+<p>In newer versions of Revit, the updater itself can specify programmatically that no warning should appear if the updater is not found, as explained in the list of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">what's new in the Revit 2012 API</a>:</p>
+
+<h5 style="color:darkblue">Dynamic Update Framework API changes</h5>
+
+<p style="color:darkblue">There are new settings to flag an updater as optional. Optional updaters will not cause prompting the end user when they are opening a document that was modified by that updater but the updater is not currently registered. Optional updaters should be used only when necessary. By default, updaters are non-optional. New methods introduced to support this change are:</p>
+
+<ul style="color:darkblue">
+<li>UpdaterRegistry.SetIsUpdaterOptional(UpdaterId id, bool isOptional)</li>
+<li>UpdaterRegistry.RegisterUpdater(UpdaterId id, bool isOptional)</li>
+<li>UpdaterRegistry.RegisterUpdater(UpdaterId id, Document doc, bool isOptional)</li>
+</ul>
+
+<p style="color:darkblue">New methods were added to access information about currently registered updaters:</p>
+
+<ul style="color:darkblue">
+<li>UpdaterRegistry.GetRegisteredUpdaterInfos(Document doc)</li>
+<li>UpdaterRegistry.GetRegisteredUpdaterInfos()</li>
+</ul>
+
+<p style="color:darkblue">Revit now disallows any calls to UpdaterRegistry from within the Execute() method of an updater. That means any calls to RegistryUpdater(), AddTrigger(), etc. will now throw an exception. The only method of UpdaterRegistry allowed to be called during execution of an updater is UnregisterUpdater(,) but the updater to be unregistered must be not the one currently being executed.</p>
+
+<p>That will not help you with old or existing models, though.</p>
+
+<p>I tested the very simple and logical steps to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/vsta-to-stay-and-updater-to-go.html#2">
+remove an updater reference</a> on
+
+your sample model and they worked absolutely fine for me:</p>
+
+<ul>
+<li>Open the model in the user interface.</li>
+<li>Select 'continue working and do not warn me again'.</li>
+<li>Save and close the file.</li>
+</ul>
+
+<p>When I reopen the file the next time, the warning is gone.</p>
+
+<p>By the way, you always should disconnect your files from central before sending them to us for testing.</p>
+
+<p>I see the following messages when opening your file:</p>
+
+<ul>
+<li>1_central_model_msg.png</li>
+<li>2_missing_updater.png</li>
+<li>3_cannot_find_central.png</li>
+<li>4_save_not_synced.png</li>
+</ul>
+
+<p>After performing the removal described above, the updater warning disappears.
+On reopening again, I only see the 'cannot find central' message.</p>
+
+<p>The developer responded:
+"I tried it again and it didn’t work.
+Then I remembered your comment about detaching from central (sorry about that), did that and tried again.
+Then it worked."</p>
+
+<p>Motto: disconnect from central to remove an updater.</p>
+
+
+<a name="10"></a>
+
+<h4>Autodesk Chronicle Launch</h4>
+
+<p><a href="https://chronicle.autodesk.com">
+Chronicle</a> is
+
+a free technology preview that enables capturing, sharing, and learning from software workflows, currently supporting AutoCAD, Revit, and Inventor.</p>
+
+<p>It is being launched now at AU.</p>
+
+<p>Chronicle consists of a recording utility to capture recordings, and a web site that displays the recordings as Chronicles, interactive video tutorials. The videos can be shared publically or set to private, so that they can be used as internal training materials for a private office or classroom. In essence, Chronicle allows software experts to showcase their expertise and allows other users to view and learn from their real-world expert examples.</p>
+
+<p>The Chronicle Recording Utility captures workflows from within Autodesk products. It records a continuous video screen capture and optionally voice narration. It is also records the timing and details of workflow information, such as the commands, tools, settings, and dialog boxes used during the workflow. Captured data is uploaded to the Chronicle website. An author can publish the Chronicle as public or private, so the desired user group can view a video of the workflow. Additionally, the captured workflow events are displayed on an interactive timeline, enhancing the viewing and learning experience.</p>
+
+<p>Check out
+
+<a href="https://chronicle.autodesk.com">
+Chronicle</a> and
+
+start sharing your knowledge today!</p>
+
+
+<a name="11"></a>
+
+<h4>View Depth Override Macro and Chronicle Sample</h4>
+
+<p>Just by chance, I happened to notice the
+
+<a href="http://puntorevit.blogspot.it/2013/10/view-depth-override-2014-codice-sorgente.html">
+View Depth Override macro</a>
+
+(<a href="zip/ViewDepthOverride2014.cs">source</a>)
+
+on the
+
+<a href="http://puntorevit.blogspot.it">Punto Revit</a> blog by
+
+Paolo Emilio Serra and his more recent
+
+<a href="http://puntorevit.blogspot.it/2013/11/3d-view-depth-override-update.html">
+updated 3D version</a>
+
+(<a href="zip/3DViewDepthOverride-Write-Read_2014.cs">source</a>)
+
+running
+
+a macro in perspective mode, currently still work in progress, and thought that might be of interest to others as well.
+Looks like interesting stuff.</p>
+
+<p>By the way, the demos on those pages are recorded using the preview version of Chronicle, so you can see some nice live examples of that functionality in use.</p>
+
+
+<a name="12"></a>
+
+<h4>Sound of Noise</h4>
+
+<p>My son Christopher has been actively creating and publishing music on SoundCloud as
+
+<a href="https://soundcloud.com/allerdings">Allerdings</a>.</p>
+
+<p>One nice little sample is
+
+<a href="https://soundcloud.com/allerdings/hydrophonie">Hydrophonie</a>,
+
+created from nothing but natural sounds recorded using a glass of water and some sesame seeds:</p>
+
+<center>
+<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/112570612&amp;color=ff6600&amp;auto_play=false&amp;show_artwork=true"></iframe>
+</center>
+
+<p>Christopher now set up his own Internet presence at
+
+<a href="http://soundofnoise.de">SoundOfNoise</a>.</p>
+
+<p>Exciting stuff, and congratulations!</p>

@@ -1,0 +1,663 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09996688 [Update Text property (test font style)]
+
+http://forums.autodesk.com/t5/revit-api/saving-family-after-editing-with-familymanager/td-p/5291581
+
+-->
+
+<h3>Modifying, Saving and Reloading Families</h3>
+
+<p>I recently grabbed one of those rare opportunities to do a little bit of coding myself, to answer a question on modifying and reloading a family.</p>
+
+<p>More precisely, the task at hand is to modify the text note type font in all of the loaded families.</p>
+
+<p>I'll take a look at that <a href="#3">below.</a></p>
+
+<p>First, lets look at a simpler question, on how to
+
+<a href="http://forums.autodesk.com/t5/revit-api/saving-family-after-editing-with-familymanager/td-p/5291581">
+save a family after editing it</a>,
+
+raised by Raunoveb on the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">
+Revit API discussion forum</a>:</p>
+
+
+
+<a name="2"></a>
+
+<h4>Saving Family after Editing with FamilyManager</h4>
+
+<p><strong>Question:</strong> We are developing a solution that uploads Revit Family files to DMS server.</p>
+
+<p>First we added a few shared parameters that have the information of DMS record to our families using the FamilyManager AddParameter method.</p>
+
+<!--
+  if (doc.IsFamilyDocument)
+  {
+    Family f = doc.OwnerFamily;
+    FamilyManager manager = doc.FamilyManager;
+    //Check if parameters have already been added to Family and it's Symbols.
+    //If not then adding parameters using Transaction.
+    if (manager.get_Parameter("DMS_DOCNUMBER") == null)
+    {
+      using (Transaction trans = new Transaction(doc, "PARAM_SET"))
+      {
+        trans.Start();
+        manager.AddParameter("DMS_DOCNUMBER", BuiltInParameterGroup.PG_IDENTITY_DATA, ParameterType.Text, true);
+        manager.AddParameter("DMS_DOCVERSION", BuiltInParameterGroup.PG_IDENTITY_DATA, ParameterType.Text, true);
+        manager.AddParameter("DMS_DOCTYPE", BuiltInParameterGroup.PG_IDENTITY_DATA, ParameterType.Text, true);
+        manager.AddParameter("DMS_DOCPART", BuiltInParameterGroup.PG_IDENTITY_DATA, ParameterType.Text, true);
+        trans.Commit();
+      }
+    }
+    //Create FamilyParameter reference objects after parameters have been added or checked if added
+    FamilyParameter docnr = manager.get_Parameter("DMS_DOCNUMBER");
+    FamilyParameter docvers = manager.get_Parameter("DMS_DOCVERSION");
+    FamilyParameter doctype = manager.get_Parameter("DMS_DOCTYPE");
+    FamilyParameter docpart = manager.get_Parameter("DMS_DOCPART");
+
+    //Setting parameter values for every Symbol in the family
+    foreach (FamilyType ft in manager.Types)
+    {
+      if (!MaterialHasDocument(ft, manager))
+      {
+        DocumentObj docObj = CreateDMSDocument("RVT");
+        using (Transaction trans = new Transaction(doc, "SET_PARAM"))
+        {
+          trans.Start();
+          manager.CurrentType = ft;
+          manager.Set(docnr, docObj.docNumber);
+          manager.Set(docvers, docObj.docVersion);
+          manager.Set(doctype, docObj.docType);
+          manager.Set(docpart, docObj.docPart);
+          trans.Commit();
+        }
+        //This is where we upload the .rfa file
+        //MANY MANY ERRORS
+        UploadOriginal(docObj, f, doc);
+      }
+    }
+  }
+  else
+  {
+    TaskDialog.Show("Info", "Family view not open.");
+  }
+-->
+
+<p>Everything works fine until we call our UploadOriginal method that attempts to save the modified family file:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> path = Path.GetTempPath();
+&nbsp; <span class="blue">string</span> name = family.Name;
+&nbsp; <span class="blue">string</span> fName = name + <span class="maroon">&quot;.rfa&quot;</span>;
+&nbsp; <span class="blue">string</span> fPath = path + fName;
+&nbsp;
+&nbsp; <span class="green">// Revit throws an error on this line </span>
+&nbsp; <span class="green">// saying that Family is not editable</span>
+&nbsp; <span class="green">// What could cause this mayhem?</span>
+&nbsp; <span class="green">// To upload .rfa Family file I need to </span>
+&nbsp; <span class="green">// save it as a file first and that's what </span>
+&nbsp; <span class="green">// I try to do until mighty ERROR occurs</span>
+&nbsp;
+&nbsp; <span class="teal">Document</span> famDoc = doc.EditFamily( family );
+&nbsp; famDoc.SaveAs( fPath );
+&nbsp; famDoc.Close( <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="green">// application related code following...</span>
+</pre>
+
+<p>What could be the reason of this error? How could I fix it?
+Must it be overwritten like a baus (<a href="https://www.youtube.com/watch?v=NisCkxU544c">BOSS</a>)?</p>
+
+
+<p><strong>Answer:</strong> I recently implemented an add-in that I discuss further down to update fonts in loaded families.</p>
+
+<p>For some of the loaded families, EditFamily threw that same exception saying, "Family is not editable".</p>
+
+<p>I added an exception handler to skip them:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r1.FamilyDocument
+&nbsp; &nbsp; &nbsp; = famdoc
+&nbsp; &nbsp; &nbsp; = doc.EditFamily( f );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">ArgumentException</span> ex )
+&nbsp; {
+&nbsp; &nbsp; r1.Skipped = <span class="blue">true</span>;
+&nbsp; &nbsp; results.Add( r1 );
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Family '{0}': {1}&quot;</span>, f.Name, ex.Message );
+&nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; }
+</pre>
+
+<p>Here is an excerpt of the add-in log; the families marked 'skipped' are the ones I mean:</p>
+
+<center>
+<img src="img/reload_family_result_msg.png" alt="Reload family report"/>
+</center>
+
+<p>I simply assumed that is normal.</p>
+
+<p>P.S. cool video  :-)</p>
+
+<p><strong>Question:</strong> I managed to skip those families by simply adding an <code>if(family.IsEditable)</code> block around the code.
+Unfortunately for us these families we try to process must be processed so we can't just skip them.</p>
+
+<p>I've had 2 ideas that could explain those errors:</p>
+
+<p>FamilyManager (fm) somehow locks the family currently open in Family Document and only allows us to edit the family after it's released the family.
+However even after fm.Dispose() the EditFamily method threw that exception.</p>
+
+<p>(This idea could be related to first idea).
+One cannot just simply write a family to file just after the shared parameters have been changed/added.
+A "save" command must be somehow executed in order to "unlock" this family.
+However once again I found no methods in either FamilyManager or Family class that would allows us to do that.</p>
+
+<p>I have danced around this problem for 3 days and have ran out of ideas.
+Any help "unlocking" these families would be greatly appreciated.</p>
+
+
+<p><strong>Answer:</strong> Thank you very much for pointing out the IsEditable predicate.
+I successfully replaced my exception handler by simply checking that instead.</p>
+
+<p>Regarding your locked families, have you tried ensuring that absolutely no other documents are open, only the one and only family that you are trying to modify?</p>
+
+
+<p><strong>Question:</strong> Thanks for your comment about any other open documents.
+I suddenly realized that in my main program I already had FamilyDocument open.
+When I used UploadOriginal() method I gave doc as an input and then tried:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> famDoc = doc.EditFamily( family );
+&nbsp; famDoc.SaveAs( path );
+&nbsp; famDoc.Close( <span class="blue">false</span> );
+</pre>
+
+<p>That created another Family Document instance of the same family and that's why it threw this "Family not editable" exception. I changed it to:</p>
+
+<pre class="code">
+&nbsp; doc.SaveAs( path );
+&nbsp;
+&nbsp; <span class="green">// Can't close it since I have this family view </span>
+&nbsp; <span class="green">// open in Revit and API doesn't have permission </span>
+&nbsp; <span class="green">// to close visibly open documents in Revit.</span>
+&nbsp;
+&nbsp; <span class="green">//doc.Close(false);</span>
+</pre>
+
+<p>However now I've got problems with getting the Family.Name value from doc.OwnerFamily.Name.
+It always returns "" and all the files saved look like this "/folder/.rfa", when they should look something like this "/folder/NightLamp.rfa".</p>
+
+
+<p><strong>Answer:</strong> Cool.</p>
+
+<p>Progress.</p>
+
+<p>How about using the document title instead of the family name?</p>
+
+
+<p><strong>Question:</strong> Using doc.Title did the trick. However it's weird that OwnerFamily.Name returned blank response.</p>
+
+<p>Thanks for everything. And since your second answer provided most help regarding to the main question I'll mark that one as a solution.</p>
+
+<p><strong>Answer:</strong> Cooler still.</p>
+
+<p>That was a quick solution.</p>
+
+<p>Thank you for marking the solution and for the interesting discussion.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Replacing all Text Note Type Fonts in all Loaded Families</h4>
+
+<p>With that little intermezzo out of the way, we get to the real thing:</p>
+
+<p><strong>Question:</strong> Update text font style property.
+
+<p>I am trying to update the text font property for the active project and also update all the families loaded in that project, i.e. the active document.</p>
+
+<p>The first part works fine, updating the text property for the active project.</p>
+
+<p>I am having trouble figuring out how to update the text property for all the families loaded into the active project, though.</p>
+
+<p>This is my current coding attempt:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> doc = commandData.Application
+&nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collectorUsed
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collectorUsed.OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> collectorUsed )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> name = f.Name;
+&nbsp; &nbsp; <span class="teal">Document</span> famdoc = doc.EditFamily( f );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> famcollectorUsed
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( famdoc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; textNoteTypes
+&nbsp; &nbsp; &nbsp; = famcollectorUsed.OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> textNoteTypeId <span class="blue">in</span> textNoteTypes )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> ele = doc.GetElement( textNoteTypeId );
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> p <span class="blue">in</span> ele.Parameters )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( p.Definition.Name == <span class="maroon">&quot;Text Font&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tranew
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tranew.Start( <span class="maroon">&quot;Update&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.Set( <span class="maroon">&quot;Arial Black&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tranew.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<p><strong>Answer:</strong></p>
+
+<p>I discussed the topic of reloading families on The Building Coder in 2011:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html">Reloading a family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/10/reloading-a-family-again.html">Reloading a family again</a></li>
+</ul>
+
+<p>Some things have changed a little bit since then.</p>
+
+<p>The main principles remain the same, however.</p>
+
+<p>I looked at the help file on the
+
+<a href="http://knowledge.autodesk.com/support/revit-products/downloads/caas/CloudHelp/cloudhelp/2014/ENU/Revit/files/GUID-B3E40C07-175D-48CA-BF73-3003AF760F7B-htm.html">
+Text Note Type Properties</a> and
+
+see the Text Font property that you wish to change, and that looks fine.</p>
+
+<p>There is no need to loop through all the element parameters and match individual strings to find the parameter you are after, however.</p>
+
+<p>You can use the GetParameters or LookupParameter method instead. You should obviously no longer use the obsolete get_Parameter method, if you can avoid it.</p>
+
+<p>By the way, you should also not use the parameter name to identify it if it is possible to use a built-in parameter enumeration value instead, since the latter is both language independent, more efficient, and guaranteed to return a unique result.</p>
+
+<p>For the sake of efficiency, you might want to check whether the current font property setting already as the desired value before you open an extra new transaction and modify it.</p>
+
+<p>Just as you say, though, even after you have modified the text note types in the family document and committed the transactions, the changes are still not reflected in the container project document.</p>
+
+<p>This is actually clearly documented in the Revit API help file RevitAPI.chm, in the remarks on the Document.EditFamily method:</p>
+
+<blockquote>
+<h4>Remarks</h4>
+
+<p>This creates an independent copy of the family for editing. To apply the changes back to the family stored in the document, use the LoadFamily overload accepting IFamilyLoadOptions.</p>
+
+<p>This method may not be called if the document is currently modifiable (has an open transaction) or is in a read-only state. The method may not be called during dynamic updates. To test the document's current status, check the values of IsModifiable and IsReadOnly properties.</p>
+</blockquote>
+
+<p>I also pointed this out when discussing some
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/edit-family-requires-no-transaction.html">
+changes in calling the EditDocument method</a> back
+
+in the Revit 2013 timeframe.</p>
+
+<p>There are some further important considerations when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html">
+reloading a family</a>.</p>
+
+<p>Actually, here is a complete list of discussions related to reloading families or mentioning the IFamilyLoadOptions interface that might also be useful:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html">The Revit Family API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/ifamilyloadoptions-and-gemini.html">IFamilyLoadOptions</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/reloading-a-family.html">Reloading a Family</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/10/reloading-a-family-again.html">Reloading a Family Again</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/edit-family-requires-no-transaction.html">Edit Family Requires No Transaction</a></li>
+</ul>
+
+<p>Based on the information provided there, we have to explicitly reload all the modified families after updating their text note type font properties by calling the LoadFamily method on each, and specify an appropriate IFamilyLoadOptions interface implementation when doing so. Here is a suitable one, updated from the discussions listed above:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">JtFamilyLoadOptions</span> : <span class="teal">IFamilyLoadOptions</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> OnFamilyFound(
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> familyInUse,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> <span class="blue">bool</span> overwriteParameterValues )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; overwriteParameterValues = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> OnSharedFamilyFound(
+&nbsp; &nbsp; &nbsp; <span class="teal">Family</span> sharedFamily,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> familyInUse,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> <span class="teal">FamilySource</span> source,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> <span class="blue">bool</span> overwriteParameterValues )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; source = <span class="teal">FamilySource</span>.Family;
+&nbsp; &nbsp; &nbsp; overwriteParameterValues = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Another issue to be aware of is that you are not allowed to perform any element deletions while iterating over the results of a filtered element collector, or Revit will throw an InvalidOperationException saying 'The iterator cannot proceed due to changes made to the Element table in Revit's database (typically, This can be the result of an Element deletion).'</p>
+
+<p>That forced me to postpone the family reloading operation and move it out of the collector iteration loop, where it was originally situated.</p>
+
+<p>I implemented a new add-in named SetTextFontInFamilies to demonstrate all this.</p>
+
+<p>As usual, in order to understand and understand what it really does, the logging and reporting code exceeds the actual task implementation.</p>
+
+<p>It keeps track of all the families processed.</p>
+
+<p>Some families are skipped, because the EditFamily method throws an ArgumentException saying 'This family is not editable.'</p>
+
+<p>If not skipped, it also records all the text note types processed, and how many of them actually require a modification of the font.</p>
+
+<p>Here is the main result logging implementation class:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Logging helper class to keep track of the result</span>
+&nbsp; <span class="gray">///</span><span class="green"> of updating the font of all text note types in a</span>
+&nbsp; <span class="gray">///</span><span class="green"> family. The family may be skipped or not. If not,</span>
+&nbsp; <span class="gray">///</span><span class="green"> keep track of all its text note types and a flag </span>
+&nbsp; <span class="gray">///</span><span class="green"> for each indicating whether it was updated.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">SetTextFontInFamilyResult</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">class</span> <span class="teal">TextNoteTypeResult</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Name { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Updated { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The Family element name in the project database.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> FamilyName { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The family document used to reload the family.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Document</span> FamilyDocument { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Was this family skipped, e.g. this family is not editable.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Skipped { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> List of text note type names and updated flags.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">TextNoteTypeResult</span>&gt; TextNoteTypeResults;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> SetTextFontInFamilyResult( <span class="teal">Family</span> f )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; FamilyName = f.Name;
+&nbsp; &nbsp; &nbsp; TextNoteTypeResults = <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> AddTextNoteType(
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteType</span> tnt,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> updated )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == TextNoteTypeResults )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; TextNoteTypeResults
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">TextNoteTypeResult</span>&gt;();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteTypeResult</span> r = <span class="blue">new</span> <span class="teal">TextNoteTypeResult</span>();
+&nbsp; &nbsp; &nbsp; r.Name = tnt.Name;
+&nbsp; &nbsp; &nbsp; r.Updated = updated;
+&nbsp; &nbsp; &nbsp; TextNoteTypeResults.Add( r );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> NumberOfUpdatedTextNoteTypes
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> == TextNoteTypeResults
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? 0
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : TextNoteTypeResults
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Count&lt;<span class="teal">TextNoteTypeResult</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.Updated );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> NeedsReload
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0 &lt; NumberOfUpdatedTextNoteTypes;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// FamilyDocument.Title</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = FamilyName + <span class="maroon">&quot;: &quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( Skipped )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;skipped&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nTotal = TextNoteTypeResults.Count;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nUpdated = NumberOfUpdatedTextNoteTypes;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} text note types processed, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{1} updated&quot;</span>, nTotal, nUpdated );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I actually ended up using it for more than just logging the results, once I discovered that we need to terminate the first iteration over the filtered element collector before we can apply the modifications.
+Therefore, by tracking the font modifications made, this class also keeps track of which families need reloading at all.</p>
+
+<p>The main Execute method making use of this, determining and iterating over all the loaded families, modifying all their text note type fonts and reloading them afterwards, ends up looking like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> families
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">SetTextFontInFamilyResult</span>&gt; results
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">SetTextFontInFamilyResult</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> famdoc;
+&nbsp; &nbsp; <span class="teal">SetTextFontInFamilyResult</span> r1;
+&nbsp; &nbsp; <span class="blue">bool</span> updatedTextNoteStyle;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> families )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; r1 = <span class="blue">new</span> <span class="teal">SetTextFontInFamilyResult</span>( f );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> updatedFamily = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Using exception handler.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//try</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; r1.FamilyDocument</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = famdoc</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = doc.EditFamily( f );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//catch( Autodesk.Revit.Exceptions.ArgumentException ex )</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; r1.Skipped = true;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; results.Add( r1 );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; Debug.Print( &quot;Family '{0}': {1}&quot;, f.Name, ex.Message );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; continue;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Better: test IsEditable predicate.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( f.IsEditable )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; r1.FamilyDocument
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = famdoc
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.EditFamily( f );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; r1.Skipped = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; results.Add( r1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Family '{0}' is not editable&quot;</span>, f.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> textNoteTypes
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( famdoc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">TextNoteType</span> tnt <span class="blue">in</span> textNoteTypes )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; updatedTextNoteStyle = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// It is normally better to use the built-in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// parameter enumeration value rather than</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the parameter definition display name.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The latter is language dependent, possibly</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// returns multiple hits, and uses a less </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// efficient string comparison.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Parameter p2 = tnt.get_Parameter( </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; _parameter_bip );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Parameter</span>&gt; ps = tnt.GetParameters(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _parameter_name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 == ps.Count,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected only one 'Text Font' parameter&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> p <span class="blue">in</span> ps )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _font_name != p.AsString() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Update Text Font&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.Set( _font_name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; updatedFamily
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = updatedTextNoteStyle
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; r1.AddTextNoteType( tnt, updatedTextNoteStyle );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; results.Add( r1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This causes the iteration over the filtered </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// element collector to throw an </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// InvalidOperationException: The iterator cannot </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// proceed due to changes made to the Element table </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// in Revit's database (typically, This can be the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// result of an Element deletion).</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//if( updatedFamily )</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; f2 = famdoc.LoadFamily(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; doc, new JtFamilyLoadOptions() );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Reload modified families after terminating </span>
+&nbsp; &nbsp; <span class="green">// the filtered element collector iteration.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IFamilyLoadOptions</span> opt
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtFamilyLoadOptions</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Family</span> f2;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SetTextFontInFamilyResult</span> r <span class="blue">in</span> results )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r.NeedsReload )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; f2 = r.FamilyDocument.LoadFamily( doc, opt );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span> d = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Set Text Note Font&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; d.MainInstruction = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} families processed.&quot;</span>, results.Count );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; family_results
+&nbsp; &nbsp; &nbsp; = results.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; r =&gt; r.ToString() );
+&nbsp;
+&nbsp; &nbsp; family_results.Sort();
+&nbsp;
+&nbsp; &nbsp; d.MainContent = <span class="blue">string</span>.Join( <span class="maroon">&quot;\r\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; family_results );
+&nbsp;
+&nbsp; &nbsp; d.Show();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Here is a report of the result, displayed by this command in a Revit task dialogue:</p>
+
+<center>
+<img src="img/reload_family_result_msg.png" alt="Reload family report"/>
+</center>
+
+<p>This report omits the list of text note types processed within each family, although we actually do keep track of them internally as well in the TextNoteTypeResult and SetTextFontInFamilyResult classes.</p>
+
+<p>Note that I go to the very slight extra effort of sorting the results alphabetically for the convenience of the human reader.</p>
+
+<p>Also note that the task dialogue very kindly adds a scroll bar automatically.</p>
+
+<p>Finally, note that running this command even in a minimal new empty Revit project takes rather a long time to complete.</p>
+
+<p>The complete implementation and Visual Studio solution including the add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/SetTextFontInFamilies">SetTextFontInFamilies GitHub repository</a>.

@@ -1,0 +1,367 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+/a/doc/revit/blog/doc/vc_isolate_system_elements.docx
+
+Draft for the new post
+
+Victor Chekalin 
+
+-->
+
+
+<h3>Isolating Elements of a Given System</h3>
+
+<p>I am very glad to present another post contributed by Victor Chekalin, or Виктор Чекалин, who already shared many valuable insights and in-depth Revit API research in the past:</p>
+
+<p>On the <a href="http://adn-cis.org/forum/index.php?topic=1795.0">Russian developer forum</a>, the user <i>goblya</i> asked an interesting question. He needs to hide all elements except those that belong to a  specific given system.</p>
+<p>There are some interesting moments in the solution.</p>
+<p>The main idea is to create the filter, assign this filter to the active view and set visibility to false for this filter. The main problem is how to create a suitable filter.</p>
+<p>User almost solved it. Here is his initial code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Parameter</span> Namesystem = elem.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM );
+&nbsp;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; IList categories = <span class="blue">new</span> List();
+
+&nbsp; categories.Add( <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_PlaceHolderDucts ) );
+&nbsp;
+&nbsp; categories.Add( <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctLinings ) );
+&nbsp;
+&nbsp; categories.Add( <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctInsulations ) );
+&nbsp;
+&nbsp; categories.Add( <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_DuctTerminal ) );
+&nbsp;
+&nbsp; categories.Add( <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_MechanicalEquipment ) );
+&nbsp;
+&nbsp; IList rules = <span class="blue">new</span> List();
+&nbsp;
+&nbsp; rules.Add( <span class="teal">ParameterFilterRuleFactory</span>
+&nbsp; &nbsp; .CreateNotContainsRule( Namesystem.Id,
+&nbsp; &nbsp; &nbsp; Namesystem.AsString(), <span class="blue">true</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ParameterFilterElement</span> filter = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; doc, <span class="maroon">&quot;Create and Apply Filter&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start();
+&nbsp; &nbsp; filter = <span class="teal">ParameterFilterElement</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;2222&quot;</span>, categories, rules );
+&nbsp; &nbsp; view.AddFilter( filter.Id );
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; doc, <span class="maroon">&quot;Set Visibility Appearance&quot;</span> ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start();
+&nbsp; &nbsp; view.SetFilterVisibility( filter.Id, <span class="blue">false</span> );
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+<p>Nevertheless, some of the elements were still not hidden, as he missed some categories.</p>
+<p>So the challenge is to create the filter.</p>
+<p>In the filter, you always have to set categories. In theory, it is possible to get all categories whose names start with 'OST_Duct', but in that case it will work only with Mechanical systems.</p>
+<p>The task requires us to hide absolutely all elements. We should not consider categories in this case at all.</p>
+<p>However, the method ParameterFilterElement.Create requires the list of categories anyway. That means we have to pass all possible categories to the method.</p>
+<p>To get all categories very easy:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> allCategories =
+&nbsp; &nbsp; doc.Settings.Categories
+&nbsp; &nbsp; .OfType&lt;<span class="teal">Category</span>&gt;()
+&nbsp; &nbsp; .Select( c =&gt; c.Id )
+&nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="blue">var</span> filter = <span class="teal">ParameterFilterElement</span>.Create(
+&nbsp; &nbsp; doc,
+&nbsp; &nbsp; <span class="maroon">&quot;All elements except the system &quot;</span> + system.Name ),
+&nbsp; &nbsp; allCategories,
+&nbsp; &nbsp; rules );
+</pre>
+
+<p>Failed.</p>
+<p>This produces the exception 'One of the given categories is not filterable'.</p>
+<p>OK. Not all categories can be included to the filter.</p>
+<p>Somehow we need to get only the categories what can be applied to the filter.</p>
+<p>After some researching of the RevitAPI.chm, I found a useful class, ParameterFilterUtilities.</p>
+<p>The method ParameterFilterUtilities.GetAllFilterableCategories returns exactly that we need.</p>
+<p>The second attempt:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> filter = <span class="teal">ParameterFilterElement</span>.Create(
+&nbsp; &nbsp; doc,
+&nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;___ ________, _____ _______ {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; system.Name ),
+&nbsp; &nbsp; <span class="teal">ParameterFilterUtilities</span>.GetAllFilterableCategories(),
+&nbsp; &nbsp; rules );
+</pre>
+
+<p>Failed again.</p>
+<p>One of the given rules refers to a parameter that doesn't apply to this filter's categories.</p>
+<p>It seems like we need two filters:</p>
+
+<ul>
+<li>All elements that does not have the parameter 'System Name'</li>
+<li>All elements that have the parameter 'System Name' and the value of the parameter does not contain the specific system name.</li>
+</ul>
+
+<p>Looking again to the methods of the class ParameterFilterUtilities.</p>
+<p>There is no method that does exactly what we need.</p>
+<p>Nevertheless, there are some methods we can use to get there.</p>
+<p>The method ParameterFilterUtilities.GetFilterableParametersInCommon returns the list of the parameters applicable to the given categories.</p>
+<p>For any category we can check whether we can use the specific parameter in that category or not.</p>
+<p>As a result, I created the following method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green">&nbsp; &nbsp; &nbsp; &nbsp; </span>
+&nbsp; <span class="gray">///</span><span class="green"> Returns the list of the categories what can be </span>
+&nbsp; <span class="gray">///</span><span class="green"> used in filter by the specific parameter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;</span><span class="green">Document on which the filter </span>
+&nbsp; <span class="gray">///</span><span class="green"> is applying</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;bip&quot;&gt;</span><span class="green">BuiltInParameter</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;inverse&quot;&gt;</span><span class="green">If true, the list will </span>
+&nbsp; <span class="gray">///</span><span class="green"> be inverted. I.e. you will get the list of the </span>
+&nbsp; <span class="gray">///</span><span class="green"> categories what cannot be used in filter by </span>
+&nbsp; <span class="gray">///</span><span class="green"> the specific parameter </span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt;
+&nbsp; &nbsp; GetCategoriesApplicableForParameter(
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span> bip,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> inverse = <span class="blue">false</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// All categories available for filter.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> allCategories = <span class="teal">ParameterFilterUtilities</span>
+&nbsp; &nbsp; &nbsp; .GetAllFilterableCategories();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; retResult
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> categoryId <span class="blue">in</span> allCategories )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Get the list of paramteres </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// compatible with the category.&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> applicableParameters
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">ParameterFilterUtilities</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetFilterableParametersInCommon(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, <span class="blue">new</span>[] { categoryId } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If the parameter we are interested in is </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// in the collection, add it to the result.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( applicableParameters.Contains(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; retResult.Add( categoryId );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Invert if needed. </span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( inverse )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; retResult = allCategories.Where(
+&nbsp; &nbsp; &nbsp; &nbsp; x =&gt; !retResult.Contains( x ) ).ToList();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> retResult;
+&nbsp; }
+</pre>
+
+<p>Back to our task.</p>
+<p>To get all categories that can be applied in the filter and allow to filter by 'System Name' parameter, we can use this code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> categoriesWithSystem =
+&nbsp; &nbsp; GetCategoriesApplicableForParameter( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM );
+</pre>
+
+<p>And the list of categories without 'System Name' parameter.</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> categoriesWithoutSystemNameParameter =
+&nbsp; &nbsp; GetCategoriesApplicableForParameter( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM, <span class="blue">true</span> );
+</pre>
+
+<p>We need to remember that an element can belong to several systems.</p>
+
+<p>In this case we have to consider all of them and create several filter rules:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// An element can be assigned to the several systems.</span>
+&nbsp; <span class="green">// In this case System Name parameter has a comma-</span>
+&nbsp; <span class="green">// separated list of the systems.</span>
+&nbsp; <span class="green">// Create several rules.</span>
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FilterRule</span>&gt; rules = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FilterRule</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">var</span> systems = systemName.Split( <span class="blue">new</span>[] { <span class="maroon">','</span> },
+&nbsp; &nbsp; <span class="teal">StringSplitOptions</span>.RemoveEmptyEntries );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> system <span class="blue">in</span> systems )
+&nbsp; {
+&nbsp; &nbsp; rules.Add(
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterFilterRuleFactory</span>.CreateNotContainsRule(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM ),
+&nbsp; &nbsp; &nbsp; system.Trim(), <span class="blue">true</span> ) );
+&nbsp; }
+</pre>
+
+<p>The full code of the command:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> r;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SystemElementFilter</span>(),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select an alement of a system&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> elem = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="blue">var</span> systemNameParam =
+&nbsp; &nbsp; elem.get_Parameter(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM );
+&nbsp;
+&nbsp; <span class="blue">if</span>( systemNameParam == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;How did you do that?&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; <span class="blue">var</span> categoriesWithSystem =
+&nbsp; &nbsp; GetCategoriesApplicableForParameter( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM );
+&nbsp;
+&nbsp; <span class="blue">var</span> categoriesWithoutSystemNameParameter =
+&nbsp; &nbsp; GetCategoriesApplicableForParameter( doc,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM, <span class="blue">true</span> );
+&nbsp;
+&nbsp; <span class="blue">var</span> systemName = systemNameParam.AsString();
+&nbsp;
+&nbsp; <span class="green">// An element can be assigned to the several systems.</span>
+&nbsp; <span class="green">// In this case System Name parameter has a comma-</span>
+&nbsp; <span class="green">// separated list of the systems.</span>
+&nbsp; <span class="green">// Create several rules.</span>
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FilterRule</span>&gt; rules = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FilterRule</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">var</span> systems = systemName.Split( <span class="blue">new</span>[] { <span class="maroon">','</span> },
+&nbsp; &nbsp; <span class="teal">StringSplitOptions</span>.RemoveEmptyEntries );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> system <span class="blue">in</span> systems )
+&nbsp; {
+&nbsp; &nbsp; rules.Add(
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterFilterRuleFactory</span>.CreateNotContainsRule(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( <span class="teal">BuiltInParameter</span>.RBS_SYSTEM_NAME_PARAM ),
+&nbsp; &nbsp; &nbsp; system.Trim(), <span class="blue">true</span> ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;System isolate&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Hide all elements which do no have a System </span>
+&nbsp; &nbsp; <span class="green">// Name parameter. Do not use this filter if </span>
+&nbsp; &nbsp; <span class="green">// you want to hide only the systems.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterFilterElement</span> filter1 =
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterFilterElement</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;All elements without System Name parameter&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; categoriesWithoutSystemNameParameter );
+&nbsp;
+&nbsp; &nbsp; view.AddFilter( filter1.Id );
+&nbsp; &nbsp; view.SetFilterVisibility( filter1.Id, <span class="blue">false</span> );
+&nbsp;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Hide elements which are not </span>
+&nbsp; &nbsp; <span class="green">// in the selected system</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ParameterFilterElement</span> filter2 =
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterFilterElement</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;All elements not in the systems {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; systemName ),
+&nbsp; &nbsp; &nbsp; &nbsp; categoriesWithSystem,
+&nbsp; &nbsp; &nbsp; &nbsp; rules );
+&nbsp;
+&nbsp; &nbsp; view.AddFilter( filter2.Id );
+&nbsp; &nbsp; view.SetFilterVisibility( filter2.Id, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>If you do not want to isolate architecture, and want to isolate only systems, do not apply the first filter.</p>
+<p>Here are some results of running the command.</p>
+<p>Before:</p>
+
+<center>
+<img src="img/vc_isolate_system_elements_1.png" alt="Before" width="400"/>
+</center>
+
+<p>After:</p>
+
+<center>
+<img src="img/vc_isolate_system_elements_2.png" alt="After" width="400"/>
+</center>
+
+<p>With the element in several systems.</p>
+
+<p>Before:</p>
+
+<center>
+<img src="img/vc_isolate_system_elements_3.png" alt="Before" width="400"/>
+</center>
+
+<p>After:</p>
+
+<center>
+<img src="img/vc_isolate_system_elements_4.png" alt="After" width="400"/>
+</center>
+
+<p>The full source code is on <a href="https://github.com/chekalin-v/HideRevitSystems.git">GitHub</a> and in the <a href="https://github.com/chekalin-v/HideRevitSystems/archive/master.zip">archive</a>.</p>
+
+<p>Many thanks to Victor for this interesting discussion and useful result!</p>

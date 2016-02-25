@@ -1,0 +1,247 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Shalini Ramesh (Intern) Re: REVIT GBXML Export
+
+-->
+
+
+<h3>Launching a Stand-alone Executable</h3>
+
+<p>A colleague of mine asked for some help implementing a Revit add-in to launch an external stand-alone Windows executable from the Revit user interface.</p>
+
+<p>Since this might be useful to others as well, here is a summary of our discussion and solution:</p>
+
+<p><strong>Question:</strong> I am working on a windows application using GBS API to perform building parametric analysis (energy consumption in terms of comparison of window glazing materials, building orientation). Currently, I am exporting the gbxml file, saving it on my desktop and using the gbxml file in GBS simulations.</p>
+
+<p>I would like to know if I can directly export the gbxml file to my windows application and run the simulation by creating a Revit add-in of my windows application.</p>
+
+<p><strong>Answer:</strong> I do not understand the difference between the two:</p>
+
+<ol>
+<li>Exporting the gbxml file, saving it on my desktop and using the gbxml file in GBS simulations.</li>
+<li>Export the gbxml file to my windows application</li>
+</ol>
+
+<p>The only gbxml export option provided by the Revit API is the Export method:</p>
+
+<pre class="code">
+  public bool Export(
+    string folder,
+    string name,
+    GBXMLExportOptions options )
+</pre>
+
+<p>It produces the same result as exporting to gbxml manually.</p>
+
+<p><strong>Response:</strong> I have been working on other parts of my sample.</p>
+<p>I now want to create an add-in feature in Revit that executes my windows desktop application. Can you help me to identify the code to perform this?</p>
+<p>I would like to know what code I am supposed to follow to create a Revit add-in of my .exe file.</p>
+
+<p><strong>Answer:</strong> Do you mean you want to launch a stand-alone Windows executable from your C# .NET add-in?</p>
+
+<p>The answer is provided immediately by a standard Internet search, e.g. for
+
+<a href="http://lmgtfy.com/?q=c#+launch+exe">c# launch exe</a>.</p>
+
+<p>You cannot create a Revit add-in from an exe file.</p>
+
+<p>You can however easily launch an external executable from a Revit add-in.</p>
+
+<p><strong>Response:</strong> If it does not take too much of your time it would be great if you could write it for me.</p>
+
+<p>I do have Visual Studio installed.</p>
+
+<p>Thank you for your help.</p>
+
+<p><strong>Answer:</strong> Here is
+
+<a href="zip/RvtLaunchExe.zip">RvtLaunchExe.zip</a> containing
+
+the complete source code, Visual Studio solution, and add-in manifest.</p>
+
+<p>It also includes a sample executable:</p>
+
+<center>
+<img src="img/launch_exe_sln.png" alt="RvtLaunchExe solution" width="219"/>
+</center>
+
+<p>The sample exe just displays a dialogue box:</p>
+
+<center>
+<img src="img/launch_exe_msg.png" alt="Sample executable message box" width="149"/>
+</center>
+
+<p>Its entire implementation looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">using</span> System;
+&nbsp; <span class="blue">using</span> System.Windows.Forms;
+&nbsp;
+&nbsp; <span class="blue">namespace</span> SampleExe
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">class</span> <span class="teal">Program</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> Main( <span class="blue">string</span>[] args )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MessageBox</span>.Show( <span class="maroon">&quot;Hello Shalini.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Sample Executable&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>If you open the Visual Studio solution and compile, the whole thing should install itself, i.e. copy the add-in manifest and assembly DLL to the proper location for Revit to find and load them.</p>
+
+<p>Revit will then display the add-in ribbon panel:</p>
+
+<center>
+<img src="img/launch_exe_app.png" alt="RvtLaunchExe ribbon panel" width="326"/>
+</center>
+
+<p>Simply click the button to do the dirty deed.</p>
+
+<p>The external application defines the ribbon panel and command button like this:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> System.Reflection;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> RvtLaunchExe
+{
+&nbsp; <span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Add our command button to the ribbon panel.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> PopulatePanel( <span class="teal">RibbonPanel</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly()
+&nbsp; &nbsp; &nbsp; &nbsp; .Location;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">RibbonItemData</span> rid = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RvtLaunchExe_Command&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Launch External\r\nWindows Executable&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; path, <span class="maroon">&quot;RvtLaunchExe.Command&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; rid.ToolTip = <span class="maroon">&quot;Launch an external &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; stand-alone Windows executable&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; p.AddItem( rid );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; PopulatePanel(
+&nbsp; &nbsp; &nbsp; &nbsp; a.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Launch Executable&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Clicking the button launches the external command.
+It calls the LaunchExe method, which simply uses the .NET System.Diagnostics process functionality to launch the external executable:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.IO;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> RvtLaunchExe
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _standalone_exe_path
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;C:/a/vs/RvtLaunchExe/SampleExe/bin/Debug/SampleExe.exe&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> LaunchExe( <span class="blue">string</span> path )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( path ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> ( <span class="blue">new</span> <span class="teal">ArgumentException</span>( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;'{0}' not found.&quot;</span>, path ) ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> rc = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Prepare the process to run</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ProcessStartInfo</span> start = <span class="blue">new</span> <span class="teal">ProcessStartInfo</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Enter the command line arguments, everything </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// you would enter after the executable name.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//start.Arguments = arguments;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Enter the complete executable path</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; start.FileName = path;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Do you want to show a console window?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; start.WindowStyle = <span class="teal">ProcessWindowStyle</span>.Hidden;
+&nbsp; &nbsp; &nbsp; start.CreateNoWindow = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Run the external process and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// wait for it to finish</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Process</span> proc = <span class="teal">Process</span>.Start( start ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; proc.WaitForExit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve the external application exit code</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; rc = proc.ExitCode;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> rc = LaunchExe( _standalone_exe_path );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 != rc )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} returned error code {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _standalone_exe_path, rc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>I hope this covers all you need and is useful to others as well.</p>
+
+<p>After all, it does provide a really minimal example of setting up one single ribbon button and one single trivial external command with an absolute minimum of fuss and effort.</p>

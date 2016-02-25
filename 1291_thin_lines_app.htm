@@ -1,0 +1,530 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- thin lines support in r2, and workaround for earlier versions
+  http://forums.autodesk.com/t5/revit-api/view-thin-lines/m-p/2641406
+  http://forums.autodesk.com/t5/revit-api/exported-image-line-weight-thin-line-and-rendering-setting/m-p/5528318
+  Rudolf Honke AW: programmatically set thin lines
+  Rudolf Honke Re: Thin Lines: Get, Set, Toggle
+  /a/doc/revit/blog/zip/rh_ThinLines.zip
+  what other new Revit 2015 r2 functionality is avaiable?
+
+copy "$(ProjectDir)ThinLines.addin" "$(AppData)\Autodesk\REVIT\Addins\2015"
+copy "$(ProjectDir)bin\debug\ThinLines.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"
+
+-->
+
+<h3>Thin Lines Add-in Using UI Automation</h3>
+
+<p>Revit add-in developers have repeatedly requested access to the Thin Lines setting provided in the Revit user interface, leading to
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> threads on
+
+<a href="http://forums.autodesk.com/t5/revit-api/view-thin-lines/m-p/2641406">view thin lines</a>,
+
+<a href="http://forums.autodesk.com/t5/revit-api/exported-image-line-weight-thin-line-and-rendering-setting/m-p/5528318">
+exported image line weight (thin line) and rendering setting</a> and
+
+a Revit API wish list item CF-192 &ndash; <i>As an add-in developer, I need the API ability to detect and modify the "Thin lines" setting, so that the user can automatically get the environment configured in the way they like</i>.
+
+<p>Happily, that wish list item has now been closed off, since this functionality is provided in Revit 2015 R2, as described in the
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-6084E92F-4C46-4047-B98C-2984E730A53D">
+What's New in Revit 2015 R2 overview</a> section on
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-9D26B850-026A-4734-BB76-997154ADE5F2">
+Graphics Settings in Revit.ini</a>:</p>
+
+
+<a name="2"></a>
+
+<h4>New in Revit 2015 R2</h4>
+
+<h5>Architectural Enhancements</h5>
+
+<ul>
+<li><b>Thin lines:</b> To improve consistency between Revit sessions, when you use the Thin Lines tool, the setting is stored in the Revit.ini file. When you launch Revit, the stored Thin Lines setting is used as the default. See Graphics Settings in Revit.ini.</li>
+</ul>
+
+<a name="3"></a>
+
+<h4>Graphics Settings in Revit.ini</h4>
+
+<h5>ThinLinesEnabled</h5>
+
+<p>Stores the Thin Lines setting.</p>
+
+<ul>
+<li>Type = integer</li>
+<li>Valid values: 1 = enable thin lines (default), 0 = disable thin lines</li>
+</ul>
+
+<p>Note: This feature or functionality is available only to students and to Autodesk Maintenance and Desktop Subscription customers for Revit 2015 software releases.</p>
+
+<p>Better still, the thin lines setting provided in the INI file from Revit 2015 R2 onwards is also programmatically accessible:</p>
+
+
+<a name="4"></a>
+
+<h4>Revit API Thin Lines Options</h4>
+
+<p>The utility class ThinLinesOptions contains settings related to the Thin Lines options displayed in the UI.</p>
+
+<p>The static property:</p>
+
+<ul><li>ThinLinesOptions.AreThinLinesEnabled</li></ul>
+
+<p>defines if the 'Thin Lines' setting is on or off in this session.</p>
+
+<a name="5"></a>
+
+<h4>Separate APIs for Revit 2015 and Revit 2015 R2</h4>
+
+<p>One little problem remains for the moment: what to do if I do not have Revit 2015 R2 installed?</p>
+
+<p>Or even more relevant: how can I avoid the need to support separate versions of my add-in for Revit 2015 and Revit 2015 R2?</p>
+
+<p>This issue already came up in these discussion forum threads:</p>
+
+<ul>
+<li><a href="http://forums.autodesk.com/t5/revit-api/r2-vs-ur4/m-p/5382029">R2 vs. UR4</a></li>
+<li><a href="http://forums.autodesk.com/t5/revit-api/worksets/m-p/5360275">Workset API</a></li>
+</ul>
+
+
+<a name="6"></a>
+
+<h4>ThinLines Add-in &ndash; UI Automation Workaround For Pre-R2 Usage</h4>
+
+<p>Once again, the cavalry comes to the rescue in the shape of
+
+<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">Revitalizer</a>, aka
+
+Rudolf Honke of <a href="http://www.acadgraph.de">Mensch und Maschine acadGraph</a>,
+
+who already contributed lots of tricks towards making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+.NET UI Automation library</a> to
+
+hack the Revit user interface.</p>
+
+<p>He uses UI Automation to determine the current state of the thin lines button, and PostCommand to invoke the built-in Revit Thin Lines command in case the current setting needs to be changed.</p>
+
+<p>Please note, as always,
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">The Building Coder Disclaimer</a>:
+
+in the following, we present a workaround solution not covered by the officially supported Revit API, leading to an experimental implementation suitable only for a personal controlled usage that should not be relied upon for production use.</p>
+
+
+
+<a name="7"></a>
+
+<h4>Implementation History and Ideas</h4>
+
+<p><strong>Rudolf says:</strong>
+
+As usual, I think UIAutomation can be used to achieve that.</p>
+
+<p>I can get the TL state by reading the button’s state, but when I try to set it by invoking that button, it won’t work since I’m still on the button that invokes my own command.</p>
+<p>Cannot focus another button at the same time.</p>
+<p>Perhaps you could delay the execution of pressing the button by putting it into an Idling event handler.</p>
+<p>Hey, I see that there is a 'PostableCommand.ThinLines'</p>
+
+<p>So what about:</p>
+
+<pre>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RevitCommandId</span> commandId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.ThinLines );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( app.CanPostCommand( commandId ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.PostCommand( commandId );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+</pre>
+
+<p><strong>Rudolf says:</strong>
+
+As far as I can see, the getter method works as expected.</p>
+
+<p>I think it would be useful to provide an add-in solution that shows how to reference the automation libraries etc.</p>
+
+<p><strong>Rudolf says:</strong>
+
+Setting the TL using the PostableCommand works very well!</p>
+
+<p>I will combine the getter and setter methods and send you a VS solution.</p>
+
+
+<p><strong>Rudolf says:</strong>
+
+Here is a VS project that addresses the ThinLines issues.</p>
+
+<p>There is a LineTools Tab containing these three buttons, which in fact just get the state of the TL button.</p>
+
+<!--
+<center>
+<img src="img/ThinLinesApp.png" alt="ThinLines add-in" width="508"/>
+</center>
+-->
+
+<center>
+<img src="img/ThinLinesApp2.png" alt="ThinLines add-in" width="424"/>
+</center>
+
+
+<p>A creative workaround to avoid the Revit API restrictions ('subscription API extensions only').</p>
+
+<p>Two remarks:</p>
+
+<ul>
+<li>It has to be tested if this will still work if the TL button is removed from Quick Access Toolbar.</li>
+
+<li>Also, I faced an exception saying 'command cannot be invoked several times' or so when clicking the buttons too fast.</li>
+</ul>
+
+<p>Too fast for Revit.</p>
+
+<p>Perhaps that could be encapsulated in a try/catch handler.</p>
+
+
+
+<a name="8"></a>
+
+<h4>Implementation Notes and Download</h4>
+
+<p>The command ribbon button images are encapsulated in a proper resource file:</p>
+
+<center>
+<img src="img/ThinLinesVs.png" alt="ThinLines add-in Visual Studio solution" width="246"/>
+</center>
+
+<p>We obviously need references to the various UI Automation libraries:</p>
+
+<center>
+<img src="img/ThinLinesReferences.png" alt="ThinLines add-in Visual Studio solution references" width="263"/>
+</center>
+
+<p>All three external command implementations for thin lines, thick lines and to toggle line thickness are trivial one-liners, since they simply call back to the functionality and helper functions defined by the main external application class:</p>
+
+<pre class="code">
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">namespace</span> ThinLines
+{
+&nbsp; [Autodesk.Revit.Attributes.<span class="teal">Transaction</span>(
+&nbsp; &nbsp; Autodesk.Revit.Attributes.<span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; [Autodesk.Revit.Attributes.<span class="teal">Regeneration</span>(
+&nbsp; &nbsp; Autodesk.Revit.Attributes.<span class="teal">RegenerationOption</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command_ThinLines</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ThinLinesApp</span>.SetThinLines( commandData.Application, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The external application implementation demonstrates how to:</p>
+
+<ul>
+<li>Set up the custom ribbon panel</li>
+<li>Handle the external command ribbon button images</li>
+<li>Use P/Invoke to access and make use of the Windows API functionality defined in User32.dll to find and enumerate specific windows</li>
+<li>Use the Revit API PostCommand method to invoke the built-in Thin Lines command</li>
+<li>Access the Revit Thin Lines button and determine its current state</li>
+</ul>
+
+<p>Sounds cool?</p>
+
+<p>It is!</p>
+
+<p>Here is how:</p>
+
+<pre class="code">
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Drawing;
+<span class="blue">using</span> System.Runtime.InteropServices;
+<span class="blue">using</span> System.Windows;
+<span class="blue">using</span> System.Windows.Automation;
+<span class="blue">using</span> System.Windows.Interop;
+<span class="blue">using</span> System.Windows.Media;
+<span class="blue">using</span> System.Windows.Media.Imaging;
+&nbsp;
+<span class="blue">namespace</span> ThinLines
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">ThinLinesApp</span> : <span class="teal">IExternalApplication</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Windows API, get from pinvoke.net
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span> )]
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> FindWindowEx(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hwndParent, <span class="teal">IntPtr</span> hwndChildAfter,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> lpszClass, <span class="blue">string</span> lpszWindow );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; [<span class="blue">return</span>: <span class="teal">MarshalAs</span>( <span class="teal">UnmanagedType</span>.Bool )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> EnumChildWindows(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> window, <span class="teal">EnumWindowProc</span> callback,
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> i );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">delegate</span> <span class="blue">bool</span> <span class="teal">EnumWindowProc</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, <span class="teal">IntPtr</span> parameter );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> EnumWindow(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> handle,
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> pointer )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GCHandle</span> gch = <span class="teal">GCHandle</span>.FromIntPtr( pointer );
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; list = gch.Target <span class="blue">as</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt;;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( list != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; list.Add( handle );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; GetChildWindows(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> parent )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; result = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">GCHandle</span> listHandle = <span class="teal">GCHandle</span>.Alloc( result );
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">EnumWindowProc</span> childProc = <span class="blue">new</span> <span class="teal">EnumWindowProc</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; EnumWindow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; EnumChildWindows( parent, childProc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GCHandle</span>.ToIntPtr( listHandle ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listHandle.IsAllocated )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listHandle.Free();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> tabName = <span class="maroon">&quot;LineTools&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> panelName = <span class="maroon">&quot;LineTools&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> buttonThinName = <span class="maroon">&quot;Thin&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> buttonThickName = <span class="maroon">&quot;Thick&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> buttonToggleName = <span class="maroon">&quot;Toggle&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">RibbonPanel</span>&gt; panels = a.GetRibbonPanels(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tabName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; a.CreateRibbonTab( tabName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">RibbonPanel</span> panelViewExport = a.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; &nbsp; tabName, panelName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; panelViewExport.Name = panelName;
+&nbsp; &nbsp; &nbsp; panelViewExport.Title = panelName;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> buttonThin = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; buttonThinName, buttonThinName,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Reflection.<span class="teal">Assembly</span>.GetExecutingAssembly().Location,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Command_ThinLines</span> ).FullName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; buttonThin.ToolTip = buttonThinName;
+&nbsp; &nbsp; &nbsp; <span class="teal">ImageSource</span> iconThin = GetIconSource( <span class="teal">Images</span>.Thin );
+&nbsp; &nbsp; &nbsp; buttonThin.LargeImage = iconThin;
+&nbsp; &nbsp; &nbsp; buttonThin.Image = Thumbnail( iconThin );
+&nbsp; &nbsp; &nbsp; panelViewExport.AddItem( buttonThin );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> buttonThick = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; buttonThickName, buttonThickName,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Reflection.<span class="teal">Assembly</span>.GetExecutingAssembly().Location,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Command_ThickLines</span> ).FullName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; buttonThick.ToolTip = buttonThickName;
+&nbsp; &nbsp; &nbsp; <span class="teal">ImageSource</span> iconThick = GetIconSource( <span class="teal">Images</span>.Thick );
+&nbsp; &nbsp; &nbsp; buttonThick.LargeImage = iconThick;
+&nbsp; &nbsp; &nbsp; buttonThick.Image = Thumbnail( iconThick );
+&nbsp; &nbsp; &nbsp; panelViewExport.AddItem( buttonThick );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> buttonToggle = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; buttonToggleName, buttonToggleName,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Reflection.<span class="teal">Assembly</span>.GetExecutingAssembly().Location,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Command_ToggleLineThickness</span> ).FullName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; buttonToggle.ToolTip = buttonToggleName;
+&nbsp; &nbsp; &nbsp; <span class="teal">ImageSource</span> iconToggle = GetIconSource( <span class="teal">Images</span>.ToggleLineThickness );
+&nbsp; &nbsp; &nbsp; buttonToggle.LargeImage = iconToggle;
+&nbsp; &nbsp; &nbsp; buttonToggle.Image = Thumbnail( iconToggle );
+&nbsp; &nbsp; &nbsp; panelViewExport.AddItem( buttonToggle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ImageSource</span> GetIconSource( <span class="teal">Bitmap</span> bmp )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BitmapSource</span> icon
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Imaging</span>.CreateBitmapSourceFromHBitmap(
+&nbsp; &nbsp; &nbsp; &nbsp; bmp.GetHbitmap(), <span class="teal">IntPtr</span>.Zero, <span class="teal">Int32Rect</span>.Empty,
+&nbsp; &nbsp; &nbsp; &nbsp; System.Windows.Media.Imaging.<span class="teal">BitmapSizeOptions</span>.FromEmptyOptions() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> (System.Windows.Media.<span class="teal">ImageSource</span>) icon;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ImageSource</span> Thumbnail(
+&nbsp; &nbsp; &nbsp; <span class="teal">ImageSource</span> source )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Rect</span> rect = <span class="blue">new</span> <span class="teal">Rect</span>( 0, 0, 16, 16 );
+&nbsp; &nbsp; &nbsp; <span class="teal">DrawingVisual</span> drawingVisual = <span class="blue">new</span> <span class="teal">DrawingVisual</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">DrawingContext</span> drawingContext
+&nbsp; &nbsp; &nbsp; &nbsp; = drawingVisual.RenderOpen() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; drawingContext.DrawImage( source, rect );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">RenderTargetBitmap</span> resizedImage
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">RenderTargetBitmap</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) rect.Width, (<span class="blue">int</span>) rect.Height, 96, 96,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PixelFormats</span>.Default );
+&nbsp;
+&nbsp; &nbsp; &nbsp; resizedImage.Render( drawingVisual );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> resizedImage;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">AutomationElement</span> GetThinLinesButton()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> revitHandle
+&nbsp; &nbsp; &nbsp; &nbsp; = System.Diagnostics.<span class="teal">Process</span>.GetCurrentProcess()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .MainWindowHandle;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> outerToolFrame = FindWindowEx( revitHandle,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span>.Zero, <span class="maroon">&quot;AdImpApplicationFrame&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;AdImpApplicationFrame&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> innerToolFrame = GetChildWindows(
+&nbsp; &nbsp; &nbsp; &nbsp; outerToolFrame )[0];
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> innerToolFrameElement
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">AutomationElement</span>.FromHandle( innerToolFrame );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeRibbonCondition
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Custom );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> lowestPanel
+&nbsp; &nbsp; &nbsp; &nbsp; = innerToolFrameElement.FindFirst(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, typeRibbonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> nameRibbonCondition
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ID_THIN_LINES_RibbonItemControl&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andCondition = <span class="blue">new</span> <span class="teal">AndCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; typeRibbonCondition, nameRibbonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> buttonContainer
+&nbsp; &nbsp; &nbsp; &nbsp; = lowestPanel.FindFirst( <span class="teal">TreeScope</span>.Children,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; andCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> typeButtonCondition
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.ControlTypeProperty,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ControlType</span>.Button );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyCondition</span> nameButtonCondition
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PropertyCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>.AutomationIdProperty,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ID_THIN_LINES&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AndCondition</span> andConditionButton = <span class="blue">new</span> <span class="teal">AndCondition</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; typeButtonCondition, nameButtonCondition );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> button = buttonContainer.FindFirst(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TreeScope</span>.Children, andConditionButton );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> button;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SetThinLines(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> app,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> makeThin )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> isAlreadyThin = IsThinLines();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( makeThin != isAlreadyThin )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Switch TL state by invoking </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// PostableCommand.ThinLines</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RevitCommandId</span> commandId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.ThinLines );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( app.CanPostCommand( commandId ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; app.PostCommand( commandId );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsThinLines()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> button = GetThinLinesButton();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TogglePattern</span> togglePattern
+&nbsp; &nbsp; &nbsp; &nbsp; = button.GetCurrentPattern(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TogglePattern</span>.Pattern ) <span class="blue">as</span> <span class="teal">TogglePattern</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> state = togglePattern.Current
+&nbsp; &nbsp; &nbsp; &nbsp; .ToggleState.ToString().ToUpper();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> ( state == <span class="maroon">&quot;ON&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The complete source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/ThinLines">
+ThinLines GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/ThinLines/releases/tag/2015.0.0.1">
+release 2015.0.0.1</a>.</p>
+
+<p>As said, please be aware of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">The Building Coder Disclaimer</a> before
+
+you even dream of making use of this.</p>
+
+<p>Many thanks to Rudi for his research and nice, clean implementation!</p>

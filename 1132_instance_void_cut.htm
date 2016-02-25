@@ -1,0 +1,498 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html
+  1269546 [Documentation for InstanceVoidCutUtils]
+  1267564 [How to create a recess (non cut-through opening) in Revit]
+  C:\a\j\adn\case\special\hsb\2012\modeller\src\Modeller\Modeller.sln
+
+From: Jim Jia 
+Date: Wednesday, April 9, 2014 08:11
+To: Jeremy Tammik 
+Cc: Scott Conover 
+Subject: RE: how to use InstanceVoidCutUtils
+
+Hi Jeremy,
+
+Scott is right - I verified doc.Regenerate() can solve the issue.
+
+Besides, I also noticed if the cutter family was already loaded and some cutter instances were ever created, the doc.regenerate() is not required.
+But it should be always safer to call doc.Regenerate().
+
+Jim
+
+From: Scott Conover
+Sent: Tuesday, April 08, 2014 7:44 PM
+To: Jeremy Tammik
+Cc: Revit API
+Subject: RE: how to use InstanceVoidCutUtils
+
+Hi Jeremy – could the solution be as simple as Regenerating after the creation of the instance?  Your sample code does not do that.
+
+Normally before any part of a newly created element is read or used, Revit requires a regeneration to take place.
+
+Note that for that reason, if you have a significant number to place and join in a loop, you may want to structure the code that it places them all, then regenerates, and then creates all of cuts/joins.
+
+Thank you,
+Scott
+
+From: Scott Conover 
+Date: Thursday, March 20, 2014 15:07
+To: Jeremy Tammik , Revit API 
+Subject: RE: how to use InstanceVoidCutUtils
+
+Hi Jeremy – can the two elements be manually combined using the join/cut tools in the UI (Modify tab)?
+
+The operations should be analogous to InstanceVoidCutUtils.
+
+Thank you,
+Scott
+
+-->
+
+<h3>Transaction Group and Regeneration for InstanceVoidCutUtils</h3>
+
+<p>We looked at a nice example of using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">
+Boolean operations and InstanceVoidCutUtils</a> back
+
+in the year 2011, cutting out part of a beam using a void cutter family.</p>
+
+<p>I tried to make use of this again in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/02/different-revit-api-aspects-and-features.html">
+recent Revit API training</a> and was
+
+somewhat shocked to discover that it did not work as expected.</p>
+
+<p>I checked all the prerequisites were fulfilled.</p>
+
+
+<a name="2"></a>
+
+<h4>Void Cutter Family</h4>
+
+<p>First of all, the void cutter family must have its 'Cut with Voids When Loaded' parameter checked:</p>
+
+<center>
+<img src="img/instance_void_cut_cut_with_voids.png" alt="Cut with void property" width="356"/>
+</center>
+
+<p>If this is not the case, the void is not an 'Unattached' void, and it will throw an exception saying "The element is not a family instance with an unattached void that can cut. Parameter name: cuttingInstance".</p>
+
+<p>The cutting symbol has three angle parameters associated with it, which can be used to rotate it around various axes.</p>
+
+
+
+<a name="3"></a>
+
+<h4>CutBeamWithVoid Method</h4>
+
+<p>The sample code implements a method CutBeamWithVoid taking two arguments: the beam family instance and the void cutter family symbol. It places three cutter instances along the top of the beam, modifies their angle parameters and applies the cut.</p>
+
+<p>Initially, the three cutting instances are placed along the top face of the beam.</p>
+
+<p>Their angle parameter values are changed from the default zero to 45 degrees, causing two of them to partially cut the beam.</p>
+
+<p>The call to the InstanceVoidCutUtils.AddInstanceVoidCut method still threw a message saying "The element is not a family instance with an unattached void that can cut. Parameter name: cuttingInstance".</p>
+
+<p>When the call to InstanceVoidCutUtils.AddInstanceVoidCut was commented out, you could see that the cutter family instances were correctly positioned:</p>
+
+<center>
+<img src="img/instance_void_cut_no_cut.png" alt="Cutting instances placed with no cut applied"/>
+</center>
+
+<p>Selecting the elements manually and combining them using the join and cut tools in the UI Modify tab successfully completed the operation:</p>
+
+<center>
+<img src="img/instance_void_cut_applied.png" alt="Cutting instances placed with cut applied"/>
+</center>
+
+<p>The manual operation should be completely analogous to InstanceVoidCutUtils.</p>
+
+<p>What was wrong?</p>
+
+
+<a name="4"></a>
+
+<h4>Need for Regeneration</h4>
+
+<p>After struggling for a while with that, I gave up and asked my colleagues.</p>
+
+<p>Scott Conover answered: could the solution be as simple as Regenerating after the creation of the instance?  Your sample code does not do that.</p>
+
+<p>Normally, before any part of a newly created element is read or used, Revit requires a regeneration to take place.</p>
+
+<p>Note that for that reason, if you have a significant number to place and join in a loop, you may want to structure the code that it places them all, then regenerates, and then creates all of cuts/joins.</p>
+
+<p>Jim Jia added: Scott is right &ndash; I verified doc.Regenerate can solve the issue.</p>
+
+<p>Besides, I also noticed if the cutter family was already loaded and some cutter instances were ever created, the call to doc.Regenerate is not required.</p>
+
+<p>Shockingly enough (for me personally), that really is the simple solution to this problem.</p>
+
+<p>We have talked about this numerous times in the past, and yet I missed it myself this time around, again:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">
+Manual regeneration option danger</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">Regeneration option best practices</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html">
+To regenerate or not to regenerate...</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/refresh-referencing-sheet-parameter-display.html">Refresh referencing sheet parameter display</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/setting-text-width-requires-regen.html">
+Setting text width requires regen</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/extra-transaction-or-regeneration-required.html">Extra transaction or regeneration required</a></li>
+<!-- <li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/curve-evaluation-and-song-of-the-gulls.html">Curve Evaluation and Song of the Gulls</a></li> -->
+<li><a href="http://adndevblog.typepad.com/aec/2013/01/it-is-easy-to-miss-this-regenerating-the-model.html">Regenerate between plane and dimension creation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/erasing-extensible-storage-with-linked-files.html#3">
+Regenerate to avoid accessing stale data</a></li>
+</ul>
+
+<p>The topic of regeneration is also related to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+temporary transaction trick</a>,
+
+the associated suggestion to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+encapsulate multiple transactions in a transaction group</a>,
+
+commit the individual transactions and then roll bock the entire group instead.</p>
+
+<p>In Revit 2010, in this particular case, the regeneration was apparently not required.</p>
+
+<p>Whenever you run into an issue like this, you must always consider the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">
+need to regenerate</a>.</p>
+
+
+
+<a name="5"></a>
+
+<h4>InstanceVoidCutTest Add-in</h4>
+
+<p>I implemented a Revit add-in defining an external command to demonstrate this in the
+
+<a href="https://github.com/jeremytammik/InstanceVoidCutTest">InstanceVoidCutTest GitHub repository</a>.</p>
+
+<p>The initial code without the cut working is captured in
+
+<a href="https://github.com/jeremytammik/InstanceVoidCutTest/releases/tag/2014.0.0.0">release 2014.0.0.0</a>.</p>
+
+<p>In
+
+<a href="https://github.com/jeremytammik/InstanceVoidCutTest/releases/tag/2014.0.0.2">release 2014.0.0.2</a>,
+
+I separated the operations placing the cutting instances and applying the cut into two separate transactions.
+Both operations were performed in a single loop iterating over the three instances, so I separated them into two loops, each contained in its own transaction.</p>
+
+<p>At that point, all works well.</p>
+
+
+<a name="6"></a>
+
+<h4>Transactions, Transaction Groups and Simple Regeneration</h4>
+
+<p>Three separate transactions are used to load the cutting family, create the cutting instances and apply the actual cuts:</p>
+
+<center>
+<img src="img/instance_void_cut_three_transactions.png" alt="Three separate transactions"/>
+</center>
+
+<p>If you prefer not to display the individual transaction generated by one single command in the undo stack visible in the user interface, you can collect them all together into a transaction group.</p>
+
+<p>I therefor added a transaction group and assimilated the transactions into that by calling its Assimilate method.</p>
+
+<p>Note that the call to Assimilate includes the commit, so trying to call Commit afterwards in addition to Assimilate will throw an exception saying "The Transaction group has not been started (its status is not 'Started')".</p>
+
+<p>Here is the undo stack displaying the single transaction group:</p>
+
+<center>
+<img src="img/instance_void_cut_transaction_group.png" alt="Transaction group"/>
+</center>
+
+<p>This version is captured in the GitHub repository as
+
+<a href="https://github.com/jeremytammik/InstanceVoidCutTest/releases/tag/2014.0.0.3">release 2014.0.0.3</a>.</p>
+
+<p>Looking more closely at my colleagues' recommendations above, I see that they are actually just pointing out the need to regenerate, which is a less expensive operation than committing a transaction and starting a new one.</p>
+
+<p>I therefore updated the implementation in
+
+<a href="https://github.com/jeremytammik/InstanceVoidCutTest/releases/tag/2014.0.0.4">release 2014.0.0.4</a> to
+
+use one single transaction to both create instances and apply the cut, and added a call to regenerate in between.</p>
+
+
+<a name="7"></a>
+
+<h4>InstanceVoidCutTest External Command Implementation</h4>
+
+<p>Here is the final implementation:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">using</span> Autodesk.Revit.DB.Structure;
+<span class="blue">using</span> System.IO;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> InstanceVoidCutTest
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> FamilyName = <span class="maroon">&quot;Cutter&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> FamilyPath
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;C:/a/vs/InstanceVoidCutTest/Cutter.rfa&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ErrorMsg( <span class="blue">string</span> msg )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( msg );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;InstanceVoidCutUtils Test&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; msg );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return a string for a real number</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> formatted to two decimal places.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> RealString( <span class="blue">double</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> a.ToString( <span class="maroon">&quot;0.##&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return a string for an XYZ point</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> or vector with its coordinates</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> formatted to two decimal places.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> PointString( <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1},{2})&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; RealString( p.X ),
+&nbsp; &nbsp; &nbsp; &nbsp; RealString( p.Y ),
+&nbsp; &nbsp; &nbsp; &nbsp; RealString( p.Z ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">BeamSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.IntegerValue.Equals( (<span class="blue">int</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Retrieve cutting symbol, </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> loading family if needed.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">FamilySymbol</span> RetrieveOrLoadCuttingSymbol(
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Family</span> family = a.FirstOrDefault&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( FamilyName ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == family )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// It is not present, so check for </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the file to load it from:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( FamilyPath ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please ensure that the void cutter &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;family file '{0}' is present.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FamilyPath ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Load family from file:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Load Family&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.LoadFamily( FamilyPath, <span class="blue">out</span> family );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> cuttingSymbol = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; cuttingSymbol = s;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> cuttingSymbol;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Cut a beam with three instances of a void</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> cutting family. Its family parameter &quot;Cut </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> with Voids When Loaded&quot; must be set to true.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> CutBeamWithVoid(
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam,
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> cuttingSymbol )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = beam.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Level</span> level = doc.GetElement( beam.LevelId )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = beam.Location
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> beamCurve = lc.Curve;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Beam location from {0} to {1}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; PointString( beamCurve.GetEndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; PointString( beamCurve.GetEndPoint( 1 ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = 3;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> parameter_name;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>[] ids = <span class="blue">new</span> <span class="teal">ElementId</span>[n];
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Cutting Instances and Apply Cut&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt;= n; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Position on beam for this cutting instance</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p = beamCurve.Evaluate( i * 0.25, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Family instance insertion at {0}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PointString( p ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> cuttingInstance = doc.Create
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NewFamilyInstance( p, cuttingSymbol,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; level, <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parameter_name = <span class="maroon">&quot;A&quot;</span> + i.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cuttingInstance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .get_Parameter( parameter_name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( 0.5 * <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ids[i - 1] = cuttingInstance.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <b style="font-size:large; font-weight:bold;">doc.Regenerate();</b>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">InstanceVoidCutUtils</span>.AddInstanceVoidCut(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, beam, doc.GetElement( ids[i] ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> g
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; g.Start( <span class="maroon">&quot;Cut Beam with Voids&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve or load cutting symbol</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> cuttingSymbol
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = RetrieveOrLoadCuttingSymbol( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Select beam to cut</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">BeamSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Pick beam to cut&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; beam = doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Place cutting instances and apply cuts</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; CutBeamWithVoid( beam, cuttingSymbol );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; g.Assimilate();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>In future (Jeremy), please do remember the</p>
+
+<p style="text-align:center; font-size:xx-large; font-weight:bold; color:darkorange;">need to regenerate</p>
+
+
+<br/>
+
+<a name="8"></a>
+
+<p><strong>Addendum:</strong> Arno&scaron;t L&ouml;bel points out that the title of this post may be a bit misleading.</p>
+
+<p>There is no regeneration for 'Transaction Groups'.
+Regenerations of a model are possible only within a Transaction.</p>
+
+<p>Jeremy replies that the original title was 'Transaction Groups and Regeneration Need for InstanceVoidCutUtils', but that is too long and causes a horrible line break, so I just removed all the words that could possibly be left out.</p>
+
+<p>Sorry for that  :-)</p>

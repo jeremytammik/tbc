@@ -1,0 +1,262 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/combine-multiple-transactions-into-one-undo/m-p/5502149
+
+Arnošt Löbel
+Sr. Principal Engineer
+Autodesk, Revit R&D
+
+-->
+
+<h3>Using Transaction Groups</h3>
+
+<p>We repeatedly discussed the optimal usage and error handling of transactions, mainly based on the expert advice of Arno&scaron;t L&ouml;bel, Sr. Principal Engineer of the Autodesk Revit R&D team:</p>
+
+<!-- 0750 0753 1250 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/scope-and-dispose-transactions.html">Scope and Dispose of Transactions</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">Using Using Automagically Disposes and Rolls Back</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/11/handling-transaction-status-and-errors.html#4">Handling Transaction Status and Errors</a></li>
+</ul>
+
+<p>Let's complete this with his most recent advice on handling transaction groups to
+
+<a href="http://forums.autodesk.com/t5/revit-api/combine-multiple-transactions-into-one-undo/m-p/5502149">
+combine multiple transactions into one undo</a>:</p>
+
+<p><strong>Question:</strong>
+
+I am creating an application that must do the following steps:</p>
+
+<ol>
+<li>Load a FamilySymbol from a file.</li>
+<li>Get the FamilyManager from the Family document and access some parameters.</li>
+<li>Place an instance of the FamilySymbol into the project.</li>
+</ol>
+
+<p>In order to load the FamilySymbol into the project, I have to have a transaction running. Then, in order to open the Family document, the transaction has to be closed.  In order to place an instance of the component, a transaction has to be running.</p>
+
+<p>This causes the application to create two undo points &ndash; one for each transaction.</p>
+
+<p>Is there a way to combine the two transactions into a single undo point so the entire action of the command can be undone?</p>
+
+<p>I am using the Manual TransactionMode.</p>
+
+<p><strong>Answer:</strong>
+
+I am glad you asked.
+Yes, it can certainly be done.
+It is what Transaction Groups are for.
+The steps are simple:</p>
+
+<ol>
+<li>Start a transaction group. Give it a name.</li>
+<li>Do your first transaction.</li>
+<li>Open the family document.</li>
+<li>Load the family into the project</li>
+<li>Close the transaction group by calling Assimilate method</li>
+</ol>
+
+<p>The last operation will merge all transactions that have been committed within the group into just one transaction.
+It will bear the name of the transaction group.</p>
+
+<p>When working with transaction group, make sure you scope them by the 'using' block, just like you would with transactions.</p>
+
+<p>I hope this helps. There is more info if needed in the RevitAPI.chm file.
+Simply look up the TransactionGroup class.</p>
+
+<p><strong>Response:</strong>
+
+Ok, let me make sure I'm doing this correctly when dealing with exceptions.</p>
+
+<p>When the TransactionGroup is rolled back, all of the committed and uncommitted Transactions inside it are rolled back?</p>
+
+<p>When a TransactionGroup is committed or assimilated, all of the Transactions inside of it must already be committed?</p>
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> transGroup = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( document ) )
+&nbsp; {
+&nbsp; &nbsp; transGroup.Start( <span class="maroon">&quot;Transaction Group&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> firstTrans = <span class="blue">new</span> <span class="teal">Transaction</span>( document ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; firstTrans.Start( <span class="maroon">&quot;First Transaction&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// do some stuff</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; firstTrans.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; transGroup.Rollback(); <span class="green">// &lt;-- We do not have to roll back firstTrans?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> secondTrans = <span class="blue">new</span> <span class="teal">Transaction</span>( document ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; secondTrans.Start( <span class="maroon">&quot;Second Transaction&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// do some stuff</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; secondTrans.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; transGroup.Rollback(); <span class="green">// &lt;-- We do not have to roll back secondTrans?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; transGroup.Assimilate();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<p><strong>Answer:</strong>
+
+Regarding to your two questions:</p>
+
+<p>Yes and No, actually.
+Your statement is almost correct except one part, which I highlight here: "... all of the committed and <strong>uncommitted</strong> Transactions..."
+The thing is that you cannot close (that is either Commit, RollBack, or Assimilate) a transaction group while there is an uncommitted transaction still open.
+All transactions that start inside a transaction group must be either properly committed or rolled back before any of the aforementioned methods can be called upon the transaction group object.</p>
+
+<p>Yes, basically what I have just stated above.
+All transactions inside a group must be either committed or rolled back.
+If you try to call any of the transaction-group closing methods while there is still a transaction open (in the same document), you will get an exception.</p>
+
+<p>As for your code snippet, it is quite all right, except for two details, one more important than the other.
+I’ll start with that one:</p>
+
+<p>You do not have to Roll Back the open transaction in the catch blocks, because it will be rolled back automatically upon leaving its using block.
+However, in your case it can in fact even be dangerous to call RollBack in the catch.
+The problem is that you may actually (in theory) get an exception from the Start method too, and if you do, you would most certainly get another one when attempting to roll the transaction back.
+That would be an exception thrown while exception handling, and that is never a good thing.
+Thus, if you want to call RollBack as you do, you need to test whether the transaction has actually started.
+(There is a method for that or you could test the status.)</p>
+
+<p>This second problem is less dangerous, but could lead to unexpected results.
+(Unexpected as your code goes, I mean.)
+A programmer should anticipate that committing a transaction does not need to succeed.
+It can fail and it is not all that uncommon, in fact.
+There are several possible reasons for such an outcome, one of which is a failed regeneration. When that happens and your transaction actually fails, it is most likely that you would not like to continue with opening another transaction that might only work if the previous transaction succeeded.
+Ignoring the results of transactions can lead to a spiral of errors and failures that might be rather challenging to untangle.</p>
+
+<p>Lastly, a very minor thingy, that is not a problem, but could make your code simpler. You do not have to have instantiate a new transaction for each and every transaction. You can re-start an existing one instead; simply give it a proper name in the Start method.</p>
+
+<p>Putting all the above comments into action, I’ve rewritten your simple snippet as follows:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> transGroup
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( document ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> trans
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( document ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; transGroup.Start( <span class="maroon">&quot;Action&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;First Transaction&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// do some stuff</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( trans.Commit() != <span class="teal">TransactionStatus</span>.Committed )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;Second Transaction&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// do some more stuff</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( trans.Commit() != <span class="teal">TransactionStatus</span>.Committed )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; transGroup.Assimilate();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p><strong>Response:</strong>
+
+One more question:
+In the same logic as checking that Transaction.Commit returns TransactionStatus.Committed, is it a good idea to check that Transaction.Start returns TransactionStatus.Started?
+Is there a reason why it wouldn't?</p>
+
+<p><strong>Answer:</strong>
+
+I have been asked that very question many times in the past.
+My answer is that even though it is indeed possible in theory that the Start method returns a status other then Started, it is rather unlikely that it actually happens, if is it all possible in the public API. (Note: We, Revit programmers use the same classes internally and for us it is a tiny bit more likely that such a situation may happen.) In most situations that come to my mind the Start method would raise an exception if it is not possible (or permitted) to start a transaction, or any one of the three transaction-phase objects for that matter.</p>
+
+<p>And since I am back on this particular case, there is one small detail I could have changed in the snippet I wrote above:
+I could have explicitly roll back the transaction group in the two places where I return with a failure due to a transaction failing to commit.
+Although this explicit closing of the group is not necessary (for it will be closed implicitly upon leaving its using block), I do tend to write my code that way.
+The reason is more style related; I simply prefer to make it clear to anyone who comes across my code that I knew what I was doing (here, I am aware that the group must be rolled back.)</p>
+
+
+<p>Thank you very much, Arno&scaron;t, for your on-going support and expert in-depth advice!</p>
+
+
+
+<a name="2"></a>
+
+<h4>Finally Finished Eliminating The Building Coder Samples Obsolete API Usage</h4>
+
+<p>I finally completed the on-going effort to eliminate all Obsolete API Usage from The Building Coder samples.</p>
+
+<p>After <a href="http://thebuildingcoder.typepad.com/blog/2015/02/list-pipe-sizes-and-more-obsolete-api-usage-removal.html">the last step</a>,
+
+there were still <a href="zip/bc_migr_2015_g.txt">15 warnings</a> left:</p>
+
+<ul>
+<li>ViewSheet.Views is obsolete: Use GetAllPlacedViews() instead.</li>
+<li>Autodesk.Revit.Creation.Document.NewPipe: Use Pipe.Create() instead.</li>
+<li>Definitions.Create(string, Autodesk.Revit.DB.ParameterType, bool) is obsolete: Use Create(Autodesk.Revit.DB.ExternalDefinitonCreationOptions) instead.</li>
+<li>Element.get_Parameter(string) is obsolete: More than one parameter can have the same name on a given element. Use Element.Parameters to obtain a complete list of parameters on this Element, or Element.GetParameters(String) to get a list of all parameters by name, or Element.LookupParameter(String) to return the first available parameter with the given name (11 occurrences).</li>
+</ul>
+
+<p>I cleaned them up systematically, step by step, and published
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.117.2">
+release 2015.0.117.2</a>,
+
+which is completely clean and compiles with no warnings at all.</p>
+
+<p>Look at this
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2015.0.117.1...2015.0.117.2">diff between 2015.0.117.1 and 2015.0.117.2</a> to
+
+see exactly what I changed.</p>
+
+<p>This is an important milestone to accomplish before tackling the migration to upcoming future versions of the API.</p>
+
+<p>As always,
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder sample GitHub repository</a> provides
+
+the most up-to-date version.</p>

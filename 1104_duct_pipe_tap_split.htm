@@ -1,0 +1,121 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09236087 [Split Duct/Pipe]
+
+Erez van LeeuwenCadac Group Holding BV
+
+CF-802 [API wish: split duct or pipe like 'Split Elements' command]
+
+-->
+
+<h3>Daylighting Extension and Splitting with Taps</h3>
+
+<p>Here is a quick update on the status of the
+
+<a href="#2">daylighting analysis</a> technology preview and some helpful advice for anyone trying to
+
+<a href="#3">split a duct or pipe with taps</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Daylighting Analysis</h4>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/starting-to-clean-up-for-the-break.html#4">
+Daylighting Analysis for Revit</a> technology
+
+preview free analysis period has been extended until March 31 or until a commercial version becomes available, whichever comes first.</p>
+
+<center>
+<img src="img/daylighting_analysis_preview.png" alt="Daylighting Analysis for Revit"/> <!-- width="400"/ -->
+</center>
+
+<p>Find out more and download the updated plug-in from the
+
+<a href="https://beta.autodesk.com/callout/?callid=976EB2E05A1D46B5818473BDF2FAABC5">
+Daylighting Analysis for Revit</a> Autodesk
+
+Labs page.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Splitting a Duct or Pipe with Taps</h4>
+
+<p><strong>Question:</strong> I would like to split a Duct or a Pipe in a way that retains the intact Revit functionality.</p>
+
+<p>The user interface provides a command to split walls via Modify &gt; Split Element &gt; Split with Gap.</p>
+
+<p>How can I programmatically achieve something similar to split a duct or a pipe?</p>
+
+<p><strong>Answer:</strong> The Duct and Pipe classes do not provide any built-in split functionality.</p>
+
+<p>Here are a discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/split-a-duct-or-pipe.html">
+splitting a duct or pipe</a> from
+
+2012 and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/revit-api-cases-1.html#2">
+an older one</a> from
+
+2009.</p>
+
+<p><strong>Response:</strong> Splitting a pipe by shortening it and then creating a new one for the other end works fine for simple cases.</p>
+
+<p>However, what can I do if there are taps connected to it?</p>
+
+<p>In that case, shortening the pipe will remove the connection between the tap and the pipe and cause errors.</p>
+
+<p>Creating a new pipe at the old one's location will not automatically reattach the tap.</p>
+
+<p>So how can I split a pipe or a duct that has taps attached to it?</p>
+
+<p><strong>Answer:</strong> As always, the Revit API will not provide any additional functionality beyond what you have in the user interface.</p>
+
+<p>From the UI standpoint, one would need to:
+
+<ol>
+<li>Remove the taps.
+In some cases, when you shorten a duct, Revit will throw an error saying that you need to delete the tap.
+In other cases it will not.
+Regardless, you need to get rid of them to create new ones.
+So, of course, you'll want to remember their type, location, orientation, etc.</li>
+
+<li>Reconnect the branch to the newly created duct that supplements the old shortened one.
+In the UI, the 'extend' command will insert a tap for you.
+The API will as well, as we saw in some of the various cases during the development of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/newelbowfitting-easily-places-rolling-offset-elbow-fittings.html">
+simpler rolling offset</a>.</li>
+</ol>
+
+
+<p><strong>Response:</strong> I accept that the API will not provide any additional functionality beyond what you have in the user interface.
+
+<p>However, besides the 'Split with Gap' functionality for walls, the UI also provides a 'Split Element' command that does work for Ducts and Pipes.
+Are you saying this functionality is available programmatically?
+If so, where can I find it, please?</p>
+
+<p>Secondly, you suggest to remove the taps and then recreate them.</p>
+
+<p>In the UI, the extend method will only create the tap again if it is also defined in the DuctType and if the Preferred Junction Type is set to Tap.
+Furthermore, another thing that needs to be taken into account is that certain parameters might be set for the duct or pipe. and all of these parameter values will need to be copied to the newly created segment as well.</p>
+
+<p>The function 'Split Elements' provided by the user interface does all of this automatically: it will just split the Duct and add a union family in between.
+That is exactly what I would like to achieve programmatically as well.</p>
+
+
+<p><strong>Answer:</strong> Thank you for the clarification and sorry for the detour.</p>
+
+<p>I am sorry to say that you are right in not finding that access and this functionality is currently not available through the API, so
+I submitted a wish list item on your behalf for it.</p>

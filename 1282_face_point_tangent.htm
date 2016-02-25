@@ -1,0 +1,326 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- http://au.typepad.com/au/2015/02/now-featuring-drumroll-please-autodesk-screencasts.html
+  Autodesk Screencasts
+
+-->
+
+<h3>Determining the Face Tangent at a Picked Point</h3>
+
+<p>Happy Valentine's Day!</p>
+
+<center>
+<img src="img/moni_valentine_flowers2.jpg" alt="Happy Valentine's Day!" width="408"/>
+</center>
+
+<p>I keep repeating how much I love all kinds of geometric problems &ndash; besides my sweetheart, of course &ndash; merci filmool fier di scheeni Bliemli!</p>
+
+<p>Unfortunately, there are far too few of them around  :-)</p>
+
+<p>Happily, Jordi just raised one in the Revit API discussion forum thread on an
+
+<a href="http://forums.autodesk.com/t5/revit-api/api-c-question/td-p/5506500">
+API C# question</a>,
+
+providing another welcome opportunity to make use of the Face Project and ComputeDerivatives methods:</p>
+
+<p><strong>Question:</strong>
+
+I'm coding a plugin for Revit 2015 that inserts a family of my choice inside an existing project.</p>
+
+<p>I want to insert the family directly on a face of an existing 3D item.
+But depending on the situation I must insert it on different types of faces, such as planar faces or cylindrical.
+Problem is, I can't get my code to function on either; I don't know how to check for the type of face prior to my operations.</p>
+
+<p>That's my code for cylindrical faces:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Please pick a point on a &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;face for family instance insertion&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="teal">GeometryObject</span> obj
+&nbsp; &nbsp; = e.GetGeometryObjectFromReference( r );
+&nbsp;
+&nbsp; <span class="green">//PlanarFace face = obj as PlanarFace;</span>
+&nbsp; <span class="teal">CylindricalFace</span> face = obj <span class="blue">as</span> <span class="teal">CylindricalFace</span>;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p = r.GlobalPoint;
+&nbsp; <span class="teal">XYZ</span> v = face.Axis.CrossProduct( <span class="teal">XYZ</span>.BasisZ );
+&nbsp; <span class="blue">if</span>( v.IsZeroLength() )
+&nbsp; {
+&nbsp; &nbsp; v = face.Axis.CrossProduct( <span class="teal">XYZ</span>.BasisX );
+&nbsp; }
+&nbsp; doc.Create.NewFamilyInstance( r, p, v, symbol );
+</pre>
+
+<p>And that's my code for planar faces:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Please pick a point on a &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;face for family instance insertion&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="teal">GeometryObject</span> obj
+&nbsp; &nbsp; = e.GetGeometryObjectFromReference( r );
+&nbsp;
+&nbsp; <span class="teal">PlanarFace</span> face = obj <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; <span class="green">//CylindricalFace face = obj as CylindricalFace;</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p = r.GlobalPoint;
+&nbsp; <span class="teal">XYZ</span> v = face.Normal.CrossProduct( <span class="teal">XYZ</span>.BasisZ );
+&nbsp; <span class="blue">if</span>( v.IsZeroLength() )
+&nbsp; {
+&nbsp; &nbsp; v = face.Normal.CrossProduct( <span class="teal">XYZ</span>.BasisX );
+&nbsp; }
+&nbsp; doc.Create.NewFamilyInstance( r, p, v, symbol );
+</pre>
+
+<p>Almost nothing changes except for the declaration of v with the change: Axis/Normal.</p>
+
+<p>I've been using code from The Building Coder.
+I'm fairly new to programming and totally new to C#, and I've never used any API before.</p>
+
+<p>I also have other questions:</p>
+
+<ul>
+<li>Right now I'm typing the path and the name of the family item that I want to insert directly inside my code. Ideally, I'd like the user to pick the family when he starts the plugin, but I have no idea how to do that.</li>
+
+<li>Last thing I'd like to know is, after my family is inserted, how do I run automatically an interference check to see if there is any collision. The plugin is aimed to people totally new to geomatics, that have never used any software like AutoCAD, and I want them to push the least number of buttons possible to achieve their goal.</li>
+</ul>
+
+<p><strong>Answer:</strong>
+
+Thank you for your query.</p>
+
+<p>Looks like a very cool project.</p>
+
+<p>Congratulations on getting so far already.</p>
+
+<p>Let me address your question in four steps:</p>
+
+<ul>
+<li><a href="#2">Dynamic face type checking</a></li>
+<li><a href="#3">Arbitrary axis algorithm</a></li>
+<li><a href="#4">Generic face tangent determination</a></li>
+<li><a href="#5">Use UVPoint directly</a></li>
+<li><a href="#6">Family path and name selection</a></li>
+<li><a href="#7">Interference and collision checking</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Dynamic Face Type Checking</h4>
+
+<p>You can easily check for the type of the face dynamically using something like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">PlanarFace</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> planarFace = obj <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Handle planar face case ...</span>
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( obj <span class="blue">is</span> <span class="teal">CylindricalFace</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CylindricalFace</span> cylindricalFace = obj
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">CylindricalFace</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Handle cylindrical face case ...</span>
+&nbsp; }
+</pre>
+
+<p>It might be better not to separate between planar and cylindrical faces, though.</p>
+
+<p>All you want is the vector v, is it?</p>
+
+<p>And you want v to be tangential to the face surface?</p>
+
+<p>That can be achieved in a generic fashion, independent of the face type.</p>
+
+
+<a name="3"></a>
+
+<h4>Arbitrary Axis Algorithm</h4>
+
+<p>Actually, as far as I can tell, what you are after is just an arbitrary vector tangential to the face surface.</p>
+
+<p>That reminds me of the age-old
+
+<a href="http://www.autodesk.com/techpubs/autocad/acadr14/dxf/arbitrary_axis_algorithm_al_u05_c.htm">
+AutoCAD arbitrary axis algorithm</a> and
+
+<!--
+the arbitrary axis algorithm is not really mentioned here after all:
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">Polygon Transformation</a>
+-->
+
+the determination of a normal vector performed by the GetCurveNormal method:</p>
+
+<!-- 0356 0375 0462 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/detail-curve-must-be-in-plane.html">Detail curve must be in plane</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/model-curve-creator.html">Model curve creator</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/plane-normal-and-points-on-plane.html">Plane normal and points on plane</a></li>
+</ul>
+
+<p>However, in this case, there is actually no need for all this, because the Revit API provides all we need built-in.</p>
+
+
+<a name="4"></a>
+
+<h4>Generic Face Tangent Determination</h4>
+
+<p>Given a Revit API geometric face, the easiest way to determine the tangent vectors at a given point is provided by the generic Face.ComputeDerivatives method.</p>
+
+<p>The only little twist required to make use of it is that it takes a UV point in the 2D face coordinate system as an input argument.
+Given the 3D global XYZ point returned by the reference returned by PickObject, we can use the Face.Project method to determine the corresponding UV point on the face.</p>
+
+<p>Thus, ComputeDerivatives can be used to determine a face tangent for any kind of face like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Place an instance of the given family symbol</span>
+&nbsp; <span class="gray">///</span><span class="green"> on a selected face of an existing 3D element.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">FamilyInstance</span> PlaceFamilyInstanceOnFace(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Please pick a point on &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; a face for family instance insertion&quot;</span>);
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeometryObject</span> obj
+&nbsp; &nbsp; &nbsp; = e.GetGeometryObjectFromReference( r );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = r.GlobalPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Better than specialised individual handlers</span>
+&nbsp; &nbsp; <span class="green">// for each specific case, handle the general </span>
+&nbsp; &nbsp; <span class="green">// case in a generic fashion.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = obj <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> ir = face.Project( p );
+&nbsp; &nbsp; <span class="teal">UV</span> q = ir.UVPoint;
+&nbsp; &nbsp; <span class="teal">Transform</span> t = face.ComputeDerivatives( q );
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = t.BasisX; <span class="green">// or BasisY, or whatever...</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> doc.Create.NewFamilyInstance(r, p, v, symbol);
+&nbsp; }
+</pre>
+
+<p>As you can see, this is elegant and generic &ndash; there is no need to care about the type of face at all, it works the same way for all, including face types that you may now even be aware of, e.g. conical, Hermite, revolved and ruled, and other unthinkable ones that might potentially be added in the future.</p>
+
+
+<a name="5"></a>
+
+<h4>Use UVPoint Directly</h4>
+
+<p>Taking a second look at the possibilities offered, I notice that the PickPoint reference already provides direct access to the face UV point in case a surface has actually been selected, so there is no need for the projection of the 3D XYZ point and the code simplifies to this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, <span class="maroon">&quot;Please pick a point on &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot; a face for family instance insertion&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( r.ElementId );
+&nbsp;
+&nbsp; <span class="teal">GeometryObject</span> obj
+&nbsp; &nbsp; = e.GetGeometryObjectFromReference( r );
+&nbsp;
+&nbsp; <span class="teal">Face</span> face = obj <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; <span class="teal">UV</span> q = r.UVPoint;
+&nbsp;
+&nbsp; <span class="teal">Transform</span> t = face.ComputeDerivatives( q );
+&nbsp; <span class="teal">XYZ</span> v = t.BasisX; <span class="green">// or BasisY, or whatever...</span>
+&nbsp;
+&nbsp; <span class="blue">return</span> doc.Create.NewFamilyInstance( r, p, v, symbol );
+</pre>
+
+<p>Your other questions are pretty interesting as well.</p>
+
+
+<a name="6"></a>
+
+<h4>Family Path and Name Selection</h4>
+
+<p>To pick the path and name of the family to insert, you can use the .NET OpenFileDialog to select a family definition RFA file as demonstrated by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/text-file-driven-automatic-placement-of-family-instances.html">
+text file driven automatic placement of family instances</a> example
+
+that uses it to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/text-file-driven-automatic-placement-of-family-instances.html">
+select an input text file</a>.
+
+Once the family definition file is selected, you can load it with the LoadFamily method.
+The Building Coder provides lots of examples of how to do that.</p>
+
+
+<a name="7"></a>
+
+<h4>Interference and Collision Checking</h4>
+
+<p>Running an interference check is only a little bit more work, and there are probably various ways to go at it,
+so I will just hint at one possible starting point here.
+The first idea that comes to mind is the following:</p>
+
+<ul>
+<li>Determine the solid of the inserted family instance.</li>
+<li>Instantiate an ElementIntersectsSolidFilter using that.</li>
+<li>Retrieve all elements passing the filter.</li>
+</ul>
+
+<p><a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+
+CmdCollectorPerformance external command is currently set up to call the GetInstancesIntersectingElement method to test and demonstrate use of the ElementIntersectsElementFilter, closely related to the ElementIntersectsSolidFilter, with a detailed analysis of the use and result provided by the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/determining-intersecting-elements-and-continued-futureproofing.html#3">
+determining all family instances intersecting an element</a>.</p>
+
+<p>Furthermore, The Building Coder provides a whole topic group on various aspects of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.48">
+element intersection and collision detection</a>.</p>
+
+<p>I added all the code described above to the new method PlaceFamilyInstanceOnFace in the module
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewLightingFixture.cs">
+CmdNewLightingFixture.cs</a> in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.117.3">
+release 2015.0.117.3</a> of
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+
+<p>That should be more than enough to help you get on with the next steps of your add-in.
+Good luck!</p>
+
+
+
+<a name="8"></a>
+
+<h4>Autodesk Screencasts for Training Videos and Tutorials</h4>
+
+<p>If you are preparing any kind of training video or tutorial on how to achieve a specific computing task, check out the possibilities offered by
+
+<a href="http://au.typepad.com/au/2015/02/now-featuring-drumroll-please-autodesk-screencasts.html">
+Autodesk Screencasts</a>:
+
+a Screencast is like a screenshot in video form taking a ride-along with the person giving the presentation and seeing click-by-click how it is driven.</p>

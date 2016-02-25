@@ -1,0 +1,195 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<h3>RoomEditorApp PluralString and Free Educational Software</h3>
+
+<p>Yesterday, I mentioned some last-minute clean-up of the JavaScript part of my room editor,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/room-editor-with-handlebars-and-refresh.html">
+adding the handlebars module and a call to refresh</a> on
+
+save.</p>
+
+<p>Today, for the sake of completeness, I'll add a last-minute pass over the Revit add-in part as well, including an even more trivial change.</p>
+
+<p>I'll also mention that I had some time out in nature again, before jetting to Toronto for two days next week, celebrating a deep and wonderful
+
+<a href="http://en.wikipedia.org/wiki/Sweat_lodge">
+sweat lodge</a> or
+
+<a href="http://www.barefootsworld.net/sweatlodge.html">
+back to life ceremony</a> on
+
+a beautiful plot of land with some friends, my son, overflowing nature and a vast view.</p>
+
+<p>Good preparation, earthing.</p>
+
+
+<a name="2"></a>
+
+<h4>PluralString Helper Method</h4>
+
+<p>During the work on the JavaScript part, I noticed that I could make the message generation and logging code slightly more succinct and readable by implementing a little helper method to encapsulate my previous PluralSuffix calls.</p>
+
+<p>In C#, the result is the new Util.PluralString method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return an English pluralised string for the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given thing or things. If the thing ends with</span>
+&nbsp; <span class="gray">///</span><span class="green"> 'y', the plural is assumes to end with 'ies', </span>
+&nbsp; <span class="gray">///</span><span class="green"> e.g. </span>
+&nbsp; <span class="gray">///</span><span class="green"> (2, 'chair') -- '2 chairs'</span>
+&nbsp; <span class="gray">///</span><span class="green"> (2, 'property') -- '2 properties'</span>
+&nbsp; <span class="gray">///</span><span class="green"> (2, 'furniture item') -- '2 furniture items'</span>
+&nbsp; <span class="gray">///</span><span class="green"> If in doubt, appending 'item' or 'entry' to </span>
+&nbsp; <span class="gray">///</span><span class="green"> the thing description is normally a pretty </span>
+&nbsp; <span class="gray">///</span><span class="green"> safe bet. Replaces calls to PluralSuffix </span>
+&nbsp; <span class="gray">///</span><span class="green"> and PluralSuffixY.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> PluralString(
+&nbsp; &nbsp; <span class="blue">int</span> n,
+&nbsp; &nbsp; <span class="blue">string</span> thing )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( 1 == n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;1 &quot;</span> + thing;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = thing.Length - 1;
+&nbsp; &nbsp; <span class="blue">char</span> cy = thing[i];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> n.ToString() + <span class="maroon">&quot; &quot;</span> + ( ( <span class="maroon">'y'</span> == cy )
+&nbsp; &nbsp; &nbsp; ? thing.Substring( 0, i ) + <span class="maroon">&quot;ies&quot;</span>
+&nbsp; &nbsp; &nbsp; : thing + <span class="maroon">&quot;s&quot;</span> );
+&nbsp; }
+</pre>
+
+<p>I can use the new method to simplify some of my message generation and logging code, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Selected {0} from {1} displaying &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2}, {3} with HasMaterialQuantities=true&quot;</span>,
+&nbsp; &nbsp; <span class="teal">Util</span>.PluralString( Count, <span class="maroon">&quot;category&quot;</span> ),
+&nbsp; &nbsp; <span class="teal">Util</span>.PluralString( _nViews, <span class="maroon">&quot;view&quot;</span> ),
+&nbsp; &nbsp; <span class="teal">Util</span>.PluralString( _nElements, <span class="maroon">&quot;element&quot;</span> ),
+&nbsp; &nbsp; _nElementsWithCategorMaterialQuantities );
+</pre>
+
+<p>That previously looked like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Selected {0} categor{1} from &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} view{3} displaying {4} element{5}, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{6} with HasMaterialQuantities=true&quot;</span>,
+&nbsp; &nbsp; Count, <span class="teal">Util</span>.PluralSuffixY( Count ),
+&nbsp; &nbsp; _nViews, <span class="teal">Util</span>.PluralSuffix( _nViews ),
+&nbsp; &nbsp; _nElements, <span class="teal">Util</span>.PluralSuffix( _nElements ),
+&nbsp; &nbsp; _nElementsWithCategorMaterialQuantities );
+</pre>
+
+<p>An example of the resulting message is identical:</p>
+
+<pre>
+  Selected 5 categories from 5 views displaying
+  1901 elements, 877 with HasMaterialQuantities=true
+</pre>
+
+<p>All is well in the best of all worlds if we can worry our pretty little heads about this kind of trivia, isn't it?</p>
+
+
+
+<a name="3"></a>
+
+<h4>Download</h4>
+
+<p>The RoomEditorApp source code, Visual Studio solution and add-in manifest live in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.18">
+release 2015.0.2.18</a>.
+
+<p>For something slightly less trivial and much more useful, how about this important news item reproduced from Kean's note on
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2014/05/free-autodesk-software-for-students-and-educators.html">free Autodesk software for students and educators</a>?</p>
+
+
+
+<a name="4"></a>
+
+<h4>Free Autodesk Software for Students and Educators</h4>
+
+<p>Students world-wide can download and use pretty much the full range of Autodesk software for free* from the
+
+<a href="http://students.autodesk.com">Education Community site</a>.</p>
+
+<p>The
+
+<a href="http://news.autodesk.com/press-release/autodesk-consumer-group-and-education/autodesk-transforms-education-business-model-hel">public announcement</a> was
+
+made a few weeks ago.</p>
+
+<p>This is great news for students around the world!
+Although the press release specifically mentions North America, this is apparently a worldwide initiative.</p>
+
+<p>By the way, once you are nearing the end of your studies, you might also want to check the
+
+<a href="http://autodesk.com/careers">Autodesk careers site</a> as
+
+a next step.</p>
+
+<center>
+<img src="img/adsk_free_edu.png" alt="Free educational Autodesk software" width="450"/>
+</center>
+
+<p><em><span style="font-size: x-small;">* Free Autodesk software and/or cloud-based services are subject to acceptance of and compliance with the terms and conditions of the software license agreement or terms of service that accompany such software or cloud-based services. Software and cloud-based services provided without charge to Education Community members may be used solely for purposes directly related to learning, teaching, training, research or development and shall not be used for commercial, professional or any other for-profit purposes.</span></em></p>
+
+
+<a name="5"></a>
+
+<h4>Multi Culti</h4>
+
+<p>I may have mentioned now and then that I am interested in music of all kinds, and my son Christopher deals with sound recording professionally.</p>
+
+<p>Here is his newest music recommendation for me:</p>
+
+<p><a href="https://soundcloud.com/multiculti">Multi Culti</a> &ndash; "Music to trip to. Music to meditate on. Music to heal the world. Music to upgrade your DNA. Music to get your whole family dancing. Music to teach you. Music to live by. Music to die to. Music to multiply your mind."</p>
+
+<p>I hope you enjoy it too  :-)</p>
+
+
+
+<a name="6"></a>
+
+<h4>Four Tips on Creativity</h4>
+
+<p>While I'm at it anyway, let's go on...
+
+<p>Another recommendation by Christopher,
+
+<a href="http://www.musicofsound.co.nz">The Music of Sound</a>, led me to these
+
+<a href="http://designtaxi.com/news/365478/Four-Tips-On-Creativity-From-Bill-Watterson-Creator-Of-Calvin-Hobbes/?t=1400535942577">
+four tips on creativity</a> from
+
+Bill Watterson, creator of the Calvin and Hobbes comics that I really enjoy:</p>
+
+<ol>
+<li>Lose yourself in your work &ndash; By blocking out the world, you're better able to produce work to the best of your ability.</li>
+
+<li>Create for yourself &ndash; Forget that there's an audience and focus on making something for yourself.</li>
+
+<li>Make it beautiful &ndash; People invest time and effort into viewing your work, so make sure it's worth their while.</li>
+
+<li>Every medium has power &ndash; Though comics might seem like an inconsequential platform, they possess the power to forge a deep connection with readers.</li>
+</ol>
+
+<p>I definitely endorse these.</p>
+
+<p>Have you noticed? &nbsp; :-)</p>

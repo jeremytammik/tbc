@@ -1,0 +1,136 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+-->
+
+<h3>Simpler Rolling Offset Using NewElbowFitting</h3>
+
+<p>I continue the work on my MEP
+
+<a href="http://content.case-inc.com/au-hackathon-2013">
+CASE BIM Hackathon</a> project to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+calculate a rolling offset</a> between
+
+two pipes,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+insert the rolling offset pipe segment</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+connect it to its neighbours</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+explicitly placing elbow fittings</a>.</p>
+
+<p>The explicit fitting placement was pretty hard and fiddly to implement, requiring the following steps:</p>
+
+<ul>
+<li>Explore a manually generated model to determine the appropriate family and elbow fitting types.</li>
+<li>Research the fitting family instance parameters to determine how to define its diameter and elbow angle.</li>
+<li>Explicitly place elbow fitting family instance using the NewFamilyInstance method.</li>
+<li>Orient it in the proper direction toward the other, parallel, offset pipe.</li>
+<li>Shorten the original pipes to make space for the fitting.</li>
+<li>Create the connections between neighbouring pipes and fittings.</li>
+</ul>
+
+<p>It worked, but only after a lot of research and effort.</p>
+
+<p>As pointed out by Tate in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html?cid=6a00e553e168978833019b04c5511d970d#comment-6a00e553e168978833019b04c5511d970d">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+connecting the rolling offset pipe</a> to
+
+its neighbours, almost all that effort can be avoided by using the NewElbowFitting method instead.
+It selects, creates, adapts, places and connects an elbow fitting automatically, with the additional advantage of taking all the Revit pipe routing preferences and other settings into account.</p>
+
+<p>We touched on the topic of new fitting creation methods now and then in the past, but never presented an example using NewElbowFitting in context like this, so it is actually rather overdue:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/cable-tray-orientation-and-fittings.html">Cable tray orientation and fittings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html">Use of NewTakeOffFitting on a duct</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/set-elbow-fitting-type.html">Set elbow fitting type</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/use-of-newtakeofffitting-on-a-pipe.html">Use of NewTakeOffFitting on a pipe</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/07/mep-placeholders.html">MEP placeholders</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/elbow-fitting-selection-and-dimensioning.html">Elbow fitting selection and dimensioning</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Rolling Offset Fitting Placement Using NewElbowFitting</h4>
+
+<p>I expanded my previous code that calculates and places the rolling offset pipe segment.</p>
+
+<p>Last time I discussed it, it
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+connected a pipe directly</a> to
+
+the neighbouring original pipes with no fittings in between.</p>
+
+<p>To make use of NewElbowFitting, I simply replaced the code hooking up the connectors by six new lines that (twice) select the appropriate connector pairs and invoke the method like this:</p>
+
+<pre class="code">
+&nbsp; pipe = doc.Create.NewPipe( q0, q1,
+&nbsp; &nbsp; pipe_type_standard );
+&nbsp;
+&nbsp; pipe.get_Parameter( bipDiameter )
+&nbsp; &nbsp; .Set( diameter );
+&nbsp;
+&nbsp; <span class="green">// Connect rolling offset pipe segment</span>
+&nbsp; <span class="green">// directly with the neighbouring original</span>
+&nbsp; <span class="green">// pipes</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">//Util.Connect( q0, pipes[0], pipe );</span>
+&nbsp; <span class="green">//Util.Connect( q1, pipe, pipes[1] );</span>
+&nbsp;
+&nbsp; <span class="green">// NewElbowFitting performs the following:</span>
+&nbsp; <span class="green">// - select appropriate fitting family and type</span>
+&nbsp; <span class="green">// - place and orient a family instance</span>
+&nbsp; <span class="green">// - set its parameters appropriately</span>
+&nbsp; <span class="green">// - connect it with its neighbours</span>
+&nbsp;
+&nbsp; <span class="teal">Connector</span> con0 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; pipes[0], q0 );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> con = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; pipe, q0 );
+&nbsp;
+&nbsp; doc.Create.NewElbowFitting( con0, con );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> con1 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; pipes[1], q1 );
+&nbsp;
+&nbsp; con = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; pipe, q1 );
+&nbsp;
+&nbsp; doc.Create.NewElbowFitting( con, con1 );
+</pre>
+
+<p>As you can see, all the questionable hard-coded calculations required to explicitly place the fittings are now eliminated.</p>
+
+<p>The resulting model looks exactly the same as the one presented yesterday, generated by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/explicitly-placing-rolling-offset-pipe-elbow-fittings.html#4">
+explicitly placing the elbow fittings</a>.</p>
+
+<p>The new method to place the elbow fittings and properly connect the rolling offset is included in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, in the external command CmdRollingOffset, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.5">
+release 2014.0.106.5</a>.</p>
+
+<p>That just about concludes this project, except for the question on how to use Pipe.Create instead of Document.Create.NewPipe, which is still open.</p>

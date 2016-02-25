@@ -1,0 +1,309 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Victor Chekalin 
+
+Re: Fill Patterns Control Benchmark
+
+-->
+
+<h3>WPF Fill Pattern Viewer Control Benchmark</h3>
+
+<p>I recently presented
+
+<a href="http://www.facebook.com/profile.php?id=100003616852588">Victor Chekalin</a>'s
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control.html">WPF control for viewing Revit fill patterns</a>.
+
+<p>In his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control.html#comment-6a00e553e16897883301a5119e101d970c">
+comment</a>,
+
+Victor already mentioned some worries about performance of this control and his intention to create a simple benchmark to monitor it.</p>
+
+<p>Well, here it is.</p>
+
+<p>At the same time, I also took the opportunity to migrate the fill pattern control to Revit 2015.</p>
+
+
+<a name="2"></a>
+
+<h4>Migrate the Fill Pattern Viewer Control to Revit 2015</h4>
+
+<p>The migration to the Revit 2015 API was extremely straightforward, just like the previous add-ins I performed it for, e.g.:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-revit-2015.html">RevitLookup for Revit 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html">Compiling the Revit 2015 SDK and Migrating The Building Coder Samples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/migrating-roomeditorapp-to-revit-2015.html">Migrating RoomEditorApp to Revit 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-ur1-adn-aec-and-au-news.html">RevitLookup for Revit 2015 UR1</a></li>
+</ul>
+
+<p>The source code, Visual Studio solution and add-in manifest of the complete AddMaterials add-in including the fill pattern viewer WPF control is provided in the
+
+<a href="https://github.com/jeremytammik/AddMaterials">AddMaterials GitHub repository</a>,
+
+and the initial migration to the Revit 2015 API is captured in
+
+<a href="https://github.com/jeremytammik/AddMaterials/releases/tag/2015.0.0.2">
+release 2015.0.0.2</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Fill Pattern Viewer Control Benchmark</h4>
+
+<p>In Victor's own words:</p>
+
+<blockquote>
+
+<p>I was interested about benchmark and created it:)</p>
+
+<p>I created the new command 'AddMaterials - Fill Pattern benchmark' and added it to the AddMaterials Add-In.</p>
+
+<p>As it turned out, the most complex pattern is 'Concrete'. To create the graphics for it took more that one second.</p>
+
+</blockquote>
+
+<p>Displaying any other fill pattern in this control requires only about 10 milliseconds.</p>
+
+<p>The benchmark implementation is accomplished in a new external command, FillPatternBenchmarkCommand, which retrieves all fill patterns from the model and displays them in a form:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">FillPatternBenchmarkCommand</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> doc = commandData.Application
+&nbsp; &nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> fillPatternElements
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FillPatternElement</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">FillPatternElement</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OrderBy( fp =&gt; fp.Name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> fillPatterns
+&nbsp; &nbsp; &nbsp; &nbsp; = fillPatternElements.Select(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fpe =&gt; fpe.GetFillPattern() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FillPatternsViewModel</span> fillPatternsViewModel
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FillPatternsViewModel</span>( fillPatterns
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select( x =&gt; <span class="blue">new</span> <span class="teal">FillPatternViewModel</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FillPatternsView</span> fillPatternsView
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FillPatternsView</span>()
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; DataContext = fillPatternsViewModel
+&nbsp; &nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; &nbsp; fillPatternsView.ShowDialog();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The form requires two new ViewModel modules to view a simple fill pattern, a list of all fill patterns, and present that list in a WPF form.</p>
+
+<p>The actual benchmarking is performed by adding a couple of lines to the existing FillPatternViewerControlWpf.xaml.cs module.</p>
+
+<p>The new code instantiates a stopwatch.</p>
+
+<p>In debug mode only, the stopwatch elapsed time in milliseconds is displayed in red on top of the fill pattern:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> DrawFillPattern( <span class="teal">Graphics</span> g )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Stopwatch</span> sw = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">float</span> matrixScale;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> fillPattern = FillPattern;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fillPattern == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fillPattern.Target == <span class="teal">FillPatternTarget</span>.Model )
+&nbsp; &nbsp; &nbsp; matrixScale = Scale;
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; matrixScale = Scale * 10;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> width =
+&nbsp; &nbsp; &nbsp; ( ActualWidth == 0 ? Width : ActualWidth ) == 0
+&nbsp; &nbsp; &nbsp; &nbsp; ? 100
+&nbsp; &nbsp; &nbsp; &nbsp; : ( ActualWidth == 0 ? Width : ActualWidth );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">double</span>.IsNaN( width ) )
+&nbsp; &nbsp; &nbsp; &nbsp; width = 100;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> height =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( ActualHeight == 0 ? Height : ActualHeight ) == 0
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? 30
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ( ActualHeight == 0 ? Height : ActualHeight );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">double</span>.IsNaN( height ) )
+&nbsp; &nbsp; &nbsp; &nbsp; height = 30;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> rect = <span class="blue">new</span> <span class="teal">Rectangle</span>( 0, 0,
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) width, (<span class="blue">int</span>) height );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> centerX = ( rect.Left + rect.Left
+&nbsp; &nbsp; &nbsp; &nbsp; + rect.Width ) / 2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> centerY = ( rect.Top + rect.Top
+&nbsp; &nbsp; &nbsp; &nbsp; + rect.Height ) / 2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; g.TranslateTransform( centerX, centerY );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> rectF = <span class="blue">new</span> <span class="teal">Rectangle</span>( -1, -1, 2, 2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; g.FillRectangle( <span class="teal">Brushes</span>.Blue, rectF );
+&nbsp;
+&nbsp; &nbsp; &nbsp; g.ResetTransform();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> fillGrids = fillPattern.GetFillGrids();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;FilPattern name: {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; fillPattern.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Grids count: {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; fillGrids.Count );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> fillGrid <span class="blue">in</span> fillGrids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> degreeAngle = (<span class="blue">float</span>) RadianToGradus(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fillGrid.Angle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">new</span> <span class="blue">string</span>( <span class="maroon">'-'</span>, 100 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\tOrigin: U: {0} V:{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fillGrid.Origin.U, fillGrid.Origin.V );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\tOffset: {0}&quot;</span>, fillGrid.Offset );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\tAngle: {0}&quot;</span>, degreeAngle );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\tShift: {0}&quot;</span>, fillGrid.Shift );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> pen = <span class="blue">new</span> <span class="teal">Pen</span>( System.Drawing.<span class="teal">Color</span>.Black )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Width = 1f / matrixScale
+&nbsp; &nbsp; &nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">float</span> dashLength = 1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> segments = fillGrid.GetSegments();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( segments.Count &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pen.DashPattern = segments
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select( <span class="teal">Convert</span>.ToSingle )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToArray();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\tSegments:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> segment <span class="blue">in</span> segments )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\t\t{0}&quot;</span>, segment );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dashLength = pen.DashPattern.Sum();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; g.ResetTransform();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> rotateMatrix = <span class="blue">new</span> <span class="teal">Matrix</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; rotateMatrix.Rotate( degreeAngle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> matrix = <span class="blue">new</span> <span class="teal">Matrix</span>( 1, 0, 0, -1,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; centerX, centerY );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; matrix.Scale( matrixScale, matrixScale );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; matrix.Translate( (<span class="blue">float</span>) fillGrid.Origin.U,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">float</span>) fillGrid.Origin.V );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> backMatrix = matrix.Clone();
+&nbsp; &nbsp; &nbsp; &nbsp; backMatrix.Multiply( rotateMatrix );
+&nbsp; &nbsp; &nbsp; &nbsp; matrix.Multiply( rotateMatrix );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> first = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 20; i &gt; 0; i-- )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !first )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; matrix.Translate( (<span class="blue">float</span>) fillGrid.Shift,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">float</span>) fillGrid.Offset );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; backMatrix.Translate( (<span class="blue">float</span>) fillGrid.Shift,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -(<span class="blue">float</span>) fillGrid.Offset );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> offset = ( -10 ) * dashLength;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; matrix.Translate( offset, 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; backMatrix.Translate( offset, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; g.Transform = matrix;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; g.DrawLine( pen, <span class="blue">new</span> <span class="teal">PointF</span>( 0, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PointF</span>( 200, 0 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; g.Transform = backMatrix;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; g.DrawLine( pen, <span class="blue">new</span> <span class="teal">PointF</span>( 0, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PointF</span>( 200, 0 ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; sw.Stop();
+&nbsp; &nbsp; &nbsp; g.ResetTransform();
+&nbsp;
+<span class="blue">#if</span> DEBUG
+&nbsp; &nbsp; &nbsp; g.DrawString( <span class="blue">string</span>.Format( <span class="maroon">&quot;{0} ms&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; sw.ElapsedMilliseconds),
+&nbsp; &nbsp; &nbsp; &nbsp; System.Drawing.<span class="teal">SystemFonts</span>.DefaultFont,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Brushes</span>.Red, 0, 0);
+<span class="blue">#endif</span>
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( ex.Message );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The result of running the benchmark command in Revit 2015 looks like this:</p>
+
+<center>
+<img src="img/fill_pattern_viewer_benchmark.png" alt="AddMaterial fill pattern viewer benchmark" width="238"/>
+</center>
+
+<p>The benchmarking code is added to the
+
+<a href="https://github.com/jeremytammik/AddMaterials">AddMaterials GitHub repository</a> and
+
+captured in
+
+<a href="https://github.com/jeremytammik/AddMaterials/releases/tag/2015.0.0.3">
+release 2015.0.0.3</a>.</p>
+
+<p>Many thanks to Victor for the initial implementation and again for this benchmark implementation!</p>

@@ -1,0 +1,130 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10245752 [Batch rendering Views across several Revit files with the API]
+
+-->
+
+<h3>AU Ends and Batch Rendering Across Several Projects</h3>
+
+<p>Let me share a couple of thoughts and a batch of links to discussions of topics related to batch processing that came up answering a case today in between all the hectic activity at Autodesk University.</p>
+
+<p>For my part, AU is over now, and I am already sitting in the airport waiting for the flight back to Europe and the series of West European DevDays conferences starting in Paris on Monday.</p>
+
+<p>The batch-processing topic was raised by this query:</p>
+
+<p><strong>Question:</strong> Can I use the Revit API to batch render views in several different individual Revit projects?</p>
+
+<p>I have lot of Revit files, each with a set of views named in a structured, standardized manner.</p>
+
+<p>I would like to batch render these overnight or during the weekend.</p>
+
+<p>Is that achievable using the Revit API?</p>
+
+<p>If not, do you know of any other way to do it, e.g. through a combination of Revit API and maybe external user interface scripting or something?</p>
+
+
+<p><strong>Answer:</strong> Yes, this is definitely possible.</p>
+
+<p>There are a number of different possible approaches.</p>
+
+<p>They may or may not involve some or all of the following techniques:</p>
+
+<ul>
+<li>Use of the journal file.</li>
+<li>Use of an add-in performing required tasks automatically triggered by the DocumentOpened event.</li>
+<li>If the DocumentOpened event does not allow you to achieve everything you need, you may want to implement a cascading event triggering a one-off Idling event.</li>
+</ul>
+
+<p>Here is a bunch of discussions on The Building Coder on these and related topics:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/getting-the-journal-file-path.html">Getting the Journal File Path</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/journal-file-replay.html">Journal File Replay</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-conversion-journal-script.html">IFC Import and Conversion Journal Script</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html">Modeless Door Lister Flaws</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/subscribing-to-ui-automation-events.html">Subscribing to UI Automation Events</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/loading-an-add-in-with-a-journal-file.html">Loading an Add-in With a Journal File</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/elbow-fitting-selection-and-dimensioning.html#6">Invoke External Command on Start-up</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">The Revit Server REST API</a></li>
+</ul>
+
+<p>Of these, the IFC import and conversion example is the most complete and probably the best place to start, while the others cover various additional aspects.</p>
+
+<p>Actually, the more I think about this, the more different topics might be involved:</p>
+
+<p>You might want to
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+drive Revit from outside</a>,
+
+or you could launch the whole batch process from within Revit, like the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/external-command-lister-and-adding-ribbon-commands.html">
+external command lister</a>.
+
+Please be aware that you might run out of memory if you open and close a large number of files in one single Revit session.
+Revit was built with end user interaction in mind, and an end user is normally not expected to open more than a handful or a few dozen files in one session.
+Therefore, a serious batch processor will either have to monitor and log its progress, regularly check that Revit is still alive and well from time and time, and shut down and automatically restart to continue processing where it broke off if not.</p>
+
+<p>When running unattended, you may need to programmatically
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">
+detect and handle messages and failures</a>.</p>
+
+<p>You may be able to choose between the journaling approach pointed to above, and using
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3">PostCommand</a> to
+
+programmatically launch built-in and Revit add-in commands instead.
+Customisation using the journal file is not officially supported, whereas the PostCommand approach is.</p>
+
+<blockquote>
+<p>Alice came to a fork in the road. 'Which road do I take?' she asked.</p>
+<p>'Where do you want to go?' responded the Cheshire Cat.</p>
+<p>'I don't know,' Alice answered.</p>
+<p>'Then,' said the Cat, 'it doesn't matter.</p>
+</blockquote>
+
+<center>
+<img src="img/alice_and_the_cheshire_cat.jpg" alt="Alice and the Cheshire Cat" width="445"/>
+</center>
+
+<p>Good luck to you with this, and wish me luck now crossing the pond!</p>
+
+
+<a name="2"></a>
+
+<h4>Addendum</h4>
+
+<p><strong>Question:</strong> Thank you for replying in such a fast manner.</p>
+
+<p>I’ve found several posts on The Building Coder on automating Revit using the Journal file, but as far as I understand this is not directly supported by AutoDesk and it’s not very stable across Revit versions (compared to a strict API approach).</p>
+
+<p>You covered my question about workarounds and I appreciate that.</p>
+
+<p>But would it be possible to achieve this ONLY using the Revit API, e.g., a batch rendering plugin that doesn’t use the journal file?</p>
+
+<p><strong>Answer:</strong> I partially covered that aspect as well above already.</p>
+
+<p>I do indeed believe that it is possible to implement a solution that avoids all use of the journal file.</p>
+
+<p>Maybe like this:</p>
+
+<ol>
+<li>Implement the rendering functionality you require as an external command.</li>
+
+<li>Rewrite it so that it can be called from the DocumentOpened event, or Idling, if necessary.</li>
+
+<li>Launch Revit with your required files one by one in a batch file and let your add-in do its dirty deed.</li>
+</ol>
+
+<p>With all the possible variations already hinted at, I am optimistic that you can solve this to your full satisfaction.</p>
+
+
+<p>By the way, I have now landed safely in London.
+Next leg is Paris.</p>

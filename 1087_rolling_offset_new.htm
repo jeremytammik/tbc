@@ -1,0 +1,208 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Revit-API/Pipe-placeholder-set-system-type/td-p/3840383
+08281195 [MEP pipes and placeholders assign system type]
+SPR #217278 [Wishlist: Ability to set the piping system type via the API if the pipe was created via the API]
+REVIT-28762 [API bug calling Pipe.Create]
+
+-->
+
+<h3>Creating a Rolling Offset Pipe Between Two Pipes</h3>
+
+<p>I talked about my nice little MEP related
+
+<a href="http://content.case-inc.com/au-hackathon-2013">
+CASE BIM Hackathon</a> project to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+calculate a rolling offset</a> between
+
+two pipes the day before yesterday.</p>
+
+<p>An obvious immediate question is: OK, and now how do I insert a real pipe segment element instead of just displaying a model line to represent the calculation result?</p>
+
+<p>Actually, this involves two separate steps:</p>
+
+<ul>
+<li>Create the rolling offset pipe segment</li>
+<li>Connect the three pipes with each other</li>
+</ul>
+
+<p>As I mentioned previously, e.g. discussing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/move-duct-join-add-in-with-video-and-github-support.html">
+how to move a duct join</a>,
+
+there are two different approaches to completing these two tasks:</p>
+
+<ul>
+<li>First place the pipes and then connect their connectors with each other; this automatically generates, places and connects the appropriate fittings.</li>
+<li>Place the fittings, then connect those with each other and the two original pipes; this will automatically generate, place and connect the rolling offset pipe.</li>
+</ul>
+
+<p>Long term, I would like to implement and discuss both of these approaches here.</p>
+
+<p>For the moment, I will just look at the first step, placing a pipe to define the rolling offset, and not worry at all about connecting it yet.</p>
+
+<p>Even just looking at that raises an interesting issue or two.</p>
+
+
+<a name="2"></a>
+
+<h4>Two Pipe Creation Methods</h4>
+
+<p>The Revit API provides two methods to create a new pipe:</p>
+
+<ul>
+<li>The new static creation method on the class itself: <a href="#3">Pipe.Create</a>.</li>
+<li>The old method on the creation document: <a href="#4">Document.Create.NewPipe.</li>
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>Initial Problems Using Pipe.Create</h4>
+
+<p>I obviously tried to use the new method first.
+
+<p>The static Pipe.Create method to create the pipe takes six arguments:</p>
+
+<ul>
+<li>document: The document.</li>
+<li>systemTypeId: The id of the piping system type.</li>
+<li>pipeTypeId: The id of the pipe type.</li>
+<li>levelId: The level id for the pipe.</li>
+<li>firstPoint: The first point of the pipe.</li>
+<li>secondPoint: The second point of the pipe.</li>
+</ul>
+
+<p>I tried to grab the required information from one of the two pre-existing pipes and call the creation method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> idSystem = pipe.MEPSystem.Id;
+&nbsp; <span class="teal">ElementId</span> idType = pipe.PipeType.Id;
+&nbsp; <span class="teal">ElementId</span> idLevel = pipe.LevelId;
+&nbsp;
+&nbsp; pipe = <span class="teal">Pipe</span>.Create( doc, idSystem,
+&nbsp; &nbsp; idType, idLevel, q0, q1 );
+</pre>
+
+<p>Unfortunately, this throws an argument exception saying "The systemTypeId is not valid piping system type. Parameter name: systemTypeId".</p>
+
+<p>I tried several other options to retrieve a useable piping system type id, including the ElementId.InvalidElementId and creating a new PipingSystem element, but so far they all failed, unfortunately.</p>
+
+<p>I'll let you know as soon as I have a running solution.</p>
+
+
+<a name="4"></a>
+
+<h4>Pipe Creation Using NewPipe</h4>
+
+<p>As a workaround, I resorted to the old pipe creation method NewPipe provided by the creation document.</p>
+
+<p>I had some old code lying around, so it was no problem reusing that, and it works fine.</p>
+
+<p>The NewPipe method requires the start point, end point, and pipe type.</p>
+
+<p>I use a filtered element collector to retrieve the standard pipe type by comparing its name to "Standard".
+I am sure there is also a language independent way of achieving this.</p>
+
+<p>I added an assertion to check that one of the two original pipes is using the same pipe type, so I could also just grab that instead.
+That is the case in this super simple sample model.
+In the real world, the situation would obviously be more complex.</p>
+
+<p>I also grab the original pipe diameter and set the new one to the same value via its built-in parameter RBS_PIPE_DIAMETER_PARAM.</p>
+
+<p>Here is the resulting code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.RBS_PIPE_DIAMETER_PARAM;
+&nbsp;
+&nbsp; <span class="blue">double</span> diameter = pipe
+&nbsp; &nbsp; .get_Parameter( bip ) <span class="green">// &quot;Diameter&quot;</span>
+&nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; <span class="teal">PipeType</span> pipe_type_standard
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipeType</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">PipeType</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">PipeType</span>&gt;( e
+&nbsp; &nbsp; &nbsp; &nbsp; =&gt; e.Name.Equals( <span class="maroon">&quot;Standard&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">PipeType</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; pipe_type_standard.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; pipe.PipeType.Id.IntegerValue ),
+&nbsp; &nbsp; <span class="maroon">&quot;expected all pipes in this simple &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;model to use the same pipe type&quot;</span> );
+&nbsp;
+&nbsp; pipe = doc.Create.NewPipe( q0, q1,
+&nbsp; &nbsp; pipe_type_standard );
+&nbsp;
+&nbsp; pipe.get_Parameter( bip )
+&nbsp; &nbsp; .Set( diameter );
+</pre>
+
+<p>Here is a screen snapshot of the situation with the two pipes before executing the command:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_1.png" alt="Two original pipes"/>
+</center>
+
+<p>The command identifies the two, calculates the rolling offset, adjusts the two existing pipe end points, and generates a new pipe segment between them:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_2.png" alt="New rolling offset pipe segment"/>
+</center>
+
+<p>Note that I have not made any attempt so far to connect the three.</p>
+
+<p>I'll have a look at that some other time.</p>
+
+<p>As promised, I will also try to get the new Pipe.Create method up and running.</p>
+
+<p>The code presented above is available from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, in the external command CmdRollingOffset, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.2">
+release 2014.0.106.2</a>.</p>
+
+<p>It implements two Boolean variables to switch between the different tests discussed so far:</p>
+
+<ul>
+<li>Creation of a model line placeholder</li>
+<li>Pipe creation using Pipe.Create</li>
+<li>Pipe creation using Document.Create.NewPipe</li>
+</ul>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> This command can place either a model line</span>
+&nbsp; <span class="gray">///</span><span class="green"> to represent the rolling offset calculation</span>
+&nbsp; <span class="gray">///</span><span class="green"> result, or insert a real pipe segment and the </span>
+&nbsp; <span class="gray">///</span><span class="green"> associated fittings.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> _place_model_line = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Switch between the new static Pipe.Create</span>
+&nbsp; <span class="gray">///</span><span class="green"> method and the obsolete </span>
+&nbsp; <span class="gray">///</span><span class="green"> Document.Create.NewPipe.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> _use_static_pipe_create = <span class="blue">false</span>;
+</pre>
+
+<p>I hope you find this useful, and look forward to the further exploration.</p>
+
+<p>If you already know how to achieve some of the missing steps, please feel free to fork and enhance the sample code on GitHub. Thank you!</p>

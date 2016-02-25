@@ -1,0 +1,329 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08833064 [Calling GetBoundingBox on GeometryElement returned from GeometryElement.GetTransformed]
+
+/a/j/adn/case/sfdc/08833064/AlignedBoundingBox.cs
+
+-->
+
+<h3>LINQ DIY Transformed Geometry Bounding Box</h3>
+
+<p>We looked at a couple of transformation issues in the past, e.g.:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">Polygon Transformation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/03/transform.html">Transform</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/03/transform-instance-coordinates.html">Transform Instance Coordinates</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/transform-an-element.html">Transform an Element</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/transformations.html">Transformations</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/get-transformed-family-instance-geometry.html">Get Transformed Family Instance Geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/planar-face-transform.html">Planar Face Transform</a></li>
+</ul>
+
+<p>Now Jon Smith of
+
+<a href="http://coins-global.com">
+Construction Industry Solutions Ltd</a> raised
+
+another issue related to transformations.</p>
+
+<p>Unlike the ones listed above, however, this one deals with the transformation and bounding box of the in-memory geometry objects, as opposed to database elements:</p>
+
+<p><strong>Question:</strong> We need to transform some elements into a different coordinate system before getting their bounding box.
+We are doing this by getting the GeometryElement object, calling GetTransformed on it, and then calling GetBoundingBox on that.</p>
+
+<p>This works perfectly well in Revit 2014.
+In Revit 2013, however, calling GetBoundingBox on a transformed GeometryElement returns a box with a huge negative maximum, and a huge positive maximum &ndash; obviously wrong &ndash; and the max is less than the min.
+Is there a workaround for this in 2013?
+I tried tweaking the geometry options but to no avail.
+Also, the actual geometry objects contained in the geometry elements do appear to be valid (or at least there are the same number of solids in the pre and post transformation elements).</p>
+
+<p>Here is a code snippet that demonstrates the problem.
+In my real code, I am transforming the GeometryElement by something meaningful, but in this sample case I just use the identity matrix.
+Therefore, preTransformBox should be equal to postTransformBox.
+One problem with the sample is both max and min are displaying positive in the dialog, but max is actually negative &ndash; the values are too large to display properly!
+This sample works fine in 2014, but in 2013 the returned BoundingBoxXYZ is garbage:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> test( <span class="teal">Element</span> elem )
+{
+&nbsp; <span class="teal">Options</span> geomOpts = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geometryElement
+&nbsp; &nbsp; = elem.get_Geometry( geomOpts );
+&nbsp;
+&nbsp; <span class="blue">if</span>( geometryElement == <span class="blue">null</span> )
+&nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> preTransformBox
+&nbsp; &nbsp; = geometryElement.GetBoundingBox();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geometryElementTransformed
+&nbsp; &nbsp; = geometryElement.GetTransformed(
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span>.Identity );
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> blah = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> postTransformBox
+&nbsp; &nbsp; = geometryElementTransformed.GetBoundingBox();
+&nbsp;
+&nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show(
+&nbsp; &nbsp; <span class="maroon">&quot;Pre Min: &quot;</span> + preTransformBox.Min.ToString()
+&nbsp; &nbsp; + <span class="maroon">&quot;\nPre Max: &quot;</span> + preTransformBox.Min.ToString()
+&nbsp; &nbsp; + <span class="maroon">&quot;\nPost Min: &quot;</span> + postTransformBox.Min.ToString()
+&nbsp; &nbsp; + <span class="maroon">&quot;\nPost Max: &quot;</span> + postTransformBox.Min.ToString() );
+}
+</pre>
+
+<p><strong>Answer:</strong> Interesting topic.
+I have not used the geometry element transformation or bounding box functionality in the past, just of the main Revit database element.</p>
+
+<p>What do you use it for, please?</p>
+
+<p>Is there an alternative way to achieve your goal?</p>
+
+<p>Could you use the database element bounding box instead of the geometry element one?</p>
+
+<p>I am glad to hear that the problem does not occur in Revit 2014.</p>
+
+<p>Regarding the situation in Revit 2013, the fact that the normal geometry retrieval seems to be working properly sounds like a good starting point to me.</p>
+
+<p>I would suggest simply traversing that geometry and creating your own min and max bounding box points from it.</p>
+
+<p>There are several samples on the blog that demonstrate the process, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">
+structural setout point</a> application.
+It collects and marks all vertices of structural concrete element geometry solids.</p>
+
+<p>Instead of collecting all the individual points from the geometry, you could just traverse the points and keep track of and extend the min and max as you go along. If you wish to handle curved elements correctly, you could ask them for their tessellations and process all the intermediate points as well.</p>
+
+<p><strong>Answer:</strong> Perfect &ndash; thank you!
+Talking it through has helped me with a shim for 2013.</p>
+
+<p>The reason for using GeometryElement is we can transform the geometry into the elements "ECS" or entity coordinate system, using AutoCAD terminology, so we can create a tight bounding box for it.
+We cannot transform the element itself as its geometry may be affected by other elements, e.g. wall joins.</p>
+
+<p>My solution for 2013 (that appears to work from some initial testing) is to extract all triangulated edges for each solid in each non-transformed geometry element, transform the points into the ECS and create the bounding box from those points.</p>
+
+<p>I pulled out the code into the following stand-alone method getAlignedBoundingBoxFromElement &ndash; it’s still fairly long but there might be something useful in it.</p>
+
+<p>It includes both ways of retrieving the aligned bounding box in the code &ndash; the 2014 method, and the 2013 one as a fallback.
+I prefer the 2014 method as it does not rely on a particular type of geometry and will be future-proof if other geometry types are added, or Revit changes its bounding-box algorithm:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return an aligned bounding box around a given</span>
+&nbsp; <span class="gray">///</span><span class="green"> element. Only works if the element uses a </span>
+&nbsp; <span class="gray">///</span><span class="green"> LocationCurve (not LocationPoint).</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;elem&quot;&gt;</span><span class="green">Element to return </span>
+&nbsp; <span class="gray">///</span><span class="green"> bounding box for</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Bounding box</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">BoundingBoxXYZ</span>
+&nbsp; &nbsp; getAlignedBoundingBoxFromElement(
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> elem )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = elem.Location
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( lc != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &amp;&amp; lc.Curve.IsBound )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> geomOpts = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geometryElement
+&nbsp; &nbsp; &nbsp; &nbsp; = elem.get_Geometry( geomOpts );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geometryElement != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transformation matrix from model </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to the element curve ECS</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to simplify it, we force the transformation </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to be aligned to the world XY plane - so </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// just rotated around the Z axis</span>
+&nbsp;
+<span class="blue">#if</span> _REVIT2014_
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> StartPoint = lc.Curve.GetEndPoint(0);
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> EndPoint = lc.Curve.GetEndPoint(1);
+<span class="blue">#else</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; &nbsp; XYZ StartPoint = lc.Curve.get_EndPoint( 0 );</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; &nbsp; XYZ EndPoint = lc.Curve.get_EndPoint( 1 );</span>
+<span class="blue">#endif</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// flatten its Z - where the Z is, is </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// irrelevant as the bounding box will </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// determine the height</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; EndPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( EndPoint.X, EndPoint.Y,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; StartPoint.Z );&nbsp;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> direction = EndPoint - StartPoint;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> t
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Transform</span>.Identity;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Origin = StartPoint;
+&nbsp; &nbsp; &nbsp; &nbsp; t.BasisX = direction.Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.BasisY = normal.CrossProduct( t.BasisX )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.BasisZ = t.BasisX.CrossProduct( t.BasisY )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// check we have a valid matrix</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !t.IsConformal || t.Determinant &lt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> modelToElementTransform = t.Inverse;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transform the geometry into the ECS we </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// have created to get an aligned bounding box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geometryElementTransformed
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = geometryElement.GetTransformed(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; modelToElementTransform );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> ecsBoundingBox
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = geometryElementTransformed
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetBoundingBox();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Revit 2013 Shim</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ===============</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// in Revit 2013, the returned bounding box </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// is garbage - the Max is hugely negative </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and the Min is hugely positive</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// if this happens then get geometry points </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// in model coordinates, convert to element </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// coordinates and create bounding box from </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// those</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// NB. we could use this code for 2014 as </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// well, but the calculation is probably not </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// as accurate for some situations</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ecsBoundingBox.Max.X
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt; ecsBoundingBox.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// get points from all edges in all solids </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// - allows for curves by using tessellated </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// edges</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Solid</span> solid <span class="blue">in</span> geometryElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Solid</span>&gt;() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> solid.Edges )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.AddRange( edge.Tessellate() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transform the points into element </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// coordinates</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts = pts.Select(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pt =&gt; modelToElementTransform.OfPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pt ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pts.Any() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// calculate the bounding box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox.Max = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Max( pt =&gt; pt.X ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Max( pt =&gt; pt.Y ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Max( pt =&gt; pt.Z ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox.Min = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Min( pt =&gt; pt.X ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Min( pt =&gt; pt.Y ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pts.Min( pt =&gt; pt.Z ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// fail-case - if element has </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// no solid geometry</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// finally apply the ECS to Model </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transformation back to the bounding box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox.Transform = t.Multiply(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ecsBoundingBox.Transform );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> ecsBoundingBox;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>Many thanks to Jon for this discovery, his nice exploration and clean solution.</p>
+
+<p>Please note that his method includes some neat use of generic LINQ methods to succinctly extract all vertices and tessellation points from all solids contained in the element geometry and determine their maximum and minimum coordinate values in a very few lines of code:</p>
+
+
+<a name="2"></a>
+
+<h4>Extract all Vertices and Tessellation Points from all Solids</h4>
+
+<p>Let me extract and highlight Jon's compact example of using LINQ to achieve the following, since it can come in useful and be reused for numerous purposes:</p>
+
+<ul>
+<li>Extract all solids from the element geometry.</li>
+<li>Extract all vertices and intermediate tessellation points from all edges of each solid.</li>
+</ul>
+
+<pre class="code">
+&nbsp; &nbsp; <span class="green">// get points from all edges in all solids </span>
+&nbsp; &nbsp; <span class="green">// - allows for curves by using tessellated </span>
+&nbsp; &nbsp; <span class="green">// edges</span>
+
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Solid</span> solid <span class="blue">in</span> geometryElement
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Solid</span>&gt;() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> solid.Edges )
+&nbsp; &nbsp; &nbsp; &nbsp; pts.AddRange( edge.Tessellate() );
+&nbsp; &nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Isolate Conditional Compilation</h4>
+
+<p>I have one little generic suggestion to improve readability of the code above, applicable in many other circumstances as well:</p>
+
+<p>You could eliminate the conditional compilation in the following lines:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">#if</span> _REVIT2014_
+&nbsp; &nbsp; <span class="teal">XYZ</span> StartPoint = lc.Curve.GetEndPoint(0);
+&nbsp; &nbsp; <span class="teal">XYZ</span> EndPoint = lc.Curve.GetEndPoint(1);
+<span class="blue">&nbsp; #else</span>
+<span class="gray">&nbsp; &nbsp; XYZ StartPoint = lc.Curve.get_EndPoint( 0 );</span>
+<span class="gray">&nbsp; &nbsp; XYZ EndPoint = lc.Curve.get_EndPoint( 1 );</span>
+<span class="blue">&nbsp; #endif</span>
+</pre>
+
+<p>This could be replaced by implementing an extension method for the Curve class named GetEndpoint, which is conditionally compiled and only defined for Revit versions prior to 2014.</p>
+
+<p>With such an extension method, the new Revit 2014 code could be used throughout, and you would not even see that the extension method routes it through to the old method when needed.</p>

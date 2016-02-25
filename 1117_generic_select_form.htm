@@ -1,0 +1,284 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+<h3>Using Generic Collections and Filtered Element Collectors and Windows Forms</h3>
+
+-->
+
+<h3>Using Generic Collections with Filters and Forms</h3>
+
+<p>Today I discuss some uses of generics to elegantly and efficiently handle lists of Revit elements and .NET Windows forms, specifically:</p>
+
+<ul>
+<li>One line of code to retrieve all printable floor plan views from the BIM.</li>
+<li>One line of code to retrieve all selected floor plan views from a Windows check box list.</li>
+</ul>
+
+<p>This is my first step starting to implement the new RoomEditorApp features for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/back-from-desert-and-two-happy-events.html#3">
+generic 2D simplified BIM editor</a> Tech
+
+Summit presentation.</p>
+
+<p>The current tentative planned workflow steps to upload the database information look like this:</p>
+
+<ol>
+<li>Launch the RoomEditorApp export plan views command.</li>
+<li>Display a list of plan views in a popup window.</li>
+<li>Select views to be exported and click OK.</li>
+<li>Display a list of categories in a popup window.</li>
+<li>Select categories to be exported and click OK.</li>
+<li>Store relevant graphical and non-graphical information in a cloud database.</li>
+</ol>
+
+<p>The following editing and downloading steps will remain similar to the original implementation:</p>
+
+<ol start="7">
+<li>Navigate and display simplified model on mobile device.</li>
+<li>Edit graphical and non-graphical information.</li>
+<li>Update Revit BIM either interactively or real-time.</li>
+</ol>
+
+<p>I will be looking at the first three steps today.</p>
+
+<p>Yesterday, I mentioned a nice use of the generic ToDictionary method to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated.html">
+convert a filtered element collector to a dictionary</a in
+
+one fell swoop.</p>
+
+<p>Today I would like to present related examples, e.g. to populate a CheckListBox in a Windows form and extract the resulting user selection back to a generic list in a single call.</p>
+
+<p>I implemented a new RoomEditorApp command named <a href="#3">CmdUploadViews</a>.</p>
+
+<p>It makes use of a form to select the plan views to export named <a href="#2">FrmSelectViews</a>.</p>
+
+<p>Let's look at the latter first.</p>
+
+
+<a name="2"></a>
+
+<h4>FrmSelectViews</h4>
+
+<p>This .NET Windows form supports interactive user selection of plan views.</p>
+
+<p>Here is a snapshot of the floor plans in the project browser in a very simple Revit model:
+
+<center>
+<img src="img/select_views_browser.png" alt="Floor plans in project browser"/>
+</center>
+
+<p>Using RevitLookup to examine the ViewPlan instances stored in the Revit database, we note that there are many more than the ones of interest:</p>
+
+<center>
+<img src="img/select_views_snoop.png" alt="ViewPlan instances in RevitLookup"/>
+</center>
+
+<p>Some of these are ceiling plans, not floor plans.
+Others are unknown objects that we cannot even explain.</p>
+
+<p>We can filter out the ones we actually want by checking their ViewType and CanBePrinted properties.</p>
+
+<p>This is done in a LINQ Where statement added to the filtered element collector filtering.</p>
+
+<p>Please note that the filtered element collector itself is enumerable, and we can make good use of that to combine it with other generic filters to post-process the results returned by Revit.</p>
+
+<p>In the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+FindElement and collector optimisation</a>,
+
+I already mentioned that it is often not necessary and even wasteful to convert a filtered element collector to a list of elements or element ids.</p>
+
+<p>The following code performs all that filtering and generates a generic list of views that can be used to directly populate a Windows .NET CheckedListBox via its DataSource and DisplayMember properties:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt; views = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt;(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">ViewPlan</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">ViewPlan</span>&gt;( v =&gt; v.CanBePrinted
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ViewType</span>.FloorPlan == v.ViewType ) );
+</pre>
+
+<p>Similarly, the floor plans selected by the user in the form by checking the associated boxes can be retrieved in one single line from the checked list box CheckedItems property by adding LINQ statements to cast the items and convert them to a generic List of ViewPlan instances.</p>
+
+<p>To cut a long story short &ndash; or rather, to keep the short story as short as it is, without adding yet more unnecessary verbosity &ndash; here is the source code of this form &ndash; from the horse's mouth, so to say:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Windows.Forms;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> <span class="teal">Form</span> = System.Windows.Forms.<span class="teal">Form</span>;
+
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Interactive user selection of plan views.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">FrmSelectViews</span> : <span class="teal">Form</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The Revit input project document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Document</span> _doc;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Constructor initialises document</span>
+&nbsp; <span class="gray">///</span><span class="green"> and nothing else.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> FrmSelectViews( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; InitializeComponent();
+&nbsp;
+&nbsp; &nbsp; _doc = doc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Candidate views are retrieved by a filtered </span>
+&nbsp; <span class="gray">///</span><span class="green"> element collector on loading the form.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> FrmSelectViews_Load(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt; views = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">ViewPlan</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">ViewPlan</span>&gt;( v =&gt; v.CanBePrinted
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ViewType</span>.FloorPlan == v.ViewType ) );
+&nbsp;
+&nbsp; &nbsp; checkedListBox1.DataSource = views;
+&nbsp; &nbsp; checkedListBox1.DisplayMember = <span class="maroon">&quot;Name&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Selected views are accessible after the </span>
+&nbsp; <span class="gray">///</span><span class="green"> form has been successfully completed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt; GetSelectedViews()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> checkedListBox1.CheckedItems
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">ViewPlan</span>&gt;().ToList&lt;<span class="teal">ViewPlan</span>&gt;();
+&nbsp; }
+}
+</pre>
+
+
+
+
+<a name="3"></a>
+
+<h4>CmdUploadViews</h4>
+
+<p>The command is still just a skeleton, doing nothing at all yet except to exercise and test the FrmSelectViews view selection.</p>
+
+<p>Two noteworthy details:</p>
+
+<ul>
+<li>Determine the Revit main application window handle and use that to parent the forms we display, so that they behave correctly on minimising and restoring Revit etc.</li>
+<li>Once again use generic collection functionality to avoid touching the individual selected view element names, using the string Join method to create a list to display in a message box.</li>
+</ul>
+
+<p>Here is the entire command implementation:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> <span class="teal">ComponentManager</span> = Autodesk.Windows.<span class="teal">ComponentManager</span>;
+<span class="blue">using</span> <span class="teal">IWin32Window</span> = System.Windows.Forms.<span class="teal">IWin32Window</span>;
+<span class="blue">using</span> <span class="teal">DialogResult</span> = System.Windows.Forms.<span class="teal">DialogResult</span>;
+
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdUploadViews</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FrmSelectViews</span> form = <span class="blue">new</span> <span class="teal">FrmSelectViews</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == form.ShowDialog(
+&nbsp; &nbsp; &nbsp; revit_window ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt; views = form.GetSelectedViews();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = views.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} Plan View{1} Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> list = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; views.Select&lt;<span class="teal">Element</span>,<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( caption, list );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//List&lt;Category&gt; categories = new List&lt;Category&gt;();</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The view selection form is displayed like this:</p>
+
+<center>
+<img src="img/select_views_form.png" alt="View selection form"/>
+</center>
+
+<p>The resulting user selection is reported in a standard Revit task dialogue:</p>
+
+<center>
+<img src="img/select_views_report.png" alt="View selection report"/>
+</center>
+
+
+
+<a name="4"></a>
+
+<h4>Download</h4>
+
+<p>For the complete source code, Visual Studio solution and add-in manifest, please refer to the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is stored as
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.2.1">release 2014.0.2.1</a>.</p>
+
+<p>I hope this helps you make use of generics and compiling them with Revit API objects as well, and avoid implementing code handling individual collection member unnecessarily.</p>
+
+<p>Wish me luck for the next steps.</p>

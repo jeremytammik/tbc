@@ -1,0 +1,229 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+#3DWEB #3DViewAPI #HTML5 #threejs #3D #WEBGL #APIs
+
+-->
+
+
+<h3>3D Viewing, vA3C and RevitLookup Updates</h3>
+
+<p>Here are some GitHub updates on the vA3C and RevitLookup projects, and 3D viewing in general:</p>
+
+<ul>
+<li><a href="#2">vA3C project going full steam ahead</a></li>
+<li><a href="#3">vA3C hacker R1 is up</a></li>
+<li><a href="#4">Rendering an element in 3D</a></li>
+<li><a href="#5">Small RevitLookup update</a></li>
+<!-- <li><a href="#6">OBJ import</a></li> -->
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>vA3C Project Going Full Steam Ahead</h4>
+
+<p>The WebGL and three.js based AEC 3D viewer project
+
+<a href="http://va3c.github.io">vA3C</a> is going ahead at full steam, driven mainly by Theo Armour.</p>
+
+<p>vA3C is a free, open source viewer and navigator for a variety of file types.</p>
+
+<p>The most recent addition is a bunch of sample STL files received from NASA.</p>
+
+<p>The models are viewable using the built-in GitHub STL viewer or the vA3C viewers.
+In either case, you may zoom, pan and rotate the models with your pointing device:</p>
+
+<ul>
+<li><a href="http://va3c.github.io/nasa-samples">vA3C viewer</a> (loads a random model at open, so wait a bit before loading another one).</li>
+<li><a href="https://github.com/va3c/nasa-samples/tree/master/stl">GitHub STL viewer</a> (click on any file name to view).</li>
+</ul>
+
+<p>Here is Theo's exuberant status report from November last year:</p>
+
+
+
+<a name="3"></a>
+
+<h4>vA3C Hacker R1 is up</h4>
+
+<ul>
+<li><a href="http://va3c.github.io/viewer/va3c-hacker/latest">Live</a></li>
+<li><a href="https://github.com/va3c/viewer/tree/gh-pages/va3c-hacker">Code</a></li>
+<li><a href="http://va3c.github.io/viewer/va3c-hacker">Readme</a></li>
+</ul>
+
+<p>Overview:</p>
+
+<ul>
+<li>The code screams, "steal me!"</li>
+<li>The user interface is written in Markdown.</li>
+<li>The content potential is that place where the map is bigger than the territory.</li>
+<li>Yes, I do suffer from an over-abundance of exuberance: nonetheless I'm exuberant.</li>
+</ul>
+
+<p>I feel like the little boy that cries "wolf!" too many times, except that I scream "yippee!"</p>
+
+<p>More vA3C cool things:</p>
+
+<ul>
+<li>There's almost no code. And when there is code, there's no mumbo-jumbo.</li>
+<li>A new shoulder to stand upon has been re-discovered: <a href="http://zz85.github.io/zz85-bookmarklets/threelabs.html">Three.js Inspector</a>.</li>
+<li>There's nothing it can't do</li>
+</ul>
+
+<p>It is, however, release 1, so some of the first attempts at functions can bring your computer to its knees.
+Do give it 20 to 30 seconds.
+If it works for you, note: camera moving, objects moving, load and dispose shaded objects on demand, text-to-speech and more.</p>
+
+<p>And like everything vA3C, Hacker is:</p>
+
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Free_and_open-source_software">FOSS</a></li>
+<li>Runs from any free static web page server or locally</li>
+<li>Simple code like JavaScript or C# that can talk to any library, app or SaaS</li>
+</ul>
+
+<p>Your tasks: Click <a href="http://va3c.github.io/viewer/va3c-hacker/latest">vA3C Hacker</a>.
+See if your computer survives the adventure.
+Report results.</p>
+
+
+<a name="4"></a>
+
+<h4>Rendering an Element in 3D</h4>
+
+<p>The topic of vA3C and other 3D viewers is vaguely related with the following Revit API discussion forum thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-render-families-in-3d-objectviewer-example-used-as-basis/m-p/5468847">
+how to render families in 3D &ndash; ObjectViewer example used as basis</a>:</p>
+
+<p><strong>Question:</strong> I was wondering if anyone could point me in the right direction. I looked at the ObjectViewer sample in the SDK, and incorporated the viewer for objects there into my project, but I have two questions.</p>
+
+<ol>
+<li>Can it be used to render previews that are of "better" quality than wireframe?</li>
+<li>The demo only accepts one object, I tried with a window FamilyInstance and that didn't render properly, only came out grey; I tried with a wall and that looked OK, and I could move it about.</li>
+</ol>
+
+<p>What I am trying to do is previewing/rendering a view of a family instance.</p>
+
+<p>Any thoughts, suggestions?</p>
+
+
+<p><strong>Answer:</strong> Since you have the ElementViewer and ObjectViewer source code included in the Revit SDK, you can basically answer these questions yourself.</p>
+
+<p>For your convenience, I'll state that both of those samples make use of an extremely simple little custom renderer that only draws lines.</p>
+
+<p>You would have to replace that and also implement hidden line removal and a bunch of other stuff to do anything more complex.</p>
+
+<p>I would not recommend using this at all for any professional application.</p>
+
+<p>Its main use is to understand and debug the geometry traversal and associated transformations.</p>
+
+<p>There are tons of better rendering options around.</p>
+
+<p>To start with, you might be able to make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/appstore-advice-and-zooming-in-a-preview-control.html#4">
+Revit API PreviewControl</a>.</p>
+
+<p>For more advanced rendering interaction outside of Revit, there is also the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">
+Autodesk View and Data API</a>.</p>
+
+<p>We also implemented a simpler WebGL and three.js based viewer at the AEC Hackathon last year, basically a simpler version of the Autodesk View and Data API, called
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/threejs-aec-viewer-progress-on-two-fronts.html">
+vA3C</a>.</p>
+
+<p>These are just three possibilities out of many.</p>
+
+<p><strong>Response:</strong> Hi Jeremy and thank you for pointing me in the right direction.</p>
+
+<p>After trying out several things, I figured that the external web viewer is overkill for my needs and the ObjectViewer example as you stated isn't suited for my needs.</p>
+
+<p>I managed to display a 3D view of selected objects with the PreviewControl, but I don't seem to get the perspective I want or the current perspective in Revit.</p>
+
+<p>I was wondering if there was a simpler way to achieve the preview window you get when you try to export in GbXML format?</p>
+
+<p>This is what I'm aiming for, because I'm adding properties to families and the user has to be able to name those properties from visual cues seen in the 3D preview of the family. </p>
+
+<p>And since I'm writing an add-in using Winforms I would rather not use a webpage.</p>
+
+<p><strong>Answer:</strong> I think maybe you should play around a bit with the various WebGL solutions after all.</p>
+
+<p>Once you have gotten the hang of them, you may discover that they nowadays provide the handiest, most flexible, versatile and low footprint solution of all.</p>
+
+<p>Regarding Winforms versus web pages: it is in fact possible to host an own web browser inside your own Windows form, e.g. using the embedded Chrome library.</p>
+
+<p>It would be easier to just use the pre-installed browser, though.</p>
+
+<p>Are you aware of any computer system of interest to your users lacking a built-in browser?</p>
+
+<p>Regarding how to set up the preview control view: the PreviewControl does not take any input whatsoever beyond what you supply to its constructor.
+In the constructor, you specify the Revit view to be displayed.
+However, you can create a dedicated Revit view for that specific purpose and set it up using all the Revit API view control functionality.</p>
+
+<p>That should really provide all you need.</p>
+
+<p>I hope this helps.</p>
+
+
+<a name="5"></a>
+
+<h4>Small RevitLookup Update</h4>
+
+<p>I just merged a small update to RevitLookup submitted by Victor, who added CategoryType to the CategoryCollector method, creating a new
+
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2015.0.0.5">release 2015.0.0.5</a>.</p>
+
+<p>Here is a recent question that came up on this as a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-revit-2015.html?cid=6a00e553e16897883301bb07d8e96a970d#comment-6a00e553e16897883301bb07d8e96a970d">comment</a>:</p>
+
+<p><strong>Question:</strong> Why is it that RevitLookup is not longer included in the Revit SDK, now that a lot of developers use it?</p>
+
+<p>I tried to implement RevitLookup but without any success. I followed Troy Gates
+
+<a href="http://revitcoaster.blogspot.dk/2014/06/revit-lookup-2015-addin.html">
+Revit Lookup 2015 Addin</a> instructions.</p>
+
+<p>That resulted in an error when launching Revit 2015 saying:</p>
+
+<pre>
+  Revit cannot run the external application "RevitLookup"
+  System.IO.FileLoadExecption
+  Could not load file or assembly
+  ...\RevitLookup.dll or one of its dependencies.
+  Operation is not supported.
+  (Exception from HRESULT: 0x80131515)
+</pre>
+
+<p>I also tried implementing your repository along with the files from Troy and still without any success.
+Can you give my any advice on how to fix this?</p>
+
+<p><strong>Answer:</strong> RevitLookup is no longer included in the Revit SDK for the simple reason to make it easier for all users of it to add their improvements to it.</p>
+
+<p>It is now hosted in its own
+
+<a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>.</p>
+
+<p>By coincidence, a new enhancement was added just yesterday.</p>
+
+<p>I created a new
+
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2015.0.0.5">release 2015.0.0.5</a> for
+
+it.</p>
+
+<p>To get the latest and greatest, you can always simply clone the master branch.</p>
+
+<p>You should normally not use older versions posted somewhere else, since they will be outdated as soon as the one and only main GitHub version is enhanced.</p>
+
+<p>I hope this clarifies.</p>

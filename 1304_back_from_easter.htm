@@ -1,0 +1,297 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+/j/photo/jeremy/2015/2015-04-05_gamserrugg/jeremy_falk_auf_gamzerugg_mit_saentis.jpeg
+bitten_schoki_easter_bunny.jpeg
+beam_distance_to_floor.png
+
+-->
+
+
+<h3>Back from Easter Holidays and Various Revit API Issues</h3>
+
+<p>I hope you had a wonderful time over Easter.</p>
+
+<p>I returned from my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/revit-api-trends-and-team-meeting-in-bretagne.html#2">
+team meeting</a> and
+
+subsequent brief holiday in the snow and am confronted with a long list of unanswered
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> issues.</p>
+
+<p>I answered a dozen and present a summary of a few of the most interesting ones:</p>
+
+<ul>
+<li><a href="#2">Determining the distance between floor and bottom of a beam</a></li>
+<li><a href="#3">Consecutive ordering of TopographySurface boundary points</a></li>
+<li><a href="#4">Extracting unique building element geometry vertices</a></li>
+<li><a href="#5">Retrieving all visible elements</a></li>
+</ul>
+
+<p>Before I get to them, two pictures relating to the past weekend.</p>
+
+<p>First, a toast in the snow with the <a href="https://en.wikipedia.org/wiki/S%C3%A4ntis">Säntis Mountain</a> in the background:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2015/2015-04-05_gamserrugg/jeremy_falk_auf_gamserrugg_mit_saentis.jpeg" alt="A toast with Falk and Saentis in the background" width="530"/>
+</center>
+
+<p>Secondly, a snapshot of a brief and slightly sad conversation shortly after Easter:</p>
+
+<center>
+<img src="img/bitten_schoki_easter_bunny.jpeg" alt="Two chokolate Easter bunnies" width="480"/>
+</center>
+
+<p>Getting back to the Revit API, here are some of the recent issues raised:</p>
+
+
+<a name="2"></a>
+
+<h4>Determining the Distance Between Floor and Bottom of a Beam</h4>
+
+<p>Raised by David in
+
+<a href="http://forums.autodesk.com/t5/revit-api/help-how-can-get-of-a-beam-element-their-quot-level-quot-and/m-p/5567028M9357">
+how can get of Beam element 'Level' and 'Upper Level'</a>:</p>
+
+<p><strong>Question:</strong>
+
+I am trying to get the ELEVATION (double value) the Beam element.
+I'm going to subtract values the Upper Elevation and Elevation the element for getting the height of the void space.
+For example, height = Level 4 - Level 0 = 4 meters:</p>
+
+<center>
+<img src="img/beam_distance_to_floor.png" alt="Beam distance to floor" width="488"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+You can use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/a-couple-of-recent-issues.html#4">
+ReferenceIntersector</a> ray
+
+tracing functionality to achieve this.</p>
+
+<p>In fact, the SDK sample MeasureHeight does almost exactly what you are asking for.</p>
+
+<p>It was introduced in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/devcamp-session-on-whats-new.html">Revit 2011 API</a> and
+
+originally provided via the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">FindReferencesByDirection method</a>.</p>
+
+<p>The example later published as the MeasureHeight SDK sample is described in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/findreferencesbydirection.html">FindReferencesByDirection</a> &gt;
+
+Measure distances &gt; Example: Measure Distance with FindReferencesByDirection.</p>
+
+
+
+
+
+<a name="3"></a>
+
+<h4>Consecutive Ordering of TopographySurface Boundary Points</h4>
+
+<p>Raised by Klanea in
+
+<a href="http://forums.autodesk.com/t5/revit-api/does-topographysurface-getboundarypoints-guarantee-point/m-p/5565632">
+does TopographySurface.GetBoundaryPoints guarantee point ordering?</a>
+
+<p><strong>Question:</strong>
+
+I'd like to extract consecutive boundary points of a TopographySurface, i.e., by traversing the returned List[XYZ].</p>
+
+<p>I'm simulating a continuous, vertex-by-vertex walk around the TopographySurface perimeter.</p>
+
+<p>I suspect all of this information must live in the underlying data structure, but I can't find out how to get at it, and the documentation of the
+
+<a href="http://revitapisearch.com/html/f34dbefb-94de-43e8-967d-8662f6593dac.htm">
+TopographySurface.GetBoundaryPoints method</a> makes no mention of ordering.</p>
+
+<p>I've also tried probing the Vertices member of the underlying Mesh (with a call to Geometry.GetEnumator()), but this returns boundary and interior points, also in an unknown order.</p>
+
+<p>Anyone know how best to extract this information directly from the API, or else have insight into the order guaranteed by a call to TopographySurface.GetBoundaryPoint()?</p>
+
+
+<p><strong>Answer:</strong>
+
+In the far distant past, you could not even ask the topography surface which points were interior or exterior.</p>
+
+<p>Therefore, I implemented a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/toposurface-interior-and-boundary-points.html">
+topo surface interior and boundary points</a> add-in
+
+to determine this.</p>
+
+<p>The interior versus exterior predicate was later added to the API, cf.
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014 API</a> &gt;
+
+Reading points from a TopographySurface.</p>
+
+<p>However, my old add-in should help provide what you need as well.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Extracting Unique Building Element Geometry Vertices</h4>
+
+
+<p>Raised by abhijitdesale in
+
+<a href="http://forums.autodesk.com/t5/revit-api/extracting-co-ordinates-from-geometry-of-room-or-any-other/td-p/5565050">
+extracting coordinates from geometry of room or any other structure</a>:</p>
+
+<p><strong>Question:</strong>
+
+I am a newbie in using C# and Revit API programming for creating plugins.</p>
+
+<p>I am trying to retrieve co-ordinates of any structure. Let's say, for a room with four walls, I need to retrieve the co-ordinates of the four corners and write them to a text file.</p>
+
+<p>I have used a wall filter to extract the elements and then applied the get_Geometry method on each element.</p>
+<p>This approach gives me a lot of duplicate co-ordinates.</p>
+<p>I have tried the same way for using different filters for roofs, floors, doors and windows.</p>
+
+<p>I don't know for sure whether I am correct or not.</p>
+<p>Please let me know if this is a correct way of extracting the co-ordinates of any structure.</p>
+<p>If there is a better and more correct method to do it, please let me know.</p>
+
+<p><strong>Answer:</strong>
+
+Your approach sounds fine to me.</p>
+
+<p>Duplicate coordinates are to be expected, of course.</p>
+
+<p>You can eliminate them in many ways.</p>
+
+<p>The easiest, I find, is to implement a fuzzy point equality comparer and then add the points as keys to a dictionary.</p>
+
+<p>I think I do so in my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/concrete-setout-points-for-revit-structure-2015.html">
+concrete setout point add-in</a>.</p>
+
+<p>I also demonstrate this approach in many other samples on The Building Coder.</p>
+
+<p>Search for <code>XyzEqualityComparer</code>, for instance.</p>
+
+<p>I implemented the original version of it that back in 2009 to analyse
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/nested-instance-geometry.html">
+nested instance geometry</a>.</p>
+
+
+
+
+<a name="5"></a>
+
+<h4>Retrieving All Visible Elements</h4>
+
+<p>Raised by Sunil in
+
+<a href="http://forums.autodesk.com/t5/revit-api/getting-all-elements-with-hasmaterialquantities-condition/m-p/5560261">
+getting all elements with HasMaterialQuantities condition</a>:</p>
+
+<p><strong>Question:</strong>
+
+To retrieve all visible elements, we referred to the previous discussion here on
+
+<a href="http://forums.autodesk.com/t5/revit-api/retrieving-all-elements/td-p/3377715">retrieving all elements</a>.</p>
+
+<p>It suggests using the HasMaterialQuantities method.</p>
+
+<p>But Category::HasMaterialQuantities is returning false for topography, railings, and similar elements.</p>
+
+<p>So they are missing when we try to get all the Revit model elements.</p>
+
+<p>Here is the snippet of managed C++ .NET code that we are trying to use:</p>
+
+<pre>
+  FilteredElementCollector^ allInstances
+    = gcnew FilteredElementCollector( revitDocument );
+
+  allInstances = allInstances-&gt;WhereElementIsNotElementType();
+
+  for each( Element^ element in allInstances )
+  {
+    if( element != nullptr && element-&gt;Category != nullptr
+      && !element-&gt;Category-&gt;Name-&gt;Contains(“Legend Components”)
+      && element-&gt;Category-&gt;HasMaterialQuantities )
+    {
+      GeometryElement^ geomElem = element-&gt;Geometry::get(geomOption);
+      if( geomElem != nullptr && geomElem-&gt;GetEnumerator()-&gt;MoveNext() )
+      {
+        // if this geom element genuinely contains geometry
+        // put element in list
+      }
+    }
+  }
+</pre>
+
+<p>Any idea why HasMaterialQuantities is skipping visible elements like topography, railings etc.?</p>
+
+<p>If we remove the HasMaterialQuantities condition, then we are getting the topography, railings along with all other elements, but we also get extra elements such as Rooms, which are not visible in the Revit project.</p>
+
+<p>So what should be the right approach so that we get all the visible elements without skipping any valid visible elements like topography, railings etc.?</p>
+
+<p><strong>Answer:</strong>
+
+I am afraid that you are encountering a basic and incontestable aspect of BIM: it is complex.</p>
+
+<p>It may be hard or impossible to find a simple one-line criteria that satisfies your exact needs.</p>
+
+<p>The Building Coder topic group on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9">
+Filtering for all Elements</a> discusses
+
+this exact issue.</p>
+
+<p>You will probably have to implement some more complex filtering criteria, and possibly handle different groups of elements in different ways.</p>
+
+<p>Here are two examples of simple first stabs at retrieving MEP and structural elements demonstrating such combinations:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">Retrieving MEP elements and connectors</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">Retrieving structural elements</a></li>
+</ul>
+
+<p>You will probably have to implement a similar kind of combined filtering algorithm for your needs.</p>
+
+<p>Many more filtering samples are assembled in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">
+CmdCollectorPerformance module</a>.</p>
+
+<p>Also, I am sure that you understand that the next developer's needs will differ ever so slightly from yours, so there cannot be a simple solution for this challenge.</p>
+
+<p>Please let us know how you end up solving this!</p>
+
+<p><strong>Response:</strong>
+
+I am now using a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">
+Custom Exporter</a> to
+
+retrieve all elements and it is serving the purpose.</p>
+
+<p>I followed the samples that you have put on Building Coder.</p>
+
+<p>I agree that special filtering logic will be needed for specific elements and there is no one generic logic that can be used.</p>

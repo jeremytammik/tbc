@@ -1,0 +1,715 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+10067542 [Width Calculate Minimum]
+
+http://forums.autodesk.com/t5/revit-api/textnote-width-calculate-minimum/m-p/5322447
+
+-->
+
+<h3>New Text Note and Text Width Calculation</h3>
+
+<p>How can I determine the exact width of a Revit text note?</p>
+
+<p>This is the topic of the Revit API discussion thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/textnote-width-calculate-minimum/m-p/5322447">
+textnote width calculate minimum</a>.</p>
+
+<p>We worked through a whole series of implementation attempts, mostly suggested by Scott Wilson, who also finally suggested the one that currently seems to be optimal and near perfect:</p>
+
+<p><strong>Question:</strong> When creating a new TextNote I'm given the option to give the TextNote a LineWidth Property.
+I understand this is the 1:1 scale of the width and the real Width would be that number * the scale factor of the View.
+So here's the code I'm using to create the TextNote:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TextNoteType</span> Bold = doc.GetElement(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 1212838 ) ) <span class="blue">as</span> <span class="teal">TextNoteType</span>;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create TextNotes&quot;</span> );
+&nbsp; &nbsp; <span class="teal">TextNote</span> txNote = doc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, 0.06, <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT
+&nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, <span class="maroon">&quot;TEST BOLD&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; txNote.TextNoteType = Bold;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+<p>This works fine so long as the string doesn't get longer.
+If I need to change the length of the string (which I am) I'd need to give it a new LineWidth, or set the Width Property after I change the TextNoteType.  This is important because I need to create a new TextNote after this bolded String and I want to make sure it's not too far from the last letter of the bolded string I just created.</p>
+
+<p>So, is there a way to calculate the minimum Width of a TextNote without it wrapping?</p>
+
+
+<p><strong>Answer:</strong> When I used to do text rendering in game engines, I made use of Windows GDI to measure the size of text strings for a particular font. Maybe you could combine this kind of technique with other known information of the text note and view scale to get what you need?</p>
+
+<p>I did a quick google and found what looks like
+
+<a href="http://msdn.microsoft.com/en-us/library/9bt8ty58(v=vs.110).aspx">
+the .NET way of doing this</a>.</p>
+
+
+
+<p><strong>Response:</strong> Thanks for the suggestion, that worked out perfect in the following specific case!</p>
+
+<p>I had to do some manipulation and calculations to try and figure out how tall my font in pixels and how to convert the width from pixels to inches, but I got it close enough to do a sentence (and I only need a few words) so this code works pretty good:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TextNoteType</span> Bold = doc.GetElement(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( 1212838 ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">TextNoteType</span>; <span class="green">// Arial 3/32&quot; Bold</span>
+&nbsp;
+&nbsp; <span class="teal">Font</span> ArialBoldFont = <span class="blue">new</span> <span class="teal">Font</span>( <span class="maroon">&quot;Arial&quot;</span>, 9,
+&nbsp; &nbsp; <span class="teal">FontStyle</span>.Bold );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create TextNote&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;TEST BOLD&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Size</span> txtBox = TextRenderer.MeasureText( s,
+&nbsp; &nbsp; &nbsp; ArialBoldFont );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> newWidth = ( (<span class="blue">double</span>) txtBox.Width / 86 )
+&nbsp; &nbsp; &nbsp; / 12;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TextNote</span> txNote = doc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, 0.1, <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT
+&nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, s );
+&nbsp;
+&nbsp; &nbsp; txNote.TextNoteType = Bold;
+&nbsp; &nbsp; txNote.Width = newWidth;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+
+
+<p><strong>Response 2:</strong> I do not understand how you get from the 3/32" font size defined in the Revit text type to the number 9 that you specify as the em-size in points of the new .NET font.</p>
+
+<p>Also, vice versa, MeasureText returns the size in pixels. Why do you divide this by 86? Would that mean 86 pixels per inch? Does that depend on the Revit scale? If it is pixels, it also depends on the device, doesn't it? And the division by 12 transforms that to feet, of course.</p>
+
+<p>Can you explain, please?</p>
+
+<p>Actually, trying to make general use of the solution above does not seem to work for me.</p>
+
+<p>I looked at ways to improve it, making it work in my context, and would like to hear your opinion on the following expanded experiment:</p>
+
+<p>It performs the following steps:</p>
+
+<ul>
+<li>Pick a text insertion point.</li>
+<li>Grab the first text note type encountered.</li>
+<li>Convert the text note type nominal size to points, i.e. 1/72".</li>
+<li>Create the appropriate .NET font.</li>
+<li>Measure the text size in pixels in this font.</li>
+<li>Determine the current display horizontal dots per inch resolution.</li>
+<li>Use that to convert the size in pixels to inches.</li>
+<li>Determine the Revit view scale.</li>
+<li>Scale the width in inches according to that.</li>
+<li>Add a factor to account for imprecision, currently the experimentally determined factor 1.4.</li>
+</ul>
+
+<p>That seems to work for me and produces the following result:</p>
+
+<center>
+<img src="img/text_width_1_1.4.png" alt="Text note width" width="461"/>
+</center>
+
+<p>Here is the current version of the external command source code producing that result:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">class</span> <span class="teal">CmdNewTextNote</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> GetDC( <span class="teal">IntPtr</span> hwnd );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">Int32</span> ReleaseDC( <span class="teal">IntPtr</span> hwnd );
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Determine the current display</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> horizontal dots per inch.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">float</span> DpiX
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Single</span> xDpi, yDpi;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> dc = GetDC( <span class="teal">IntPtr</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Graphics</span> g = <span class="teal">Graphics</span>.FromHdc( dc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xDpi = g.DpiX;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; yDpi = g.DpiY;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ReleaseDC( <span class="teal">IntPtr</span>.Zero ) != 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// GetLastError and handle...</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> xDpi;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick text insertion point&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//TextNoteType boldTextType = doc.GetElement(</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; new ElementId( 1212838 ) ) as TextNoteType; // Arial 3/32&quot; Bold</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 1 inch = 72 points</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// 3/32&quot; = 72*3/32 points =</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteType</span> textType
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">TextNoteType</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( textType.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 6 mm Arial happens to be the first text type found</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// 6 mm = 6 / 25.4 inch = 72 * 6 / 25.4 points = 17 pt</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Font</span> font = <span class="blue">new</span> <span class="teal">Font</span>( <span class="maroon">&quot;Arial&quot;</span>, 17, <span class="teal">FontStyle</span>.Bold );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create TextNote&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;The quick brown fox jumped over the lazy dog&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Size</span> txtBox = System.Windows.Forms.<span class="teal">TextRenderer</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .MeasureText( s, font );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> w_inch = txtBox.Width / DpiX;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> v_scale = view.Scale; <span class="green">// ratio of true model size to paper size</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Text box width in pixels {0} = {1} inch, scale {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; txtBox.Width, w_inch, v_scale );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//double newWidth</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; = ( (double) txtBox.Width / 86 ) / 12;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> newWidth = w_inch / 12;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; newWidth = newWidth * v_scale;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; newWidth *= 1.4;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextNote</span> txNote = doc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView, p, <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0.1, <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, s );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; txNote.TextNoteType = textType;
+&nbsp; &nbsp; &nbsp; &nbsp; txNote.Width = newWidth;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I would love to hear your comments on this.</p>
+
+<p>I am sure it includes at least lots of room for improvement, and potentially serious errors.</p>
+
+<p>I do wonder how your simple solution presented above could work as well as you say it does.</p>
+
+<p>Does it really?</p>
+
+<p>Thank you!</p>
+
+<p>Actually, the factor 1.4 is a bit large for the lower case test sentence:</p>
+
+<center>
+<img src="img/text_width_1_1.4.png" alt="Text note width using factor 1.4" width="461"/>
+</center>
+
+<p>Further experiments prove that a factor of 1.3 is too small for upper case text.</p>
+
+<p>It works for the lower case test sentence:</p>
+
+<center>
+<img src="img/text_width_2_1.3.png" alt="Text note width using factor 1.3" width="385"/>
+</center>
+
+<p>The width calculated using a factor of 1.3 for upper case words is insufficient, however, and they are wrapped:</p>
+
+<center>
+<img src="img/text_width_3_1.3.png" alt="Upper case text note width using factor 1.3" width="280"/>
+</center>
+
+
+<p><strong>Answer:</strong> Fortunately, I have the luxury of only having to deal with one specific font (Arial), one specific height (3/32"), one view scale (1:1), and very short phrases, so my code does work with the crazy math.  I used 9 for the TextRenderer because I was going to use 1/8" text (which, at 72DPI, is 9em), but then changed to 3/32", I just forgot to change the 9 to 6.75, which might be why I had to use 86 for my DPI.  Once I got it to work I was just like, "got it, don't change anything".</p>
+
+<p>I did update my code to 6.75 em and changed the division to be by 72.27 DPI, and it still gets pretty close to accurate, see attached PNG.</p>
+
+<p>If you can improve the code it would be great, because I do think it would be a great help (at least until we can override characters in a TextBox to be bold like we can with the GUI).</p>
+
+<p>I realize the DPI could be different on each user's screen, but wouldn't you be able to always use the same 72 DPI to calculate the width?  The width of the TextNote doesn't rely on the DPI of the user's screen, so I feel like the DPI division should be a constant.  Also, the Width of the TextNote will include the BuiltInParameter.LEADER_OFFSET_SHEET (times 2), but the TextRenderer wouldn't.  You'll have to take that into account for the Width too.</p>
+
+<p>I had a bit of a play with the enhanced code to see what I could discover.
+I generalised it further to read in the size of the text style, width factor and border offset and then calculate the rest on the fly without hard-coding any values. I think the magic scaling factor of 1.4 is actually due to Revit treating fonts as 96 DPI (which I believe is the standard for Windows these days) instead of 72 (1.3333 factor). If I calculate the point size at 96 dpi I am able to discard the final scaling step and still get similar results.</p>
+
+<p>I also played around a little with other common typographic units such as the
+
+<a href="http://www.translatorscafe.com/cafe/EN/units-converter/typography/7-4/pixel_(X)-millimeter">
+pixel to millimeter converter</a>.</p>
+
+<p>However, nothing else could explain the ~1.4 figure (I also considered that 1.4 is quite close to sqrt(2) which is a scaling factor used for ISO paper sizes, but that didn't really make sense).</p>
+
+<p>The text measure method from Windows.Forms returns the size in whole pixels and therefore will be rounded. I have noticed that the variance between actual shortest line length and the calculated value is inconsistent between text sizes (sometimes the calculated value is larger, sometimes it is smaller and sometimes almost spot on), this is probably related to this integer rounding. The Graphics.MeasureString method that I originally suggested returns the width in fractional pixels without rounding, so is more consistent, but the value returned is always too large and still fluctuates a little depending on text size.</p>
+
+<p>This is I believe caused by non-standard font sizes causing the text rendering system to perform its own rounding while scaling the font for drawing (and calculating string widths). I've found that if I round my calculated point size up to the nearest 8th of a point (0.125) then multiply that by 10 (then of course dividing the resulting text width by 10) to gain more resolution the end result is much more consistent.</p>
+
+<p>I tested several sizes ranging from 1 mm up to 12 mm and found that a few sizes just don't behave very well (3 mm and 5 mm for example) and will calculate a length just a little too short while the rest are fine. To compensate for this I then added 2.5 points to my scaled up font size and it then worked for all sizes.</p>
+
+<p>It's a pretty good length approximation that is usually just a little larger than required. There are still a few sizes that don't behave though, so there's more analysis required to pin down a proper generalised solution. I think the inconsistency comes from Revit dealing with font size point rounding and scaling in a different way to the methods we are using, sometimes the rounding is in synch, other times it will diverge.
+It would be handy to know the actual method Revit uses so that it could be mimicked.</p>
+
+<p>Also, be sure to apply the text type's Width Factor and then add twice the border offset defined by the  BuiltInParameter.LEADER_OFFSET_SHEET.</p>
+
+
+
+<p><strong>Response:</strong> Wow, thank you very much indeed for your valuable additional research.</p>
+
+<p>That is more than I could have hoped for.</p>
+
+<p>It sounds like this provides the basis for a pretty complete solution.</p>
+
+<p>I implemented this partially as follows:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">class</span> <span class="teal">CmdNewTextNote</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> GetDC( <span class="teal">IntPtr</span> hwnd );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">Int32</span> ReleaseDC( <span class="teal">IntPtr</span> hwnd );
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Determine the current display</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> horizontal dots per inch.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">float</span> DpiX
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Single</span> xDpi, yDpi;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> dc = GetDC( <span class="teal">IntPtr</span>.Zero );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Graphics</span> g = <span class="teal">Graphics</span>.FromHdc( dc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xDpi = g.DpiX;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; yDpi = g.DpiY;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ReleaseDC( <span class="teal">IntPtr</span>.Zero ) != 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// GetLastError and handle...</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> xDpi;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick text insertion point&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteType</span> textType
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstElement() <span class="blue">as</span> <span class="teal">TextNoteType</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;TextNoteType.Name = &quot;</span> + textType.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// 6 mm Arial happens to be the first text type found</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// 6 mm = 6 / 25.4 inch = 72 * 6 / 25.4 points = 17 pt.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Nowadays, Windows does not assume that a point is</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// 1/72&quot;, but moved to 1/96&quot; instead.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">float</span> text_type_height_mm = 6;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">float</span> mm_per_inch = 25.4f;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">float</span> points_per_inch = 96; <span class="green">// not 72</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">float</span> em_size = points_per_inch
+&nbsp; &nbsp; &nbsp; &nbsp; * ( text_type_height_mm / mm_per_inch );
+&nbsp;
+&nbsp; &nbsp; &nbsp; em_size += 2.5f;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Font</span> font = <span class="blue">new</span> <span class="teal">Font</span>( <span class="maroon">&quot;Arial&quot;</span>, em_size,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FontStyle</span>.Regular );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create TextNote&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;The quick brown fox jumps over the lazy dog&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Size</span> txtBox = System.Windows.Forms.<span class="teal">TextRenderer</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .MeasureText( s, font );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> w_inch = txtBox.Width / DpiX;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> v_scale = view.Scale; <span class="green">// ratio of true model size to paper size</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Text box width in pixels {0} = {1} inch, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;view scale = {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; txtBox.Width, w_inch, v_scale );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> newWidth = w_inch / 12;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextNote</span> txNote = doc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.ActiveView, p, <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; newWidth, <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM, s );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; txNote.TextNoteType = textType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;NewTextNote lineWidth {0} times view scale &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{1} = {2} generated TextNote.Width {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( newWidth ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( v_scale ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( newWidth * v_scale ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( txNote.Width ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This fails.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; Util.IsEqual( newWidth * v_scale, txNote.Width ),</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &quot;expected the NewTextNote lineWidth &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; + &quot;argument to determine the resulting &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; + &quot;text note width&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; txNote.Width = newWidth * v_scale;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Does that match your intentions and explanation, Scott?</p>
+
+<p>I do not see where to obtain the "text type's Width Factor" that you mention. Where is that stored?</p>
+
+<p>Furthermore, what element hosts the BuiltInParameter.LEADER_OFFSET_SHEET?</p>
+
+<p>It sounds like you tested this for various different fonts and text string samples.</p>
+
+<p>Have you written some kind of test framework iterating over the available text note types, matching them with .NET fonts and trying them out with different strings?</p>
+
+<p>In order to use this approach in a serious production environment, I would definitely set up and use such a system and a corresponding unit test to verify that the chosen adjustments really do work correctly in all cases encountered.</p>
+
+
+
+<p><strong>Answer:</strong> That looks pretty close Jeremy.
+One extra thing my solution does is scale the font point size up by 10x then divides the resulting string width by 10 afterwards so that we can get sub-pixel accuracy out of the MeasureText method. I do this upscaling before adding the 2.5 points (magic number unfortunately...).</p>
+
+<p>The command I developed is based upon your code, but iterates through all available textnote types calculating the font metrics and placing a note for each just below the preceding one. It works fine for each note type in my testing template (ranging from 1 through to 12mm), none of them wrap, but some sizes do have a little more line length than I would like. I'll clean it up a little to remove the references to my framework and post it up.</p>
+
+<p>BuiltInParameter.LEADER_OFFSET_SHEET is the Leader/Border offset parameter found in the TextNoteType element. The font height and width factor can also be found there. One thing my code doesn't do just yet is handle font styles such as bold and italics; it'll only take 5 min to throw that in before I post it up though.</p>
+
+<p>Ok...</p>
+
+<p>After a little more testing I've decided that using TextRenderer.MeasureText() is not the way to go.
+The results are too inconsistent and require too much hand-waving to normalise.
+I believe that TextRenderer.MeasureText() uses standard GDI to calculate the text dimensions while Graphics.MeasureString() makes use of GDI+. I would think that Revit would itself be using GDI+, so it would make sense to use the same system for our calculations.</p>
+
+<p>I stripped away all of the scaling and magic numbers and used Graphics.MeasureString().
+I found that although the line lengths do end up a little larger than you would like, the results are much more stable (although it isn't perfect, I was able to cause a line wrap with an Arial bold, italic, underlined 16.5mm font). I also stripped out the User32 Interop stuff as it is quite easy to get at the same data using managed code.</p>
+
+<p>Anyway here is the full external command class for you to play with, I won't go as far as to say it is a complete solution as there are still a few instances where it will cause a line wrap. I just think that Revit is doing some odd things internally with regard to calculation of line wrapping and we'll never know for sure until it is one day (hopefully) exposed to the API.</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">float</span> GetDpiX()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">float</span> xDpi, yDpi;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Graphics</span> g = <span class="teal">Graphics</span>.FromHwnd( <span class="teal">IntPtr</span>.Zero ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; xDpi = g.DpiX;
+&nbsp; &nbsp; &nbsp; yDpi = g.DpiY;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> xDpi;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> GetStringWidth( <span class="blue">string</span> text, <span class="teal">Font</span> font )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> textWidth = 0.0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Graphics</span> g = <span class="teal">Graphics</span>.FromHwnd( <span class="teal">IntPtr</span>.Zero ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; textWidth = g.MeasureString( text, font ).Width;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> textWidth;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Result</span> commandResult = <span class="teal">Result</span>.Succeeded;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uiDoc = uiApp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> dbDoc = uiDoc.Document;
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view = uiDoc.ActiveGraphicalView;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pLoc = <span class="teal">XYZ</span>.Zero;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; pLoc = uiDoc.Selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick text insertion point&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;Operation cancelled.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Operation cancelled.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">TextNoteType</span>&gt; noteTypeList
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( dbDoc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">TextNoteType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">TextNoteType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Sort note types into ascending text size</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span> bipTextSize
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.TEXT_SIZE;
+&nbsp;
+&nbsp; &nbsp; &nbsp; noteTypeList.Sort( ( a, b )
+&nbsp; &nbsp; &nbsp; &nbsp; =&gt; a.get_Parameter( bipTextSize ).AsDouble()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CompareTo(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.get_Parameter( bipTextSize ).AsDouble() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">TextNoteType</span> textType <span class="blue">in</span> noteTypeList )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( textType.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextFont
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_FONT );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextSize
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_SIZE );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramBorderSize
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.LEADER_OFFSET_SHEET );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextBold
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_STYLE_BOLD );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextItalic
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_STYLE_ITALIC );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextUnderline
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_STYLE_UNDERLINE );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> paramTextWidthScale
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = textType.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.TEXT_WIDTH_SCALE );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> fontName = paramTextFont.AsString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> textHeight = paramTextSize.AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> textBold = paramTextBold.AsInteger() == 1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="blue">true</span> : <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> textItalic = paramTextItalic.AsInteger() == 1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="blue">true</span> : <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> textUnderline = paramTextUnderline.AsInteger() == 1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="blue">true</span> : <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> textBorder = paramBorderSize.AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> textWidthScale = paramTextWidthScale.AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FontStyle</span> textStyle = <span class="teal">FontStyle</span>.Regular;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( textBold )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; textStyle |= <span class="teal">FontStyle</span>.Bold;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( textItalic )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; textStyle |= <span class="teal">FontStyle</span>.Italic;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( textUnderline )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; textStyle |= <span class="teal">FontStyle</span>.Underline;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">float</span> fontHeightInch = (<span class="blue">float</span>) textHeight * 12.0f;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">float</span> displayDpiX = GetDpiX();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">float</span> fontDpi = 96.0f;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">float</span> pointSize = (<span class="blue">float</span>) ( textHeight * 12.0 * fontDpi );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Font</span> font = <span class="blue">new</span> <span class="teal">Font</span>( fontName, pointSize, textStyle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> viewScale = view.Scale;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( dbDoc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Test TextNote lineWidth calculation&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> textString = textType.Name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; (&quot;</span> + fontName + <span class="maroon">&quot; &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ( textHeight * 304.8 ).ToString( <span class="maroon">&quot;0.##&quot;</span> ) + <span class="maroon">&quot;mm, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + textStyle.ToString() + <span class="maroon">&quot;, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ( textWidthScale * 100.0 ).ToString( <span class="maroon">&quot;0.##&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;%): The quick brown fox jumps over the lazy dog.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> stringWidthPx = GetStringWidth( textString, font );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> stringWidthIn = stringWidthPx / displayDpiX;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;String Width in pixels: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + stringWidthPx.ToString( <span class="maroon">&quot;F3&quot;</span> ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( ( stringWidthIn * 25.4 * viewScale ).ToString( <span class="maroon">&quot;F3&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; mm at 1:&quot;</span> + viewScale.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> stringWidthFt = stringWidthIn / 12.0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> lineWidth = ( ( stringWidthFt * textWidthScale )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ( textBorder * 2.0 ) ) * viewScale;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextNote</span> textNote = dbDoc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view, pLoc, <span class="teal">XYZ</span>.BasisX, <span class="teal">XYZ</span>.BasisY, 0.001,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_TOP, textString );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; textNote.TextNoteType = textType;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; textNote.Width = lineWidth;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Place next text note below this one with 5 mm gap</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; pLoc += view.UpDirection.Multiply(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( textHeight + ( 5.0 / 304.8 ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * viewScale ).Negate();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">ExternalApplicationException</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;Exception Encountered (Application)\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + e.Message + <span class="maroon">&quot;\nStack Trace: &quot;</span> + e.StackTrace );
+&nbsp;
+&nbsp; &nbsp; &nbsp; commandResult = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">&quot;Exception Encountered (General)\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + e.Message + <span class="maroon">&quot;\nStack Trace: &quot;</span> + e.StackTrace );
+&nbsp;
+&nbsp; &nbsp; &nbsp; commandResult = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> commandResult;
+&nbsp; }
+</pre>
+
+<p>This provides good results.
+Please test it out with various combinations of textnote styles with width factors like 0.75 and you'll see that it does sometimes fail at larger text heights, e.g. &gt; 16mm.
+Overall I'm happy with it, though, and will be adding it to my framework as a basis for several commands I've been meaning to add for a while now.</p>
+
+
+<p><strong>Response:</strong> Your new implementation based on Graphics.MeasureString instead of TextRenderer.MeasureText works perfectly for me in all the simple standard cases:</p>
+
+<center>
+<img src="img/text_width_4_iterate.png" alt="Text note width using Graphics.MeasureString" width="827"/>
+</center>
+
+<p>I added this as a new external command CmdNewTextNote to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> published
+
+on GitHub.</p>
+
+<p>Your current code is tagged as
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.114.2">
+release 2015.0.114.2</a>.</p>
+
+<p>Thank you!</p>

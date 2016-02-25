@@ -1,0 +1,385 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+From: Miroslav Schonauer 
+Date: Wednesday, March 12, 2014 18:42
+To: Scott Conover , Sasha Crotty , Jeremy Tammik 
+Cc: Revit API , Saikat Bhattacharya 
+Subject: RE: "Detach From Plane" for Beam via API?
+
+Thanks all a lot, it works like a charm, all from a single Transaction!
+
+Here's the commented code for Jeremy's blog – pls wait till at least tmr lunchtime as I want my consulting client to get it first ;-)
+
+Cheers
+
+Miro
+
+
+classSelectionFilterBeam : ISelectionFilter
+{
+      public bool AllowElement(Element e)
+      {
+             if (!(e is FamilyInstance))
+                    return false;
+
+             if(e.Category.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralFraming)
+                    return false;
+
+             // In theory could still be a Brace, but Structural Usage
+             // is sometimes NOT set and cannot be relied upon!
+             // So, good enough as "Beam" if here.
+
+             return true;
+      }
+
+      public bool AllowReference(Reference reference, XYZ position)
+      {
+             return true;
+      }
+}
+
+[Transaction(TransactionMode.Automatic)]
+public class CmdDetachBeamFromPlane : IExternalCommand
+{
+      public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+      {
+             UIDocument _uiDoc = commandData.Application.ActiveUIDocument;
+             Document _doc = _uiDoc.Document;
+
+             // Pick a beam
+             SelectionFilterBeam selFilterBeam = new SelectionFilterBeam();
+             Reference r = _uiDoc.Selection.PickObject(ObjectType.Element, selFilterBeam, "Select a Beam to 'Detach From Plane'");
+             FamilyInstance beam = _uiDoc.Document.GetElement(r) as FamilyInstance;
+
+             // Check if it has 'Work Plane' to detach
+             //
+             // One would expect that it is simplest to check .Host as commented below, BUT
+             // there are some strange situations where Host IS null and Revit STILL displays (as read-only):
+             // "Work Plane = <not associated>" !?
+             //if (null == beam.Host)
+             //{
+             //    MessageBox.Show("Selected Family Instance of 'Structural Framing' Category has NO 'Work Plane'!");
+             //    return Result.Cancelled;
+             //}
+             //
+             // So, must check if that read-only SKETCH_PLANE_PARAM param exists:
+             if (null == beam.get_Parameter(BuiltInParameter.SKETCH_PLANE_PARAM))
+             {
+                    MessageBox.Show("Selected Family Instance of 'Structural Framing' Category has NO 'Work Plane'!");
+                    return Result.Cancelled;
+             }
+
+             // In theory, the plane could be non-horizontal but in 99% should be
+             // and in 99.99% for beams it would NOT be vertical which is the only case that
+             // would not work using the following (adjusting the elevation):
+             // As .Host is RO property, the workaround is to move the END ELEVATIONs outside the plane
+             // which will internally "detach" it in Revit, then simply move back!
+            // Note that Moving the element would not work as it is constrained to the plane.
+
+             double elevOldSta = beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).AsDouble();
+             double elevOldEnd = beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END1_ELEVATION).AsDouble();
+
+             double elevTmpSta = elevOldSta + 1.0;
+             double elevTmpEnd = elevOldEnd + 1.0;
+
+             // This will "detach from plane"...
+             beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(elevTmpSta);
+             beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END1_ELEVATION).Set(elevTmpEnd);
+
+             //...and this move back to the same original position
+             beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(elevOldSta);
+             beam.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END1_ELEVATION).Set(elevOldEnd);
+
+             MessageBox.Show("Successfully removed the 'Work Plane' constrain");
+             return Result.Succeeded;
+      }
+
+
+From: Scott Conover
+Sent: 12 March 2014 14:24
+To: Sasha Crotty; Miroslav Schonauer
+Cc: Revit API; Saikat Bhattacharya
+Subject: RE: "Detach From Plane" for Beam via API?
+
+And if that doesn't work, you could use a TransactionGroup and assimilate the two transactions into one.
+
+
+From: Sasha Crotty
+Sent: Wednesday, March 12, 2014 9:52 AM
+To: Miroslav Schonauer
+Cc: Revit API; Saikat Bhattacharya
+Subject: RE: "Detach From Plane" for Beam via API?
+
+Not 100% sure, but I think you may be able to get away without 2 transactions. Move it, then move it back in the same transaction.
+
+Thanks,
+Sasha
+
+From: Miroslav Schonauer
+Sent: Wednesday, March 12, 2014 8:24 AM
+To: Sasha Crotty
+Cc: Revit API; Saikat Bhattacharya
+Subject: RE: "Detach From Plane" for Beam via API?
+
+Ah, thx Sasha! Will try this J
+Just to clarify – I need the beam to remain in the same physical position, so (1) first transaction moving the end elevations say +dv in plane normal direction and then (2) another transaction to move it back by –dv sounds like a best bet?
+
+Thx,
+
+Miro
+
+From: Sasha Crotty
+Sent: 12 March 2014 11:49
+To: Miroslav Schonauer
+Cc: Revit API; Saikat Bhattacharya
+Subject: Re: "Detach From Plane" for Beam via API?
+
+Changing the end elevation of the beam using the end elevation params (forcing it to go out of plane) should detach it from the ref plane - unless the structural team changed the behavior in the last 2 years :)
+
+Thanks,
+Sasha
+
+On Mar 12, 2014, at 6:17 AM, "Miroslav Schonauer" wrote:
+
+All,
+
+I've found the thread below as I have EXACTLY the same need for a customer that I consulting-mentor on developing in-house set of tools.
+Has this been enabled in API in later releases?
+If not, can I at least have the request ref.no and link please?
+
+TIA,
+
+Miro
+
+
+Miroslav Schonauer
+Solution Architect / Senior Technical Consultant
+Autodesk Consulting
+
+Mobile +44 (0)7921 492808
+
+<image001.png>
+
+From: Harry Mattison
+Sent: 27 April 2011 14:17
+To: Saikat Bhattacharya; Revit API
+Subject: RE: Detach from Plane for a beam using API
+
+Hi Saikat,
+
+This is not currently enabled in the API. Thanks for having already filed the request.
+
+Harry
+
+From: Saikat Bhattacharya
+Sent: Tuesday, April 26, 2011 8:04 AM
+To: Revit API
+Subject: Detach from Plane for a beam using API
+
+Hello All:
+
+Is there a way to replicate the behavior as seen with 'Detach from Plane' when we right click on a beam using the UI, using the API. On clicking the 'Detach from Plane' button on the right click context menu on a selected structural beam, Revit removes the parameter "Work plane" (BuiltInParameter.SKETCH_PLANE_PARAM) and enables the "Reference Level" parameter (which is read-only otherwise). An ADN partner wants to replicate this behavior using the API.
+
+I tried deleting the Work plane parameter but that did not help. Even the FamilyInstance.Host for a beam is returned as read-only.
+
+Is there a way to achieve this using the API.
+Thanks
+Saikat
+
+From: Sasha Crotty 
+Date: Friday, March 14, 2014 00:51
+To: Miroslav Schonauer , Scott Conover , Jeremy Tammik , Revit API 
+Subject: RE: "ATTACH To Plane" for Beam via API?
+
+Hi Miro,
+
+As a performance improvement to be code below, there’s no need to adjust both ends of the beam. Just one should be sufficient.
+
+I am not aware of a rehost API. The only one I can find is for Forms. Unless someone else knows if it exists I would file a wishlist.
+
+Thanks,
+Sasha
+
+-->
+
+<h3>Detach Beam from Plane</h3>
+
+<p>Here is a long-standing question raised once again now by Miroslav Schonauer of Autodesk Consulting and solved with help from Sasha Crotty of the Revit development team:</p>
+
+<p><strong>Question:</strong> Is there a way to programmatically replicate the 'Detach from Plane' functionality accessible in the user interface through the beam context menu?</p>
+
+<p>I can right click on a structural beam and select 'Detach from Plane'.
+Revit removes the parameter 'Work plane', i.e. BuiltInParameter.SKETCH_PLANE_PARAM, and enables the 'Reference Level' parameter, which is read-only otherwise.
+I would like to replicate this behaviour using the API.</p>
+
+<p>I tried to delete the Work plane parameter but that did not help.
+Even the FamilyInstance.Host for a beam is returned as read-only.</p>
+
+<p>Is there a way to achieve this using the API?</p>
+
+
+<p><strong>Answer:</strong> Changing the end elevation of the beam using the end elevation parameters will force it to go out of plane.
+That should also detach it from the reference plane.</p>
+
+
+<p><strong>Response:</strong> I need the beam to remain in the same physical position, so should I do it like this, then?
+
+<ul>
+<li>First transaction: move the end elevations +dv in plane normal direction.</li>
+<li>Second transaction: move it back by –dv.</li>
+</ul>
+
+<p><strong>Answer:</strong> I think you may be able to get away without two transactions.
+Move the beam and then move it back in the same transaction.</p>
+
+<p>If that doesn't work, you could use a TransactionGroup and assimilate the two transactions into one.</p>
+
+
+<p><strong>Response:</strong> Thanks all a lot.
+It works like a charm, all from a single transaction!
+Here is some sample code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">SelectionFilterBeam</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !(e <span class="blue">is</span> <span class="teal">FamilyInstance</span>) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Category.Id.IntegerValue != (<span class="blue">int</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// In theory could still be a Brace, but </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Structural Usage is sometimes NOT set and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// cannot be relied upon!</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// So, good enough as &quot;Beam&quot; if here.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdDetachBeamFromPlane</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Pick a beam</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SelectionFilterBeam</span> selFilterBeam
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SelectionFilterBeam</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, selFilterBeam,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select a Beam to 'Detach From Plane'&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam = doc.GetElement( r )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Check if it has 'Work Plane' to detach</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// One would expect that it is simplest to </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// check .Host as commented below, BUT there </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// are some strange situations where Host IS </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// null and Revit STILL displays (as read-only):</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// &quot;Work Plane = &lt;not associated&gt;&quot; !?</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//if (null == beam.Host)</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; MessageBox.Show(&quot;Selected Family Instance of 'Structural Framing' Category has NO 'Work Plane'!&quot;);</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; return Result.Cancelled;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// So, must check if that read-only SKETCH_PLANE_PARAM param exists:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SKETCH_PLANE_PARAM ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; MessageBox.Show( <span class="maroon">&quot;Selected Family Instance &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;of 'Structural Framing' Category has NO &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;'Work Plane'!&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// In theory, the plane could be non-horizontal </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// but in 99% should be and in 99.99% for beams </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// it would NOT be vertical which is the only </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// case that would not work using the following </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// (adjusting the elevation):</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// As .Host is RO property, the workaround is </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to move the END ELEVATIONs outside the plane</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// which will internally &quot;detach&quot; it in Revit, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// then simply move back!</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Note that Moving the element would not work </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// as it is constrained to the plane.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> elevOldSta = beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END0_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> elevOldEnd = beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END1_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> elevTmpSta = elevOldSta + 1.0;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> elevTmpEnd = elevOldEnd + 1.0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This will &quot;detach from plane&quot;...</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END0_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( elevTmpSta );
+&nbsp;
+&nbsp; &nbsp; &nbsp; beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END1_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( elevTmpEnd );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// ...and this move back to the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// same original position</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END0_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( elevOldSta );
+&nbsp;
+&nbsp; &nbsp; &nbsp; beam.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.STRUCTURAL_BEAM_END1_ELEVATION )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Set( elevOldEnd );
+&nbsp;
+&nbsp; &nbsp; &nbsp; MessageBox.Show( <span class="maroon">&quot;Successfully removed the &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;'Work Plane' constraint&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Please note the numerous valuable hints included in the code comments.</p>
+
+<p>Also note that a slight performance improvement might be achievable by adjusting just one end of the beam instead of both.</p>
+
+<p>Finally, note that the code could be made more readable by defining shorthand variables for the lengthy built-in paramenter enumeration values :-)</p>
+
+<p>Many thanks to Miro and Sascha for this useful solution!</p>

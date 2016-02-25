@@ -1,0 +1,293 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+- Jim Quanci , Stephen Preston 
+  As we approach the DevDays and AU season...
+
+- Caroline Ward 
+  RE: Tag line for DevDays 2014
+  FW: Autodesk Developer News - September 23, 2014 - Registration for DevDays now open!
+
+-->
+
+<h3>Events, Again, and Creating an Extrusion Roof</h3>
+
+<p>Jon and Scott Wilson discussed some issues
+
+<a href="http://forums.autodesk.com/t5/revit-api/extrusion-roof-fails/td-p/5300295">
+creating extrusion roofs</a> on
+
+arbitrary planes in the Revit API discussion forum in the past couple of days.</p>
+
+<p>One neat spin-off is a simple little external command that shows the basic use of the NewExtrusionRoof method, so I took the opportunity of adding that to The Building Coder samples.</p>
+
+<p>Before getting to the details of that, here is a little update on the upcoming events:</p>
+
+<ul>
+<li><a href="#2">October hackathons and AU Germany</a></li>
+<li><a href="#3">Autodesk University in Las Vegas</a></li>
+<li><a href="#4">DevDays registration and motto</a></li>
+<li><a href="#5">DevDay meetups</a></li>
+<li><a href="#6">Presentation best practices</a></li>
+<li><a href="#7">Creating an extrusion roof</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>October Hackathons and AU Germany</h4>
+
+<p>October will be a busy travelling month for me, participating in hackathons in Zurich, Brussels and Berlin, with the German Autodesk University in Darmstadt taking place in between as well.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/upcoming-event-calendar.html">
+DevDay, meetup and hackathon event calendar</a> I
+
+published a month ago remains valid.</p>
+
+
+<a name="3"></a>
+
+<h4>Autodesk University in Las Vegas</h4>
+
+<p>As planned and announced, I am participating at Autodesk University in Las Vegas and the ADN DevDay and DevHack events preceding it.</p>
+
+<center>
+<img src="img/AU14-Speaker-275x250.png" alt="Autodesk University 2014" width="275"/>
+</center>
+
+<p>My class proposals were not accepted, so my main responsibility besides the DevDay and DevHack will be to lead the Revit API expert panel
+
+<!--
+
+https://events.au.autodesk.com/connect/search.ww#loadSearch-searchPhrase=tammik&searchType=session&tc=0&sortBy=&i(11080)=
+https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=5156
+
+-->
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=5156">
+SD5156 &ndash; Open House on the Factory Floor</a>.</p>
+
+<p>You can check the
+
+<a href="https://events.au.autodesk.com/connect/dashboard.ww">
+AU 2014 class catalogue</a> for
+
+the complete list of classes.</p>
+
+
+<a name="4"></a>
+
+<h4>DevDays Registration and Motto</h4>
+
+<p>The
+
+<a href="http://autodeskdevdays.com">
+DevDays registration</a> is
+
+now open to ADN members. The participation is free of charge.</p>
+
+<p>At several sites worldwide, you can stay on for a DevHack or an evening meetup.</p>
+
+<p>The meetups are open for non-ADN members as well.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/upcoming-event-calendar.html#2">
+list of sites</a> I
+
+published a month ago remains valid.</p>
+
+<p>This year's DevDays theme is <b>10x</b>, sharing how Autodesk is expanding its business and how you can join in on this 10x journey by using Cloud, Mobile and Desktop technologies to expand your user base by 10x while growing your revenue and profits.</p>
+
+
+
+<a name="5"></a>
+
+<h4>DevDay Meetups</h4>
+
+<p>The associated meetups offer an opportunity to gather with ADN partners, Autodesk and other local technologists in your community for a social and educational evening.  The focus will be on bringing 3D to the web and mobile devices.  Autodesk is investing in technology to make it easy for people to bring 3D content to the web across a whole range of industries and applications in addition to design and engineering.  We'll have lively discussions and sharing on where broader technologies are heading as well as how to make the web an engaging 3D experience for your customers and target users.</p>
+
+<p>These meetups are open to non-ADN members, so feel free to invite your technology friends and join us for some food, beverages and engaging conversation!</p>
+
+<p>You can check the locations at which evening meetups will be held by visiting
+
+<a href="http://autodeskdevdays.com/meetups">autodeskdevdays.com/meetups</a>.
+
+
+
+<a name="6"></a>
+
+<h4>Presentation Best Practices</h4>
+
+<p>With all these events and conferences coming up, we will be doing a lot of presenting.</p>
+
+<p>Here is a list of 33 presentation tips and tricks, pointed out by Jim Quanci, courtesy of
+
+<a href="http://www.inc.com/geoffrey-james/33-tricks-that-make-presentations-memorable.html">Geoffrey James</a>,
+
+plus another nine important suggestions specific to discussing API and source code contributed by Stephen Preston:
+
+<ol>
+<li>Build your presentation around the decision you want made.</li>
+<li>Structure the presentation as a journey through a series of emotions.</li>
+<li>Keep it simple. Your audience doesn't want or need more complexity.</li>
+<li>Cut your intro down to a maximum of two sentences.</li>
+<li>Cut your presentations to half as long as you originally thought they should be.</li>
+<li>Include only simple graphics and highlight important data points.</li>
+<li>Use a slide background that's simple with a neutral color.</li>
+<li>Eliminate slides that you might need to skip due to time constraints.</li>
+<li>Expunge business buzzwords from your slides (and your vocabulary).</li>
+<li>Use large fonts in simple faces, like Arial.</li>
+<li>Limit the distracting use of special effects and visual gimcracks.</li>
+<li>Customize every presentation because every audience is different.</li>
+<li>Unless it's a keynote, cut your presentation down to 20 minutes or less.</li>
+<li>No matter what, rehearse your presentation at least 20 times.</li>
+<li>Schedule presentations when audiences can give you their full attention.</li>
+<li>Check your equipment setup well in advance.</li>
+<li>Have somebody else introduce you; it creates anticipation.</li>
+<li>Don't start with an apology lest you seem like a victim.</li>
+<li>Don't review your company's history because nobody cares.</li>
+<li>Kick off with a shocking fact, surprising insight, or unique perspective.</li>
+<li>Keep your front to your audience; don't look back at the screen.</li>
+<li>Be yourself; audiences immediately sense if you're not being genuine.</li>
+<li>Don't fidget with papers, jewelry, glasses, or clothing.</li>
+<li>Speak directly to individuals in the audience, moving from person to person.</li>
+<li>Tell a story that casts your audience as the hero and you as the sidekick.</li>
+<li>Use facts that are quantifiable, verifiable, memorable, and dramatic.</li>
+<li>Slow down. Slow down. Slow down.</li>
+<li>Never read from your slides. It irritates everyone. Never ever.</li>
+<li>Be upbeat and positive but don't tell jokes unless you're a comedian.</li>
+<li>Avoid hot buttons (e.g., politics) that will distract from your message.</li>
+<li>Identify and emphasize the next step you want the audience to take.</li>
+<li>Don't ask for extra time because you're late; instead end on schedule.</li>
+<li>Have a question or two up your sleeve in case nobody has one.</li>
+<li>Use a mouse if you're demoing something that requires zoom, pan and rotate (e.g. the viewer).</li>
+<li>Showing function signatures or very small snippets of code on your slides is OK; don't copy large code snippets into slides &ndash; switch to the IDE instead.</li>
+<li>Adjust the IDE font to be large enough to be seen from the back of the room.</li>
+<li>If you're live coding, make sure you have backup code in case you make a mistake &ndash; it's really hard to spot typos in your code when 500 people are staring at you &ndash; and don't spend more than one minute trying to fix your code before going to your backup.</li>
+<li>Live coding is cool, but not if its long or repetitive. Have code snippets available to copy and paste so you don't have to type everything.</li>
+<li>If you're talking through the code &ndash; run it in the debugger and step through it &ndash; don't just point at static lines of code and explain what would have happened if it was running.</li>
+<li>It's often a good idea to demonstrate what your finished code does before going back and showing how to write it.</li>
+<li>When you're sitting at your laptop debugging code, your head tends to drop down and you voice becomes quieter. Fight this tendency by sticking a post-it note at the top of your screen that says ‘speak up' or similar.</li>
+<li>Only sit behind your computer for as long as it takes to demo the code &ndash; then stand up again and move out from behind the table.</li>
+</ol>
+
+<p>Sounds too good to be true, doesn't it?
+Let's see how well we can abide by them all  :-)</p>
+
+
+
+<a name="6"></a>
+
+<h4>Creating an Extrusion Roof</h4>
+
+<p>Back to some hard-core Revit API usage.</p>
+
+<p>In their discussion on
+
+<a href="http://forums.autodesk.com/t5/revit-api/extrusion-roof-fails/td-p/5300295">
+extrusion roof failure</a> on
+
+arbitrary planes in the Revit API discussion forum, Jon and Scott Wilson are looking at more subtle issues.</p>
+
+<p>Ignoring those for the moment, I just grabbed Jon's example code to demonstrate the basic use of the NewExtrusionRoof method, using it to add a new external command named CmdNewExtrusionRoof to The Building Coder samples.</p>
+
+<p>It generates this stair-shaped element, which in actual fact really is a roof:</p>
+
+<center>
+<img src="img/NewExtrusionRoof.png" alt="NewExtrusionRoof" width="295"/>
+</center>
+
+<p>The completely self-contained external command Execute method mainline looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;NewExtrusionRoof&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RoofType</span> fs
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">RoofType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">RoofType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">RoofType</span>&gt;( a =&gt; <span class="blue">null</span> != a );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Level</span> lvl
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">Level</span>&gt;( a =&gt; <span class="blue">null</span> != a );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> x = 1;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> origin = <span class="blue">new</span> <span class="teal">XYZ</span>( x, 0, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> vx = <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; <span class="teal">XYZ</span> vy = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> sp = <span class="teal">SketchPlane</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> Autodesk.Revit.DB.<span class="teal">Plane</span>( vx, vy,
+&nbsp; &nbsp; &nbsp; &nbsp; origin ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveArray</span> ca = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 1, 0 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 1, 1 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 2, 1 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 2, 2 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 3, 2 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 3, 3 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 4, 3 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( x, 4, 4 ) };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = pts.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 1; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ca.Append( <span class="teal">Line</span>.CreateBound(
+&nbsp; &nbsp; &nbsp; &nbsp; pts[i - 1], pts[i] ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewModelCurveArray( ca, sp );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View</span> v = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferencePlane</span> rp
+&nbsp; &nbsp; &nbsp; = doc.Create.NewReferencePlane2(
+&nbsp; &nbsp; &nbsp; &nbsp; origin, origin + vx, origin + vy, v );
+&nbsp;
+&nbsp; &nbsp; rp.Name = <span class="maroon">&quot;MyRoofPlane&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExtrusionRoof</span> er
+&nbsp; &nbsp; &nbsp; = doc.Create.NewExtrusionRoof(
+&nbsp; &nbsp; &nbsp; &nbsp; ca, rp, lvl, fs, 0, 3 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Extrusion roof element id: &quot;</span>
+&nbsp; &nbsp; &nbsp; + er.Id.ToString() );
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>You can download the most up-to-date version from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.112.0">2015.0.112.0</a>.</p>
+

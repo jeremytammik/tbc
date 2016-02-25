@@ -1,0 +1,148 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09611499 [Mapping triangles after SolidUtils::TessellateSolidOrShell to Faces]
+
+<p>http://forums.autodesk.com/t5/Revit-API/Mapping-triangles-after-SolidUtils-TessellateSolidOrShell-to/td-p/5037452</p>
+http://forums.autodesk.com/t5/Revit-API/Mapping-triangles-after-SolidUtils-TessellateSolidOrShell-to/m-p/5047000
+
+Erepb1991
+Mapping triangles after SolidUtils::TessellateSolidOrShell to Faces
+2014-05-16 04:10 PM
+
+-->
+
+<h3>TessellateSolidOrShell &ndash; Holes Versus Wholes</h3>
+
+<p>Let's try to clarify further the various options to retrieve closed faceted shells from a Revit BIM.</p>
+
+<p>When processed face by face, the Revit API will return gaps.</p>
+
+<p>This issue was addressed by the introduction of the TessellateSolidOrShell method.</p>
+
+<p>Let's look at some pros and cons of it, raised by the Revit API discussion forum thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Mapping-triangles-after-SolidUtils-TessellateSolidOrShell-to/td-p/5037452">
+mapping the triangles it generates to faces</a>.</p>
+
+<p>We already looked at the topics of gaps in shells and the TessellateSolidOrShell method now and then in the past:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/birthdays-and-gaps-in-shells.html">Gaps in shells</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/building-performance-analysis-and-face-tessellation.html#3">Face Tessellation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html">Solid Centroid and Volume Calculation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a>
+&gt; Small Enhancements & API Interface Changes
+&gt; Geometry & sketching
+&gt; Solid tessellation</li>
+</ul>
+
+<p>Time for a recapitulation, I think, and a summary of the options at your disposal that I can see:</p>
+
+
+<p><strong>Question:</strong>
+
+<p>I'm trying to rewrite my old triangulation code where triangulation was done face by face. SolidUtils::TessellateSolidOrShell works really good, but I also need colour information, which I can't get from the Revit TriangulatedSolidOrShell method. I decided to map triangles manually by projecting triangle points on face (face.Project) and checking the distance. But this solution has few issues:</p>
+
+<ol>
+<li>It's slow. nFace * nTriangles complexity. For geometry with 100k and more triangles it could take a lot of time.</li>
+<li>Some triangles are not mapped at all.</li>
+<li>Some triangles are mapped to more that one face.</li>
+</ol>
+
+<p>Is there some other way to triangulate or get colour information that I didn't find?</p>
+
+
+<p><strong>Answer:</strong> Yes, there is yes another possibility that you might want to consider.
+You could use a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">custom exporter</a>.
+
+That will return all the triangles processed by the Revit graphics pipeline directly and include colour information.</p>
+
+
+<p><strong>Response:</strong> I tested this method, but looks like it also produces gaps between faces just like the face-by-face triangulation.</p>
+
+
+<p><strong>Answer:</strong> Oh dear, I am sorry to hear that.</p>
+
+<p>The other option I can suggest is to fix up the holes yourself by matching vertices as they arrive, by ignoring any coordinate differences smaller than ca. 1 millimetre.</p>
+
+<p>Simply implement a dictionary of all vertices encountered so far.</p>
+
+<p>Each time you receive a new vertex, check whether it is close to another vertex already received. If so, use the one you already have instead of the new one received.</p>
+
+<p>That should fix all the holes automatically.</p>
+
+<p>I used that lots of times in various samples on The Building Coder blog, e.g. for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-export-considerations.html#6">OBJ model exporter</a>.</p>
+
+
+
+<p><strong>Response:</strong> I already do this.
+But on the border of two faces number of points doesn't match.
+For example imagine curved wall and border between top face and one of the sides.
+Side face after triangulation has one extra point on the top comparing to the top face.
+This leads to very thin missed triangle.
+Look at the following pictures.</p>
+
+<p>On the first you see the wall after face-by-face triangulation:</p>
+
+<center>
+<img src="img/wall_tesselation_1.png" alt="Wall tesselation 1" width="400"/>
+</center>
+
+<p>A missing triangle is marked with blue colour.</p>
+
+<p>On the second picture I zoomed on the middle point of that triangle:</p>
+
+<center>
+<img src="img/wall_tesselation_2.png" alt="Wall tesselation 2" width="440"/>
+</center>
+
+<p>As you see, the top face lacks that point.</p>
+
+<p>I think that there is no way to get gap-free triangulation without loosing material information.
+I'll try to somehow fix gaps on my side then.</p>
+
+
+<p><strong>Answer:</strong> Oh dear (again).
+Yes, indeed, I have heard about and discussed the problematic behaviour you describe in the past as well.</p>
+
+<p>Revit triangulates each face as efficiently as required &ndash; and as roughly as possible &ndash; to display it.</p>
+
+<p>The required precision will vary from face to face, obviously, causing the effect you describe.</p>
+
+<p>This in turn causes problems for people interested in a closed shell, such as yourself.</p>
+
+<p>This prompted the implementation of the TessellateSolidOrShell to solve the problem, which you already tried out.</p>
+
+<p>Unfortunately, this method processes one body at a time and is less efficient than the other global processing methods.</p>
+
+<p>Which takes us right back to square one.</p>
+
+<p>I hope this clarifies the situation, at least.</p>
+
+<p><b>Suggestion 1:</b> develop a solution avoiding individual calls to TessellateSolidOrShell that tolerates these imprecisions, just like Revit's rendering pipeline and other workflows do.</p>
+
+<p><b>Suggestion 2:</b> implement a solution based on TessellateSolidOrShell to avoid these imprecisions and a workflow to drive it that is not time critical, e.g. overnight batch processing or something.</p>
+
+
+<p><strong>Response:</strong> Thanks for your help.</p>
+
+<p>One more question about Faces.
+Is it possible that faces in single Solid have different Material?
+Maybe there is no need to map triangles after TessellateSolidOrShell to Faces.</p>
+
+
+<p><strong>Answer:</strong> Good question.</p>
+
+<p>Unfortunately, I believe that is perfectly possible.</p>
+
+<p>To test, I would suggest using the Revit user interface paint tool to colour different parts of a single wall.</p>
+
+<p>Please let us know what you find out.</p>

@@ -1,0 +1,81 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09181838 [POST request of the Revit Server 2014 keeps returning error code 404]
+
+Jeff CampbellBurns & McDonnell
+
+-->
+
+<h3>REST POST Request to Revit Server 2014</h3>
+
+<p>I just arrived in Gothenburg, Sweden, for a mini-web-workshop.
+I'll let you know what I learn here soon.</p>
+
+<p>Meanwhile, here is a quick little important note on a change to the Revit Server 2014 REST API that affected some:</p>
+
+<p><strong>Question:</strong> I am using a POST request to copy a RVT file from one Revit Server folder to another.
+This call worked fine in Revit Server 2013, but returns an error code 404 in Revit Server 2014.
+I looked at the documentation of the request and can see no changes.</p>
+
+<p>I can perform GET requests on my folders in 2014 and get valid responses, but a POST will not work.
+Here are the strings that I am using for my testing, corresponding to the SDK document examples:</p>
+
+<ul>
+<li>"POST"</li>
+<li>"http://ABC-REV-T01/RevitServerAdminRESTService2014/AdminRESTService.svc/10Folder/descendent?sourceObjectPath=00Folder|01CentralModel.rvt&pasteAction=Move&duplicateOption=CopyIncrement"</li>
+</ul>
+
+<p>I reviewed all the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/revit-server-api-access-and-vbscript.html">
+Revit Server API access</a>
+
+sample code I could find to no avail.</p>
+
+<p>All of the other requests work fine with 2014.
+I also compared my POST lines for 2013 and 2014.
+They are identical, and so are the ones provided in the 2013/2014 PDFs.
+If I take the post lines I have created for 2014 and change them back to 2013 they work just fine as well.</p>
+
+<p>What in heaven's name is the problem, please, and, above all, how can I fix it?</p>
+
+
+<p><strong>Answer:</strong> Oops.
+Sorry.
+The signature of that API call changed since the documentation you are using was created.</p>
+
+<p>The new syntax is:</p>
+
+<ul>
+<li>Method: POST</li>
+<li>URI: {base URI}/{sourceObjectPath}?destinationObjectPath={destinationObjectPath}&pasteAction={pasteAction}&replaceExisting={replaceExisting}
+<ul>
+<li>{destinationObjectPath} = destination path of the operation</li>
+<li>{pasteAction} = Move or Copy</li>
+<li>{replaceExisting} = true or false</li>
+</ul>
+</li>
+</ul>
+
+<p><strong>Example:</strong> Given a model called WorkingModel.rvt in a folder called OldFolder at the root of the Projects tree that needs to be moved to a new folder at the same level called NewFolder.
+Here is the call to achieve that:</p>
+
+<ul>
+<li>Method: POST</li>
+<li>URI:
+<br/>{base_URI}/OldFolder|WorkingModel.rvt
+<br/>?destinationObjectPath=NewFolder|WorkingModel.rvt
+<br/>&pasteAction=Move
+<br/>&replaceExisting=true</li>
+</ul>
+
+<p><strong>Response:</strong> Works like a charm.</p>
+
+<p>I have been adding quite a bit of functionality to my original copy down tool, e.g., the ability for users to create projects, add RVT's with specified names, and create a CMD file to batch copy down central files for our Navisworks integration.</p>
+
+<p>Thank you.</p>

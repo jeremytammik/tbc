@@ -1,0 +1,207 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Debugging and Maintaining the Image Relationship</h3>
+
+<p>The Revit database contains a number of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">
+undocumented relationships</a>,
+
+and it can be challenging and useful to discover them.</p>
+
+<p>Christian Tonn of <a href="http://www.kubit-software.com">kubit</a> presents a powerful method to determine and maintain such a relationship using an officially supported approach instead:</p>
+
+<p><strong>Question:</strong> Is it possible to get the ImageType object from an image you inserted in the Revit document with Document.Import?</p>
+
+<p><strong>Answer:</strong> Not directly!</p>
+
+<p>I am using the Import method:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">bool</span> Import(
+&nbsp; &nbsp; <span class="blue">string</span> file,
+&nbsp; &nbsp; <span class="teal">ImageImportOptions</span> options,
+&nbsp; &nbsp; View view,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="teal">Element</span> element);
+</pre>
+
+<p>It only returns an Element object, which has no parameters attached &ndash; I used RevitLookup to check &ndash; nor can it be cast to anything useful, e.g. ImageType.
+
+<p>However, I can query Revit for all ImageType classes, and it really is possible to read the right Bitmap object out of the appropriate instance.
+
+<p>But how to connect the element returned by the Import method with the appropriate ImageType instance?</p>
+
+<p>The Element holds the image position in the view and the ImageType holds the Bitmap without position.</p>
+
+<p>I need both.</p>
+
+<p>Luckily, both items have the same Element.Name in the database, the image filename.</p>
+
+<p>I implemented a solution to determine and maintain the missing relationship like this:</p>
+
+<ol>
+<li>Start a TransactionGroup.</li>
+<li>Start a first transaction.</li>
+<li>Import the image with a unique filename:</li>
+
+<pre class="code">
+<span class="teal">String</span> tmpFilename = System.IO.<span class="teal">Path</span>.GetTempPath()
+&nbsp; + <span class="maroon">&quot;kubit_&quot;</span> + <span class="teal">Guid</span>.NewGuid().ToString() + <span class="maroon">&quot;.png&quot;</span>;
+&nbsp;
+mDoc.Import( tmpFilename, options, newView,
+&nbsp; <span class="blue">out</span> element );
+</pre>
+
+<li>Attach an extensible storage Entity to the returned image element:</li>
+
+<pre class="code">
+Entity additionalData = newEntity(
+&nbsp; MyImageSchema.GetSchema() );
+&nbsp;
+element.SetEntity( additionalData );
+</pre>
+
+<li>Commit the first transaction.</li>
+<li>Search the Revit database for all ImageType objects.</li>
+<li>Use them to populate a dictionary mapping the Name property value to the ImageType instance: Dictionary&lt;string, ImageType&gt; nameImageTypeMap.</li>
+<li>Retrieve all Element objects returned by the Import method in step 3 using an ExtensibleStorageFilter.</li>
+<li>Start a second transaction.</li>
+<li>Loop through all the elements and add the ImageType information to them using the dictionary:</li>
+
+<pre class="code">
+Entity additionalData = elem.GetEntity(
+&nbsp; MyImageSchema.GetSchema() );
+&nbsp;
+<span class="blue">if</span>( additionalData.IsValid() )
+{
+&nbsp; <span class="green">// Find correspondence between ImageType and </span>
+&nbsp; <span class="green">// Element (first has image, second has additionalData)</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( !nameImageTypeMap.ContainsKey( elem.Name ) )
+&nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp;
+&nbsp; <span class="teal">ImageType</span> image = nameImageTypeMap[elem.Name];
+&nbsp; additionalData.Set&lt;<span class="teal">ElementId</span>&gt;( <span class="maroon">&quot;ImageTypeId&quot;</span>, image.Id );
+&nbsp; elem.SetEntity( additionalData );
+}
+</pre>
+
+<li>Commit the second transaction.</li>
+<li>Commit the TransactionGroup.</li>
+</ol>
+
+<p>After this you can easily retrieve the image elements using an ExtensibleStorageFilter and also determine their associated ImageType instanced using the element id stored in ImageTypeId.</p>
+
+<p>I am so happy I could figure this out.</p>
+
+<p>I really hope this will be improved in some future release of the Revit API.</p>
+
+
+<a name="2"></a>
+
+<h4>Element Lister Description and Questions</h4>
+
+<p>Very many thanks to Christian for his research and solution!</p>
+
+<p>An easy way to discover certain element relationships between related objects that are added to Revit by certain operations is provided by the element lister:</p>
+
+<ol>
+<li>List all elements to a file A.</li>
+<li>Perform an operation in Revit.</li>
+<li>List all elements to a file B.</li>
+<li>Determine the difference between A and B.</li>
+</ol>
+
+<p>That gives me the newly added or deleted elements and their ids.</p>
+
+<p>I used it any number of times in the past to explore:</p>
+
+<ul>
+<li>Stacked walls</li>
+<li>Constraints</li>
+<li>Dimensioning</li>
+<li>Revision clouds</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">Element parameters</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/title-block-of-sheet.html">Title block of sheet</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/pre-post-and-pick-select.html">Pre-, post- and pick select</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">Curtain wall geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/remove-dwf-links.html">Removing DWF links</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/sydney-revit-api-training-and-vacation.html#5">Purging zero-area rooms and spaces</a></li>
+</ul>
+
+<p>Possibly something similar could be implemented using a more API oriented approach by subscribing to the DocumentChanged event, which returns the same information in the added and deleted element id collections.</p>
+
+<p>The element lister and other basic tools were used to establish certain
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">
+undocumented element id relationships</a>.</p>
+
+<p>Use of these element id relationships is
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">
+totally unsupported</a>,
+
+of course, and they can obviously change at any time.</p>
+
+<p>Your approach sounds much more robust.</p>
+
+<p>How does yours compare with these?</p>
+
+<p>Do you see any similarity at all?</p>
+
+<p>Are the element ids of the related elements also related?</p>
+
+
+
+<a name="3"></a>
+
+<h4>Confirmation</h4>
+
+<p>Yes, the ElementId of the ImageType is one less than the ElementId of the returned image Element from doc.Import, so they should obviously belong together.</p>
+
+<p>I was not sure about this, however, and chose the Element.Name approach instead.</p>
+
+<p>It is kind of similar, and I agree that it ought to be more robust.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Conclusion</h4>
+
+<p>The relationship discussed here between an image and the associated image type exists analogously for other pairs of Revit elements as well, so the approach described above is probably also useful for other similar situations.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Welcome Back, Jaime!</h4>
+
+<p>Six weeks ago, we
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/upgrading-family-files-silently-part-2.html#4">
+welcomed our new colleague Jaime</a> and
+
+enjoyed his first blog post.
+Immediately afterwards, he went off for a long holiday and begin a much longer marriage.
+Now he returned and immediately answered a
+
+<a href="http://forums.autodesk.com/t5/revit-api/get-value-from-app-config-file/m-p/5244679">
+Revit API forum issue</a> with
+
+a new blog post on
+
+<a href="http://adndevblog.typepad.com/aec/2014/09/get-value-from-appconfig-file-and-sur-la-france.html">
+reading a value from an app.config file</a> and
+
+the good times he had while away.</p>
+
+<p>Welcome back, Jaime!</p>

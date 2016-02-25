@@ -1,0 +1,364 @@
+<head>
+<meta http-equicenter="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+ElementIntersectsSolidFilter - bug or by-design?
+Miroslav Schonauer 
+Scott Conover 
+
+#revitapi #adsk #bim #3dwebcoder #aec #geometry #adskdevnetwrk
+#cloud #restapi
+#dotnet #csharp #python
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #csharp #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Intersect Solid Filter, AVF vs DirectShape Debugging</h3>
+
+<p>We already discussed the important topics of the
+<a href="http://thebuildingcoder.typepad.com/blog/avf">analysis visualisation framework AVF</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/directshape-versus-families-category-and-texture.html">DirectShape</a>
+(<a href="http://thebuildingcoder.typepad.com/blog/2015/02/from-hack-to-app-obj-mesh-import-to-directshape.html">mesh import</a>,
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#4.16">new functionality</a>),
+and the ElementIntersectsSolidFilter.</p>
+
+<p>Today, let's look at a little-know restriction on the latter and how to work around it, raised and solved by Miroslav Schonauer, Solution Architect in Autodesk Consulting, and Scott Conover, Software Development Manager of the Revit API team:</p>
+
+<ul>
+<li><a href="#2">ElementIntersectsSolidFilter problem</a></li>
+<li><a href="#3">Resolution</a></li>
+<li><a href="#4">Rectangular prism solid construction</a></li>
+<li><a href="#5">DirectShape is easier than AVF for prototyping and visualisation</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>ElementIntersectsSolidFilter Problem</h4>
+
+<p><strong>Question:</strong>
+
+I have a problem with the results of ElementIntersectsSolidFilter.</p>
+
+<p>It is not behaving as I would assume.</p>
+
+<p>I need to determine if a given point if within a tolerance, e.g., 100 mm, of any solid part of the wall and retrieve the list of such walls.</p>
+
+<p>ElementIntersectsSolidFilter looked like an ideal solution:</p>
+
+<ul>
+<li>I create an <code>ElementIntersectsSolidFilter filterSphere =</code> <code>newElementIntersectsSolidFilter(tolSphere)</code> with a Solid tolSphere of radius = tol.</li>
+<li>Then, I use <code>new FilteredElementCollector( doc )</code> <code>.OfClass( typeof( Wall ) )</code> <code>.WherePasses( filterSphere );</code></li>
+</ul>
+
+<p>Unfortunately, testing this with a given point that lies spot-on the wall face, I get NO walls for a tolerance of 100 mm, and the expected wall only for a tolerance of 1000 mm.</p>
+
+<p>I suspected I was doing something wrong with my transforms, due to the complex workflow.</p>
+
+<p>However, adding code to <a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html">display the solid using AVF</a> and the sphere creation code provided there prove that in both cases everything really is spot-on:</p>
+
+<center>
+<img src="img/1340_inters_solid_filt_01.png" alt="A sphere intersecting a wall" width="406"/>
+</center>
+
+<p>Finally, I worked out that I get the hit if I set the sphere tolerance greater than the wall thickness, e.g., 425 mm.</p>
+
+<p>No hit is returned if it is less, e.g. 375 mm.</p>
+
+<p>It looks as if the internal interpretation of this filter if really '3D intersection', i.e., the solid must fully 'go through' the element &ndash; in this case wall &ndash; geometry and not just 'penetrate' it, i.e. have a Boolean overlap.</p>
+
+<p>Questions:</p>
+
+<ul>
+<li>Is this a bug or by design?</li>
+<li>If by design, what would be the best solution &ndash; is anything better or faster than checking for Boolean overlaps between the solids?</li>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>Resolution</h4>
+
+<p><strong>Answer:</strong>
+
+This is indeed a limitation of the Boolean operations that sometimes crops up in Revit.</p>
+
+<p>If neither joining entity intersects along an edge, the intersection is not properly detected.   This is tracked as issue REVIT-32243.</p>
+
+<p>In your case, it would probably make sense to change from a sphere shape to a cube.</p>
+
+<p>The cube should intersect the face on some of its edges and be reported correctly.</p>
+
+
+<p><strong>Response:</strong>
+
+Thank you for confirming what I’m sure is the root cause here!</p>
+
+<p>It all adds up: with the smaller sphere, all the edges on the 'wall-surface meridian' are 100% ON the surface and do not really intersect it.</p>
+
+<p>With the bigger sphere, the ones on the other end start intersecting the opposite surface.</p>
+
+<p>It works fine even if I offset the centre point of the sphere by dXYZ=(1,1,1)[mm], since then the sphere edges intersect the closer surface.</p>
+
+<p>I will switch to a cube and possibly add some pre-filtering based on the walls’ delta-expanded Bounding Boxes.</p>
+
+
+<a name="4"></a>
+
+<h4>Rectangular Prism Solid Construction</h4>
+
+<p><strong>Answer:</strong>
+
+Here is a quick cube or rectangular prism construction example:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and return a cube of </span>
+&nbsp; <span class="gray">///</span><span class="green"> side length d at the origin.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Solid</span> CreateCube( <span class="blue">double</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> CreateRectangularPrism(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, d, d, d );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and return a rectangular prism of the</span>
+&nbsp; <span class="gray">///</span><span class="green"> given side lengths centered at the given point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Solid</span> CreateRectangularPrism(
+&nbsp; &nbsp; <span class="teal">XYZ</span> center,
+&nbsp; &nbsp; <span class="blue">double</span> d1,
+&nbsp; &nbsp; <span class="blue">double</span> d2,
+&nbsp; &nbsp; <span class="blue">double</span> d3 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt; profile = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Curve</span>&gt;();
+&nbsp; &nbsp; <span class="teal">XYZ</span> profile00 = <span class="blue">new</span> <span class="teal">XYZ</span>( -d1 / 2, -d2 / 2, -d3 / 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> profile01 = <span class="blue">new</span> <span class="teal">XYZ</span>( -d1 / 2, d2 / 2, -d3 / 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> profile11 = <span class="blue">new</span> <span class="teal">XYZ</span>( d1 / 2, d2 / 2, -d3 / 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> profile10 = <span class="blue">new</span> <span class="teal">XYZ</span>( d1 / 2, -d2 / 2, -d3 / 2 );
+&nbsp;
+&nbsp; &nbsp; profile.Add( <span class="teal">Line</span>.CreateBound( profile00, profile01 ) );
+&nbsp; &nbsp; profile.Add( <span class="teal">Line</span>.CreateBound( profile01, profile11 ) );
+&nbsp; &nbsp; profile.Add( <span class="teal">Line</span>.CreateBound( profile11, profile10 ) );
+&nbsp; &nbsp; profile.Add( <span class="teal">Line</span>.CreateBound( profile10, profile00 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveLoop</span> curveLoop = <span class="teal">CurveLoop</span>.Create( profile );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SolidOptions</span> options = <span class="blue">new</span> <span class="teal">SolidOptions</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>.InvalidElementId,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span>.InvalidElementId );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; &nbsp; .CreateExtrusionGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveLoop</span>[] { curveLoop },
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, d3, options );
+&nbsp; }
+</pre>
+
+<p>You will obviously want to pass in your own target location in the <code>center</code> argument.</p>
+
+<p><strong>Response:</strong>
+
+Thank you.</p>
+
+<p>I confirm that the cube works fine as well!</p>
+
+<center>
+<img src="img/1340_inters_solid_filt_03.png" alt="A cube intersecting a wall" width="398"/>
+</center>
+
+<p>To test this yourself, create a standalone hard-coded RVT model defining the geometry and an external command base don the code below, with the following:</p>
+
+<ul>
+<li>One wall in RVT.</li>
+<li>Code creates 3 solids: sphere with a radius &lt; wall width, sphere with radius &gt; wall width, cube with side &lt; wall width, each with their centre *exactly* on one of wall side surfaces.</li>
+<ul>
+<li>Spheres created using the <a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html">sphere creation for AVF and filtering</a> code.</li>
+<li>For each solid, create the Intersect filter with wall; the first one should result in NO hits, the latter two OK.</li>
+<li>For visualization, use AVF to show the solids.</li>
+</ul>
+</ul>
+
+<p>Besides the code above to create a rectangular prism, here is an analogous method creating a sphere:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and return a solid sphere </span>
+&nbsp; <span class="gray">///</span><span class="green"> with a given radius and centre point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">Solid</span> CreateSphereAt(
+&nbsp; &nbsp; <span class="teal">XYZ</span> centre,
+&nbsp; &nbsp; <span class="blue">double</span> radius )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Use the standard global coordinate system </span>
+&nbsp; &nbsp; <span class="green">// as a frame, translated to the sphere centre.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Frame</span> frame = <span class="blue">new</span> <span class="teal">Frame</span>( centre, <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisY, <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create a vertical half-circle loop </span>
+&nbsp; &nbsp; <span class="green">// that must be in the frame location.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc = <span class="teal">Arc</span>.Create(
+&nbsp; &nbsp; &nbsp; centre - radius * <span class="teal">XYZ</span>.BasisZ,
+&nbsp; &nbsp; &nbsp; centre + radius * <span class="teal">XYZ</span>.BasisZ,
+&nbsp; &nbsp; &nbsp; centre + radius * <span class="teal">XYZ</span>.BasisX );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound(
+&nbsp; &nbsp; &nbsp; arc.GetEndPoint( 1 ),
+&nbsp; &nbsp; &nbsp; arc.GetEndPoint( 0 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveLoop</span> halfCircle = <span class="blue">new</span> <span class="teal">CurveLoop</span>();
+&nbsp; &nbsp; halfCircle.Append( arc );
+&nbsp; &nbsp; halfCircle.Append( line );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp; &nbsp; loops.Add( halfCircle );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">GeometryCreationUtilities</span>
+&nbsp; &nbsp; &nbsp; .CreateRevolvedGeometry( frame, loops,
+&nbsp; &nbsp; &nbsp; &nbsp; 0, 2 * <span class="teal">Math</span>.PI );
+&nbsp; }
+</pre>
+
+<p>I use the following to drive the AVF:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">int</span> schemaId = -1;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> PaintSolid(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Solid</span> s,
+&nbsp; &nbsp; <span class="blue">double</span> value )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( view.AnalysisDisplayStyleId
+&nbsp; &nbsp; &nbsp; == <span class="teal">ElementId</span>.InvalidElementId )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CreateAVFDisplayStyle( doc, view );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SpatialFieldManager</span> sfm = <span class="teal">SpatialFieldManager</span>
+&nbsp; &nbsp; &nbsp; .GetSpatialFieldManager( view );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sfm )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; sfm = <span class="teal">SpatialFieldManager</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .CreateSpatialFieldManager( view, 1 );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( -1 != schemaId )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="blue">int</span>&gt; results = sfm.GetRegisteredResults();
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !results.Contains( schemaId ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; schemaId = -1;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( -1 == schemaId )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalysisResultSchema</span> resultSchema1
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisResultSchema</span>( <span class="maroon">&quot;PaintedSolid&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Description&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; schemaId = sfm.RegisterResult( resultSchema1 );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FaceArray</span> faces = s.Faces;
+&nbsp; &nbsp; <span class="teal">Transform</span> trf = <span class="teal">Transform</span>.Identity;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> faces )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> idx = sfm.AddSpatialFieldPrimitive( face, trf );
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">UV</span>&gt; uvPts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">UV</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; doubleList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ValueAtPoint</span>&gt; valList = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ValueAtPoint</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxUV</span> bb = face.GetBoundingBox();
+&nbsp; &nbsp; &nbsp; uvPts.Add( bb.Min );
+&nbsp; &nbsp; &nbsp; doubleList.Add( value );
+&nbsp; &nbsp; &nbsp; valList.Add( <span class="blue">new</span> <span class="teal">ValueAtPoint</span>( doubleList ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FieldDomainPointsByUV</span> pnts
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FieldDomainPointsByUV</span>( uvPts );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FieldValues</span> vals = <span class="blue">new</span> <span class="teal">FieldValues</span>( valList );
+&nbsp; &nbsp; &nbsp; sfm.UpdateSpatialFieldPrimitive( idx, pnts,
+&nbsp; &nbsp; &nbsp; &nbsp; vals, schemaId );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> CreateAVFDisplayStyle(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">View</span> view )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create AVF Style&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalysisDisplayColoredSurfaceSettings</span>
+&nbsp; &nbsp; &nbsp; &nbsp; coloredSurfaceSettings = <span class="blue">new</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AnalysisDisplayColoredSurfaceSettings</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; coloredSurfaceSettings.ShowGridLines = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalysisDisplayColorSettings</span> colorSettings
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisDisplayColorSettings</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalysisDisplayLegendSettings</span> legendSettings
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">AnalysisDisplayLegendSettings</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; legendSettings.ShowLegend = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">AnalysisDisplayStyle</span> analysisDisplayStyle
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">AnalysisDisplayStyle</span>.CreateAnalysisDisplayStyle(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;Paint Solid&quot;</span>, coloredSurfaceSettings,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; colorSettings, legendSettings );
+&nbsp;
+&nbsp; &nbsp; &nbsp; view.AnalysisDisplayStyleId = analysisDisplayStyle.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>DirectShape is Easier than AVF for Prototyping and Visualisation</h4>
+
+<p><strong>Answer:</strong>
+
+Thank you for the confirmation and sample code.</p>
+
+<p>One note regarding your use of AVF for visualisation and graphical debugging:</p>
+
+<p>Nowadays, it is a lot easier to visualize 3D geometry by using DirectShape instead of AVF.</p>
+
+<p>AVF still has its uses, but for prototyping and visualisation, DirectShape is a lot easier.</p>
+
+<p><strong>Response:</strong>
+
+So hard to keep up with all the great improvements for all products and APIs &nbsp; ;-)</p>
+
+<p>DirectShape is on my list to try asap!</p>
+
+<p>Many thanks to Miro and Scott for bringing up and solving this important issue!</p>
+
+<p>I added the solid sphere and cube creation utility methods to
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> in
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.120.3">
+release 2016.0.120.3</a>.</p>

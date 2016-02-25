@@ -1,0 +1,137 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08684213 [Can we get the revit application externally from other application]
+08685306 [calling IExternalCommand from dockable window]
+
+Van: Jeremy Tammik
+Verzonden: donderdag 18 juli 2013 11:05
+Aan: Renzo van Rijswijk
+Onderwerp: Re: DockableDialog
+
+Met vriendelijke groet,
+Strukton Engineering bv
+
+Renzo van Rijswijk
+Manager R&D
+
+http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html?cid=6a00e553e16897883301910445b4b2970c#comment-6a00e553e16897883301910445b4b2970c
+
+Renzo van Rijswijk has left you a comment:
+
+Hi Jeremy, Finally I succeeded in getting this sample to work for me and changed it for my needs. Thanks to your explanation. Now, I created a button on the WPF form that must get the selected Revit objects. In some way I have to pass the Application to the WPF form. Somehow, I can not solve this step. Can you give me an idea for that... Greetins, Renzo
+
+-->
+
+<h3>No Command Launching from Dockable Panel</h3>
+
+<p>Here is an issue that has come up a few times now and is worthwhile clarifying: how to operate on a Revit document from a dockable panel.</p>
+
+<p>The dockable panel UI API framework was introduced in Revit 2014.
+Its use is demonstrated by the DockableDialogs SDK sample, including modeless dialog design and external events, and also by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html">
+simpler dockable panel sample</a>.</p>
+
+<p>The fact that a dockable panel lives in a modeless context is apparently confusing for some.
+Since the panel is active at all times, you are <u>not</u> inside a Revit external command handler and therefore <u>not in a valid Revit API context</u>.</p>
+
+<p>This leads to queries like this:</p>
+
+
+<a name="2"></a>
+
+<p><strong>Question 1:</strong> I'm probably overlooking something, but how do you call an IExternalCommand from a dockable window.
+I guess this is possible, right?</p>
+
+<p><strong>Answer:</strong> No, sorry.
+See below.</p>
+
+
+<a name="3"></a>
+
+<p><strong>Question 2:</strong> I create my own dockable dialog.
+It loads a table from an external data source and displays that information in a tree view.
+That works fine.</p>
+
+<p>Now I want to add a button to that form to retrieve a selected Revit element and attach that to one of the tree nodes (cf. discussion group
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html?cid=6a00e553e16897883301910445b4b2970c#comment-6a00e553e16897883301910445b4b2970c">
+comment</a>).
+
+In fact, I just want to keep it simple and copy some tree node data to a Revit shared parameter.</p>
+
+<p>I implemented the code to determine the right tree node.</p>
+
+<p>However, how can I get this button to connect to the current active Revit document?
+Am I doing something wrong here?
+Is that possible with this at all?</p>
+
+<p>I noticed an outdated AUGI discussion thread on
+
+<a href="http://forums.augi.com/showthread.php?98991-Windows-Form-Pass-to-Revit-Command">
+accessing a Revit document from a Windows form</a> that
+
+seems to implicate that I need to pass the Application object to the XAML form.
+However, the explanation in that answer is not enough for me to solve my problem.</p>
+
+<p>Now I also discovered that starting a transaction from an external application running outside of a valid Revit API context is not allowed.</p>
+
+<p>How can I solve this, please?</p>
+
+
+<p><strong>Answer:</strong> As mentioned in the introduction above, a dockable panel is similar to a modeless form, which is similar to an external Windows application, which is basically the same as any other process outside of Revit: it has not been registered with the Revit API, Revit is completely unaware of its existence, and you can make no use whatsoever of the Revit API from that process.</p>
+
+<p>Modeless access to the Revit API boils down to accessing the Revit application from an arbitrary external application.</p>
+
+The Revit API does not provide any direct access to the Revit application, except in the valid Revit API context situations defined by the various Revit API events.
+
+Basically, the complete Revit API is based entirely on call-back methods.
+
+There is no API support for driving Revit from an external application, whether .NET, WPF, or anything else.
+
+<p>Being in a modeless context, you have no valid Revit API context.
+You can subscribe to the Idling event to obtain one, and the available dockable dialogue samples demonstrate how to do so.</p>
+
+<p>Workarounds exist, have been frequently described, both here and elsewhere, and numerous previous discussions address various aspects of this situation.</p>
+
+<p>The nicest and most recent complete sample I know of is my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html">
+cloud-based round-trip 2D Revit model editor</a> project.</p>
+
+<p>Here are some other recent mentions of the topic:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/effortless-extensible-storage.html#7">
+Display real-time interactive element properties</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/behind-the-scenes-of-the-nbs-revit-add-in.html">
+Behind the scenes of the NBS Revit add-in</a></li>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/behind-the-scenes-of-the-nbs-revit-add-in.html#3">
+Controlling Revit from modeless dialogues</a></li>
+</ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">
+Batch mode data extraction</a></li>
+</ul>
+
+<p>For more background information, please look at the following blog categories and keyword search results:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/idling">
+Idling</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/external">
+External</a></li>
+<li><a href="http://lmgtfy.com/?q=revit+api+driving+outside">
+Driving Revit from outside</a></li>
+<li><a href="http://lmgtfy.com/?q=revit+api+modeless">
+Modeless Revit API access</a></li>
+</ul>
+
+<p>Happy exploring!</p>

@@ -1,0 +1,150 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>AdnRme Update to Eliminate Obsolete API Usage</h3>
+
+<p>The ADN Revit MEP HVAC and electrical sample
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.40">
+AdnRme</a> version
+
+<a href="https://github.com/jeremytammik/AdnRme/releases/tag/2015.0.0.2">
+2015.0.0.2</a> produces
+
+<a href="zip/AdnRme_2015_2_warnings.txt">three compilation warnings</a>,
+
+all three saying:</p>
+
+<ul><li>'Autodesk.Revit.DB.Family.Symbols' is obsolete:
+'This property is obsolete in Revit 2015.
+Use Family.GetFamilySymbolIds() instead.'</li></ul>
+
+<p>So let's do what the man says.</p>
+
+<p>The code producing the first two instances of the warning in the module CmdChangeSize.cs looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> family <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Family category is not implemented, </span>
+&nbsp; &nbsp; <span class="green">// so check the symbols instead:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> categoryMatches = <span class="blue">false</span>;
+
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; categoryMatches = ( <span class="blue">null</span> != symbol.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; symbol.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( <span class="blue">int</span> ) <span class="teal">BuiltInCategory</span>.OST_DuctTerminal ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>; <span class="green">// we only need to check the first one</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( categoryMatches )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">SymbMinMax</span>&gt; familySymbols
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">SymbMinMax</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SymbMinMax</span> a = <span class="blue">new</span> <span class="teal">SymbMinMax</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; a.Symbol = symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; a.Min = <span class="teal">Util</span>.GetParameterValueFromName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbol, <span class="teal">ParameterName</span>.MinFlow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; a.Max = <span class="teal">Util</span>.GetParameterValueFromName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbol, <span class="teal">ParameterName</span>.MaxFlow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; familySymbols.Add( a );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; dictFamilyToSymbols.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; family.Name, familySymbols );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>This is the replacement code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> family <span class="blue">in</span> collector )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ISet</span>&lt;<span class="teal">ElementId</span>&gt; symbolIds
+&nbsp; &nbsp; &nbsp; = family.GetFamilySymbolIds();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Family category is not implemented, </span>
+&nbsp; &nbsp; <span class="green">// so check the symbols instead:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> categoryMatches = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> symbolIds )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> symbol = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; categoryMatches = ( <span class="blue">null</span> != symbol.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; symbol.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_DuctTerminal ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>; <span class="green">// we only need to check the first one</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( categoryMatches )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">SymbMinMax</span>&gt; familySymbols
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">SymbMinMax</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> symbolIds )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = doc.GetElement( id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SymbMinMax</span> a = <span class="blue">new</span> <span class="teal">SymbMinMax</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; a.Symbol = symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; a.Min = <span class="teal">Util</span>.GetParameterValueFromName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbol, <span class="teal">ParameterName</span>.MinFlow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; a.Max = <span class="teal">Util</span>.GetParameterValueFromName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbol, <span class="teal">ParameterName</span>.MaxFlow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; familySymbols.Add( a );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; dictFamilyToSymbols.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; family.Name, familySymbols );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Note that in the first replacement above, we skip casting the element returned by the GetElement method to a FamilySymbol instance, because all we need to do with it is query its Category property.
+This can be done just as well on the Element base class.</p>
+
+<p>The second replacement requires the cast, however.</p>
+
+<p>You can view the GitHub
+
+<a href="https://github.com/jeremytammik/AdnRme/compare/2015.0.0.2...2015.0.0.3">
+diff between version 2015.0.0.2 and 2015.0.0.3</a> to
+
+see the exact changes I made to eliminate all three warnings.</p>
+
+<p>I added some other trivial changes after the fix described above, in fact, so the current version at the moment of writing this is
+
+<a href="https://github.com/jeremytammik/AdnRme/releases/tag/2015.0.0.4">2015.0.0.4</a>.</p>
+
+<p>You can always download the complete source code, Visual Studio solution and add-in manifest of the most up-to-date version from the
+
+<a href="https://github.com/jeremytammik/AdnRme">
+AdnRme GitHub repository</a>.</p>

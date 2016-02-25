@@ -1,0 +1,229 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Scott Conover Save new central to Revit Server
+
+09039239 [How to change the Category of families in an RVT file?] -- According to my colleagues on Revit engineer team, "you can only change the category for the family associated with a family document, e.g. the OwnerFamily of the family’s Document. Thus you have to be editing the family when this happens. There are some other restrictions too, I believe, which match what the UI allows you to do."
+
+-->
+
+<h3>Saving a New Central File to Revit Server</h3>
+
+<p>One topic brought up at Scott Conover's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html#5">
+worksharing roundtable</a> was
+
+the question of how to save a new Revit central file to a Revit Server.</p>
+
+<p>Participants even questioned whether this is possible at all with the current API.</p>
+
+<p>Well, it is, and we look at the exact steps to achieve that below as well as:</p>
+
+<ul>
+<li><a href="#2">DevDay in Farnborough, cabs and flights</a></li>
+<li><a href="#3">Saving a new central file to Revit Server</a></li>
+<li><a href="#4">Consistent naming of transactions and transaction groups</a></li>
+<li><a href="#5">Changing the category of a family in project</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>DevDay in Farnborough, Cabs and Flights</h4>
+
+<p>We started the day in a rather bumpy British cab. Here is the resulting blurred image of Philippe, Caroline and Jim all cosy on the back seat:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-12-11_farnborough/philippe_caroline_jim_london_cab_x_4.jpeg" alt="Philippe, Caroline and Jim in a cab"/>
+</center>
+
+<p>The conference was lively and exciting.
+Here are Paavo and Adam happily on the way back to the airport afterwards in another British cab:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-12-11_farnborough/paavo_adam_in_cab.jpg" alt="Paavo and Adam in a cab" width="536"/>
+</center>
+
+<p>Philippe and Peter may be less happy.
+They attempted to board their Easyjet flight from Gatwick to Munich and were rejected because they had not checked in in advance.</p>
+
+<p>Now we are a significantly reduced team sitting in the hotel bar wondering how to reorganise and handle the presentations tomorrow:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-12-11_farnborough/paavo_jeremy_paul_adam_jim_david_in_angelo.jpg" alt="Planning the Munich DevDay presentations" width="536"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>Saving a New Central File to Revit Server</h4>
+
+<p>Ensure the following conditions are met to successfully save a new central file to a Revit Server ServerPath using the Document.SaveAs method:</p>
+
+<ul>
+<li>WorksharingSaveAsOptions.SaveAsCentral = true.</li>
+<li>The file is currently workshared &ndash; note that there is currently no API to make this happen.</li>
+<li>You have a server set for the Revit session, and you know or can obtain the correct relative path on the server for the new server document.</li>
+</ul>
+
+<p>With that in place, the following code achieves this task:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> OpenDetachedAndSaveAsNewCentral(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Open non-interactive document with options</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelPath</span> toOpen = GetWSAPIModelPath(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;open_detached.rvt&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> openedDoc = OpenDetached( app, toOpen );
+&nbsp;
+&nbsp; &nbsp; ShowInfoOnOpenedWorksharedDocument( openedDoc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> serverPathRoot = uiapp.Application
+&nbsp; &nbsp; &nbsp; .GetRevitServerNetworkHosts().First();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelPath</span> modelPath = <span class="blue">new</span> <span class="teal">ServerPath</span>(
+&nbsp; &nbsp; &nbsp; serverPathRoot,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;all_new_saved_central_on_server_preserve.rvt&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SaveAsOptions</span> options = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WorksharingSaveAsOptions</span> wsOptions
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">WorksharingSaveAsOptions</span>();
+&nbsp;
+&nbsp; &nbsp; wsOptions.SaveAsCentral = <span class="blue">true</span>;
+&nbsp; &nbsp; options.SetWorksharingOptions( wsOptions );
+&nbsp; &nbsp; openedDoc.SaveAs( modelPath, options );
+&nbsp;
+&nbsp; &nbsp; ShowInfoOnOpenedWorksharedDocument( openedDoc );
+&nbsp;
+&nbsp; &nbsp; openedDoc.Close( <span class="blue">false</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Helper to return a local path </span>
+&nbsp; <span class="gray">///</span><span class="green"> for a target model file.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ModelPath</span> GetWSAPIModelPath(
+&nbsp; &nbsp; <span class="blue">string</span> fileName )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FileInfo</span> filePath = <span class="blue">new</span> <span class="teal">FileInfo</span>( <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">@&quot;C:\test\WS API Models&quot;</span>,
+&nbsp; &nbsp; &nbsp; fileName ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelPath</span> mp = <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; .ConvertUserVisiblePathToModelPath(
+&nbsp; &nbsp; &nbsp; &nbsp; filePath.FullName );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> mp;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">Document</span> OpenDetached(
+&nbsp; &nbsp; <span class="teal">Application</span> app,
+&nbsp; &nbsp; <span class="teal">ModelPath</span> modelPath )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">OpenOptions</span> opt = <span class="blue">new</span> <span class="teal">OpenOptions</span>();
+&nbsp;
+&nbsp; &nbsp; opt.DetachFromCentralOption
+&nbsp; &nbsp; &nbsp; = <span class="teal">DetachFromCentralOption</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .DetachAndPreserveWorksets;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> openedDoc = app.OpenDocumentFile(
+&nbsp; &nbsp; &nbsp; modelPath, opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> openedDoc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Show popup with info about worksets </span>
+&nbsp; <span class="gray">///</span><span class="green"> and worksharing status</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> ShowInfoOnOpenedWorksharedDocument(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">String</span> documentName = doc.Title;
+&nbsp; &nbsp; <span class="blue">bool</span> isWorkshared = doc.IsWorkshared;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredWorksetCollector</span> fwc
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredWorksetCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; fwc.OfKind( <span class="teal">WorksetKind</span>.UserWorkset );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> wsCount = fwc.Count&lt;<span class="teal">Workset</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span> td = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Opened document info&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; td.MainInstruction
+&nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;Application has opened the document &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + documentName;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> mainContent = <span class="maroon">&quot;Workshared: &quot;</span>
+&nbsp; &nbsp; &nbsp; + isWorkshared
+&nbsp; &nbsp; &nbsp; + ( isWorkshared
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;\nassociated to: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">ModelPathUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ConvertModelPathToUserVisiblePath(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.GetWorksharingCentralModelPath() )
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;&quot;</span> )
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\nWorkset count: &quot;</span> + wsCount + <span class="maroon">&quot;\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">String</span>.Join( <span class="maroon">&quot;\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; fwc.Select&lt;<span class="teal">Workset</span>, <span class="teal">String</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ws =&gt; ws.Name + <span class="maroon">&quot; - &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ( ws.IsOpen ? <span class="maroon">&quot;open&quot;</span> : <span class="maroon">&quot;closed&quot;</span> ) ) );
+&nbsp;
+&nbsp; &nbsp; td.MainContent = mainContent;
+&nbsp;
+&nbsp; &nbsp; td.Show();
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Consistent Naming of Transactions and Transaction Groups</h4>
+
+<p>Somebody pointed out an interesting little issue concerning the naming of transactions and transaction groups which might possibly cause some confusion for an add-in user and can easily be worked around:</p>
+
+<p>Let's assume that your add-in has defined a transaction group named A. Within it, it committs one single transaction named B. In that case, the undo stack displayed to the user shows B instead of A.</p>
+
+<p>The suggested workaround to handle this cleanly is simple: keep a count of commited transactions within the group. As long as the count is still zero, name the first transaction A as well, just like the top level group.</p>
+
+<p>One aspect of this situation is described in the Revit API help file RevitAPI.chm: "There are two ways of committing a group &ndash; Commit and Assimilate. By committing, all transactions committed inside a group stay as they are, while by assimilating, all inner transactions will be merged into a single transaction."</p>
+
+
+<!--
+
+09039239 [How to change the Category of families in an RVT file?] -- According to my colleagues on Revit engineer team, "you can only change the category for the family associated with a family document, e.g. the OwnerFamily of the family’s Document. Thus you have to be editing the family when this happens. There are some other restrictions too, I believe, which match what the UI allows you to do."
+
+-->
+
+<a name="5"></a>
+
+<h4>Changing the Category of a Family in Project</h4>
+
+<p><strong>Question:</strong> How can I change a curtain panel family category from Curtain Panel to Window?</p>
+
+<p>I know I can do it through the user interface, but how do I achieve the same thing programmatically?</p>
+
+<p>I can imagine something along the following steps: iterate the FamilySymbols, get the Family, edit it as a Document &ndash; which I can do &ndash; change the category and add it back to the RVT file.</p>
+
+<p>Can this be done without editing it as a Document?</p>
+
+<p>What is the proper workflow for this task, please?</p>
+
+<p><strong>Answer:</strong> You can only change the category for the family associated with a family document, i.e. the OwnerFamily of the family Document. This means that you have to be editing the family when this happens, i.e. open and access the family document via the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/edit-family-requires-no-transaction.html">
+EditFamily</a> method.
+
+There are probably some other restrictions as well, which match what the UI allows you to do.</p>

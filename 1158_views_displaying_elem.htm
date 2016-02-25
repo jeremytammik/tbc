@@ -1,0 +1,423 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09599062 [SpatialElement Level] Sergej MuhicInstitute of Architecture and Media, Graz University of Technology
+
+Chris Mckeown RE: Revit API Element ID change after synchronisation
+
+-->
+
+<h3>Determine Views Displaying Given Element</h3>
+
+<p>I am slowly getting back to normal working mode after the AEC Hackathon last weekend and the neat project that we worked on there, so I finally get around to publishing this post that I started working on last week.</p>
+
+<p>The only remaining issue is of a physical nature: my feet are still swollen after flying to New York on Friday, sitting and working non-stop at the Hackathon from Saturday morning until Sunday afternoon, standing for a couple of hours in a pub afterwards, and then sitting in the flight back again the same evening and Monday. My veins are getting old, it seems, and need some horizontal time out now and then.</p>
+
+<p>In the meantime, other topics cropped up as well, including some cases and emails I answered since my return:</p>
+
+<ul>
+<li><a href="#2">SpatialElement Level property</a></li>
+<li><a href="#3">Export to DWFx, SVG or XML</a></li>
+<li><a href="#4">Add-in benchmarking</a></li>
+<li><a href="#5">NoSQL and top five considerations</a></li>
+<li><a href="#6">Determine views displaying given element</a></li>
+<li><a href="#7">Download</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>SpatialElement Level Property</h4>
+
+<p><strong>Question:</strong> The previous version of the API provided direct access to a Level object directly from a SpatialElement.
+In the current version this has been made obsolete and replaced by only a LevelId.</p>
+
+<p>The previous way allowed me to get the information about a Level from a particular SpatialElement that I was working with. Is there any work-around to get Level information from a SpatialElement or is it intended that I acquire the Level through the LevelId I can access from the SpatialElement?</p>
+
+<p><strong>Answer:</strong> I am not aware of any other method than what you suggest, nor can I imagine that any other method would or even could be more direct and efficient than that.</p>
+
+<p>You could in fact implement this approach as an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html">
+extension method</a> on
+
+the Revit 2015 API SpatialElement class, if you prefer to leave your existing code unchanged, e.g.</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">Level</span> Level( <span class="blue">this</span> <span class="teal">SpatialElement</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = a.Document;
+&nbsp; &nbsp; <span class="blue">return</span> doc.GetElement( a.LevelId );
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Export to DWFx, SVG or XML</h4>
+
+<p>I replied to a Revit API discussion thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Rvit-Plan-View-custom-export-DWFx-or-SVG-etc/m-p/5039904">
+Revit plan view custom export</a>:</p>
+
+<p><strong>Question:</strong> I have some questions on DWFx and other graphical export from Revit:</p>
+
+<ol>
+<li>How does the export to DWFx work?</li>
+<li>Does the process simply export all visible elements on plan view (Geometry, Annotation, etc.), or is there a more
+complicated process such as printing preprocessing?</li>
+</ol>
+
+<p>The reason I'm asking is that I would like to create my own plan view export, for example to SVG or some other XML based format of my own creation, with complete detail information including annotations, etc.</p>
+
+<p>Do you think that would be possible?</p>
+
+
+<p><strong>Answer:</strong> Definitely yes.</p>
+
+<p>There are a lot of answers to this.</p>
+
+<p><b>1.</b> How does the export to DWFx work?</p>
+
+<p>The first answer is simple, and applies to most of the Revit API:</p>
+
+<p>The Revit API export to DWFx works exactly the same way as the user interface functionality.</p>
+
+<p>Call the Document.Export method overload taking a DWFXExportOptions argument to exports the current view or a selection of views in DWFX format.</p>
+
+<p>For examples, please look at the Revit SDK and The Building Coder blog, e.g. searching for
+
+<a href="http://lmgtfy.com/?q=building+coder+dwf+export">building coder dwf export</a>.</p>
+
+<p><b>2.</b> Does it simply export all visible elements on plan view?</p>
+
+<p>It exports exactly what you see in the view.
+You can set up the view to export what you want.
+This includes annotation and also
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/section-view-geometry.html">sections</a>.</p>
+
+<p><b>3.</b> I would like to create my own plan view export, for example to SVG or some other XML based format.</p>
+
+<p>Here, you are in great luck:</p>
+
+<p>You can look at my simplified
+
+<a href="http://lmgtfy.com/?q=building+coder+room+editor">
+2D BIM room editor</a> for
+
+a very complete example of exporting 2D to SVG.</p>
+
+<p>It lives on GitHub, in two repositories,
+
+<a href="https://github.com/jeremytammik/roomedit">roomedit</a>, implementing the NoSQL CouchDB HTML and SVG viewer, and
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a>, implementing the Revit add-in, database upload and real-time BIM update.</p>
+
+<p>It shows that you can easily not just export to SVG and display a simplified BIM view through server-side scripting-generated HTML, but edit the SVG live in the browser and update your BIM with the results in real-time as well.</p>
+
+<p>That might well be exactly what you are looking for.</p>
+
+<p>For a full 3D export of the Revit model to JSON and a live web viewer displaying both graphics and non-graphical element properties, you can look at what we achieved last weekend at the AEC Hackathon in New York:</p>
+
+<ul>
+<li><a href="https://www.hackerleague.org/hackathons/aec-technology-hackathon-2014/hacks/three-dot-js-aec-viewer-model-exporters">
+Project description</a></li>
+<li><a href="https://va3c.github.io">
+Main project page</a></li>
+<li><a href="https://va3c.github.io/viewer">
+Sample viewer</a></li>
+<li><a href="https://va3c.github.io/#team">
+va3c team</a></li>
+<li><a href="https://github.com/va3c/RvtVa3c">
+va3c exporter from Revit by Matt Mason and Jeremy</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/aec-hackathon-from-the-midst-of-the-fray.html">
+Live blog post during the event</a></li>
+</ul>
+
+<p>We won second prize! &nbsp; :-)</p>
+
+
+<a name="4"></a>
+
+<h4>Revit Add-in Benchmarking</h4>
+
+<p><strong>Question:</strong> I am reworking a Revit add-in that I discussed with you last year.</p>
+
+<p>Before I move further, I wondered if you would like to take a look at it?</p>
+
+<p>I am having some performance issues that I'm sure are easily fixed.</p>
+
+<p>I am using SQL and &ndash; for the first time &ndash; WPF, and loving both of them.</p>
+
+<p><strong>Answer:</strong> Before I take a look at it, have you benchmarked it in any way whatsoever?</p>
+
+<p>That should immediately highlight any bottlenecks, and you might improve your performance significantly with a very few tweaks, or alternatively prove that no such tweaks exist, e.g. if the performance issue is caused by Revit and not your add-in.</p>
+
+<p>Please look at the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/profiling-revit-add-ins-and-roomeditorapp-enhancements.html">profiling Revit add-ins</a>,
+
+see what you can achieve using that, and then we can continue talking.</p>
+
+
+<a name="5"></a>
+
+<h4>NoSQL and Top Five Considerations</h4>
+
+<p>Continuing with the question above on SQL:
+I cannot say anything specific about SQL, but I do like NoSQL, 'Not only SQL':</p>
+
+<ul>
+<li><a href="http://nosql-database.org">nosql-database.org</a> (<a href="https://en.wikipedia.org/wiki/NoSQL">Wikipedia</a>)</li>
+<li>Next generation database paradigm</li>
+<li>Non-relational, distributed, open-source, tremendously scalable, huge data</li>
+<li>Mostly schema-free, easy replication support, simple API</li>
+<li>Eventually consistent, BASE (not ACID)</li>
+</ul>
+
+<p>The
+
+<a href="https://en.wikipedia.org/wiki/CAP_theorem">CAP theorem</a> states
+
+that a  distributed computer system based on a traditional ACID paradigm such as SQL cannot possibly simultaneously provide all three of the following guarantees:</p>
+
+<ul>
+<li>Consistency (all nodes see the same data at the same time)</li>
+<li>Availability (a guarantee that every request receives a response about whether it was successful or failed)</li>
+<li>Partition tolerance (the system continues to operate despite arbitrary message loss or failure of part of the system)</li>
+</ul>
+
+<p>NoSQL relies on new  distributed computing insights such as
+
+<a href="https://en.wikipedia.org/wiki/Eventual_consistency">eventual consistency</a>,
+
+enabling the switch from traditional rigid ACID concepts to BASE database paradigms:
+
+<ul>
+<li>ACID</li>
+<ul>
+<li>Atomicity, Consistency, Isolation, Durability</li>
+<li>Traditional computer science</li>
+<li>Guarantee that database transactions are processed reliably</li>
+</ul>
+<li>BASE </li>
+<ul>
+<li>Basic Availability, Soft-state, Eventual consistency</li>
+<li>Not guaranteed to be in a consistent state at a given moment</li>
+<li>Consistency is guaranteed, eventually</li>
+</ul>
+</ul>
+
+<p>Have you taken a look at that?</p>
+
+<p>Here is a whitepaper on the
+
+<a href="http://www.mongodb.com/nosql-explained">top five NoSQL considerations</a>,
+
+including some comparison with SQL, provided by MongoDB and only slightly commercially tainted.</p>
+
+<p>I have not done much with WPF, and nothing at all with SQL in the last years.</p>
+
+
+<a name="6"></a>
+
+<h4>Determine Views Displaying Given Element</h4>
+
+<p>Several people recently asked about how to
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Revision-help-which-views-show-this-object/m-p/5029772">
+retrieve all views displaying a given element</a>.</p>
+
+<p>I provided my standard answer to the question by looping over all views and using a filtered element collector passing in the view element id of each.</p>
+
+<p>That primitive approach was enhanced by Colin, who replies:</p>
+
+<blockquote>
+<p>The solution as Jeremy suggested is certainly possible, BUT in a model with many views, it can take an extremely long time to run.</p>
+<p>The reason for this is, (as far as I can tell), when using a view-specific FilteredElementCollector, Revit effectively opens that view and checks whether the element is visible in the view.</p>
+<p>The result of this is that getting a list of views where an element is present takes the same amount of time as opening every view that is checked.</p>
+<p>That being said, I implemented a method FindAllViewsWhereAllElementsVisible and helper method FindAllViewsThatCanDisplayElements for this (cf. below).</p>
+<p>If you can't tell, I'm a big fan of LINQ... Let me know if you need me to explain anything that's happening here.</p>
+</blockquote>
+
+<p>Jeremy replies to Colin saying:</p>
+
+<p>Nice solution!</p>
+
+<p>I like it!</p>
+
+<p>You also seem to like extension methods, performance optimisation and the ElementMulticlassFilter.</p>
+
+<p>So do I.</p>
+
+<p>I therefore integrated your code into The Building Coder samples and implemented a new external command CmdViewsShowingElements to exercise it.</p>
+
+<p>While I was at it, I also finally also reorganised the RvtSamples include file BcSamples.txt to generate three groups for The Building Coder samples instead of two to reduce the menu overflow. Previously, the commands were split into two groups A-M and N-Z listing over 50 entries each. The bottom ones were off the bottom of the screen and impossible to pick.
+The new three groups list a bit over 30 entries each.</p>
+
+<p>Here is the CmdViewsShowingElements implementation including Colin's two extension methods:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit Document and IEnumerable</span><span class="gray">&lt;Element&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> extension methods.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">class</span> <span class="teal">ExtensionMethods</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return an enumeration of all views in this</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> document that can display elements at all.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt;
+&nbsp; &nbsp; &nbsp; FindAllViewsThatCanDisplayElements(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Document</span> doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementMulticlassFilter</span> filter
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementMulticlassFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">View3D</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ViewSection</span> ) } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( filter )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">View</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Where( v =&gt; !v.IsTemplate );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return all views that display </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> any of the given elements.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt;
+&nbsp; &nbsp; &nbsp; FindAllViewsWhereAllElementsVisible(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;elements&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//if( 0 == elements.Count )</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//{</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; return new List&lt;View&gt;();</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//}</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e1 = elements.FirstOrDefault&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">View</span>&gt;();
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = e1.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt; relevantViewList
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.FindAllViewsThatCanDisplayElements();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ElementId</span>&gt; idsToCheck
+&nbsp; &nbsp; &nbsp; &nbsp; = ( <span class="blue">from</span> e <span class="blue">in</span> elements <span class="blue">select</span> e.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> (
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">from</span> v <span class="blue">in</span> relevantViewList
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">let</span> idList
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc, v.Id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToElementIds()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> !idsToCheck.Except( idList ).Any()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> v );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine all views displaying </span>
+&nbsp; <span class="gray">///</span><span class="green"> a given set of elements.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">class</span> <span class="teal">CmdViewsShowingElements</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> revit,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = revit.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve pre-selected elements.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; &nbsp; = uidoc.Selection.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == ids.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please pre-select some elements &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;before launching this command to list &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;the views displaying them.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine views displaying them.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Element</span>&gt; targets
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">from</span> id <span class="blue">in</span> ids <span class="blue">select</span> doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">View</span>&gt; views = targets
+&nbsp; &nbsp; &nbsp; &nbsp; .FindAllViewsWhereAllElementsVisible();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Report results.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> names = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; ( <span class="blue">from</span> v <span class="blue">in</span> views <span class="blue">select</span> v.Name ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nElems = targets.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nViews = names.Count&lt;<span class="blue">char</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; c =&gt; <span class="maroon">','</span> == c ) + 1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span> dlg = <span class="blue">new</span> <span class="teal">TaskDialog</span>( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} are visible in {2} view{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; nElems, <span class="teal">Util</span>.PluralSuffix( nElems ),
+&nbsp; &nbsp; &nbsp; &nbsp; nViews, <span class="teal">Util</span>.PluralSuffix( nViews ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; dlg.MainInstruction = names;
+&nbsp;
+&nbsp; &nbsp; &nbsp; dlg.Show();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Download The Building Coder Samples</h4>
+
+<p>The complete source code, Visual Studio solution and RvtSamples include file is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.110.0">
+release 2015.0.110.0</a>.</p>

@@ -1,0 +1,329 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10429685 [Abort PromptForFamilyInstancePlacement() via API]
+
+Sending Escape to Terminate a Family Instance Placement Loop #WEBGL #threejs #3DWEB #HTML5
+
+-->
+
+<h3>Sending Escape to Terminate a Family Instance Placement Loop</h3>
+
+<p>I presented the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+PromptForFamilyInstancePlacement method</a> in
+
+June 2010 when it was newly introduced in the Revit API, together with a nice little solution temporarily subscribing to the OnDocumentChanged to access the newly added elements after terminating the placement interaction.</p>
+
+<p>Since then, the Revit 2015 API provided some
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#4.02">
+Document API additions</a> such
+
+as the method UIDocument.PostRequestForElementTypePlacement enabling an add-in to launch and to some extents control the full standard placement interaction between user and the Revit product.</p>
+
+<p>To retain control over the operation and subsequent actions, however, the PromptForFamilyInstancePlacement method is still interesting as well.</p>
+
+<p>One recent request was to limit it to place one single instance.</p>
+
+<p>Luckily, a separate call to OnDocumentChanged is triggered by each family instance placement, enabling an add-in to terminate the placement loop programmatically in the middle of the user interaction loop.</p>
+
+<p>This solution was suggested by Joachim Schmitz of
+
+<a href="http://www.linear.de">
+liNear Gesellschaft für konstruktives Design mbH</a> in
+
+the following conversation:</p>
+
+<p><strong>Question:</strong>
+
+In a special application case, we'd like to restrict the placement of family instances to one per call to PromptForFamilyInstancePlacement().</p>
+
+<p>To do so, I have subscribed to the OnDocumentChanged event and am now trying to abort the placement operation after the addition of the first family instance to the model.</p>
+
+<p>I can currently think of no better solution than to raise an Esc-Keydown event on the Revit MainWindow, but wasn't able to get that window object from its handle. Seems to be a dirty hack anyway.</p>
+
+<p>Could you help me out with any suggestions here?</p>
+
+<p>Any help highly appreciated!</p>
+
+<p><strong>Answer:</strong>
+
+I can certainly help you determine a valid window handle for the Revit main window.</p>
+
+<p>I have been using the JtWindowHandle helper class for years to determine the Revit window handle and reliably attach dialogue boxes and forms to it:</p>
+
+<p>The most recent use of it was in the
+
+<a href="https://github.com/jeremytammik/DirectObjLoader">DirectObjLoader</a> add-in,
+
+in the module
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/blob/master/DirectObjLoader/JtWindowHandle.cs">JtWindowHandle.cs</a>.</p>
+
+<p>The code to make use of it looks like this at the beginning of the external command Execute method:</p>
+
+<pre class="code">
+  IWin32Window revit_window
+    = new JtWindowHandle(
+      ComponentManager.ApplicationWindow );
+</pre>
+
+<p>It requires a reference to AdWindows.dll from the Revit executable folder.</p>
+
+<p>Yes, I agree that sending an Escape key hit sounds like a dirty hack.</p>
+
+<p>Unfortunately, the Revit API currently provides no official method to achieve this.</p>
+
+<p><strong>Response:</strong>
+
+After vainly trying to implement the escape key hack by raising a key down event on the Revit main window, I finally turned to a call to PostMessage.</p>
+
+<p>It works like a charm now. I think that we can live with this solution until the next Revit API improvements to the PromptForFamilyInstancePlacement method are released.</p>
+
+<p>Here is what I did:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> OnDocumentChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; addedInstances.AddRange( e.GetAddedElementIds() );
+&nbsp; &nbsp; <span class="blue">if</span>( addedInstances.Count &gt;= 1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ComponentManager</span>.ApplicationWindow != <span class="teal">IntPtr</span>.Zero )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; WindowsMessaging.PostWindowsMessage(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">ComponentManager</span>.ApplicationWindow,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; WindowsMessaging.WM_KEYDOWN,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">Keys</span>.Escape, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; WindowsMessaging.PostWindowsMessage(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">ComponentManager</span>.ApplicationWindow,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; WindowsMessaging.WM_KEYDOWN,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">Keys</span>.Escape, 0 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">WindowsMessaging</span>
+&nbsp; {
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;User32.dll&quot;</span>, EntryPoint = <span class="maroon">&quot;SendMessage&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> SendMessage(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> hWnd, <span class="blue">int</span> Msg, <span class="blue">int</span> wParam, <span class="blue">int</span> lParam );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;User32.dll&quot;</span>, EntryPoint = <span class="maroon">&quot;PostMessage&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> PostMessage(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> hWnd, <span class="blue">int</span> Msg, <span class="blue">int</span> wParam, <span class="blue">int</span> lParam );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">int</span> WM_KEYDOWN = 0x0100;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> SendWindowsMessage(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> hWnd, <span class="blue">int</span> Msg, <span class="blue">int</span> wParam, <span class="blue">int</span> lParam )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> result = 0;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( hWnd &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; result = SendMessage( hWnd, Msg, wParam, lParam );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> PostWindowsMessage(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> hWnd, <span class="blue">int</span> Msg, <span class="blue">int</span> wParam, <span class="blue">int</span> lParam )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> result = 0;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( hWnd &gt; 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; result = PostMessage( hWnd, Msg, wParam, lParam );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p><strong>Answer:</strong>
+
+Congratulations on solving this!</p>
+
+<p>Inspired by your solution, I implemented code to abort the PromptForFamilyInstancePlacement after placing the first instance in the existing external command implementation
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">
+CmdPlaceFamilyInstance</a> in The Building Coder samples and posted the code to the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder sample GitHub repository</a> in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.117.1">release 2015.0.117.1</a>.</p>
+
+<p>Here is my full implementation making use of the <code>Press</code> class implemented to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/launching-a-revit-command.html">launch a Revit command</a> using WM_KEYDOWN Windows messages similar to your sample code above:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.DB.Events;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> <span class="teal">ComponentManager</span> = Autodesk.Windows.<span class="teal">ComponentManager</span>;
+<span class="blue">using</span> <span class="teal">IWin32Window</span> = System.Windows.Forms.<span class="teal">IWin32Window</span>;
+<span class="blue">using</span> <span class="teal">Keys</span> = System.Windows.Forms.<span class="teal">Keys</span>;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdPlaceFamilyInstance</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set this flag to true to abort after </span>
+&nbsp; <span class="gray">///</span><span class="green"> placing the first instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> _place_one_single_instance_then_abort
+&nbsp; &nbsp; = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Send messages to main Revit application window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">IWin32Window</span> _revit_window;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; _added_element_ids
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; _revit_window
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.OfCategory( <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> symbol = collector.FirstElement()
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; _added_element_ids.Clear();
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; uidoc.PromptForFamilyInstancePlacement( symbol );
+&nbsp;
+&nbsp; &nbsp; app.DocumentChanged
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">DocumentChangedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnDocumentChanged );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = _added_element_ids.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Place Family Instance&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} element{1} added.&quot;</span>, n,
+&nbsp; &nbsp; &nbsp; &nbsp; ( ( 1 == n ) ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span> ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnDocumentChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">DocumentChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; idsAdded
+&nbsp; &nbsp; &nbsp; = e.GetAddedElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = idsAdded.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} id{1} added.&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// this does not work, because the handler will</span>
+&nbsp; &nbsp; <span class="green">// be called each time a new instance is added,</span>
+&nbsp; &nbsp; <span class="green">// overwriting the previous ones recorded:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//_added_element_ids = e.GetAddedElementIds();</span>
+&nbsp;
+&nbsp; &nbsp; _added_element_ids.AddRange( idsAdded );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( _place_one_single_instance_then_abort
+&nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Why do we send the WM_KEYDOWN message twice?</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// I tried sending it once only, and that does</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// not work. Maybe the proper thing to do would </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// be something like the Press.OneKey method...</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// nope, that did not work.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//Press.OneKey( _revit_window.Handle,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; (char) Keys.Escape );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Press</span>.PostMessage( _revit_window.Handle,
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">uint</span>) <span class="teal">Press</span>.<span class="teal">KEYBOARD_MSG</span>.WM_KEYDOWN,
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">uint</span>) <span class="teal">Keys</span>.Escape, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Press</span>.PostMessage( _revit_window.Handle,
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">uint</span>) <span class="teal">Press</span>.<span class="teal">KEYBOARD_MSG</span>.WM_KEYDOWN,
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">uint</span>) <span class="teal">Keys</span>.Escape, 0 );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>I don't know why one has to send the WM_KEYDOWN message twice.</p>
+
+<p>Whatever the reason, I can confirm that sending the WM_KEYDOWN message twice works fine for me as well, and sending it once only does not. I also tested using the existing key-press method in The Building Coder samples instead, and that did not do the job either.</p>
+
+<p><strong>Response:</strong>
+
+When you place instances with PromptForFamilyInstancePlacement, the previous one remains selected just until you drop the next one. The first esc key hit removes that selection while still allowing you to continue adding instances to the model. Only a second esc hit aborts the command. I was already used to this behavior from manually aborting the placement operation, even though I doubt that it serves any special purpose, since the user can’t do anything to that selected instance before the command is terminated. But it is probably perfectly normal for a newly added instance to automatically get selected in the first place, and obviously that selection has a higher priority in the message queue than the placement command. Hence the two esc hits.</p>
+
+
+<p>Many thanks to Joachim for solving this task and sharing this approach!</p>
+
+
+
+
+
+<a name="2"></a>
+
+<h4>MilanoJS Meetup</h4>
+
+<p>Today is the day of the
+
+<a href="http://milanojs.com">Milano JS</a> meetup and presentation of the
+
+<a href="https://developer-autodesk.github.io">View and Data API</a> at
+
+Jobrapido, Via Pietro Paleocapa 7, 20121 Milano.</p>
+
+<p>I will be using our new interactive online
+
+<a href="http://developer-autodesk.github.io/LmvQuickStartSlides">View and Data API slide deck</a>,
+
+implemented by my colleague Shiya Luo, who now also published the absolutely minimal
+
+<a href="https://github.com/Developer-Autodesk/View-and-Data-Barebone">View-and-Data-Barebone</a>
+
+basic example of View and Data API client side scripting using the minimal JavaScript needed to get a viewer running, in only about 60 lines of code.</p>
+
+<center>
+<img src="img/milanojs.png" alt="Milano JS" width="312"/>
+</center>
+
+<p>Looking forward to seeing you at the meetup tonight, if you happen to be in the area!</p>

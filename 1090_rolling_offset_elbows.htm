@@ -1,0 +1,243 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+-->
+
+<h3>Explicitly Placing Rolling Offset Elbow Fittings</h3>
+
+<p>I continue the work on my MEP
+
+<a href="http://content.case-inc.com/au-hackathon-2013">
+CASE BIM Hackathon</a> project to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+calculate a rolling offset</a> between
+
+two pipes,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+insert the rolling offset pipe segment</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+connect it to its neighbours</a>.</p>
+
+<p>The last missing puzzle piece was inserting appropriate fittings between the three pipe segments.</p>
+
+<p>It only took me about a hundred debugging and testing iterations to nail down a working sequence to perform all the required steps manually, edging forward minute step by minute step.</p>
+
+<p>Here are some of the main ones I encountered, researched and resolved for this post &ndash; hacking my thorny way towards the Revit veni, vidi, vinci:</p>
+
+<ul>
+<li>Create appropriate pipes and elbow fittings manually to determine what family symbol to use.</li>
+<li>Explore the family instance parameters to determine which ones to use to define its diameter and elbow angle.</li>
+<li>Place the elbow fitting instance.</li>
+<li>Rotate it around the pipe axis to point it in the proper direction toward the other, parallel, offset pipe.</li>
+<li>Shorten the original pipes to accommodate the additional distance between the elbow insertion and connection points.</li>
+<li>Place the rolling offset pipe segment between the elbow fittings.</li>
+<li>Create all connections between neighbouring pipes and fittings.</li>
+</ul>
+
+<p>After implementing this and preparing the discussion below, Tate posted an extremely apt and helpful suggestion in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html?cid=6a00e553e168978833019b04c5511d970d#comment-6a00e553e168978833019b04c5511d970d">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+connecting the rolling offset pipe</a> to
+
+its neighbours:</p>
+
+<p><i>The Document.NewElbowFitting will create, place and connect the fitting automatically for you, provided the two connectors are close enough.</i></p>
+
+<p>This saves completing all these steps yourself and explicitly calling Connector.ConnectTo.</p>
+
+<p>Many thanks to Tate for that!</p>
+
+<p>Consequently, the entire discussion below can be seen as a possibly interesting and completely useless exercise.</p>
+
+<p>I hope you enjoy it anyway, and find lots of use in the additional background understanding it provides.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Rolling Offset Geometry</h4>
+
+<p>Lets review the main geometrical points, based on the original pipes and the calculation of the distance required to accommodate the rolling offset between them at a specific given angle, in our case 45 degrees:</p>
+
+<center>
+<img src="img/rolling_offset_geom.png" alt="Main rolling offset calculation points" width="478">
+</center>
+
+<p>The points p0 and p1 are the two endpoints of the original pipes that are furthest apart.
+They remain unchanged.</p>
+
+<p>The point pm is the midpoint between p0 and p1.
+This is used to define the centre point of the entire calculation and the resulting rolling offset pipe segment.</p>
+
+<p>The points q0 and q1 are the two resulting corner points of the rolling offset.
+The original pipes closer two endpoints were adjusted back to these points when drawing a model line to represent the rolling offset, and also when inserting a pipe without any fittings.</p>
+
+<p>They also become the insertion points for the elbow fittings.
+With fittings, the original pipes need to be cut back a bit further still to accommodate the additional distance between the fitting insertion and connection points.</p>
+
+<p>Besides these main points, we need to be aware of the variable z storing the normal vector of the plane defined by the two parallel and offset pipes, which is also the plane hosting the rolling offset, since this is needed to calculate the angle to rotate the fitting around the pipe axis to point it exactly toward the other pipe.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Rolling Offset Fitting Placement</h4>
+
+<p>I implemented a new Boolean switch _place_fittings to toggle back and forth between the fitting placement and the previous rolling offset implementation variations.</p>
+
+<p>The calculation of the rolling offset itself remains completely unchanged from the preceding versions.</p>
+
+<p>The new version is currently implemented in a rather long spaghetti style code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FamilySymbol</span> symbol
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_PipeFitting )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FamilySymbol</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">FamilySymbol</span>&gt;( e
+&nbsp; &nbsp; &nbsp; &nbsp; =&gt; e.Family.Name.Contains( <span class="maroon">&quot;Elbow - Generic&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">FamilySymbol</span>&gt;();
+&nbsp;
+&nbsp; <span class="green">// Set up first 45 degree elbow fitting</span>
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fitting0 = doc.Create
+&nbsp; &nbsp; .NewFamilyInstance( q0, symbol,
+&nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; fitting0.get_Parameter( <span class="maroon">&quot;Angle&quot;</span> ).Set(
+&nbsp; &nbsp; 45.0 * <span class="teal">Math</span>.PI / 180.0 );
+&nbsp;
+&nbsp; <span class="green">//fitting0.get_Parameter( bipDiameter ) // does not exist</span>
+&nbsp; <span class="green">//&nbsp; .Set( diameter );</span>
+&nbsp;
+&nbsp; fitting0.get_Parameter( <span class="maroon">&quot;Nominal Radius&quot;</span> )
+&nbsp; &nbsp; .Set( 0.5 * diameter );
+&nbsp;
+&nbsp; <span class="teal">Line</span> axis = <span class="teal">Line</span>.CreateBound( p0, q0 );
+&nbsp; angle = z.AngleTo( <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; doc, fitting0.Id, axis, <span class="teal">Math</span>.PI - angle );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> con0 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; fitting0, p0 );
+&nbsp;
+&nbsp; <span class="green">// Trim or extend existing pipe</span>
+&nbsp;
+&nbsp; ( pipes[0].Location <span class="blue">as</span> <span class="teal">LocationCurve</span> ).Curve
+&nbsp; &nbsp; = <span class="teal">Line</span>.CreateBound( p0, con0.Origin );
+&nbsp;
+&nbsp; <span class="green">// Connect pipe to fitting</span>
+&nbsp;
+&nbsp; <span class="teal">Util</span>.Connect( con0.Origin, pipe, fitting0 );
+&nbsp;
+&nbsp; <span class="green">// Set up second 45 degree elbow fitting</span>
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fitting1 = doc.Create
+&nbsp; &nbsp; .NewFamilyInstance( q1, symbol,
+&nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; fitting1.get_Parameter( <span class="maroon">&quot;Angle&quot;</span> ).Set(
+&nbsp; &nbsp; 45.0 * <span class="teal">Math</span>.PI / 180.0 );
+&nbsp;
+&nbsp; fitting1.get_Parameter( <span class="maroon">&quot;Nominal Radius&quot;</span> )
+&nbsp; &nbsp; .Set( 0.5 * diameter );
+&nbsp;
+&nbsp; axis = <span class="teal">Line</span>.CreateBound(
+&nbsp; &nbsp; q1, q1 + <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; doc, fitting1.Id, axis, <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; axis = <span class="teal">Line</span>.CreateBound( q1, p1 );
+&nbsp;
+&nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement(
+&nbsp; &nbsp; doc, fitting1.Id, axis, <span class="teal">Math</span>.PI - angle );
+&nbsp;
+&nbsp; <span class="teal">Connector</span> con1 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; fitting1, p1 );
+&nbsp;
+&nbsp; ( pipes[1].Location <span class="blue">as</span> <span class="teal">LocationCurve</span> ).Curve
+&nbsp; &nbsp; = <span class="teal">Line</span>.CreateBound( con1.Origin, p1 );
+&nbsp;
+&nbsp; <span class="teal">Util</span>.Connect( con1.Origin, fitting1, pipes[1] );
+&nbsp;
+&nbsp; con0 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; fitting0, pm );
+&nbsp;
+&nbsp; con1 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; fitting1, pm );
+&nbsp;
+&nbsp; <span class="green">// Connecting one fitting to the other does</span>
+&nbsp; <span class="green">// not insert a pipe in between. If the </span>
+&nbsp; <span class="green">// system is edited later, however, the two </span>
+&nbsp; <span class="green">// fittings snap together.</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">//con0.ConnectTo( con1 );</span>
+&nbsp;
+&nbsp; <span class="green">// Create rolling offset pipe segment</span>
+&nbsp;
+&nbsp; pipe = doc.Create.NewPipe( con0.Origin,
+&nbsp; &nbsp; con1.Origin, pipe_type_standard );
+&nbsp;
+&nbsp; pipe.get_Parameter( bipDiameter )
+&nbsp; &nbsp; .Set( diameter );
+&nbsp;
+&nbsp; <span class="green">// Connect rolling offset pipe segment</span>
+&nbsp; <span class="green">// with elbow fittings at each end</span>
+&nbsp;
+&nbsp; <span class="teal">Util</span>.Connect( con0.Origin, fitting0, pipe );
+&nbsp; <span class="teal">Util</span>.Connect( con1.Origin, pipe, fitting1 );
+</pre>
+
+<p>Note that some of the calculations are more hard-coded than I would like.</p>
+
+<p>Possibly a more optimal solution would base the calculations on the connector transform properties.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Resulting Rolling Offset with Fittings</h4>
+
+<p>Running this form of the CmdRollingOffset command in my sample model generates, places and connects the following fittings:</p>
+
+<center>
+<img src="img/rolling_offset_fitting_1.png" alt="Appropriately placed elbow fitting" width="526">
+</center>
+
+<p>You get a good idea of the slantedness in all directions by looking at the end cross section of the rolling offset pipe segment:</p>
+
+<center>
+<img src="img/rolling_offset_fitting_2.png" alt="Properly connected rolling offset pipe" width="535">
+</center>
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>The code to place the elbow fittings and properly connect the rolling offset is included in the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, in the external command CmdRollingOffset, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.4">
+release 2014.0.106.4</a>.</p>
+
+<p>As pointed out by Tate, a much simpler and more general solution is possible by calling the NewElbowFitting method to perform all of the steps listed above fully automatically, with the additional advantage of taking all the Revit pipe routing preferences and other settings into account.</p>
+
+<p>Consequently, please stay tuned for the next instalment, coming up soon.</p>

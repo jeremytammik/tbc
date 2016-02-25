@@ -1,0 +1,102 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09891801 [change phase of a view]
+
+http://forums.autodesk.com/t5/Revit-API/change-phase-of-a-view/m-p/5206419
+
+-->
+
+<h3>Setting the Phase of a View</h3>
+
+<p>Here is a quick summary of one of the many issues being discussed on the
+
+<a href="http://forums.autodesk.com/t5/Revit-API/bd-p/160">
+Revit API forum</a>,
+
+on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/change-phase-of-a-view/m-p/5206419">
+changing the phase of a view</a>,
+
+with a quick and happy conclusive result:</p>
+
+
+<p><strong>Question:</strong> Is it possible to change the phase of a view? Something like view.phase?</p>
+
+<p>I've tried with the created phase but it doesn't work.</p>
+
+<p>Thank for your help!</p>
+
+<p><strong>Answer:</strong> Does this old discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/create-room-on-level-in-phase.html">
+creating a room on a level in a phase</a> help?</p>
+
+<p>Please look specifically at the reply to most recent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/03/create-room-on-level-in-phase.html#comment-6a00e553e16897883301a511f1f07a970c">
+comment</a> by Jared.</p>
+
+
+<p><strong>Response:</strong> I tried what you explain on the blog but I don't know why it doesn't work:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">View</span> active = commandData.Application
+&nbsp; &nbsp; .ActiveUIDocument.ActiveGraphicalView;
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Phase</span> ii <span class="blue">in</span> phase )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = active.get_Parameter(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.VIEW_PHASE );
+
+&nbsp; &nbsp; <span class="teal">ElementId</span> iiId = ii.Id;
+&nbsp; &nbsp; p.SetValueString( iiId );
+&nbsp; }
+</pre>
+
+
+<p><strong>Answer:</strong> How is your variable 'phase' defined?</p>
+
+<p>Have you checked what storage type the built-in parameter VIEW_PHASE is expecting?</p>
+
+<p>You can use RevitLookup to explore it.</p>
+
+<p>Whatever storage type it is expecting, I am pretty sure that you cannot set it using SetValueString.</p>
+
+<p>I would expect the storage type to be ElementId, in which case you need to set it using the element id directly, e.g. like this:</p>
+
+<pre class="code">
+  p.Set( iiId );
+</pre>
+
+<p>I hope this helps.</p>
+
+
+<p><strong>Response:</strong> Yeah it works!</p>
+
+<p>phase is defined like this: <code>PhaseArray phase = doc.Phases;</code></p>
+
+<p>Here is the working code to set it:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> iiId = ii.Id;
+&nbsp;
+&nbsp; <span class="teal">Parameter</span> p = active.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.VIEW_PHASE );
+&nbsp;
+&nbsp; p.Set( iiId );
+</pre>
+
+<p>with:</p>
+
+<ul>
+<li>ii &ndash; a Phase</li>
+<li>active &ndash; a view</li>
+</ul>
+
+<p>Thank a lot!</p>

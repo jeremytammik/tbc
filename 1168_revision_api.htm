@@ -1,0 +1,457 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09627603 [How to extract revision information in as shown in the 'Sheet Issues/Revisions' dialog]
+
+Dan TartagliaNBBJ LP
+
+-->
+
+<h3>The Revision API and a Form on the Fly</h3>
+
+<p>Poetical, ain't it?</p>
+
+<p>One of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3">
+major Revit 2015 API additions</a> is
+
+access to
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3.04">
+revisions</a>.</p>
+
+<p>All prior versions provided very limited access to revision data in a project.
+Here are some things people achieved in spite of the limitations:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/max-revision-wrapper-class.html">Max' revision wrapper class</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/02/wrangling-revisions-with-ruby.html">Wrangling revisions with Ruby</a></li>
+</ul>
+
+<p>Let's now take a look at an elegant example of accessing and displaying the complete revision data in a project,
+
+<a href="https://github.com/jeremytammik/GetRevisionData">
+GetRevisionData</a>,
+
+prompted by the following query by Dan Tartaglia of
+
+<a href="http://www.nbbj.com">
+design technology@NBBJ</a>:</p>
+
+
+<p><strong>Question:</strong> Selecting the View tab in Revit and then Revisions in the Sheet Composition pane displays  the 'Sheet Issues/Revisions' dialogue:</p>
+
+<center>
+<img src="img/sheet_issues_revisions.png" alt="Sheet Issues Revisions dialogue"/>
+</center>
+
+<p>I am trying to access the information displayed programmatically, in particular the information for these revisions  found in the 'Show' column with the three possible choices 'None', 'Tag' and 'Cloud and Tag'.</p>
+
+<p>Is that possible?</p>
+
+<p>I am currently using the GetAllProjectRevisionIds method, but that does not return all the required information.</p>
+
+
+<p><strong>Answer:</strong> What you ask for is now possible in Revit 2015 using the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3.04">
+revision classes</a>.</p>
+
+<p>I am not aware of any way to access it programmatically in Revit 2014, though.
+Developers have been asking for it for a long time, and that access was one of the major Revit 2015 API enhancements.</p>
+
+<p>Examining your
+
+<a href="https://github.com/jeremytammik/GetRevisionData/releases/tag/2014.0.0.0">
+Revit 2014 GetRevisionData attempt</a> in
+
+a little more detail, I have some comments on that before getting to the Revit 2015 solution.</p>
+
+<p>It includes a nice utility method GetParameterInformation to convert a parameter value to a string representation.
+That is used by the ParamsFromGetAllRevElements method to retrieve all project revisions via their ids and list all their parameter values.</p>
+
+<p>However, as said, it does not return the information we are after.</p>
+
+<p>I fixed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+architecture mismatch warnings</a> in
+
+the initial 2014 project using my recursive project parser and fixer
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">
+DisableMismatchWarning.exe</a>.</p>
+
+<p>I like the parameter to value to string converter, so let's list it here for posterity to enjoy:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Extract the parameter information.</span>
+&nbsp; <span class="gray">///</span><span class="green"> By Dan Tartaglia.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetParameterInformation(
+&nbsp; &nbsp; <span class="teal">Parameter</span> para,
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> defName = <span class="maroon">&quot;&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use different method to get parameter </span>
+&nbsp; &nbsp; <span class="green">// data according to the storage type</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">switch</span>( para.StorageType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine the parameter type </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Double:
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Convert the number into Metric</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; defName = para.AsValueString();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.ElementId:
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Find out the name of the element</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">ElementId</span> id
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = para.AsElementId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; defName = ( id.IntegerValue &gt;= 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? doc.GetElement( id ).Name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : id.IntegerValue.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.Integer:
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ParameterType</span>.YesNo
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == para.Definition.ParameterType )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( para.AsInteger() == 0 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; defName = <span class="maroon">&quot;False&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; defName = <span class="maroon">&quot;True&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; defName = para.AsInteger().ToString();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">StorageType</span>.String:
+&nbsp; &nbsp; &nbsp; &nbsp; defName = para.AsString();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; defName = <span class="maroon">&quot;Unexposed parameter&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> defName;
+&nbsp; }
+</pre>
+
+<p>One little suggestion I have is to encapsulate the text writer instance in a using block, e.g. like this:</p>
+
+<pre class="code">
+  using( TextWriter tw = new StreamWriter(
+    "C:/tmp/RevisionTest.txt" ) )
+  {
+    tw.WriteLine( ". . ." );
+    tw.Close();
+  }
+</pre>
+
+<p>For comparison with the Revit 2015 results, let's list the limited data accessible via the Revit 2014 API here, printed out to a text file <code>C:/tmp/RevisionTest.txt</code>:</p>
+
+<pre class="code">
+C:\tmp>cat RevisionTest.txt
+Hidden = False
+Element Name: Revisions
+oParamRevEnum = 0
+oParamRevDate = Date 1
+oParamRevDescrip = Revision 1
+oParamRevIssued = False
+oParamRevIssuedBy =
+oParamRevIssuedTo =
+oParamRevNumber = 1
+oParamSeqNumber = 1
+==============================
+Hidden = False
+Element Name: Revisions
+oParamRevEnum = 0
+oParamRevDate = Date 2
+oParamRevDescrip = Revision 2
+oParamRevIssued = False
+oParamRevIssuedBy =
+oParamRevIssuedTo =
+oParamRevNumber = 2
+oParamSeqNumber = 2
+==============================
+Hidden = False
+Element Name: Revisions
+oParamRevEnum = 0
+oParamRevDate = Date 5
+oParamRevDescrip = Revision 5
+oParamRevIssued = False
+oParamRevIssuedBy =
+oParamRevIssuedTo =
+oParamRevNumber = 5
+oParamSeqNumber = 5
+==============================
+</pre>
+
+<p>I published the Revit 2014 version in the
+
+<a href="https://github.com/jeremytammik/GetRevisionData">
+GetRevisionData GitHub repository</a> as
+
+<a href="https://github.com/jeremytammik/GetRevisionData/releases/tag/2014.0.0.0">
+version 2014.0.0.0</a>.</p>
+
+
+<p><strong>Response:</strong> Yes, I verified that I can get what I need with the Revit 2015 API like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; oElemIDs = oViewSheet.GetAllRevisionIds();
+&nbsp;
+&nbsp; <span class="blue">if</span>( oElemIDs.Count == 0 )
+&nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> elemID <span class="blue">in</span> oElemIDs )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> oEl = doc.GetElement( elemID );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Revision</span> oRev = oEl <span class="blue">as</span> <span class="teal">Revision</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Category Name: &quot;</span> + oRev.Category.Name );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Description: &quot;</span> + oRev.Description );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Issued: &quot;</span> + oRev.Issued.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Issued By: &quot;</span> + oRev.IssuedBy.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Issued To: &quot;</span> + oRev.IssuedTo.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Number Type: &quot;</span> + oRev.NumberType.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Date: &quot;</span> + oRev.RevisionDate );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Visibility: &quot;</span> + oRev.Visibility.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Sequence Number: &quot;</span> + oRev.SequenceNumber.ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add text line to text file</span>
+&nbsp; &nbsp; tw.WriteLine( <span class="maroon">&quot;Rev Number: &quot;</span> + oRev.RevisionNumber );
+&nbsp; }
+</pre>
+
+
+
+<p><strong>Answer:</strong> Congratulations on solving it!</p>
+
+<p>I am glad that the Revit 2015 API provides all you need.</p>
+
+<p>I implemented a sample command grabbing all the revision data displayed in the Revit 'Sheet Issues/Revisions' form and displaying that in a Windows form generated on the fly.</p>
+
+<p>It avoids the text writer and file output completely by implementing a revision data holder class and a container dictionary, using a Windows forms data grid view container and its DataSource property to access and display the data:</p>
+
+<center>
+<img src="img/revision_data.png" alt="Revision data"/>
+</center>
+
+<p>It demonstrates several other nice features, in addition to the revision functionality:</p>
+
+<ul>
+  <li>Accessing and displaying all the revision information without ever actually touching or formatting any individual data members.</li>
+  <li>Generating a Windows form programmatically on the fly.</li>
+  <li>Populating a DataGridView via its DataSource property.</li>
+</ul>
+
+<p>The Revit 2015 version is published in the
+
+<a href="https://github.com/jeremytammik/GetRevisionData">
+GetRevisionData GitHub repository</a> as
+
+<a href="https://github.com/jeremytammik/GetRevisionData/releases/tag/2015.0.0.0">
+version 2015.0.0.0</a>.</p>
+
+<p>The hardest challenge was actually not implementing the DataGridView population, but the automatic resizing.
+That took quite a while, testing and debugging numerous combinations of the automatic resizing properties until finally finding one that worked.</p>
+
+<p>The complete external command implementation defines just three simple little items:</p>
+
+<ul>
+<li>RevisionData &ndash; a container for the revision data displayed in the Revit 'Sheet Issues/Revisions' dialogue.</li>
+<li>DisplayRevisionData &ndash; generate a Windows modeless form on the fly and display the revision data in it in a DataGridView.</li>
+<li>Execute &ndash; external command mainline.</li>
+</ul>
+
+<p>Each one on its own is pretty trivial.</p>
+
+<p>Together, they form a rally neat and elegant solution, I think:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Data;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Drawing;
+<span class="blue">using</span> System.IO;
+<span class="blue">using</span> System.Windows.Forms;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Windows;
+<span class="blue">using</span> <span class="teal">TaskDialog</span> = Autodesk.Revit.UI.<span class="teal">TaskDialog</span>;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> GetRevisionData
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> External command demonstrating how to use the </span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit 2015 Revision API to retrieve and display</span>
+&nbsp; <span class="gray">///</span><span class="green"> all infoormation shown in the Revit </span>
+&nbsp; <span class="gray">///</span><span class="green"> 'Sheet Issues/Revisions' dialogue.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> A container for the revision data displayed in</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> the Revit 'Sheet Issues/Revisions' dialogue.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">class</span> <span class="teal">RevisionData</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Sequence { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="teal">RevisionNumberType</span> Numbering { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Date { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Description { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Issued { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> IssuedTo { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> IssuedBy { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="teal">RevisionVisibility</span> Show { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> RevisionData( <span class="teal">Revision</span> r )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; Sequence = r.SequenceNumber;
+&nbsp; &nbsp; &nbsp; &nbsp; Numbering = r.NumberType;
+&nbsp; &nbsp; &nbsp; &nbsp; Date = r.RevisionDate;
+&nbsp; &nbsp; &nbsp; &nbsp; Description = r.Description;
+&nbsp; &nbsp; &nbsp; &nbsp; Issued = r.Issued;
+&nbsp; &nbsp; &nbsp; &nbsp; IssuedTo = r.IssuedTo;
+&nbsp; &nbsp; &nbsp; &nbsp; IssuedBy = r.IssuedBy;
+&nbsp; &nbsp; &nbsp; &nbsp; Show = r.Visibility;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Generate a Windows modeless form on the fly </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> and display the revision data in it in a </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> DataGridView.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> DisplayRevisionData(
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">RevisionData</span>&gt; revision_data,
+&nbsp; &nbsp; &nbsp; <span class="teal">IWin32Window</span> owner )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; System.Windows.Forms.<span class="teal">Form</span> form
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> System.Windows.Forms.<span class="teal">Form</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; form.Size = <span class="blue">new</span> <span class="teal">Size</span>( 680, 180 );
+&nbsp; &nbsp; &nbsp; form.Text = <span class="maroon">&quot;Revision Data&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DataGridView</span> dg = <span class="blue">new</span> <span class="teal">DataGridView</span>();
+&nbsp; &nbsp; &nbsp; dg.DataSource = revision_data;
+&nbsp; &nbsp; &nbsp; dg.AllowUserToAddRows = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; dg.AllowUserToDeleteRows = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; dg.AllowUserToOrderColumns = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; dg.Dock = System.Windows.Forms.<span class="teal">DockStyle</span>.Fill;
+&nbsp; &nbsp; &nbsp; dg.Location = <span class="blue">new</span> System.Drawing.<span class="teal">Point</span>( 0, 0 );
+&nbsp; &nbsp; &nbsp; dg.ReadOnly = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; dg.TabIndex = 0;
+&nbsp; &nbsp; &nbsp; dg.Parent = form;
+&nbsp; &nbsp; &nbsp; dg.AutoSize = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; dg.AutoSizeColumnsMode = <span class="teal">DataGridViewAutoSizeColumnsMode</span>.AllCells;
+&nbsp; &nbsp; &nbsp; dg.AutoResizeColumns( <span class="teal">DataGridViewAutoSizeColumnsMode</span>.AllCells );
+&nbsp; &nbsp; &nbsp; dg.AutoResizeColumns();
+&nbsp;
+&nbsp; &nbsp; &nbsp; form.ShowDialog( owner );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( doc.IsFamilyDocument )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Not a Revit RVT Project&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;This command requires an active Revit RVT file.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( doc.ActiveView <span class="blue">is</span> <span class="teal">ViewSheet</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Current View is not a Sheet&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;This command requires an active sheet view.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Revision</span>.GetAllRevisionIds( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = ids.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">RevisionData</span>&gt; revision_data
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RevisionData</span>&gt;( n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Revision</span> r = doc.GetElement( id ) <span class="blue">as</span> <span class="teal">Revision</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; revision_data.Add( <span class="blue">new</span> <span class="teal">RevisionData</span>( r ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; DisplayRevisionData( revision_data,
+&nbsp; &nbsp; &nbsp; &nbsp; revit_window );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Enjoy!</p>
+
+<p>Next time I write will be from Toronto,
+
+ &nbsp; <span style="font-family: Amiri,sans-serif;" xml:lang="ar" lang="ar">إن شاء الله</span>
+
+ &nbsp; (<a href="http://en.wikipedia.org/wiki/Insha%27Allah">insha'Allah</a>, God willing).</p>

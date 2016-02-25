@@ -1,0 +1,947 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+<style type="text/css">p.en { font-style: italic; }</style>
+</head>
+
+<!--
+
+Magson Leone 
+Re: Compatibilizar plugin entre as varias versões do Revit
+
+#revitapi #adsk #bim #adskdevnetwrk #dotnet #csharp
+#3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>Compatibilizar entre versões &ndash; API Compatibility Helper</h3>
+
+<p>Once again, the time has come to migrate add-ins to the new version of the Revit API.</p>
+
+<p>Magson Leone in Brazil has been through this process every year now since Revit 2012 and got tired of maintaining separate versions of his code for each release of Revit.</p>
+
+<p>He solved the problem by using Reflection to implement a whole host of Revit API compatibility helper methods that reroute the call to the proper underlying API method for any Revit API version.</p>
+
+<p>In Magson's own words, interspersed with my spontaneous (and first ever!) translation from Portuguese:</p>
+
+<p>Eu sou um programador brasileiro e tenho acompanhado com bastante frequência o material de excelente qualidade que você tem postado em seu blog.
+E por isto que quero te parabenizar pelo seu excelente trabalho.</p>
+
+<p class="en">I am a Brazilian programmer and frequently follow the high quality material you post on your blog.
+I would like to thank you for your excellent work.</p>
+
+<p>Eu quero expor neste email uma sugestão de postagem sobre um assunto que eu não sei se você já postou, mas que é bastante interessante.
+É sobre compatibilizar o código fonte com as varias versões do Revit.</p>
+
+<p class="en">I would like to suggest a topic that I find very interesting and you may already have touched on, to support source code compatibility between different versions of Revit.</p>
+
+<p>Eu trabalho com a API do revit desde a versão 2012 e todo ano eu faço uma copia do código fonte de cada plugin e o ajusto para a versão atual.
+Mas com o passar dos anos a quantidade de copias vai aumentando e sempre que um ajuste se torna necessário em um plugin eu preciso replicar estas mudanças em todas as copias do código fonte.
+E isto além de ser um pouco trabalhoso as vezes tem o problema de eu esquecer uma coisa ou outra, o que acaba gerando alguns bugs em uma versão ou outra.
+Então recentemente eu decidi trabalhar com Reflexão para uma unica versão do código fonte compatível com todas a versões do revit desde a versão 2012.
+Eu vou citar como exemplo o método Document.GetElement(); este método anteriormente era Document.get_Element(); então eu pensei: porque ao invés de eu criar uma cópia do codigo fonte eu não faço um método via reflexão que me possibilita os dois casos no mesmo codígo fonte?</p>
+
+<p class="en">I have been working with Revit since the version 2012.
+Every year, I am forced to copy every add-in's source code and adapt it for the new version.
+The number of copies continues to increase as the year go by.
+It is getting painful to maintain.
+Therefore I recently decided to use Reflection to implement one single source code version compatible with all versions of the Revit API since 2012.
+For example, let's look at the Document.GetElement method; it was previously named get_Element; so I thought: why not use reflection to implement code supporting both names for both cases?</p>
+
+<p>Segue abaixo o metodo que cria usando Reflexão:</p>
+
+<p class="en">Here is the method I created using Reflection:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> PegarElemento(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">ElementId</span> id )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> ele = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Two different Revit versions:</span>
+&nbsp; &nbsp; <span class="green">//ele = doc.get_Element(id);</span>
+&nbsp; &nbsp; <span class="green">//ele = doc.GetElement(id);</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = doc.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;get_Element&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = doc.GetType().GetMethod( <span class="maroon">&quot;GetElement&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; ele = met.Invoke( doc, <span class="blue">new</span> <span class="blue">object</span>[] { id } )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> ele;
+&nbsp; }
+</pre>
+
+<p>Em acesso anexo eu estou te enviando um arquivo .cs contendo vários métodos extensões que eu criei para usar nos meus plugins afim de torna-los compatíveis com todos as versões do revit desde a versão 2012.</p>
+
+<p class="en">Here is my module <a href="zip/ml_correção_revit.cs">correção_revit.cs</a> containing various extension methods that I use in my add-ins to make them compatible with all versions of Revit since 2012.</p>
+
+<p>I started integrating Magson's code into The Building Coder samples for easier access, sharing and to ensure that everything compiles correctly.</p>
+
+<p>This turned up a couple of issues that Magson very kindly corrected:</p>
+
+<p>First, the use of a global variable <code>g</code>, and excessive line lengths for publishing on the blog, which allows a maximum of about 55 characters.</p>
+
+
+<p><strong>Magson responded:</strong> Vou fazer as correções que você sugeriu e além disso eu vou traduzir o nome de cada método para o idioma inglês, já que esta é a linguagem padrão da API. Assim que eu fizer estes ajustes eu te retorno.</p>
+
+<p>Fiz os ajustes que você solicitou e traduzi a nomenclatura dos metodos para o idioma inglês.
+Para evitar que os métodos entrem em conflito com os métodos já existentes na API do Revit eu acrescentei o número do dois ao final do nome de cada método. Eu também agrupei os métodos de acordo com as classes que eles estão estendendo. Quanto a postagem eu acho que ficou muito boa, precisando apenas substituir a parte do código pelo novo código.</p>
+
+<p class="en">I'll add these changes and translate the method names to English, since it is the Revit API language anyway.
+I also appended a suffix <b>2</b> to each method name in order to avoid conflicts with existing Revit API ones, and grouped the extension methods by the Revit API classes they extend.</p>
+
+
+<p><strong>Answer:</strong> Thank you very much for the update.
+However...</p>
+
+<p>I have a critical note on new method implementations, in which you added exception handlers catching all exceptions.</p>
+
+<p>You should never catch all exceptions, as explained by these discussions on
+<a href="http://stackoverflow.com/questions/315948/c-catching-all-exceptions">C# catching all exceptions</a> and
+<a href="http://blogs.msdn.com/b/dotnet/archive/2009/02/19/why-catch-exception-empty-catch-is-bad.aspx">
+why <code>catch(Exception)</code> and empty <code>catch</code> is bad</a>.</p>
+
+<p>Therefore, something like this is not a good idea:</p>
+
+<pre class="code">
+<span class="blue">#region</span> curve
+<span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> GetPoint2(
+&nbsp; <span class="blue">this</span> <span class="teal">Curve</span> curva,
+&nbsp; <span class="blue">int</span> i )
+{
+&nbsp; <span class="teal">XYZ</span> value = <span class="blue">null</span>;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = curva.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;GetEndPoint&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">int</span> ) } );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = curva.GetType().GetMethod( <span class="maroon">&quot;get_EndPoint&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">int</span> ) } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; value = met.Invoke( curva, <span class="blue">new</span> <span class="blue">object</span>[] { i } )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">XYZ</span>;
+&nbsp; }
+&nbsp; <span class="blue">catch</span> { }
+&nbsp; <span class="blue">return</span> value;
+}
+<span class="blue">#endregion</span> <span class="green">// curve</span>
+</pre>
+
+<p>Would you like to remove the exception handlers again?</p>
+
+<p>In general, you should not add exception handlers at all unless you really expect an exception to occur.</p>
+
+<p>Are you expecting exceptions in all these methods?</p>
+
+<p>I think the initial version without them was better.</p>
+
+<p>If you see a need for them, then I would suggest catching the specific exception that you are expecting to occur.</p>
+
+<p><strong>Response:</strong>
+
+Muito obrigado Jeremy pelas suas criticas e sugestões.
+É a primeira vez que estou compartilhando um código de autoria minha, e por isto preciso muito da sua orientação.
+Se houver qualquer uma outra sugestão ou crítica, por favor me fale para que eu possa melhorar o código.
+Estou te enviando novamente o arquivo. Eu fiz uma correção no nome das regiões.</p>
+
+<p class="en">Thank you for the suggestions.
+This is the first time I share my code like this, so I am happy for some guidance.
+Here is the updated code with corrected region names.</p>
+
+<p>The final resulting code defining all the compatibility methods needed by Magson now looks like this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> These compatibility helper methods make use of </span>
+<span class="gray">///</span><span class="green"> Reflection to determine which Revit method is</span>
+<span class="gray">///</span><span class="green"> available and call that. You can use these </span>
+<span class="gray">///</span><span class="green"> methods to create an add-in that is compatible </span>
+<span class="gray">///</span><span class="green"> across all versions of Revit from 2012 to 2016.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">CompatibilityMethods</span>
+{
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Curve
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> GetPoint2(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Curve</span> curva,
+&nbsp; &nbsp; <span class="blue">int</span> i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> value = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = curva.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;GetEndPoint&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">int</span> ) } );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = curva.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;get_EndPoint&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">int</span> ) } );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; value = met.Invoke( curva, <span class="blue">new</span> <span class="blue">object</span>[] { i } )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">XYZ</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Curve</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Definitions
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Definition</span> Create2(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Definitions</span> definitions,
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="blue">string</span> nome,
+&nbsp; &nbsp; <span class="teal">ParameterType</span> tipo,
+&nbsp; &nbsp; <span class="blue">bool</span> visibilidade )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Definition</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; .GetTypes().Where( a =&gt; a.IsClass &amp;&amp; a
+&nbsp; &nbsp; .Name == <span class="maroon">&quot;ExternalDefinitonCreationOptions&quot;</span> ).ToList();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="teal">ConstructorInfo</span> c = t
+&nbsp; &nbsp; &nbsp; .GetConstructor( <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>(<span class="blue">string</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>(<span class="teal">ParameterType</span>) } );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> ed = c
+&nbsp; &nbsp; &nbsp; .Invoke( <span class="blue">new</span> <span class="blue">object</span>[] { nome, tipo } );
+&nbsp; &nbsp; &nbsp; ed.GetType().GetProperty( <span class="maroon">&quot;Visible&quot;</span> )
+&nbsp; &nbsp; &nbsp; .SetValue( ed, visibilidade, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; value = definitions.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Create&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { t } ).Invoke( definitions,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { ed } ) <span class="blue">as</span> <span class="teal">Definition</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = definitions.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Create&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>(<span class="blue">string</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>(<span class="teal">ParameterType</span>), <span class="blue">typeof</span>(<span class="blue">bool</span>) } ).Invoke( definitions,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { nome, tipo,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; visibilidade } ) <span class="blue">as</span> <span class="teal">Definition</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Definitions</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Document
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> GetElement2( <span class="blue">this</span> <span class="teal">Document</span>
+&nbsp; doc, <span class="teal">ElementId</span> id )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = doc.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;get_Element&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; met = doc.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetElement&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp; &nbsp; value = met.Invoke( doc,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { id } ) <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> GetElement2( <span class="blue">this</span> <span class="teal">Document</span>
+&nbsp; doc, <span class="teal">Reference</span> refe )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; value = doc.GetElement( refe );
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Line</span> CreateLine2( <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1, <span class="teal">XYZ</span> p2, <span class="blue">bool</span> bound = <span class="blue">true</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Line</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { p1,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p2 };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="blue">string</span> metodo = <span class="maroon">&quot;CreateBound&quot;</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( bound == <span class="blue">false</span> ) metodo =
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CreateUnbound&quot;</span>;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = <span class="blue">typeof</span>( <span class="teal">Line</span> )
+&nbsp; &nbsp; .GetMethod( metodo, tipos );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = met.Invoke( <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros ) <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; parametros = <span class="blue">new</span> <span class="blue">object</span>[] { p1, p2,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; bound };
+&nbsp; &nbsp; &nbsp; tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; &nbsp; value = doc.Application.Create
+&nbsp; &nbsp; &nbsp; .GetType().GetMethod( <span class="maroon">&quot;NewLine&quot;</span>, tipos ).Invoke( doc
+&nbsp; &nbsp; &nbsp; .Application.Create, parametros ) <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Wall</span> CreateWall2( <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Curve</span> curve, <span class="teal">ElementId</span> wallTypeId,
+&nbsp; &nbsp; <span class="teal">ElementId</span> levelId, <span class="blue">double</span> height, <span class="blue">double</span> offset, <span class="blue">bool</span> flip,
+&nbsp; &nbsp; <span class="blue">bool</span> structural )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Wall</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curve, wallTypeId, levelId, height, offset, flip,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; structural };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = <span class="blue">typeof</span>( <span class="teal">Wall</span> )
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Create&quot;</span>, tipos );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = met.Invoke( <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros ) <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; parametros = <span class="blue">new</span> <span class="blue">object</span>[] { curve,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">WallType</span>)doc.GetElement2(wallTypeId), (<span class="teal">Level</span>)doc
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetElement2(levelId), height, offset, flip,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; structural };
+&nbsp; &nbsp; &nbsp; tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; &nbsp; value = doc.Create.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;NewWall&quot;</span>, tipos ).Invoke( doc.Create,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros ) <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Arc</span> CreateArc2( <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1, <span class="teal">XYZ</span> p2, <span class="teal">XYZ</span> p3 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Arc</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { p1,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p2, p3 };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="blue">string</span> metodo = <span class="maroon">&quot;Create&quot;</span>;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = <span class="blue">typeof</span>( <span class="teal">Arc</span> )
+&nbsp; &nbsp; .GetMethod( metodo, tipos );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = met.Invoke( <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros ) <span class="blue">as</span> <span class="teal">Arc</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = doc.Application.Create
+&nbsp; &nbsp; &nbsp; .GetType().GetMethod( <span class="maroon">&quot;NewArc&quot;</span>, tipos ).Invoke( doc
+&nbsp; &nbsp; &nbsp; .Application.Create, parametros ) <span class="blue">as</span> <span class="teal">Arc</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">char</span> GetDecimalSymbol2( <span class="blue">this</span>
+&nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">char</span> valor = <span class="maroon">','</span>;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = doc.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetUnits&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = met.Invoke( doc, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;DecimalSymbol&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> o = prop.GetValue( temp, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( o.ToString() == <span class="maroon">&quot;Comma&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; valor = <span class="maroon">','</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; valor = <span class="maroon">'.'</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = doc.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;ProjectUnit&quot;</span> ).GetValue( doc, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;DecimalSymbolType&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> o = prop.GetValue( temp, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( o.ToString() == <span class="maroon">&quot;DST_COMMA&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; valor = <span class="maroon">','</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; valor = <span class="maroon">'.'</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> valor;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> UnjoinGeometry2( <span class="blue">this</span> <span class="teal">Document</span>
+&nbsp; doc, <span class="teal">Element</span> firstElement, <span class="teal">Element</span> secondElement )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; .GetTypes().Where( a =&gt; a.IsClass &amp;&amp; a
+&nbsp; &nbsp; .Name == <span class="maroon">&quot;JoinGeometryUtils&quot;</span> ).ToList();
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; firstElement, secondElement };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;UnjoinGeometry&quot;</span>, tipos );
+&nbsp; &nbsp; &nbsp; met.Invoke( <span class="blue">null</span>, parametros );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> JoinGeometry2( <span class="blue">this</span> <span class="teal">Document</span>
+&nbsp; doc, <span class="teal">Element</span> firstElement, <span class="teal">Element</span> secondElement )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; .GetTypes().Where( a =&gt; a.IsClass &amp;&amp; a
+&nbsp; &nbsp; .Name == <span class="maroon">&quot;JoinGeometryUtils&quot;</span> ).ToList();
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; firstElement, secondElement };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;JoinGeometry&quot;</span>, tipos );
+&nbsp; &nbsp; &nbsp; met.Invoke( <span class="blue">null</span>, parametros );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsJoined2( <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Element</span> firstElement, <span class="teal">Element</span> secondElement )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> value = <span class="blue">false</span>;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; .GetTypes().Where( a =&gt; a.IsClass &amp;&amp; a
+&nbsp; &nbsp; .Name == <span class="maroon">&quot;JoinGeometryUtils&quot;</span> ).ToList();
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; firstElement, secondElement };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;AreElementsJoined&quot;</span>, tipos );
+&nbsp; &nbsp; &nbsp; value = (<span class="blue">bool</span>) met.Invoke( <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> CalculateVolumeArea2( <span class="blue">this</span>
+&nbsp; <span class="teal">Document</span> doc, <span class="blue">bool</span> value )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; .GetTypes().Where( a =&gt; a.IsClass &amp;&amp; a
+&nbsp; &nbsp; .Name == <span class="maroon">&quot;AreaVolumeSettings&quot;</span> ).ToList();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc };
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros
+&nbsp; &nbsp; &nbsp; .Select( a =&gt; a.GetType() ).ToArray();
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetAreaVolumeSettings&quot;</span>, tipos );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = met.Invoke( <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; parametros );
+&nbsp; &nbsp; &nbsp; temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;ComputeVolumes&quot;</span> ).SetValue( temp, value, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = doc.Settings
+&nbsp; &nbsp; &nbsp; .GetType().GetProperty( <span class="maroon">&quot;VolumeCalculationSetting&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = prop.GetValue( doc
+&nbsp; &nbsp; &nbsp; .Settings, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; prop = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;VolumeCalculationOptions&quot;</span> );
+&nbsp; &nbsp; &nbsp; temp = prop.GetValue( temp, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; prop = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;VolumeComputationEnable&quot;</span> );
+&nbsp; &nbsp; &nbsp; prop.SetValue( temp, value, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Group</span> CreateGroup2( <span class="blue">this</span> <span class="teal">Document</span>
+&nbsp; doc, <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elementos )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Group</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> eleset = <span class="blue">new</span> <span class="teal">ElementSet</span>();
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> ele <span class="blue">in</span> elementos )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; eleset.Insert( ele );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; col = elementos
+&nbsp; &nbsp; .Select( a =&gt; a.Id ).ToList();
+&nbsp; &nbsp; <span class="blue">object</span> obj = doc.Create;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = obj.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;NewGroup&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { col.GetType() } );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">new</span> <span class="blue">object</span>[] { col } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = obj.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;NewGroup&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { eleset.GetType() } );
+&nbsp; &nbsp; &nbsp; met.Invoke( obj,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { eleset } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> Delete2( <span class="blue">this</span> <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Element</span> ele )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">object</span> obj = doc;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = obj.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Delete&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">Element</span> ) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">new</span> <span class="blue">object</span>[] { ele } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = obj.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Delete&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">new</span> <span class="blue">object</span>[] { ele
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Id } );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Document</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Element
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> Level2( <span class="blue">this</span> <span class="teal">Element</span> ele )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = ele.Document;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="blue">if</span>( t.GetProperty( <span class="maroon">&quot;Level&quot;</span> ) != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; value = t.GetProperty( <span class="maroon">&quot;Level&quot;</span> )
+&nbsp; &nbsp; &nbsp; .GetValue( ele, <span class="blue">null</span> ) <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; value = doc.GetElement2( (<span class="teal">ElementId</span>) t
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;LevelId&quot;</span> ).GetValue( ele, <span class="blue">null</span> ) );
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt; Materiais2( <span class="blue">this</span>
+&nbsp; <span class="teal">Element</span> ele )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt; value = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Material</span>&gt;();
+&nbsp; &nbsp; <span class="teal">Document</span> doc = ele.Document;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="blue">if</span>( t.GetProperty( <span class="maroon">&quot;Materials&quot;</span> ) != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; value = ( (<span class="teal">IEnumerable</span>) t
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;Materials&quot;</span> ).GetValue( ele, <span class="blue">null</span> ) ).Cast&lt;<span class="teal">Material</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetMaterialIds&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">bool</span> ) } );
+&nbsp; &nbsp; &nbsp; value = ( (<span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt;) met
+&nbsp; &nbsp; &nbsp; .Invoke( ele, <span class="blue">new</span> <span class="blue">object</span>[] { <span class="blue">false</span> } ) )
+&nbsp; &nbsp; &nbsp; .Select( a =&gt; doc.GetElement2( a ) ).Cast&lt;<span class="teal">Material</span>&gt;().ToList();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Parameter</span> GetParameter2( <span class="blue">this</span>
+&nbsp; <span class="teal">Element</span> ele, <span class="blue">string</span> nome_paramentro )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;LookupParameter&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">string</span> ) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; met = t.GetMethod( <span class="maroon">&quot;get_Parameter&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="blue">string</span> ) } );
+&nbsp; &nbsp; value = met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { nome_paramentro } ) <span class="blue">as</span> <span class="teal">Parameter</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( value == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> pas = ele.Parameters
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Parameter</span>&gt;().ToList();
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pas.Exists( a =&gt; a.Definition
+&nbsp; &nbsp; &nbsp; .Name.ToLower() == nome_paramentro.Trim().ToLower() ) )
+&nbsp; &nbsp; &nbsp; &nbsp; value = pas.First( a =&gt; a
+&nbsp; &nbsp; &nbsp; &nbsp; .Definition.Name.ToLower() == nome_paramentro.Trim()
+&nbsp; &nbsp; &nbsp; &nbsp; .ToLower() );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Parameter</span> GetParameter2( <span class="blue">this</span>
+&nbsp; <span class="teal">Element</span> ele, <span class="teal">BuiltInParameter</span> builtInParameter )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;LookupParameter&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; met = t.GetMethod( <span class="maroon">&quot;get_Parameter&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">BuiltInParameter</span> ) } );
+&nbsp; &nbsp; value = met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { builtInParameter } ) <span class="blue">as</span> <span class="teal">Parameter</span>;
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> GetMaterialArea2( <span class="blue">this</span>
+&nbsp; <span class="teal">Element</span> ele, <span class="teal">Material</span> m )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> value = 0;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetMaterialArea&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>(<span class="teal">ElementId</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>(<span class="blue">bool</span>) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = (<span class="blue">double</span>) met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { m.Id, <span class="blue">false</span> } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = t.GetMethod( <span class="maroon">&quot;GetMaterialArea&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">Element</span> ) } );
+&nbsp; &nbsp; &nbsp; value = (<span class="blue">double</span>) met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { m } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> GetMaterialVolume2( <span class="blue">this</span>
+&nbsp; <span class="teal">Element</span> ele, <span class="teal">Material</span> m )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> value = 0;
+&nbsp; &nbsp; <span class="teal">Type</span> t = ele.GetType();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetMaterialVolume&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>(<span class="teal">ElementId</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>(<span class="blue">bool</span>) } );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = (<span class="blue">double</span>) met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { m.Id, <span class="blue">false</span> } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetMaterialVolume&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ElementId</span> ) } );
+&nbsp; &nbsp; &nbsp; value = (<span class="blue">double</span>) met.Invoke( ele,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { m.Id } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">GeometryObject</span>&gt;
+&nbsp; GetGeometricObjects2( <span class="blue">this</span> <span class="teal">Element</span> ele )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">GeometryObject</span>&gt; value =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">GeometryObject</span>&gt;();
+&nbsp; &nbsp; <span class="teal">Options</span> op = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; <span class="blue">object</span> obj = ele.get_Geometry( op );
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = obj.GetType()
+&nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;Objects&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( prop != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; obj = prop.GetValue( obj, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span> arr = obj <span class="blue">as</span> <span class="teal">IEnumerable</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geo <span class="blue">in</span> arr )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; value.Add( geo );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">GeometryObject</span>&gt; geos =
+&nbsp; &nbsp; &nbsp; obj <span class="blue">as</span> <span class="teal">IEnumerable</span>&lt;<span class="teal">GeometryObject</span>&gt;;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> geo <span class="blue">in</span> geos )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; value.Add( geo );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Element</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.FamilySymbol
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> EnableFamilySymbol2( <span class="blue">this</span>
+&nbsp; <span class="teal">FamilySymbol</span> fsymbol )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = fsymbol.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Activate&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( fsymbol, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.FamilySymbol</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.InternalDefinition
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> VaryGroup2( <span class="blue">this</span>
+&nbsp; <span class="teal">InternalDefinition</span> def, <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] { doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span> };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = def.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;SetAllowVaryBetweenGroups&quot;</span>, tipos );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( def, parametros );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.InternalDefinition</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Part
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ElementId</span> GetSource2( <span class="blue">this</span> <span class="teal">Part</span> part )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = part.GetType()
+&nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;OriginalDividedElementId&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( prop != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; value = prop.GetValue( part,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span> ) <span class="blue">as</span> <span class="teal">ElementId</span>;
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = part.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetSourceElementIds&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = met.Invoke( part, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; met = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;First&quot;</span> );
+&nbsp; &nbsp; &nbsp; temp = met.Invoke( temp, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; prop = temp.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;HostElementId&quot;</span> );
+&nbsp; &nbsp; &nbsp; value = prop.GetValue( temp,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span> ) <span class="blue">as</span> <span class="teal">ElementId</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Part</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.UI.Selection.Selection
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; GetSelection2( <span class="blue">this</span>
+&nbsp; <span class="teal">Selection</span> sel, <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; value = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; sel.GetElementIds();
+&nbsp; &nbsp; <span class="teal">Type</span> t = sel.GetType();
+&nbsp; &nbsp; <span class="blue">if</span>( t.GetMethod( <span class="maroon">&quot;GetElementIds&quot;</span> ) != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = t
+&nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;GetElementIds&quot;</span> );
+&nbsp; &nbsp; &nbsp; value = ( (<span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt;) met
+&nbsp; &nbsp; &nbsp; .Invoke( sel, <span class="blue">null</span> ) ).Select( a =&gt; doc.GetElement2( a ) )
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = ( (<span class="teal">IEnumerable</span>) t
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;Elements&quot;</span> ).GetValue( sel, <span class="blue">null</span> ) ).Cast&lt;<span class="teal">Element</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SetSelection2( <span class="blue">this</span> <span class="teal">Selection</span>
+&nbsp; sel, <span class="teal">Document</span> doc, <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; elementos )
+&nbsp; {
+&nbsp; &nbsp; sel.ClearSelection2();
+&nbsp; &nbsp; <span class="blue">object</span>[] parametros = <span class="blue">new</span> <span class="blue">object</span>[] {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; elementos };
+&nbsp; &nbsp; <span class="teal">Type</span>[] tipos = parametros.Select( a =&gt; a
+&nbsp; &nbsp; .GetType() ).ToArray();
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = sel.GetType()
+&nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;SetElementIds&quot;</span>, tipos );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( sel, parametros );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = sel.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;Elements&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> temp = prop.GetValue( sel, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elementos.Count == 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; met = temp.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Clear&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; met.Invoke( temp, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> elementos )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> elemento = doc
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetElement2( id );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; parametros = <span class="blue">new</span> <span class="blue">object</span>[] {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; elemento };
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tipos = parametros
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select( a =&gt; a.GetType() ).ToArray();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; met = temp.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Add&quot;</span>, tipos );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; met.Invoke( temp, parametros );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ClearSelection2(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Selection</span> sel )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = sel.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;Elements&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( prop != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> obj = prop.GetValue( sel, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = obj.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;Clear&quot;</span> );
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = sel.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;SetElementIds&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { ids.GetType() } );
+&nbsp; &nbsp; &nbsp; met.Invoke( sel, <span class="blue">new</span> <span class="blue">object</span>[] { ids } );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.UI.Selection.Selection</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.UI.UIApplication
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> System.Drawing
+&nbsp; .<span class="teal">Rectangle</span> GetDrawingArea2( <span class="blue">this</span> <span class="teal">UIApplication</span> ui )
+&nbsp; {
+&nbsp; &nbsp; System.Drawing.<span class="teal">Rectangle</span> value = System
+&nbsp; &nbsp; .Windows.Forms.<span class="teal">Screen</span>.PrimaryScreen.Bounds;
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.UI.UIApplication</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.View
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ElementId</span> Duplicate2( <span class="blue">this</span> <span class="teal">View</span> view )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = view.Document;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly.GetTypes()
+&nbsp; &nbsp; &nbsp; .Where( a =&gt; a.IsEnum
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; a.Name == <span class="maroon">&quot;ViewDuplicateOption&quot;</span> )
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> obj = view;
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = view.GetType().GetMethod(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Duplicate&quot;</span>, <span class="blue">new</span> <span class="teal">Type</span>[] { t } );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; value = met.Invoke( obj,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { 2 } ) <span class="blue">as</span> <span class="teal">ElementId</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SetOverlayView2(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">View</span> view,
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids,
+&nbsp; &nbsp; <span class="teal">Color</span> cor = <span class="blue">null</span>,
+&nbsp; &nbsp; <span class="blue">int</span> espessura = -1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = view.Document;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; ls = doc.GetType().Assembly
+&nbsp; &nbsp; &nbsp; .GetTypes().Where(
+&nbsp; &nbsp; &nbsp; &nbsp; a =&gt; a.IsClass
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; a.Name == <span class="maroon">&quot;OverrideGraphicSettings&quot;</span> )
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp; &nbsp; <span class="blue">if</span>( ls.Count &gt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t = ls[0];
+&nbsp; &nbsp; &nbsp; <span class="teal">ConstructorInfo</span> construtor = t
+&nbsp; &nbsp; &nbsp; &nbsp; .GetConstructor( <span class="blue">new</span> <span class="teal">Type</span>[] { } );
+&nbsp; &nbsp; &nbsp; construtor.Invoke( <span class="blue">new</span> <span class="blue">object</span>[] { } );
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> obj = construtor.Invoke( <span class="blue">new</span> <span class="blue">object</span>[] { } );
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = obj.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;SetProjectionLineColor&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { cor.GetType() } );
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">new</span> <span class="blue">object</span>[] { cor } );
+&nbsp; &nbsp; &nbsp; met = obj.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;SetProjectionLineWeight&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { espessura.GetType() } );
+&nbsp; &nbsp; &nbsp; met.Invoke( obj, <span class="blue">new</span> <span class="blue">object</span>[] { espessura } );
+&nbsp; &nbsp; &nbsp; met = view.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;SetElementOverrides&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>(<span class="teal">ElementId</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; obj.GetType() } );
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; met.Invoke( view, <span class="blue">new</span> <span class="blue">object</span>[] { id, obj } );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">MethodInfo</span> met = view.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;set_ProjColorOverrideByElement&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Color</span> ) } );
+&nbsp; &nbsp; &nbsp; met.Invoke( view, <span class="blue">new</span> <span class="blue">object</span>[] { ids, cor } );
+&nbsp; &nbsp; &nbsp; met = view.GetType()
+&nbsp; &nbsp; &nbsp; &nbsp; .GetMethod( <span class="maroon">&quot;set_ProjLineWeightOverrideByElement&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Type</span>[] { <span class="blue">typeof</span>( <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="blue">int</span> ) } );
+&nbsp; &nbsp; &nbsp; met.Invoke( view, <span class="blue">new</span> <span class="blue">object</span>[] { ids, espessura } );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.View</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Viewplan
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ElementId</span> GetViewTemplateId2(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">ViewPlan</span> view )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> value = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = view.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;ViewTemplateId&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( prop != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; value = prop.GetValue( view,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span> ) <span class="blue">as</span> <span class="teal">ElementId</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> value;
+&nbsp; }
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SetViewTemplateId2( <span class="blue">this</span>
+&nbsp; <span class="teal">ViewPlan</span> view, <span class="teal">ElementId</span> id )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PropertyInfo</span> prop = view.GetType()
+&nbsp; &nbsp; &nbsp; .GetProperty( <span class="maroon">&quot;ViewTemplateId&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( prop != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; prop.SetValue( view, id, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Viewplan</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Autodesk.Revit.DB.Wall
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> FlipWall2( <span class="blue">this</span> <span class="teal">Wall</span> wall )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> metodo = <span class="maroon">&quot;Flip&quot;</span>;
+&nbsp; &nbsp; <span class="teal">MethodInfo</span> met = <span class="blue">typeof</span>( <span class="teal">Wall</span> )
+&nbsp; &nbsp; &nbsp; .GetMethod( metodo );
+&nbsp; &nbsp; <span class="blue">if</span>( met != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; met.Invoke( wall, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; metodo = <span class="maroon">&quot;flip&quot;</span>;
+&nbsp; &nbsp; &nbsp; met = <span class="blue">typeof</span>( <span class="teal">Wall</span> ).GetMethod( metodo );
+&nbsp; &nbsp; &nbsp; met.Invoke( wall, <span class="blue">null</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Autodesk.Revit.DB.Wall</span>
+}
+</pre>
+
+<p>The updated version of The Building Code samples including these compatibility methods is
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.120.13">
+release 2015.0.120.13</a>.</p>
+
+<p>Many thanks to Magson for this useful idea, his work on implementing these methods and sharing it with us all!</p>

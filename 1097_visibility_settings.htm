@@ -1,0 +1,272 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09174526 [Visibility settings]
+
+Remy van den BorICN Solutions BV
+
+http://forums.autodesk.com/t5/Revit-API/Visibility-settings/m-p/4764061
+
+Scott Conover 
+Andrzej Trelinski 
+
+-->
+
+<h3>The GEOM_VISIBILITY_PARAM Visibility Settings</h3>
+
+<p>Here is an nice, useful and interesting example of a Revit API forum
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Visibility-settings/m-p/4764061">
+discussion thread</a> and
+
+cooperative research between
+
+Remy van den Bor of <a href="http://www.icnsolutions.net">ICN Solutions</a>,
+
+Rudolf Honke of <a href="http://www.acadgraph.de">Mensch und Maschine acadGraph</a>,
+
+the Revit development team, Joe Ye and your humble scribe on retrieving an element's detail view visibility settings, before wishing you and us all the best for the
+
+<a href="#2">year of the horse</a>:</p>
+
+<p><strong>Remy:</strong> Hello Reviteers,</p>
+
+<p>Does anybody know how to get to the visibility settings in the family editor with the API?</p>
+
+<p>Manually, you just select the element, click Visibility settings and change its appearance, e.g.,
+Plan/RCP, Front/Back, Left/Right, Coarse, Medium or Fine.</p>
+
+<p>I tried snooping using RevitLookup, but I can't find the parameter that is affected when I alter these settings.</p>
+
+<p>Help greatly appreciated.</p>
+
+<p><strong>Rudolf:</strong> Try this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyElementVisibility</span> visibility = <span class="blue">new</span>
+&nbsp; &nbsp; <span class="teal">FamilyElementVisibility</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyElementVisibilityType</span>.Model );
+&nbsp;
+&nbsp; visibility.IsShownInCoarse = <span class="blue">true</span>;
+&nbsp; visibility.IsShownInFine = <span class="blue">true</span>;
+&nbsp; visibility.IsShownInMedium = <span class="blue">true</span>;
+&nbsp; visibility.IsShownInFrontBack = <span class="blue">true</span>;
+&nbsp; visibility.IsShownInLeftRight = <span class="blue">true</span>;
+&nbsp; visibility.IsShownInPlanRCPCut = <span class="blue">false</span>;
+&nbsp;
+&nbsp; yourElement.SetVisibility( visibility );
+</pre>
+
+<p><strong>Remy:</strong> Thank you very much, that is what I needed :)</p>
+
+<p>Only one question remains: you say "yourElement.SetVisibility(visibility)", but I can't get it to work.</p>
+
+<p>I tried calling the SetVisibility method on both FamilyInstance and Element.</p>
+
+<p>Both tell me they don't have such a method.</p>
+
+<p>The only thing I can find is the doc.ActiveView.SetVisibility but it doesn't have a constructor for an element, only a whole category  :-(</p>
+
+<p>So my next question is: how can I use the SetVisibility for a family instance (within the family editor)?</p>
+
+<p><strong>Rudolf:</strong> Oh, I see.</p>
+
+<p>I used it for SymbolicCurve elements.</p>
+
+<p>In the Family context, you can use it also with ModelCurves.</p>
+
+<p>Also, each element whose class is derived from GenericForm will provide this method, meaning Extrusions, Sweeps and so on.</p>
+
+<p><strong>Remy:</strong> Okay, I see.</p>
+
+<p>Yes, when I create an extrusion and snoop it, I see the method you mention.</p>
+
+<p>But I have a different situation: I made a sweep and loaded this sweep into another family, so it's a nested family.</p>
+
+<p>Snooping this family, Revit sees it as FamilyInstance, which doesn't have the FamilyElementVisibility method.</p>
+
+<p>And you can't simply cast the FamilyInstance to a sweep  :-) </p>
+
+<p><strong>Rudolf:</strong> There is another method to access the visibility.</p>
+
+<p>FamilyInstances residing in a Family document provide a built-in parameter named GEOM_VISIBILITY_PARAM.</p>
+
+<p>This is an integer typed read-write parameter, so it can be set.</p>
+
+<p>The only thing you have to do is to find out the relation between the integer value and the corresponding menu entries in the user interface.</p>
+
+<p>In the following dialog, the parameter is named "Überschreibungen Sichtbarkeit/Grafiken".</p>
+
+<p>Here are the visibility settings in the user interface:</p>
+
+<center>
+<img src="img/visibility_setting_1.png" alt="" width="400"/>
+</center>
+
+<p>We can see the resulting parameter value in RevitLookup:</p>
+
+<center>
+<img src="img/visibility_setting_2.png" alt="" width="400"/>
+</center>
+
+<p>Changing the parameter value in the user interface:</p>
+
+<center>
+<img src="img/visibility_setting_3.png" alt="" width="400"/>
+</center>
+
+<p>The changes are reflected in RevitLookup:</p>
+
+<center>
+<img src="img/visibility_setting_4.png" alt="" width="400"/>
+</center>
+
+<p>So what you could do is to test different configurations and take note of their corresponding integer representations.</p>
+
+<p>These values can be used for setting the visibility even with nested families.</p>
+
+<p>So I hope ;-)</p>
+
+<p><strong>Remy:</strong> Super, that's it.</p>
+
+<p>Normally, I don't like the "magic numbers" approach, but this time I'll make an exception.</p>
+
+<p>So, to summarise:</p>
+
+<p>The "FamilyElementVisibility" method can be used when creating solids in a family (sweeps, extrusions etc.).</p>
+
+<p>The "magic numbers" method can be used when using families as nested families.</p>
+
+<p>To name a few:</p>
+
+<ul>
+<li>All checked = 57406</li>
+<li>Plan/RCP (Grundriss/Deckenplan) unchecked = 57398</li>
+<li>Left/Right (Links/rechts) unchecked = 57374</li>
+</ul>
+
+<p>Thanx again :smileyhappy:</p>
+
+<p><strong>Rudolf:</strong> This approach may be picked up by Jeremy, I hope.</p>
+
+<p>It's a typical workaround in the Revit API environment.</p>
+
+<p>It would be great not only to know all the magic numbers, but also the algorithm that calculates them.</p>
+
+<p>Also, are the values stable even between different Family documents?</p>
+
+<p><strong>Remy:</strong> Yes, I agree 100%.</p>
+
+<p>As far as I can tell these numbers are stable for 3D elements.</p>
+
+<p>In a detail component family there is only the coarse/medium/fine setting and the visibility/graphics overrides parameter has value 0, so no magic numbers there.</p>
+
+<p>So, it would be a nice topic for Jeremy indeed :smileyhappy: (hint)</p>
+
+<p><strong>Jeremy:</strong> I fully agree that this looks interesting.</p>
+
+<p>Two additional observations:</p>
+
+<ul>
+<li>Those magic numbers are probably much less magic when you look at them in binary or hexadecimal representation.</li>
+
+<li>I would not be at all surprised if there is an enumeration value defined somewhere in the Revit API, and Boolean or combinations of the enumeration values provide these 'magic' or not-so-magic values.</li>
+</ul>
+
+<p>What do you think?</p>
+
+<p>Have you seen any likely candidates?</p>
+
+<p><strong>Rudolf:</strong> Yes, I also think so.</p>
+
+<p>These magic numbers aren’t magic at all, there must be a way to calculate them.</p>
+
+<p>They are some sort of combined enumeration, I fully agree.</p>
+
+<p>As Remy pointed out, there is a constant first number for 2D families.</p>
+
+<p>To finish the forum thread, it would be nice if somebody could evaluate the algorithm by trying out the different combinations.</p>
+
+<p><strong>Remy:</strong> I am sure there must be some enumeration behind it, only not available for us plebs :smileyhappy:</p>
+
+<p>So for now, the numbers appear magical to me, but Joe Ye already submitted a wish list item to expose them officially, so who knows...</p>
+
+<p><strong>Andrzej:</strong> Here are the definitions of the constants used in C++:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bUndefined:1; <span class="green">// Mostly for caching errors</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bModel:1;
+&nbsp;
+&nbsp; <span class="green">// Model</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bPlanRCPCut:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bTopBottom:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bFrontBack:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bLeftRight:1;
+&nbsp;
+&nbsp; <span class="green">// View direction specific</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOnlyWhenCut:1;
+&nbsp;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_reserved:6;
+&nbsp;
+&nbsp; <span class="green">// Detail level</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bCoarse:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bMedium:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bFine:1;
+&nbsp;
+&nbsp; <span class="green">// ----- 16 bits up to here -------</span>
+&nbsp;
+&nbsp; <span class="green">// Old stuff - for compatibility with loaded families</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOld:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldGeom:1;
+&nbsp;
+&nbsp; <span class="green">// Old Geom</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldGeomPlan:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldGeomRCP:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldGeomElev:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldGeom3d:1;
+&nbsp;
+&nbsp; <span class="green">// Old Curves</span>
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldCurve3d:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldCurveParallel:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldCurveAntiParallel:1;
+&nbsp; <span class="blue">unsigned</span> <span class="blue">int</span> m_bOldCurveInFront:1;
+</pre>
+
+<p>For example, m_bCoarse is at position 14, and 'reserved' is taking 6 bits, so you can check it by using a bitmask defined like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">int</span> ival = e.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.GEOM_VISIBILITY_PARAM )
+&nbsp; &nbsp; &nbsp; .AsInteger();
+&nbsp;
+&nbsp; <span class="blue">bool</span> isCourse = 0 != (ival &amp; (0x1 &lt;&lt; 13));
+</pre>
+
+<p><strong>Scott:</strong> You should also take a look at the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/set-detail-curve-visibility.html">
+setting the visibility</a> of
+
+a detail curve.</p>
+
+<p>Normally, an add-in will only need to deal with the detail level stuff at this level, because the Revit API already exposes model level geometry visibility at a higher level as a more easily used API object.</p>
+
+<p>Many thanks to all the contributors for their help in exploring and sharing this!</p>
+
+
+<a name="2"></a>
+
+<h4>Happy Year of the Horse!</h4>
+
+<center>
+<img src="img/year_of_the_horse_2014.png" alt="Happy Year of the Horse!" width="400"/>
+</center>
+
+<p>Happy
+
+<a href="http://www.theguardian.com/technology/2014/jan/30/chinese-new-year-google-doodle">
+Year of the Horse</a>!</p>

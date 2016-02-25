@@ -1,0 +1,122 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html?cid=6a00e553e168978833019aff7c6098970c#comment-6a00e553e168978833019aff7c6098970c
+
+Max has left you a comment:
+
+For everyone also looking for the Revision Parameters: Here a little Wrapper class in C#:
+
+-->
+
+<h3>Max' Revision Wrapper Class</h3>
+
+<p>Max posted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html?cid=6a00e553e168978833019aff7c6098970c#comment-6a00e553e168978833019aff7c6098970c">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+what's new in the Revit 2014 API</a> presenting
+
+a neat little revision parameter wrapper class that I have taken the liberty of adding to The Building Coder sample collection.</p>
+
+<p>In Max' own words:
+For everyone also looking for the Revision parameters:
+Here a little wrapper class in C#:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> Autodesk.Revit.DB;
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> A Revision parameter wrapper class by Max.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">JtRevision</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The BIM element.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="teal">Element</span> _e;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Internal access to the named parameter. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="teal">Parameter</span> _p( <span class="blue">string</span> parameter_name )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _e.get_Parameter( parameter_name );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Create a Revision parameter accessor </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> for the given BIM element.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> JtRevision( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _e = e;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Date
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Revision Date&quot;</span> ).AsString(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Revision Date&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> IssuedTo
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Issued to&quot;</span> ).AsString(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Issued to&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Number
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Revision Number&quot;</span> ).AsString(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Revision Number&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Issued
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Issued&quot;</span> ).AsInteger(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Issued&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Numbering
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Numbering&quot;</span> ).AsInteger(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Numbering&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Sequence
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Revision Sequence&quot;</span> ).AsInteger(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Revision Sequence&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> Description
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Revision Description&quot;</span> ).AsString(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Revision Description&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> IssuedBy
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> _p( <span class="maroon">&quot;Issued by&quot;</span> ).AsString(); }
+&nbsp; &nbsp; &nbsp; <span class="blue">set</span> { _p( <span class="maroon">&quot;Issued by&quot;</span> ).Set( <span class="blue">value</span> ); }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>As you can see for yourself, there is no magic to this, and the principle could be used for many other purposes.</p>
+
+<p>In fact, all this does is hard code a mapping of parameter names to wrapper class methods.</p>
+
+<p>Mille grazie, Max, for providing this nice implementation!</p>
+
+<p>I wish everybody a nice weekend!</p>

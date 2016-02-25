@@ -1,0 +1,100 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Игнатович Александр Сергеевич 
+
+RE: adding new materials from list futher enhancement
+
+-->
+
+<h3>Getting Serious Adding New Materials from List</h3>
+
+<p>Here is a post on some serious usability enhancements for the AddMaterials add-in, which reads a list of material properties from an Excel spreadsheet and generates Revit material elements accordingly.</p>
+
+<p>It was originally presented for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/add-new-materials-from-list.html#2">
+Revit 2011</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated.html">
+reimplemented for Revit 2014</a>,
+
+and enhanced with
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated-again.html">
+improved error messages and reporting</a> soon
+
+after.</p>
+
+<p>Until now, it was more of a programming example than an actual usable tool, but that is starting to change, thanks to a number of enhancements by Alexander Ignatovich, last but least the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control.html">
+WPF FillPattern viewer control</a> presented
+
+last week.
+Says Alex:</p>
+
+<blockquote>
+
+<p>I want to further enhance the tool for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated-again.html">
+adding new materials from a list</a>.</p>
+
+<p>First of all, I split off the XLS data reading from the materials creation.
+I also noticed that we cannot create a new material if the copy source base material does not exist in project, i.e. there if is no material with the name provided in 11 column.
+Another problem I noticed occurs if I try to run the add-in command several times: in this case, it tries to repeatedly generate materials with the same name, and the LINQ ToDictionary method fails.
+So, we must avoid such situations.</p>
+
+<p>Summarizing: let's read data, mark the materials with no base class provided, or base class not found, and existing materials as "non-loadable", show the materials list to the user, where he (or she) can deselect some items and create the resulting materials list.</p>
+
+<p>And one other, I think, the most valuable thing: in the materials import dialogue I added
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control.html">
+surface and cut pattern preview controls</a> (see View\Controls\FillPatternViewerControlWpf.xaml).
+
+This code is based on work performed by Victor Chekalin when he was working in our company.</p>
+
+<p>I hope this code sample will be helpful.
+Sorry, maybe some things are not accurate.
+For example, Visual Studio does not show the design view of the MaterialsView form, because my MaterialViewModel.SurfacePattern and MaterialViewModel.CutPattern classes are really Autodesk.Revit.DB.FillPattern, but it is just an example :-)</p>
+
+</blockquote>
+
+<p>Thank you very much, and thanks to Victor as well for the nice fill pattern viewer.</p>
+
+<p>That is a powerful tool and sample in its own right.</p>
+
+<p>Here are screen snapshots of the AddMaterials add-in in action running.
+In the first run, none of the CSI copy source base materials have been defined in the current project, so no new materials can be added:</p>
+
+<center>
+<img src="img/add_materials_ai_zero.png" alt="Material list with zero source materials defined" width="400"/>
+</center>
+
+<p>In the second run, I manually added one CSI material to copy from, and now one material can be added:</p>
+
+<center>
+<img src="img/add_materials_ai_one.png" alt="Material list with one source material defined" width="400"/>
+</center>
+
+<p>If this project is of further interest, another enhancement might be to remove the COM references to Microsoft office, to allow the command to work on computers without Microsoft Office installed.</p>
+
+<p>Once again, many thanks to Victor and Alex for these valuable enhancements!</p>
+
+<p>The complete source code, Visual Studio solution and add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/AddMaterials">AddMaterials GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/AddMaterials/releases/tag/2014.0.0.1">
+release 2014.0.0.2</a>.</p>
+
+<p>Please feel free to fork that and add your own enhancements as well.</p>
+
+<p>Good luck!</p>

@@ -1,0 +1,277 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- update xcode from 4.5.2 to 6.1 or higher. it requires osx 10.9.4. i have 10.8.5. can i run it anyway?
+  https://en.wikipedia.org/wiki/OS_X
+  Version 10.0: "Cheetah"
+  Version 10.1: "Puma"
+  Version 10.2: "Jaguar"
+  Version 10.3: "Panther"
+  Version 10.4: "Tiger"
+  Version 10.5: "Leopard"
+  Version 10.6: "Snow Leopard"
+  Version 10.7: "Lion"
+  Version 10.8: "Mountain Lion"
+  Version 10.9: "Mavericks"
+  Version 10.10: "Yosemite"
+
+  bdsas081914
+-->
+
+<h3>View and Data API Sample in Swift and Mac OS Upgrade</h3>
+
+<p>As you know, we have a pretty impressive number of
+
+<a href="https://github.com/Developer-Autodesk">
+samples</a> demonstrating
+
+the use of the
+
+<a href="https://developer-autodesk.github.io">View and Data API</a> web
+
+services.</p>
+
+<p>We are currently reviewing them all to ensure their documentation is reliable and consistent.</p>
+
+<p>I picked Adam Nagy's
+
+<a href="https://github.com/Developer-Autodesk/workflow-macos-swift-view.and.data.api">
+workflow sample written in Swift</a> to review.</p>
+
+<p>That required a look at the
+
+<a href="https://en.wikipedia.org/wiki/Swift_(programming_language)">Swift programming language</a> itself
+
+and a system upgrade before I could start with the review itself.</p>
+
+<p>Before getting to that, let me also mention the upcoming 3D Web Festival, and then wrap up with yet another update of The Building Coder samples:</p>
+
+<ul>
+<li><a href="#2">3D Web Festival</a></li>
+<li><a href="#3">Swift</a></li>
+<li><a href="#4">Upgrading OS X, Xcode and Parallels</a></li>
+<li><a href="#5">Swift Command Line</a></li>
+<li><a href="#6">Swift Shell Scripting</a></li>
+<li><a href="#7">View and Data API workflow in Swift</a></li>
+<li><a href="#8">Started eliminating automatic transaction mode</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>3D Web Festival</h4>
+
+<p>Are you a creative human being interested in 3D on the web?</p>
+
+<p>Then the <a href="http://www.3dwebfest.com">3D Web Festival</a> may be just your thing.</p>
+
+<p>It will showcase 3D web sites presenting mixtures of music, art and technology, bringing together the best of the 3D Web &ndash; presented as Live Performance Art &ndash; amazing, delightful, surprising and at times disturbing, including creations by artists and developers of all kinds live with musical accompaniment.</p>
+
+<p>Time and place is Wednesday May 13th from 7 to 10 pm at the Folsom Street Foundry in San Francisco, with ticket proceeds going to the
+
+<a href="http://www.roxie.com">Roxie</a>, a community-based, non-profit theatre.</p>
+
+
+<a name="3"></a>
+
+<h4>Swift</h4>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Swift_(programming_language)">Swift programming language</a> was
+
+created by <a href="https://developer.apple.com/swift">Apple</a> for iOS and OS X development.</p>
+
+<p>It uses the same underlying machinery as Objective C with a much simpler syntax.</p>
+
+<p>Python is one of the languages that helped inspire Swift, and Swift also provides a
+
+<a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a> or
+
+read-eval-print loop, even though it is a compiled language.</p>
+
+<p>Working with Swift code requires the development environment Xcode 6.1, which in turn requires OS X 10.9.4 or higher, nicknamed Mavericks.</p>
+
+<p>Up until this morning, I was still on 10.8.5, aka Mountain Lion, so it was clear that some serious computer system updating would be required for me to be able t make use of it.</p>
+
+
+<a name="4"></a>
+
+<h4>Upgrading OS X, Xcode and Parallels</h4>
+
+<p>Well, I took the plunge and upgraded straight from 10.8.5 to 10.10.2 Yosemite, since that was the suggestion made by the Apple AppStore.</p>
+
+<p>The next step was upgrading Xcode from my previous version of 5.5.1 to 6.1.1.</p>
+
+<p>That was harder, and I initially failed, until I read the recommendation to simply
+
+<a href="http://apple.stackexchange.com/questions/71662/how-to-can-i-upgrade-xcode-4-1-to-4-5-2-properly">uninstall the previous version</a> and
+
+then reinstall from scratch.
+Even then it was not as simple as it sounded, though.
+It took me several attempts before I really had eliminated the previous installation and the reinstallation truly installed the new version instead of just automatically updating the old one.</p>
+
+<p>As far as I can tell so far, all my other applications work fine after the update, except Parallels Desktop, which I use to run Windows application like Revit and Visual Studio on a virtual machine within the Mac OS.</p>
+
+<p>The version of Parallels 8 that I was using before the upgrade did not work at all.
+Upgrading that to the newest version of 8 enabled me to start up and use the virtual Windows machines again.</p>
+
+<p>I was unable to access my virtual Windows drives from the Mac environment, though.</p>
+
+<p>The Windows drives can be mounted in the Mac file system, enabling access to Windows files from the Mac command line and applications.</p>
+
+<p>For instance, I have all my Revit add-ins on the C:\ drive and use git on the Mac terminal command line to clone them down from GitHub and push them and their changes back up again.
+It would be really painful have to have to move them on a Mac drive, because some loading and debugging does not work unless they are on a local Windows drive.</p>
+
+<p>Happily, simply upgrading to Parallels 10 finally resolved that issue as well, and the Windows drive <code>C:\</code> now appears in Mac OS as <code>/Volumes/C</code>, just like it always did:</p>
+
+<pre>
+  /Volumes/ $ ls -o
+  drwxrwxrwx  1 jta   16384 Feb 18 21:04 C
+  lrwxr-xr-x  1 root      1 Feb 19 07:34 jtharddisk -> /
+</pre>
+
+<p>I seem to be back to normal again, all systems go, and I can run Swift.</p>
+
+
+<a name="5"></a>
+
+<h4>Swift Command Line</h4>
+
+<p>Once Xcode 6.1.1 is installed, the Swift command line is accessible:</p>
+
+<pre>
+  $ xcrun swift
+  Welcome to Swift!  Type :help for assistance.
+    1&gt; :help
+
+    . . .
+
+    1&gt; var x = 1
+  x: Int = 1
+    2&gt; x+x
+  $R0: Int = 2
+    3&gt;
+</pre>
+
+<p>As it so kindly tells you, you can type <code>:help</code> for help, and <code>:quit</code> or Ctrl-D to get out of the Swift read-eval-print loop again.</p>
+
+<p>On OS X Yosemite and Xcode 6.1 or later, as in my case, you can run Swift by just typing <code>swift</code> in the command line.</p>
+
+
+<a name="6"></a>
+
+<h4>Swift Shell Scripting</h4>
+
+<p>You can create a Swift shell script and use the shebang to run it as a program directly like this:</p>
+
+<pre>
+  $ cat hello.sh
+  #!/usr/bin/env xcrun swift
+  println("hello world")
+
+  $ chmod +x hello.sh
+  $ ./hello.sh
+  hello world
+</pre>
+
+<p>Alternatively, you can pass a Swift script file as an argument to the swift command line like this for the same effect:</p>
+
+<pre>
+  $ cat hello.sw
+  println("hello world")
+
+  $ swift hello.sw
+  hello world
+</pre>
+
+<p>Nice tutorials to get started are provided on Santosh Rajan's
+
+<a href="https://medium.com/swift-programming">Swift programming</a> site, e.g.,
+
+<a href="https://medium.com/swift-programming/1-learn-swift-by-running-scripts-73fdf8507f4b">1. Learn Swift by running Scripts</a>.</p>
+
+<p>A couple of other cool examples are provided by
+
+<a href="https://github.com/blakemerryman/Swift-Scripts">Blake Merryman's Swift scripts</a>.</p>
+
+
+<a name="7"></a>
+
+<h4>View and Data API Workflow in Swift</h4>
+
+<p>Adam's View and Data API workflow sample is by no means a simple Swift script, though, but a full-blown Xcode IDE application:</p>
+
+<center>
+<img src="img/MacViewStarter_xcode.png" alt="Xcode IDE with MacViewStarter app" width="536"/>
+</center>
+
+<p>Running the app in the Xcode debugger displays the main screen:</p>
+
+<center>
+<img src="img/MacViewStarter_app.png" alt="MacViewStarter app" width="399"/>
+</center>
+
+<p>All you have to do is enter your Autodesk View and Data API credentials, obtained from the
+
+<a href="https://developer.autodesk.com">Autodesk Web Services API</a> web
+
+page, request an access token, enter a valid bucket name and select a file to upload.</p>
+
+<p>That adds the resulting model identifier &ndash; aka
+
+<a href="https://en.wikipedia.org/wiki/Uniform_resource_name">URN</a> or
+
+uniform resource name &ndash; to the URN drop-down list:</p>
+
+<center>
+<img src="img/MacViewStarter_urn.png" alt="MacViewStarter generates a URN" width="399"/>
+</center>
+
+<p>The image box at the bottom displays the model thumbnail preview once translation is complete, which may take a while for a large model:</p>
+
+<center>
+<img src="img/MacViewStarter_thumbnail.png" alt="MacViewStarter displays a thumbnail once translation completes" width="399"/>
+</center>
+
+<p>To make further use of the translated model, please refer to the numerous other
+
+<a href="https://github.com/Developer-Autodesk">View and Data API samples on GitHub</a>.</p>
+
+<p>Look at the <a href="https://developer-autodesk.github.io">View and Data API sample overview</a> to
+
+decide where to go next from here.</p>
+
+
+
+<a name="8"></a>
+
+<h4>Started Eliminating Automatic Transaction Mode</h4>
+
+<p>Let's wrap up with yet another update to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+
+<p>I now started removing the use of the old automatic transaction mode.</p>
+
+<p>It is probably best never to use it at all nowadays, and go for either Manual or ReadOnly mode, depending on whether you need to update the model or not.</p>
+
+<p>The first occurence that I happened upon is in the age-old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/09/revit-install-location.html">
+CmdInstallLocation</a> command,
+
+so I updated that from Revit 2010 to 2015 and replaced TransactionMode.Automatic by ReadOnly in it.</p>
+
+<p>Please note that that command is probably not needed at all nowadays, since other methods are available to determine the Revit installatin location, e.g., using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/perpetual-guid-algorithm-and-revit-2014-product-guids.html">perpetual GUID algorithm</a>.</p>
+
+<p>Anyway, the updated command is included in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.117.4">
+release 2015.0.117.4</a> with
+
+more to follow.</p>

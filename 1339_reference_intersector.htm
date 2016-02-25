@@ -1,0 +1,244 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+- 10430089 [ReferenceIntersector]
+  /a/doc/revit/tbc/1339_reference_intersector.htm
+
+Håvard Dagsvik VS: Regarding [CaseNo:10430089.] ReferenceIntersector
+10430089 [ReferenceIntersector] Håvard DagsvikCad Quality AB, NO
+http://forums.autodesk.com/t5/revit-api/referenceintersector/m-p/5493918
+
+#revitapi #adsk #bim #3dwebcoder #aec #geometry #cloud #restapi
+#dotnet #csharp #python
+#responsivedesign #typepad #adskdevnetwrk
+#ah8 #augi #au2015 #dotnet #csharp #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Using ReferenceIntersector in Linked Files</h3>
+
+<p>Quite a while ago, we had a Revit API discussion forum thread on the use of the
+<a href="http://forums.autodesk.com/t5/revit-api/referenceintersector/m-p/5493918">
+ReferenceIntersector in linked files</a>.</p>
+
+<p>Apparently, some restrictions on that have been removed in Revit 2016.</p>
+
+<p>Before getting to that, let me mention that I have been very busy in the past few days in the
+<a href="">Revit API discussion forum</a>, answering various cases, and on
+<a href="">The 3D Web Coder</a>, implementing a cloud-based enhancement for the FireRating Revit SDK sample.</p>
+
+
+<a name="2"></a>
+
+<h4>Steps Towards a Cloud-Based FireRating SDK Sample</h4>
+
+<p>I already mentioned some based aspects of the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/07/firerating-and-the-revit-python-shell-in-the-cloud-as-web-servers.html#2">
+existing FireRating SDK sample</a> and my plans to
+<a href="http://thebuildingcoder.typepad.com/blog/2015/07/firerating-and-the-revit-python-shell-in-the-cloud-as-web-servers.html#4">
+reimplement it as a cloud-based app</a>.</p>
+
+<p>Here is an overview of my explorations so far:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html">My first mongo database</a></li>
+<ul>
+<li>Define the over-all goal and what to store, namely building projects, door instances hosted in them, and each door's fire rating value, based on the venerable old Revit SDK FireRating sample.</li>
+</ul>
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Implementing relationships</a></li>
+<ul>
+<li>Define a more complete schema that includes information about the container projects, i.e., the Revit RVT BIM or building information model project files.</li>
+<li>Define and maintain the relationships between the door family instances and their container projects.</li>
+</ul>
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/starting-to-implement-the-firerating-rest-api.html">
+Starting to Implement the FireRating REST API</a></li>
+<ul>
+<li>Add a REST API to manage and query the database programmatically.</li>
+</ul>
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html">
+Put, Post, Delete and Curl Testing a REST API</a></li>
+<ul>
+<li>Adding a REST API version prefix.</li>
+<li>Testing the REST API using the browser and cURL.</li>
+<li>Implementing PUT, POST and DELETE.</li>
+</ul>
+
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/adding-a-mongodb-document-from-c-net-via-rest-api.html">
+Populating MongoDB via C# .NET REST API</a></li>
+<ul>
+<li>Installing and running  and the node.js web server on Windows</li>
+<li>Storing a document in MongoDB via the REST API from a C# .NET Revit add-in</li>
+</ul>
+
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>Using the ReferenceIntersector in Linked Files</h4>
+
+<p>Now let's continue looking at using the ReferenceIntersector in linked files.</p>
+
+<p><strong>Question:</strong>
+
+According to the API documentation and preliminary testing the ReferenceIntersector won't find any references in linked Revit files in Revit 2015.</p>
+<p>So, for example, using the vector of a cable tray won't hit any linked walls... or so it seems.</p>
+<p>But then why does it have a Boolean property named <code>FindReferencesInRevitLinks</code>?</p>
+<p>Setting it 'true' doesn't seem to make any difference.</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ReferenceIntersector</span> refIntersector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( intersectFilter,
+&nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Face, view3D );
+&nbsp;
+&nbsp; refIntersector.FindReferencesInRevitLinks = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ReferenceWithContext</span>&gt; referencesWithContext
+&nbsp; &nbsp; = refIntersector.Find( startPoint, rayDirection );
+</pre>
+
+<p>Has anyone succeeded in getting linked references using this method?</p>
+
+<p><strong>Comment:</strong>
+
+I can confirm that using any of the following filters does not work in Revit 2015 when the elements are contained in linked files:</p>
+
+<ul>
+<li>ElementClassFilter</li>
+<li>ElementMulticlassFilter</li>
+<li>ElementCategoryFilter</li>
+<li>ElementMulticategoryFilter</li>
+</ul>
+
+<p>When I say that these filters do not work, I mean that setting a class or category filter to look for walls in a linked file will not return any results from that link.</p>
+
+<p>What does work, however, is creating a class or category filter that looks for a RevitLinkInstance.</p>
+
+<p>So, what you need to do is use a RevitLinkInstance category or class filter (an inverted ElementIsElementType filter worked as well), and then filter the results yourself.</p>
+
+<p>IMO, this is not how the filters should work when looking for elements in a linked file.  To me, passing an ElementClassFilter looking for Wall objects to a ReferenceIntersector with FindReferencesInRevitLinks set to true should return walls whether they are in the local or in linked files.  The documentation regarding all of this is quite sparse as well.</p>
+
+<p><strong>Question Continued:</strong>
+
+What I did was to use a ElementSolidIntersectFilter.</p>
+<p>So if I want to intersect a cable tray and a linked wall I first use the ElementSolidIntersectFilter on the link.</p>
+<p>Done by passing the linked document into the filter.</p>
+<p>This requires the link to have a 3D view which it may or may not have but thats ok.</p>
+
+<p>ElementSolidIntersectFilter returns a collection of ElementId's for the linked intersected walls which I pass into ReferenceIntersector.</p>
+<p>Then use the centerline of the cable tray as "intersector ray".</p>
+<p>The advantage is that if a cable tray only partially intersects, that is if tray centerline falls outside the wall, I can still pick it up and handle it.</p>
+<p>Otherwise I would need to project rays for every tray corner to catch this.</p>
+
+<p>The only problem im having is that "FindReferenceTarget" is not working as expected.</p>
+<p>FindReferenceTarget has 6 possible enumerations, All, Curve, Egde, Element, Face and Mesh.</p>
+<p>When using "Face" I get 3 hits no matter which "FindReferenceTarget" option is used and have to rule out two of them.</p>
+
+<p>What this function does in the end is to place what IFC refers to as IfcProvisionForVoid.</p>
+<p>In Revit this is a Generic Model (solid) representing a hole for letting the tray through the wall.</p>
+<p>I havent had time to work with the code lately but it works.</p>
+
+<p><strong>Answer:</strong>
+
+Good news!</p>
+
+<p>This ReferenceIntersector code that wasn’t working in Revit 2015 works great using the same test model in Revit 2016:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Dictionary</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>&gt; GetIntersectPoints(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="teal">Element</span> intersect )
+{
+&nbsp; <span class="green">// Find a 3D view to use for the </span>
+&nbsp; <span class="green">// ReferenceIntersector constructor.</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">Func</span>&lt;<span class="teal">View3D</span>, <span class="blue">bool</span>&gt; isNotTemplate = v3
+&nbsp; &nbsp; =&gt; !( v3.IsTemplate );
+&nbsp;
+&nbsp; <span class="teal">View3D</span> view3D = collector
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) )
+&nbsp; &nbsp; .Cast&lt;<span class="teal">View3D</span>&gt;()
+&nbsp; &nbsp; .First&lt;<span class="teal">View3D</span>&gt;( isNotTemplate );
+&nbsp;
+&nbsp; <span class="green">// Use location point as start point for intersector.</span>
+&nbsp;
+&nbsp; <span class="teal">LocationCurve</span> lp = intersect.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; <span class="teal">XYZ</span> startPoint = lp.Curve.GetEndPoint( 0 ) <span class="blue">as</span> <span class="teal">XYZ</span>;
+&nbsp; <span class="teal">XYZ</span> endPoint = lp.Curve.GetEndPoint( 1 ) <span class="blue">as</span> <span class="teal">XYZ</span>;
+&nbsp;
+&nbsp; <span class="green">// Shoot intersector along element.</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> rayDirection = endPoint.Subtract(
+&nbsp; &nbsp; startPoint ).Normalize();
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt; builtInCats
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">BuiltInCategory</span>&gt;();
+&nbsp;
+&nbsp; builtInCats.Add( <span class="teal">BuiltInCategory</span>.OST_Roofs );
+&nbsp; builtInCats.Add( <span class="teal">BuiltInCategory</span>.OST_Ceilings );
+&nbsp; builtInCats.Add( <span class="teal">BuiltInCategory</span>.OST_Floors );
+&nbsp; builtInCats.Add( <span class="teal">BuiltInCategory</span>.OST_Walls );
+&nbsp;
+&nbsp; <span class="teal">ElementMulticategoryFilter</span> intersectFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementMulticategoryFilter</span>( builtInCats );
+&nbsp;
+&nbsp; <span class="teal">ReferenceIntersector</span> refIntersector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( intersectFilter,
+&nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Element, view3D );
+&nbsp;
+&nbsp; refIntersector.FindReferencesInRevitLinks = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ReferenceWithContext</span>&gt; referencesWithContext
+&nbsp; &nbsp; = refIntersector.Find( startPoint,
+&nbsp; &nbsp; &nbsp; rayDirection );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; intersectPoints = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; intersectRefs
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Reference</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>&gt; dictProvisionForVoidRefs
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ReferenceWithContext</span> r <span class="blue">in</span>
+&nbsp; &nbsp; referencesWithContext )
+&nbsp; {
+&nbsp; &nbsp; dictProvisionForVoidRefs.Add( r.GetReference(),
+&nbsp; &nbsp; &nbsp; r.GetReference().GlobalPoint );
+&nbsp; }
+&nbsp; <span class="blue">return</span> dictProvisionForVoidRefs;
+}
+</pre>
+
+<p><strong>Addendum:</strong>
+
+I have been using this successfully for a while now.</p>
+<p>With perpendicular and rectangular geometry, the bounding box from ElementIntersectSolidFilter is usually sufficient.</p>
+<p>I place an unhosted ProvisionForVoid family using the solid intersection bounding box.</p>
+
+<p>I only trigger a ReferenceIntersector when the required action is to place a face  or workplane based family on a face, and usually when the geometry is sloped or circular, like a pipe, circular duct or sloped wall or ceiling.</p>
+
+<p>ReferenceIntersector doesn’t seem to return a face or anything else workplane related that can be used to place a family.</p>
+<p>Therefore, right now, I iterate the reference geometry to achieve that: I retrieve the face with zero proximity from the intersector hit point and place the face-based family on that.</p>
+<p>Logically, though, if the returned ReferenceTarget is a Face, I should be able to cast it as such, thereby avoiding the need to iterate geometry faces.</p>
+<p>I need to look into that some more, and see if there are other suitable overloads of the NewFamilyInstance method that take reference face arguments.</p>

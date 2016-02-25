@@ -1,0 +1,1092 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Alexander Buschmann Re: SelectionFilters
+
+-->
+
+
+<h3>SelFilter, a Powerful Generic Selection Filter Utility</h3>
+
+<p>I recently discussed the minimalist generic selection filter implementation
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/selection-filters-adjacency-and-the-good-universe.html#2">
+JtElementsOfClassSelectionFilter</a> that
+
+I added to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>.</p>
+
+<p>Alexander Buschmann of
+
+<a href="http://www.idat.de">
+IDAT GmbH</a> responded to that and says:</p>
+
+<p>I saw your generic SelectionFilter class and this reminded me of a little pet project I've done in my spare time that I thought your readers might be interested in.</p>
+
+<p>Two things always bothered me about the ISelectionFilter:</p>
+
+<ul>
+<li>You have to create a class to use it.</li>
+<li>Though most often you just want to select Elements that match certain criteria, you can't use the already existing ElementFilters instead. It just feels wrong to create my own class to do something that a Revit class can do for me &ndash; and most probably it can do it even better than I could do it myself.</li>
+</ul>
+
+<p>I therefore implemented a class <b><code>GetFilter</code></b> that provides fast and easy access to the (probably?) most common selection filtering scenarios:</p>
+
+<p>It supports filtering for one or more classes, for one or more ElementIds, filtering using ElementFilters, some example ReferenceFilterings (for PlanarFaces and for normal vectors of Faces), some methods to filter with delegates or lambdas and some logical combinators, i.e. "and", "or" and "not".</p>
+
+<p>For the logical combinators there are extension methods for ISelectionFilter defined, so every ISelectionFilter can be combined using these.</p>
+
+<p>Using this should be quite easy &ndash; here is an
+
+<a href="zip/SelFilters.zip">example command and a Revit project to run it in</a>.</p>
+
+<p>Here are some usage examples:</p>
+
+<ul>
+<li>SelFilter.GetElementFilter&lt;Wall&gt;() &ndash; returns a filter for Walls.</li>
+<li>SelFilter.GetElementFilter(typeof(Wall), typeof(Floor), typeof(Pipe)) &ndash; returns a filter for Walls, Floors and Pipes.</li>
+<li>SelFilter.GetElementFilter (elementFilter) &ndash; return a filter using an Autodesk.Revit.DB.ElementFilter.</li>
+<li>SelFilter.GetElementFilter(idList) &ndash; returns a filter that will let only elements in the idList pass; this might be useful to select faces or edges on some preselected elements.</li>
+<li>filter1.And(filter2) &ndash; returns a filter that will check both filter1 and filter2.</li>
+</ul>
+
+<p>Further information:</p>
+
+<ul>
+<li>The GetFilter class itself is a static class with static methods that return an interface of an instance of the actual (private) filter classes.</li>
+<li>The actual Filter classes are private to reduce namespace cluttering &ndash; it's mostly a matter of taste.</li>
+<li>GetElementFilter methods return an IElementSelectionFilter which does the filtering using the AllowElement method; those classes just return true for the AllowReference method.</li>
+<li>GetReferenceFilter, GetPlanarFaceFilter and GetFaceNormalFilter return an IReferenceSelectionFilter that performs the filtering using the AllowReference method; these classes just return true for the AllowElement method.</li>
+<li>As a consequence, the combination of IElementSelectionFilters with IReferenceSelectionFilters is only meaningful using "and". If "or" is used, everything will pass the combined filter.</li>
+<li>The "and" and "or" filter methods return an ILogicalCombinationFilter that combines two or more filters. This interface exposes a property "ExecuteAll" &ndash; if it is set to "true", all the filters are called, even when the result already is fixed. This might or might not be helpful for debugging purposes.</li>
+<li>The "not" filter is just an inversion of any other filter and directly returns an "ISelectionFilter".</li>
+<li>The GetFilter method creates a filter class for delegates, method groups or lambdas. This gives the option to create arbitrary and complex filters on the fly without creating classes for them.</li>
+</ul>
+
+<p>I think the mightiest of the methods is the ElementFilter method &ndash; all different types of ElementFilter can be used, including CategoryFilters, IntersectionFilters, ExtensibleStorageFilters, ParameterFilters, etc.</p>
+
+<p>If the power of ElementFilters is not needed, the Class and ElementId filters give easy access to simpler filtering, and if more power is needed, this can easily be done with lambdas or delegates.</p>
+
+<p>There are lots of comments in the code, though it is really very easy and straightforward.
+The great thing about this class is not something complicated, just having everything needed in one single place.</p>
+
+<p>The
+
+<a href="zip/SelFilters.zip">zip file SelFilters.zip</a> contains
+
+the SelFilter class, the interface files, an example external command using some of the SelFilter functionality, an add-in manifest file for the example command and a small Revit project to test it in.</p>
+
+<p>Hopefully, you and your readers find this class helpful.</p>
+
+<p>Thank you very much, Alexander, for sharing this!</p>
+
+<p>For the sake of completeness, and especially for the convenience of all those search engines out there, here is the source code for the sample external command mainline Execute method (to see the truncated lines in full, view source or copy and paste to a text editor):</p>
+
+<pre class="code">
+<span class="green">//</span>
+<span class="green">// Copyright (c) 2014 Alexander Buschmann</span>
+<span class="green">//</span>
+<span class="green">// Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="green">// of this software and associated documentation files (the &quot;Software&quot;), to </span>
+<span class="green">// deal in the Software without restriction, including without limitation the </span>
+<span class="green">// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or </span>
+<span class="green">// sell copies of the Software, and to permit persons to whom the Software is </span>
+<span class="green">// furnished to do so, subject to the following conditions:</span>
+<span class="green">//</span>
+<span class="green">// The above copyright notice and this permission notice shall be included in </span>
+<span class="green">// all copies or substantial portions of the Software.</span>
+<span class="green">//</span>
+<span class="green">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR </span>
+<span class="green">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, </span>
+<span class="green">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="green">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER </span>
+<span class="green">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING </span>
+<span class="green">// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER </span>
+<span class="green">// DEALINGS IN THE SOFTWARE.</span>
+<span class="green">//</span>
+&nbsp;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Collections.ObjectModel;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+&nbsp;
+<span class="blue">namespace</span> RevitSelectionFilters
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">SelectionExamples</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of IExternalCommand
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uiDoc = commandData.Application.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uiDoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Select Wall or Floor</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> pickedReference = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelFilter</span>.GetElementFilter( <span class="blue">typeof</span>( <span class="teal">Wall</span> ), <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select Wall or Floor&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pickedReference == <span class="blue">null</span> ) <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> firstElement = doc.GetElement( pickedReference );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Result&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;First Selection: &quot;</span> + firstElement.Category.Name + <span class="maroon">&quot;: &quot;</span> + firstElement.Name + <span class="maroon">&quot; (&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; firstElement.Id + <span class="maroon">&quot;)&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Select anything intersecting:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> filter = <span class="blue">new</span> <span class="teal">ElementIntersectsElementFilter</span>( firstElement );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> notTheFirst = <span class="blue">new</span> <span class="teal">ExclusionFilter</span>( <span class="blue">new</span> <span class="teal">Collection</span>&lt;<span class="teal">ElementId</span>&gt; { firstElement.Id } );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> intersectionFilter =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelFilter</span>.GetElementFilter( filter ).And( <span class="teal">SelFilter</span>.GetElementFilter( notTheFirst ) );
+&nbsp; &nbsp; &nbsp; &nbsp; pickedReference = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, intersectionFilter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select anything intersecting the first picked Element&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pickedReference == <span class="blue">null</span> ) <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> secondElement = doc.GetElement( pickedReference );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Result&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Second Selection: &quot;</span> + secondElement.Category.Name + <span class="maroon">&quot;: &quot;</span> + secondElement.Name + <span class="maroon">&quot; (&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; secondElement.Id + <span class="maroon">&quot;)&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Select colums or beams or foundations within 20 feet of the second element in any direction, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// but not if they do intersect with the first element</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">BuiltInCategory</span>&gt; categories = <span class="blue">new</span>[] {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Columns,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFoundation,
+&nbsp; &nbsp; &nbsp; &nbsp; };
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> catFilter = <span class="blue">new</span> <span class="teal">ElementMulticategoryFilter</span>( categories );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> box = secondElement.get_BoundingBox( <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> vector = <span class="blue">new</span> <span class="teal">XYZ</span>( 20, 20, 20 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Outline</span> outline = <span class="blue">new</span> <span class="teal">Outline</span>( box.Min - vector, box.Max + vector );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementFilter</span> boxFilter = <span class="blue">new</span> <span class="teal">BoundingBoxIntersectsFilter</span>( outline );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> selectionFilter = intersectionFilter.Not().And(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelFilter</span>.GetElementFilter( catFilter ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelFilter</span>.GetElementFilter( boxFilter ) );
+&nbsp; &nbsp; &nbsp; &nbsp; pickedReference = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, selectionFilter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select Column, Beam, Foundation within 20 feet of second element, not intersecting first element&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pickedReference == <span class="blue">null</span> ) <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> thirdElement = doc.GetElement( pickedReference );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Result&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Third Selection: &quot;</span> + thirdElement.Category.Name + <span class="maroon">&quot;: &quot;</span> + thirdElement.Name + <span class="maroon">&quot; (&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; thirdElement.Id + <span class="maroon">&quot;)&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Select Face of thirdElement with normal parallel to BasisZ</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; selectionFilter = <span class="teal">SelFilter</span>.GetReferenceFilter( ( reference, xyz ) =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( reference.ElementId != thirdElement.Id ) <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Face</span> face =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; thirdElement.GetGeometryObjectFromReference( reference ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face == <span class="blue">null</span> ) <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = face.ComputeNormal( <span class="teal">UV</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> crossProduct = normal.CrossProduct( <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> ( crossProduct.IsAlmostEqualTo( <span class="teal">XYZ</span>.Zero ) );
+&nbsp; &nbsp; &nbsp; &nbsp; } );
+&nbsp; &nbsp; &nbsp; &nbsp; pickedReference = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, selectionFilter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select Face of third element with normal parallel to z-Axis&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Face</span> pickedFace = thirdElement.GetGeometryObjectFromReference( pickedReference ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pickedNormal = pickedFace.ComputeNormal( <span class="teal">UV</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Result&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Fourth Selection: &quot;</span> + pickedFace.GetType().Name + <span class="maroon">&quot; (&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pickedReference.ConvertToStableRepresentation( doc ) + <span class="maroon">&quot;)\n&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Normal: (&quot;</span> + pickedNormal.X.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot; / &quot;</span> + pickedNormal.Y.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot; / &quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pickedNormal.Z.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot;)&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Now select any Face with an X oder Y-Normal from any previously selected Element</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IElementSelectionFilter</span> idFilter = <span class="teal">SelFilter</span>.GetElementFilter( firstElement.Id, secondElement.Id, thirdElement.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span> xFilter = <span class="teal">SelFilter</span>.GetFaceNormalFilter( doc, <span class="teal">XYZ</span>.BasisX, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span> yFilter = <span class="teal">SelFilter</span>.GetFaceNormalFilter( doc, <span class="teal">XYZ</span>.BasisY, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ILogicalCombinationFilter</span> logicalFilter = idFilter.And( xFilter.Or( yFilter ) );
+<span class="blue">#if</span> DEBUG
+&nbsp; &nbsp; &nbsp; &nbsp; logicalFilter.ExecuteAll = <span class="blue">true</span>;
+<span class="blue">#endif</span>
+&nbsp; &nbsp; &nbsp; &nbsp; pickedReference = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Face, logicalFilter,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Now select any Face with an x oder y-Normal from any previously selected Element&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> element = doc.GetElement( pickedReference );
+&nbsp; &nbsp; &nbsp; &nbsp; pickedFace = element.GetGeometryObjectFromReference( pickedReference ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; pickedNormal = pickedFace.ComputeNormal( <span class="teal">UV</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Result&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Fifth Selection: &quot;</span> + pickedFace.GetType().Name + <span class="maroon">&quot; (&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pickedReference.ConvertToStableRepresentation( doc ) + <span class="maroon">&quot;)\n&quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Normal: (&quot;</span> + pickedNormal.X.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot; / &quot;</span> + pickedNormal.Y.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot; / &quot;</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pickedNormal.Z.ToString( <span class="maroon">&quot;0.###&quot;</span> ) + <span class="maroon">&quot;)&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Cancelled&quot;</span>, <span class="maroon">&quot;User cancelled&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+}
+</pre>
+
+<p>Here is the pretty fully documented SelFilter class source code:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">SelFilter</span>
+{
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Element-Filters: Will filter only for </span>
+&nbsp; <span class="green">// elements, not for references</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that only </span>
+&nbsp; <span class="gray">///</span><span class="green"> elements of type T will pass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter&lt;T&gt;()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementTypeFilter</span>( <span class="blue">typeof</span>( T ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that elements of </span>
+&nbsp; <span class="gray">///</span><span class="green"> any type in the collection will pass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Type</span>&gt; allowedTypes )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementTypeFilter</span>( allowedTypes );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that elements </span>
+&nbsp; <span class="gray">///</span><span class="green"> of any of the given types&nbsp; will pass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">Type</span> type,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">Type</span>[] types )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementTypeFilter</span>( type, types );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter from an ElementFilter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">ElementFilter</span> filter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementFilterFilter</span>( filter );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that will use </span>
+&nbsp; <span class="gray">///</span><span class="green"> the &quot;filterMethod&quot; to filter the elements</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; filterMethod )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">DelegatesFilter</span>( filterMethod, <span class="teal">DelegatesFilter</span>.AllReferences );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that will use </span>
+&nbsp; <span class="gray">///</span><span class="green"> the &quot;filterMethod&quot; to filter the elements</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">Predicate</span>&lt;<span class="teal">Element</span>&gt; filterMethod )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">DelegatesFilter</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt;( filterMethod ),
+&nbsp; &nbsp; &nbsp; <span class="teal">DelegatesFilter</span>.AllReferences );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp; Creates a selection filter that will </span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp; let pass only the elements defined by the ids</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">ElementId</span> id,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ElementId</span>[] ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementIdFilter</span>( id, ids );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp; Creates a selection filter that will </span>
+&nbsp; <span class="gray">///</span><span class="green">&nbsp; let pass only the elements defined by the ids</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IElementSelectionFilter</span> GetElementFilter(
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ElementId</span>&gt; ids )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">ElementIdFilter</span>( ids );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Reference-Filters: Will filter only for </span>
+&nbsp; <span class="green">// references, let all elements pass</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that will use </span>
+&nbsp; <span class="gray">///</span><span class="green"> the &quot;filterMethod&quot; to filter the references</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IReferenceSelectionFilter</span> GetReferenceFilter(
+&nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>, <span class="blue">bool</span>&gt; filterMethod )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">DelegatesFilter</span>( <span class="teal">DelegatesFilter</span>.AllElements,
+&nbsp; &nbsp; &nbsp; filterMethod );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that will let only </span>
+&nbsp; <span class="gray">///</span><span class="green"> PlanarFace-References pass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IReferenceSelectionFilter</span> GetPlanarFaceFilter( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> GetReferenceFilter( ( reference, xyz ) =&gt;
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> element = doc.GetElement( reference );
+&nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> planarFace = element.GetGeometryObjectFromReference(
+&nbsp; &nbsp; &nbsp; &nbsp; reference ) <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> planarFace != <span class="blue">null</span>;
+&nbsp; &nbsp; } );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a selection filter that will let faces </span>
+&nbsp; <span class="gray">///</span><span class="green"> pass if their normal vector at (0/0) is </span>
+&nbsp; <span class="gray">///</span><span class="green"> codirectional or parallel to the given normal </span>
+&nbsp; <span class="gray">///</span><span class="green"> vector</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IReferenceSelectionFilter</span> GetFaceNormalFilter(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal,
+&nbsp; &nbsp; <span class="blue">bool</span> acceptParallel = <span class="blue">false</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> _normal = normal.Normalize();
+&nbsp; &nbsp; <span class="teal">XYZ</span> minusNormal = -1 * _normal;
+&nbsp; &nbsp; <span class="blue">return</span> GetReferenceFilter( ( reference, xyz ) =&gt;
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> element = doc.GetElement( reference );
+&nbsp; &nbsp; &nbsp; <span class="teal">Face</span> face = element.GetGeometryObjectFromReference( reference ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( face == <span class="blue">null</span> ) <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> faceNormal = face.ComputeNormal( <span class="teal">UV</span>.Zero );
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> erg = faceNormal.IsAlmostEqualTo( _normal );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( acceptParallel ) erg |= faceNormal.IsAlmostEqualTo( minusNormal );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> erg;
+&nbsp; &nbsp; } );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Filter for Elements and References</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ISelectionFilter</span> GetFilter(
+&nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; elementFilterMethod,
+&nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>, <span class="blue">bool</span>&gt; referencesFilterMethod )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">DelegatesFilter</span>( elementFilterMethod,
+&nbsp; &nbsp; &nbsp; referencesFilterMethod );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Logical-Filters: Will call other filters</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;or&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalOrFilter(
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> second,
+&nbsp; &nbsp; <span class="blue">bool</span> executeAll = <span class="blue">false</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( first, second, executeAll );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;or&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalOrFilter(
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( first, filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;or&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalOrFilter(
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ISelectionFilter</span>&gt; filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;and&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalAndFilter(
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> second,
+&nbsp; &nbsp; <span class="blue">bool</span> executeAll = <span class="blue">false</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( first, second, executeAll );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;and&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalAndFilter(
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( first, filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;and&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> GetLogicalAndFilter(
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ISelectionFilter</span>&gt; filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;not&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ISelectionFilter</span> GetLogicalNotFilter(
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span> filter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalNotFilter</span>( filter );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Extension Methods for SelectionFilters</span>
+&nbsp; <span class="green">// </span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;or&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;_this&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filters&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> Or(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">ISelectionFilter</span> _this,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( _this, filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;and&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ILogicalCombinationFilter</span> And(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">ISelectionFilter</span> _this,
+&nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalAndFilter</span>( _this, filters );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Creates a logical &quot;not&quot; filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ISelectionFilter</span> Not(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">ISelectionFilter</span> _this )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">LogicalNotFilter</span>( _this );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Interfaces</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// Private classes will do the actual work - </span>
+&nbsp; <span class="green">// don't need to be visible.</span>
+&nbsp; <span class="green">// ISelectionFilter is not strictly neccessary on </span>
+&nbsp; <span class="green">//each class, but I like to explicitly say what I </span>
+&nbsp; <span class="green">// am doing.</span>
+&nbsp; <span class="green">//</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a selection </span>
+&nbsp; <span class="gray">///</span><span class="green"> filter that will filter only for elements</span>
+&nbsp; <span class="gray">///</span><span class="green"> and lets all references pass</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">abstract</span> <span class="blue">class</span> <span class="teal">ElementSelectionFilter</span>
+&nbsp; &nbsp; : <span class="teal">IElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">abstract</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem );
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> This class does not filter for references</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a </span>
+&nbsp; <span class="gray">///</span><span class="green"> filter for one or more ElementTypes</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">ElementTypeFilter</span>
+&nbsp; &nbsp; : <span class="teal">ElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> List of the allowed types </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt; m_types
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Type</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a Filter for a single Type</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementTypeFilter( <span class="teal">Type</span> type )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_types.Add( type );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a Filter for a list of Types</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementTypeFilter( <span class="teal">IEnumerable</span>&lt;<span class="teal">Type</span>&gt; types )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_types.AddRange( types );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a Filter for a number of Types</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementTypeFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> type,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="teal">Type</span>[] types )
+&nbsp; &nbsp; &nbsp; : <span class="blue">this</span>( type )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_types.AddRange( types );
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_types.Any( type
+&nbsp; &nbsp; &nbsp; &nbsp; =&gt; type.IsInstanceOfType( elem ) );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a </span>
+&nbsp; <span class="gray">///</span><span class="green"> filter using an ElementFilter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">ElementFilterFilter</span>
+&nbsp; &nbsp; : <span class="teal">ElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The ElementFilter that is used</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">ElementFilter</span> m_filter;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a SelectionFilter for an ElementFilter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementFilterFilter( <span class="teal">ElementFilter</span> filter )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_filter = filter;
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Overrides of ElementSelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> An element passes if it passes the ElementFilter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_filter.PassesFilter( elem );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a filter </span>
+&nbsp; <span class="gray">///</span><span class="green"> for one or more specific elements.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Especially usefull when and-combined </span>
+&nbsp; <span class="gray">///</span><span class="green"> with a ReferenceFilter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">ElementIdFilter</span>
+&nbsp; &nbsp; : <span class="teal">ElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The list of valid ElementIds</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; m_ids
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a ElementIdFilter for one or more ElementIds</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementIdFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ElementId</span>[] ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_ids.Add( id );
+&nbsp; &nbsp; &nbsp; m_ids.AddRange( ids );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a ElementIdFilter for a </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> collection of ElementIds</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> ElementIdFilter( <span class="teal">IEnumerable</span>&lt;<span class="teal">ElementId</span>&gt; ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_ids.AddRange( ids );
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Overrides of ElementSelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> An Element passes if its Id is </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> in the list of valid Ids</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_ids.Contains( elem.Id );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents </span>
+&nbsp; <span class="gray">///</span><span class="green"> a filter using delegate methods</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">DelegatesFilter</span>
+&nbsp; &nbsp; : <span class="teal">IElementSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">IReferenceSelectionFilter</span>,
+&nbsp; &nbsp; <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The delegate used to filter elements</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; m_elementFilter;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The delegate used to filter References</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">Func</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>, <span class="blue">bool</span>&gt; m_referenceFilter;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a filter that uses the element </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> and reference filter delegates</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> DelegatesFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; elementFilter,
+&nbsp; &nbsp; &nbsp; <span class="teal">Func</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>, <span class="blue">bool</span>&gt; referenceFilter )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_elementFilter = elementFilter;
+&nbsp; &nbsp; &nbsp; m_referenceFilter = referenceFilter;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Use this if all Elements should pass the Filter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Func</span>&lt;<span class="teal">Element</span>, <span class="blue">bool</span>&gt; AllElements
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> element =&gt; <span class="blue">true</span>; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Use this, if all References should pass the Filter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Func</span>&lt;<span class="teal">Reference</span>, <span class="teal">XYZ</span>, <span class="blue">bool</span>&gt; AllReferences
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span> { <span class="blue">return</span> ( reference, xyz ) =&gt; <span class="blue">true</span>; }
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Elements that pass the element filter </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> predicate will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_elementFilter( elem );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Elements that pass the reference filter </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> predicate will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_referenceFilter( reference, position );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a logical or filter for selection filters.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">abstract</span> <span class="blue">class</span> <span class="teal">LogicalCombinationFilter</span> : <span class="teal">ISelectionFilter</span>, <span class="teal">ILogicalCombinationFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> List of the filters to check</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">protected</span> <span class="blue">readonly</span> <span class="teal">List</span>&lt;<span class="teal">ISelectionFilter</span>&gt; m_filterList
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ISelectionFilter</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> If true, all filters are executed, </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> even if the result is already obvious</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> ExecuteAll { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical filter for two selectionFilters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">protected</span> LogicalCombinationFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> second,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> executeAll = <span class="blue">false</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span>.ExecuteAll = executeAll;
+&nbsp; &nbsp; &nbsp; m_filterList.Add( first );
+&nbsp; &nbsp; &nbsp; m_filterList.Add( second );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical filter for </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> a number of selectionsFilters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> executeAll is set to false</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">protected</span> LogicalCombinationFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span>.ExecuteAll = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; m_filterList.Add( first );
+&nbsp; &nbsp; &nbsp; m_filterList.AddRange( filters );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical filter for </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> a number of selectionsFilters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> executeAll is set to false</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filters&quot;&gt;&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">protected</span> LogicalCombinationFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ISelectionFilter</span>&gt; filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ExecuteAll = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; m_filterList.AddRange( filters );
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">abstract</span> <span class="blue">bool</span> AllowElement(
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> elem );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">abstract</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position );
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a logical or filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">LogicalOrFilter</span>
+&nbsp; &nbsp; : <span class="teal">LogicalCombinationFilter</span>, <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical or filter for two Filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalOrFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> second,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> executeAll )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( first, second, executeAll )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical or filter for </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> a number of filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalOrFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( first, filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical or filter for </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> a number of filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalOrFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ISelectionFilter</span>&gt; filters )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Elements that pass at least on </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> of the filters will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> erg = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ExecuteAll )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_filterList.ForEach( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; erg |= filter.AllowElement( elem ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; erg = m_filterList.Any( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; filter.AllowElement( elem ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> erg;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> References that pass at least one </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> of the filters will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> erg = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ExecuteAll )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_filterList.ForEach( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; erg |= filter.AllowReference(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reference, position ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; erg = m_filterList.Any( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; filter.AllowReference(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reference, position ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> erg;
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a logical and filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">LogicalAndFilter</span>
+&nbsp; &nbsp; : <span class="teal">LogicalCombinationFilter</span>, <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical and filter for two Filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalAndFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> second,
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> executeAll )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( first, second, executeAll )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical and filter </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> for a number of filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalAndFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> first,
+&nbsp; &nbsp; &nbsp; <span class="blue">params</span> <span class="teal">ISelectionFilter</span>[] filters )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( first, filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructs a logical and </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> filter for a number of filters</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalAndFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ISelectionFilter</span>&gt; filters )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( filters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Elements that pass all of the filters will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> erg = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ExecuteAll )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_filterList.ForEach( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; erg = erg &amp; filter.AllowElement( elem ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; erg = m_filterList.All( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; filter.AllowElement( elem ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> erg;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> References that pass all of the filters will pass</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> erg = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ExecuteAll )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_filterList.ForEach( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; erg = erg &amp; filter.AllowReference(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reference, position ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; erg = m_filterList.All( filter
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; filter.AllowReference(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reference, position ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> erg;
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Private class that represents a logical Not filter</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">class</span> <span class="teal">LogicalNotFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The filter, that will get negated</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">readonly</span> <span class="teal">ISelectionFilter</span> m_filter;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> constructs a not-Filter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filter&quot;&gt;</span><span class="green"> </span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> LogicalNotFilter( <span class="teal">ISelectionFilter</span> filter )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_filter = filter;
+&nbsp; &nbsp; }
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Implementation of ISelectionFilter
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Elements will pass, if they don't </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> pass the original filter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> elem )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> !m_filter.AllowElement( elem );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> References will pass, if they </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> don't pass the original filter</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference(
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> reference,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> position )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> !m_filter.AllowReference(
+&nbsp; &nbsp; &nbsp; &nbsp; reference, position );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+}
+</pre>
+
+<a name="3"></a>
+
+<h4>Culinary Notes from Paris</h4>
+
+<p>By the way, I am sitting in the meetup in London now.</p>
+
+<p>Before ending for today, I have two little culinary notes from Paris to share:</p>
+
+<p>I was lucky enough not to stay in horrible huge hotel there, but in a really nice little bed and breakfast instead, right next to
+
+<a href="https://en.wikipedia.org/wiki/Montmartre">Montmartre</a> and
+
+<a href="https://en.wikipedia.org/wiki/Sacr%C3%A9-C%C5%93ur,_Paris">Sacré-Cœur</a>.</p>
+
+<p>Better still, it was right next to the prize-winning baker and patissier
+
+<a href="http://boulangerieraphaelle.fr">Boulangerie Raphaëlle</a>, so I had great croissants and chocolate for breakfast.</p>
+
+<p>Then, to my surprise, arriving a bit early at the airport, I discovered the
+
+<a href="http://www.laduree.com">Ladurée</a> restaurant
+
+at the Charles de Gaulle airport and enjoyed my first ever
+
+<a href="http://www.traditionalfrenchfood.com/truffle-omelette.html">
+truffle omelette</a> before
+
+hopping on to the plane.</p>

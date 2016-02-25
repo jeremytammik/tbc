@@ -1,0 +1,130 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-API/how-many-of-you-developers-multihread-your-revit-api-requests/m-p/5392013
+
+10173810 [How many of you developers multihread your revit api requests?]
+
+-->
+
+<h3>The Revit API is Never Ever Thread Safe</h3>
+
+<p>Let us summarise and preserve this interesting Revit API forum discussion between Erik Eriksson, Ollikat and Arno&scaron;t L&ouml;bel on why
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-many-of-you-developers-multihread-your-revit-api-requests/m-p/5392013">
+the Revit API cannot safely be used from multiple threads</a> under
+
+any circumstances whatsoever, even for read-only operations:</p>
+
+
+<p><strong>Question:</strong> I've been using the Revit API for some years now, but I have never tried multithreaded requests. Basically because Autodesk told me that it will never work.</p>
+
+<p>I've now grown a little more confident and started testing a bit. So I figured that as long as I keep the calls to the API in a single thread, I can multithread over the results (from the filtered element collector for instance).</p>
+
+<p>I've tested to cache all the rooms with parameter values using the Parallel.Foreach method and it really speed things up. From 1000 ms to 400 ms.</p>
+
+<p>I figured that not all the objects that you can retrieve from the element can be obtained multithreaded, but parameters do apparently work (in my tests at least).</p>
+<p>get_Geometry does not work (but that was a real long shot, imho).</p>
+
+<p>Has anybody else got any experience of do's and don'ts here?</p>
+
+<p>I'm not integrating this in my production add-ins, I'm just testing.</p>
+
+<p>And also I figure that writing to the Revit document from multiple threads is too problematic to even try.</p>
+
+<p>So at the moment I just want to speed up my reads from the documents.</p>
+
+<p><strong>Answer:</strong> The Revit development team has never said that you cannot use multiple threads within your add-in.</p>
+
+<p>The only important thing is to ensure that all calls to the Revit API are made from a valid Revit API context, and that context will always reside within the main thread, cf. The Building Coder topic group on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+Idling samples for modeless access and driving Revit from outside</a>.</p>
+
+<p>Therefore, by the way, I can absolutely guarantee that the correct final answer to your question will be zero.</p>
+
+<p>There were some loopholes in the past, but they were illegal and the Revit API team is working diligently to close them all.</p>
+
+<p><strong>Clarification:</strong> On the two statements by Jeremy, "the Revit development team has never said that you cannot use multiple thread within your add-in" and Eric, "...but I have never tried multithreaded requests":</p>
+
+<p>I think Eric indeed was referring only to API request through multiple threads.
+It is pretty obvious that otherwise you can have billions of threads in your add-in if you wish.</p>
+
+<p>I understood that the question was: How many of us have successfully used the Revit API via (worker) threads and how.</p>
+
+<p>For my behalf, I think I haven't done that &ndash; at least intentionally :-).
+And as Jeremy stated, that would be very risky as even it might work now, it might be incompatible in the future. But in any case... I agree that it's super shame that we aren't able to do anything concurrently with Revit API.</p>
+
+<p><strong>Response:</strong> Thank you for your replies.</p>
+
+<p>I do extensively use multiple threads to make my add-ins more responsive and to get Revit's attention I use the tools available. Like the Idling event and external event framework.</p>
+
+<p>However, my meaning was more that I wanted to use multiple threads when communicating with Revit.</p>
+
+<p>My initial theory was that all properties should be safe to read from any thread and the methods needs to be handled with more care.</p>
+
+<p>Like I said in my first post I'm able to get parameter values, despite using methods to get them. However the get_Geometry method does not seem to work.</p>
+
+<p>But just getting parameter values multithreaded will speed up my add-ins a lot. Since most of what we do is juggle parameter values around.</p>
+
+<p><strong>Answer:</strong> Just a quick clarification about properties and methods in .NET. Actually under the hood, there's no such a thing as calling the property. All properties are eventually also methods...either get_... or set_...</p>
+
+<p>In other words...it's just a matter of designer of the API whether he decides which one (method or property) reflects better the purpose of the public member of the class. From technical point of view there's no difference what so ever which one is used and called.</p>
+
+<p>So in this case the only thing that matters is the code behind the property or method.</p>
+
+<p><strong>Answer by Arno&scaron;t L&ouml;bel:</strong> The official statement is and always has been that accessing the Revit API from other than the main thread is not allowed and not recommended. The primary objective behind such a strong statement is the safety of the model, but also the health and robustness of applications connected to it.</p>
+
+<p>I believe it is generally understood that modifying a model from multiple threads is not a good idea. However, not a lot of programmers realize that also just reading from it, even if 'only' parameter values, can lead to very confusing results. The thing is that no one application can be sure that during its reading the model there isn’t some other application modifying it at the same time. Therefore, reading parameters from worker threads could yield values that are out of sync with each other even when taken from the same element (but  at two different times, even if ever so slightly apart of each other.)</p>
+
+<p>I assume we could partially overcome the danger if we post an event about each transaction starting. That way programmers would know when it has stopped being safe to continue reading. However, this idea may look good on paper, but is not so great overall, because it increases the vulnerability of the model. Besides, even with this event the danger cannot be completely eliminated. There are many places in Revit that are not thread-safe and it is almost impossible to single them out. That is why some reads may always be safe (assuming a read-only state of the model), while some will never be safe, and some may be safe only occasionally.</p>
+
+<p>We understand it could be a big deal for many users, but the API is simply not there. We have a lot of multithreading internally In Revit. It is how we get faster with every release even as models get larger. However, the internal multithreading happens in very controlled environment, therefore it is very safe (with respect to the model and Revit process) and robust.</p>
+
+<p>There have been some experiments done with reading Revit models on separated processes (rather than threads). With the ever increasing computing power and available memory this could be actually a better approach for getting results faster than trying to bend the single-threaded API backwards to make it adequately safe.</p>
+
+<p><strong>Response:</strong> Ollikat, I'm aware that one can basically wrap a method inside a property and the other way round.
+However my hypothesis was that these were the best ones to start with, since you should use properties for more simple 'get-a-value'-operations and methods for more 'calculate-something-and-return'-operations, so the properties would be the best bet for getting anything to work.</p>
+
+<p>Arnost, yes I know, that's why I haven't tried it in the 5-6 years I've been working with the Revit API.</p>
+
+<p>I did actually try what you are suggesting in the end last summer. I created an small API that used WCF named pipes to communicate between add-ins in different Revit instances that opened the same model to be able to multithread both read and writes. This works &ndash; not as fast as my current tests, but hey you can write multithreaded.</p>
+
+<p>However this approach has many drawbacks, debugging is tedious for instance. This might have to do with my limited experience with WCF. I guess maybe REST could be easier.</p>
+
+<p>I totally agree on the writing multithreaded part. I won't even try that from the same process.</p>
+
+<p>However, I think you misunderstood my initial intentions. Currently, I'm testing how I can iterate over a collection multithreaded, using the Parallel.Foreach method.</p>
+
+<p>To get around the problem of having a background thread reading things, one could just check if the doc is modifiable; if not, then no transactions are open and it is safe to read.</p>
+
+<p>However, currently, I'm not trying to read things in the background while writing in the main thread. I just want to speed up my reads from collections.</p>
+
+<p><strong>Answer by Arno&scaron;t L&ouml;bel:</strong> I appreciate you being cautious when experimenting with multithreading in the Revit API. It can only pay off. However, practically nothing you do (short of running separate processes) can guarantee you always a successful execution no matter what you do and how careful you are. I understand your intention very well. You try to read properties of elements you have collected in a collection. You do it with parallel execution. It sounds like it ought to be safe, and it might, as long as you read thread-safe data, and the end user is doing nothing, and there is no other external application installed with Revit, including the ones we ship Revit with. And that is rather hard to guarantee, I am afraid.</p>
+
+<p>Your idea about using Document.IsModifiable may sound like one way to mitigate problems, but it is not. For one, the method itself is not thread-safe, but even if it were (and it would not be very difficult to make it if we wanted to), it would still not be an atomic operation, thus the result you get from calling it may not reflect the state of the property at the time the result is delivered to you. In other words: You cannot trust the value of IsModifiable if you are looking at it from other then the main thread. This is in fact similar to reading any non-thread-local value from multiple treads. Unless you put locks around it, you cannot guarantee that the read operation returns a current value.</p>
+
+<p>Again, I understand well that you are not trying to read values while modifying the model at the same time. You are just reading. However, even just reading is not safe unless you are also completely in control of writing. And this only applies generally &ndash; it does not always apply to every reading in Revit. Let’s assume that you are in control of writing. Let’s say you are executing your external command in a read-only transaction mode, or in manual mode but without a transaction open. Then you are virtually guaranteed the document is in read-only state. However, it does not mean there will be no changes to the memory we need for the model. When a model is opened in Revit, we do not load it in all at once. We only load the parts we need to know about, which include certain information about each element, but not all data associated with every element. If you happen to read only the data from the top-level tier, you would be safe. However, if you happen to read data that require the element to be fully loaded in (we call it 'expanding an element'), you may get into trouble. This operation will require memory to get allocated and I am afraid that element expansion may not be completely safe when it is triggered from multiple threads at the same time.</p>
+
+<p>I might have gone a bit too technical, but my main point was to elaborate on my previous statement, which was that one cannot ever be thread-safe in the Revit API, even if only reading from the model.</p>
+
+<p>Many thanks to Erik, Ollikat and Arno&scaron;t for this interesting discussion and important words of caution!</p>
+
+
+<p><strong>Addendum:</strong> As Arno&scaron;t points out in his comment below, the blog post title is incorrect:</p>
+
+<blockquote>
+<p>It is not correct that the entire Revit API is NEVER thread safe.</p>
+
+<p>There are in fact a few functions that ARE thread safe.</p>
+
+<p>For example, the ExternalEvent.Raise is thread-safe, naturally.</p>
+</blockquote>
+
+<p>For didactical reasons, though, it might be best to leave the blog post title anyway, plus this note on the very few exceptions to the rule.</p>
+
+<p>Thanks again to Arno&scaron;t for picking this up!</p>

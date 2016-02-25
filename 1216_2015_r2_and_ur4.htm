@@ -1,0 +1,200 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+- Autodesk Revit 2015 Update Release 4 Sep 21, 2014
+  http://knowledge.autodesk.com/support/revit-products/downloads/caas/downloads/content/autodesk-revit-2015-update-release-4.html?v=2015
+  http://knowledge.autodesk.com/support/revit-products/downloads#?cg=Downloads&p=Revit%20Products&v=2015&sort=PublishDate&page=1&s=Update%20Release%204
+  http://knowledge.autodesk.com/support/revit-products/downloads#?cg=Downloads&p=Revit%20Products&v=2015&s=Update%20Release%204
+  ~/downloads/adsk/revit/2015/ur4/Enhancements_List_RVT_2015_UR4.docx
+
+http://aecmag.com/technology-mainmenu-35/667-news-autodesk-r2-update
+
+http://aectechtalk.wordpress.com/2014/09/17/revit-2015-r2-releases
+
+A great overview with pointers to other more detailed discussion on specific topics to drill down
+
+http://therevitkid.blogspot.ch/2014/09/revit-2015-r2-12-must-see-links.html
+
+Enhancement list
+
+http://revit.downloads.autodesk.com/download/2015RVT_RTM/R2/Enhancements_List_RVT_2015_R2.pdf
+
+
+
+http://forums.autodesk.com/t5/revit-api/dimension-pre-and-suffix-leads-to-crash-revit-2014-2015/m-p/5289107
+
+10015663 [Dimension pre and suffix leads to crash revit 2014/2015 ]
+
+REVIT-48282 [DimensionSegment Prefix and Suffix crash Revit if empty]
+
+-->
+
+<h3>Revit 2015 R2, UR4 and Dimension Prefix &amp; Suffix</h3>
+
+<p>Today, let's take a quick look at the Revit product updates that were published last week and a discussion on workarounds for an issue making use of the dimension Prefix and Suffix properties:</p>
+
+<ul>
+<li><a href="#2">Revit 2015 Release 2 and Revit 2015 Update Release 4</a></li>
+<ul>
+<li><a href="#2.1">API enhancements</a></li>
+</ul>
+<li><a href="#3">Dimension prefix &amp; suffix workarounds</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Revit 2015 Release 2 and Revit 2015 Update Release 4</h4>
+
+<p>Two different Revit updates were released last week: Revit 2015 Release 2 (R2) and Revit 2015 Update Release 4 (UR4).</p>
+
+<p>Revit 2015 R2 is a new version introducing new functionality, both in the product and API, available to subscription customers.</p>
+
+<p>Revit 2015 UR4 is a normal update release and a subset of R2.</p>
+
+<p>You can access the download
+
+<a href="http://knowledge.autodesk.com/support/revit-products/downloads#?cg=Downloads&p=Revit%20Products&v=2015&s=Update%20Release%204">
+sources for Revit 2015 UR4</a> on
+
+the Autodesk Revit product pages.</p>
+
+<p>From a product point of view, the features and differences are explained by
+
+<a href="http://aecmag.com/technology-mainmenu-35/667-news-autodesk-r2-update">
+AEC Magazine</a> and
+
+<a href="http://aectechtalk.wordpress.com/2014/09/17/revit-2015-r2-releases">
+Doug Bowers Consulting</a>.</p>
+
+<p>To drill down in depth and for information on specific areas, please refer to the overview and links to detailed discussions on specific topics compiled by Jeff Pinheiro,
+
+<a href="http://therevitkid.blogspot.ch/2014/09/revit-2015-r2-12-must-see-links.html">The Revit Kid</a>.</p>
+
+<p>Finally, here are the direct pointers to the official lists of enhancements:</p>
+
+<ul>
+<li><a href="http://revit.downloads.autodesk.com/download/2015RVT_RTM/R2/Enhancements_List_RVT_2015_R2.pdf">Revit 2015 Release 2 enhancement list</a></li>
+<li><a href="http://knowledge.autodesk.com/sites/default/files/file_downloads/Enhancements_List_RVT_2015_UR4.docx">Revit 2015 Update Release 4 enhancement list</a></li>
+</ul>
+
+
+<a name="2.1"></a>
+
+<h4>Revit 2015 Release 2 and Revit 2015 Update Release 4 API Enhancements</h4>
+
+<p>The API enhancements for these two different versions are identical.</p>
+
+<p>For your convenience, here they are:</p>
+
+<ul>
+<li>Improves reliability of retrieving the current selection in an API Dockable Pane.</li>
+<li>Restricts the deletion of the drafting solid fill pattern from a model by any method, including the API.</li>
+<li>Improves API behavior to reflect the user interface by enabling the API user to 1) open a local model when ignorable worksharing exceptions occur, such as a central model missing; and 2) open a host model (local or central) when ignorable worksharing exceptions occur on loading the linked model, such as a linked model missing.</li>
+<li>Improves stability when errors are posted during calling API Document.SynchronizeWithCentral by addons.</li>
+<li>Corrects the API by changing the exception from SEHException to OperationCanceledException for API Selection.PickBox.</li>
+<li>Improves stability when the Pick Points API was invoked from within a Dockable Frame.</li>
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>Dimension Prefix &amp; Suffix Workarounds</h4>
+
+<p>Remy van den Bor of <a href="http://www.icnsolutions.net">ICN Solutions</a> ran
+
+into an issue accessing the
+
+<a href="http://forums.autodesk.com/t5/revit-api/dimension-pre-and-suffix-leads-to-crash-revit-2014-2015/m-p/5289107">
+dimension Prefix and Suffix properties</a> and
+
+had an interesting discussion about it with Scott Wilson, providing several possible workarounds.</p>
+
+<p>I hope you don't encounter the same issues; if you do, however, here are some hints on handling them:</p>
+
+<p><strong>Question:</strong> I noticed something strange with Revit dimensions in Revit 2014 and 2015.</p>
+
+<p>I make a collection of dimensions. I want to check whether a prefix or suffix is used. When a value is found, put the value in a textbox.</p>
+
+<p>The problem lies in the <code>dim(seg).Prefix != null</code> and <code>dim(seg).Suffix != null</code> part.</p>
+
+<p>Lets say a dimension has a suffix "mm". When asking for dim.Prefix it will return "" (empty string).</p>
+
+<p>BUT, when no prefix or suffix is used, Revit will throw an AccesViolation error and close down without a warning!</p>
+
+<p>So, you cannot check dim.Prefix or dim.Suffix when no pre- or suffixes are set. The value will not be an empty string, it just crashes Revit.</p>
+
+<p>The workaround I use for now is to check whether the dim.value is a double. If not, I know a prefix or suffix is used. If the value can be parsed to a double, I bypass the dim.prefix call.</p>
+
+<p>Does anybody know how to solve this in a proper way?</p>
+
+<p>Here is my workaround that seems to work. I check to see whether the dimseg.value is a string. If not, the crash can be avoided:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">bool</span> CheckVal( <span class="blue">string</span> val )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">char</span> c <span class="blue">in</span> val )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="blue">char</span>.IsDigit( c ) &amp;&amp; c != <span class="maroon">'.'</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+
+&nbsp; <span class="green">// . . .</span>
+
+&nbsp; <span class="blue">if</span>( CheckVal( dimseg.ValueString ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( txtPrefix.Text ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; txtPrefix.Text = dimseg.Prefix;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( txtSuffix.Text ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; txtSuffix.Text = dimseg.Suffix;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p><strong>Answer by Scott:</strong> I devised a couple of workarounds for avoiding the crash while we wait for it to get looked at and hopefully remedied.</p>
+
+<p>The first was quite tedious and involved independently building the dimension string exactly as you would get from ValueText using the dimension type properties and then checking that against the segment to determine whether any text modifiers existed.</p>
+
+<p>That would be painful to implement and thankfully you don't have to, there's a much better way. If you assign a value to any of the text properties, it gives the API enough of a nudge that it wakes up and fixes the faulty properties in a similar way to what I was seeing with the UI editor.</p>
+
+<p>So, before you attempt to access any of the potentially bugged properties, simply take one of the well behaved ones (such as .Above ) and re-assign its value to itself (so that no information is lost) and you're all good, no more crashing. I hope...</p>
+
+<p>Change the last part of your code to:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">DimensionSegment</span> dimseg <span class="blue">in</span> dim.Segments )
+&nbsp; {
+&nbsp; &nbsp; dimseg.Above = dimseg.Above; <span class="green">// Hello API, are you awake?</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( txtPrefix.Text ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; txtPrefix.Text = dimseg.Prefix;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( txtSuffix.Text ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; txtSuffix.Text = dimseg.Suffix;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Edit: Oh I see you already have a work around &nbsp; :-)  &ndash; Oh well, here's another!</p>
+
+<p>By the way, simply checking for non-numerical characters in the ValueText is likely to include any segments that contain text due to unit suffixes and alternate units. These segments will still crash if accessed. Unless you have full control over the environment and are certain that no text could be present unless added manually, then I wouldn't use it in production code.</p>
+
+
+<p><strong>Response:</strong> I tried using Scott's "// Hello API, are you awake?" approach in Revit 2014, but it results in the same crash.</p>
+
+<p>So that workaround only works for Revit 2015.
+I confirmed that it really does work there  :-)</p>

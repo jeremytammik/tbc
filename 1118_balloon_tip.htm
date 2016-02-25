@@ -1,0 +1,138 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+From: Игнатович Александр Сергеевич 
+Date: Saturday, March 22, 2014 07:39
+To: Jeremy Tammik 
+Subject: Yet another ballons for custom messages, I want to share
+
+Hi, Jeremy!
+
+I want to share another solution for balloon tips for custom messages, without using unsupported AdWindows library in your blogpost
+
+http://thebuildingcoder.typepad.com/blog/2014/03/using-balloon-tips-in-revit.html
+
+Just see the project in attachment :-)
+
+Sincerely, Alexander Ignatovich
+
+-->
+
+<h3>Another Balloon Tip Implementation</h3>
+
+<p>Alexander Ignatovich, or Игнатович Александр, responds to the recent discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-balloon-tips-in-revit.html">
+using balloon tips in Revit</a> and says:
+
+<blockquote>
+<p>I want to share another solution for balloon tips for custom messages, without using the unsupported AdWindows library.</p>
+
+<p>Just see the project attached in
+
+<a href="zip/YetAnotherBalloonTip.zip">YetAnotherBalloonTip.zip</a>
+
+:-)</p>
+</blockquote>
+
+<p>Alexander's solution provides three different sample commands:</p>
+
+<ul>
+<li>Simple balloon</li>
+<li>Warning balloon</li>
+<li>Balloon from another thread</li>
+</ul>
+
+<p>The implementation is packaged in a separate self-contained class named NotifyBox, so instantiating a simple balloon tip is really very simple indeed, in one single constructor call:</p>
+
+<pre class="code">
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> IVC.NotifyBox.Controls;
+<span class="blue">using</span> IVC.NotifyBox.ViewModel.Enums;
+&nbsp;
+<span class="blue">namespace</span> YetAnotherBaloons
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">StartSimpleBaloonCommand</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">NotifyBox</span>.Show( <span class="maroon">&quot;Hello&quot;</span>, <span class="maroon">&quot;Hello from &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Investicionnaya Venchurnaya Companiya ;-)&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotificationDuration</span>.Short );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>An argument enables you to specify the duration.</p>
+
+<p>The resulting balloon tip looks like this, and fades away after a moment:</p>
+
+<center>
+<img src="img/balloon_tip_simple.png" alt="Simple balloon tip" width="407"/>
+</center>
+
+<p>Another argument allows you to specify an icon, e.g. to implement a warning balloon tip:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">StartWarningBaloonCommand</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">NotifyBox</span>.Show( <span class="maroon">&quot;Warning&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Warning! Something is not perfect :)&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotificationIcon</span>.Warning,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotificationDuration</span>.Medium );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The resulting balloon tip includes an icon:</p>
+
+<center>
+<img src="img/balloon_tip_warning.png" alt="Balloon tip with a warning icon" width="403"/>
+</center>
+
+<p>Since the balloon tip class is completely independent of Revit, it can obviously be called from a different thread as well:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">StartBaloonFromAnotherThreadCommand</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; System.Threading.Tasks.<span class="teal">Task</span>.Factory.StartNew( () =&gt;
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( <span class="teal">TimeSpan</span>.FromSeconds( 3 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotifyBox</span>.Show( <span class="maroon">&quot;Warning&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;This message is from another thread!&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotificationIcon</span>.Warning,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">NotificationDuration</span>.Medium );
+&nbsp; &nbsp; &nbsp; } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Many thanks to Alexander for sharing this!</p>

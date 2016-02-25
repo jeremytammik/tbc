@@ -1,0 +1,556 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08924098 [Get parameter units]
+
+Jose FandosAndekan LLC
+
+-->
+
+<h3>Unit Abbreviations</h3>
+
+<p>Today, we look at determining the units for a given parameter, and specifically providing a suitable unit abbreviation for it.</p>
+
+<p>The Revit 2014 API introduced a new Unit API with a large number of enhancements to complete and simplify unit handling issues, and I have not yet explored all of them in depth.
+Here is the overview of it from
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014 API</a>:</p>
+
+<a name="0"></a>
+
+<h4 style="color:darkblue">Units API</h2>
+<p style="color:darkblue">The API for Units in Revit has been expanded and changed. The methods</p>
+<ul>
+<li style="color:darkblue">Document.GetUnits()</li>
+<li style="color:darkblue">Document.SetUnits()</li>
+</ul>
+<p style="color:darkblue">allow interaction with the units of a document.  The Units class provides access to data such as</p>
+<ul>
+<li style="color:darkblue">DecimalSymbol</li>
+<li style="color:darkblue">DigitGroupingAmount</li>
+<li style="color:darkblue">DigitGroupingSymbol</li>
+<li style="color:darkblue">FormatOptions</li>
+</ul>
+<p style="color:darkblue">The FormatOptions class provides access to data including:</p>
+<ul>
+<li style="color:darkblue">Rounding</li>
+<li style="color:darkblue">Accuracy</li>
+<li style="color:darkblue">DisplayUnits</li>
+<li style="color:darkblue">SuppressLeadingZeros</li>
+<li style="color:darkblue">SuppressTrailingZeros</li>
+<li style="color:darkblue">SuppressSpaces</li>
+</ul>
+<p style="color:darkblue">LabelUtils.GetLabelFor() has been enhanced so that it can now return the user-visible name for a UnitSymbolType.</p>
+<h5 style="color:darkblue">Unit Formatting and Parsing</h5>
+<p style="color:darkblue">The methods:</p>
+<ul>
+<li style="color:darkblue">UnitFormatUtils.FormatValueToString()</li>
+<li style="color:darkblue">UnitFormatUtils.TryParse()</li>
+</ul>
+<p style="color:darkblue">provide the ability to format a value into a string based on formatting options and to parse a formatted string (including units) into a value if possible.</p>
+<h5 style="color:darkblue">Unit Conversion</h5>
+<p style="color:darkblue">The new class UnitUtils contains methods to convert between unit types:</p>
+<ul>
+<li style="color:darkblue">UnitUtils.Convert() &ndash; Converts a value from one unit type to another, such as square feet to square meters.</li>
+<li style="color:darkblue">UnitUtils.ConvertFromInternalUnits() &ndash; Converts a value from Revit's internal unit type.</li>
+<li style="color:darkblue">UnitUtils.ConvertToInternalUnits() &ndash; Converts a value to Revit's internal unit type.</li>
+</ul>
+
+
+<p>In fact, probably very few people are aware of all the powerful functionality now available.</p>
+
+<p>This became clear to me once again when I was prompted by this query to explore the specific aspect of retrieving or defining abbreviations for the display unit types:</p>
+
+<a name="1"></a>
+
+<p><strong>Question:</strong> How can I determine the units for a given Parameter or FamilyParameter?</p>
+
+<p>I tried to use the LabelUtils GetLabelFor method, passing in the parameter DisplayUnitType.</p>
+
+<p>This returns the full unit name, e.g., "Millimeters" for DUT_MILLIMETERS.</p>
+
+<p>I would prefer something shorter, e.g. an abbreviation like "mm".</p>
+
+<p>How could I achieve that, please?</p>
+
+<p><strong>Answer:</strong> First of all, congratulations on discovering the approach you describe.</p>
+
+<p>It sounds like the best the way to go to me.</p>
+
+<p>The parameter definition defines the basic unit type, e.g. simple ones like length and more complex combined ones like stress. The possible unit types are listed in the UnitType enumeration.</p>
+
+<p>The parameter itself specifies the unit in which this data is displayed to the user, which is controlled by the unit settings, and may be set to things like ft, m or mm for length, and kg / (m · s²), ksi or MPa for stress.  The possible display unit types are listed in the DisplayUnitType enumeration.</p>
+
+<p>We already looked at one
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/unit-conversion-and-display-string-formatting.html">
+unit conversion and display string formatting</a> issue
+
+in some depth, e.g. to define the _map_parameter_type_to_unit_type mapping, the ParameterUnitConverter class and the external command CmdParameterUnitConverter included in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>,
+
+and more recently at another
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/parameter-displayunittype-and-decompilers.html#2">
+Parameter DisplayUnitType enhancement</a>.</p>
+
+<p>The LabelUtils class provides methods to return user-visible names for enumerations via the different overloads of the GetLabelFor method.</p>
+
+<p>That leads to the approach you already discovered.</p>
+
+<p>If you would like a method to return abbreviations for the display unit types instead of their full names, the most efficient approach is probably to <a href="#2">implement your own abbreviation list</a>.</p>
+
+<p>Alternatively, if you are clever, you can also use the Revit API functionality to <a href="#3">automatically generate an abbreviation</a> for you.</p>
+
+<p>I discuss those two options, implement an <a href="#4">external command to test</a> them, point to the <a href="#5">download</a> and wind up with a little <a href="#6">gift</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>How to Implement your Own Hard Coded Display Unit Type Abbreviation List</h4>
+
+<p>You can implement your own display unit type abbreviations right away and it is a very easy thing to do.</p>
+
+<p>In fact, I went and did it for you, for the first 26 of them, at least:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Hard coded abbreviations for the first 26</span>
+&nbsp; <span class="gray">///</span><span class="green"> DisplayUnitType enumeration values.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span>[] DisplayUnitTypeAbbreviation
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;m&quot;</span>, <span class="green">// DUT_METERS = 0,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;cm&quot;</span>, <span class="green">// DUT_CENTIMETERS = 1,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;mm&quot;</span>, <span class="green">// DUT_MILLIMETERS = 2,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ft&quot;</span>, <span class="green">// DUT_DECIMAL_FEET = 3,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_FEET_FRACTIONAL_INCHES = 4,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_FRACTIONAL_INCHES = 5,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;in&quot;</span>, <span class="green">// DUT_DECIMAL_INCHES = 6,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ac&quot;</span>, <span class="green">// DUT_ACRES = 7,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ha&quot;</span>, <span class="green">// DUT_HECTARES = 8,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_METERS_CENTIMETERS = 9,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;y^3&quot;</span>, <span class="green">// DUT_CUBIC_YARDS = 10,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ft^2&quot;</span>, <span class="green">// DUT_SQUARE_FEET = 11,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;m^2&quot;</span>, <span class="green">// DUT_SQUARE_METERS = 12,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ft^3&quot;</span>, <span class="green">// DUT_CUBIC_FEET = 13,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;m^3&quot;</span>, <span class="green">// DUT_CUBIC_METERS = 14,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;deg&quot;</span>, <span class="green">// DUT_DECIMAL_DEGREES = 15,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_DEGREES_AND_MINUTES = 16,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_GENERAL = 17,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;N/A&quot;</span>, <span class="green">// DUT_FIXED = 18,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;%&quot;</span>, <span class="green">// DUT_PERCENTAGE = 19,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;in^2&quot;</span>, <span class="green">// DUT_SQUARE_INCHES = 20,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;cm^2&quot;</span>, <span class="green">// DUT_SQUARE_CENTIMETERS = 21,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;mm^2&quot;</span>, <span class="green">// DUT_SQUARE_MILLIMETERS = 22,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;in^3&quot;</span>, <span class="green">// DUT_CUBIC_INCHES = 23,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;cm^3&quot;</span>, <span class="green">// DUT_CUBIC_CENTIMETERS = 24,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;mm^3&quot;</span>, <span class="green">// DUT_CUBIC_MILLIMETERS = 25,</span>
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;l&quot;</span> <span class="green">// DUT_LITERS = 26,</span>
+&nbsp; &nbsp; };
+</pre>
+
+<p>Note that this a hard coded array, indexed with integer numbers.</p>
+
+<p>I am completely free to choose any abbreviation I like.</p>
+
+<p>An integer index into the list can be obtained by casting from a DisplayUnitType enumeration value.</p>
+
+<p>This array will only return the correct abbreviations as long as the underlying DisplayUnitType enumeration values correspond to the expected integer values.</p>
+
+<p>Therefore, I would strongly recommend you to implement some code in your application start-up that ensures that this is the case, e.g. by calling a sequence of debug assertions like the following:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _s = <span class="maroon">&quot;unexpected display unit type &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;enumeration sequence&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( 0 == (<span class="blue">int</span>) <span class="teal">DisplayUnitType</span>.DUT_METERS, _s );
+&nbsp; <span class="teal">Debug</span>.Assert( 1 == (<span class="blue">int</span>) <span class="teal">DisplayUnitType</span>.DUT_CENTIMETERS, _s );
+&nbsp; <span class="teal">Debug</span>.Assert( 2 == (<span class="blue">int</span>) <span class="teal">DisplayUnitType</span>.DUT_MILLIMETERS, _s );
+
+&nbsp; . . .
+
+&nbsp; <span class="teal">Debug</span>.Assert( 26 == (<span class="blue">int</span>) <span class="teal">DisplayUnitType</span>.DUT_LITERS, _s );
+</pre>
+
+<p>Wouldn't it be nice to avoid this hard-coded list and this sequence of assertions?</p>
+
+<p>Well, you can!</p>
+
+
+
+<a name="3"></a>
+
+<h4>How to Automatically Generate Display Unit Type Abbreviations Using the Revit API</h4>
+
+<p>As said, the Revit API provides a lot of unit handling functionality, and some of it is still poorly known.</p>
+
+<p>I first looked for ways extract the desired abbreviations from a value formatted to the desired unit by the FormatUtils.Format or UnitFormatUtils.Format methods.</p>
+
+<p>They format a number with units into a string, either based on a list of input arguments or based on the units formatting settings for a given document.</p>
+
+<p>If you set up a document to use millimetres and pass it in with the unit type UT_Length and the value 1.0, I would assume it will return the string "1 mm", from which you might be able to extract the desired abbreviation.</p>
+
+<p>I'll leave that as an exercise to the thus inclined reader, though, because I preferred to stick with the display unit types &ndash; with the DUT_ prefix &ndash; and completely avoid the non-display unit types &ndash; with the UT_ prefix &ndash; required by these methods.</p>
+
+<p>After some further digging on the Revit API help file RevitAPI.chm, I discovered the FormatOptions GetValidUnitSymbols method, which does indeed take a display unit type input argument and returns a list of valid unit symbols for it, represented by UnitSymbolType enumeration values.</p>
+
+<p>Here are the first 22 UnitSymbolType enumeration values, out of a total of about 300:</p>
+
+<pre class="code">
+  UST_NONE = 0,
+  UST_M = 1,
+  UST_CM = 101,
+  UST_MM = 201,
+  UST_LF = 301,
+  UST_FOOT_SINGLE_QUOTE = 302,
+  UST_INCH_DOUBLE_QUOTE = 601,
+  UST_ACRES = 701,
+  UST_HECTARES = 801,
+  UST_CY = 1001,
+  UST_SF = 1101,
+  UST_FT_SUP_2 = 1102,
+  UST_FT_CARET_2 = 1103,
+  UST_M_SUP_2 = 1201,
+  UST_M_CARET_2 = 1202,
+  UST_CF = 1301,
+  UST_FT_SUP_3 = 1302,
+  UST_FT_CARET_3 = 1303,
+  UST_M_SUP_3 = 1401,
+  UST_M_CARET_3 = 1402,
+  UST_DEGREE_SYMBOL = 1501,
+  UST_PERCENT_SIGN = 1901,
+  ...
+</pre>
+
+<p>Looking at these enumeration values, I notice that they correspond pretty closely with the hard coded abbreviation strings that I define above.
+Actually, all I have to do is replace the substring "_SUP_" by "^" and convert them to lower case to obtain an identical list.</p>
+
+<p>Accordingly, I implemented the following helper method to fulfil that task:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a UnitSymbolType enumeration value</span>
+&nbsp; <span class="gray">///</span><span class="green"> to a brief human readable abbreviation string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> UnitSymbolTypeString(
+&nbsp; &nbsp; <span class="teal">UnitSymbolType</span> u )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = u.ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( s.StartsWith( <span class="maroon">&quot;UST_&quot;</span> ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected UnitSymbolType enumeration value &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;to begin with 'UST_'&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; s = s.Substring( 4 )
+&nbsp; &nbsp; &nbsp; .Replace( <span class="maroon">&quot;_SUP_&quot;</span>, <span class="maroon">&quot;^&quot;</span> )
+&nbsp; &nbsp; &nbsp; .ToLower();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> s;
+&nbsp; }
+&nbsp;
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>CmdDutAbbreviation External Command to Test the Display Unit Type Abbreviations</h4>
+
+<p>I added a new external command CmdDutAbbreviation to The Building Coder samples to test both versions of my new display unit type abbreviation functionality.</p>
+
+<p>It obviously uses read-only transaction mode, since it does not interact with the Revit database in any way whatsoever.</p>
+
+<p>Omitting the list of assertions described above to verify the expected order of DisplayUnitType enumeration values, the implementation of the CmdDutAbbreviation external command mainline Execute method looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DisplayUnitType</span> n
+&nbsp; &nbsp; &nbsp; = <span class="teal">DisplayUnitType</span>.DUT_GALLONS_US;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Here is a list of the first {0} &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;display unit types with The Building Coder &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;abbreviation and the valid unit symbols:\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) n - 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> valid_unit_symbols;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="teal">DisplayUnitType</span> i = <span class="teal">DisplayUnitType</span>
+&nbsp; &nbsp; &nbsp; .DUT_METERS; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; valid_unit_symbols = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FormatOptions</span>.GetValidUnitSymbols( i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">UnitSymbolType</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; u =&gt; <span class="teal">Util</span>.UnitSymbolTypeString( u ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0,6} - {1}: {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DisplayUnitTypeAbbreviation[(<span class="blue">int</span>)i],
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LabelUtils</span>.GetLabelFor( i ),
+&nbsp; &nbsp; &nbsp; &nbsp; valid_unit_symbols,
+&nbsp; &nbsp; &nbsp; &nbsp; i );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<p>For the first 26 display unit types, it generates the following list of abbreviations from the hard coded string array and the UnitSymbolTypeString method applied to the valid unit symbols:</p>
+
+<pre>
+     m - Meters: none, m
+    cm - Centimeters: none, cm
+    mm - Millimeters: none, mm
+    ft - Decimal feet: none, foot_single_quote, lf
+   N/A - Feet and fractional inches: none
+   N/A - Fractional inches: none
+    in - Decimal inches: none, inch_double_quote
+    ac - Acres: none, acres
+    ha - Hectares: none, hectares
+   N/A - Meters and centimeters: none
+   y^3 - Cubic yards: none, cy
+  ft^2 - Square feet: none, sf, ft^2
+   m^2 - Square meters: none, m^2
+  ft^3 - Cubic feet: none, cf, ft^3
+   m^3 - Cubic meters: none, m^3
+   deg - Decimal degrees: none, degree_symbol
+   N/A - Degrees minutes seconds: none
+   N/A - General: none
+   N/A - Fixed: none
+     % - Percentage: none, percent_sign
+  in^2 - Square inches: none, in^2
+  cm^2 - Square centimeters: none, cm^2
+  mm^2 - Square millimeters: none, mm^2
+  in^3 - Cubic inches: none, in^3
+  cm^3 - Cubic centimeters: none, cm^3
+  mm^3 - Cubic millimeters: none, mm^3
+     l - Liters: none, l
+</pre>
+
+<p>Funnily enough, as you can see, my hand written hard coded abbreviations correspond <b>exactly</b> with the ones I generate automatically from the UnitSymbolType list returned by the FormatOptions GetValidUnitSymbols method.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>As you already know,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-building-coder-samples-on-github.html">
+The Building Coder samples are on GitHub</a>,
+
+so the most up-to-date code is available from the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a>.
+
+The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.105.0">
+release 2014.0.105.0</a>.</p>
+
+
+
+<!--
+
+Victor Chekalin Re: Comment to the Unit Abbreviations post
+
+<a name="5.2"></a>
+
+<h4>Addendum</h4>
+
+<p>Victor Chekalin, or Виктор Чекалин, reacted to this analysis and adds:</p>
+
+<p>Thank you for your investigation.</p>
+
+<p>But... There is a big 'but' :-)</p>
+
+<p>Your method with UnitSymbolType is not completely suitable for localised applications, e.g. Russian.</p>
+
+<p>As always, I have solved these little issues :-)</p>
+
+<p>You write above: 'After some further digging on the Revit API help file RevitAPI.chm, I discovered the FormatOptions GetValidUnitSymbols method'. But you did not dig deep enough to find the old GetLabelFor method in the static LabelUtils class.</p>
+
+<p>If you looked at that, you'll see that one of overridden method takes UnitSymbolType as parameter.</p>
+
+<p>And guess what it returns?</p>
+
+<p>Right. The <b>localizable</b> abbreviation for Unit Symbol :-)  &ndash; exactly what we need.</p>
+
+<p>So, the command to retrieve a suitable localised Unit Type abbreviation becomes much simpler &ndash; check out
+
+<a href="http://pastebin.com/ZZ0mVeYE">http://pastebin.com/ZZ0mVeYE</a>:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">DisplayUnitType</span> n = <span class="teal">DisplayUnitType</span>.DUT_GALLONS_US;
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="teal">DisplayUnitType</span> i = <span class="teal">DisplayUnitType</span>
+&nbsp; &nbsp; .DUT_METERS; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> validUnitSymbols = <span class="teal">FormatOptions</span>
+&nbsp; &nbsp; &nbsp; .GetValidUnitSymbols( i );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> validUnitSymbol <span class="blue">in</span> validUnitSymbols )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( validUnitSymbol != <span class="teal">UnitSymbolType</span>.UST_NONE )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> abbrUnitTypeLabel = <span class="teal">LabelUtils</span>.GetLabelFor(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; validUnitSymbol );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} - {1}&quot;</span>, abbrUnitTypeLabel,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LabelUtils</span>.GetLabelFor( i ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Regards, Victor.</p>
+
+<p>Jeremy adds: I updated
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a> and
+
+integrated Victor's enhancement to the existing CmdDutAbbreviation command, which also includes the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/mapping-display-unit-type-to-unit-types.html">
+Display Unit Type to Unit Types mapping</a> that
+
+we added in the meantime.</p>
+
+<p>The relevant code looks like this now and lists both the official Revit API LabelUtils and hard-coded abbreviations plus the valid unit symbols for the first 26 display unit types:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">MapDutToUt</span> map_dut_to_ut = <span class="blue">new</span> <span class="teal">MapDutToUt</span>();
+&nbsp;
+&nbsp; <span class="teal">DisplayUnitType</span> n
+&nbsp; &nbsp; = <span class="teal">DisplayUnitType</span>.DUT_GALLONS_US;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Here is a list of the first {0} &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;display unit types with official Revit API &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;LabelUtils, hard-coded The Building Coder &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;abbreviations and valid unit symbols:\n&quot;</span>,
+&nbsp; &nbsp; (<span class="blue">int</span>) n - 1 );
+&nbsp;
+&nbsp; <span class="blue">string</span> unit_types, valid_unit_symbols;
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="teal">DisplayUnitType</span> i = <span class="teal">DisplayUnitType</span>
+&nbsp; &nbsp; .DUT_METERS; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; uts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; map_dut_to_ut[i]
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">UnitType</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; u =&gt; u.ToString().Substring( 3 ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> m = uts.Count;
+&nbsp;
+&nbsp; &nbsp; unit_types = 4 &gt; m
+&nbsp; &nbsp; &nbsp; ? <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, uts )
+&nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}, {1} and {2} more&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; uts[0], uts[1], m - 2 );
+&nbsp;
+&nbsp; &nbsp; valid_unit_symbols = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">FormatOptions</span>.GetValidUnitSymbols( i )
+&nbsp; &nbsp; &nbsp; &nbsp; .Where( u =&gt; <span class="teal">UnitSymbolType</span>.UST_NONE != u )
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">UnitSymbolType</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; u =&gt; <span class="teal">LabelUtils</span>.GetLabelFor( u )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;/&quot;</span> + <span class="teal">Util</span>.UnitSymbolTypeString( u ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0,6} - {1} - {2}: {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DisplayUnitTypeAbbreviation[(<span class="blue">int</span>) i],
+&nbsp; &nbsp; &nbsp; <span class="teal">LabelUtils</span>.GetLabelFor( i ),
+&nbsp; &nbsp; &nbsp; unit_types,
+&nbsp; &nbsp; &nbsp; <span class="green">//i</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//UnitFormatUtils.Format( UnitType. ???</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//UnitUtils.ConvertFromInternalUnits( 1, i ),</span>
+&nbsp; &nbsp; &nbsp; valid_unit_symbols );
+&nbsp; }
+</pre>
+
+<p>This generates the following output in the Visual Studio debug output window:</p>
+
+<pre>
+Here is a list of the first 26 display unit types with
+official Revit API LabelUtils, hard-coded The Building
+Coder abbreviations and valid unit symbols:
+
+    m - Meters - Length, SheetLength and 19 more: m/m
+   cm - Centimeters - Length, SheetLength and 20 more: cm/cm
+   mm - Millimeters - Length, SheetLength and 20 more: mm/mm
+   ft - Decimal feet - Length, SheetLength and 19 more: '/foot_single_quote, LF/lf
+  N/A - Feet and fractional inches - Length, SheetLength and 19 more:
+  N/A - Fractional inches - Length, SheetLength and 20 more:
+   in - Decimal inches - Length, SheetLength and 20 more: "/inch_double_quote
+   ac - Acres - Area, HVAC_CrossSection: acres/acres
+   ha - Hectares - Area, HVAC_CrossSection: hectare/hectares
+  N/A - Meters and centimeters - Length, SheetLength and 17 more:
+  y^3 - Cubic yards - Volume, Piping_Volume: CY/cy
+ ft^2 - Square feet - Area, HVAC_CrossSection and 2 more: SF/sf, ft²/ft^2
+  m^2 - Square meters - Area, HVAC_CrossSection and 2 more: m²/m^2
+ ft^3 - Cubic feet - Volume, Piping_Volume and 2 more: CF/cf, ft³/ft^3
+  m^3 - Cubic meters - Volume, Piping_Volume and 2 more: m³/m^3
+  deg - Decimal degrees - Angle, SiteAngle, Rotation: °/degree_symbol
+  N/A - Degrees minutes seconds - Angle, SiteAngle, Rotation:
+  N/A - General - Number:
+  N/A - Fixed - Number, HVAC_Factor, Electrical_Demand_Factor:
+    % - Percentage - Number, Slope and 4 more: %/percent_sign
+ in^2 - Square inches - Area, HVAC_CrossSection and 2 more: in²/in^2
+ cm^2 - Square centimeters - Area, HVAC_CrossSection and 2 more: cm²/cm^2
+ mm^2 - Square millimeters - Area, HVAC_CrossSection and 2 more: mm²/mm^2
+ in^3 - Cubic inches - Volume, Piping_Volume and 2 more: in³/in^3
+ cm^3 - Cubic centimeters - Volume, Piping_Volume and 2 more: cm³/cm^3
+ mm^3 - Cubic millimeters - Volume, Piping_Volume, Section_Modulus: mm³/mm^3
+    l - Liters - Volume, Piping_Volume: L/l
+</pre>
+
+<p>The updated version is published as
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.105.2">
+release 2014.0.105.2</a> and
+
+includes the release 2014.0.105.1
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/mapping-display-unit-type-to-unit-types.html">
+Display Unit Type to Unit Types mapping</a>.</p>
+
+-->
+
+
+
+<a name="6"></a>
+
+<h4>Gift</h4>
+
+<p>Let me close for today with the following uplifting poem by Czeslaw Milosz (1911–2004), 1980 Nobel Prize winner in literature:</p>
+
+<blockquote>
+
+<h4>Gift</h4>
+<p>A day so happy.
+<br/>Fog lifted early. I worked in the garden.
+<br/>Hummingbirds were stopping over the honeysuckle flowers.
+<br/>There was no thing on earth I wanted to possess.
+<br/>I knew no one worth my envying him.
+<br/>Whatever evil I had suffered, I forgot.
+<br/>To think that once I was the same man did not embarrass me.
+<br/>In my body I felt no pain.
+<br/>When straightening up, I saw blue sea and sails.</p>
+</blockquote>

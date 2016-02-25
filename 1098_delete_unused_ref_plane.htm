@@ -1,0 +1,306 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09203609 [DeleteUnnamedNonHostingReferencePlanes]
+
+-->
+
+<h3>Deleting Unnamed Non-Hosting Reference Planes</h3>
+
+<p>Once upon a time, while teaching a Revit API class, the training participants identified a problem that was simple enough to be used as a filtered element collector learning example and did something useful at the same time:
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html#2">
+deleting reference planes not hosting any elements</a>,
+
+implemented as the stand-alone external command DeleteUnnamedNonHostingReferencePlanes.</p>
+
+<p>It deletes all reference planes that have not been named and are not hosting any elements.</p>
+
+<p>Here is another thread discussing
+
+<a href="http://www.revitforum.org/architecture-general-revit-questions/419-filtering-reference-planes.html">
+filtering reference planes</a> and
+
+explaining the use of this.</p>
+
+<p>The first part of the check, for a valid element name, is achieved by using a filtered element collector with an ElementParameterFilter that returns only those elements whose built-in parameter DATUM_TEXT that returns the reference plane element name has an empty string value.</p>
+
+<p>The second part of the check, whether the reference plane is currently hosting any elements, is automatically executed by the Delete method itself, which fails if that is the case.</p>
+
+<p>A developer now raised an issue with that command:</p>
+
+<p><strong>Question:</strong> I have been using the code to delete all unnamed reference planes that do not host any elements.</p>
+
+<p>It worked fine for a long time, but now it is throwing an error and shutting down Revit.</p>
+
+<p>Will you please check this.</p>
+
+<p><strong>Answer:</strong> Thank you for your query.</p>
+
+<p>Basically, the short answer to this question is: no.</p>
+
+<p>The utility command that you refer to was provided on The Building Coder as a learning example to show you how to solve a specific problem yourself.</p>
+
+<p>It is completely unsupported, and any use you make of it is completely at your own risk.</p>
+
+<p>We are more than happy to provide you with developer support for your own applications, but we cannot maintain sample code, nor can we provide any guarantees that the examples presented on the blog will work or be of any productive use at all, except for learning purposes.</p>
+
+<p>Please rephrase the question to request support for solving a specific API related issue that you are encountering in your own application development, and we will be more than happy to help.</p>
+
+<p>I hope you understand the difference.</p>
+
+<p>So, alas, no help for that specific query.</p>
+
+<p>On the other hand, I do wonder for myself what might have changed, and decided to explore the issue anyway.</p>
+
+<p>Meaning that, as an exception, I can change that 'no' to a 'yes' for the nonce.
+Lucky you.</p>
+
+<p>To do so, I implemented a new external command named CmdDeleteUnusedRefPlanes in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>,
+
+migrated the code to the current version and ran a quick test.</p>
+
+<p>Unfortunately, it ended up being not so quick after all, as usual.</p>
+
+<p>The original command uses a filtered element collector to retrieve all unnamed reference planes like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Construct a parameter filter to get only </span>
+&nbsp; <span class="green">// unnamed reference planes, i.e. reference </span>
+&nbsp; <span class="green">// planes whose name equals the empty string:</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.DATUM_TEXT;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterStringRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; provider, evaluator, <span class="maroon">&quot;&quot;</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ReferencePlane</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = 0;
+&nbsp; <span class="blue">int</span> nDeleted = 0;
+&nbsp;
+&nbsp; <span class="green">// No need to cast ... this is pretty nifty,</span>
+&nbsp; <span class="green">// I find ... grab the elements as ReferencePlane</span>
+&nbsp; <span class="green">// instances, since the filter guarantees that </span>
+&nbsp; <span class="green">// only ReferencePlane instances are selected.</span>
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ReferencePlane</span> rp <span class="blue">in</span> col )
+&nbsp; {
+&nbsp; &nbsp; ++n;
+&nbsp; &nbsp; nDeleted += DeleteIfNotHosting( rp ) ? 1 : 0;
+&nbsp; }
+</pre>
+
+<p>That part still works fine and remains unchanged.</p>
+
+<p>As you can see, the original command loops through the resulting reference planes and calls the method DeleteIfNotHosting that performs the deletion using the doc.Delete method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Delete the given reference plane </span>
+&nbsp; <span class="gray">///</span><span class="green"> if it is not hosting anything.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">True if the given reference plane</span>
+&nbsp; <span class="gray">///</span><span class="green"> was in fact deleted, else false.</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">bool</span> DeleteIfNotHosting( <span class="teal">ReferencePlane</span> rp )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = rp.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Delete ReferencePlane &quot;</span>
+&nbsp; &nbsp; &nbsp; + ( ++_i ).ToString() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Deletion simply fails if the reference plane </span>
+&nbsp; &nbsp; <span class="green">// hosts anything. If so, the return value ids </span>
+&nbsp; &nbsp; <span class="green">// is null:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = doc.Delete( rp );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids || 1 &lt; ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.RollBack();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; rc = <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+</pre>
+
+<p>The Delete method overload taking an Element argument is deprecated in Revit 2014, so I replaced it by a call to the overload taking an element id instead:</p>
+
+<pre class="code">
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = doc.Delete( rp.Id );
+</pre>
+
+<p>When running the resulting command, the following exception is thrown:</p>
+
+<pre>
+Autodesk.Revit.Exceptions.ArgumentException:
+  HResult=-2146233088
+  Message=ElementId cannot be deleted.
+Parameter name: elementId
+  Source=RevitAPI
+  ParamName=elementId
+Stack Trace:
+  at Autodesk.Revit.DB.Document.Delete(ElementId)
+  at DeleteIfNotHosting(ReferencePlane rp)
+  at CmdDeleteUnusedRefPlanes.Execute(...) ...
+</pre>
+
+<p>The comment in the original code states that "Deletion simply fails if the reference plane hosts anything. If so, the return value ids collection is null".</p>
+
+<p>This behaviour has been modified in Revit 2014 to throw the exception listed above instead of simply failing.</p>
+
+<p>In other words, this exception is thrown if the reference plane is in fact hosting any elements and therefore should not be removed.</p>
+
+<p>Furthermore, the original command was implemented before I started pointing out that all
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+transactions should best be encapsulated within a 'using' statement</a> block.</p>
+
+<p>Such a block and an exception handler should be added to the call.</p>
+
+<p>Another check that was added in Revit 2014 prevents element deletion while iterating over a collection.</p>
+
+<p>Attempting to delete an element as shown above within the loop iterating over the filtered element collector throws the following exception:</p>
+
+<pre>
+Autodesk.Revit.Exceptions.InvalidOperationException:
+  HResult=-2146233088
+  Message=The iterator cannot proceed due to changes made
+  to the Element table in Revit's database (typically,
+  This can be the result of an Element deletion).
+  Source=RevitAPI
+Stack Trace:
+  at Autodesk.Revit.DB.FilteredElementIterator.MoveNext()
+  at BuildingCoder.CmdDeleteUnusedRefPlanes.Execute() ...
+</pre>
+
+<p>One solution to all this is the following simplification.</p>
+
+<p>Instead of using a separate transaction for each individual attempt to delete a reference plane, do them all in one single go.</p>
+
+<p>Furthermore, extract the element ids from the filtered element collector and process them one by one in a separate follow-up loop.</p>
+
+<p>Finally, add an exception handler around each call to the Delete method, since each call to it with a plane hosting elements will cause it to throw an exception.</p>
+
+<p>Here is the complete resulting external command mainline Execute method implementation:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Construct a parameter filter to get only </span>
+&nbsp; <span class="green">// unnamed reference planes, i.e. reference </span>
+&nbsp; <span class="green">// planes whose name equals the empty string:</span>
+&nbsp;
+&nbsp; <span class="teal">BuiltInParameter</span> bip
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.DATUM_TEXT;
+&nbsp;
+&nbsp; <span class="teal">ParameterValueProvider</span> provider
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ParameterValueProvider</span>(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>( bip ) );
+&nbsp;
+&nbsp; <span class="teal">FilterStringRuleEvaluator</span> evaluator
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilterStringEquals</span>();
+&nbsp;
+&nbsp; <span class="teal">FilterStringRule</span> rule = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
+&nbsp; &nbsp; provider, evaluator, <span class="maroon">&quot;&quot;</span>, <span class="blue">false</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementParameterFilter</span> filter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementParameterFilter</span>( rule );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ReferencePlane</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( filter );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = 0;
+&nbsp; <span class="blue">int</span> nDeleted = 0;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = col.ToElementIds();
+&nbsp;
+&nbsp; n = ids.Count();
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Delete {0} ReferencePlane{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids2 = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; ids );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids3 = doc.Delete(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nDeleted += ids3.Count;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">ArgumentException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} unnamed reference plane{1} examined, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} element{3} in total were deleted.&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; nDeleted, <span class="teal">Util</span>.PluralSuffix( nDeleted ) ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Running this in the rac_basic_sample_project.rvt model produces the following result:</p>
+
+<center>
+<img src="img/delete_unused_reference_planes_msg.png" alt="Delete unused reference planes"/>
+</center>
+
+<p>The new command CmdDeleteUnusedRefPlanes is included in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>,
+
+and the version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.107.0">
+release 2014.0.107.0</a>.</p>

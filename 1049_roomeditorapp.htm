@@ -1,0 +1,482 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>RoomEditorApp Architecture and External Application</h3>
+
+<p>A couple of days ago, I wrote about
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/roomeditorapp-for-revit-2014-on-github.html">
+creating the RoomEditorApp GitHub repository</a> for
+
+the Revit add-in part of my cloud-based real-time round-trip 2D Revit model editing application on any mobile device and promised to discuss its implementation details anon.</p>
+
+<p>Well, the obvious place to start that is by providing an
+
+<a href="#2">architectural overview</a>,
+
+followed by a look at its
+
+<a href="#3">external application implementation</a>.</p>
+
+<p>I'll also mention an issue with
+
+<a href="#4">unresponsive Idling</a> that
+
+I am currently experiencing and hope to resolve, and where to
+
+<a href="#5">download</a> the
+current state of things.</p>
+
+<p>Before getting to the nitty-gritty, by the way, have you already heard that
+
+<a href="http://www.archdaily.com/441499/top-10-apps-for-architects">
+three out of the top ten mobile apps for architects are developed by Autodesk</a>?</p>
+
+
+<a name="2"></a>
+
+<h4>RoomEditorApp Architectural Overview</h4>
+
+<p>The room editor add-in consists of the following modules:</p>
+<ul>
+<li>App.cs</li>
+<li>CmdAbout.cs</li>
+<li>CmdSubscribe.cs</li>
+<li>CmdUpdate.cs</li>
+<li>CmdUpload.cs</li>
+<li>CmdUploadAll.cs</li>
+<li>ContiguousCurveSorter.cs</li>
+<li>DbModel.cs</li>
+<li>DbUpdater.cs</li>
+<li>DbUpload.cs</li>
+<li>GeoSnoop.cs</li>
+<li>JtBoundingBox2dInt.cs</li>
+<li>JtBoundingBoxXyz.cs</li>
+<li>JtPlacement2dInt.cs</li>
+<li>JtWindowHandle.cs</li>
+<li>Point2dInt.cs</li>
+<li>Point2dIntLoop.cs</li>
+<li>RoomEditorDb.cs</li>
+<li>Util.cs</li>
+</ul>
+
+<p>Starting at the end of the list, Util.cs contains a bunch of utilities to handle little details such as:</p>
+
+<ul>
+<li>Unit conversion</li>
+<li>Formatting</li>
+<li>Messages</li>
+<li>Browsing for a directory</li>
+<li>Flipping SVG Y coordinates</li>
+</ul>
+
+<p>Moving back to the beginning of the list, the five modules with a Cmd prefix are external command implementations driven by the custom panel created by the external application defined in App.cs.</p>
+
+<p>They fulfil the following tasks:</p>
+
+<ul>
+<li>CmdAbout &ndash; display an about message.</li>
+<li>CmdUpload &ndash; upload selected rooms and their furniture and equipment to the cloud database.</li>
+<li>CmdUploadAll &ndash; upload all rooms in the model and their furniture and equipment to the cloud database.</li>
+<li>CmdUpdate &ndash; refresh all furniture and equipment family instance placements from the cloud database.</li>
+<li>CmdSubscribe &ndash; toggle back and forth between real-time subscription to updates from the cloud database.</li>
+</ul>
+
+<p>A noteworthy aspect of subscription command is that it switches the button text dynamically to reflect its state. </p>
+
+<p>They are represented by corresponding icons displayed by the ribbon panel user interface:</p>
+
+<center>
+<img src="img/roomedit_2014_ext_app_icons.png" alt="Room editor add-in user interface" width="300"/>
+</center>
+
+<p>The remaining modules can be grouped into the following main areas:</p>
+
+<ul>
+<li>Boundary loops &ndash; determine the room and family instance boundary loop polygons, driven by CmdUpload:</li>
+<ul>
+<li>ContiguousCurveSorter.cs</li>
+<li>JtBoundingBox2dInt.cs</li>
+<li>JtBoundingBoxXyz.cs</li>
+<li>JtPlacement2dInt.cs</li>
+<li>Point2dInt.cs</li>
+<li>Point2dIntLoop.cs</li>
+</ul>
+<li>GeoSnoop &ndash; temporary graphical display of the boundary loops, triggered by CmdUpload when it has done its job:</li>
+<ul>
+<li>GeoSnoop.cs</li>
+<li>JtWindowHandle.cs</li>
+</ul>
+<li>Database model &ndash; manage the information uploaded to and retrieved from the cloud database:</li>
+<ul>
+<li>DbModel.cs</li>
+<li>DbUpdater.cs</li>
+<li>DbUpload.cs</li>
+<li>RoomEditorDb.cs</li>
+</ul>
+</ul>
+
+<p>I already discussed all the aspects of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html">
+boundary loop determination, GeoSnoop graphical debugging display and database representation</a> in
+
+pretty good detail back in April:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#2">Database structure</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#3">Database upload</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#4">Integer based 2D placement</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#5">Populating symbols and instances</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#6">Retrieving the boundary loops</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#7">GeoSnoop loop display</a></li>
+</ul>
+
+<p>Actually, that was the last time I discussed anything at all related to this add-in until migrating it to Revit 2014 last week, so all the items I listed as
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#10">
+next steps</a> back
+
+then and that have now been implemented remain to be discussed.</p>
+
+<p>Let's begin with the external application implementation:</p>
+
+
+
+<a name="3"></a>
+
+<h4>RoomEditorApp External Application Implementation</h4>
+
+<p>The external application fulfils the following main tasks:</p>
+
+<ol>
+<li><a href="3.1">Handle retrieval of the embedded icon resources</a>.</li>
+<li><a href="3.2">Create and populate the custom ribbon panel</a>.</li>
+<li><a href="3.3">Toggle subscription command text and manage the Idling event handler</a>.</li>
+<li><a href="3.4">Main entry points</a>.</li>
+</ol>
+
+<p>Let's look at each of these in more detail.</p>
+
+<a name="3.1"></a>
+
+<h4>Handle Retrieval of Embedded Icon Resources</h4>
+
+<p>All the icons are saved into the Revit add-in assembly as embedded resources, living in an own subfolder named Icon:</p>
+
+<center>
+<img src="img/roomedit_2014_embedded_icon_resource.png" alt="Embedded icon resources" width="220"/>
+</center>
+
+<p>This is obviously very handy, as there is no need to copy the icon files around separately.</p>
+
+<p>Here are the methods used to extract the bitmap image information at runtime:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Executing assembly namespace</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _namespace = <span class="blue">typeof</span>( <span class="teal">App</span> ).Namespace;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return path to embedded resource icon</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> IconResourcePath(
+&nbsp; &nbsp; <span class="blue">string</span> name,
+&nbsp; &nbsp; <span class="blue">string</span> size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _namespace
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;.&quot;</span> + <span class="maroon">&quot;Icon&quot;</span> <span class="green">// folder name</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;.&quot;</span> + name + size <span class="green">// icon name</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;.png&quot;</span>; <span class="green">// filename extension</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Load a new icon bitmap from embedded resources.</span>
+&nbsp; <span class="gray">///</span><span class="green"> For the BitmapImage, make sure you reference </span>
+&nbsp; <span class="gray">///</span><span class="green"> WindowsBase and PresentationCore, and import </span>
+&nbsp; <span class="gray">///</span><span class="green"> the System.Windows.Media.Imaging namespace. </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">BitmapImage</span> GetBitmapImage(
+&nbsp; &nbsp; <span class="teal">Assembly</span> a,
+&nbsp; &nbsp; <span class="blue">string</span> path )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span>[] names = a.GetManifestResourceNames();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Stream</span> s = a.GetManifestResourceStream( path );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != s,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected valid icon resource&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BitmapImage</span> img = <span class="blue">new</span> <span class="teal">BitmapImage</span>();
+&nbsp;
+&nbsp; &nbsp; img.BeginInit();
+&nbsp; &nbsp; img.StreamSource = s;
+&nbsp; &nbsp; img.EndInit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> img;
+&nbsp; }
+</pre>
+
+
+<a name="3.2"></a>
+
+<h4>Create and Populate Custom Ribbon Panel</h4>
+
+<p>I define the various command button data such as its text, implementation class, icon and tooltip in arrays of strings to enable defining the ribbon items in a simple loop.</p>
+
+<p>With the bitmap handling functionality in place, the entire custom ribbon panel creation is handled in one fell swoop by the following AddRibbonPanel method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Caption</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">const</span> <span class="blue">string</span> Caption = <span class="maroon">&quot;Room Editor&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Command name prefix</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _cmd_prefix = <span class="maroon">&quot;Cmd&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Currently executing assembly path</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _path = <span class="blue">typeof</span>( <span class="teal">App</span> )
+&nbsp; &nbsp; .Assembly.Location;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Keep track of our ribbon buttons to toggle</span>
+&nbsp; <span class="gray">///</span><span class="green"> them on and off later and change their text.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">RibbonItem</span>[] _buttons;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create a custom ribbon panel and populate</span>
+&nbsp; <span class="gray">///</span><span class="green"> it with our commands, saving the resulting</span>
+&nbsp; <span class="gray">///</span><span class="green"> ribbon items for later access.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> AddRibbonPanel(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span>[] tooltip = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Upload selected rooms to cloud.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Upload all rooms to cloud.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Update furniture from the last cloud edit.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Subscribe to or unsubscribe from updates.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;About &quot;</span> + Caption + <span class="maroon">&quot;: ...&quot;</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] text = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Upload Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Upload All&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Update Furniture&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Subscribe&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;About...&quot;</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] classNameStem = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Upload&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;UploadAll&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Update&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Subscribe&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;About&quot;</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] iconName = <span class="blue">new</span> <span class="blue">string</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;1Up&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;2Up&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;1Down&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ZigZagRed&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Question&quot;</span>
+&nbsp; &nbsp; };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = classNameStem.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( text.Length == n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal number of text and class name entries&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _buttons = <span class="blue">new</span> <span class="teal">RibbonItem</span>[n];
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> panel
+&nbsp; &nbsp; &nbsp; = a.CreateRibbonPanel( Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SplitButtonData</span> splitBtnData
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SplitButtonData</span>( Caption, Caption );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SplitButton</span> splitBtn = panel.AddItem(
+&nbsp; &nbsp; &nbsp; splitBtnData ) <span class="blue">as</span> <span class="teal">SplitButton</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Assembly</span> asm = <span class="blue">typeof</span>( <span class="teal">App</span> ).Assembly;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> d = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; classNameStem[i], text[i], _path,
+&nbsp; &nbsp; &nbsp; &nbsp; _namespace + <span class="maroon">&quot;.&quot;</span> + _cmd_prefix
+&nbsp; &nbsp; &nbsp; &nbsp; + classNameStem[i] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.ToolTip = tooltip[i];
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.Image = GetBitmapImage( asm,
+&nbsp; &nbsp; &nbsp; &nbsp; IconResourcePath( iconName[i], <span class="maroon">&quot;16&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.LargeImage = GetBitmapImage( asm,
+&nbsp; &nbsp; &nbsp; &nbsp; IconResourcePath( iconName[i], <span class="maroon">&quot;32&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; d.ToolTipImage = GetBitmapImage( asm,
+&nbsp; &nbsp; &nbsp; &nbsp; IconResourcePath( iconName[i], <span class="maroon">&quot;&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _buttons[i] = splitBtn.AddPushButton( d );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="3.3"></a>
+
+<h4>Toggle the Subscription Command Text and Idling Event Handler Management</h4>
+
+<p>With all of the commands in place, the subscription command text toggling and Idling event handler management becomes almost trivial.</p>
+
+<p>I presented the principles to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html#3">
+implement your own toggle button</a>
+
+a year ago, and we simply make use of that here.</p>
+
+<p>The button icon could be toggled as well, if we like.</p>
+
+<p>The Idling event handler is defined in the subscription command implementation, where it belongs.</p>
+
+<p>However, best practice as demonstrated by the ModelessDialog ModelessForm_IdlingEvent Revit SDK sample retains the final control and the subscription to the event in the external application.</p>
+
+<p>In order for the command to define the handler and toggle the subscription on and off, the external application provides a method named ToggleSubscription taking the event handler implementation as an argument.</p>
+
+<p>It subscribes to or unsubscribes from the event as requested, and also toggles the text displayed by the corresponding command button:</p>
+
+<p>I define a property name 'Subscribed' to determine the current subscription status, and toggle it on and off by calling the ToggleSubscription method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Our one and only Revit-provided </span>
+&nbsp; <span class="gray">///</span><span class="green"> UIControlledApplication instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">UIControlledApplication</span> _uiapp;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Switch between subscribe </span>
+&nbsp; <span class="gray">///</span><span class="green"> and unsubscribe commands.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _subscribe = <span class="maroon">&quot;Subscribe&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _unsubscribe = <span class="maroon">&quot;Unsubscribe&quot;</span>;
+
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Are we currently subscribed </span>
+&nbsp; <span class="gray">///</span><span class="green"> to automatic cloud updates?</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> Subscribed
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _buttons[3].ItemText.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; _unsubscribe );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle on and off subscription to </span>
+&nbsp; <span class="gray">///</span><span class="green"> automatic cloud updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt; handler )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp.Idling -= handler;
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _subscribe;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp.Idling += handler;
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _unsubscribe;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="3.4"></a>
+
+<h4>Main Entry Points OnStartup and OnShutdown</h4>
+
+<p>All that remains to do for the external application is initialise the _uiapp variable and add the custom ribbon panel on start-up, and remove the Idling event handler if it is still active on shutdown:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _uiapp = a;
+&nbsp;
+&nbsp; &nbsp; AddRibbonPanel( a );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp.Idling
+&nbsp; &nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( sender, ea ) =&gt; { } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>This is probably my most complex external application to date.</p>
+
+<p>I hope you appreciate its simplicity in spite of all the requirements it fulfils, and that this presentation helps you keep your add-ins as simple as possible as well.</p>
+
+
+<a name="4"></a>
+
+<h4>Unresponsive Idling</h4>
+
+<p>Before closing, let me mention that my tests of this application so far on Revit 2014 and Windows 7 show a decreased responsiveness of the Idling event compared to Revit 2013 and Windows XP.</p>
+
+<p>In Revit 2013, I was even calling the SetRaiseWithoutDelay method to get as many Idling calls as possible with no problem.</p>
+
+<p>Regardless of that setting, the system is currently much less responsive in Revit 2014.</p>
+
+<p>The task manager shows Revit.exe hogging almost 100% percent of the CPU as soon as I subscribe to the Idling event.</p>
+
+<p>Debugging this, I also note that my attempts to unsubscribe from the Idling event handler have no effect; surprisingly, the Idling event handler still gets called anyway.
+Something seems to have changed in the interaction between Revit 2014 and the Idling event.</p>
+
+<p>I added some debugging variables to count the number of Idling calls received, print a message now and then, and skip the database query for most of them.
+I also removed the exception wrapping the database query.
+The problem is somewhat alleviated but not yet solved.</p>
+
+<p>I don't know yet whether I have an issue with my virtual machine in Parallels in Mac, or my cloud database is acting differently on Windows 7 than it did on Windows XP, or some other suboptimal setting is causing this.
+Hopefully I can get it resolved soon, though.</p>
+
+<p>Any advice on this is much appreciated!</p>
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>This application lives in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a> and
+
+the version discussed above is
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.15">
+release 2014.0.0.15</a>.</p>

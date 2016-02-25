@@ -1,0 +1,444 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- opening a document
+  using external event and xaml:
+  http://forums.autodesk.com/t5/revit-api/switching-active-documents-is-not-allowed-during-api-event/m-p/5498500
+  https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle
+  using ApplicationInitialized:
+  http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878
+  C:\a\vs\OpenProject\OpenProject.sln
+
+- https://www.youtube.com/watch?v=JV0HyXjpMi0&feature=youtu.be
+  The Autodesk Foundation is the first foundation to focus investment exclusively on the people and organizations using design for impact. Impact design is a growing trend among designers who are using their talents to create a better world. The fields of public interest, social impact, community, humanitarian, and sustainable design—together making up impact design—are all on a critical growth path as more people use the power of design for positive social and environmental impact.
+  https://internal.autodesk360beta.com/portal/groups/2013022815376/pages/PG5a730QTbf0022d07515287d8e0a9e4c2f7
+  https://www.youtube.com/watch?v=JV0HyXjpMi0
+
+-->
+
+<h3>Open and Activate Document in Event Handler</h3>
+
+<p>I have been a busy beaver with the Revit API on the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">discussion forum</a> in
+
+the past few days, and on
+
+<a href="https://github.com/jeremytammik">GitHub</a> as well.</p>
+
+<p>I want to take a closer look at two related issues that date back a little bit further:</p>
+
+<ul>
+<li><a href="http://forums.autodesk.com/t5/revit-api/switching-active-documents-is-not-allowed-during-api-event/m-p/5498500">
+Switching active documents is not allowed during API event handling</a></li>
+
+<li><a href="http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878">
+Loading a RVT project file automatically on start-up</a></li>
+</ul>
+
+<!--
+<ul>
+<li><a href="#2">Open and activate a document during an API event</a></li>
+<li><a href="#3">Loading a RVT project file automatically on start-up</a></li>
+</ul>
+-->
+
+<p>Let's discuss the first today and save the second for later.</p>
+
+<p>Before getting to that, I also want to mention the Autodesk Foundation that is currently celebrating its one-year anniversary.</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk Foundation</h4>
+
+<p>The Autodesk Foundation is the first foundation to focus investment exclusively on the people and organizations using design for impact.
+<b>Impact design</b> is a growing trend among designers who are using their talents to create a better world.
+The fields of public interest, social impact, community, humanitarian, and sustainable design—together making up impact design—are all on a critical growth path as more people use the power of design for positive social and environmental impact.</p>
+
+<p>Here is a <a href="https://www.youtube.com/watch?v=JV0HyXjpMi0">three and a half minute video</a> explaining more about the Autodesk Foundation and impact design and describing how:</p>
+
+<ul>
+<li>15 impact design organizations were supported by the Autodesk Foundation. One said, “In less than a year, the Autodesk Foundation has become one of the most sophisticated foundations working in the field.”</li>
+<li>2700 nonprofits were supported by employees and/or the Autodesk Foundation with funding, technology, and volunteer time.</li>
+<li>1500 Autodeskers joined in making a positive impact at work, at home, and in the community.</li>
+</ul>
+
+<center>
+<iframe width="420" height="236" src="https://www.youtube.com/embed/JV0HyXjpMi0" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Back to the Revit API...</p>
+
+
+<a name="3"></a>
+
+<h4>Open and Activate a Document During an API Event</h4>
+
+<p>This query on
+
+<a href="http://forums.autodesk.com/t5/revit-api/switching-active-documents-is-not-allowed-during-api-event/m-p/5498500">
+switching active documents is not allowed during API event handling</a> was
+
+raised by
+
+<a href="https://github.com/LiFeleSs">Luigi Trabacchin</a>.</p>
+
+<p>If you wish to fast-forward straight to the solution, it consists in using an external event and XAML in VB.NET, and is demonstrated by the
+
+<a href="https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle">VB.NET RevitOpenAndActivateDuringIdle sample on GitHub</a>.</p>
+
+<p>Here is the edited discussion leading up to this result:</p>
+
+<p><strong>Question:</strong>
+
+This really self-explanatory exception is thrown when I try to do an Application.OpenandActivateDocument, the second time (when I have no active documents it works),</p>
+
+<p>The point is the event I'm trying to do this from, in the application Idling event handler.</p>
+
+<p>I really expected to be allowed to do that from there.</p>
+
+<p><strong>Answer:</strong>
+
+Does this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/closing-the-active-document.html">
+closing the active document</a> help
+
+in any way?</p>
+
+
+
+<p><strong>Response:</strong>
+
+Hello Jeremy I went through your blog thoroughly before posting and that article has been read.</p>
+
+<p>I tried to close the document but I get another error, I think process start can help, but I dislike that option since I don't get any reference to the document ... maybe I can get through open documents and find the one with that filename...</p>
+
+<p>First call works from second on it doesn't.</p>
+
+<p>I made a solution
+
+<a href="https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle">RevitOpenAndActivateDuringIdle</a> to
+
+investigate the problem with the community.</p>
+
+
+<p><strong>Answer</strong> by Arno&scaron;t L&ouml;bel:
+
+Naturally, I have to step in, for I do not like Jeremy’s suggested solution all that much (and he knows it :-)</p>
+
+<p>Although opening a new active document is not allowed from event handlers when there already is a document open in Revit, there may be an alternative. I believe we have implemented External Events so they do not share this restriction with events. Thus, for the user who otherwise used the Idling event, switching to an External Event could be a suitable solution. And it is both supported and safe.</p>
+
+<p>Of course, just as you say, opening a DB document has no restrictions. You should be always able to do it in virtually any situations.</p>
+
+<p>There is some help on using External Events in the SDK samples and Revit API help file.</p>
+
+<p><strong>Response:</strong>
+
+I've found an example about that on Jeremy's blog, my source for inspiration (thanks Jeremy) and updated my solution to not use the Idling event but to raise my shiny new external event, and it works like a charm!</p>
+<p>I didn't realize the external events purpose; I thought it was a way to leverage Idling handling...</p>
+<p>So thanks for pointing me in the right direction!</p>
+
+<p>I updated the
+
+<a href="https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle">GitHub repository</a>,
+
+if you want to include it in the samples...</p>
+
+<p><strong>Answer:</strong>
+
+Congratulations on resolving your problem, and thank you for sharing the result.</p>
+
+<p>I would love to share your sample with the rest of the Revit add-in developer community...</p>
+
+<p>Could you be a bit more specific about what it actually demonstrates and how, now that all the issues you were encountering are resolved and you are clear about the use of external events?</p>
+
+<p><strong>Response:</strong>
+
+Very good!
+You can share my example as long as you want; in fact it is publicly available on
+
+<a href="https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle">GitHub</a>.</p>
+
+<p>The last version of it demonstrates how using an ExternalEvent solves getting the "Switching active documents is not allowed during API event handling" exception trying to open a document (or more than one) during a call from a command or an event such the Idling.</p>
+
+<p>And also it demonstrates how to declare and call the external event.</p>
+
+<p>The previous versions could be also quite useful to some Revit API users because it shows how to get a task executed during the Idling event, but needs some rearrangement because it was built to demonstrate the other issue.</p>
+
+
+<!--
+
+<a name="3"></a>
+
+<h4>Loading a RVT Project File Automatically on Start-up</h4>
+
+<p>Let's follow up with another related query, also raised in the discussion forum with a solution posted to GitHub, on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878">
+loading a RVT project file automatically on start-up</a>.</p>
+
+<p>I already published the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/02/family-instance-area-and-auto-loading-a-project-file.html#3">initial answers</a>
+
+by Arno&scaron;t and me a month ago, but there was much more and the real solution to come later...</p>
+
+
+<p><strong>Question:</strong> I wonder how can I load a Revit file automatically when starting the Revit system.</p>
+<p>Since the UIControlledApplication is the only parameter of the OnStartup function of the IExternalApplication class, while the OpenAndActivateDocument is the function of the UIApplication but not of the UIControlledApplication.</p>
+<p>How can I invoke the UIApplication.OpenAndActivateDocument method in the OnStartup function? Or is there some other method to address the problem?</p>
+
+<p><strong>Answer:</strong> The UIControlledApplication controlled application provided in the OnStartup method cannot open a document, because Revit is still in the process of starting up and is not ready to open and process project files yet.</p>
+
+<p>In the OnStartup method, you can set up a system to open the project document later on, when Revit has finished loading.</p>
+
+<p>Before getting to that, though, let me point out that the easiest way to start up Revit with a project file loaded is to use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/using-processstart-to-open-a-project-or-family.html">
+Process.Start</a>.</p>
+
+<p>Once Revit is up and running, as you have pointed out yourself, you can also use the UIApplication.OpenAndActivateDocument method, as demonstrated in this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/closing-the-active-document.html">closing the active document</a>.</p>
+
+<p>You can prepare a call to this method from within the OnStartup method by temporarily subscribing to the Idling event in the OnStartup method, then unsubscribing from Idling in the Idling event handler, opening the document and doing whatever else you want at that point.</p>
+
+<p>That should give you a couple of useful options to choose from.</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t L&ouml;bel: The Revit API now provides another solution for the problem besides using the Idling event.
+Three years ago, the Idling event may have been the only work-around, but there is a better solution now: a better way of opening a document on start-up is via the ApplicationInitialized event.
+Like with the Idling event, an application subscribes to it during the OnStartup call.
+Revit will raise this event a bit later, when the Revit application start-up has completed.
+Remember, just as with the Idling event, the OpenAndActivateDocument method can be used only as long there is no active document in Revit yet.</p>
+
+
+<p><strong>Response:</strong>
+
+Thank you very much for your prompt and detailed solution.</p>
+
+<p>However, when I tested the System.Diagnostics.Process.Start method, the Revit file can be opened when start the Revit but disappear only straight away.</p>
+
+<p>And I don't know how to test the Idling event and how to use the UIApplication.OpenAndActivateDocument method in OnStartup since I have no access to the UIApplication there.</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+As I tried to explain but failed, apparently, please do not use the Idling event. Use the ApplicationInitialized event instead.
+Subscribe to it during the OnStartup method of your external application, then from within the event's handler invoke the OpenAndActivateDocument method.</p>
+
+<p><strong>Response:</strong>
+
+Thx! I'll try this solution...</p>
+
+<p>When I used the event ApplicationInitialized and the System.Diagnostics.Process.Start in the event handler, it works now.</p>
+
+<p>Thx for ur kindness direction !!</p>
+
+
+
+<p><strong>Question:</strong> by Matt:
+
+I'm not sure if I understand your suggestion to use the ApplicationInitialized event.
+While I agree that event is the right one to use for the timing of when it executes, it doesn't seem like we have access to the right contexts at the right time?</p>
+
+<ul>
+<li>If we register it during startup, we're registering it against the ControlledApplication class.</li>
+<li>When we are in the callback after, we're in the callback of the ControlledApplication class.</li>
+</ul>
+
+<p>When we're in that callback &ndash; how would we have access to the UIApplication object so that we could call OpenAndActivate?</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+I may be wrong, but I think it works differently than what you guessed. The object inside the OnStartup is indeed a ControlledApplication, but it ought to be an Application instance as the sender argument of the ApplicationInitialized even handler. With that you will be able to construct an instance of UIApplication and use its methods.  (Unfortunately, most of us New Englanders are working from their homes  today due to a storm, and I am trying to limit my debugging sessions to a minimum! If it turns out it is not working for you as I suggested, however, let me know and ’ll debug it myself by tomorrow or Wednesday.)</p>
+
+<p>Just as a side note: it does not matter whether an event handler subscribes to an event using ControlledApplication or Application. The repository of application event delegates are always with the Application instance (internally).</p>
+
+<p><strong>Answer:</strong>
+
+You make it sound so easy...</p>
+
+<p>Here we are, an hour or two later:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _test_project_filepath
+&nbsp; &nbsp; = <span class="maroon">&quot;Z:/a/rvt/CurvedWall.rvt&quot;</span>;
+&nbsp;
+&nbsp; UIApplication _uiapp;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Retrieving UIApplication from UIControlledApplication
+&nbsp; &nbsp; <span class="green">// These attempts to access a UIApplication</span>
+&nbsp; &nbsp; <span class="green">// or Application instance are all in vain:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//_uiapp = (UIApplication) a;</span>
+&nbsp; &nbsp; <span class="green">//_uiapp = (UIApplication) a.ControlledApplication;</span>
+&nbsp; &nbsp; <span class="green">//Application app = (Application) a;</span>
+&nbsp; &nbsp; <span class="green">//Application app2 = (Application) a.ControlledApplication;</span>
+&nbsp; &nbsp; <span class="green">//Application app3 = a.m_application;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Using Reflection works, though:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Type</span> type = a.GetType();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Not useful in this case, but interesting:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] publicMembers = type.GetMembers();
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] nonPublicMembers = type.GetMembers( <span class="teal">BindingFlags</span>.NonPublic );
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] staticMembers = type.GetMembers( <span class="teal">BindingFlags</span>.Static );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// This is the call that finally yields useful results:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BindingFlags</span> flags = <span class="teal">BindingFlags</span>.Public
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.NonPublic
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.GetProperty
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.Instance;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] propertyMembers = type.GetMembers(
+&nbsp; &nbsp; &nbsp; flags );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Note that the field &quot;m_application&quot; is listed</span>
+&nbsp; &nbsp; <span class="green">// in the propertyMembers array, and also the </span>
+&nbsp; &nbsp; <span class="green">// method &quot;getUIApp&quot;... let's grab the field:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> propertyName = <span class="maroon">&quot;m_application&quot;</span>;
+&nbsp; &nbsp; flags = <span class="teal">BindingFlags</span>.Public | <span class="teal">BindingFlags</span>.NonPublic
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.GetField | <span class="teal">BindingFlags</span>.Instance;
+&nbsp; &nbsp; <span class="teal">Binder</span> binder = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">object</span>[] args = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">object</span> result = type.InvokeMember(
+&nbsp; &nbsp; &nbsp; &nbsp; propertyName, flags, binder, a, args );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> _uiapp;
+&nbsp;
+&nbsp; &nbsp; _uiapp = (<span class="teal">UIApplication</span>) result;
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Retrieving UIApplication from UIControlledApplication</span>
+&nbsp;
+&nbsp; &nbsp; _uiapp.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// This does not work, because the sender is</span>
+&nbsp; &nbsp; <span class="green">// an Application instance, not UIApplication.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//UIApplication uiapp = sender as UIApplication;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Sender is an Application instance:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// However, UIApplication can be </span>
+&nbsp; &nbsp; <span class="green">// instantiated from Application.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; uiapp.OpenAndActivateDocument(
+&nbsp; &nbsp; &nbsp; _test_project_filepath );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>It works!</p>
+
+<p>Is that what you intended?</p>
+
+<p><strong>Response:</strong>
+
+Thanks!
+You are correct; the sender of the ApplicationInitialized event callback is the Application (not the controlled application).
+So my quest of a non-hacky way to transition between the ControlledApplication and the Application is finally solved!</p>
+
+<p>Jeremy &ndash; I'm not sure that the reflection was actually necessary? Was that just exploration?</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+Perhaps I made it sound simple because it is in fact rather simple. Indeed, as Matt already noted, no reflection is necessary.
+In the OnStartup you get UIControlledApplication, from which you can get ControlledApplication (the latter always exists if the former does), and on that you subscribe to the ApplicationInitialized.
+Keep in mind you cannot cast a ControlledApplication to Application &ndash; that is the ControlledApplication’s very point of existence.</p>
+
+<p>Then in the event handler the sender should be an instance of Application, which can be used to instantiate a UIApplication, on which the OpenAndActivateDocument method can be invoked. Like I said, quite simple. ;-) Each of the two methods is only a few lines of code.</p>
+
+<p><strong>Answer:</strong>
+
+Oh dear. What a waste.</p>
+
+<p>Yes, of course, given the UIApplication constructor taking an Application argument, all is clear and the Reflection is not needed. I did not notice that, and what I described was the first alternative I could find  :-)</p>
+
+<p>Well, well, apparently all roads lead to Rome after all... but it saves effort taking the easiest path.</p>
+
+<p>For the sake of completeness and those that trust nothing but source code, here is the complete solution without using Reflection, showing just how short and simple it can be:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _test_project_filepath
+&nbsp; &nbsp; = <span class="maroon">&quot;Z:/a/rvt/CurvedWall.rvt&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.ControlledApplication.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Sender is an Application instance:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// However, UIApplication can be </span>
+&nbsp; &nbsp; <span class="green">// instantiated from Application.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; uiapp.OpenAndActivateDocument(
+&nbsp; &nbsp; &nbsp; _test_project_filepath );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<p>The complete source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/OpenProject">
+OpenProject GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/OpenProject/releases/tag/2015.0.0.0">
+release 2015.0.0.0</a>.</p>
+
+<p>It could also be noted, for the sake of completeness, that in the majority of application events, the sender is the Application object.
+There are only a handful (if at all that much) of events that are raised by the UIApplication.
+Those are more like exceptions to the rule, as documented in the Revit API help file RevitAPI.chm in the SDK.</p>
+
+-->

@@ -1,0 +1,82 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+FW: Intern Project Posted! Stephen Preston 
+https://autodesk.taleo.net/careersection/adsk_cmp/jobdetail.ftl?job=14WD17104
+http://adndevblog.typepad.com/aec/2015/01/technical-evangelist-intern-wanted.html
+http://modthemachine.typepad.com/my_weblog/2015/01/intern-wanted.html
+
+-->
+
+
+<h3>Autodesk Internship in California and Sorting Edges</h3>
+
+<p>We have an internship opening coming up, and geometrical topics like sorting face loop edges is always fun:</p>
+
+<ul>
+<li><a href="#2">Wanted more alive than alive: intern</a></li>
+<li><a href="#3">Sorting face loop edges</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Wanted More Alive than Alive: Intern</h4>
+
+<p>Are you or someone you know currently pursuing a bachelor or master's degree in computer science or a discipline with a strong computing component? Are you looking for a potentially life-changing internship experience this summer? Look no further; the Autodesk Developer Network is looking for an enthusiastic intern evangelist for this summer in the Bay Area. If you're excited by design and by working with 3D on the web, keep reading.</p>
+
+<p>You  will start by learning the API and developing a plan for writing your own sample apps, then implementing them. You blog about your experiences using the APIs as you progress, so others can follow in your steps. The completed samples are posted to our public GitHub account and used by developer evangelists around the world to showcase the API capabilities. There may be opportunities to attend hackathons, meetups and conferences as a sponsor to help spread the word about these amazing APIs.</p>
+
+<img src="img/internship.png" alt="Internship" width="216"/>
+
+<p>In short, your task will be to have as much fun as possible doing cool things with our APIs, and then telling other people about your achievements.</p>
+
+<p>If you are up for the challenge and this sounds like you,
+
+<a href="https://autodesk.taleo.net/careersection/adsk_cmp/jobdetail.ftl?job=14WD17104">
+apply right away</a>.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Sorting Face Loop Edges</h4>
+
+<p>Back to the Revit API, here is the nicest of the numerous questions that came up today:</p>
+
+<p><strong>Question:</strong> The Face.EdgeLoops property returns a bunch of unsorted edges.</p>
+
+<p>How can I sort them into the proper contiguous order and separate them into inner and outer loops?</p>
+
+
+<p><strong>Answer:</strong> I do not believe the Revit API provides the full functionality that you are asking for.</p>
+
+<p>One method that does part of the work that you should definitely be aware of is the Edge.AsCurveFollowingFace method that returns a curve corresponding to the edge oriented in its topological direction on the specified face.
+That is the simplest option and a good place to start.</p>
+
+<p>I use that myself in the RoomEditorApp, in the module CmdUploadRooms.cs, available from the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>.</p>
+
+<p>Before discovering this method, I implemented similar functionality myself, in the same project, in the GetContiguousCurvesFromSelectedCurveElements method provided by the CurveUtils class in the ContiguousCurveSorter.cs module.</p>
+
+<p>Another bit of Revit API functionality that may be useful in this context is the ExporterIFCUtils.ValidateCurveLoops method.</p>
+
+<p>I also looked at differentiating between inner and outer loops, in one of the very early discussions on The Building Coder.
+This also involves
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">determining the area of the polygons</a>.</p>
+
+<p>Determining areas of polygons is simple, fast and precise.</p>
+
+<p>The more complex, general case with curved edges is harder.
+If you can live with the approximation provided by tessellating the curves, it is trivial to convert the non-linear curved area to an approximated polygonal one.</p>
+
+<p>One potential helpful tool for solving the general case more precisely is a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/boolean-operations-for-2d-polygons.html">2D polygon and Boolean operation library</a>.</p>

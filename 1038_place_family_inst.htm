@@ -1,0 +1,494 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Emmanuel Di Giacomo 
+RE: Revit API application - Automatically place Revit Families at x, y, z coordinates
+
+-->
+
+<h3>Text File Driven Automatic Placement of Family Instances</h3>
+
+<p>My colleague Emmanuel Di Giacomo recently asked me for an application to automatically place Revit family instances in a project at a list of X, Y, Z coordinates read from a text file.</p>
+
+<p>A similar add-in was already published for Revit 2011 at
+
+<a href="http://revitaddons.blogspot.ca/2011/04/revittoday-xyz-out-and-xyz-in.html">Revit Today</a>.</p>
+
+<p>The user interface is minimal:</p>
+
+<center>
+<img src="img/PlaceInstances.png" alt="Place family instances" width="312"/>
+</center>
+
+<p>This form enables the following simple and effective workflow  to achieve a lot of functionality in very few lines of code, significantly aided and abetted by the combo box DataSource and the regular expression supported real number parsing functionality:</p>
+
+<ol>
+<li><a href="#1">On loading</a>, list all families whose placement type equals <code><span class="teal">FamilyPlacementType</span>.OneLevelBased</code>.</li>
+<li><a href="#2">On selecting a family</a>, list all its symbols.</li>
+<li>Prompt the user to <a href="#3">select an input text file</a> containing a list of X, Y and Z coordinates.</li>
+<li>Helper method to parse a string to <a href="#4">extract an XYZ point</a>.</li>
+<li><a href="#5">Parse the input text file</a>.</li>
+<li>External command mainline and form driver &ndash; start a transaction and <a href="#6">place instances of the selected family type</a> at all the XYZ points.</li>
+<li><a href="#7">Conclusion and download</a>.</li>
+<li><a href="#8">GitHub repository</a>.</li>
+</ol>
+
+<p>On an unrelated topic, we end with some news on <a href="#9">BIM 360 Glue</a>.</p>
+
+<p>First, a look at the event handlers and other code implementing the steps above:</p>
+
+
+<a name="1"></a>
+
+<h4>1. On Load &ndash; List Families</h4>
+
+<p>When the form is initially loaded, a filtered element collector retrieves all families in the document.</p>
+
+<p>Since this add-in only supports the simplest form of instance placement and one single overload of the NewFamilyInstance method taking a point, family type and StructuralType argument, we remove all families except the ones whose placement type equals <code><span class="teal">FamilyPlacementType</span>.OneLevelBased</code>:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> PlaceInstancesForm_Load(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt; families = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Family</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Family</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Family</span>&gt;( f =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f.FamilyPlacementType ==
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyPlacementType</span>.OneLevelBased ) );
+&nbsp;
+&nbsp; &nbsp; cmbFamily.DataSource = families;
+&nbsp; &nbsp; cmbFamily.DisplayMember = <span class="maroon">&quot;Name&quot;</span>;
+&nbsp; }
+</pre>
+
+<p>Note how easily and efficiently we can populate the combo box entries using the DataSource property to extract and display the family names to the user.</p>
+
+
+<a name="2"></a>
+
+<h4>2. On Selecting a Family &ndash; List its Symbols</h4>
+
+<p>Each time the selected family changes, the cmbFamily_SelectedIndexChanged event handler updates the list of family symbols it provides.</p>
+
+<p>They are immediately accessible from the Family.Symbols property.</p>
+
+<p>However, the FamilySymbolSet that it returns cannot immediately be passed into the family type combo box DataSource property; it can be passed in after converting it to a generic List instance:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> cmbFamily_SelectedIndexChanged(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ComboBox</span> cb = sender <span class="blue">as</span> <span class="teal">ComboBox</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != cb,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a combo box&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( cb == cmbFamily,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;what combo box are you, then?&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Family</span> f = cb.SelectedItem <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbolSet</span> symbols = f.Symbols;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// I have to convert the FamilySymbolSet to a</span>
+&nbsp; &nbsp; <span class="green">// List, or the DataSource assignment will throw </span>
+&nbsp; &nbsp; <span class="green">// an exception saying &quot;Complex DataBinding </span>
+&nbsp; &nbsp; <span class="green">// accepts as a data source either an IList or</span>
+&nbsp; &nbsp; <span class="green">// an IListSource.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt; symbols2
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">FamilySymbol</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; symbols.Cast&lt;<span class="teal">FamilySymbol</span>&gt;() );
+&nbsp;
+&nbsp; &nbsp; cmbType.DataSource = symbols2;
+&nbsp; &nbsp; cmbType.DisplayMember = <span class="maroon">&quot;Name&quot;</span>;
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>3. Select an Input Text File</h4>
+
+<p>Hmm.
+Actually, there is absolutely nothing to say about this step.
+Well, I can mention the methods implementing it.</p>
+
+<p>The Util class provides a method FileSelectTxt to select the input text file:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Select a specified file in the given folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;folder&quot;&gt;</span><span class="green">Initial folder.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filename&quot;&gt;</span><span class="green">Selected filename on </span>
+&nbsp; <span class="gray">///</span><span class="green"> success.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Return true if a file was successfully </span>
+&nbsp; <span class="gray">///</span><span class="green"> selected.</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> FileSelect(
+&nbsp; &nbsp; <span class="blue">string</span> folder,
+&nbsp; &nbsp; <span class="blue">string</span> title,
+&nbsp; &nbsp; <span class="blue">string</span> filter,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">OpenFileDialog</span> dlg = <span class="blue">new</span> <span class="teal">OpenFileDialog</span>();
+&nbsp; &nbsp; dlg.Title = title;
+&nbsp; &nbsp; dlg.CheckFileExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.CheckPathExists = <span class="blue">true</span>;
+&nbsp; &nbsp; dlg.InitialDirectory = folder;
+&nbsp; &nbsp; dlg.Filter = filter;
+&nbsp; &nbsp; <span class="blue">bool</span> rc = ( <span class="teal">DialogResult</span>.OK == dlg.ShowDialog() );
+&nbsp; &nbsp; filename = dlg.FileName;
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Select a text file in the given folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;folder&quot;&gt;</span><span class="green">Initial folder.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;filename&quot;&gt;</span><span class="green">Selected filename on </span>
+&nbsp; <span class="gray">///</span><span class="green"> success.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">Return true if a file was successfully </span>
+&nbsp; <span class="gray">///</span><span class="green"> selected.</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> FileSelectTxt(
+&nbsp; &nbsp; <span class="blue">string</span> folder,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> FileSelect( folder,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select XYZ coordinate text file or Cancel to Exit&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;XYZ coordinate text Files (*.txt)|*.txt&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> filename );
+&nbsp; }
+</pre>
+
+<p>This helper method is called by the browse button click handler, and the selected file path and directory is saved on success:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> btnBrowseXyz_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> filename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.FileSelectTxt( _txt_folder_name,
+&nbsp; &nbsp; &nbsp; <span class="blue">out</span> filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; txtFilename.Text = filename;
+&nbsp;
+&nbsp; &nbsp; &nbsp; _txt_folder_name = <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; &nbsp; filename );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>4. Parse a String for an XYZ Point</h4>
+
+<p>I use a regular expression to find and extract real numbers from the lines of text parsed from the selected XYZ input file:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> A regular expression to match a </span>
+&nbsp; <span class="gray">///</span><span class="green"> real number with optional leading sign.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _one_real_number_regex
+&nbsp; &nbsp; = <span class="maroon">@&quot;[-+]?[0-9]*\.?[0-9]+&quot;</span>;
+</pre>
+
+<p>Initially, I tried using a more complex regular expression to grab all three XYZ coordinates at once, ignoring all intervening characters of any kind whatsoever:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> A regular expression to match three occurrences</span>
+&nbsp; <span class="gray">///</span><span class="green"> of a real number with optional leading sign.</span>
+&nbsp; <span class="gray">///</span><span class="green"> We gave up using this, because the greedy .*</span>
+&nbsp; <span class="gray">///</span><span class="green"> gobbles the +- sign away from the Y and Z</span>
+&nbsp; <span class="gray">///</span><span class="green"> coordinates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _xyz_real_number_regex
+&nbsp; &nbsp; = <span class="maroon">@&quot;(?&lt;X&gt;&quot;</span> + _one_real_number_regex + <span class="maroon">&quot;)&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">@&quot;.*(?&lt;Y&gt;&quot;</span> + _one_real_number_regex + <span class="maroon">&quot;)&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">@&quot;.*(?&lt;Z&gt;&quot;</span> + _one_real_number_regex + <span class="maroon">&quot;)&quot;</span>;
+</pre>
+
+<p>This does not work well, however, due to the greedy nature of regular expressions, which gobble up as much as they can as soon as possible, for instance removing the preceding +- sign from the Y and Z coordinates.</p>
+
+<p>Furthermore, this forces the user to always enter exactly three coordinates.</p>
+
+<p>By parsing the real numbers one at a time, I can more easily provide support for either two or three coordinates, assuming a zero default Z value.</p>
+
+<p>I pre-compile the regular expression and use it like this in the GetThreeRealNumbers helper method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Static regular expression for </span>
+&nbsp; <span class="gray">///</span><span class="green"> parsing real numbers.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Regex</span> _regex = <span class="blue">new</span> <span class="teal">Regex</span>(
+&nbsp; &nbsp; <span class="green">//_xyz_real_number_regex</span>
+&nbsp; &nbsp; _one_real_number_regex );
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Read three real numbers from the given string</span>
+&nbsp; <span class="gray">///</span><span class="green"> and return true on success. Parse the string s </span>
+&nbsp; <span class="gray">///</span><span class="green"> for exactly two or three real numbers </span>
+&nbsp; <span class="gray">///</span><span class="green"> representing the XY or XYZ placement </span>
+&nbsp; <span class="gray">///</span><span class="green"> coordinates. Z defaults to 0.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> GetThreeRealNumbers(
+&nbsp; &nbsp; <span class="blue">string</span> s,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">double</span>[] xyz )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> i = 0; <span class="green">// index in string</span>
+&nbsp; &nbsp; <span class="blue">int</span> n = 0; <span class="green">// count real numbers found</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Match</span> m = _regex.Match( s, i );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Pure debugging support</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Group</span> g <span class="blue">in</span> m.Groups )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( g.ToString() );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Read all the real numbers we can get</span>
+&nbsp; &nbsp; <span class="green">// and stop if we find too many</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( 4 &gt; n &amp;&amp; m.Success )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 3 &gt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; xyz[n] = <span class="blue">double</span>.Parse( m.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; i = m.Index + m.Length;
+&nbsp; &nbsp; &nbsp; &nbsp; m = _regex.Match( s, i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Group</span> g <span class="blue">in</span> m.Groups )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( g.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; ++n;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Add the default Z coordinate in case of need</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 == n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; xyz[n++] = 0.0;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Return success if we found 2 or 3 real numbers</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> 3 == n;
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>5. Parse Input Text File</h4>
+
+<p>On confirming the selections made, the input file is read and each line is fed to the GetThreeRealNumbers method.</p>
+
+<p>On success, the three real numbers retrieved are used to populate a Revit XYZ point instance and add it to the list.</p>
+
+<p>Lines beginning with a hash characters are considered comments and ignored.</p>
+
+<p>Each non-comment line that is successfully parsed contributes a point instance to the list of family instance placement coordinates; all other lines are simply ignored:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> btnOk_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">StreamReader</span> reader = <span class="teal">File</span>.OpenText(
+&nbsp; &nbsp; &nbsp; txtFilename.Text );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> read = reader.ReadToEnd();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span>[] lines = read.Split( <span class="maroon">'\n'</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s;
+&nbsp; &nbsp; <span class="blue">double</span>[] xyz = <span class="blue">new</span> <span class="blue">double</span>[3] { 0, 0, 0 };
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> line <span class="blue">in</span> lines )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = line.Trim();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( s.StartsWith( <span class="maroon">&quot;#&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Parse string s for exactly two or three</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// real numbers representing the XY or XYZ</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// placement coordinates. Z defaults to 0.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( GetThreeRealNumbers( s, <span class="blue">ref</span> xyz ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = <span class="blue">new</span> <span class="teal">XYZ</span>( xyz[0], xyz[1], xyz[2] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _pts )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; _pts.Add( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>This leaves plenty of space for you to shoot yourself in the foot, since no warnings are issued if a line does not parse correctly.</p>
+
+<p>We are lenient and expect you to either make no errors or notice them yourself.</p>
+
+
+
+<a name="6"></a>
+
+<h4>6. External Command Mainline and Form Driver &ndash; Place Instances of the Selected Family Type</h4>
+
+<p>The external command mainline Execute method performs the following tasks:</p>
+
+<ul>
+<li>Determine the main Revit application window handle to define the form owner.</li>
+<li>Display and handle the place instances form.</li>
+<li>On confirmation, open and commit a transaction in which instances of the selected family type are placed at all XYZ points read from the input file.</li>
+</ul>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PlaceInstancesForm</span> f
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">PlaceInstancesForm</span>( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == f.ShowDialog(
+&nbsp; &nbsp; &nbsp; revit_window ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Place Instances&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creation_doc = doc.Create;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span> st
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">StructuralType</span>.NonStructural;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> f.Points )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; creation_doc.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p, f.Type, st );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Short and sweet, isn't it?</p>
+
+
+<a name="7"></a>
+
+<h4>7. Conclusions and Download</h4>
+
+<p>This is rather a lot of useful functionality in rather a few lines of code, I think.</p>
+
+<p>I was especially happy to make use of the DataSource property to directly populate a .NET user interface widget from a filtered element collector.</p>
+
+<p>Well, actually, there is now a tiny amount of LINQ code in between the collector and the data source property.
+The initial version did not check for the family placement type, and the filtered element collector was used to feed it directly.</p>
+
+<p>To see the whole thing in context and try it out for yourself, here is
+
+<a href="zip/PlaceInstances05.zip">PlaceInstances05.zip</a> containing
+
+the full source code, Visual Studio solution and add-in manifest for the PlaceFamilyInstances external command.</p>
+
+<p>Please be aware that it only supports the simplest kind of family placement requiring a single input point.</p>
+
+<p>Support for curve based, face or element hosted families etc. is left as an exercise to the reader.</p>
+
+<p>Many thanks to Emmanuel for suggesting and testing this.</p>
+
+
+<a name="8"></a>
+
+<h4>8. The PlaceInstances GitHub Repository</h4>
+
+<p>Better than the direct download above, I repeat my exercise from yesterday creating the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/move-duct-join-add-in-with-video-and-github-support.html#6">
+MoveDuctJoin GitHub repository</a>.</p>
+
+<p>Here is the new
+
+<a href="https://github.com/jeremytammik/PlaceInstances">PlaceInstances</a> repository,
+
+including the direct link to download the
+
+<a href="https://github.com/jeremytammik/PlaceInstances/archive/master.zip">
+latest version</a> or
+
+access this first Revit 2014 release,
+
+<a href="https://github.com/jeremytammik/PlaceInstances/archive/2014.0.0.5.zip">version 2014.0.0.5</a>.</p>
+
+<p>Actually, I already fixed something after starting to write this article, so the latest current release is now
+
+<a href="https://github.com/jeremytammik/PlaceInstances/archive/2014.0.0.6.zip">version 2014.0.0.6</a>.</p>
+
+
+
+<a name="9"></a>
+
+<h4>9. BIM 360 Glue API Pilot and Updated Samples</h4>
+
+<p>Last but not least, I discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">
+BIM 360 Glue viewer and REST API</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">
+authentication using Python</a> end
+
+of last year.</p>
+
+<p><a href="http://adndevblog.typepad.com/aec/mikako-harada.html">Mikako Harada</a> now
+
+published information on the
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/bim-360-glue-api-pilot-and-updated-samples.html">
+BIM 360 Glue API pilot and updated samples</a> that
+
+you definitely should check out if you have any interest in this area.</p>
+
+<p>This of course ties in quite nicely with the chance to win $5000 in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/revit-2013-api-developer-guide-pdf.html#4">
+AppHack contest 2.0</a>...</p>

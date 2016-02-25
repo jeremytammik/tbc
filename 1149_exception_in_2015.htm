@@ -1,0 +1,171 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+exception thrown when accessing API from separate thread
+
+http://forums.autodesk.com/t5/Revit-API/Revit-2015-exception-with-Autodesk-Revit-DB-CustomExporter/m-p/4981202
+
+09549857 [Revit 2015 API issue]
+Ryan WelchKierantimberlake
+
+09555900 [Getting Element Parameter Value Exception]
+Kevin YuInnovaya LLC
+
+-->
+
+<h3>Multithreading Throws Exceptions in Revit 2015</h3>
+
+<p>I have received several cases lately dealing with add-ins that have been working fine in previous versions of Revit and now throw various exceptions after migration to Revit 2015.</p>
+
+<p>Similar issues were also raised in the Revit API discussion forum, e.g. exploring a
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Revit-2015-exception-with-Autodesk-Revit-DB-CustomExporter/m-p/4981202">Revit 2015 exception with a CustomExporter</a>.</p>
+
+<p>In all of the cases so far, these problems were due to attempts to access the Revit API from a multi-threaded context.</p>
+
+<p>As the Revit API documentation clearly states, multi-treaded use of the Revit API is not supported and never has been.</p>
+
+<p>This is spelled out in those very words in the
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API developers guide</a>.
+
+<p>If you search it for the single word "thread", the first hit displayed is the section on
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-411A9D2F-9748-46AC-9C2F-EA2D90DABCFD">Deployment Options</a>:</p>
+
+<a name="2"></a>
+
+<h4 style="color:darkblue">Deployment Options</h4>
+
+<p style="color:darkblue">The Autodesk Revit API supports in-process DLLs only. This means that your API application will be compiled as a DLL loaded into the Autodesk Revit process. The Autodesk Revit API supports single threaded access only. This means that your API...</p>
+
+<p>Let's look at two recent cases dealing with this:</p>
+
+<p><strong>Question 1:</strong> I am migrating my Revit add-in from Revit 2014 project to Revit 2015.</p>
+
+<p>In it, I loop through the parameters of an element, and check the parameter StorageType.
+If it's Double, e.g., I call AsDouble to retrieve the parameter value.</p>
+
+<p>This code worked fine in Revit 2013 and 2014.
+In 2015, it throws an exception error and exits Revit.</p>
+
+<p>Many other properties on the parameter also generate the same exception, e.g. HasValue, IsReadOnly and so on.</p>
+
+<p>If I run in Debug mode, an AccessViolationException is thrown:</p>
+
+<center>
+<img src="img/ky_accessviolationexception.png" alt="AccessViolationException"/> <!--  width="400" -->
+</center>
+
+<p>Running my add-in program directly from Revit in release mode causes an unrecoverable error:</p>
+
+<center>
+<img src="img/ky_unrecoverable_error.png" alt="Unrecoverable error"/> <!--  width="400" -->
+</center>
+
+<p>After that, Revit closes:</p>
+
+<center>
+<img src="img/ky_error_report.png" alt="Error report"/> <!--  width="400" -->
+</center>
+
+<p>My add-in calls a method that runs in its own background worker process.</p>
+
+<p>As said, this code worked fine for several years, e.g. in Revit 2012 and 2013, and the problem only appears in Revit 2015.</p>
+
+
+<p><strong>Question 2:</strong> Having previously developed a custom add-in for Revit 2013 and 2014, I am now testing a forthcoming release for Revit 2015 compatibility. After changing references to the 2015 versions of RevitAPI.dll and RevitAPIUI.dll and the target framework to .NET 4.5, I attempted to run the program via the 2015 Add-in Manager. It loaded without any issues, but when it attempted to execute code pertaining to a background worker class (which updates a UI progress bar) Revit crashed immediately. </p>
+
+<p>Are add-ins no longer able to execute background worker classes on a separate thread from the main Revit UI thread?
+If so, this seems like a significant change.</p>
+
+<p>Essentially, I am trying to get a progress bar to update while performing time-consuming calculations based on elements in the Revit model (no transactions, just collecting and reading parameter values).</p>
+
+<p><strong>Answer:</strong> You are perfectly correct in your assessment of the problem:</p>
+
+<p>Revit add-ins are not allowed to access the Revit API from separate threads, only from the main Revit UI thread.</p>
+
+<p>However, this is not a significant change, and not even a change at all.</p>
+
+<p>This has always been the case.</p>
+
+<p>For better protection of the add-ins developers and their users, it is now more strictly enforced.</p>
+
+<p>Please look at the
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API developers guide</a> and
+
+its section on
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-411A9D2F-9748-46AC-9C2F-EA2D90DABCFD">Deployment Options</a> quoted
+
+above.</p>
+
+<p>If you were previously accessing the Revit API from a separate thread, you and your users were at great risk.</p>
+
+<p>If all you are doing in the separate thread is display a progress bar, with no Revit API access at all, there should be no problem.</p>
+
+<p>Revit API access is however limited to the main thread.</p>
+
+<p>This very topic was explicitly discussed on The Building Coder three years ago, in a post with a title that says it all:
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/no-multithreading-in-revit.html">
+no multithreading in Revit</a>.</p>
+
+<p>Regarding the task at hand, you will have to collect all the required Revit element data in one go beforehand, from the main execution thread.</p>
+
+<p>Once you have it, you can happily launch your processing and progress bar in a separate thread, as long as you make no more Revit API calls in it.</p>
+
+
+<p><strong>Response:</strong> Thanks for your feedback. The challenge I was facing is that it is precisely the Revit API calls (which consist of filtered element collectors and get parameter values) that consume the vast majority of operation time, i.e. ca. 30 seconds for a moderately sized Revit model. Hence, I chose to introduce a background worker that would enable me to update a progress bar during the operation, so that our users would know if there was time to go get a coffee.</p>
+
+<p>I found your progress bar example in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample-adnrme-for-revit-mep-2013.html">ADN Revit MEP sample AdnRme</a> quite
+
+helpful insofar as you were able to implement UI updates without resorting to multithreading via a call to the System.Windows.Forms.Application.DoEvents method. I tried moving my earlier code outside the background worker and replacing each instance of</p>
+
+<pre class="code">
+  bw.ReportProgress(progress, notification);
+</pre>
+
+<p>with</p>
+
+<pre class="code">
+  reportProgress(progress, notification);
+</pre>
+
+<p>where the associated functions are defined as follows:</p>
+
+<pre class="code">
+  bw.ProgressChanged += new ProgressChangedEventHandler(
+    delegate(object o, ProgressChangedEventArgs args)
+    {
+      bProg.Value = args.ProgressPercentage;
+      labelPerc.Text = args.ProgressPercentage + "%";
+      labelLoading.Text = args.UserState.ToString();
+    });
+
+  void reportProgress(int progressvalue, string notification)
+  {
+    bProg.Value = progressvalue;
+    labelPerc.Text = progressvalue + "%";
+    labelLoading.Text = notification;
+    System.Windows.Forms.Application.DoEvents();
+  }
+</pre>
+
+<p>And the good news is... with this change my application seems to work perfectly well in Revit 2015!</p>
+
+<p>The only noticeable difference is that I loose UI control within my form while the time-consuming operations are taking place (except for that brief moment when the UI refresh takes place and users can access events like click, resize, drag, et. al.). This isn't a problem for me, as I don't need users to do any UI work while my application is performing these operations. Are you aware of any potential pitfalls of this DoEvents call? If not, I'd say this is a great workaround!</p>
+
+<p>So please be aware that multi-threaded usage might be causing unexpected new exceptions in your code that seemed to work fine in previous versions.</p>
+
+<p>I hope you can appreciate and be grateful that you are now forced to rectify the previous illegal API usage.</p>
+
+<p>Sorry for the additional work this might be causing.</p>
+
+<p>It is for your own good  :-)</p>

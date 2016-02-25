@@ -1,0 +1,389 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Jim Quanci RE: running Revit and other Autodesk software as a service
+
+Adam Nagy RE: Headless version of Revit / Revit as a service?
+
+--------------------
+Question in an email
+--------------------
+
+From: Jim Quanci 
+Date: Friday, April 18, 2014 19:32
+To: Jeremy Tammik 
+Cc: Stephen Preston , Mikako Harada , Cyrille Fauvel 
+Subject: RE: running Revit and other Autodesk software as a service
+
+Jeremy –
+
+You have it correct.
+
+Yes they can do this internally.
+
+But not externally.
+
+“Sorry, we understand the need, you are not the only one asking, but we don’t have an answer at this time, sorry”.
+
+On what more we want to say about Revit on a server... leaving that to Mikako to sort out with Anthony and company.
+
+I would hope we would get a Revit web service at some point (like the AutoCAD folks are developing – ACES – or how the Inventor folks have made formally “okay” with Inventor ETO).
+
+Cheers,
+Jim Q
+Mobile: +1-415-640-4461
+
+From: Jeremy Tammik
+Sent: Friday, April 18, 2014 10:24 AM
+To: Jim Quanci; Stephen Preston; Mikako Harada; Cyrille Fauvel
+Subject: running Revit and other Autodesk software as a service
+
+hi guys,
+
+what is the official statement to make on a query such as the below?
+
+i feel really stupid telling people "this is not officially legal nor supported, but go ahead and do it if you like".
+
+it sounds completely crazy.
+
+obviously (i guess) the limit is somewhere along the lines of "are you using this for yourself or selling this service to others?"
+
+what can i tell officially people about this?
+
+or whom can i send them to for a reliable statement?
+
+i am getting at least one question like this every single week.
+
+thank you!
+
+cheers and happy easter!
+
+jeremy
+
+From: Chris Oace 
+Date: Friday, April 18, 2014 18:29
+To: Jeremy Tammik 
+Subject: If you could answer a question about REVIT API please
+
+Jeremy,
+
+You have a wonderfully instructive blog... thank you for the time you spend putting it together.  I was searching your blog for mention of a capability, and did not see it.  Either it doesn’t exist or you haven’t written about it.  That’s why I’m writing you.
+
+We created a Revit ADDIN that takes advantage of the API (since 2010).  We use our existing program (Andersen’s Window Studio®) to generate the geometry that is fed into the Revit API for creating windows and doors in the Family Editor.  This works quite nicely on the desktop version of Revit.  We have a similar SketchUp plugin too.
+
+We want to allow online users to use the Revit API to generate their Family/Type.  AutoDesk’s release of RevitLT makes this much more important since LT does not allow the use of Addins.  If we could run Revit as a service, it would also allow us to have a presence on SEEK.
+
+So we would like to run Revit as a service, send online-collected parameters via a webservice, and return a Revit RFA file to the requestor (asynchronously).
+
+Has that finally been made possible with the new Revit 2015? Or Autodesk 360?
+
+Thank you so much for taking the time to answer this question.
+
+Chris Oace
+THE WEIDT GROUP®
+
+5800 Baker Road
+Minnetonka, MN 55345
+T 952.938.1588
+F 952.938.1480
+twgi.com
+
+------------------------------------------
+Question on the Revit API discussion forum
+------------------------------------------
+
+From: Adam Nagy 
+Date: Saturday, April 19, 2014 00:26
+To: Sasha Crotty , Arnost Lobel , Revit API 
+Subject: RE: Headless version of Revit / Revit as a service?
+
+Thank you both.
+
+"Running regular Revit on a server would be very difficult;" - you mean it would not be very difficult? :)
+
+So if a company has one license of Revit and they run it on a machine/server that can be accessed by others just to automate certain tasks, would that be legal?
+What if all users accessing this server has a license of Revit, would that make it legal?
+
+E.g. in case of Inventor, as far as I know, the only legal way of running Inventor as a server, is to buy it as part of Inventor ETO.
+
+From: Sasha Crotty
+Sent: 18 April 2014 22:51
+To: Arnost Lobel; Adam Nagy; Revit API
+Subject: RE: Headless version of Revit / Revit as a service?
+
+I want to make one correction. At this time, there is no external access to RCE whatsoever. Please do not discuss this as an option outside of Autodesk.
+
+There may, however, be opportunity for Autodesk Consulting to build customer solutions on top of RCE. Please discuss requests for this capability directly with me.
+
+Thanks,
+Sasha
+
+Sasha Crotty
+Product Manager
+Revit Platform Technologies
+Building & Collaboration Product Group
+
+From: Arnost Lobel
+Sent: Friday, April 18, 2014 5:36 PM
+To: Adam Nagy; Revit API
+Subject: RE: Headless version of Revit / Revit as a service?
+
+There is several things/requests mixed together that need sorting. I'll try to state the minimum of facts; hopefully it'll help.
+
+1. It is perfectly legal run running Revit on whatever machines (user or server) as long as there is a valid licence available for it. Running regular Revit on a server would be very difficult; it would not even require depending on the Idling event mechanism.
+
+2. It is not legal to run external applications with Revit LT (assuming the user finds a way of doing so (it would require serious hacking).
+
+3. Revit has a special mode for running without the UI, a.k.a. the Headless Revit, a.k.a. Faceless Revit, a.k.a. Revit Core Engine, "RCE"). It is not legal for parties outside or Autodesk to use that mode, however. A special written permission must be obtained to run in RCE mode.
+
+I hope it makes sense.
+
+Thank you
+
+Arnošt Löbel
+
+Sr. Principal Engineer
+
+From: Adam Nagy
+Sent: Friday, April 18, 2014 2:15 PM
+To: Revit API
+Subject: Headless version of Revit / Revit as a service?
+
+Hi guys,
+
+I'm not sure I fully understand what this guy means, but the question it made me wonder about is if it's legal to use Revit on a server machine to generate families based on info from multiple users:
+
+http://forums.autodesk.com/t5/Revit-API/Revit-server-API-access/m-p/4971680
+
+>>>>>
+Last year I posted a question (in this thread) about using Revit 2013 as a service.  I didn't hear back that it was possible.  Do you know whether the new 2015 version of Revit and the 2015 Revit API would allow Revit to be accessed as a Software As A Service implementation?  We have an even greater need to do this now that Revit LT has been adopted by folks who want to incorporate our windows and doors into their Revit models.  Since LT is not designed to run the Addins, they have no way of using our window generator Addin.
+<<<<<
+
+I guess technically it should be possible to start up Revit and then an addin would just keep generating stuff in the onidle event based on some info coming from outside.
+
+Cheers,
+Adam
+
+-->
+
+<h3>Revit as a Service and Sheet-View-Element Transforms</h3>
+
+<p>Several people recently brought up the question of running Revit as a service, e.g. in this
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Revit-server-API-access/m-p/4971680">
+Revit API forum discussion thread</a>,
+
+so let us take a closer look at that.</p>
+
+<p>I also finally got around to making some seriously overdue progress on the RoomEditorApp, which I should really rename to SimplifiedBimEditorApp.
+It now displays a Windows preview form showing the sheets, the views, and the elements they contain in preparation to uploading them to a cloud database.</p>
+
+<p>While I'm at it, I'll also add an explanation on the relationship &ndash; or non-relationship &ndash; between line style and line pattern.</p>
+
+<p>So here goes:</p>
+
+<ul>
+<li><a href="#2">On running Revit as a service</a></li>
+<li><a href="#3">Sheet view element display transformation</a></li>
+<li><a href="#4">Non-relationship between Line Style and Line Pattern</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>On Running Revit as a Service</h4>
+
+<p>I already presented examples of running Revit as a service by making use of the Idling or an external event, e.g. to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">
+drive Revit through a WCF service</a>,
+
+proving it at least technically feasible.</p>
+
+<p>One important question in this context is the legality of making serious use of this possibility.</p>
+
+<p><strong>Question:</strong> I have implemented a Revit add-in that uses our existing stand-alone program to generate geometry that is fed into the Revit API for creating windows and doors in the family editor.
+This works nicely on the desktop version of Revit, and we have implemented a similar SketchUp plugin too.</p>
+
+<p>I would like to allow online users to use the Revit API to generate their families and types as well.
+The release of Revit LT makes this even more important, since it does not allow the use of add-ins.
+If we could run Revit as a service, it would also allow us to have a presence on
+
+<a href="http://seek.autodesk.com">Autodesk Seek</a>.</p>
+
+<p>So we would like to run Revit as a service, send online-collected parameters via a web service, and asynchronously return a Revit RFA file to the requestor.</p>
+
+<p>Ideally, we just need the Revit family editor to be running as a service.</p>
+
+<p>Is that finally possible with Revit 2015? Or Autodesk 360?</p>
+
+
+<p><strong>Answer:</strong> The Revit and other Autodesk software licenses do not officially allow running the software as a service.</p>
+
+<p>On the other hand, technically it definitely is possible.</p>
+
+<p>As Adam explained in the
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Revit-server-API-access/m-p/4971680">
+forum thread</a>,
+
+"no headless or server version of Revit is available. <!-- for third parties. -->
+Technically it should be possible to have a Revit on a server that is accessed from other computers to do some processing.
+I do not know the legal side of it though &ndash; e.g. if all users accessing this server would need to have a full Revit license or not, or if even that would not make it legal."</p>
+
+<p>Here is an add-in showing how you can
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">
+drive Revit through a WCF service</a>.</p>
+
+<p>The Building Coder also provides a number of other examples of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+driving Revit from outside</a>.</p>
+
+<p>There are licensing issues to overcome and you may want to talk to the appropriate people at Autodesk about using a Revit in this way.</p>
+
+<p>It is legal to run Revit on any machine (user or server) as long as there is a valid licence available for it. Running regular Revit on a server would require depending on the Idling or an external ß  event mechanism.</p>
+
+<p>It is not legal and hopefully not possible either to run external applications with Revit LT.</p>
+
+<p>You can also discuss with Autodesk Consulting about building custom solutions making use of Revit as a service.</p>
+
+
+<a name="3"></a>
+
+<h4>Sheet View Element Display Transformation</h4>
+
+<p>The last update on my Tech Summit preparations showed how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/determining-the-size-and-location-of-viewports-on-a-sheet.html">
+determine the size and location of viewports on a sheet</a>.</p>
+
+<p>Retrieving the geometry of the elements displayed in the views and transforming them appropriately to fit inside the viewports displayed on a sheet is a bit more complex.
+It required some struggles and refactoring of the RoomEditorApp code.</p>
+
+<p>Happily I managed, however.</p>
+
+<p>Here is a simple sample sheet with three views:</p>
+
+<center>
+<img src="img/sheet_bimel_01.png" alt="Sheet with three views" width="407"/>
+</center>
+
+<p>I implemented the code to display an simplified view of this in a temporary Windows .NET form generated on the fly in preparation to uploading it to a NoSQL cloud database.
+The required steps include the calculations of the following transformation to:</p>
+
+<ul>
+<li>Scale the sheet to the form</li>
+<li>Place each view in its corresponding viewport on the sheet</li>
+<li>Place the elements displayed within each view in the appropriate positions in each viewport</li>
+<li>Handle family instance transformations</li>
+</ul>
+
+<p>The resulting form looks like this:</p>
+
+<center>
+<img src="img/sheet_bimel_02.png" alt="Windows preview of sheet, views and BIM elements" width="407"/>
+</center>
+
+<p>All elements from views that are not floor plans are ignored.</p>
+
+<p>I determine the element scaling by rather naively calculating the bounding box of all elements within each view and mapping that to the viewport rectangle.</p>
+
+<p>That is obviously not precise.
+However, it should suffice for my needs.</p>
+
+<p>As explained when discussing the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/selecting-visible-categories-from-a-set-of-views.html">
+selection of visible categories from a set of views</a>,
+
+only specific BIM elements belonging to selected categories are retrieved and displayed.</p>
+
+<p>Obviously, we have no interest in showing the elevation view markers and such-like stuff.</p>
+
+<p>Curtain walls are currently missing, because I am not handling the way their geometry is defined.</p>
+
+<p>The code to achieve this is provided in full by the updated RoomEditorApp, Visual Studio solution and add-in manifest in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.10">
+release 2015.0.2.10</a>.</p>
+
+<p>After finishing and publishing the above, I cleaned up the code a bit and added one more small but significant feature.</p>
+
+<p>Previously, I was simply ignoring family instances with no location property.</p>
+
+<p>That was causing the curtain walls to disappear.</p>
+
+<p>I modified the code to treat family instances with no location point as fixed building element parts instead.</p>
+
+<p>Lo and behold, the curtain walls now appear just fine:</p>
+
+<center>
+<img src="img/sheet_bimel_03.png" alt="Preview including curtain walls" width="407"/>
+</center>
+
+<p>The updated version fresh off the press is
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.11">
+release 2015.0.2.11</a>.</p>
+
+
+
+<!--
+
+09521521 [How to get the relationship between a Line Style and a Line Pattern?]
+
+David VanSlykeCAD Technology Center Inc
+
+http://forums.autodesk.com/t5/Revit-API/How-to-get-the-relationship-between-a-Line-Style-and-a-Line/m-p/4993274
+
+-->
+
+<a name="4"></a>
+
+<h4>Non-relationship Between Line Style and Line Pattern</h4>
+
+<p>The following is a summary of the Revit API discussion forum thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/How-to-get-the-relationship-between-a-Line-Style-and-a-Line/m-p/4993274">
+how to get the relationship between a line style and a line pattern</a>:</p>
+
+<p><strong>Question:</strong> I am struggling to figure out how to find the relationship between a line style and a line pattern in the Revit project environment.</p>
+
+<p>For example, line styles are basically a subcategory of the Line category.  The general Line category can have many Line Style subcategories, and all subcategories of the Line category apparently *are* line styles.</p>
+
+<p>To get to line patterns, you use a FilteredElementCollector.OfClass (LinePatternElement).</p>
+
+<p>Line Patterns have a name and a list of LineSegment classes, each which has a Length double and an enum LineSegmentType (e.g. dash, dot or space).</p>
+
+<p>Each line style can have exactly 1 line pattern or no line patterns.  What we need to find out is which line pattern (if any) is related to each line style (subcategory).  There does not seem to be, for example, a LinePattern property on the Category class (Category class is used for both Categories and SubCategories, so in reality a Line Style is of the Category class).</p>
+
+
+<p><strong>Answer:</strong> This was discussed not long ago in the following Q & A:</p>
+
+<p><b>[Q]</b> The Revit documentation says that Line Patterns are used in the definition of GraphicsStyle objects: "A line pattern is a pattern of dashes and dots used to control the way the lines of an object are drawn in Revit. Line patterns are used in the definition of GraphicsStyle objects. A line pattern is defined by a repeating sequence segments. Each segment is a dash, a dot or a space. A line pattern definition must contain an even number of segments, starting with a visible segment (a dash or a dot) and alternating between visible segments and spaces." However, I could not find any APIs to connect these objects. How are these objects connected and how to use the APIs to connect them?</p>
+
+<p><b>[A]</b> Revit does currently not expose the API to set or get a GraphicsStyle object's line pattern element. Users can only change/get the line pattern for GraphicsStyle object via the Revit UI. You can create a new line pattern element in Revit 2014 using its constructor to create a LinePattern object: LinePattern(String). You can call the LinePattern.SetSegment() method to create customized line patterns. You can create a LinePatternElement via LinePatternElement.Create(LinePattern).</p>
+
+<p>Based on that, I don't think we currently expose any link between GraphicsStyle and line pattern. I don't think we even have the ability to get a line pattern directly from the category.</p>
+
+<p>However, you can get the pattern id for a specific view via two OverrideGraphicSettings properties: ProjectionLinePatternId and CutLinePatternId. These get the value from the Visibility/Graphics dialog, not object styles. Not sure if it will return the object styles value if it's not overridden in the view.</p>
+
+<p>Clearing up a few incorrect assumptions in the query itself:</p>
+
+<ul>
+<li>Line style != subcategory or category. It's not a 1:1 relationship.</li>
+
+<li>Each category and subcategory has two GraphicsStyles: cut and projection (selected via GraphicsStyleType). Each style has a color, weight & pattern reference.</li>
+
+<li>Patterns are shared by multiple styles, so you can't map back from a line pattern back to a single line style or category because it's a one to many relationship.</li>
+</ul>

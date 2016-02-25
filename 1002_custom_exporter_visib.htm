@@ -1,0 +1,325 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Determining Absolutely All Visible Elements</h3>
+
+<p>Yesterday, I discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/view-filter-api.html">
+view filter API</a>.</p>
+
+<p>One issue mentioned that was not completely answered was the following:</p>
+
+<p style="color: darkblue"><strong>Question 3:</strong> I would like to export only visible objects.
+Using the element IsHidden method reports whether it was hidden using the Hide in View &gt; Elements menu option, but ignores Hide in View filters, and so does the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/11/visible-elements.html">
+IsHiddenElementOrCategory</a> method.</p>
+
+<p style="color: darkblue">How can my application determine exactly what the user actually sees on the screen?
+Our customers obviously expect this functionality for the export.</p>
+
+<p>The cavalry is coming to the rescue here in the shape of Scott Conover of the Revit development team and Joel Spahn, software developer for
+
+<a href="http://www.agi32.com">Lighting Analysts, Inc.</a> and
+
+<a href="http://www.elumtools.com">ElumTools</a>.</p>
+
+<p>Scott and Joel explain how the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">
+custom exporter framework</a> can
+
+be used to solve this completely, cleanly and efficiently.
+
+<p>I already showed how to make use of it to export to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#4">XML</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#5">Collada</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html">
+ADN mesh data JSON</a> file formats.</p>
+
+<p>Scott and Joel point out that it can also be used in a more trivial fashion simply to determine the visibility of building elements, including all the different ways of controlling visibility, also covering elements in linked files.</p>
+
+<p>Here is the description and part of the evolution of this project:</p>
+
+<p><strong>Goal:</strong> I want to find out if an element is visible in a view taking into account:</p>
+
+<ul>
+<li>Everything</li>
+<ol type="a">
+<li>Whether the element is 'hidden'.</li>
+<li>Whether the element category (or one of its parent categories) is not visible.</li>
+<li>Visibility filters, e.g. set in visibility graphics.</li>
+<li>Etc.</li>
+<ul>
+<li>Crop Regions</li>
+<li>View Range</li>
+<li>Scope Box</li>
+<li>Depth Clipping</li>
+<li>Differences between Floor & Ceiling views</li>
+<li>Phases</li>
+<li>Design Options</li>
+<li>Etc.</li>
+</ul>
+</ol>
+</ul>
+
+<p>I have built methods to take into account whether the category is hidden.
+Must I now test all the filters and filter rules associated with the given view?
+Or is there a shortcut?</p>
+
+<p>A filtered element collector taking a view id argument would cover all of this, which would constitute a big time saver.</p>
+
+<p>That works great!</p>
+
+<p>Now for the inevitable 'however':</p>
+
+<p>Given an element from a linked document (found via a filtered element collector), how can I tell if the linked element is visible in a view that lives in the main document?</p>
+
+<p>The view settings don’t necessarily carry over from host to link, so using FilteredElementCollector in this way won’t work.</p>
+
+<p>It is not possible to create a filtered element collector where the document being filtered is a linked document, but the view being filtered is in the main document.</p>
+
+<p>It may be possible to use a tool that is seemingly not appropriate to the task: CustomExporter.</p>
+
+<p>This new capability processes a 3D view and has callbacks for when Links begin and end, and Elements begin and end.</p>
+
+<p>So it may be possible to build a tree of elements that are considered visible in this view by using this and always returning RenderNodeAction.Skip for elements so that the child nodes (faces, meshes) are not gathered and passed.</p>
+
+<p>I was able to get a CustomExporter up and running in minutes to produce a map of visible element ids that I store in a Dictionary mapping Document to HashSet of ElementId.</p>
+
+<p>With larger models I was experiencing an undesirable performance hit until I started returning RenderNodeAction.Skip from the OnElementBegin method.
+I can return that for all elements, since all I need is the element id in the first place.</p>
+
+<p>Returning Skip immediately is the right approach to avoid generation of data you don’t care about.</p>
+
+<p>There is also the small matter of keeping track which document each element belongs to. After exporting the desired views you can call the ElementVisible property to determine whether an element is visible in one of the exported views.</p>
+
+<p>One other point of note here is the choice between using the Document instance itself or the Doc.PathName as a dictionary key. I chose to use the document path as the key because I wanted to persist the data for a while, and wasn’t sure how long I could hold on to the Document object before it became invalid.  It would certainly be cleaner to use the Document object as the key.  Also I may at some point use a HashSet of Integer instead of ElementId if I need to persist the data.</p>
+
+<p>I think Document.PathName is better for a key as of now.
+The Document class does override Equals and GetHashCode, but they do not seem to work correctly in all scenarios.</p>
+
+<p>All in all, this should provide a complete solution to the issue #3 listed above.</p>
+
+<p>It also shows the implementation of a custom export context in VB.NET.</p>
+
+<p>Here is the code implementing ElementsVisibleInViewExportContext and its ElementVisible property:</p>
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">ElementsVisibleInViewExportContext</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> Documents <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Stack</span>(<span class="blue">Of</span> <span class="teal">Document</span>)
+&nbsp; <span class="blue">Private</span> <span class="blue">Property</span> Elements <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Dictionary</span>( _
+&nbsp; &nbsp; <span class="blue">Of</span> <span class="blue">String</span>, <span class="teal">HashSet</span>(<span class="blue">Of</span> <span class="teal">ElementId</span>))
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">ReadOnly</span> <span class="blue">Property</span> ElementVisible( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> doc <span class="blue">As</span> <span class="teal">Document</span>, <span class="blue">ByVal</span> id <span class="blue">As</span> <span class="teal">ElementId</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="blue">Boolean</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Get</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> ids <span class="blue">As</span> <span class="teal">HashSet</span>(<span class="blue">Of</span> <span class="teal">ElementId</span>)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> Elements.TryGetValue(doc.PathName, ids) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> ids.Contains(id) <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">True</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">False</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Get</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Property</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> <span class="blue">New</span>(<span class="blue">ByVal</span> mainDocument <span class="blue">As</span> <span class="teal">Document</span>)
+&nbsp;
+&nbsp; &nbsp; Documents.Push(mainDocument)
+&nbsp; &nbsp; Elements.Add(mainDocument.PathName,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="blue">New</span> <span class="teal">HashSet</span>(<span class="blue">Of</span> <span class="teal">ElementId</span>))
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Start() <span class="blue">As</span> <span class="blue">Boolean</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.Start
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">True</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> Finish() _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.Finish
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnViewBegin( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">ViewNode</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">RenderNodeAction</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnViewBegin
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">RenderNodeAction</span>.Proceed
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnViewEnd( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> elementId <span class="blue">As</span> <span class="teal">ElementId</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnViewEnd
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnLinkBegin( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">LinkNode</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">RenderNodeAction</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnLinkBegin
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> doc = node.GetDocument
+&nbsp;
+&nbsp; &nbsp; Documents.Push(doc)
+&nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> Elements.ContainsKey(doc.PathName) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; Elements.Add(doc.PathName, _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="blue">New</span> <span class="teal">HashSet</span>(<span class="blue">Of</span> <span class="teal">ElementId</span>))
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">RenderNodeAction</span>.Proceed
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnLinkEnd(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">LinkNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnLinkEnd
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> doc = Documents.Pop()
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnElementBegin( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> elementId <span class="blue">As</span> <span class="teal">ElementId</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">RenderNodeAction</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnElementBegin
+&nbsp;
+&nbsp; &nbsp; Elements(Documents.Peek.PathName).Add(elementId)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">RenderNodeAction</span>.Skip
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnElementEnd(<span class="blue">ByVal</span> elementId <span class="blue">As</span> <span class="teal">ElementId</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnElementEnd
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnInstanceBegin( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">InstanceNode</span>) <span class="blue">As</span> <span class="teal">RenderNodeAction</span> _
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnInstanceBegin
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">RenderNodeAction</span>.Skip
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnInstanceEnd(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">InstanceNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnInstanceEnd
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnFaceBegin(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">FaceNode</span>) _
+&nbsp; &nbsp; <span class="blue">As</span> <span class="teal">RenderNodeAction</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnFaceBegin
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">RenderNodeAction</span>.Skip
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnFaceEnd(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">FaceNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnFaceEnd
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnMaterial(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">MaterialNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnMaterial
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnPolymesh(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">PolymeshTopology</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnPolymesh
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnRPC(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">RPCNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnRPC
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnDaylightPortal( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">DaylightPortalNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnDaylightPortal
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Sub</span> OnLight(<span class="blue">ByVal</span> node <span class="blue">As</span> <span class="teal">LightNode</span>) _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.OnLight
+&nbsp;
+&nbsp; &nbsp; <span class="green">'Nothing.</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> IsCanceled() <span class="blue">As</span> <span class="blue">Boolean</span> _
+&nbsp; &nbsp; <span class="blue">Implements</span> <span class="teal">IExportContext</span>.IsCanceled
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">False</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p>For the sake of completeness, here is
+
+<a href="zip/CustomExporterElementVisibleInView.zip">CustomExporterElementVisibleInView.zip</a> providing
+
+this code in pure VB as well.</p>
+
+<p>This works wonderfully and may be the only solution for determining the visibility of an element in a linked model due to the visibility settings in the host model.</p>
+
+<p>I hope you find this useful.</p>
+
+<p>Many thanks to Scott and Joel for their idea, development, testing and sharing!</p>
+
+
+<a name="2"></a>
+
+<p><strong>Addendum</strong> by Arno&scaron;t L&ouml;bel: This information is very correct.
+Using filters and visibility settings may give somehow adequate results, but widespread opinion in the Revit graphics team considers the only way of truly figuring out what is or is not visible in a view running it through an export context, e.g. via a Custom Exporter.</p>
+
+<p>However, you do need to keep in mind and note that the current Custom Exporter only processes (and sends to an export context) items that would be rendered, which may not include all objects that are actually visible in a 3D view.
+For example, model lines are not processed, because they do not render.</p>
+
+<!-- In a future we may support more Contexts for other kind of exports/views, maybe even for exporting 2D views (eventually, one day :-) -->
+
+mein haus besichtigen
+ueberlegen, ob es eventuell irgendwie in unser konzept und weitere ueberlegungen beruecksichtigt werden koennte und sollte  :-)
+sich weiter kennenlernen
+nett zusammen zu abend essen

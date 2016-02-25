@@ -1,0 +1,572 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09616865 [Adding buttons to Revit's Modify tab]
+
+Frode TørresdalNorconsult Informasjonssystemer AS
+
+/a/doc/techsummit/2014/cam/Room Editor Live/index.html
+
+-->
+
+<h3>Room Editor Live and Unofficial Custom Ribbon Button</h3>
+
+<p>I spent a wonderful weekend and yesterday's
+
+<a href="http://en.wikipedia.org/wiki/Whit_Monday">Whit Monday</a> holiday
+
+enjoying high summer in Swiss nature with no electricity and a Chäschessi, the Swiss variant of a Jacuzzi or hot tub.
+Today I am leaving for a ten-day camping vacation in nature in Sweden.</p>
+
+<p>Here are two topics I would like to address before leaving that will hopefully keep you occupied and entertained during my absence:</p>
+
+<ul>
+<li><a href="#3">Room Editor Live</a></li>
+<li><a href="#4">Adding a custom button to the Modify tab</a></li>
+<li><a href="#5">Vacation time</a></li>
+</ul>
+
+
+<!--
+<a name="2"></a>
+
+<h4>Technical Summit Day 2</h4>
+
+<p>This being an internal meeting, I cannot talk openly about all the topics covered.</p>
+
+<p>A couple of titbits that I found especially exciting are based on openly available research, though, so I can't do much harm mentioning those.</p>
+-->
+
+<a name="3"></a>
+
+<h4>Room Editor Live</h4>
+
+<p>I presented my room editor version two at the internal Autodesk technical summit in Toronto.
+
+<p>The presentation is obviously similar to the recently presented
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/adn-revit-2015-api-training-material.html#2">
+preview recording</a> of
+
+the enhanced cloud-based round-trip simplified 2D BIM editor.</p>
+
+<p>Here comes the live thing with an additional illuminating Q and A session at the end:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/room_editor_2/tech_summit_live/ts2014_jeremy_tammik.pdf">Slide deck</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/room_editor_2/tech_summit_live/index.html">Half hour live recording</a></li>
+</ul>
+
+<p>An hour before the presentation, I happened to discover and fix a bug related to the buttons defined by the external application.</p>
+
+<p>I modify the text on one of them to implement a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html">
+toggle button</a>,
+
+and its index was off by one since I added a new button at the top.</p>
+
+<p>The RoomEditorApp source code, Visual Studio solution and add-in manifest is updated in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a> and
+
+now sports the final release
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.20">
+release 2015.0.2.20</a>.
+
+
+
+<a name="4"></a>
+
+<h4>Adding a custom button to the Modify tab</h4>
+
+<p>In a completely different vein:</p>
+
+<p>A Revit add-in can only add its commands to the Revit Add-Ins and Analyze ribbon tabs.</p>
+
+<p>However, if you really need more flexibility, Frode T&oslash;rresdal of
+
+<a href="http://www.nois.no">
+Norconsult Informasjonssystemer</a> has
+
+a clever and interesting workaround to offer:</p>
+
+<p>You can add a non-API custom button to any Revit ribbon tab you want using the .NET UI Automation library.</p>
+
+<p>You can also add an event handler to catch a button click on it.</p>
+
+<p>Revit will know nothing about it, however, and you cannot use the Revit API in the custom button click event handler.</p>
+
+<p>You can however subscribe to the Idling event beforehand, send your Idling event handler a message from the button click event handler, use the Revit API in the Idling event handler, and unsubscribe from Idling again.<p>
+
+<p>Here is a quick demo of ModifyTabButton, a Revit add-in demonstrating how to
+
+<a href="https://www.youtube.com/watch?v=LwrBlRrplD8">
+add a custom button to the Modify tab and trigger Revit API functionality from it</a>:</p>
+
+<center>
+<iframe width="450" height="253" src="http://www.youtube.com/embed/LwrBlRrplD8" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Frode raised the question and provided the solution in the following discussion:</p>
+
+<p><strong>Question:</strong> I'm trying to add buttons to Revit's modify tab. I retrieve the Autodesk.Windows.RibbonTab with id="Modify" and add a Autodesk.Windows.RibbonPanel to this tab. This seems to work.</p>
+
+<p>But how do I disable and hide my buttons? I do not want them to show when e.g. placing a wall. I only want them to show when no command is selected or a detail item is selected.</p>
+
+<p>Also please let me know if there is a better way to add buttons to the Modify tab.</p>
+
+<p><strong>Answer:</strong> The Revit API officially does not support use of the Autodesk.Windows functionality, so you are on your own if you are making use of that.</p>
+
+<p>As far as I can tell, the UIControlledApplication.CreateRibbonPanel method taking two string arguments allows you to create an own panel in any of the ribbon tabs. Why do you not use that?</p>
+
+<p>To disable and hide your button, you can make us of an
+
+<a href="http://lmgtfy.com/?q=revit+api+building+coder+AvailabilityClassName">availability class</a>,
+
+i.e. a class implementing the
+
+<a href="http://lmgtfy.com/?q=revit+api+building+coder+IExternalCommandAvailability">IExternalCommandAvailability interface</a> and
+
+the PushButton.AvailabilityClassName property specifying its name:</p>
+
+<p>That will allow you to toggle the visibility and availability of your class at will, just as you require.</p>
+
+<p><strong>Response:</strong> Thanks for the answer. I have found out how to do this using the Autodesk.Windows functionality, but I would rather use the official API. I tried to use the UIControlledApplication.CreateRibbonPanel method, but it does not find the Modify tab. I guess it's not supposed to, or am I using the method incorrectly?</p>
+
+<p><strong>Answer:</strong> Yes, you are perfectly correct.
+The Revit API officially only supports adding panels to the Add-Ins and Analyse tabs.</p>
+
+<p>Sorry for misleading you there, and thank you for checking.</p>
+
+<p>When you add your own custom Autodesk.Windows.RibbonPanel to the modify tab, are you still able to use the standard Revit API functionality to add buttons etc. to it?</p>
+
+<p>If not, it will be hard to hook it up properly to your external command...</p>
+
+<p><strong>Response:</strong> I use the Autodesk.Windows.RibbonButton and the Autodesk.Windows.RibbonPanel classes.
+To check if a user click button I use this event handler:</p>
+
+<pre class="code">
+&nbsp; Autodesk.Windows.<span class="teal">ComponentManager</span>.UIElementActivated
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;
+&nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">UIElementActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; OnUiElementActivated );
+</pre>
+
+<p>In the OnUIElementActivated method I check if one of my buttons is clicked and use another EventHandler like this:</p>
+
+<pre class="code">
+&nbsp; _controlledApp.Idling
+&nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; OnButtonIdling );
+</pre>
+
+<p>Finally, in the Idling function, I execute my command and remove the idling event handler.</p>
+
+<p><strong>Answer:</strong> Oh, I see, you are not defining an external command at all.</p>
+
+<p>You are just using .NET UI Automation to add a button that the Revit API knows nothing about and capture the click event on it and then passing that information in to your external application working with the Idling event.</p>
+
+<p>That is very interesting.</p>
+
+<p>One question: do you observe acceptable performance? I heard rumours that using UI Automation to interact with the Revit ribbon was intolerably slow. Apparently not, if you can make effective use of it.</p>
+
+<p>One suggestion: I found that the Idling event has very significant drawbacks, mainly due to the fact that Revit provides no possibility to control the frequency of calls. Therefore, I found
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html">using an external event instead of Idling</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/triggering-immediate-external-event-execute.html">triggering immediate external event execute</a> a
+
+more effective approach.
+I now basically never recommend use of the Idling event at all, except for one-off call.</p>
+
+<p>Ah, maybe in your case it is a single call that you are interested in?</p>
+
+<p><strong>Response:</strong> Yes, I just use one single call, so Idling is the proper solution.</p>
+
+<p>I have not noticed any performance issues.</p>
+
+<p><strong>Answer:</strong> One little bit of feedback on your code: TransactionMode does not need to be specified for an external application. It only applies to external commands.</p>
+
+<p>I implemented a new sample application ModifyTabButton making use of your code, but I do not see the custom panel when I load and run it.</p>
+
+<p>Oh, I also added a line to break out of the loop once its purpose has been served.</p>
+
+<p>In the debugger, everything seems to work fine, but nothing appears.</p>
+
+<p>How does it look for you?</p>
+
+<p><strong>Response:</strong> Your example works for me. The buttons should only be visible in a 3D view. The only fault I have found is that I cannot see the image on the buttons. We use 16 x 16 ico files and they work fine.</p>
+
+<p>I found out that _currentView could be null when I run both my own and yours application. There should be a test for this in the setModifyPanelVisible function.</p>
+
+<p>The modify panel should only be visible in 3d views when an element is selected.</p>
+
+<p><strong>Answer:</strong> Aha, my button is 64 x 64, so I'll change that then.</p>
+
+<p>Yes, the problem was that it requires 16 x 16 format to display at this point.</p>
+
+<p>I looked in the debugger and saw _currentView being set correctly.</p>
+
+<p>I also discovered that I have to be in a 3D view <b><i>and</i></b> I need to select an element, e.g. a wall.</p>
+
+<p>It works now!</p>
+
+<p>I refactored the code a bit to make it easy to add a third button as well, while we are at it.</p>
+
+<p>Here is the 'My Modify' panel and its three buttons displayed by the ModifyTabButton add-in in the Revit Modify ribbon tab when a wall is selected in a 3D view:</p>
+
+<center>
+<img src="img/ModifyTabButton_panel.png" alt="ModifyTabButton panel displayed in the Revit Modify ribbon tab" width="413"/>
+</center>
+
+<p>Clicking any one of the three buttons triggers the sequence of events and handlers described above and displays a message box like this:</p>
+
+<center>
+<img src="img/ModifyTabButton_message.png" alt="ModifyTabButton command message" width="366"/>
+</center>
+
+<p>Notes and ideas:</p>
+
+<ul>
+<li>No availability class</li>
+<li>No Revit API access here! ... in the UI Automation event handlers</li>
+<li>Make a note of elements selected? Identify type, at least?</li>
+</ul>
+
+<p>Here is the totally trivial button click handler implementation:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> ModifyTabButton
+{
+&nbsp; <span class="blue">class</span> <span class="teal">Command</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt =
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Button {0} clicked in view '{1}' in document '{2}'.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> OnButton(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> button_nr,
+&nbsp; &nbsp; &nbsp; <span class="teal">View</span> view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = view.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; _prompt, button_nr, view.Name, doc.Title );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="teal">App</span>.Caption, msg );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Note that this is a custom command class, not an official Revit API external command.</p>
+
+<p>Here is the full external application implementation doing all the interesting stuff:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="green">// BitmapImage requires PresentationCore</span>
+<span class="green">// System.Windows.Controls requires PresentationFramework</span>
+&nbsp;
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.IO;
+<span class="blue">using</span> System.Reflection;
+<span class="blue">using</span> System.Windows.Media.Imaging;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Events;
+&nbsp;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> ModifyTabButton
+{
+&nbsp; <span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> Caption = <span class="maroon">&quot;ModifyTabButton&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIControlledApplication</span> _controlledApp;
+&nbsp; &nbsp; <span class="teal">View</span> _currentView;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> The button that was clicked, 1, 2 or 3.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">int</span> _button_nr;
+&nbsp;
+&nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonPanel</span> _modifyPanel;
+&nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonButton</span> _button1;
+&nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonButton</span> _button2;
+&nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonButton</span> _button3;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Set the visibility of our custom panel</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> and its buttons.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> SetCustomPanelVisible( <span class="blue">bool</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _modifyPanel.IsVisible = a;
+&nbsp; &nbsp; &nbsp; _button1.IsVisible = a;
+&nbsp; &nbsp; &nbsp; _button2.IsVisible = a;
+&nbsp; &nbsp; &nbsp; _button3.IsVisible = a;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Retrieve an embedded resource image</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> for the button icons.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">BitmapSource</span> GetEmbeddedImage( <span class="blue">string</span> name )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Assembly</span> a = <span class="teal">Assembly</span>.GetExecutingAssembly();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Stream</span> s = a.GetManifestResourceStream( name );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">BitmapFrame</span>.Create( s );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Create a basic ribbon button with an </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> identifying number and an image.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> Autodesk.Windows.<span class="teal">RibbonButton</span> CreateButton(
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nr,
+&nbsp; &nbsp; &nbsp; <span class="teal">BitmapSource</span> image )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = nr.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonButton</span> b
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonButton</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; b.Name = <span class="maroon">&quot;_Button&quot;</span> + s;
+&nbsp; &nbsp; &nbsp; b.Id = <span class="maroon">&quot;ID_MYBUTTON&quot;</span> + s;
+&nbsp; &nbsp; &nbsp; b.AllowInStatusBar = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.AllowInToolBar = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.GroupLocation = Autodesk.Private.Windows
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">RibbonItemGroupLocation</span>.Middle;
+&nbsp; &nbsp; &nbsp; b.IsEnabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.IsToolTipEnabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.IsVisible = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; b.LargeImage = image;
+&nbsp; &nbsp; &nbsp; b.Image = image;
+&nbsp; &nbsp; &nbsp; b.ShowImage = <span class="blue">true</span>; <span class="green">//&nbsp; true;</span>
+&nbsp; &nbsp; &nbsp; b.ShowText = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.ShowToolTipOnDisabled = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.Text = <span class="maroon">&quot;Button &quot;</span> + s;
+&nbsp; &nbsp; &nbsp; b.ToolTip = <span class="maroon">&quot;Button &quot;</span> + s;
+&nbsp; &nbsp; &nbsp; b.MinHeight = 0;
+&nbsp; &nbsp; &nbsp; b.MinWidth = 0;
+&nbsp; &nbsp; &nbsp; b.Size = Autodesk.Windows.<span class="teal">RibbonItemSize</span>.Standard;
+&nbsp; &nbsp; &nbsp; b.ResizeStyle = Autodesk.Windows
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">RibbonItemResizeStyles</span>.HideText;
+&nbsp; &nbsp; &nbsp; b.IsCheckable = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; b.Orientation = System.Windows.Controls
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">Orientation</span>.Horizontal; <span class="green">// PresentationFramework</span>
+&nbsp; &nbsp; &nbsp; b.KeyTip = <span class="maroon">&quot;Button&quot;</span> + s;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> b;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _controlledApp = a;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Locate and load embedded button images.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BitmapSource</span> image = GetEmbeddedImage(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ModifyTabButton.icon.cartoon_house_16.ico&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Add modify panel</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonControl</span> ribbon
+&nbsp; &nbsp; &nbsp; &nbsp; = Autodesk.Windows.<span class="teal">ComponentManager</span>.Ribbon;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Windows.<span class="teal">RibbonTab</span> tab
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> ribbon.Tabs )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( tab.Id == <span class="maroon">&quot;Modify&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _modifyPanel = <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonPanel</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _modifyPanel.IsVisible = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonPanelSource</span> source
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonPanelSource</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; source.Name = <span class="maroon">&quot;mymod&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; source.Id = <span class="maroon">&quot;mymod&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; source.Title = <span class="maroon">&quot;My Modify&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _modifyPanel.Source = source;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _modifyPanel.FloatingOrientation
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = System.Windows.Controls.<span class="teal">Orientation</span>.Vertical;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _button1 = CreateButton( 1, image );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _button2 = CreateButton( 2, image );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _button3 = CreateButton( 3, image );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">ComponentManager</span>.UIElementActivated
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">UIElementActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnUiElementActivated );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">RibbonRowPanel</span> rowPanel
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonRowPanel</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rowPanel.Items.Add( _button1 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rowPanel.Items.Add( <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonRowBreak</span>() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rowPanel.Items.Add( _button2 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rowPanel.Items.Add( <span class="blue">new</span> Autodesk.Windows.<span class="teal">RibbonRowBreak</span>() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rowPanel.Items.Add( _button3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _modifyPanel.Source.Items.Add( rowPanel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tab.Panels.Add( _modifyPanel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tab.Panels.CollectionChanged
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> System.Collections.Specialized
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">NotifyCollectionChangedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnCollectionChanged );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.ViewActivated
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">ViewActivatedEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnViewActivated );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">ComponentManager</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .UIElementActivated -= OnUiElementActivated;
+&nbsp;
+&nbsp; &nbsp; &nbsp; a.ViewActivated -= OnViewActivated;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> React to Revit view activation.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> OnViewActivated(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewActivatedEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _currentView = e.CurrentActiveView;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> React to ribbon panel changes, triggered by </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Revit element selection. We have no external</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> command, hence no availability class, so we </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> use this to hide and show our custom panel.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> We have absolutely no access to the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Revit API in this method!</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> OnCollectionChanged(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; System.Collections.Specialized
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">NotifyCollectionChangedEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.NewItems != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> visible = ( <span class="blue">null</span> != _currentView )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( _currentView <span class="blue">is</span> <span class="teal">View3D</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; SetCustomPanelVisible( visible );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.OldItems != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; SetCustomPanelVisible( <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> React to UI element activation, </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> e.g. button click. We have absolutely </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> no access to the Revit PI in this method!</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> OnUiElementActivated(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">UIElementActivatedEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Item != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// We could just remember the button id here</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and use one single Idling event handler</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// for both.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.Item.Id == <span class="maroon">&quot;ID_MYBUTTON1&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || e.Item.Id == <span class="maroon">&quot;ID_MYBUTTON2&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || e.Item.Id == <span class="maroon">&quot;ID_MYBUTTON3&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _button_nr = <span class="blue">int</span>.Parse(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Item.Id.Substring( 11 ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _controlledApp.Idling
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OnButtonIdling );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Idling event handler for all buttons.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> This is where we have access to the Revit</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> API again.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> OnButtonIdling(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">IdlingEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = sender <span class="blue">as</span> <span class="teal">UIApplication</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( uiapp != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Command</span>.OnButton( _button_nr, uidoc.ActiveView );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; _controlledApp.Idling -= OnButtonIdling;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<p>The complete ModifyTabButton source code, Visual Studio solution and add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/ModifyTabButton">
+ModifyTabButton GitHub repository</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Vacation Time</h4>
+
+<p>I'm off now.</p>
+
+<p>Have fun with the Revit API, and enjoy summer!</p>
+
+<p>Or winter, down under...</p>
+
+<p>Bye bye!</p>

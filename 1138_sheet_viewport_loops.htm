@@ -1,0 +1,173 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Determining the Size and Location of Viewports on a Sheet</h3>
+
+<p>Today, let's look at how to determine the size and location of a sheet and the views displayed by it.</p>
+
+<p>This is part of the first and most Revit-related of the three enhancement goals for my simplified 2D BIM editor:</p>
+
+<ul>
+<li>Display selected BIM elements in their sheet and view context &ndash; in addition to pure model space room and family instance elements.</li>
+<li>Display and edit non-graphical parameters &ndash; in addition to the purely graphical family instance outlines.</li>
+<li>Implement more graphical editing using translation and rotation grip points &ndash; in addition to the simple rotation button.</li>
+</ul>
+
+<p>In previous versions of Revit, determining the size and locations of views on a sheet was a pretty challenging undertaking.</p>
+
+<p>Here are some related explorations:</p>
+
+<!--
+
+/a/doc/revit/blog/ $ ls -1 *viewport*
+0065_creating_a_viewport.htm
+0067_viewports_and_sheets.htm
+0885_viewport_type.htm
+1031_viewport_position.htm
+1138_sheet_viewport.htm
+
+/a/doc/revit/blog/ $ ls -1 *sheet*
+0067_viewports_and_sheets.htm
+0247_title_block_of_sheet.htm
+0371_sheet_size.htm
+0445_view_location_on_sheet.htm
+0467_refresh_referencing_sheet.htm
+0505_sheet_set_manager.htm
+0899_schedules_on_sheet.htm
+1125_select_sheets.htm
+1138_sheet_viewport.htm
+
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/viewports-and-sheets.html">
+List all sheets and their views &ndash; CmdListViews</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/determine-sheet-size.html">
+Determine sheet size &ndash; CmdSheetSize</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/09/view-location-on-sheet.html">
+Determine view location on sheet &ndash; using Viewport bounding box</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/exact-viewport-positioning-conceptual-design-automation-and-graitec.html#2">
+Exact viewport positioning &ndash; using Viewport Outline</a></li>
+</ul>
+
+<p>A quote from the third:
+"The View class has a very important property Outline.
+The Outline property will return the Max and Min point of the closest bounding box, which includes all elements in this view.
+The value in this Max and Min the result of the legend view's real Max and Min coordinates subdivided by the view scale.
+For more information about Outline property, please refer to the Revit SDK developer guide 'Revit 2011 API Developer Guide.pdf'.
+Approximately, the outline Max point is mapping the same Max point of the viewport in view sheet."</p>
+
+<p>Nowadays, the Viewport class provides an Outline property that considerably simplifies this task.</p>
+
+<p>Here is a sheet 'A101 - Level 0, 1 and 3D' displaying three views:</p>
+
+<center>
+<img src="img/sheet_viewport_loops_1.png" alt="Sheet displaying three views" width="516"/>
+</center>
+
+<p>My GeoSnoop utility dynamically generates this temporary form displaying the outlines of the sheet and the three views it contains:</p>
+
+<center>
+<img src="img/sheet_viewport_loops_2.png" alt="GeoSnoop displaying the sheet and vieport outlines" width="296"/>
+</center>
+
+<p>The top level code in the CmdUploadSheets external command implementation retrieving the sheet and viewport loops and displaying them in a temporary modeless form basically just consists of two lines of code, calling the new GetSheetViewportLoops and the existing GeoSnoop.DisplayLoops methods:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> sheet <span class="blue">in</span> sheets )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">JtLoops</span> sheetViewportLoops
+&nbsp; &nbsp; &nbsp; = GetSheetViewportLoops( sheet );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> sheet_number = sheet.get_Parameter(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.SHEET_NUMBER )
+&nbsp; &nbsp; &nbsp; &nbsp; .AsString();
+&nbsp;
+&nbsp; &nbsp; caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Sheet and Viewport Loops - {0} - {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; sheet_number, sheet.Name );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeoSnoop</span>.DisplayLoops( revit_window,
+&nbsp; &nbsp; &nbsp; caption, <span class="blue">false</span>, sheetViewportLoops );
+&nbsp; }
+</pre>
+
+<p>The GeoSnoop.DisplayLoops method is pretty much unchanged from its last incarnation for displaying
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html">
+room and furniture loops using symbols</a>,
+
+except that the family instances and symbol geometry arguments now are optional and default to null.</p>
+
+<p>The interesting new code to retrieve the sheet and viewport rectangles is short and sweet, making use of a couple of extensions I added to the existing Point2dInt and JtLoop classes:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return polygon loops representing the size </span>
+&nbsp; <span class="gray">///</span><span class="green"> and location of given sheet and the viewports </span>
+&nbsp; <span class="gray">///</span><span class="green"> it contains.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">JtLoops</span> GetSheetViewportLoops(
+&nbsp; &nbsp; <span class="teal">ViewSheet</span> sheet )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = sheet.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Viewport</span>&gt; viewports = sheet
+&nbsp; &nbsp; &nbsp; .GetAllViewports()
+&nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">ElementId</span>,<span class="teal">Viewport</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; id =&gt; doc.GetElement( id ) <span class="blue">as</span> <span class="teal">Viewport</span> )
+&nbsp; &nbsp; &nbsp; .ToList&lt;<span class="teal">Viewport</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = viewports.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtLoops</span> sheetViewportLoops = <span class="blue">new</span> <span class="teal">JtLoops</span>( n + 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxUV</span> bb = sheet.Outline; <span class="green">// (0,0), (2.76,1.95)</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtBoundingBox2dInt</span> ibb = <span class="blue">new</span> <span class="teal">JtBoundingBox2dInt</span>(); <span class="green">// (0,0),(840,...)</span>
+&nbsp;
+&nbsp; &nbsp; ibb.ExpandToContain( <span class="blue">new</span> <span class="teal">Point2dInt</span>( bb.Min ) );
+&nbsp; &nbsp; ibb.ExpandToContain( <span class="blue">new</span> <span class="teal">Point2dInt</span>( bb.Max ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtLoop</span> loop = <span class="blue">new</span> <span class="teal">JtLoop</span>( 4 );
+&nbsp;
+&nbsp; &nbsp; loop.Add( ibb.Corners );
+&nbsp;
+&nbsp; &nbsp; sheetViewportLoops.Add( loop );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Viewport</span> vp <span class="blue">in</span> viewports )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> center = vp.GetBoxCenter();
+&nbsp; &nbsp; &nbsp; <span class="teal">Outline</span> outline = vp.GetBoxOutline();
+&nbsp;
+&nbsp; &nbsp; &nbsp; ibb.Init();
+&nbsp;
+&nbsp; &nbsp; &nbsp; ibb.ExpandToContain(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point2dInt</span>( outline.MinimumPoint ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ibb.ExpandToContain(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Point2dInt</span>( outline.MaximumPoint ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; loop = <span class="blue">new</span> <span class="teal">JtLoop</span>( 4 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; loop.Add( ibb.Corners );
+&nbsp;
+&nbsp; &nbsp; &nbsp; sheetViewportLoops.Add( loop );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> sheetViewportLoops;
+&nbsp; }
+</pre>
+
+<p>The updated RoomEditorApp source code, Visual Studio solution and add-in manifest live in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.8">
+release 2015.0.2.8</a>.</p>

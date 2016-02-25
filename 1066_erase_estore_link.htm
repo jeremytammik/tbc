@@ -1,0 +1,289 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+http://manjraprd01/browse/REVIT-14580 - API EraseSchemaAndAllEntities generates internal exception if linked document is present.
+
+REVIT-14580 [API EraseSchemaAndAllEntities generates internal exception if linked document is present.]
+
+http://forums.autodesk.com/t5/Revit-API/InternalException-when-using-Schema-EraseSchemaAndAllEntities/td-p/4598127
+
+Hi Jeremy,
+
+Thanks for your help.
+
+My document have one linked project in it, but it tried to run the code in a document with no links and I keep getting the same error. This is the code that I've been using for testing.
+
+public void CreateESDSchema() { using (Transaction trans = new Transaction(_doc, "Create Schema")) { trans.Start(); Schema schema = Schema.Lookup(_schemaGuid); if (schema == null) { SchemaBuilder schemaBuilder = new SchemaBuilder(_schemaGuid); schemaBuilder.SetSchemaName("Tracking Elements"); schemaBuilder.SetReadAccessLevel(AccessLevel.Public); schemaBuilder.SetWriteAccessLevel(AccessLevel.Public); FieldBuilder fieldBuilder = schemaBuilder .AddSimpleField("LinkedInstanceElementID", typeof(int)); fieldBuilder.SetDocumentation("Instance Element Unique ID"); fieldBuilder = schemaBuilder .AddSimpleField("LinkedTypeElementID", typeof(int)); fieldBuilder.SetDocumentation("Type Element Unique ID"); fieldBuilder = schemaBuilder .AddArrayField("InstanceParameters", typeof(string)); fieldBuilder.SetDocumentation("List of instance parameters"); fieldBuilder = schemaBuilder .AddArrayField("TypeParameters", typeof(string)); fieldBuilder.SetDocumentation("List of type parameters"); fieldBuilder = schemaBuilder .AddSimpleField("LinkedDocument", typeof(string)); fieldBuilder.SetDocumentation("Document where element is linked"); schema = schemaBuilder.Finish(); // register the Schema object } trans.Commit(); } } public void SetDataLinkedInsElemID(int id) { using (Transaction trans = new Transaction(_doc, "Store Data trans")) { trans.Start(); Schema schema = Schema.Lookup(_schemaGuid); Entity entity = new Entity(schema); entity.Set<int>(schema.GetField("ESD_LinkedInstanceElementID"), id); _modelElementInstance.SetEntity(entity); trans.Commit(); } } public void DeleteSchema() { Schema schema = Schema.Lookup(_schemaGuid); Schema.EraseSchemaAndAllEntities(schema, true); }
+
+The variable _modelElementInstance it's an element that I manually pick.
+
+If I run this when deleting the Schema I get the InternalException.
+
+CreateESDSchema(); SetDataLinkedInsElemID(123456); DeleteSchema();
+
+In one of your articles (http://thebuildingcoder.typepad.com/blog/2013/08/deleting-and-updating-extensible-storage-schema.html) someone have a similar issue. Can you confirm if the issue is caused because the linked files?
+
+Regarding my code for testing, am I doing something wrong?
+
+I highgly apreciate your help.
+
+Thanks again,
+
+Marc
+
+Author:	marcart (Contributor)
+Date:	11-12-2013 08:59 AM
+HI Jeremy,
+
+Thanks again for your help.
+
+The type of fields are just an example it is not causing the error. The problem is that I can't delete the schema from the document if I want to.
+
+I knew that Revit handles elements ids intelligently but just with elements within that document.
+
+This addin is intended to track elements from linked projects, so I couldn't use this feature.
+
+Please, let me know if you find any other issue that maybe causing that problem.
+
+Thanks
+
+Marc
+
+Dear Marc,
+
+Thank you for your query.
+
+Basically, the Revit SDK ExtensibleStorageUtility shows you how to use this method.
+
+Ning, I believe it should work perfectly well even if entities using the schema still exist.
+
+One thing that strikes me as rather strange is that the Schema.EraseSchemaAndAllEntities method will delete storage of this schema in *all* open documents.
+
+In your code, you only have a transaction open on the document stored in the _doc variable.
+
+I wonder how this will affect other documents if you have no trnasaction open for them.
+
+I would suggest running this with only one document open in the current Revit session.
+
+Can you please confirm that this is in fact the case, please?
+
+Thank you.
+
+Here is a list of The Building Coder topics related to this topic:
+
+http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23
+
+The last one, especially, may be of use.
+
+I hope this helps.
+
+Best regards,
+
+Hi,
+
+I finally found that the InternalException was caused by having projects linked in the document.
+
+I have to Unload all linked files first and run the method Schema.EraseSchemaAndAllEntities(schema,
+false) and then Load the files again.
+
+This is the final custom method that worked for me including the transaction.
+
+public void DeleteSchema()
+{
+using (Transaction trans = new Transaction(_doc, "Delete Schema Transaction"))
+{
+trans.Start();
+Schema schema = Schema.Lookup(_schemaGuid);
+Schema.EraseSchemaAndAllEntities(schema, false);
+trans.Commit();
+}
+}
+
+Thanks for all your help!
+
+Marc
+
+- need to regenerate model before querying it: hide connectors and export image -- 08971502 [HideElements not working on new view]
+
+- http://architosh.com/2013/11/autodesk-talks-to-architosh-about-revit-through-web-browser
+
+-->
+
+<h3>Erasing Extensible Storage with Linked Files</h3>
+
+<p>Here is a query and resolution raised by Marc in the discussion forum on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/InternalException-when-using-Schema-EraseSchemaAndAllEntities/td-p/4598127">
+erasing extensible storage data with linked files</a>,
+
+followed by a reminder of the need to regenerate the model to
+
+<a href="#3">avoid accessing stale data</a> and
+
+hint of possible things to come related to
+
+<a href="#4">Revit and cloud computing</a>:</p>
+
+
+<a name="2"></a>
+
+<h4>Erasing Extensible Storage Data with Linked Files</h4>
+
+<p><strong>Question:</strong> I am calling the method Schema.EraseSchemaAndAllEntities in a project containing linked documents, and it is throwing an InternalException.
+How can this be avoided, please?</p>
+
+<p>I see a report of a similar issue in the article on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/deleting-and-updating-extensible-storage-schema.html">
+deleting and updating extensible storage schema</a>.</p>
+
+<p>Can you confirm that this issue is caused by the linked files?</p>
+
+
+<p><strong>Answer:</strong> Basically, the Revit SDK ExtensibleStorageUtility shows you how to use this method.
+I believe it should work perfectly well even if entities using the schema still exist.</p>
+
+<p>By the way, here is a list of most of The Building Coder
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">extensible storage related topics</a>.
+
+<p>It strikes me as rather strange that in your sample code, you only have a transaction open on the main document.</p>
+
+<p>The Schema.EraseSchemaAndAllEntities method will delete storage of this schema in <b><i>all</i></b> open documents.</p>
+
+<p>I wonder how this will affect the other linked documents if you have no transaction open for them.</p>
+
+<p>I would suggest running this with only one document open in the current Revit session.</p>
+
+<p><strong>Response:</strong> I can confirm that the InternalException was caused by having projects linked in the document.
+
+<p>I have to unload all linked files first, run the method Schema.EraseSchemaAndAllEntities method, and then load the files again.</p>
+
+<p>This is the final custom method that worked for me including the transaction:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> DeleteSchema()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( _doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;Delete Schema&quot;</span> );
+&nbsp; &nbsp; &nbsp; Schema schema = Schema.Lookup( _schemaGuid );
+&nbsp; &nbsp; &nbsp; Schema.EraseSchemaAndAllEntities( schema, <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Many thanks to Marc for exploring and solving this issue!</p>
+
+
+<!-- need to regenerate model before querying it: hide connectors and export image -- 08971502 [HideElements not working on new view] -->
+
+<a name="3"></a>
+
+<h4>Regenerate to Avoid Accessing Stale Data</h4>
+
+<p>We have looked at numerous issues in the past where developers ran into problems &ndash; or, rather, created them for themselves &ndash; by modifying something in the model and then attempted to read the stale data without regenerating it first.</p>
+
+<p>Here is another example that shows clearly how easy it can be to miss this fact if you do not make a habit of checking for this possibility as one of the first things to do when running into mysterious problems:</p>
+
+<p><strong>Question:</strong> I'm trying to find the connectors of a view using:
+
+<pre class="code">
+&nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( famDoc );
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ConnectorElement</span> ) );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; connectors
+&nbsp; &nbsp; = collector.ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">if</span>( connectors.Count &gt; 0 )
+&nbsp; &nbsp; view.HideElements( connectors );
+</pre>
+
+<p>This works fine if I do that on a existing 3D view, but if I create the view myself by calling CreateIsometric like this it does not:</p>
+
+<pre class="code">
+&nbsp; view = <span class="teal">View3D</span>.CreateIsometric( famDoc,
+&nbsp; &nbsp; viewFamilyType.Id );
+</pre>
+
+<p>Then the connectors remain visible in the view exported PNG. This also happens for any other kind of element I try to hide; it works well on an existing 3D view but not in a newly created one.</p>
+
+<p>I attached a sample project that generates two pictures: one is a modification of an existing view and has the connectors hidden; the other one uses a newly generated view where the connectors cannot be hidden.
+If I do this inside the DocumentOpened event, none of the methods hide the connectors.</p>
+
+<p>How can I hide elements in a newly created view generated by View3D.CreateIsometric, please?</p>
+
+<p><strong>Answer:</strong> I am happy to report that this problem is easy to fix and the Revit API is working properly, completely as expected.</p>
+
+<p>You are creating a situation in which you are working with stale data.</p>
+
+<p>If you make any modifications whatsoever to the model, you need to regenerate it again before reading.</p>
+
+<p>Here are some previous examples of this kind of situation and when and how to regenerate the BIM, going all the way back to the year 2010:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/manual-regeneration-mode-danger.html">Manual Regeneration Option Danger</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/regeneration-option-best-practices.html">Regeneration Option Best Practices</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/to-regenerate-or-not-to-regenerate.html">To Regenerate or Not to Regenerate...</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/refresh-referencing-sheet-parameter-display.html">Refresh Referencing Sheet Parameter Display</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/setting-text-width-requires-regen.html">Setting Text Width Requires Regen</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/extra-transaction-or-regeneration-required.html">Extra Transaction or Regeneration Required</a></li>
+<!-- <li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/curve-evaluation-and-song-of-the-gulls.html">Curve Evaluation and Song of the Gulls</a></li> -->
+<li><a href="http://adndevblog.typepad.com/aec/2013/01/it-is-easy-to-miss-this-regenerating-the-model.html">Regenerate between plane and dimension creation</a></li>
+</ul>
+
+<p>The topic of regeneration is also related to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+temporary transaction trick</a>,
+
+the associated suggestion to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+encapsulate multiple transactions in a transaction group</a>,
+
+commit the individual transactions and then roll bock the entire group instead.</p>
+
+<p>Every time a transaction is committed, a regeneration is automatically included.</p>
+
+<p>In your case, hiding the connectors and creating a new view is obviously modifying the model before it is read by the image export.</p>
+
+<p>Once a to regenerate before exporting is added, the process works just the way you presumably want:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Hide connectors</span>
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(view.Document);
+&nbsp;
+&nbsp; collector.OfClass(<span class="blue">typeof</span>(<span class="teal">ConnectorElement</span>));
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; connectors
+&nbsp; &nbsp; = collector.ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">if</span> (connectors.Count &gt; 0)
+&nbsp; &nbsp; view.HideElements(connectors);
+&nbsp;
+&nbsp; view.Document.Regenerate(); <span class="green">// &lt;---- Add this! ------</span>
+&nbsp;
+&nbsp; <span class="green">// Export view</span>
+</pre>
+
+
+<!-- http://architosh.com/2013/11/autodesk-talks-to-architosh-about-revit-through-web-browser -->
+
+<a name="4"></a>
+
+<h4>Revit and Cloud Computing</h4>
+
+<p>Here is a quick pointer to an interesting interview with Architosh on
+
+<a href="http://architosh.com/2013/11/autodesk-talks-to-architosh-about-revit-through-web-browser">
+running Revit through a Web Browser</a> on
+
+any device, and several other big Autodesk CAD applications as well.</p>

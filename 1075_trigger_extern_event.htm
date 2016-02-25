@@ -1,0 +1,166 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Triggering Immediate External Event Execution</h3>
+
+<p>We held our first West European Devday in Paris on Monday and I am now sitting in the airport headed for Milano.</p>
+
+<p>En route to Milano, I worked at testing Joe Ye's
+
+<a href="http://adndevblog.typepad.com/aec/2013/07/tricks-to-force-trigger-idling-event.html">
+trick to trigger the Idling event</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2013/07/curve-length-idling-units-and-revitpythonshell.html#3">potential SetRaiseWithoutDelay workaround</a>)
+
+to force an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#8">
+immediate execution of my external event</a>.</p>
+
+<p>I also added a comment from Guy Robinson on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#10">Revit requiring focus</a> that
+
+had me worried for a moment.</p>
+
+<p>However, the solution is easy!</p>
+
+<p>Before we get to that, here is our one and only photo from the DevDay event in Paris, a shot of beautiful evening sky at the Charles de Gaulle airport:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2013/2013-12-09_paris/sky_at_cdg.jpg" alt="Evening sky at Charles de Gaulle airport" width="400"/>
+</center>
+
+
+<a name="2"></a>
+
+<h4>Triggering External Event Execute by Setting Focus</h4>
+
+<p>Let me recapitulate the situation: I can call the external event Raise method from an external thread, giving me complete control over timing and performance overhead.</p>
+
+<p>I can see from my debug output log messages that Revit has received and taken account of the Raise and the external event is now marked as pending.</p>
+
+<p>However, Revit does not call the external event Execute method until some time later, often when the mouse cursor is moved over its window area.</p>
+
+<p>Guy mentions
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#10">Revit requiring focus</a>.</p>
+
+<p>That can easily be achieved using the Windows API SetForegroundWindow provided by user32.dll.</p>
+
+<p>I use it in conjunction with its sibling GetForegroundWindow method, so I can restore focus back to the original window after activating Revit for an instant.</p>
+
+<p>They can both be referenced from user32.dll using p/invoke like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// DLL imports from user32.dll to set focus to</span>
+&nbsp; <span class="green">// Revit to force it to forward the external event</span>
+&nbsp; <span class="green">// Raise to actually call the external event </span>
+&nbsp; <span class="green">// Execute.</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The GetForegroundWindow function returns a </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the foreground window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> GetForegroundWindow();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Move the window associated with the passed </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the front.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> SetForegroundWindow(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+</pre>
+
+<p>With those references in place, I can momentarily shift focus to Revit in the  CheckForPendingDatabaseChanges method, immediately after raising the external event, and Revit  forwards that call to the external event Execute method right away, just as I had hoped:</p>
+
+<pre class="code">
+&nbsp; &nbsp; <span class="blue">if</span>( rdb.LastSequenceNumberChanged(
+&nbsp; &nbsp; &nbsp; <span class="teal">DbUpdater</span>.LastSequence ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _event.Raise();
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++_nUpdatesRequested;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;database update pending event raised {0} times&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; _nUpdatesRequested ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Set focus to Revit for a moment.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Otherwise, it may take a while before </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Revit forwards the event Raise to the</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// event handler Execute method.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hBefore = GetForegroundWindow();
+&nbsp;
+&nbsp; &nbsp; &nbsp; SetForegroundWindow(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( hBefore );
+&nbsp; &nbsp; }
+</pre>
+
+<p>With these three extra lines in place, Revit reacts immediately to my external event Raise.
+This is also reflected in the log file (compare with the previous version
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#8">
+waiting for Revit to react</a>):</p>
+
+<pre>
+01:16:56.820 CheckForPendingDatabaseChanges loop 1 - check for changes 1
+01:16:57.012 CheckForPendingDatabaseChanges loop 2 - check for changes 2
+01:16:57.217 CheckForPendingDatabaseChanges loop 3 - check for changes 3
+. . .
+01:17:09.058 CheckForPendingDatabaseChanges loop 63 - check for changes 63
+01:17:09.076 database update pending event raised 1 times
+01:17:09.115 UpdateBim begin
+01:17:09.216 UpdateBim end
+01:17:09.283 CheckForPendingDatabaseChanges loop 64 - check for changes 64
+01:17:09.457 CheckForPendingDatabaseChanges loop 65 - check for changes 65
+01:17:09.562 CheckForPendingDatabaseChanges loop 66 - check for changes 66
+. . .
+01:17:19.144 CheckForPendingDatabaseChanges loop 153 - check for changes 153
+01:17:19.249 CheckForPendingDatabaseChanges loop 154 - check for changes 154
+01:17:19.305 database update pending event raised 2 times
+01:17:19.333 UpdateBim begin
+01:17:19.400 UpdateBim end
+01:17:19.515 CheckForPendingDatabaseChanges loop 155 - check for changes 155
+01:17:19.652 CheckForPendingDatabaseChanges loop 156 - check for changes 156
+. . .
+</pre>
+
+<p><b>Much</b> shorter, <b>instantaneous</b> reaction.</p>
+
+<p>Yay!</p>
+
+<p>Success!</p>
+
+<p>Perfection!</p>
+
+<p>As already explained, I much prefer this use of an external event over the Idling event, due to the detailed timing control over the polling frequency and possibility to run my polls in a separate thread, as opposed to the Idling all-or-nothing approach.</p>
+
+
+<a name="3"></a>
+
+<h4>Download</h4>
+
+<p>I am quite happy about this and committed the changes implementing this version in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>
+
+as
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.19">
+release 2014.0.0.19</a>.
+
+<p>I hope that solves this issue for good.</p>
+
+<p>Hardly likely, though.</p>
+
+<p>Anyway, I urgently need to get some sleep now before the Milano DevDay conference, due to begin in just a very few hours...</p>
+
+<p>Again, wish me luck, guys.</p>

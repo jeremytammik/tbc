@@ -1,0 +1,290 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Autodesk-Revit-API/Rotate-a-viewplan-after-creation/td-p/3842914
+
+08259677 [Rotate view plan using API calls]
+
+Daniel AaseFocus Software
+
+-->
+
+<h3>Rotating a Plan View</h3>
+
+<p>Here is a query from the Autodesk Revit API discussion forum dealing with the
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/Rotate-a-viewplan-after-creation/td-p/3842914">
+rotation of a plan view</a>:</p>
+
+<p><strong>Question:</strong> I am trying to create rotated duplicates of existing views using the Revit 2013 API.</p>
+
+<p>I managed to create the view, both as dependent and not.
+After this I activate the view crop box and make it visible.</p>
+
+<p>I then create a rotation transformation.
+When I debug it, I can see that the transformation and rotation of the bounding box is ok.</p>
+
+<p>I try to set the rotated bounding box as the crop box.
+However, this does not work, and all I get is the standard identity matrix.</p>
+
+<p>I have a right handed rotation, and use basis Z as the rotation axis.
+I have a reference to a transaction inside the method, but have also tried to encapsulate the specific part into a sub transaction.</p>
+
+<p>This way of doing things is according to the Revit 2013 API documentation.
+It states that the bounding box can be rotated, then used as section box/crop box, and provides to following example code for this:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="blue">void</span> RotateBoundingBox( <span class="teal">View3D</span> view3d )
+{
+&nbsp; <span class="teal">BoundingBoxXYZ</span> box = view3d.SectionBox;
+&nbsp;
+&nbsp; <span class="blue">if</span>( !box.Enabled )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The View3D section box is not enabled.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Create a rotation transform</span>
+&nbsp;
+&nbsp; <span class="teal">Transform</span> rotate = <span class="teal">Transform</span>.get_Rotation(
+&nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, <span class="teal">XYZ</span>.BasisZ, 2 );
+&nbsp;
+&nbsp; <span class="green">// Transform the SectionBox </span>
+&nbsp; <span class="green">// with the rotation transfrom</span>
+&nbsp;
+&nbsp; box.Transform = box.Transform.Multiply( rotate );
+&nbsp; view3d.SectionBox = box;
+}
+</pre>
+
+<p>I tried to use it like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ViewPlan</span> rotatedView = doc.GetElement(
+&nbsp; &nbsp; viewToDuplicate.Duplicate(
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewDuplicateOption</span>.AsDependent ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ViewPlan</span>;
+&nbsp;
+&nbsp; rotatedView.CropBoxActive = <span class="blue">true</span>;
+&nbsp; rotatedView.CropBoxVisible = <span class="blue">true</span>;
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> box = rotatedView.CropBox;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> originOfRotation = 0.5 * (box.Max - box.Min);
+&nbsp; <span class="teal">XYZ</span> axizOfRotation = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; <span class="teal">Transform</span> rotate = <span class="teal">Transform</span>.get_Rotation(
+&nbsp; &nbsp; originOfRotation, axizOfRotation, <span class="teal">Math</span>.PI );
+&nbsp;
+&nbsp; box.Transform = box.Transform.Multiply( rotate );
+&nbsp;
+&nbsp; rotatedView.CropBox = box;
+</pre>
+
+<p>I also tried using the ElementTransformUtils.RotateElement method.</p>
+
+<p>Both approaches yield no result.</p>
+
+<p>Manually I make sure the plan is situated to 'Project north', show the crop box, select it, rotate it and the view is rotated accordingly.</p>
+
+<!--
+http://wikihelp.autodesk.com/Revit/enu/2012/Help/Revit_User's_Guide/1394-Document1394/1549-Use_and_1549/1594-Rotating1594/1597-Rotating1597
+
+<p>Do you have any suggestions to what to do?</p>
+
+-->
+
+<p>The desired result is a dependent view rotated at the point of creation.
+I need to create several views at once, e.g. 4-8 differently rotated ones of the same plan, to create evacuation plans.</p>
+
+<!--
+<p>I created a sample model and code that can be downloaded from here:</p>
+
+https://dl.dropboxusercontent.com/u/21688890/RotateViewPlanSample.rar
+
+<p>This contains sample visual studio code, Revit project and a Word file with explanations.</p>
+
+/a/j/adn/case/sfdc/08259677/attach/Rotating_of_view_plan.docx
+
+In the sample file, I have created the evacuation plans for three rooms.
+
+I am hoping to do some further development on these to do the steps described over. (some of them).
+
+<p>The sample is 2014, and I am using the 2014 API.</p>
+<p>In the Revit sample file. Try to duplicate the firstfloor. I have created the solution I want as 'Evacuation plan &ndash; first floor' This shows what I am looking to get.</p>
+
+<p>In my current sample code I create the transformation and try to apply it to the duplicated view.
+I then rotate the symbols placed in the view according to the specified angle.</p>
+
+<p>It is only the rotation of the view that is tricky.</p>
+
+-->
+
+<p>Let me reiterate my requirement and manual solution:</p>
+
+<h4>Issue &ndash; Rotating view plans</h4>
+<p>For creating evacuation plans for a floor, I need to create rotated dependent views so that the person looking at the plan on the inside of a door sees the situation the same way as the corridor outside.</p>
+
+<p>I can achieve it manually like this:</p>
+<ul>
+<li>Create the floor, i.e. when modelling the building.</li>
+<li>Apply all the required fire symbols.</li>
+<li>Create three duplicates as dependent views.</li>
+<li>Apply the crop region to each.</li>
+<li>Rotate each plan individually by rotating the crop box.</li>
+<li>Create filled regions to show which room the current plan applies to.</li>
+<li>Hide the 'you are here' symbols in all other rooms.</li>
+<li>Optionally rotate the symbols as well.</li>
+<li>Place these views on corresponding sheets.</li>
+</ul>
+
+<p>This is obviously a very time consuming operation.</p>
+
+<p>I have already implemented methods to create the fire and evacuation plans.</p>
+
+<p>The issue I am now dealing with is the rotation of the crop region.</p>
+
+<p>I do get the transformation, but I am not able to apply it to the crop region.
+Something fails and the transformation remains unchanged.</p>
+
+<p>How can I fix this, please?</p>
+
+
+<p><strong>Answer:</strong> Yes,
+
+<a href="http://cad-notes.com/2010/04/rotating-revit-views">
+rotating a view</a> in
+
+the user interface is perfectly straightforward, just as you say:</p>
+
+<!--
+<p>First, a couple of comments on your sample add-in code:</p>
+
+<p>You have an interesting mix of Revit API assembly references in your MinimumRevitAddin.csproj sample project. It includes two HintPath tags, and they refer to a mix of Revit API assemblies:</p>
+
+<ul>
+<li>C:\Program Files\Autodesk\Revit 2014\RevitAPI.dll</li>
+<li>C:\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</li>
+</ul>
+
+<p>I updated these to both refer to the Revit 2014 assemblies.</p>
+
+<p>Also the reference to RevitAPI.dll had its copy local flag set to true. You should avoid that, as you probably know:</p>
+
+http://thebuildingcoder.typepad.com/blog/2011/08/set-copy-local-to-false.html
+
+<p>The RegenerationOption is completely superfluous, everywhere.</p>
+
+<p>The TransactionMode makes no sense on an external application.</p>
+
+<p>The Autodesk.Revit namespace is empty, since all it contains are other namespaces, so it never ever makes sense to include it in a using statement.</p>
+
+<p>I cleaned it up and started debugging your add-in.</p>
+
+<p>The updated code is attached to this message in RotateViewPlanSampleJt.zip.</p>
+-->
+
+<p>In the API, the issue is also clear: The element to rotate is not the view, but rather the crop box element associated to it.</p>
+
+<p>If it is visible, it can be found using a filtered element collector taking document and view element id arguments.</p>
+
+<p>Here is a macro that works based on your sample code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> CreateDuplicatedRotatedCroppedView(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">View</span> activeView = doc.ActiveView;
+&nbsp; &nbsp; <span class="teal">View</span> duplicated = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Duplicate View&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; duplicated = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; activeView.Duplicate(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ViewDuplicateOption</span>.WithDetailing ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">View</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> cropBoxElement = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">TransactionGroup</span> tGroup
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">TransactionGroup</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tGroup.Start( <span class="maroon">&quot;Temp to find crop box element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t2 = <span class="blue">new</span> <span class="teal">Transaction</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, <span class="maroon">&quot;Temp to find crop box element&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Deactivate crop box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t2.Start();
+&nbsp; &nbsp; &nbsp; &nbsp; duplicated.CropBoxVisible = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; t2.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get all visible elements;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// this excludes hidden crop box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, duplicated.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; shownElems
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = collector.ToElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Activate crop box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t2.Start();
+&nbsp; &nbsp; &nbsp; &nbsp; duplicated.CropBoxVisible = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; t2.Commit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get all visible elements excluding</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// everything except the crop box</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, duplicated.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; collector.Excluding( shownElems );
+&nbsp; &nbsp; &nbsp; &nbsp; cropBoxElement = collector.FirstElement();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tGroup.RollBack();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t3 = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bbox = duplicated.CropBox;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> center = 0.5 * ( bbox.Max + bbox.Min );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> axis = <span class="teal">Line</span>.CreateBound(
+&nbsp; &nbsp; &nbsp; &nbsp; center, center + <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t3.Start( <span class="maroon">&quot;Rotate crop box element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.RotateElement( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; cropBoxElement.Id, axis, <span class="teal">Math</span>.PI / 6.0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t3.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>There are several noteworthy points in here.</p>
+
+<p>All the transactions could be assimilated into one group, if desired.</p>
+
+<p>The crop box element is retrieved using a clever trick: first hide it, retrieve the set V of all visible elements, unhide it and again retrieve all visible elements, this time excluding the set V.
+Clever, huh?</p>
+
+<!--
+<p>Windows 7b, Revit 2014:
+
+C:\a\vs\RotateViewPlanSample\MinimumRevitAddin\Helpers.cs</p>
+-->

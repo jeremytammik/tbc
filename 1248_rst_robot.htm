@@ -1,0 +1,111 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- 10207796 [Autodesk Robot Structural Analysis for Brazil]
+
+- i read some more about the command-tab + keep command pressed and press option + let go of command to open a minimised application on mac.
+  there is a better way.
+  the reason it is so bad is that you and i both are minimising apps.
+  if we stop doing that and hide them instead using command-h, then command-tab will show them again.
+  look here for more:
+  Shortcut to "un-minimize" something from the dock?
+  https://discussions.apple.com/thread/1615114?start=0&tstart=0
+  https://discussions.apple.com/message/3065018#3065018
+
+
+
+-->
+
+<h3>Robot Structural Analysis and Mac App Tabbing</h3>
+
+<p>Let's look at these two little issues today:</p>
+
+<ul>
+<li><a href="#2">Adapting Robot Structural Analysis</a></li>
+<li><a href="#3">Tabbing between applications on Mac</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Adapting Robot Structural Analysis</h4>
+
+<p><strong>Question:</strong> I installed the Revit SDK and am looking at customising Revit Structure and Robot for my needs.</p>
+
+<p>I could only find tutorials for examples of API, but I can't find any information about the database code.</p>
+
+<p>I would like to enhance the implementation based on <a href="https://en.wikipedia.org/wiki/Eurocode">Eurocode</a> for Brazil.</p>
+
+<p>How can I open and create a new database, like a 'Save As' from Eurocode?</p>
+
+<p><strong>Answer:</strong> When you say database... are you referring to a content database, like steel profiles or materials according to Eurocode catalogues?</p>
+
+<p>For creating the Code itself, we recommend the third party Code Checking framework. It makes it very easy to build and check codes.</p>
+
+<p>Here is a set of useful references:</p>
+
+<ul>
+<li>Review the BIM and Beam blog post providing a detailed description of the
+
+<a href="http://bimandbeam.typepad.com/bim_beam/2013/04/structural-analysis-and-code-checking-toolkit-2014-on-autodesk-exchange-apps.html">
+Structural Analysis and Code Checking Toolkit</a>.</li>
+
+<li>Install the
+
+<a href="http://apps.exchange.autodesk.com/RVT/Detail/Index?id=appstore.exchange.autodesk.com%3astructuralanalysisandcodecheckingtoolkit2014%3aen">
+Structural Analysis Toolkit</a> that
+
+activates the Results Storage and the code checking framework.</li>
+
+<li>Look at the Code Checking SDK provided within the Revit SDK that you already installed.
+The folder 'Structural Analysis SDK' contains all the supporting material and full documentation.</li>
+
+<li>Finally, here is another interesting discussion describing a
+
+<a href="http://adndevblog.typepad.com/aec/2013/05/structural-analysis-sdk-first-look.html">
+first look at the Structural Analysis SDK</a>
+
+to review.</li>
+
+</ul>
+
+
+
+
+<a name="3"></a>
+
+<h4>Tabbing Between Applications on Mac</h4>
+
+
+<p>I like my screen uncluttered.</p>
+
+<p>Under Windows, I practiced for decades minimising windows and then restoring them again using Alt-Tab.</p>
+
+<p>Unfortunately, on the Mac, this does not work equally well.</p>
+
+<p>If you minimise a window using the round yellow '-' minus button in the upper left hand corner of each window, it disappears happily into the dock and cannot be restored by &#8984;-Tab.</p>
+
+<p>I found two solutions to this: the wrong way and the right way.</p>
+
+<p>The wrong way involves some keyboard acrobatics: &#8984;-Tab back to the desired window, and then, keeping the &#8984; key pressed all the time, press the Option key as well. Let go of the &#8984; key, and, lo and behold, the window reappears.</p>
+
+<p>Here are some pretty old discussion threads explaining that trick:</p>
+
+<ul>
+<li><a href="https://discussions.apple.com/thread/1615114">Shortcut to 'un-minimize' something from the dock</a></li>
+<li><a href="https://discussions.apple.com/message/3065018">How to 'unhide' apps</a></li>
+</ul>
+
+<p>This is the wrong way, however, because it perpetuates my unhealthy Windows habits and mentality.</p>
+
+<p>I just realised that a much more efficient solution is to avoid minimising the windows, and hiding them instead.</p>
+
+<p>Mac OS provides a shortcut key for that, &#8984;-H.</p>
+
+<p>When hidden, a window is restored just as I want simply using &#8984;-Tab.</p>
+
+<p>I have been trying to retrain myself for almost a week now, and am still mostly falling back into the old habit...</p>

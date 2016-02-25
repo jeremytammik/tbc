@@ -1,0 +1,183 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Jim Quanci 
+
+RE: FYI... the web is moving to 3D...
+
+10197912 [Sort Levels by Elevation]
+
+http://forums.autodesk.com/t5/revit-api/sort-levels-by-elevation/m-p/5407203
+
+10195315 [Close and relinquish without saving or syncing through the API]
+
+-->
+
+<h3>WebGL Goes Mobile and Sorted Level Retrieval</h3>
+
+<p>Today, let's look at a generic WebGL and a specialised Revit API issue: <a href="#2">WebGL on all Apple platforms</a> and <a href="#3">sorted level retrieval</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>WebGL Goes Mobile</h4>
+
+<p>Apple announced
+
+<a href="http://venturebeat.com/2014/11/18/thanks-to-apple-webgl-goes-truly-cross-platform">
+full support of WebGL for its desktop and mobile browsers</a>,
+
+so WebGL goes truly cross platform, as pointed out by Paul Flanagan:</p>
+
+<blockquote>
+<p>Previous claims of cross-platform support for this HTML5 standard were largely worthless because they did not include the iPhone, iPad, or desktop Safari. That has changed, and this standard for 3D and interactive web experiences now works across all... platforms that matter.</p>
+
+<p>Rich 3D browser experience will be everything we currently see on the Web, from more interactive and engaging websites through to games which will work cross platform without the need for a big porting effort and all of the advantages of a real-time cloud platform.</p>
+</blockquote>
+
+<p>This raises an interesting question: will WebGL apps running in web components be performant enough that nobody will need a native SDK for the mobile platforms? It seems that the web version of WebGL will be available for native apps through web components very soon.</p>
+
+<p>We are happily riding the front of this wave with the WebGL-based Autodesk <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">View and Data API</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Retrieve Levels Sorted by Elevation</h4>
+
+<p>A quick look at a code snippet based on the Revit API forum discussion thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/sort-levels-by-elevation/m-p/5407203">
+sorting levels by elevation</a> raised
+
+by jmcclanathan with contributions from peterjegan, sanjaymann and my colleague
+
+<a href="http://adndevblog.typepad.com/aec/aaron-lu.html">
+Aaron Lu</a> &ndash;
+
+by the way, Aaron joined the DevTech team this very month and brings with him a wealth of experience in AEC products, both cloud and desktop &ndash; a warm welcome to Aaron, and thank you for your active participation in the forum and everywhere else!</p>
+
+<p><strong>Question:</strong> How would I go about getting a collection of levels sorted by elevation?
+From reading the info I've found so far I think that filtered element collector returns an IEnumerable and that can be sorted by using 'OrderBy', then ToElementIds could be used to create the collection of element ids in the correct order.
+Is that correct?</p>
+
+<p>Here is some code I tried and didn't work:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIDocument</span> uiDoc = <span class="blue">this</span>.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uiDoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> levCollector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; levelsCollection
+&nbsp; &nbsp; = levCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .OrderBy( lev =&gt; lev.Elevation )
+&nbsp; &nbsp; &nbsp; .ToElementIds();
+</pre>
+
+<p>Can someone please point me in the right direction?</p>
+
+<p>Also, is an ICollection sortable?</p>
+
+<p><strong>Answer 1:</strong> I didn't look at all the other stuff, but if you define an Element collection, you should fill it with Elements, not ElementIds:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt;... .ToElementIds();
+</pre>
+
+<p><strong>Answer 2:</strong>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">IOrderedEnumerable</span>&lt;<span class="teal">Level</span>&gt; FindAndSortLevels(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementClassFilter</span>( <span class="blue">typeof</span>( <span class="teal">Level</span> ), <span class="blue">false</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; &nbsp; .OrderBy( e =&gt; e.Elevation );
+&nbsp; }
+</pre>
+
+<p><strong>Answer 3:</strong> You can change this part:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">Element</span>&gt; levelsCollection
+&nbsp; &nbsp; = levCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .OrderBy( lev =&gt; lev.Elevation )
+&nbsp; &nbsp; &nbsp; .ToElementIds();
+</pre>
+
+<p>To this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Level</span>&gt; levelsCollection
+&nbsp; &nbsp; = levCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; &nbsp; .OrderBy( lev =&gt; lev.Elevation )
+&nbsp; &nbsp; &nbsp; .ToList();
+</pre>
+
+<p>Reasons:</p>
+
+<ul>
+<li>Return value can't be ICollection&lt;Element&gt; when you call .ToElementIds.</li>
+<li>OfClass() method will return a collection of Element, you can only order them by elevation after casting Element to Level, that's why I suggest using OfType&lt;Level&gt;().</li>
+<li>OrderBy() method returns IOrderedEnumerable&lt;T&gt;, if you want to have index operator, i.e. list[i], you can call ToList() to let it return a List&lt;T&gt;.</li>
+</ul>
+
+<p><strong>Answer 4:</strong> Additional comments from Jeremy:</p>
+
+<p>The shortcuts are always preferable over explicit filter instantiations, since they are guaranteed to be <b><i>quick</i></b> filters, which is why Aaron prefers OfClass to the explicit ElementClassFilter instantiation.</p>
+
+<p>You should also always avoid instantiating new collections when possible, since they may create copies of the existing data.</p>
+
+<p>The filtered element collector itself is already iterable, so often there is no need to instantiate any .NET collections at all, c.f. the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">
+FindElement and collector optimisation</a>.</p>
+
+<p>As a result of those considerations, here is my suggestion for an optimal solution:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IOrderedEnumerable</span>&lt;<span class="teal">Level</span>&gt; GetSortedLevels( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Level</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Level</span>&gt;()
+&nbsp; &nbsp; &nbsp; .OrderBy( lev =&gt; lev.Elevation );
+&nbsp; }
+</pre>
+
+<p>For many other filtered element collector code examples, including this one, please refer to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>, specifically the module
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">
+CmdCollectorPerformance.cs</a>.</p>
+
+<!--
+
+<a name="4"></a>
+
+<h4>Using Transaction Groups to Relinquish Elements Without Saving or Syncing</h4>
+
+
+<a href=""></a>
+
+<pre class="code">
+</pre>
+
+<center>
+<img src="img/.png" alt="" width="670"/>
+</center>
+
+
+<pre class="code">
+</pre>
+-->

@@ -1,0 +1,207 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+Scott Conover 
+
+RE: Ribbon Settings and drop down Pin
+RE: is family instance joined? can we know ?
+RE: ReferenceIntersector and Face.
+
+09995904 [How to Modify Family Instance Geometry]
+
+-->
+
+<h3>A Couple of Recent Issues</h3>
+
+<p>I have been quiet here for several days now, very busy working on Revit API cases, but nothing very generic to share here.</p>
+
+<p>Instead, let me mention a couple of quick answers by Scott Conover of the Revit API development team to some other recent issues that cropped up:</p>
+
+<ul>
+<li><a href="#2">Ribbon settings and drop down pin</a></li>
+<li><a href="#3">Determining whether a family instance is joined</a></li>
+<li><a href="#4">ReferenceIntersector and face</a></li>
+<li><a href="#5">How to modify family instance geometry</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Ribbon Settings and Drop Down Pin</h4>
+
+<p><strong>Question:</strong> How can I access the ribbon drop down pin and settings arrow from the API?</p>
+
+<center>
+<img src="img/ribbon_pin.png" alt="Ribbon pin" width="412"/>
+</center>
+
+<center>
+<img src="img/ribbon_arrow.png" alt="Ribbon settings arrow" width="412"/>
+</center>
+
+<p><strong>Answer:</strong> The RibbonPanel AddSlideOut method adds a sliding panel to your custom add-in ribbon user interface.</p>
+
+<p>You cannot do anything programmatically with the pin &ndash; the user has complete control over that.</p>
+
+<p>If you want to do anything beyond that, you are leaving the realm of the officially supported Revit API and may be able to use the .NET
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+UI Automation</a> library
+
+and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">
+unsupported</a> functionality
+
+provided by the AdWindows.dll assembly.</p>
+
+<p><strong>Reponse:</strong> Here is the code that I used to display the pin:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> PushButton_Settings(
+&nbsp; &nbsp; <span class="teal">RibbonPanel</span> p)
+&nbsp; {
+&nbsp; &nbsp; p.AddSlideOut(); <span class="green">// this displays the pin!</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">PushButtonData</span> pbd = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Settings&quot;</span>, <span class="maroon">&quot;File path Settings&quot;</span>,
+&nbsp; &nbsp; &nbsp; _introLabPath, <span class="maroon">&quot;HCL_Ribbon.Command&quot;</span>);
+&nbsp;
+&nbsp; &nbsp; pbd.LargeImage = NewBitmapImage(<span class="maroon">&quot;Setting-icon.png&quot;</span>);
+&nbsp; &nbsp; pbd.Image = NewBitmapImage(<span class="maroon">&quot;Setting-icon.png&quot;</span>);
+&nbsp; &nbsp; pbd.ToolTip = <span class="maroon">&quot;Set the path to the folder location&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; p.AddItem( pbd );
+&nbsp; }
+</pre>
+
+<center>
+<img src="img/ribbon_pin2.png" alt="Custom ribbon panel pin" width="235"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>Determining Whether a Family Instance is Joined</h4>
+
+<p><strong>Question:</strong> Is there a way to tell if a family instance is joined to something?</p>
+
+<p>I tried using RevitLookup but don't see anything useful.</p>
+
+<p>When transforming an edge I'm getting different results after joining the family instance to another one or a wall, etc.</p>
+
+<p><strong>Answer:</strong> There are a couple of things to try:</p>
+
+<ul>
+<li>The JoinGeometryUtils GetJoinedElements method</li>
+<li>For concrete framing family instances and walls, you can retrieve the Element's Location, cast to LocationCurve, and look at the ElementsAtJoin collection.</li>
+<li>The Element GetGeneratingElementIds method tells you for a given piece of geometry from an element what element causes this geometry to form.</li>
+<li>Finally, you can use geometric analysis, e.g. via the ReferenceIntersector or a filter such as the ElementIntersectsSolidFilter</li>
+</ul>
+
+<p>Here are some related discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/joined-beam-geometry-access.html">Joined beam geometry access</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/filter-for-touching-beams-using-solid-intersection.html">Filter for touching beams using solid intersection</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html#2">Determining the columns supporting a beam</a></li>
+</ul>
+
+<p>The last link above discusses a whole bunch of different approaches.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Getting the Face from a ReferenceIntersector</h4>
+
+<p><strong>Question:</strong> I am using the API to obtain a Face object at the intersection of a given point and direction.
+For that, I used the ReferenceIntersector like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ReferenceIntersector</span> refIntersector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( id,
+&nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Face, selectedView );
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> origin = <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, z );
+&nbsp;
+&nbsp; <span class="teal">ReferenceWithContext</span> refContext
+&nbsp; &nbsp; = refIntersector.FindNearest(
+&nbsp; &nbsp; &nbsp; origin, <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, -1 ) );
+&nbsp;
+&nbsp; <span class="teal">Reference</span> refObject = refContext.GetReference();
+</pre>
+
+<p>What next with the refObject?</p>
+
+<p>How can I get a reference to the Face object?</p>
+
+<p><strong>Answer:</strong> From the reference, you can retrieve the associated element using the Document GetElement method.</p>
+
+<p>From the element, you can retrieve the geometry object that was picked on it using GetGeometryObjectFromReference.</p>
+
+<p>You can cast that to a face, which is not an element itself.</p>
+
+
+<p>Many thanks to Scott and the team for raising and answering these questions.</p>
+
+
+<a name="5"></a>
+
+<h4>How to Modify Family Instance Geometry</h4>
+
+<p>Oh, let me add one more issue that just came in right now.</p>
+
+<p><strong>Question:</strong> I am trying to modify the geometry contained in a FamilyInstance in a project document.
+It does not appear that the API allows this.
+I have figured out how to use the Duplicate method to create a new FamilySymbol in my project document and then assign it to the FamilyInstance.Symbol property.
+But I can only seem to modify the parameter values for the duplicated symbol.
+I really need to modify its geometry.
+I would prefer to not have to go back into the family document to accomplish this because I am making these changes inside an Updater's Excute method.
+Is there a way to accomplish this?
+Please point me in the right direction.</p>
+
+<p><strong>Answer:</strong> Thank you for your query.</p>
+
+<p>The short answer is 'no'.</p>
+
+<p>I might add an emphatic 'absolutely not'.</p>
+
+<p>Sorry.</p>
+
+<p>You must be aware that the entire Revit model is parametrically driven.</p>
+
+<p>The parameters drive the model.</p>
+
+<p>The geometry is just the result.</p>
+
+<p>To make any changes to the geometry, you have to start with the parameters.</p>
+
+<p>They generate new geometry.</p>
+
+<p>That is the main feature that makes
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">
+Revit and its API different</a> from many other CAD systems:</p>
+
+<p>I hope this helps.</p>
+
+<p>This is really important to understand.</p>
+
+<p>It helps a lot to get to know Revit well from the user interface, workflow, product side of things before starting to think about programming anything.</p>
+
+<p>That helps convince you that the system actually works and does something useful, in addition to preventing you from doing everything you might be used to from programming other CAD systems.</p>
+
+<p>By the way, the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">DirectShape</a> element
+
+does in fact enable you to define geometry right there in the project environment without creating a separate family and inserting an instance for it.</p>
+
+<p>That was added to simplify IFC and other external format round trips, among other things, and does not change the main underlying principles, though.</p>

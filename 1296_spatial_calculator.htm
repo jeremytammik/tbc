@@ -1,0 +1,549 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+wall net and gross surface
+http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565
+
+10536988 [Door/Window Areas]
+
+http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html?cid=6a00e553e16897883301b8d0ec5711970c#comment-6a00e553e16897883301b8d0ec5711970c
+
+#revitapi
+
+-->
+
+<h3>Calculating Gross and Net Wall Areas</h3>
+
+<p>Determination of gross and net areas and volumes is fundamental to BIM.</p>
+
+<p>Here is an interesting solution to determine the gross and net area of a wall, i.e. with and without its openings, making use of the SpatialElementGeometryCalculator and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+temporary transaction trick</a>.</p>
+
+<p>The question was raised and solved by
+
+Phillip Miller of <a href="">Kiwi Codes Solutions Ltd</a>, starting with the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565">door/window areas</a>:</p>
+
+<p><strong>Question:</strong> I need to determine the cut areas of windows and doors in a wall. I thought this would be a simple matter of grabbing the BIP "HOST_Area_Computed" as with my testing that was returning the correct area.  It turns out that this is not the case from further testing.</p>
+
+<p>Please refer to the attached RVT file with two doors inserted into a wall.  They look similar but one is reporting through RevitLookup 4m2 and the other 2m2.</p>
+
+<p>Why is this?  What actually is "HOST_Area_Computed" reporting?  What is the most reliable way of getting the cut area of windows and doors?</p>
+
+<p><strong>Answer:</strong> I cannot really say anything about the values reported by the HOST_Area_Computed parameter. That belongs to the user interface, as far as I am concerned, and you would have to ask a product usage expert or application engineer to explain the meaning of that.</p>
+
+<p>For a pure API perspective, I assume you are aware of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+Revit SDK MaterialQuantities sample</a>?</p>
+
+<p>Does that not give you pretty much exactly what you need?</p>
+
+<p><strong>Response:</strong> Thank you for your reply and also the link to the SDK example.  I will look into that in the morning.</p>
+
+<p>To clarify what I'm doing, is, I want to find the surface areas of walls that are associated with Rooms.  To do this I'm making use of the SpatialElementGeometryCalculator class that is perfect as it does give areas of walls, floor and ceilings even if they are angled.  The only problem is it doesn't subtract things like doors and windows.</p>
+
+<p>Your link to your blog has jogged my memory though with a workaround that I could implement.  I know what doors and windows are associated with the room and also the wall associated with the rooms face, so I could get the area of the wall (which does calculate the gross - openings), then remove the associated doors and windows grab the new area and minus it from the gross and then turn back the transaction.
+I'm pretty sure that will then give me the true area of the room's walls.</p>
+
+
+<p><strong>Answer:</strong> Your use of the SpatialElementGeometryCalculator sounds very interesting.</p>
+
+<p>The Building Coder currently does not provide any samples of using that except the rather complex
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/football-and-space-adjacency-for-heat-load-calculation.html#3">
+space adjacency for heat load calculation</a>.</p>
+
+<p><strong>Response:</strong> Thank you so much for your suggestions.  The good news is that the temporary deletion of cutting objects in the wall works very well.  I'm not to sure why the BIP Area parameter is reporting odd values but I suppose that does not matter any more.</p>
+
+<p>I took a look at your suggested SDK examples and they didn't really apply to my situation as I was requiring the surface areas of walls associated to rooms.
+As a wall can span multiple rooms I had two choices.
+First up I used the room bounding object to extract the wall information.
+The downside to this approach is that you had to take the boundary segment length and then multiply that by the wall height, hoping that the wall had a consistent wall height (not always the case).
+I also was requiring the floor and ceiling areas and information and this was achieved by shooting rays from the room location point directly up and down to gather that information.  We found the results in the approach to be a bit unreliable and not very accurate at times depending on how the walls etc. were modelled.</p>
+
+<p>That led us to investigate the "SpatialElementGeometryCalculator" class, which after some trial and error does exactly what we were after.  I'm happy to provide you with some small sample code of this working for your users.</p>
+
+<p><strong>Answer:</strong> It seems to me the one of the door areas seems to be counting something double.</p>
+
+<p>Yes, of course the spatial element geometry calculator is much more suited to the need you describe.</p>
+
+<p><strong>Response:</strong> Here is a very simple stripped down version of the above calculating the wall surface area, minus cutting family instances.</p>
+
+<p>The advantages of this method over any other method that I have seen so far is that if your ceilings are room bounding and they are vaulted the wall areas are calculated correctly.</p>
+
+<p>The solution is a VB.NET solution that could easily be converted to C# if needed (copy to an editor to see the truncated lines in full, or look at the module
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/blob/master/SpatialElementGeometryCalculatorVb/extCmd.vb">extCmd.vb on GitHub</a>:</p>
+
+<pre class="code">
+<span class="blue">Imports</span> Autodesk.Revit.ApplicationServices
+<span class="blue">Imports</span> System.IO
+<span class="blue">Imports</span> Autodesk.Revit.DB.Architecture
+<span class="blue">Imports</span> System.Collections.Generic
+<span class="blue">Imports</span> System.Diagnostics
+<span class="blue">Imports</span> Autodesk.Revit.Attributes
+<span class="blue">Imports</span> Autodesk.Revit.DB
+<span class="blue">Imports</span> BoundarySegment = Autodesk.Revit.DB.<span class="teal">BoundarySegment</span>
+<span class="blue">Imports</span> Autodesk.Revit.DB.ExternalService
+<span class="blue">Imports</span> Autodesk.Revit.UI
+&nbsp;
+&lt;Autodesk.Revit.Attributes.<span class="teal">Transaction</span>(Autodesk.Revit.Attributes.<span class="teal">TransactionMode</span>.Manual)&gt; _
+&lt;Autodesk.Revit.Attributes.<span class="teal">Regeneration</span>(Autodesk.Revit.Attributes.<span class="teal">RegenerationOption</span>.Manual)&gt; _
+&lt;Autodesk.Revit.Attributes.<span class="teal">Journaling</span>(Autodesk.Revit.Attributes.<span class="teal">JournalingMode</span>.NoCommandData)&gt; _
+<span class="blue">Public</span> <span class="blue">Class</span> <span class="teal">extCmd</span>
+&nbsp; <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> Execute(commandData <span class="blue">As</span> <span class="teal">ExternalCommandData</span>, <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, elements <span class="blue">As</span> <span class="teal">ElementSet</span>) <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalCommand</span>.Execute
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> Autodesk.Revit.UI.<span class="teal">UIApplication</span> = commandData.Application
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> <span class="teal">Document</span> = app.ActiveUIDocument.Document
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> roomCol <span class="blue">As</span> <span class="teal">FilteredElementCollector</span> = <span class="blue">New</span> <span class="teal">FilteredElementCollector</span>(app.ActiveUIDocument.Document).OfClass(<span class="blue">GetType</span>(<span class="teal">SpatialElement</span>))
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> s <span class="blue">As</span> <span class="blue">String</span> = <span class="maroon">&quot;Finished populating Rooms with Boundary Data&quot;</span> + vbNewLine + vbNewLine
+&nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> e <span class="blue">As</span> <span class="teal">SpatialElement</span> <span class="blue">In</span> roomCol
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> room <span class="blue">As</span> <span class="teal">Room</span> = <span class="blue">TryCast</span>(e, <span class="teal">Room</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> room <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> spatialElementBoundaryOptions <span class="blue">As</span> <span class="blue">New</span> <span class="teal">SpatialElementBoundaryOptions</span>()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; spatialElementBoundaryOptions.SpatialElementBoundaryLocation = <span class="teal">SpatialElementBoundaryLocation</span>.Finish
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> calculator1 <span class="blue">As</span> <span class="blue">New</span> Autodesk.Revit.DB.<span class="teal">SpatialElementGeometryCalculator</span>(doc, spatialElementBoundaryOptions)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> results <span class="blue">As</span> <span class="teal">SpatialElementGeometryResults</span> = calculator1.CalculateSpatialElementGeometry(room)
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' get the solid representing the room's geometry</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> roomSolid <span class="blue">As</span> <span class="teal">Solid</span> = results.GetGeometry()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> iSegment <span class="blue">As</span> <span class="blue">Integer</span> = 1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> face <span class="blue">As</span> <span class="teal">Face</span> <span class="blue">In</span> roomSolid.Faces
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> subfaceList <span class="blue">As</span> <span class="teal">IList</span>(<span class="blue">Of</span> <span class="teal">SpatialElementBoundarySubface</span>) = results.GetBoundaryFaceInfo(face)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> subface <span class="blue">As</span> <span class="teal">SpatialElementBoundarySubface</span> <span class="blue">In</span> subfaceList
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> subface.SubfaceType = <span class="teal">SubfaceType</span>.Side <span class="blue">Then</span> <span class="green">' only interested in walls in this example</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> ele <span class="blue">As</span> <span class="teal">Element</span> = doc.GetElement(subface.SpatialBoundaryElement.HostElementId)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> subfaceArea <span class="blue">As</span> <span class="blue">Double</span> = subface.GetSubface().Area
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> netArea <span class="blue">As</span> <span class="blue">Double</span> = sqFootToSquareM(calwallAreaMinusOpenings(subfaceArea, ele, doc, room))
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">&quot;Room &quot;</span> + room.Parameter(<span class="teal">BuiltInParameter</span>.ROOM_NUMBER).AsString + <span class="maroon">&quot; : Wall &quot;</span> + ele.Parameter(<span class="teal">BuiltInParameter</span>.DOOR_NUMBER).AsString + <span class="maroon">&quot; : Area &quot;</span> + netArea.ToString + <span class="maroon">&quot;m2&quot;</span> + vbNewLine
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += vbNewLine
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp; &nbsp; &nbsp; MsgBox(s, <span class="teal">MsgBoxStyle</span>.Information, <span class="maroon">&quot;Room Boundaries&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp; &nbsp; &nbsp; MsgBox(ex.Message.ToString + vbNewLine +
+&nbsp; &nbsp; &nbsp;&nbsp; ex.StackTrace.ToString)
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Failed
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Function</span> calwallAreaMinusOpenings(<span class="blue">ByVal</span> subfaceArea <span class="blue">As</span> <span class="blue">Double</span>, <span class="blue">ByVal</span> ele <span class="blue">As</span> <span class="teal">Element</span>, <span class="blue">ByVal</span> doc <span class="blue">As</span> <span class="teal">Document</span>, <span class="blue">ByVal</span> room <span class="blue">As</span> <span class="teal">Room</span>) <span class="blue">As</span> <span class="blue">Double</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> fiCol <span class="blue">As</span> <span class="teal">FilteredElementCollector</span> = <span class="blue">New</span> <span class="teal">FilteredElementCollector</span>(doc).OfClass(<span class="blue">GetType</span>(<span class="teal">FamilyInstance</span>))
+&nbsp; &nbsp; <span class="blue">Dim</span> lstTotempDel <span class="blue">As</span> <span class="blue">New</span> <span class="teal">List</span>(<span class="blue">Of</span> <span class="teal">ElementId</span>)
+&nbsp; &nbsp; <span class="green">'Now find the familyInstances that are associated to the current room</span>
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> fi <span class="blue">As</span> <span class="teal">FamilyInstance</span> <span class="blue">In</span> fiCol
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.Parameter(<span class="teal">BuiltInParameter</span>.HOST_ID_PARAM).AsValueString = ele.Id.ToString <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.Room <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.Room.Id = room.Id <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add(fi.Id)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Continue For</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.FromRoom <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.FromRoom.Id = room.Id <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add(fi.Id)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Continue For</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.ToRoom <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> fi.ToRoom.Id = room.Id <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add(fi.Id)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Continue For</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> lstTotempDel.Count &gt; 0 <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> t <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(doc, <span class="maroon">&quot;tmp Delete&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> wallnetArea <span class="blue">As</span> <span class="blue">Double</span> = ele.Parameter(<span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED).AsDouble
+&nbsp; &nbsp; &nbsp; t.Start()
+&nbsp; &nbsp; &nbsp; doc.Delete(lstTotempDel)
+&nbsp; &nbsp; &nbsp; doc.Regenerate()
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> wallGrossArea <span class="blue">As</span> <span class="blue">Double</span> = ele.Parameter(<span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED).AsDouble
+&nbsp; &nbsp; &nbsp; t.RollBack()
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> fiArea <span class="blue">As</span> <span class="blue">Double</span> = wallGrossArea - wallnetArea
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> subfaceArea - fiArea
+&nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> subfaceArea
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Function</span> sqFootToSquareM(<span class="blue">ByVal</span> sqFoot <span class="blue">As</span> <span class="blue">Double</span>) <span class="blue">As</span> <span class="blue">Double</span>
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Math</span>.Round(sqFoot * 0.092903, 2)
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+<span class="blue">End</span> <span class="blue">Class</span>
+</pre>
+
+<p><strong>Answer:</strong>
+
+Thank you very much for your sample code.</p>
+
+<p>I created a
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator GitHub repository</a> for
+
+it and placed both the original VB.NET implementation and my migration efforts to C# in it.</p>
+
+<p>You can look at the
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/commits/master">list of commits</a> to
+
+see the steps that I took:</p>
+
+<ul>
+<li>Commits on Mar 17, 2015</li>
+<ul>
+<li>added comments &ndash; an hour ago</li>
+<li>added comments &ndash; an hour ago</li>
+<li>reformatted long lines and compare element id integer instead of string &ndash; an hour ago</li>
+<li>added comments &ndash; 2 hours ago</li>
+<li>cleaned up foreach statement and compiled successfully &ndash; 2 hours ago</li>
+</ul>
+<li>Commits on Mar 16, 2015</li>
+<ul>
+<li>C# code generated by disassembling VB.NET assembly using Reflector &ndash; 22 hours ago</li>
+<li>original VB.NET implementation &ndash; 23 hours ago</li>
+<li>added link to discussion forum thread &ndash; 23 hours ago</li>
+<li>added authors and tbc link &ndash; 23 hours ago</li>
+<li>added authors and tbc link &ndash; 23 hours ago</li>
+<li>Initial commit &ndash; 23 hours ago</li>
+</ul>
+</ul>
+
+<p>I started off by compiling, installing and testing the VB.NET solution, then disassembling the VB.NET add-in assembly DLL using
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/converting-between-vb-and-c-and-net-decompilation.html">
+Reflector</a> to
+
+generate some raw C# code as a starting point.</p>
+
+<p>The result was not ready to compile, so some additional steps were required, both just to compile it and for further clean-up.</p>
+
+<p>One little enhancement that I added was to use an integer comparison instead of string comparison to identify the family instances hosted by the given wall.
+Using <code>AsElementId().IntegerValue.Equals( Id.IntegerValue )</code> is more efficient than comparing AsValueString and ele.Id.ToString, since the string conversion is eliminated.
+Integer comparison is faster, because you are just comparing one single binary register instead of a whole sequence of bytes.</p>
+
+<p>Another significant potential enhancement in calwallAreaMinusOpenings would be to use a parameter filter for the HOST_ID_PARAM parameter value instead of the .NET element id comparison to narrow down the family instances to those hosted by the wall before returning the filtered element collector result from Revit back to .NET.</p>
+
+<p>That would vastly speed up the process for large models, because in the current implementation, all family instances are retrieved and marshalled across from native Revit to the .NET add-in memory space before the parameter value is checked in .NET.</p>
+
+<p>As I pointed out repeatedly in the past, just marshalling all of the family instance data from the Revit memory space over to the add-in .NET realm costs a lot of time. Using a parameter filter speeds things up significantly, at least by 50 percent. In a large model, where the great majority of the family instances will not be hosted by the wall of interest, this could cause a huge performance improvement.</p>
+
+<p>The end result looks like this in C#:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert square feet to square meters </span>
+&nbsp; <span class="gray">///</span><span class="green"> with two decimal places precision.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">double</span> sqFootToSquareM( <span class="blue">double</span> sqFoot )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Round( sqFoot * 0.092903, 2 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Calculate wall area minus openings. Temporarily</span>
+&nbsp; <span class="gray">///</span><span class="green"> delete all openings in a transaction that is</span>
+&nbsp; <span class="gray">///</span><span class="green"> rolled back.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;subfaceArea&quot;&gt;</span><span class="green">Initial gross subface area</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;wall&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;room&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; <span class="blue">double</span> calwallAreaMinusOpenings(
+&nbsp; &nbsp; <span class="blue">double</span> subfaceArea,
+&nbsp; &nbsp; <span class="teal">Element</span> wall,
+&nbsp; &nbsp; <span class="teal">Room</span> room )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = wall.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; room.Document.ProjectInformation.UniqueId.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; doc.ProjectInformation.UniqueId ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected wall and room from same document&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine all openings in the given wall.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> fiCol
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; lstTotempDel
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> fi <span class="blue">in</span> fiCol )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// The family instances hosted by this wall</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// could be filtered out more efficiently using </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// a filtered element collector parameter filter.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// This would be important in a large model.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( fi.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_ID_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId().IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.Id.IntegerValue ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( fi.Room != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( fi.Room.Id == room.Id ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add( fi.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( ( fi.FromRoom != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( fi.FromRoom.Id == room.Id ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add( fi.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( ( fi.ToRoom != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( fi.ToRoom.Id == room.Id ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lstTotempDel.Add( fi.Id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine total area of all openings.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> openingArea = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; lstTotempDel.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> wallAreaNet = wall.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;tmp Delete&quot;</span> );
+&nbsp; &nbsp; &nbsp; doc.Delete( lstTotempDel );
+&nbsp; &nbsp; &nbsp; doc.Regenerate();
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> wallAreaGross = wall.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp; &nbsp; &nbsp; t.RollBack();
+&nbsp;
+&nbsp; &nbsp; &nbsp; openingArea = wallAreaGross - wallAreaNet;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> subfaceArea - openingArea;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SpatialElementBoundaryOptions</span> sebOptions
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; &nbsp; sebOptions.SpatialElementBoundaryLocation
+&nbsp; &nbsp; &nbsp; = <span class="teal">SpatialElementBoundaryLocation</span>.Finish;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Result</span> rc;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> roomCol
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Finished populating Rooms with &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Boundary Data\r\n\r\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SpatialElement</span> e <span class="blue">in</span> roomCol )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Room</span> room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( room != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.DB
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">SpatialElementGeometryCalculator</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; calc = <span class="blue">new</span> Autodesk.Revit.DB
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">SpatialElementGeometryCalculator</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, sebOptions );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SpatialElementGeometryResults</span> results
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = calc.CalculateSpatialElementGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; room );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> roomSolid = results.GetGeometry();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> roomSolid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">SpatialElementBoundarySubface</span>&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subfaceList = results.GetBoundaryFaceInfo(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; face );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">SpatialElementBoundarySubface</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subface <span class="blue">in</span> subfaceList )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( subface.SubfaceType
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="teal">SubfaceType</span>.Side )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> wall = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subface.SpatialBoundaryElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .HostElementId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> subfaceArea = subface
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetSubface().Area;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> netArea = sqFootToSquareM(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; calwallAreaMinusOpenings(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; subfaceArea, wall, room ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = s + <span class="maroon">&quot;Room &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + room.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ROOM_NUMBER )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsString()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; : Wall &quot;</span> + wall.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsString()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; : Area &quot;</span> + netArea.ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; m2\r\n&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = s + <span class="maroon">&quot;\r\n&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Room Boundaries&quot;</span>, s);
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Room Boundaries&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; ex.Message.ToString() + <span class="maroon">&quot;\r\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + ex.StackTrace.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+}
+</pre>
+
+<p>Let's look at the results obtained from the little house model generated by the ADN Xtra labs:</p>
+
+<center>
+<img src="img/segc_little_house_3d.png" alt="Little house 3D view" width="268"/>
+</center>
+
+<p>The front wall hosts a door and two windows, so its area differs from the back wall's:</p>
+
+<center>
+<img src="img/segc_little_house_plan.png" alt="Little house plan view" width="268"/>
+</center>
+
+<p>The add-in reports the following net wall areas:</p>
+
+<center>
+<img src="img/segc_result_msg.png" alt="Little house wall area results" width="366"/>
+</center>
+
+<p>As you can see, the door and the two small windows consume a bit less than 2.5 square meters of wall area.</p>
+
+<p>The complete source code, Visual Solution files and add-in manifests for both the VB.NET and C# implementations are hosted by the
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator GitHub repository</a>,
+
+and the version presented here is
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2015.0.0.0">
+release 2015.0.0.0</a>.</p>
+
+<p>Many thanks to Phillip for exploring and developing this powerful solution!</p>
+
+
+<a name="2"></a>
+
+<h4>Wall Area and Orientation</h4>
+
+<p>Another recent query that might also make use of this discussion was raised by Arif Hanif in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html?cid=6a00e553e16897883301b8d0ec5711970c#comment-6a00e553e16897883301b8d0ec5711970c">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">room and wall adjacency</a>:
+
+<p><strong>Question:</strong> Love the website, I have recently started to learn C# and have started exploring the API to help with MEP Design. It has been frustrating dealing with gbXML. I am trying to get Wall Area and Orientation for Room to Excel. Can you point me to some of your past postings that could help me.</p>
+
+
+<p><strong>Answer:</strong> There are a lot of discussions on getting the wall area, e.g. for mass quantities, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">
+Revit SDK MaterialQuantities sample</a> mentioned
+
+above and the discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+2D polygon areas and outer loop</a>.</p>
+
+<p>For the orientation, here are some starting points:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/10/azimuth.html">Azimuth</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html">Facing North</a></li>
+</ul>
+
+<p>Those initial ponderings led to these further discussions:</p>
+
+<!-- 0027 0230 0275 0292 0730 0738 0787 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/unrotate-north.html">Unrotate North</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/rotate-true-north.html">Rotate True North</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/real-world-concrete-corner-coordinates.html">Real-world concrete corner coordinates</a></li>
+</ul>
+
+<p>We put in some additional work on converting Revit project coordinates to real-world ones, including the orientation transformation, when working on the setout point application:</p>
+
+<!-- 0806 1234 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">Structural concrete setout point add-in</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/11/concrete-setout-points-for-revit-structure-2015.html">Concrete setout points for Revit Structure 2015</a></li>
+</ul>
+
+<p>I hope this helps.</p>
+
+<p>Enjoy.</p>

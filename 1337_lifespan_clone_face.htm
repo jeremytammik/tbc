@@ -1,0 +1,188 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<!-- <script src="google-code-prettify/run_prettify.js"></script> -->
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+- 10876913 [IFCWALLSTANDARDCASE]
+
+#revitapi #adsk #bim #3dwebcoder #aec #geometry #milanojs
+#adskdevnetwrk #responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #csharp #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>IFC GUID Access, Life Span and Cloning of Geometry</h3>
+
+<p>Today, let's talk about the life span of Revit geometry and accessing the IFC GUID of an imported element:</p>
+
+<ul>
+<li><a href="#2">Life span and cloning of solids and faces</a></li>
+<li><a href="#3">Accessing the IFC GUID of an imported wall</a></li>
+</ul>
+
+<p>First, I'll just mention that I returned safe and sound from the successful fourth and last day of the Milano WebGL workshop, which we concluded with a group session guiding through the
+<a href="https://github.com/Developer-Autodesk/tutorial-getting.started-view.and.data">
+View and Data API tutorial</a>.</p>
+
+<p>I wrote  is a short report on that and published it together with a few other current topics on
+<a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a>,
+several of which might be of equal interest to you here as well:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/webgl-workshop-jobs-anchors-and-functional-javascript.html#2">
+WebGL workshop report</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/webgl-workshop-jobs-anchors-and-functional-javascript.html#3">
+Working at Autodesk</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/webgl-workshop-jobs-anchors-and-functional-javascript.html#4">
+Resolving the link offset error caused by the Snap responsive design menu bar</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/webgl-workshop-jobs-anchors-and-functional-javascript.html#5">
+Functional JavaScript workshop</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<p>I took a break in the middle of the train trip from Milano back home to Switzerland to meet up with a friend in Frutigen for a hike up the mountains.</p>
+
+<p>We were fortunate enough to be able to spend one night out in the open, enjoy nature, space, tranquility and the light of the half moon, followed by a beautiful day hiking over the
+<a href="https://en.wikipedia.org/wiki/First_(Kandersteg)">First</a> mountain,
+providing panorama views over the Bernese alps, overlooking Kandersteg village and the Oeschinensee halfway up (or down) the other side of the valley:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2015/2015-06-28_first/590_jeremy_on_first_with_oeschinensee.jpg" alt="Jeremy on the First with Kandersteg and the Oeschinensee" width="450"/>
+</center>
+
+<p>Here is my <a href="https://www.facebook.com/media/set/?set=a.10205983154790852.1073741836.1019863650">
+First mountain panorama view photo album</a>.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Life Span and Cloning of Solids and Faces</h4>
+
+<p>Getting back to the Revit API, let's look at this issue raised by Miroslav Schonauer, Solution Architect in Autodesk Consulting.</p>
+
+<p><strong>Question:</strong>
+
+I’d like to cache a number of Face objects by analyzing Wall/Floor Solids in a Transaction and then use these faces afterwards outside the transaction, i.e.:</p>
+
+<pre>
+  FaceCollection instantiate
+
+  -Trans.Start
+  Loop Walls/Floors Geometry (Solids)
+  FaceCollection populate
+  End Loop
+  -Trans.End
+
+  FaceCollection use (just read-only geom.access to faces)
+</pre>
+
+<p>Questions:</p>
+
+<ul>
+<li>Is this a supported scenario?</li>
+<li>If NOT, any suggestions other than having to do ALL my work within the Transaction?</li>
+<li>If YES, would it also work with "Dummy Transaction trick" (i.e., I modify Walls/Floors, regen, get faces from such modified Solids and then Abort the Transaction).</li>
+</ul>
+
+<p>To give some more context, I need to find Wall and Floor faces without certain Generic Void family instances that cut them via InstanceVoidCutUtils &ndash; I have their element ids, so I can delete them in a temporary transaction &ndash; then potentially relocate or manipulate these void instances based on the 'virgin' wall geometry cached in the dummy transaction.</p>
+
+<p><strong>Answer:</strong>
+
+First, do you even need a transaction? It is not obvious from the code fragment that you need that.</p>
+
+<p>Secondly, and also briefly, your data will not be valid after rolling back the transaction. That is not limited to faces. If you obtain objects within a transaction, then regenerate and roll back the transaction, the validity of your previously obtained objects is uncertain because they may have been scoped out.</p>
+
+<p>It sounds like this is the scenario where you want to make a temporary change and analyse the results of the temporary change.  You would have two options:</p>
+
+<ul>
+<li>Perform the analysis inside the scope of the transaction, before the rollback (but after regenerating the initial temporary change).</li>
+<li>Copy the results of the change so that they are not removed from scope. For example, we have GeometryElement.GetTransformed, which will make a copy of the input. You could pass it an identity transform and then have a copy of the element geometry which will not be affected by transaction scopes (you still need to ensure that you are keeping references to the parent object to avoid conflicts with garbage collection).</li>
+</ul>
+
+<p><strong>Response:</strong>
+
+I do need the transaction as I am making dummy-changes, as I explained in the description of the context.</p>
+
+<p>Your answer confirms more or less what I suspected.</p>
+
+<p>The reason why the option 1 is not feasible for me is that during my further actions I may need to perform valid editing transactions, so can’t do that within the dummy-one to be rolled back at the end.</p>
+
+<p>Option 2 is what I really need, but I couldn’t find any way to clone faces into equivalent persistent objects. The hint about getting the clones of GeometryElement instances from which I can later retrieve faces (via drilling down its contained geometry objects) sounds like the way forward!</p>
+
+<p>BTW, shame that there is no GetTransformed method on the GeometryObject itself, as that would simplify the process by directly making the clones of faces (and other primitives for other possible uses outside my requirements).</p>
+
+<p><strong>Answer:</strong>
+
+A Face is too granular to copy and preserve separately; it really represents the confluence of the mathematical definition of the Surface with surrounding Edges, so all of this context would need to be duplicated in order for you to do anything useful with it.</p>
+
+<p>The smallest unit of Revit 3D geometry which could be preserved and used once the original context is gone would be the Solid.  We do also have a Solid duplication routine in Revit 2016: SolidUtils.Clone() &ndash; so that could be another option, cf.
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/cloning-a-solid-angelhack-3d-web-fest-and-dubai.html#6">
+cloning a solid</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/geometry-creation-and-line-intersection-exceptions.html#3">
+GeometryCreationUtilities for moving and copying solids</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Accessing the IFC GUID of an Imported Wall</h4>
+
+<p><strong>Question:</strong>
+
+I have a wall defined in an IFC file with an id value of '3lDzp1LFjDqwXDAihsyNrA' like this:</p>
+
+<pre>
+  #615 = IFCWALLSTANDARDCASE( '3lDzp1LFjDqwXDAihsyNrA',
+    #42, '\X2\6A196E9658C1\X0\:(P)PC200:1185289', $,
+    '\X2\6A196E9658C1\X0\:(P)PC200:794115',
+    #587, #613, '1185289' );
+</pre>
+
+<p>How can I retrieve the IFC GUID '3lDzp1LFjDqwXDAihsyNrA' for this wall within the Revit model?</p>
+
+<p>I see it listed in the user interface as the IfcGUID property:</p>
+
+<center>
+<img src="img/ifc_guid_parameter.jpeg" alt="IfcGUID property" width="415"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+This data is stored as a normal parameter on the associated element.</p>
+
+<p>You can look it up by name using the standard <code>Element</code> <code>LookupParameter</code> or <code>GetParameters</code> methods, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Parameter</span>&gt; ps = e.GetParameters( <span class="maroon">&quot;IfcGUID&quot;</span> );
+
+  // or
+
+&nbsp; <span class="teal">Parameter</span> pGuid = e.LookupParameter( <span class="maroon">&quot;IfcGUID&quot;</span> );
+&nbsp; string ifc_guid = pGuid.AsString();
+</pre>
+
+<p>The former is preferred, because it ensures you take care of multiple similarly named parameters, cf.
+<a href="http://thebuildingcoder.typepad.com/blog/2015/06/cnc-direct-export-wall-parts-to-dxf-and-sat.html#2015.2">
+replacing Element.get_Parameter by Element.GetParameters</a>.</p>
+
+<p>While we are at it, I'll also point out that you should absolutely avoid using the language dependent method of looking up parameters by name. You can use the corresponding built-in parameter enumeration value instead, for built-in parameters, or the GUID, for shared parameters. Looking up a parameter by display name is only necessary for custom family parameters.</p>
+
+<p>In this case, the built-in parameters IFC_GUID and IFC_TYPE_GUID will let you access the values for instances and types, respectively, e.g., like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Parameter</span> pGuid = e.get_Parameter( <span class="teal">BuiltInParameter.IFC_GUID</span> );
+&nbsp; string ifc_guid = pGuid.AsString();
+</pre>

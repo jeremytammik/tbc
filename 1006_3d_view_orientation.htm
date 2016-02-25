@@ -1,0 +1,411 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Alexander Ignatovich, Investicionnaya Venchurnaya Companiya
+08397812 [How to use CreateIsometric to get the same result as NewView3D]
+08680877 [Again about CreateIsometric and old NewView3D]
+
+-->
+
+<h3>Setting a Default 3D View Orientation</h3>
+
+<p>Here is a nice little explanation by Alexander Ignatovich of
+
+<a href="http://www.iv-com.ru">
+Investicionnaya Venchurnaya Companiya</a> (that
+
+sounds like a venture investment company to me) on how to export an image file for a family or project.</p>
+
+<p>One issue that cropped up was how to set the default view orientation for a newly created 3D view:</p>
+
+<p><strong>Question:</strong> In versions prior to Revit 2014, I used this code to create a new 3D view with a default view direction:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> direction = <span class="blue">new</span> <span class="teal">XYZ</span>( -1, 1, -1 );
+&nbsp; <span class="blue">var</span> view3D = doc.IsFamilyDocument
+&nbsp; &nbsp; ? doc.FamilyCreate.NewView3D( direction )
+&nbsp; &nbsp; : doc.Create.NewView3D( direction );
+</pre>
+
+<p>I am having difficulty obtaining the same result in Revit 2014, though, using the View3D CreateIsometric and SetOrientation methods.</p>
+
+<p>I tried the following, but with no success:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> direction = <span class="blue">new</span> <span class="teal">XYZ</span>(-1, 1, -1);
+&nbsp; <span class="blue">var</span> collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(doc);
+&nbsp; <span class="blue">var</span> viewFamilyType = collector
+&nbsp; &nbsp; .OfClass&lt;<span class="teal">ViewFamilyType</span>&gt;()
+&nbsp; &nbsp; .Cast&lt;<span class="teal">ViewFamilyType</span>&gt;()
+&nbsp; &nbsp; .FirstOrDefault(x =&gt; x.ViewFamily
+&nbsp; &nbsp; &nbsp; == <span class="teal">ViewFamily</span>.ThreeDimensional);
+&nbsp;
+&nbsp; <span class="green">// . . . </span>
+&nbsp;
+&nbsp; <span class="blue">var</span> view3D = <span class="teal">View3D</span>.CreateIsometric(
+&nbsp; &nbsp; doc, viewFamilyType.Id);
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; view3D.SetOrientation( <span class="blue">new</span> <span class="teal">ViewOrientation3D</span>(
+&nbsp; &nbsp; direction, <span class="blue">new</span> <span class="teal">XYZ</span>(0, 1, 1), <span class="blue">new</span> <span class="teal">XYZ</span>(0, 1, -1)));
+</pre>
+
+<p>The result differs from the old obsolete code.</p>
+
+<p>What parameters should I use to get the same result?</p>
+
+<!--
+<p>These two functions are the same, except getting view3D variable:</p>
+
+<pre class="code">
+public string ExportToImage()
+{
+  string tempImageFile;
+  var tempFileName = Path.ChangeExtension(Path.GetRandomFileName(), "jpg");
+  try
+  {
+    tempImageFile = Path.Combine(Path.GetTempPath(), tempFileName);
+  }
+  catch (IOException)
+  {
+    return null;
+  }
+
+  View3D view3D = null;
+  var direction = new XYZ(-1, 1, -1);
+  try
+  {
+    view3D = document.IsFamilyDocument
+      ? document.FamilyCreate.NewView3D(direction)
+      : document.Create.NewView3D(direction);
+
+    if (view3D != null)
+    {
+      var graphicDisplayOptions = view3D.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE);
+      graphicDisplayOptions.Set(6);
+    }
+  }
+  catch (Autodesk.Revit.Exceptions.InvalidOperationException)
+  {
+  }
+
+  var ieo = new ImageExportOptions
+  {
+    FilePath = tempImageFile,
+    FitDirection = FitDirectionType.Horizontal,
+    HLRandWFViewsFileType = ImageFileType.PNG,
+    ImageResolution = ImageResolution.DPI_150,
+    ShouldCreateWebSite = false
+  };
+
+  if (view3D != null)
+  {
+    ieo.SetViewsAndSheets(new List<ElementId> {view3D.Id});
+    ieo.ExportRange = ExportRange.SetOfViews;
+  }
+  else
+  {
+    ieo.ExportRange = ExportRange.VisibleRegionOfCurrentView;
+  }
+
+  ieo.ZoomType = ZoomFitType.FitToPage;
+  ieo.ViewName = "tmp";
+
+  if (ImageExportOptions.IsValidFileName(tempImageFile))
+  {
+    try
+    {
+      document.ExportImage(ieo);
+    }
+    catch
+    {
+      return String.Empty;
+    }
+  }
+  else
+    return String.Empty;
+
+  var files = Directory.GetFiles(Path.GetTempPath(),
+  String.Format("{0}*.*", Path.GetFileNameWithoutExtension(tempFileName)));
+
+  return files.Length > 0 ? files[0] : String.Empty;
+}
+</pre>
+
+<pre class="code">
+private string ExportToImageIsometric()
+{
+  string tempImageFile;
+  var tempFileName = Path.ChangeExtension(Path.GetRandomFileName(), "jpg");
+  try
+  {
+    tempImageFile = Path.Combine(Path.GetTempPath(), tempFileName);
+  }
+  catch (IOException)
+  {
+    return null;
+  }
+
+  View3D view3D = null;
+  var direction = new XYZ(-1, 1, -1);
+  try
+  {
+    var collector = new FilteredElementCollector(document);
+    var viewFamilyType = collector
+      .OfClass<ViewFamilyType>()
+      .Cast<ViewFamilyType>()
+      .FirstOrDefault(x => x.ViewFamily == ViewFamily.ThreeDimensional);
+
+
+    if (viewFamilyType != null)
+    {
+      view3D = View3D.CreateIsometric(document, viewFamilyType.Id);
+
+      if (view3D != null)
+      {
+        view3D.SetOrientation(new ViewOrientation3D(direction, new XYZ(0, 1, 1), new XYZ(0, 1, -1)));
+        var graphicDisplayOptions = view3D.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE);
+        graphicDisplayOptions.Set(6);
+      }
+    }
+  }
+  catch (Autodesk.Revit.Exceptions.InvalidOperationException)
+  {
+  }
+
+  var ieo = new ImageExportOptions
+  {
+    FilePath = tempImageFile,
+    FitDirection = FitDirectionType.Horizontal,
+    HLRandWFViewsFileType = ImageFileType.PNG,
+    ImageResolution = ImageResolution.DPI_150,
+    ShouldCreateWebSite = false,
+  };
+
+  if (view3D != null)
+  {
+    ieo.SetViewsAndSheets(new List<ElementId> {view3D.Id});
+    ieo.ExportRange = ExportRange.SetOfViews;
+  }
+  else
+  {
+    ieo.ExportRange = ExportRange.VisibleRegionOfCurrentView;
+  }
+
+  ieo.ZoomType = ZoomFitType.FitToPage;
+  ieo.ViewName = "tmp";
+
+  if (ImageExportOptions.IsValidFileName(tempImageFile))
+  {
+    try
+    {
+      document.ExportImage(ieo);
+    }
+    catch
+    {
+      return String.Empty;
+    }
+  }
+  else
+    return String.Empty;
+
+  var files = Directory.GetFiles(Path.GetTempPath(),
+  String.Format("{0}*.*", Path.GetFileNameWithoutExtension(tempFileName)));
+
+  return files.Length > 0 ? files[0] : String.Empty;
+}
+</pre>
+-->
+
+
+
+<p><strong>Answer:</strong> I solved my issue trying to generate pictures of families and project documents looking like the default 3D views in Revit.</p>
+
+<p>I think I found the simplest way to do this, and maybe it will be useful not only for me.</p>
+
+<p>When I initially  tried to convert my code to the new way, I called the method</p>
+
+<pre class="code">
+&nbsp; view3D.SetOrientation(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ViewOrientation3D</span>(
+&nbsp; &nbsp; &nbsp; direction,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 1, 1 ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 1, -1 ) ) );
+</pre>
+
+<!--
+My old code for this task was:
+
+
+  var direction = new XYZ(-1, 1, -1);
+  var view3D = document.IsFamilyDocument
+    ? document.FamilyCreate.NewView3D(direction)
+    : document.Create.NewView3D(direction);
+-->
+
+<p>I just removed the call to invoke the SetOrientation method and it now works perfectly.</p>
+
+<p>It generates very nice pictures :-)
+Here are two of them:</p>
+
+<center>
+<img src="img/ai_3d_view_orient_1.png" alt="Sample image" width="200"/>
+<br/>
+<img src="img/ai_3d_view_orient_2.jpg" alt="Sample image" width="200"/>
+</center>
+
+<p>In my code, I make use of the following filtered element collector extension methods:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">FilteredElementCollectorExtensions</span>
+{
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">FilteredElementCollector</span> OfClass&lt;T&gt;(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">FilteredElementCollector</span> collector )
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> T : <span class="teal">Element</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> collector.OfClass( <span class="blue">typeof</span>( T ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">IEnumerable</span>&lt;T&gt; OfType&lt;T&gt;(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">FilteredElementCollector</span> collector )
+&nbsp; &nbsp; &nbsp; <span class="blue">where</span> T : <span class="teal">Element</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Enumerable</span>.OfType&lt;T&gt;(
+&nbsp; &nbsp; &nbsp; collector.OfClass&lt;T&gt;() );
+&nbsp; }
+}
+</pre>
+
+<p>Then I can generate the views using the following:</p>
+
+<pre class="code">
+<span class="blue">static</span> <span class="blue">string</span> ExportToImage( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">var</span> tempFileName = <span class="teal">Path</span>.ChangeExtension(
+&nbsp; &nbsp; <span class="teal">Path</span>.GetRandomFileName(), <span class="maroon">&quot;png&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">string</span> tempImageFile;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; tempImageFile = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; <span class="teal">Path</span>.GetTempPath(), tempFileName );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">IOException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; views = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp;
+<span class="blue">#if</span> !VERSION2014
+<span class="gray">&nbsp; &nbsp; var direction = new XYZ(-1, 1, -1);</span>
+<span class="gray">&nbsp; &nbsp; var view3D = doc.IsFamilyDocument</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; ? doc.FamilyCreate.NewView3D(direction)</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; : doc.Create.NewView3D(direction);</span>
+<span class="blue">#else</span>
+&nbsp; &nbsp; <span class="blue">var</span> collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> viewFamilyType = collector
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewFamilyType</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">ViewFamilyType</span>&gt;()
+&nbsp; &nbsp; &nbsp; .FirstOrDefault( x =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; x.ViewFamily == <span class="teal">ViewFamily</span>.ThreeDimensional );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> view3D = ( viewFamilyType != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">View3D</span>.CreateIsometric( doc, viewFamilyType.Id )
+&nbsp; &nbsp; &nbsp; : <span class="blue">null</span>;
+&nbsp;
+<span class="blue">#endif</span> <span class="green">// VERSION2014</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( view3D != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; views.Add( view3D.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> graphicDisplayOptions
+&nbsp; &nbsp; &nbsp; &nbsp; = view3D.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.MODEL_GRAPHICS_STYLE );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Settings for best quality</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; graphicDisplayOptions.Set( 6 );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; {
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> ieo = <span class="blue">new</span> <span class="teal">ImageExportOptions</span>
+&nbsp; {
+&nbsp; &nbsp; FilePath = tempImageFile,
+&nbsp; &nbsp; FitDirection = <span class="teal">FitDirectionType</span>.Horizontal,
+&nbsp; &nbsp; HLRandWFViewsFileType = <span class="teal">ImageFileType</span>.PNG,
+&nbsp; &nbsp; ImageResolution = <span class="teal">ImageResolution</span>.DPI_150,
+&nbsp; &nbsp; ShouldCreateWebSite = <span class="blue">false</span>
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">if</span>( views.Count &gt; 0 )
+&nbsp; {
+&nbsp; &nbsp; ieo.SetViewsAndSheets( views );
+&nbsp; &nbsp; ieo.ExportRange = <span class="teal">ExportRange</span>.SetOfViews;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; ieo.ExportRange = <span class="teal">ExportRange</span>
+&nbsp; &nbsp; &nbsp; .VisibleRegionOfCurrentView;
+&nbsp; }
+&nbsp;
+&nbsp; ieo.ZoomType = <span class="teal">ZoomFitType</span>.FitToPage;
+&nbsp; ieo.ViewName = <span class="maroon">&quot;tmp&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">ImageExportOptions</span>.IsValidFileName(
+&nbsp; &nbsp; tempImageFile ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// If ExportRange = ExportRange.SetOfViews </span>
+&nbsp; &nbsp; <span class="green">// and document is not active, then image </span>
+&nbsp; &nbsp; <span class="green">// exports successfully, but throws</span>
+&nbsp; &nbsp; <span class="green">// Autodesk.Revit.Exceptions.InternalException</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; doc.ExportImage( ieo );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Empty;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// File name has format like </span>
+&nbsp; <span class="green">// &quot;tempFileName - view type - view name&quot;, e.g.</span>
+&nbsp; <span class="green">// &quot;luccwjkz - 3D View - {3D}.png&quot;.</span>
+&nbsp; <span class="green">// Get the first image (we only listed one view</span>
+&nbsp; <span class="green">// in views).</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> files = <span class="teal">Directory</span>.GetFiles(
+&nbsp; &nbsp; <span class="teal">Path</span>.GetTempPath(),
+&nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}*.*&quot;</span>, <span class="teal">Path</span>
+&nbsp; &nbsp; &nbsp; .GetFileNameWithoutExtension(
+&nbsp; &nbsp; &nbsp; &nbsp; tempFileName ) ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> files.Length &gt; 0
+&nbsp; &nbsp; ? files[0]
+&nbsp; &nbsp; : <span class="blue">string</span>.Empty;
+}
+</pre>
+
+<p>Many thanks to Alexander for sharing this!</p>

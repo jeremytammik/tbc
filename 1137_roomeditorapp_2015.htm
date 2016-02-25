@@ -1,0 +1,359 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<h3>Migrating RoomEditorApp to Revit 2015</h3>
+
+<p>Yesterday I discussed the typical steps you would need to go through to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html">
+set up a Revit 2015 add-in development environment</a>.
+
+<p>My top priority right now is getting my Tech Summit talk prepared, which involves adding some functionality to the room editor application add-in.</p>
+
+<p>I decided to migrate it to Revit 2015 as well.</p>
+
+<p>Here are the steps I took:</p>
+
+<ul>
+<li><a href="#2">Flat RoomEditorApp Migration</a></li>
+<li><a href="#3">Selection.Elements is Obsolete</a></li>
+<li><a href="#4">ViewSheet.Views is Obsolete</a></li>
+<li><a href="#5">Enabling CopySourceAsHtml for Visual Studio 2012</a></li>
+<li><a href="#6">Download</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Flat RoomEditorApp Migration</h4>
+
+<p>Just like
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html#5">
+The Building Coder sample migration</a> yesterday,
+
+the flat migration proved very easy.</p>
+
+<p>I repeated the same steps:</p>
+
+<ul>
+<li>Update the Revit API assembly references.</li>
+<li>Change the .NET framework from 4.0 to 4.5.</li>
+<li>Updated the version number.</li>
+<li>Rebuild all.</li>
+</ul>
+
+<p>That was it.</p>
+
+<p>The flat migration compiles with zero errors.</p>
+
+<p>The resulting add-in works fine.</p>
+
+<p>This probably actually means that the Revit 2014 add-in would work fine in Revit 2015 as well.</p>
+
+<p>The compilation does produce
+
+<a href="zip/roomeditorapp_migr_2015_a.txt">five warnings</a> about deprecated API usage; five occurrences, actually, but only two distinct warnings, to be exact:</p>
+
+<ul>
+<li><a href="#3">Autodesk.Revit.UI.Selection.Selection.Elements is obsolete</a>: This property is deprecated in Revit 2015. Use GetElementIds and SetElementIds instead.</li>
+<li><a href="#4">Autodesk.Revit.DB.ViewSheet.Views is obsolete</a>: This property is obsolete in Revit 2015. Use GetAllPlacedViews instead.</li>
+</ul>
+
+<p>Let's take a look at those and work towards a completely clean build.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Selection.Elements is Obsolete</h4>
+
+<p>The external command causing the first warning is CmdUploadRooms, where the following code is used to check for pre-selected rooms:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; sel.Elements.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Room</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please pre-select only room&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; elements before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; ids.Add( e.Id );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Removing that warning is simple, and I can even shorten the code, like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = sel.GetElementIds();
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; ids.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( doc.GetElement( id ) <span class="blue">is</span> <span class="teal">Room</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please pre-select only room&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; elements before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>ViewSheet.Views is Obsolete</h4>
+
+<p>The second warning is also trivial to fix.</p>
+
+<p>One of the occurrences is this simple loop:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> sheet.Views )
+&nbsp; {
+&nbsp; &nbsp; GetViewTransform( v );
+&nbsp; }
+</pre>
+
+<p>The obsolete Views property returns an obsolete ViewSet class instance.</p>
+
+<p>The replacement method GetAllPlacedViews returns a set of element ids instead, in the shape of a generic set <code><span class="teal">ISet</span>&lt;<span class="teal">ElementId</span>&gt;</code>.</p>
+
+<p>You can use the generic LINQ Select method to convert the element ids straight to View object instances like this, if you like:</p>
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> sheet.GetAllPlacedViews()
+&nbsp; &nbsp; .Select&lt;<span class="teal">ElementId</span>, <span class="teal">View</span>&gt;( id =&gt;
+&nbsp; &nbsp; &nbsp; doc.GetElement( id ) <span class="blue">as</span> <span class="teal">View</span> ) )
+&nbsp; {
+&nbsp; &nbsp; GetViewTransform( v );
+&nbsp; }
+</pre>
+
+<p>Similar conversions resolve the other two warnings concerning this property.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Enabling CopySourceAsHtml for Visual Studio 2012</h4>
+
+<p>As you see, I presented some syntax coloured C# source code above, copied and pasted from Visual Studio 2012.</p>
+
+<p>I am still using the J.T. Leigh
+
+<a href="http://copysourceashtml.codeplex.com">
+CopySourceAsHtml</a> utility
+
+as described in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/updated-sdk-2012-products-and-source-code-colourisation.html#4">
+The Building Coder source code colour coder</a>
+
+and my
+
+<a href="zip/pycolorize2014.py">pycolorize.py Python script</a> to
+
+strip some extraneous baggage from the HTML code before inserting it into the blog text.</p>
+
+<p>Luckily, the description of how to
+
+<a href="http://blogs.microsoft.co.il/applisec/2010/02/25/copyashtml-in-visual-studio-2010">
+use CopySourceAsHtml for Visual Studio 2010</a> also
+
+applies to Visual Studio 2012, more or less, as I found out by trial and error.</p>
+
+<p>I now have three versions of the CopySourceAsHtml add-in file located in the following folders for Visual Studio 2008, 2010 and 2012:</p>
+
+<ul>
+<li>C:\Users\tammikj\Documents\Visual Studio 2008\Addins\CopySourceAsHtml.AddIn</li>
+<li>C:\Users\tammikj\Documents\Visual Studio 2010\Addins\CopySourceAsHtml.AddIn</li>
+<li>C:\Users\tammikj\Documents\Visual Studio 2012\Addins\CopySourceAsHtml.AddIn</li>
+</ul>
+
+<p>The add-in file that I am using for Visual Studio 2012 looks like this:</p>
+
+<pre class="code">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue"> </span><span class="red">standalone</span><span class="blue">=</span>&quot;<span class="blue">no</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">Extensibility</span><span class="blue"> </span><span class="red">xmlns</span><span class="blue">=</span>
+<span class="blue">&nbsp; </span>&quot;<span class="blue">http://schemas.microsoft.com/AutomationExtensibility</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">HostApplication</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Microsoft Visual Studio Macros<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Version</span><span class="blue">&gt;</span>11.0<span class="blue">&lt;/</span><span class="maroon">Version</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">HostApplication</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">HostApplication</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Microsoft Visual Studio<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Version</span><span class="blue">&gt;</span>11.0<span class="blue">&lt;/</span><span class="maroon">Version</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">HostApplication</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">Addin</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FriendlyName</span><span class="blue">&gt;</span>CopySourceAsHtml<span class="blue">&lt;/</span><span class="maroon">FriendlyName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+&nbsp; &nbsp; &nbsp; Adds support to Microsoft Visual Studio 2012
+&nbsp; &nbsp; &nbsp; for copying source code, syntax highlighting,
+&nbsp; &nbsp; &nbsp; and line numbers as HTML.
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+&nbsp; &nbsp; &nbsp; JTLeigh.Tools.Development.CopySourceAsHtml,
+&nbsp; &nbsp; &nbsp; Version=3.0.3215.1, Culture=neutral,
+&nbsp; &nbsp; &nbsp; PublicKeyToken=bb2a58bdc03d2e14,
+&nbsp; &nbsp; &nbsp; processorArchitecture=MSIL
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+&nbsp; &nbsp; &nbsp; JTLeigh.Tools.Development.CopySourceAsHtml.Connect
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">LoadBehavior</span><span class="blue">&gt;</span>1<span class="blue">&lt;/</span><span class="maroon">LoadBehavior</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">CommandPreload</span><span class="blue">&gt;</span>0<span class="blue">&lt;/</span><span class="maroon">CommandPreload</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">CommandLineSafe</span><span class="blue">&gt;</span>0<span class="blue">&lt;/</span><span class="maroon">CommandLineSafe</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">Addin</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">Extensibility</span><span class="blue">&gt;</span>
+</pre>
+
+<p>For the sake of completeness, the current version of my Python clean-up script looks like this:</p>
+
+<pre class="prettyprint">
+#!/usr/bin/python
+# -*- coding: iso-8859-15 -*-
+#
+# pycolorize.py - massage colorised HTML source code copied from Visual Studio
+#
+# jeremy tammik, autodesk inc, 2009-02-05
+#
+# History:
+#
+# 2009-02-05 initial version
+# 2009-05-22 updated to support Visual Studio 2008
+# 2011-04-19 updated to support Visual Studio 2010 and CopySourceAsHtml 3.0
+# 2013-05-21 migrated to mac os x unix, cf. http://coffeeghost.net/src/pyperclip.py
+#
+# read a block of text from a file or the windows clipboard
+# replace cb[12345] by the appropriate colour
+# remove the style and pre tags
+#
+import os, re
+
+color_map = { '#2b91af' : 'teal', '#a31515' : 'maroon' }
+
+def getTextMac():
+  outf = os.popen('pbpaste', 'r')
+  content = outf.read()
+  outf.close()
+  return content
+
+def setTextMac(text):
+  outf = os.popen('pbcopy', 'w')
+  outf.write(text)
+  outf.close()
+
+def getTextWin():
+  w.OpenClipboard()
+  d = w.GetClipboardData( win32con.CF_TEXT )
+  w.CloseClipboard()
+  return d
+
+def setTextWin( aType, aString ):
+  w.OpenClipboard()
+  w.EmptyClipboard()
+  w.SetClipboardData( aType, aString )
+  w.CloseClipboard()
+
+_regexColor = re.compile( '\.(cb[1-9]) \{ color\: ([#0-9a-z]+); \}' )
+_regexStyle = re.compile( '(&lt;style type="text/css"&gt;.*&lt;/style&gt;\s*&lt;div class="cf"&gt;\s*)', re.DOTALL )
+_regexEnd = re.compile( '(&lt;/pre&gt;\s*&lt;/div&gt;)', re.DOTALL )
+#_regexPreEnd = re.compile( '(&lt;/pre&gt;$)' )
+
+def replace_cb_by_color( s ):
+  "Search for '.cb1 { color: blue; }' and globally replace cb[1-9] by the appropriate colour."
+  m = _regexColor.search( s )
+  if m:
+    #print 'match found'
+    a = m.groups()
+    #print a
+    if 2 == len( a ):
+      color = a[1]
+      #print color
+      if color_map.has_key( color ): color = color_map[color]
+      #print color
+      return True, s.replace( a[0], color )
+  #else:
+  #  print 'no match found'
+
+  return False, s
+
+def main():
+  'Convert Visual Studio CopySourceAsHtml colour styles to a more compact form.'
+
+  s = getTextMac()
+  #s = '''&lt;style type="text/css"&gt; ... '''
+  #print s
+
+  go = True
+  while go: go, s = replace_cb_by_color( s )
+  #print s
+
+  m = _regexStyle.match( s )
+  #print m
+
+  if m:
+    s = s.replace( m.group( 1 ), '' )
+    #print s
+    s = s.replace( '&lt;pre class="cl"&gt;', '' )
+    #print s
+    m = _regexEnd.search( s )
+    #print m
+
+  if m:
+    s = s.replace( m.group( 1 ), '' )
+    #print s
+    s = s.strip().replace( '&lt;/pre&gt;', '' )
+    #print s
+
+  setTextMac( s )
+  #print s
+
+if __name__ == '__main__':
+  main()
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Download</h4>
+
+<p>The RoomEditorApp source code, Visual Studio solution and add-in manifest live in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a>.</p>
+
+<p>The versions discussed above are
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.6">
+release 2015.0.2.6</a> for
+
+the flat migration and
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2015.0.2.7">
+release 2015.0.2.7</a> with
+
+the deprecated API usage cleaned up.</p>
+
+<p>Next step: finally get going with the Tech Summit preparation!</p>

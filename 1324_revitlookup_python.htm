@@ -1,0 +1,90 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+#revitapi #adsk #bim #python #revitpythonshell #revitlookup
+#au2015 #dotnet #adskdevnetwrk #geometry #csharp #3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+#adskdevnetwrk
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>RevitLookup in Python Shell and Multiple Release Solution</h3>
+
+<p>Here is some exciting news from Daren Thomas on
+<a href="https://github.com/jeremytammik/RevitLookup">
+RevitLookup</a> and the
+<a href="https://github.com/architecture-building-systems/revitpythonshell">
+Revit Python Shell</a>.</p>
+
+<p>The Python and Ruby shells came up a couple of times recently, and I also mentioned Daren's initial thoughts on making the RevitLookup snoop functionality easily accessible from within the interactive Python IDE:</p>
+
+<!-- 1307 1317 1318 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/curved-wall-elevation-profile-and-creator-class-update.html#6">Curved wall elevation profile implementation in Python</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/live-development-and-a-share-bar.html#3">Live development</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/copyelements-revit-2016-scalability-python-and-ruby-shells.html#4">Revit 2016 Python shell and RevitLookup incorporation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/copyelements-revit-2016-scalability-python-and-ruby-shells.html#5">Revit 2016 Ruby shell</a></li>
+</ul>
+
+<p>This idea has now come to fruition, and more easily than one might expect.</p>
+
+<p>In Daren's own words:</p>
+
+<p>The current version of RPS now includes a function 'lookup' in the startup script. Passing in an Element or an ElementId object will open up the "Snoop Objects" window if RevitLookup is installed. Otherwise, a message will be displayed directing the user to the RevitLookup GitHub repository.</p>
+
+<p>I describe it in more detail in this discussion on <a href="http://darenatwork.blogspot.ch/2015/05/revitlookup-and-revitpythonshell.html">RevitLookup and RevitPythonShell</a>.</p>
+
+<!-- <p>I was wondering how backwards-compatible RevitLookup is &ndash; in the releases section you have the option to download the source for a given release and they seem to be geared towards a specific release of Revit. Do you have a specific reason for not providing binaries / installers? I could provide some if you like.</p> -->
+
+<p>Also, here is a technique I found useful in the RPS project: I edit the .csproj file itself and change the way the Revit API assembly DLLs RevitAPI.dll and RevitAPIUI.dll are referenced:</p>
+
+<pre class="prettyprint">
+  &lt;ItemGroup Condition="'$(Configuration)' == 'Debug 2014'"&gt;
+    &lt;Reference Include="RevitAPI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2014\RevitAPI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+    &lt;Reference Include="RevitAPIUI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2014\RevitAPIUI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+  &lt;ItemGroup Condition="'$(Configuration)' == 'Debug 2015'"&gt;
+    &lt;Reference Include="RevitAPI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2015\RevitAPI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+    &lt;Reference Include="RevitAPIUI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2015\RevitAPIUI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+  &lt;ItemGroup Condition="'$(Configuration)' == 'Debug 2016'"&gt;
+    &lt;Reference Include="RevitAPI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2016\RevitAPI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+    &lt;Reference Include="RevitAPIUI"&gt;
+      &lt;HintPath&gt;..\RequiredLibraries\Revit2016\RevitAPIUI.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+</pre>
+
+<p>I then included the API files for each supported version in a RequiredLibraries folder.
+When you change the configuration in Visual Studio (e.g., from "Debug 2014" to "Debug 2016"), the referenced assemblies also change (I think &ndash; you might need to reload Visual Studio) and compilation works just fine!</p>
+
+<p>This technique can be extended to add conditional compilation (but I think that is already handled by the VS UI).</p>
+
+<p>Anyway. I'd say this is a first stab at the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/copyelements-revit-2016-scalability-python-and-ruby-shells.html#4">
+RPS/RevitLookup collaboration</a> we discussed a week or two ago and is quite useful already.</p>
+
+<p>Many thanks to Daren for the good news!</p>
+
+<p>Congratulations on getting it up and running with such minimal fuss!</p>
+
+<p>The multi-version support you implemented looks very nice and useful too.</p>

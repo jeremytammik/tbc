@@ -1,0 +1,309 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08699150 [Revit Linked model elements]
+
+Robert Sarkozi, Quickpen Intl
+
+-->
+
+<h3>Access to Individual Elements in Linked Projects</h3>
+
+<p>Access to individual elements in linked projects is a relatively simple matter, but can still cause some confusion, as we can see below.</p>
+
+<p>We looked at various aspects of linking files and accessing the linked element data and geometry in the past, e.g.</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/linked-files.html">Linked files</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/hiding-linked-files.html">Hiding linked files</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">List linked elements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/04/access-to-linked-file-geometry.html">Access to linked file geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html">List linked files and TransmissionData</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/07/linked-element-geometry-access.html">Linked element geometry access</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html">Selecting a face in a linked file</a></li>
+
+<li>Arno&scaron;t L&ouml;bel's AU 2012 class
+
+<a href="https://www.autodeskuniversity2012.com/connect/sessionDetail.ww?SESSION_ID=3455">CP3455</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-the-view-mep-and-link-apis.html#4">
+managing Revit links</a></li>
+</ul>
+
+<p>Let's revisit this issue to hopefully achieve final clarity addressing the following points after a quick mention of my Saturday mountain hike:</p>
+
+<ul>
+<li><a href="#1">Martinsloch and Piz Segnes</a></li>
+<li><a href="#2">Executive summary</a></li>
+<li><a href="#3">Detailed discussion</a></li>
+<li><a href="#4">Sample code</a></li>
+<li><a href="#5">Consider using a custom exporter</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Martinsloch and Piz Segnes</h4>
+
+<p>I went on a beautiful hike to the Segnes pass and Piz Segnes with my friend
+
+<a href="https://www.facebook.com/urs.wiesendanger.3/posts/10200327965538712">Urs</a> this
+
+weekend.</p>
+
+<p>We spent the night outside, sleeping under the stars and occasional strong bursts of wind on the terrace in front of the
+
+<a href="http://www.segnespass.ch">mountain lodge</a> at
+
+2627 m, right beside the
+
+<a href="http://de.wikipedia.org/wiki/Martinsloch">Martinsloch</a>:</p>
+
+<center>
+<img src="img/martinsloch.jpg" alt="Martinsloch" width="400"/>
+</center>
+
+<p>From there, we climbed Piz Segnes 3098 m and went part of the way over the ridge to Piz Sardona, 3055 m.
+I really feel my legs now!</p>
+
+
+<a name="2"></a>
+
+<h4>Linked Element Access Executive Summary</h4>
+
+<p>We'll start by looking at a really short executive summary of the question and answer, followed by the lengthy discussion required to summarise it so succinctly:</p>
+
+<p><strong>Question:</strong> How can I retrieve the element geometry from all the different instances of a linked model?</p>
+
+<p>For each copy of the linked model, I need to determine a different geometric instance and representation of the same element in it.</p>
+
+<p><strong>Answer:</strong> Get the elements from the linked document, get the transformation from each one of the linked document instances, and apply them to the elements.</p>
+
+
+<a name="3"></a>
+
+<h4>Detailed Discussion</h4>
+
+<p>To see how hard and confusing it can be to achieve this understanding, here is a summary of the conversation that led up to the question and answer above:</p>
+
+<p><strong>Question:</strong> I would like to do is retrieve all copies of elements from a linked file.</p>
+
+<p>In this sample case, I am dealing with walls and have a model containing two instances of a linked model.</p>
+
+<p>The linked model contains one wall, so the containing model displays two walls.</p>
+
+<p>I am using the code at <a href="http://pastebin.com/XCC0ru8K">pastebin.com/XCC0ru8K</a>.</p>
+
+<p>In Revit 2014 it only returns the original wall coming in the linked model itself, but not the copies in the containing model that I am really interested in.</p>
+
+<!-- <p>The wall instances or copies from the copies of the linked models are not returned.</p> -->
+
+<p>My questions are:</p>
+
+<ul>
+<li>Is there any way in the API to retrieve the walls from the copies of the linked models?</li>
+<li>If there is, are these copies going to have the same element ids as their originals?</li>
+</ul>
+
+<p>If the second point is true, is there any way to still differentiate the originals from their copies by some other unique identifier?</p>
+
+<p>For a concrete example, let's say you link a model a.rvt into the containing model c.rvt.</p>
+
+<p>After linking it once, you create another copy of a.rvt in c.rvt, e.g. by Copy and Paste on the inserted linked a.rvt, placing it somewhere next to the original link.</p>
+
+<p>Here is a picture illustrating this:</p>
+
+<center>
+<img src="img/rs_linked_elements_1.jpeg" alt="Two copies of the same linked file" width="600"/>
+</center>
+
+<p>This way you have two instances of a.rvt linked into c.rvt.
+Each instance contains one wall.</p>
+
+<p>I am trying to write code to retrieve both walls.</p>
+
+<p>My attempts so far only return the wall from the linked model first inserted, not the wall from the second copy.</p>
+
+<p>I need to have both walls, because I need to access their positions to display them both in the proper location.</p>
+
+<p><strong>Answer:</strong> Yes, that should be pretty easy.
+
+<p>You know that a.rvt is linked into c.rvt.</p>
+
+<p>You can get the original wall element from a filtered element collector running on doc_a.</p>
+
+<p>This does not tell you where the wall is displayed in the C model.</p>
+
+<p>For that, you need to get the instances of A in C.
+These are link instances, represented by the Revit API class RevitLinkInstance.</p>
+
+<p>You get those from a filtered element collector running on doc_c.</p>
+
+<p>Each link instance includes placement information.</p>
+
+<p>That tells you where the different copies of the wall will appear in model C.</p>
+
+<p>There will not be any "copies of the wall", just instances of the link.</p>
+
+<p>You can easily explore the situation and see these relationships for yourself using RevitLookup.</p>
+
+<p>Actually, there are several properties that provide access to the placement information.
+The one most appropriate for your situation is probably the Instance.GetTotalTransform property.</p>
+
+<p>The sample code provided to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">list linked elements</a> shows
+
+that this was even possible way back in Revit 2009.</p>
+
+<p>The numerous other samples listed above really have said all that can be said on this topic.</p>
+
+
+<a name="4"></a>
+
+<h4>Sample Code</h4>
+
+<p>Let's look at an ultimate minimal simple sample demonstrating the main relationships between, and how to access:</p>
+
+<ul>
+<li>The link types</li>
+<li>The link instances</li>
+<li>The linked documents</li>
+<li>Their elements</li>
+</ul>
+
+<p>Here is the entire Execute method mainline of an external command accessing and listing all of these:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> links
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_RvtLinks );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\nLinks:\n&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">string</span> what;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> links )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">RevitLinkInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; what = <span class="maroon">&quot;instance&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( e <span class="blue">is</span> <span class="teal">RevitLinkType</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected all RvtLinks elements to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;be link type or link instance&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; what = <span class="maroon">&quot;type&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Link {0} '{1}' &lt;{2}&gt;&quot;</span>,
+&nbsp; &nbsp; &nbsp; what, e.Name, e.Id.IntegerValue ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\nDocuments and their elements:\n&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Document</span> d <span class="blue">in</span> app.Documents )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( d.IsLinked )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Linked document '{0}':&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; d.Title ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> walls
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( d )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> walls )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; Element '{0}' &lt;{1}&gt;&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Name, e.Id.IntegerValue ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>This command can obviously use read-only transaction mode, since no database modifications are performed.</p>
+
+<p>Note that the OST_Links built-in category identifies both link types and link instances.</p>
+
+<p>One link type is generated for each linked document.</p>
+
+<p>Every copy of the linked document placed into the model generates a new link instance.</p>
+
+<p>This is similar to the relationship between family types and instances.</p>
+
+<p>We apply this command to the following model containing two linked files, a.rvt and b.rvt, each of them containing one single wall and inserted twice into the model:</p>
+
+<center>
+<img src="img/rs_linked_elements_2.png" alt="Sample model containing four link instances or two linked files" width="300"/>
+</center>
+
+<p>Just as expected, the output generated by this call lists the two link types, one for each document, the four instances, two for each document, the two linked documents, and one wall element in each:</p>
+
+<pre>
+Links:
+
+Link type 'a.rvt' &lt;193823&gt;
+Link instance 'a.rvt : 1 : location &lt;Not Shared&gt;' &lt;193824&gt;
+Link type 'b.rvt' &lt;193826&gt;
+Link instance 'b.rvt : 2 : location &lt;Not Shared&gt;' &lt;193827&gt;
+Link instance 'a.rvt : 3 : location &lt;Not Shared&gt;' &lt;193829&gt;
+Link instance 'b.rvt : 4 : location &lt;Not Shared&gt;' &lt;193841&gt;
+
+Documents and their elements:
+
+Linked document 'a.rvt':
+  Element 'Generic - 200mm' &lt;193834&gt;
+Linked document 'b.rvt':
+  Element 'Generic - 200mm' &lt;193842&gt;
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Consider Using a Custom Exporter</h4>
+
+<p>You say that you are interested only in "the element geometry from all the different instances of a linked model".</p>
+
+<p>In that case, quite possibly, the easiest way to achieve what you want is to use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">
+custom exporter framework</a>.</p>
+
+<p>Here is a happy report in this vein by Paul Kinnane in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html?cid=6a00e553e168978833019aff1a9b0a970b#comment-6a00e553e168978833019aff1a9b0a970b">
+comment</a> on it:</p>
+
+<p>Yes, the 2014 version of OctaneRender for Revit uses the custom exporter framework.
+The 2012 and 2013 versions use a much more complex geometry extraction system based on your originally posted code, but much more complex still, e.g. in order to try to get assigned materials, generate UV's, etc.
+The custom exporter framework is vastly simpler &ndash; a lot faster to load, and about 1/50th of the coding time :-)</p>
+
+<p>I've done some load time comparisons (i.e. the time taking to get the geometry from Revit and load into Octane).
+Based on a 500k polygon scene, the C# based Revit 2014 version is one of the fastest of the plugins for the various architectural and design apps that I have written for Octane, which I was not expecting.
+I expected C++ non-managed to be significantly faster, but this was not the case.</p>
+
+<p>Not being able to obtain texture map and bump map filenames for Revit materials is still an issue...</p>
+
+<p>The biggest challenge was the limitations placed by the API when in a 3D perspective view...</p>
+
+<p>Keep up the good work with your posts and code samples &ndash; they are invaluable to plugin developers.</p>
+
+<p>Many thanks to you, Paul, for the good news, and also for reporting on the problematic areas!</p>
+
+<p>And whoever is interested in only "the element geometry from all the different instances of a linked model", please pay heed &ndash; making use of the custom exporter framework instead of the explicitly retrieving and traversing all kinds of links and relationships as described above may well prove "vastly simpler" and "1/50th of the coding time" for you too!</p>

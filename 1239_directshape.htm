@@ -1,0 +1,148 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09959475 [DirectShape API, Part Families, and more] app porting etc.
+
+09938124 [DirectShape Category]
+
+10148201 [DirectShape texture assignment]
+
+-->
+
+<h3>DirectShape versus Families, Category and Texture</h3>
+
+<p>Let's begin this week with a discussion of several aspects of direct shapes:</p>
+
+<!--
+
+<a href="http://adndevblog.typepad.com/aec/jaime-rosales.html">
+Jaime Rosales</a>:
+
+<li><a href="#2">Access to structure profiles of a railing</a></li>
+
+-->
+
+<ul>
+<li><a href="#2">Direct shapes, part families and application porting</a></li>
+<li><a href="#3">DirectShape categories</a></li>
+<li><a href="#4">DirectShape texture assignment</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Direct Shapes, Part Families and Application Porting</h4>
+
+<p><strong>Question:</strong> I am looking for some guidance related to porting my application to Revit.</p>
+
+<p>I have a parametric part engine that lives outside of Revit with a large set of existing library content.</p>
+
+<p>It would be very costly to rebuild from scratch using the Revit Part Family editor and framework, so I'm trying to link it into Revit by alternative methods.</p>
+
+<p>When the DirectShape and TessellatedShapeBuilder API was added, I thought it would be the ideal solution. With minimal effort, I was able to convert and import my part geometry into a Revit project. But I quickly realized that wasn't quite the right solution. My geometry is typically just an open mesh, not a solid. I found that I cannot dimension to the faces of the DirectShape mesh result, which I know users would want to do.</p>
+
+<p>I also would prefer to programmatically create part families so my parts look and behave as much like other part families, with shared parameters, etc. But I found that I cannot add a DirectShape result into a part family definition... is that correct? It actually lets me put it in there, but it doesn't appear when I place a family instance.</p>
+
+<p>This led me to look into other types of geometry to use. I tried a Form created using NewFormByCap which I found could only be added to a massing type of element, which I didn't think sounded right for my solution, along with the fact that I couldn't get it to display. I think Generic Model seemed more appropriate.</p>
+
+<p>I have my UI framework in place, reacting to parameter change events in a way that I can update and regenerate the geometry as necessary to get my own parametric engine working... I'm just trying to fill in a few missing pieces to the puzzle, making the best choices for the geometry in my part families.</p>
+
+<p><strong>Answer:</strong> Porting an existing application to Revit is often a challenging undertaking, especially because the underlying philosophical paradigms and user workflows in
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">
+Revit differ substantially</a> from
+
+what we application developers coming from other CAS systems are normally used to.</p>
+
+<p>The DirectShape API was mainly developed to support certain workflows and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">
+round trip functionality for IFC files</a>.
+
+For that, it is indeed an effective, simple and performant solution:</p>
+
+<p>For defining your own part families, a normal family would normally be preferable and provide more functionality, just as you have discovered.</p>
+
+<p>I am not a content creation expert, so I cannot say for sure what the optimal way to define a suitable family for your purposes might be, nor have you stated what they are. However, the Revit family system does provide support for all imaginable building components, so I am pretty sure that all you need can be found in there.</p>
+
+<p>I would suggest that you continue researching in that direction and pretend for just a moment that you wanted to create the families you need manually. Discuss in depth with content creation experts what the best structure and workflows would be for both the manual definition and subsequent use of these families.</p>
+
+<p>Once you have a reliable optimal solution for a manual workflow in place, I would next explore how to drive that process programmatically and hook it up with your own parametric system.</p>
+
+<p>If in doubt, a generic model sounds like a good starting point to me as well. I am also pretty sure you can add whatever you need to such a family.</p>
+
+<p>With that said, the direct shape functionality was first introduced in Revit 2015, and we are still looking at ways to enhance and round it off for all required situations.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>DirectShape Categories</h4>
+
+<p><strong>Question:</strong> I would like to create DirectShape elements to represent different types of beams and put them in different Categories. Until now, however, I can only create them using built-in categories like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> id = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp;
+&nbsp; <span class="teal">DirectShape</span> ds = <span class="teal">DirectShape</span>.CreateElement(
+&nbsp; &nbsp; doc, id, <span class="maroon">&quot;A&quot;</span>, <span class="maroon">&quot;B&quot;</span> );
+</pre>
+
+<p>Can I create a custom category and use that as well, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Category</span> cat = doc.Settings.Categories.get_Item(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructuralFraming );
+&nbsp;
+&nbsp; <span class="teal">Category</span> subCat = doc.Settings.Categories
+&nbsp; &nbsp; .NewSubcategory( cat, <span class="maroon">&quot;Sparren&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> elemIdSubCat = subCat.Id;
+&nbsp;
+&nbsp; <span class="teal">DirectShape</span> ds = <span class="teal">DirectShape</span>.CreateElement(
+&nbsp; &nbsp; doc, elemIdSubCat, <span class="maroon">&quot;A&quot;</span>, <span class="maroon">&quot;B&quot;</span> );
+</pre>
+
+<p>When I try this, the DirectShape creation raises an error saying the id must be a top-level category.</p>
+
+<p><strong>Answer:</strong> All I can do, really, is to summarise and confirm what you say above:</p>
+
+<ol>
+<li>You can create subcategories. You cannot create new top-level categories.</li>
+<li>The direct shape creation requires a top-level category.</li>
+</ol>
+
+<p>I think that just about answers your question, doesn't it?</p>
+
+<p>I submitted the wish list item CF-1748 [API wish: DirectShape subcategory support] requesting direct shape subcategory support for you.</p>
+
+<p>As an alternate technique that you can implement and use right away, you could consider creating one or more shared parameters and use those for differentiation in filters and schedules. From Revit 2015 onwards, such shared parameters can even be set to be read-only.</p>
+
+
+
+
+<a name="4"></a>
+
+<h4>DirectShape Texture Assignment</h4>
+
+<p><strong>Question:</strong> Is it possible to assign a texture (material) to a DirectShape object?</p>
+
+<p><strong>Answer:</strong> Materials can indeed be assigned to the faces of DirectShape solids.</p>
+
+<p>One way to do this is through SolidOptions.MaterialId, which is available for every member of GeometryCreationUtilities.</p>
+
+<p>Another way is through the TessellatedFace.MaterialId property that is available for faces used to populate the TessellatedShapeBuilder.</p>
+
+<p>The open source
+
+<a href="http://sourceforge.net/projects/ifcexporter">
+IFC link project</a> provides
+
+some live examples of this in use.</p>

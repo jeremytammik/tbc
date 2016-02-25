@@ -1,0 +1,420 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+08869979 [How do i use PostCommand on my own defined commands in Revit]
+C:\a\vs\PostAddinCommand\PostAddinCommand
+https://github.com/jeremytammik/PostAddinCommand
+
+-->
+
+<h3>Programmatic Custom Add-In External Command Launch</h3>
+
+<p>One of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#2">
+highlights</a> of
+
+the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+Revit 2014 API</a> is
+
+the new PostCommand functionality enabling programmatic launching of built-in Revit commands.</p>
+
+<p>The Revit SDK includes a new sample demonstrating its use, PostCommandWorkflow.</p>
+
+<p>However, that programmatically launches an existing built-in Revit command, not an external command added by a custom application.</p>
+
+<p>Furthermore, there was a problem launching custom external commands in the initial release of Revit 2014.
+Happily, it was fixed by the update release 1, UR1, a fact listed among the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/revit-2014-update-release-1.html">
+Revit 2014 update release 1 API enhancements</a>:</p>
+
+<ul>
+<li>Allows UIApplication.PostCommand() to work consistently for Add-in created commands.</li>
+</ul>
+
+<p>So how do we make use of this functionality?</p>
+
+<p>Here is today's question from &ndash; and my exploration of &ndash; a recent developer query, with separate yet similar answers for <a href="#1">external tool</a> and <a href="#2">custom ribbon button</a> commands.</p>
+
+<p>First, however, let me mention that we had a wonderful sunny weekend here, and my friend Karin told a nice joke that I would like to share:</p>
+
+<p>Two planets happen to meet somewhere, wandering around through the milky way.
+Says one: "Hi. Be careful, I have homo sapiens."
+Replies the other: "Hi. Don't worry, it will pass."</p>
+
+<!--
+<p><strong>Addendum:</strong> Rudolf Honke was reminded by this joke of this interesting off-topic fact he asked me to add:
+"As of now, there are 999 confirmed exoplanets.
+Confirmation of the 1000th is expected soon."</p>
+
+<p>I looked this myself as well via the Wikipedia list of
+
+<a href="http://en.wikipedia.org/wiki/List_of_potential_habitable_exoplanets">
+potential habitable exoplanets</a>,
+
+pointing to the
+
+<a href="http://phl.upr.edu/projects/habitable-exoplanets-catalog/data/database">
+Habitable Exoplanets Catalog</a>, which I downloaded as a CSV file.
+It does indeed currently contain 999 lines, with one of them representing the header, so 998 entries, which is close enough.
+-->
+
+
+<a name="1"></a>
+
+<h4>Programmatically Launching an External Tool Add-In Command</h4>
+
+<p><strong>Question:</strong> The PostCommand Revit API call seems to expect a RevitCommandId argument:</p>
+
+<pre>
+  commandData.Application.PostCommand(revitCmdID)
+</pre>
+
+<p>I tried to obtain a command id using the LookupCommandId method, passing in the name of my external command class, but it returns nothing:</p>
+
+<pre>
+  Dim revitCmdID As Autodesk.Revit.UI.RevitCommandId _
+    = RevitCommandId.LookupCommandId("DoorCommandLogger")
+
+  Dim revitCmdID As Autodesk.Revit.UI.RevitCommandId _
+    = RevitCommandId.LookupCommandId("SwingTool.DoorCommandLogger")
+</pre>
+
+<p>I also looked at the journal file after running the command from the user interface and tried passing in some variations of the different names I discovered there, such as:</p>
+
+<ul>
+<li>"Execute external command:CustomCtrl_%CustomCtrl_%NTItools%Parameters%Door Tool:SwingTool.DoorCommandLogger"</li>
+<li>"CustomCtrl_%CustomCtrl_%NTItools%Parameters%Door Tool:SwingTool.DoorCommandLogger"</li>
+</ul>
+
+<p>Still I get nothing.</p>
+
+<p>How can I post a custom command, please?</p>
+
+
+<p><strong>Answer:</strong> Let's start out by taking a more detailed look at the PostCommandWorkflow SDK sample and the classes involved in this scenario.
+
+<p>Here is the code used there to actually launch the command:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Prompts to edit the revision and resave.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;application&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> PromptToEditRevisionsAndResave(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> application )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Setup external event to be notified </span>
+&nbsp; &nbsp; <span class="green">// when activity is done</span>
+&nbsp;
+&nbsp; &nbsp; externalEvent = <span class="teal">ExternalEvent</span>.Create(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PostCommandRevisionMonitorEvent</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Setup event to be notified when revisions </span>
+&nbsp; &nbsp; <span class="green">// command starts (this is a good place to </span>
+&nbsp; &nbsp; <span class="green">// raise this external event)</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RevitCommandId</span> id
+&nbsp; &nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.SheetIssuesOrRevisions );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( binding == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; binding = application
+&nbsp; &nbsp; &nbsp; &nbsp; .CreateAddInCommandBinding( id );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; binding.BeforeExecuted
+&nbsp; &nbsp; &nbsp; += ReactToRevisionsAndSchedulesCommand;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Post the revision editing command</span>
+&nbsp;
+&nbsp; &nbsp; application.PostCommand( id );
+&nbsp; }
+</pre>
+
+<p>There is lots of stuff in there that is of no concern to us now and here.</p>
+
+<p>Actually, the only two lines of interest are the calls to LookupPostableCommandId and PostCommand.</p>
+
+<p>LookupPostableCommandId takes a PostableCommand enumeration value as an argument and returns a RevitCommandId instance, which is the argument required by the call to PostCommand.</p>
+
+<p>The RevitCommandId class internally manages a command name and id.</p>
+
+<p>In the case of the SheetIssuesOrRevisions command retrieved by PostCommandWorkflow, these are</p>
+
+<ul>
+<li>Id = 3153</li>
+<li>Name = "ID_SETTINGS_REVISIONS"</li>
+</ul>
+
+<p>You can easily see this in the Visual Studio debugger by implementing an external command executing this single statement:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">RevitCommandId</span> id_built_in
+&nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.SheetIssuesOrRevisions );
+</pre>
+
+<p>OK, so built-in Revit commands that can be posted are listed in the PostableCommand enumeration, and we can use LookupPostableCommandId to retrieve the appropriate RevitCommandId for posting.</p>
+
+<p>However, a custom add-in defining its own external command will obviously not be included there, so what can we do?</p>
+
+<p>I studied the Revit API help file for these classes and found the following:</p>
+
+<p style="color:darkblue">The RevitCommandId class represents a command id in Autodesk Revit.
+Each Revit command is assigned a command id and non-localised name.
+This class allows you to look up a command by its name, and represents any Revit command in the use of an AddInCommandBinding.</p>
+
+<p>OK, but where to obtain it?</p>
+
+<p>LookupPostableCommandId takes an enumeration value, and we do not have any to offer.</p>
+
+<p>However, the RevitCommandId class provides exactly two static methods, LookupPostableCommandId and LookupCommandId.</p>
+
+<p>The former takes a PostableCommand enumeration value, the latter a simple string, and its documentation states:</p>
+
+<p style="color:darkblue">You can use the RevitCommandId.LookupCommandId method to retrieve a corresponding Revit command id for a given id string.
+You can refer to the entries in the Revit journal to find the string to use for a particular command.</p>
+
+<p>So I did just what you already tried and described in your query:</p>
+
+<ul>
+<li>Implement a dummy command named CmdDummy, for example.</li>
+<li>Launch it manually in the user interface.</li>
+<li>Search for all occurrences of the string "Dummy" in the resulting journal file.</li>
+</ul>
+
+<p>Here is the result (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+C:\Users\tammikj\AppData\Local\Autodesk\Revit\Autodesk Revit 2014\Journals &gt; grep -i dummy journal.0242.txt
+
+' 0:&lt; Added new API pushbutton 35024, name PostAddinCommand Dummy Command, class PostAddinCommand.CmdDummy, assembly PostAddinCommand.dll, vendorId TBC_, vendor description The Building Coder, http://thebuildingcoder.typepad.com.
+
+' 4:&lt; MasterLocks 0x0000000014BB1250 DummyStorage stole m_oDataStorage 0x0000000014C52950 but left m_pDataStorage 0x0000000014C52950
+
+Jrn.RibbonEvent "Execute external command:64b3d907-37cf-4cab-8bbc-3de9b66a3efa:PostAddinCommand.CmdDummy"
+
+' 0:&lt; DummyStorage destroying DataStorageInterface 0x0000000014C52950
+</pre>
+
+<p>Eliminating the DummyStorage entries, which are probably not caused by my application, leaves only the following candidate entry for me to try to extract the appropriate string from:</p>
+
+<ul>
+<li>Jrn.RibbonEvent "Execute external command:64b3d907-37cf-4cab-8bbc-3de9b66a3efa:PostAddinCommand.CmdDummy"</li>
+</ul>
+
+<p>The GUID prefixed to the command name happens to be the external command ClientId from my add-in manifest:</p>
+
+<pre class="prettyprint">
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>PostAddinCommand Dummy Command<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Test command for PostAddinCommand.<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>PostAddinCommand.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>PostAddinCommand.CmdDummy<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>64b3d907-37cf-4cab-8bbc-3de9b66a3efa<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>TBC_<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>The Building Coder, http://thebuildingcoder.typepad.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+</pre>
+
+<p>My first attempt was therefore to use the following string as an input to LookupCommandId:</p>
+
+<ul><li>"64b3d907-37cf-4cab-8bbc-3de9b66a3efa:PostAddinCommand.CmdDummy"</li></ul>
+
+<p>That returned null, just as in your attempts.</p>
+
+<p>In my next attempt, I just used the client id all on its own.</p>
+
+<p>Lo and behold, that works perfectly fine.</p>
+
+<p>Here is the resulting external command demonstrating both methods, and launching my test command successfully:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp;
+&nbsp; <span class="green">// Built-in Revit commands are listed in the </span>
+&nbsp; <span class="green">// PostableCommand enumeration</span>
+&nbsp;
+&nbsp; <span class="teal">RevitCommandId</span> id_built_in
+&nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.SheetIssuesOrRevisions );
+&nbsp;
+&nbsp; <span class="green">// External commands defined by add-ins are </span>
+&nbsp; <span class="green">// identified by the client id specified in </span>
+&nbsp; <span class="green">// the add-in manifest</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> name
+&nbsp; &nbsp; = <span class="maroon">&quot;64b3d907-37cf-4cab-8bbc-3de9b66a3efa&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">RevitCommandId</span> id_addin
+&nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupCommandId(
+&nbsp; &nbsp; &nbsp; name );
+&nbsp;
+&nbsp; uiapp.PostCommand( id_addin );
+</pre>
+
+<p>The resulting numerical id is 35024, and the name is simply the client id GUID.</p>
+
+<p>This numerical id is also listed in the journal file when the pushbutton is created, as you can see above.</p>
+
+<p>The entire source code, Visual Studio solution and add-in manifest for the whole test is available from my
+
+<a href="https://github.com/jeremytammik/PostAddinCommand">
+PostAddinCommand GitHub repository</a>, and
+
+the version described up until now is
+
+<a href="https://github.com/jeremytammik/PostAddinCommand/releases/tag/2014.0.0.1">
+2014.0.0.1</a>.</p>
+
+
+
+
+<a name="2"></a>
+
+<h4>Launching a Custom Add-In Ribbon Button Command</h4>
+
+<p>We have now learned how to programmatically launch an external tool command defined in the add-in manifest and therefore equipped with its own client id.</p>
+
+<p>Most serious applications do not list individual commands explicitly in the add-in manifest, though, because it is not very user friendly to have to navigate to the Add-Ins tab External Tools menu each time you want to launch them.</p>
+
+<p>Actually, there are two completely different types of external commands, both implementing the IExternalCommand interface:</p>
+
+<ul>
+<li>External tool commands, listed in the add-in manifest and launched by selecting the entry added by Revit in the Add-Ins &gt; External Tools menu.</li>
+<li>Custom button commands launched by clicking a custom button created by an external application.</li>
+</ul>
+
+<p>The latter have no client id.</p>
+
+<p>Still, the procedure of analysing the journal file to discover the corresponding command name string to pass into the LookupCommandId method remains exactly the same, even thought the result differs.</p>
+
+<p>I implemented a new external command CmdDummy2 to test the latter case, and an external application to create a custom ribbon panel and custom button to launch it.</p>
+
+<p>Repeating the steps described above to manually launch the command and examine the journal file to discover its command name string produced the following lines (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+c:\Users\tammikj\AppData\Local\Autodesk\Revit\Autodesk Revit 2014\Journals>grep Dummy2 journal.0249.txt
+
+' 0:< Added new API pushbutton 6417 name  text Dummy2 class PostAddinCommand.CmdDummy2 assembly C:\Users\tammikj\AppData\Roaming\Autodesk\Revit\Addins\2014\PostAddinCommand.dll
+
+ Jrn.RibbonEvent "Execute external command:CustomCtrl_%CustomCtrl_%Add-Ins%Post Add-in Command%Dummy2:PostAddinCommand.CmdDummy2"
+
+' 1:< TaskDialog "Hello from CmdDummy2!"
+</pre>
+
+<p>The command name string is thus</p>
+
+<ul><li>"CustomCtrl_%CustomCtrl_%Add-Ins%Post Add-in Command%Dummy2"</li></ul>
+
+<p>This is concatenation of a hierarchical list of entries separated by percentage signs '%'.</p>
+
+<p>The first two entries appear to be fixed constants, "CustomCtrl_".</p>
+
+<p>The last three are the sequence of controls a user needs to navigate through to manually launch the corresponding command, in this case the standard Revit Add-Ins ribbon tab, the custom "Post Add-in Command" ribbon panel, and the text of the ribbon button item, "Dummy2".</p>
+
+<p>Although this string may seem a bit unwieldy, it does have the advantage that it can be controlled and generated by the add-in itself according to these rules, since each component is based on an add-in-defined string constant.</p>
+
+<p>The following code successfully generates a RevitCommandId for this button and programmatically launches the command:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// External tool commands defined by add-ins are</span>
+&nbsp; <span class="green">// identified by the string listed in the </span>
+&nbsp; <span class="green">// journal file when the command is launched </span>
+&nbsp; <span class="green">// manually.</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> name_addin_button_cmd
+&nbsp; &nbsp; = <span class="maroon">&quot;CustomCtrl_%CustomCtrl_%&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Add-Ins%Post Add-in Command%Dummy2&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">RevitCommandId</span> id_addin_button_cmd
+&nbsp; &nbsp; = <span class="teal">RevitCommandId</span>.LookupCommandId(
+&nbsp; &nbsp; &nbsp; name_addin_button_cmd );
+&nbsp;
+&nbsp; uiapp.PostCommand( id_addin_button_cmd );
+</pre>
+
+<p>Stepping through the execution of this code in the Visual Studio debugger and examining the resulting RevitCommandId instance shows that its internal numerical id field value equals 6417.</p>
+
+<p>This is the same number listed in the journal file during the creation of the ribbon pushbutton.</p>
+
+<p>In the case above of the external tool command, the RevitCommandId numerical id was also equal to the pushbutton number.</p>
+
+<p>If you look at the RevitCommandId numerical id produced by instantiation from a built-in Revit command PostableCommand enumeration value, you will note that they end up equal.</p>
+
+<p>This led me to wonder whether it might be possible to cast the pushbutton number to a PostableCommand enumeration value and use LookupPostableCommandId to look it up instead of going through this rigmarole of confusing command name strings.</p>
+
+
+
+<a name="3"></a>
+
+<h4>The Pushbutton Number Cannot be Cast to PostableCommand</h4>
+
+<p>Well, in short, I tested it and it does not work.</p>
+
+<p>I cast the pushbutton number of both custom external commands listed in the journal file to PostableCommand enumeration values and passed them in to the LookupPostableCommandId.</p>
+
+<p>Both attempts threw the same Revit ArgumentException saying "Invalid PostableCommand".</p>
+
+
+
+<a name="4"></a>
+
+<h4>Summary and Download</h4>
+
+<p>Well, enough time spent on that, I think, and now all should be clear.</p>
+
+<p>The updated version of the PostAddinCommand test add-in defines quite a number of classes:</p>
+
+<ul>
+<li>CmdDummy &ndash; dummy external tool command.</li>
+<li>CmdPost &ndash; external command to programmatically launch CmdDummy.</li>
+<li>CmdDummy2 &ndash; dummy custom ribbon button command.</li>
+<li>App &ndash; external application defining a ribbon panel and button to launch CmdDummy2.</li>
+<li>CmdPost2 &ndash; external command to programmatically launch CmdDummy2.</li>
+<li>CmdPostId &ndash; external command showing that the cast from pushbutton number to PostableCommand fails for CmdDummy.</li>
+<li>CmdPostId2 &ndash; ditto for CmdDummy2.</li>
+</ul>
+
+<p>The entire source code, Visual Studio solution and add-in manifest for the updated test suite is available from my
+
+<a href="https://github.com/jeremytammik/PostAddinCommand">
+PostAddinCommand GitHub repository</a>, and
+
+the version described here is
+
+<a href="https://github.com/jeremytammik/PostAddinCommand/releases/tag/2014.0.0.2">
+2014.0.0.2</a>.</p>
+
+<p>This GitHub thingy is pretty handy, actually.</p>
+
+<p>Oh, and now I finally performed the final step of setting up my git access on the Mac, to cache my credentials as described in
+
+<a href="https://help.github.com/articles/set-up-git">
+password caching</a>:</p>
+
+<pre>
+  git config --global credential.helper osxkeychain
+</pre>
+
+
+<pre class="code">
+</pre>
+
+<a name=""></a>
+
+<h4></h4>
+
+<a href="">
+</a>

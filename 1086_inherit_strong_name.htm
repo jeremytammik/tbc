@@ -1,0 +1,317 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+https://beta.autodesk.com/project/forum/thread.html?cap=495a377e9dee4a2c885cb50f6fc204d4&forid={cb92d6f1-e4d4-475d-a864-838158d7f121}&topid={2281f13c-b7b7-4bb3-b291-39b888499c49}&tp=1&to=asc&ts=last&tl=15&tv=desc#{6670E786-5B9D-4749-9B0E-C799C314B6BF}
+https://beta.autodesk.com/project/forum/thread.html?cap=495a377e9dee4a2c885cb50f6fc204d4&forid={cb92d6f1-e4d4-475d-a864-838158d7f121}&topid={187a673a-c8db-4984-bbe8-4b48a33c054b}&tp=1&to=asc&ts=last&tl=15&tv=desc#{DCE2E65E-43B9-4360-AB37-85D1EC95A36B}
+
+luigi trabacchin, orientatrium.it - Testers - ADN
+Scott Conover, Software Development Manager, Revit API & Interoperability
+
+-->
+
+<h3>No Inheritance and No Strong Naming</h3>
+
+<p>Here are two little items of general long-standing interest that just came up in a Revit API discussion forum:</p>
+
+<ul>
+<li><a href="2">Why you cannot derive a new class from FamilyInstance</a>.</li>
+<li><a href="3">Why the Revit API assemblies are not strongly named</a>.</li>
+</ul>
+
+<p>These two issues sometimes come as a surprise to developers experienced in
+
+<a href="http://en.wikipedia.org/wiki/Object-oriented_programming">
+OOP</a> and other CAD system programming.</p>
+
+<p>However, there are good reasons for both.</p>
+
+<p>Here are the detailed explanations:</p>
+
+
+
+<a name="2"></a>
+
+<h4>Why You Cannot Derive a New Class From FamilyInstance</h4>
+
+<p><strong>Question:</strong> I would like to extend some classes provided by the Revit API, e.g. by inheriting from them and implementing my own derived classes.
+I think it would be very useful to specialise some classes, like FamilyInstance.</p>
+
+<p><strong>Answer:</strong> Do you have any particular goals behind inheriting from FamilyInstance?
+What would you like to be able to accomplish that inheritance or extensibility would allow?</p>
+
+<p><strong>Question:</strong> I created an add-in that uses a Revit family to delimitate an area.
+I call it a 'marker' and can identify it by its symbol.
+It helps identify where and how other element need to be placed.</p>
+
+<p>Having a public constructor will allow us to inherit our marker class from FamilyInstance.
+In fact, a marker IS a family instance, with just some other properties.
+Now we have to copy some data from the FamilyInstance to the marker it belongs to, like its unique id, location, rotation and so on.</p>
+
+<p>It would be easier for us to serialize and deserialize the class being sure correct data is copied to the database.</p>
+
+<p>Also the code understandability would be improved, since calling <code>new FamilyInstance(x,y,z, rotation, symbol)</code> is much more obvious than calling a static constructor.</p>
+
+<p>Any programmer would expect that calling a constructor such as this would drop a new instance into the project.</p>
+
+
+<p><strong>Answer:</strong> Thank you for the clarification.</p>
+
+<p>The structure of Revit and it’s API is a little bit different than I think you expect, so this is not going to work as well as you hope.</p>
+
+<p>Revit API objects are managed wrappers around native C++ objects used by Revit’s UI and database.
+Therefore, a FamilyInstance in the API does not actually contain the properties you see &ndash; the API code accesses them through the matching native object’s members.    So extending our managed classes would not actually allow for new data to end up in the Revit file during serialization &ndash; we don’t know how to get the data from your inherited class.</p>
+
+<p>We don’t supply public constructors for many of these objects for precisely this reason &ndash; much more needs to happen than just building the object and populating the x, y, z, etc. &ndash; the document tables need updating, dependent elements must be added, relationships established etc.  So this is what we have methods like NewFamilyInstance and, for our newer element creation calls, static creation methods taking the document and necessary parameters.</p>
+
+<p>If you want to get additional serialized data onto a Revit element, you should look at
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">
+Extensible Storage</a> in the Revit API.</p>
+
+<p>If you want to make code easier to write and want to 'add' additional members to our classes (so you could have a call to a FamilyInstance.GetMarker method or something like that), you can look at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html">
+C# extension methods</a> &ndash;
+
+however, adding such methods will not allow additional data to be stored in those classes unless you implement these members using Extensible Storage.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Why the Revit API Assemblies are not Strongly Named</h4>
+
+<p><strong>Question:</strong> Looking at the Revit API documentation, I do not see any mention of
+
+<a href="http://en.wikipedia.org/wiki/Strong_key">
+strong naming</a>.</p>
+
+<p>Is there a particular reason for that?</p>
+
+<p>This can cause several security issues, and some customers may require us to sign our Revit add-in assemblies, which we currently cannot do.</p>
+
+<p><strong>Answer:</strong> Yes, this is true.
+There are good reasons for this.</p>
+
+<p>Here is an explanation why
+
+<a href="http://adndevblog.typepad.com/autocad/2012/07/can-i-sign-my-autocad-net-plug-in-with-a-strong-name.html">
+you cannot sign your AutoCAD .NET plug-in with a strong name</a>.</p>
+
+<p>It covers all the technical details and includes some workarounds, which all apply to Revit add-ins as well.</p>
+
+<p>Note that Microsoft modified the strong name verification system so that
+
+<a href="http://blogs.msdn.com/b/shawnfa/archive/2008/05/14/strong-name-bypass.aspx">
+some security measures related to signatures are now bypassed</a> by
+
+default.</p>
+
+
+<a name="4"></a>
+
+<h4>Wise Words</h4>
+
+<p>I hope these explanations make sense.</p>
+
+<p>There are quite a few surprises lurking in the Revit API and the entire Revit product paradigm for unwary developers experienced in other less parametric and BIM oriented CAD systems, as we have already repeatedly seen in the past:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/02/bim-versus-free-geometry-and-product-training.html">BIM versus free geometry and product training</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/10/porting-an-autocad-application.html">Porting an AutoCAD application</a></li>
+</ul>
+
+<p>In fact, as I often point out, one of the hardest tasks for a budding Revit add-in developer experienced in ObjectARX or other CAD system programming is to forget her accumulated previous experience and open her mind for something completely new and different.</p>
+
+<p><a href="http://www.wikihow.com/Become-a-Lifelong-Learner">Learning something new</a> and
+
+<a href="http://www.marcandangel.com/2013/09/02/5-things-you-should-know-about-letting-go">
+letting go of something old</a>
+
+can prove very challenging indeed.</p>
+
+<p>And very rewarding.</p>
+
+<p>Good luck!</p>
+
+<!--
+
+conoves wrote:
+
+Hi - you didn’t see anything in the document about strong-naming of the Revit API DLLs because we haven’t done anything to make this happen.
+
+As for the reasons why, you could look at this post (which is about AutoCAD, but covers the same technical details):
+
+http://adndevblog.typepad.com/autocad/2012/07/can-i-sign-my-autocad-net-plug-in-with-a-strong-name.html
+
+Note that some of the security measures related to signatures are now bypassed by default:
+
+http://blogs.msdn.com/b/shawnfa/archive/2008/05/14/strong-name-bypass.aspx
+
+Thank you,
+
+~ Scott
+
+This Thread -- http://beta.autodesk.com/r/?4e79a2ce564740fdbbcc7efc49ded176
+This Post -- http://beta.autodesk.com/r/?1f9bfbda30c74d73af9e222e51f4c089
+
+http://thebuildingcoder.typepad.com/blog/2014/01/no-inheritance-and-no-strong-naming.html?cid=6a00e553e16897883301a3fbef8f96970b#comment-6a00e553e16897883301a3fbef8f96970b
+
+CoderBoy has left you a comment:
+
+I find the reasons Autodesk doesn't digitally sign their API assemblies to be somewhat lame. I believe only the first 2 octets of a version number "count" when a .NET add-in loads a digitally signed assembly (only change the later digits, guys, or don't change it at all because only one ever gets loaded at runtime, right?), and SO WHAT if you need to deploy it to the GAC to improve performance??? (That's the real reason, as I read it...Autodesk's complex installer can't do gacutil -i???)
+
+In our case, we have reusable DLLs that depend on the Revit API DLLs, and those reusable DLLs are used in multiple add-ins (with separate installs to separate folders, conforming to the Autodesk Exchange Apps requirements). As the Revit API DLLs aren't signed, we can't sign our reusable DLLs.
+
+If an older add-in is run first, it loads our older reusable DLLs into memory and because they're not signed those older ones that are already in memory will get used by the newer add-in, which when run may really depend on features in a newer version of the reusable DLL that shipped with it. Crashola. Or worse: quiet misbehaving.
+
+As neither "workaround" is suitable for us, the inability for us to easily sign our reusable DLLs that depend on the Revit API with Visual Studio can actually be quite problematic.
+
+January 09, 2014 at 05:59
+
+http://thebuildingcoder.typepad.com/blog/2014/01/no-inheritance-and-no-strong-naming.html?cid=6a00e553e168978833019b047c1b71970d#comment-6a00e553e168978833019b047c1b71970d
+
+CoderBoy has replied to CoderBoy's comment:
+
+Hmmm...upon further reflection I can see how the version number problem could be more complicated than I first thought. You could publish all versions to the GAC with every update release, but then any bug fixes may not get picked up automatically by add-ins that were originally built against older releases of the API DLLs. Obviously that would be desirable. Ugggh.
+
+January 09, 2014 at 06:17
+
+From: luigi trabacchin
+Date: Thursday, January 9, 2014 15:16
+To: Jeremy Tammik
+Subject: Re: no strong name on revit api assemblies
+
+Hey Jeremy!
+
+Happy new year!
+
+I will take a deeper look and take the time to think in a few hours, the feeling i have is that performance are important, but also trying to avoid hacking and dll hell is something important, but the real bigger point is getting to the goal.
+
+The goal is having a revit that does what it’s supposed to do and being able to mantain and improve it... i do actualy developep on other Autodesk products, and i can say revit have a really well done api, so not being able to sign my dll is not such a big issue, for now.
+
+And i’m glad to know is something Autodesk already tried, is not just you don’t want to...
+
+Coder Boy have a good point on that anyway, we got similar problem for addins that are cross products, because for some products we have signed dll, and if i remember right you need to sign your dll too, so we had to duplicate those shared dlls... this generate confusion.
+
+If i remember right it was vault that needed the signed dlls...
+
+From: CoderBoy
+Date: Thursday, January 9, 2014 15:32
+To: Jeremy Tammik
+Subject: RE: no strong name on revit api assemblies
+
+Hi Jeremy.
+
+Thanks for the speedy reply.  I’m not 100% sure of the “first two octets” comment (that’s from memory of the earliest days of .NET, maybe it’s changed?).  If that is correct <I may do some testing today>, I suspect it may really boil down to just putting the API DLLs in the GAC and being done.
+
+I’m pretty sure that as an Autodesk reseller we have access to the Beta site, so I’ll see if I can get into it.
+
+We’ve had other thoughts for solving this problem, like breaking the deployment rules imposed by Autodesk Exchange Apps.  For example, always rebuild everything for all addins every time there is any change to any addin (uggh!) and deploy everything for all add-ins with all setups to a “common” folder and then create setup-specific “stub” add-in DLLs that use Assembly.LoadFrom(the common folder) to call the “real” add-in DLLs that do the actual work.  Thus everything was built at the same time together and there will only ever be one version of a reusable DLL on disc.
+
+The installer would have to never put an older set of common files on top of a newer one, obviously.
+
+This will complicate not only our build process and setups, but our licensing too.  However, we think the licensing issues may be pretty solvable without too much work.
+
+Uninstalls, however, would be a much more complicated problem to solve.
+
+We currently release all apps at the same time, so whenever a customer has an issue like this if they install the latest version of the offending app it would fix the problem, but obviously we don’t want our customers to have problems in the first place, which is why I initially made my comment.
+
+CoderBoy
+
+From: CoderBoy
+Date: Thursday, January 9, 2014 15:52
+To: Jeremy Tammik
+Subject: RE: no strong name on revit api assemblies
+
+I hear you.
+
+Another thought I have since had was to wonder how easy it would be to put DLLs in the GAC that likely depend on a lot of C++ dlls or other things that exist in the Revit install folder.
+
+I can’t even begin to imagine all the complexities that go in to building and maintaining the Revit API dlls.
+
+CoderBoy
+
+From: Kevin Vandecar
+Date: Thursday, January 9, 2014 16:07
+To: Jeremy Tammik , Stephen Preston
+Cc: Scott Conover , Sasha Crotty , DevTech
+Subject: RE: no strong name on revit api assemblies
+
+My take on this from my AutoCAD Architecture API development days were that there are no real benefits to this in the context of an application like AutoCAD (also same is true for Revit I think). Because our assemblies are wrappers around internal APIs, there is no or little business logic and they cannot be used standalone (except in a dis-assembly sense when using them in reflection tools (like reflector or ILDASM)). The likely-hood of collisions is narrow because there is either binary compatibility between certain specified acad.exe versions, or there is often clear direction that versions are not compatible with each other (separate from assembly aspects). The API assemblies live with the acad.exe, and should not be loaded into different versions.
+
+Specific to the question from the partner below, I am not sure I fully understand the problem. Do they mean the assembly that is already loaded on one version of Revit, is being reused for a different version of Revit? I think for exchange store purposes, they need to specify which version in the XML/package to ensure the correct ones are being loaded by the parent app. Because exchange store is a same-location issue, the XML is meant to differentiate which parent app version should load the app. Not sure where he got “That's the real reason, as I read it...Autodesk's complex installer can't do gacutil -i??” For me, that is not the reason. It is more that there is no real benefit  (also not sure why he thinks GAC registration has better performance…)
+
+FYI, There is a nice (older) article explaining the idea here:  http://www.codeproject.com/Articles/8874/Strong-Names-Explained
+
+I’ve been away from this for a while, so memory might have faded a little… but this is what I remember. Hope it helps.
+
+Hope it helps,
+Kevin
+
+From: Stephen Preston
+Date: Thursday, January 9, 2014 17:58
+To: Kevin Vandecar , Jeremy Tammik , Scott Conover , Sasha Crotty
+Cc: DevTech
+Subject: RE: no strong name on revit api assemblies
+
+DevTech don’t have a formal stance on this topic, because it’s never been raised as a big issue/showstopper by 3rd party developers in the past – more of a nice to have.
+
+Like Kevin, it’s been a while since I looked at this. But it’s certainly been raised from time to time by AutoCAD 3rd party developers. I discussed this with Albert a year or two ago – long enough ago that I don’t recall all his arguments. But I do recall he opined that strongly naming the AutoCAD API DLLs would be a lot of work - requiring us to sign/strongly name every AutoCAD DLL – for very marginal benefit.
+
+If the Revit team are looking into this, then a quick chat with Albert about his reasons for not doing it in AutoCAD may help speed up the decision making process.  It may be that the apps store ‘bundle’ format is the benefit that makes this worth the effort (or maybe not J).
+
+Cheers,
+
+Stephen
+
+Cyrille: signing requires GAC and all add-ins needs that also. Same for Inventor and AutoCAD. If developer does not strong name asm and the API nes are, there is a big performance hit.
+
+Philippe: strong name assemblies can only reference strong name assemblies, non-strong ones have more freedom, can reference anything.
+
+Jeremy: provide both, and provide a switch in revit.exe.config to choose between the two.
+
+Beta forum > Revit API changes and additions (PR8) (6 Replies)
+
+CoderBoy
+
+In our case, we have reusable DLLs that depend on the Revit API DLLs, and those reusable DLLs are used in multiple add-ins (with separate installs to separate folders, conforming to the Autodesk Exchange Apps requirements). As the Revit API DLLs aren’t signed, we can’t sign our reusable DLLs in Visual Studio.
+
+So if an older add-in is run first, it loads our older reusable DLLs into memory and because they’re not signed those older ones that are already in memory will get used by the newer add-in, which when run later in the same session may really depend on features in a newer version of the reusable DLL that shipped with it. Crashola. Or worse: quiet misbehaving.
+
+As neither "workaround" mentioned in the article about AutoCAD is very suitable for us, the inability for us to easily sign our reusable DLLs that depend on the Revit API with Visual Studio can actually be quite problematic.
+
+We’ve had some thoughts on ways around this problem by completely changing how we build and deploy our setups, but that would be very involved and introduces some new complex problems of its own.
+
+We’re still looking for a silver bullet on this one, but I wanted to share another use case where having strongly-named Revit API assemblies would be really very helpful.
+
+guynz
+
+FWIW,
+
+I build nuget packages for common assemblies and a private nuget repository to manage common assemblies in multiple projects. Works well and VS support of nuget is great. It at least makes working on multiple Revit projects a little easier.
+
+With regard to assembly versioning. Best solution I’ve found is just don’t let Revit manage this. In other words use IoC’s to manage assemblies and instances. Maybe not as ideal as signing but it has some significant design advantages as well as providing more control over assembly loading and instance management.
+
+There’s an argument for Autodesk implementing a service locator abstraction layer. But it can still be done now. It’s just more work initially, designing, writing and maintaining a solution for the Revit addin system.
+
+HTH,
+
+Guy
+
+jeremytammik
+
+I talked with Cyrille Fauvel and Philippe Leefsma (both ADN DevTech). They know the situation in AutoCAD and Inventor well. Their take is this: a developer needs a non-strongly signed API assembly for development, and a strongly singed API for the customer installation. Maybe a possible optimal solution would be to provide both, and to implement a switch in revit.exe.config to define which one to use before starting up Revit.
+
+Oh, and by the way, Guy: thank you very much for your in-depth background info! I really wish I understood more of what you are saying. Could you elaborate a little, and possible point to some further explanations? Thank you!
+
+Cheers,
+
+Jeremy
+
+-->

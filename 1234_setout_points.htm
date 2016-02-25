@@ -1,0 +1,168 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Concrete Setout Points for Revit Structure 2015</h3>
+
+<p>I was prompted by a Revit API forum discussion thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/jeremy-s-setoutpoint/m-p/5376217">Jeremy's setoutpoint</a> to
+
+take another look at my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">
+SetoutPoints structural concrete setout point add-in</a>,
+
+publish it on GitHub and migrate it from Revit Structure 2013 to 2015.</p>
+
+<p>SetoutPoints is a Revit add-in for automatic placement and management of structural concrete setout points.</p>
+
+<p>Setout point markers are automatically generated at all vertices of structural members.
+They can be manually designated as minor or major:</p>
+
+<center>
+<img src="img/setout_points_7.png" alt="Minor and major structural concrete setout points" width="285"/>
+</center>
+
+<p>The major points are automatically numbered, scheduled and converted to global northing and easting coordinates.</p>
+
+<p>The numbering can be edited and regenerated to ensure schedule consistency and readability.</p>
+
+<p>Here is a collection on background and further reading on this project:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">Detailed description</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">Original implementation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html">Commercial use</a></li>
+<li><a href="http://forums.autodesk.com/t5/revit-api/jeremy-s-setoutpoint/m-p/5372337">Discussion thread</a></li>
+</ul>
+
+<p>Sanjaymann took a look at this project, encountering and solving a transformation issue with some structural foundations:</p>
+
+<p><strong>Question:</strong> I was working with the setoutpoint example on structural foundations.
+The code places the points on one foundation but not on the other.
+Both of them are same family.</p>
+
+<p>While debugging, the only difference that I saw was that in the case of the first foundation, the code directly retrieves a solid in the GetSolid function; in the case of the second one, it retrieves a geometry instance instead:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve the first non-empty solid found for </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given element. In case the element is a </span>
+&nbsp; <span class="gray">///</span><span class="green"> family instance, it may have its own non-empty</span>
+&nbsp; <span class="gray">///</span><span class="green"> solid, in which case we use that. Otherwise we </span>
+&nbsp; <span class="gray">///</span><span class="green"> search the symbol geometry. If we use the </span>
+&nbsp; <span class="gray">///</span><span class="green"> symbol geometry, we have to keep track of the </span>
+&nbsp; <span class="gray">///</span><span class="green"> instance transform to map it to the actual</span>
+&nbsp; <span class="gray">///</span><span class="green"> instance project location.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Solid</span> GetSolid(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">Options</span> opt,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="teal">Transform</span> t )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">GeometryInstance</span> inst = <span class="blue">null</span>;
+&nbsp; &nbsp; t = <span class="teal">Transform</span>.Identity;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Some columns have no solids, and we have to </span>
+&nbsp; &nbsp; <span class="green">// retrieve the geometry from the symbol; </span>
+&nbsp; &nbsp; <span class="green">// others do have solids on the instance itself </span>
+&nbsp; &nbsp; <span class="green">// and no contents in the instance geometry </span>
+&nbsp; &nbsp; <span class="green">// (e.g. in rst_basic_sample_project.rvt).</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; inst = obj <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid &amp;&amp; <span class="blue">null</span> != inst )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; geo = inst.GetSymbolGeometry();
+&nbsp; &nbsp; &nbsp; t = inst.Transform;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> solid;
+&nbsp; }
+</pre>
+
+<p>As said, both foundations belong to the same family.
+Why do they behave so differently?</p>
+
+<p><strong>Answer:</strong> The difference may be caused by the fact that one foundation can use the unmodified family symbol geometry, whereas the other one needs some kind of instance specific modification, and therefore cannot use the unmodified symbol geometry.
+Does that make sense?</p>
+
+<p><strong>Response:</strong> Sometimes the sword fails and the needle does the job.</p>
+
+<p>While looping over the corners:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> corners.Keys )
+</pre>
+
+<p>The point p has to be transformed:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> p1 = t.OfPoint( p );
+&nbsp;
+&nbsp; <span class="teal">FamilyInstance</span> fi
+&nbsp; &nbsp; = doc.Create.NewFamilyInstance( p1,
+&nbsp; &nbsp; &nbsp; symbols[1], <span class="teal">StructuralType</span>.NonStructural );
+</pre>
+
+<p>One line did the trick.</p>
+
+<p><strong>Answer:</strong> Congratulations on finding the right needle for the job!</p>
+
+<p>Thank you very much for your research!</p>
+
+<p>Motivated by your work, I created a
+
+<a href="https://github.com/jeremytammik/SetoutPoints">
+GitHub repository for the SetoutPoints application</a> and
+
+migrated it to Revit Structure 2015.</p>
+
+<p>I applied the change that you suggest by adding the transformation as an 'out' parameter to the GetSolid method instead of moving the code out, cf. the
+
+<a href="https://github.com/jeremytammik/SetoutPoints/commit/13e134375c38573c9f45d755973359b98681db7c">
+GitHub diffs</a>.</p>
+
+<p>The updated solution for Revit 2015 with your transformation added is published in the
+
+<a href="https://github.com/jeremytammik/SetoutPoints">
+SetoutPoints GitHub repository</a> and
+
+your transformation enhancement is the content of
+
+<a href="https://github.com/jeremytammik/SetoutPoints/releases/tag/2015.0.0.1">release 2015.0.0.1</a>.</p>
+
+<p>Many thanks to Sanjaymann for his interest and research!</p>
+
+<p>I hope this is of interest to others as well.</p>

@@ -1,0 +1,116 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+08937765 [Inverted background]
+
+Jose FandosAndekan LLC, Andekan_LLC
+
+-->
+
+<h3>Setting the View Display Background</h3>
+
+<p>Here is an exploration of various attempts to ensure that the view background is always white, regardless of all user settings like inverted background etc.</p>
+
+<p>Before getting to that, I have to share an important discovery for me and my Tammik namesakes by my sister Helene, who recently consulted an Estonian translator.</p>
+
+<p>My last name is Estonian and comes from 'tamm', meaning 'oak'. Tammik is a small group of oaks, or oak grove, a common North European name, cf. Eklund in Swedish and Eichenhain in German.</p>
+
+<p>The translator pointed out that there is a rhyming Estonian idiomatic expression that every Tammik should know: "Tere hommikust, tulen tammikust!" &ndash; literally "Good morning, I'm coming from oak-forest!" &ndash; sounds great in Estonian and is used for a very cheerful "hello".</p>
+
+<!--
+<p>he also said</p>
+
+<p>Estonian is one of the hardest languages to learn, and we do have 14 cases... but at least Hungarian with its 18 (or sometimes infinite) cases is even worse :) </p>
+
+<p>But nothing is impossible and if you have free time and want to learn some basics online, then you can try http://www.vm.ee/?q=en/node/16777.</p>
+-->
+
+<p>A very tere hommikust to you too, and back to the view background setting issue.</p>
+
+<a name="2"></a>
+
+<h4>Ensuring a White View Background for Consistent Image Export</h4>
+
+<p>I'm using ExportImage to export a given view and would like the background colour to always be white.
+If the user running the plugin has an inverted background, the exported image has a black background.
+How can I force a given view to use a normal non-inverted background?</p>
+
+<p>We currently do not have access to the setting for inverting the background via Options &gt; Graphics &gt; Invert background.</p>
+
+<p>We thought about simply changing all black pixels to white in the exported image, but that would also change non-background objects, like shadowed and black coloured parts, and the result would not be good.</p>
+
+<p>Apparently there is no option to set the Inverted Background through the API.
+An alternative solution might be to create a large piece of geometry in the background of the view, coloured white, export the view image and remove the geometry again.</p>
+
+<p>We also tried using the rendering settings like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">RenderingSettings</span> rs = view.GetRenderingSettings();
+&nbsp; rs.BackgroundStyle = <span class="teal">BackgroundStyle</span>.Color;
+&nbsp;
+&nbsp; <span class="teal">ColorBackgroundSettings</span> cbs
+&nbsp; &nbsp; = (<span class="teal">ColorBackgroundSettings</span>) rs
+&nbsp; &nbsp; &nbsp; .GetBackgroundSettings();
+&nbsp;
+&nbsp; cbs.Color = <span class="blue">new</span> <span class="teal">Color</span>(255,0,0);
+&nbsp; rs.SetBackgroundSettings(cbs);
+&nbsp; view.SetRenderingSettings(rs);
+</pre>
+
+<p>That does not work.
+In fact, it seems that none of the RenderingSettings have any effect on the exported image.</p>
+
+<p>Why do the render settings not apply to the view?
+Apparently, exporting a normal view to a bitmap file does not classify as rendering, and the rendering settings only affect the rendering command as described in the section on 'Rendering Options' in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">
+What's New in the Revit 2013 API</a>,
+
+which says "The settings shown in the Rendering Options Dialog are exposed..."</p>
+
+<p>I finally found a way to change the background to white that only works from Revit 2014 onwards:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> view3D = ( viewFamilyType != <span class="blue">null</span> )
+&nbsp; ? <span class="teal">View3D</span>.CreateIsometric( doc, viewFamilyType.Id )
+&nbsp; : <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="green">// Ensure white background.</span>
+&nbsp;
+&nbsp; <span class="teal">Color</span> white = <span class="blue">new</span> <span class="teal">Color</span>( 255, 255, 255 );
+&nbsp;
+&nbsp; view3D.SetBackground(
+&nbsp; &nbsp; <span class="teal">ViewDisplayBackground</span>.CreateGradient(
+&nbsp; &nbsp; &nbsp; white, white, white ) );
+</pre>
+
+<p>I thought I might as well capture this discovery and save it somewhere, e.g. in The Building Coder samples.</p>
+
+<p>The
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdExportImage.cs">
+CmdExportImage</a> external
+
+command looks like a suitable place, used to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">
+set a default 3D view orientation and export an image</a>.</p>
+
+<p>That command creates a new view for exporting.
+I assume the newly created view is also affected by the inverted background setting.</p>
+
+<p>The updated code is available from
+
+<a href="https://github.com/jeremytammik/ExportCncFab">
+The Building Coder samples</a> GitHub
+
+repository, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.1">
+release 2014.0.106.1</a>.</p>
+
+<p>Once again, tere hommikust!</p>

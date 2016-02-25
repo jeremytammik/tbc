@@ -1,0 +1,281 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Victor Chekalin Re: Additional to your last post
+
+Hi Jeremy,
+
+Sorry to bother you on your vacation:)
+Tried to add the comment to your last post
+
+http://thebuildingcoder.typepad.com/blog/2013/09/how-to-save-a-solid-to-a-file.html
+
+but could not. After i clicked Post nothing is happening.
+
+I created completed Visual Studio project to demonstrate the export solid to SAT.
+You may download as zip archive
+
+https://github.com/vchekalin/SaveSolidToFileSample/archive/master.zip
+
+or clone the project from
+
+https://github.com/vchekalin/SaveSolidToFileSample
+
+I think it may be useful and you may add the links to the post.
+
+Have a nice vacation,
+Victor.
+
+-->
+
+<h3>Saving a Solid to a SAT File Implementation</h3>
+
+<p>During my recent vacation, I published a description by my colleague
+
+<a href="http://adndevblog.typepad.com/technology_perspective/akira-kudo.html">
+Akira Kudo</a> describing
+
+how to research the Revit SDK samples to find all the required bits and pieces to solve the task of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/how-to-save-a-solid-to-a-file.html">
+saving a temporary in-memory Revit solid to an external SAT file</a>.</p>
+
+<p>Victor Chekalin, or Виктор Чекалин, reacted to that and provides a complete Visual Studio project to demonstrate the full implementation of that functionality.</p>
+
+<p>You can download it as a
+
+<a href="https://github.com/vchekalin/SaveSolidToFileSample/archive/master.zip">
+zip archive</a> or
+
+clone the project from
+
+<a href="https://github.com/vchekalin/SaveSolidToFileSample">GitHub</a>.</p>
+
+<p>I grabbed Victor's sample, added a couple of trivial enhancements and included it as a new command CmdExportSolidToSat to The Building Coder sample collection.</p>
+
+<p>It demonstrates the following steps:</p>
+
+<ul>
+<li>Retrieve all floors from the model.</li>
+<li>Retrieve the floor solids.</li>
+<li>Calculate the intersection solid.</li>
+<li><a href="#2">Search for the metric mass family template file</a>.</li>
+<li>Create a new temporary family.</li>
+<li>Create a free form element from the intersection solid.</li>
+<li>Create a 3D view.</li>
+<li>Export to SAT.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Determining the Full Path of a Family Template</h4>
+
+<p>One of the steps implements functionality to find the full file path of a given family template file using a recursive directory search method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the full path of the first file </span>
+&nbsp; <span class="gray">///</span><span class="green"> found matching the given filename pattern</span>
+&nbsp; <span class="gray">///</span><span class="green"> in a recursive search through all </span>
+&nbsp; <span class="gray">///</span><span class="green"> subdirectories of the given starting folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">string</span> DirSearch(
+&nbsp; &nbsp; <span class="blue">string</span> start_dir,
+&nbsp; &nbsp; <span class="blue">string</span> filename_pattern )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> d <span class="blue">in</span> <span class="teal">Directory</span>.GetDirectories(
+&nbsp; &nbsp; &nbsp; start_dir ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> f <span class="blue">in</span> <span class="teal">Directory</span>.GetFiles(
+&nbsp; &nbsp; &nbsp; &nbsp; d, filename_pattern ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> f;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> f2 = DirSearch( d, filename_pattern );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != f2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> f2;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>With this method in place, I can determine the full path of the standard metric mass family template using a single statement like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Search for the metric mass family template file</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> template_path = DirSearch(
+&nbsp; &nbsp; app.FamilyTemplatePath,
+&nbsp; &nbsp; <span class="maroon">&quot;Metric Mass.rft&quot;</span> );
+</pre>
+
+
+<a name="3"></a>
+
+<h4>CmdExportSolidToSat External Command Implementation</h4>
+
+<p>The other steps listed above are all pretty standard.</p>
+
+<p>Here is the complete code of the external command:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="green">// Retrieve all floors from the model</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> floors
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Floor</span> ) )
+&nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Floor</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="blue">if</span>( 2 != floors.Count )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Please create two intersected floors&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Retrieve the floor solids</span>
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; <span class="blue">var</span> geometry1 = floors[0].get_Geometry( opt );
+&nbsp; <span class="blue">var</span> geometry2 = floors[1].get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">var</span> solid1 = geometry1.FirstOrDefault() <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; <span class="blue">var</span> solid2 = geometry2.FirstOrDefault() <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; <span class="green">// Calculate the intersection solid</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> intersectedSolid = <span class="teal">BooleanOperationsUtils</span>
+&nbsp; &nbsp; .ExecuteBooleanOperation( solid1, solid2,
+&nbsp; &nbsp; &nbsp; <span class="teal">BooleanOperationsType</span>.Intersect );
+&nbsp;
+&nbsp; <span class="green">// Search for the metric mass family template file</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> template_path = DirSearch(
+&nbsp; &nbsp; app.FamilyTemplatePath,
+&nbsp; &nbsp; <span class="maroon">&quot;Metric Mass.rft&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">// Create a new temporary family</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> family_doc = app.NewFamilyDocument(
+&nbsp; &nbsp; template_path );
+&nbsp;
+&nbsp; <span class="green">// Create a free form element </span>
+&nbsp; <span class="green">// from the intersection solid</span>
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( family_doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Add Free Form Element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> freeFormElement = <span class="teal">FreeFormElement</span>.Create(
+&nbsp; &nbsp; &nbsp; family_doc, intersectedSolid );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">string</span> dir = <span class="teal">Path</span>.GetTempPath();
+&nbsp;
+&nbsp; <span class="blue">string</span> filepath = <span class="teal">Path</span>.Combine( dir,
+&nbsp; &nbsp; <span class="maroon">&quot;floor_intersection_family.rfa&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">SaveAsOptions</span> sao = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>()
+&nbsp; {
+&nbsp; &nbsp; OverwriteExistingFile = <span class="blue">true</span>
+&nbsp; };
+&nbsp;
+&nbsp; family_doc.SaveAs( filepath, sao );
+&nbsp;
+&nbsp; <span class="green">// Create 3D View</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> viewFamilyType
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( family_doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewFamilyType</span> ) )
+&nbsp; &nbsp; .OfType&lt;<span class="teal">ViewFamilyType</span>&gt;()
+&nbsp; &nbsp; .FirstOrDefault( x =&gt;
+&nbsp; &nbsp; &nbsp; x.ViewFamily == <span class="teal">ViewFamily</span>.ThreeDimensional );
+&nbsp;
+&nbsp; <span class="teal">View3D</span> threeDView;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( family_doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create 3D View&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; threeDView = <span class="teal">View3D</span>.CreateIsometric(
+&nbsp; &nbsp; &nbsp; family_doc, viewFamilyType.Id );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Export to SAT</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> viewSet = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;()
+&nbsp; {
+&nbsp; &nbsp; threeDView.Id
+&nbsp; };
+&nbsp;
+&nbsp; <span class="teal">SATExportOptions</span> exportOptions
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SATExportOptions</span>();
+&nbsp;
+&nbsp; <span class="blue">var</span> res = family_doc.Export( dir,
+&nbsp; &nbsp; <span class="maroon">&quot;SolidFile.sat&quot;</span>, viewSet, exportOptions );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>Here is the SAT file
+
+<a href="zip/SolidFile.sat">SolidFile.sat</a> generated
+
+by the two intersecting floors example that I used to test the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/boolean-operations-for-2d-polygons.html">
+RvtClipper Boolean operations for 2D polygons</a>:</p>
+
+<center>
+<img src="img/import_sat.png" alt="SAT file reimported into Revit" width="220"/>
+</center>
+
+<p>It generates the following warning when reimported into Revit, but the missing pieces do not make any visibly detectable difference:</p>
+
+<center>
+<img src="img/import_sat_warning.png" alt="SAT file import warning" width="400"/>
+</center>
+
+<p>They do however affect what Revit considers the size of imported object, because if I zoom the model containing nothing but this SAT import to its extents, the actual geometry appears pretty miniscular:</p>
+
+<center>
+<img src="img/import_sat_extents.png" alt="SAT file import extents" width="400"/>
+</center>
+
+<p>That need not worry us here, though.</p>
+
+<p>Here is
+
+<a href="zip/bc_14_104_0.zip">
+version 2014.0.104.0</a> of
+
+The Building Coder samples source code, Visual Studio solution and RvtSamples include file including the new CmdExportSolidToSat command.</p>
+
+<p>Very many thanks to Victor for providing this nice implementation!</p>

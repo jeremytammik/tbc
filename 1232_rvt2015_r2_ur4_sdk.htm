@@ -1,0 +1,93 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+
+-->
+
+<h3>Updated SDKs for Revit 2015 R2 and UR4</h3>
+
+<p>The Revit SDK available from the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>
+
+has been updated for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/revit-2015-r2-ur4-and-dimension-prefix-suffix.html#2">Revit 2015 R2 and UR4</a>,
+
+aka Revit 2015 Release 2 and Revit 2015 Update Release 4.</p>
+
+<p>Here are direct links to download the updated installation packages:</p>
+
+<ul>
+<li><a href="http://images.autodesk.com/adsk/files/REVIT2015SDK_UR4.msi">Revit 2015 SDK for UR4</a> (Update September 15, 2014) (msi - 242811Kb)</li>
+<li><a href="http://images.autodesk.com/adsk/files/REVIT2015SDK_SubscriptionRelease.msi">Revit 2015 SDK for Subscription Release</a> (Update September 15, 2014) (msi - 243040Kb)</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>New SDK Sample DimensionLeaderEnd in Revit 2015 R2 SDK</h4>
+
+<p>The SDK for the Revit 2015 subscription release R2 includes a new sample, DimensionLeaderEnd, showing how to use the new dimension API to move a leader end point.</p>
+
+<p>Here is <a href="http://youtu.be/-keWEFWAVew">59-second video</a> demonstrating how it can be used:</p>
+
+<center>
+<!-- img src="img/rvt2015_r2_DimensionAPI.mp4" alt="Dimension API demo" width="400" -->
+<iframe width="420" height="315" src="http://www.youtube.com/embed/-keWEFWAVew" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>As you would expect, the updated SDK for Revit 2015 UR4 remains the same and does not include any new samples.</p>
+
+<p>In fact, comparing it with my currently installed version shows no relevant differences at all, except in the following two files:</p>
+
+<ul>
+<li>Revit Platform API Changes and Additions.docx</li>
+<li>RevitAPI.chm</li>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>Family Instance Location Point Definition</h4>
+
+<p>Talking about the existing Revit API, here is a typical question about the definition of family instance location points that is of general interest, from a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/transform-an-element.html?cid=6a00e553e16897883301b7c6f8c6b9970b#comment-6a00e553e16897883301b7c6f8c6b9970b">
+comment</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/transform-an-element.html?cid=6a00e553e16897883301b7c6f8c6b9970b#comment-6a00e553e16897883301b7c6f8c6b9970b">
+transforming an element</a>,
+
+regarding the insertion points resulting from importing an IFC file:</p>
+
+<p><strong>Question:</strong> I have some questions on importing elements from IFC:</p>
+
+<ol>
+<li>Why do all objects imported from the IFC file have a LocationPoint value of (0,0,0)?</li>
+<li>How does one define the LocationPoint of a Family?</li>
+<li>Is the LocationPoint same centroid?</li>
+</ol>
+
+<p><strong>Answer:</strong> When an object is imported from IFC, it is impossible to know exactly what insertion point it is supposed to have.</p>
+
+<p>The software could possible make a more intelligent guess than (0,0,0), of course.</p>
+
+<p>For instance, it could pick the centroid of the union of all the object's solids, assuming that they all have the same specific weight.</p>
+
+<p>However, whatever point it picks, it would still be a guess, and therefore (0,0,0) is considered as good as any.</p>
+
+<p>Do you understand?</p>
+
+<p>The location point of a family is simply the origin of the defining family project world coordinate system, which turns into the local coordinate system when an instance of the family is placed into the project document.</p>
+
+<p>It could be defined as the centroid, but it could also be located somewhere completely different.</p>
+
+<p>I would suggest playing around a bit in the family editor, manually, through the user interface, and exploring the behaviour of the resulting family instances when you place them in a project.</p>
+
+<p>Then, very quickly, all will become clear.</p>

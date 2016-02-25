@@ -1,0 +1,424 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Moving an External Command Button</h3>
+
+<p>I recently presented Frode Tørresdal's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/06/room-editor-live-and-unofficial-custom-ribbon-button.html#4">
+unofficial custom ribbon button</a> implementation
+
+showing how you can add a custom button that Revit knows nothing about to the ribbon and hook it up with the Idling event to perform some action requiring access to the Revit API.</p>
+
+<p>It would be much simpler, safer and more effective if we could implement a normal official Revit external command instead and create a button anywhere we want in the Revit ribbon to drive that.</p>
+
+<p>Well, happily, we can, almost, as Scott Wilson points out in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/06/room-editor-live-and-unofficial-custom-ribbon-button.html#comment-6a00e553e16897883301a511d0c4b8970c">
+comment</a> on that post.</p>
+
+
+<a name="1"></a>
+
+<h4>The Living</h4>
+
+<p>Before getting to that, though, let me mention something of interest to architects, techies and all AEC visionaries alike, the acquisition of the very forward-thinking architectural design studio
+
+<a href="http://www.thelivingnewyork.com">
+The Living</a>,
+
+headed by David Benjamin.
+It is the latest addition to the Autodesk research network, the first of its kind Autodesk Studio, in a move which Benjamin says 'will enable The Living to do more of what we are already doing and super-charge it.'</p>
+
+<p>Here is the official
+
+<a href="http://inthefold.autodesk.com/in_the_fold/2014/06/the-intersection-of-design-culture-and-technology-exploring-new-frontiers-in-computing-and-the-built-environment.html">
+announcement</a> and
+
+articles about it by
+
+<a href="http://www.architectmagazine.com/architects/autodesk-acquires-david-benjamins-design-studio-the-living_o.aspx">
+Architect</a>,
+
+<a href="http://www.archdaily.com/522532/what-autodesk-s-acquisition-of-the-living-means-for-architecture">
+ArchDaily</a> and
+
+<a href="http://archrecord.construction.com/news/2014/07/140701-David-Benjamin-The-Living-Autodesk.asp">
+Architectural Record</a>.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Scott</h4>
+
+<p>I thought I'd let you know of something I found a little while ago while participating in the Revit API forum thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Add-button-to-existing-ribbon-panel/td-p/4981498">
+adding a button to an existing ribbon panel</a>.</p>
+
+<p>Basically, there is a way of adding your own custom panels and buttons to the system tabs and have them behave as standard command buttons with full API access, no need for Idling callbacks and other stuff.</p>
+
+<p>Here is my brief explanation from the thread: "If you add your command button using standard API methods to its own ribbon panel on either your own tab or the built in add-ins tab, you can then find the panel using the above methods and insert it into any of the system tabs using the Autodesk.Windows.RibbonTab.Panels.Add method. The button will then behave in the same way as it would on the original tab and the API doesn't seem to notice &ndash; to the extent of my brief testing, anyway. You can then remove the panel from the add-ins tab if desired and the panel will remain happily in its new home."</p>
+
+<p>I dug up my test code, cleaned it up into a little demo project and posted it to Dropbox.com in
+
+<a href="https://dl.dropboxusercontent.com/u/74965361/RevitAPICode/RibbonMoveExample.zip">RibbonMoveExample.zip</a>.</p>
+
+<p>Please see the comments included in the source code below for the rest of Scott's detailed explanation.</p>
+
+
+<a name="3"></a>
+
+<h4>Jeremy</h4>
+
+<p>Jeremy adds: wow, very cool!</p>
+
+<p>What a beautiful workaround, working around the official Revit API limitations and yet retaining all the official functionality goodness &ndash; much better than the completely unofficial hack using the .NET UI Automation library.</p>
+
+<p>I compiled and tested this.</p>
+
+<p>It creates a new panel containing a new button and moves them to the Revit ribbon Manage tab.
+Here is the result:</p>
+
+<center>
+<img src="img/move_external_command_ribbon_button.png" alt="Moving an external command ribbon button" width="968"/>
+</center>
+
+<p>It supports all the standard external command functionality, e.g. an external command availability class.</p>
+
+
+<a name="4"></a>
+
+<h4>External Command for Testing</h4>
+
+<p>The external command used for testing is defined as follows:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">namespace</span> RibbonMoveExample
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">ExampleCommand_Availability</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommandAvailability</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsCommandAvailable(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiApp,
+&nbsp; &nbsp; &nbsp; <span class="teal">CategorySet</span> categorySet )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.UI.<span class="teal">UIDocument</span> uiDoc
+&nbsp; &nbsp; &nbsp; &nbsp; = uiApp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( uiDoc != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp;
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">ExampleCommand</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> Autodesk.Revit.UI.<span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="teal">String</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Document</span> dbDoc = commandData.Application
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;ExampleCommand&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Current document title: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + dbDoc.ProjectInformation.Name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\nLocation: &quot;</span> + dbDoc.PathName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>External Application Implementation</h4>
+
+<p>As said, the external application sports Scott's interesting explanations, including a detailed dissection of the ribbon panel and ribbon item Id property values required for identification:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Reflection;
+<span class="blue">using</span> System.Windows.Forms;
+&nbsp;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.UI;
+&nbsp;
+<span class="blue">using</span> adWin = Autodesk.Windows;
+&nbsp;
+<span class="blue">namespace</span> RibbonMoveExample
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green">&nbsp; </span>
+&nbsp; <span class="gray">///</span><span class="green"> Demonstrates the use of Autodesk.Windows.RibbonControl </span>
+&nbsp; <span class="gray">///</span><span class="green"> to move API created ribbon buttons and / or panels from </span>
+&nbsp; <span class="gray">///</span><span class="green"> their original location to any other tab / panel including </span>
+&nbsp; <span class="gray">///</span><span class="green"> system created ones.</span>
+&nbsp; <span class="gray">///</span><span class="green"> I'm pretty sure that this technique would also work in </span>
+&nbsp; <span class="gray">///</span><span class="green"> reverse to allow grabbing system panels / buttons and adding</span>
+&nbsp; <span class="gray">///</span><span class="green"> them to API created Tabs and even other system tabs, meaning </span>
+&nbsp; <span class="gray">///</span><span class="green"> that some drastic customisation of Revit's ribbon menu is </span>
+&nbsp; <span class="gray">///</span><span class="green"> possible.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit CUI addin anybody? :)</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> Created by Scott Wilson, released into the public domain as </span>
+&nbsp; <span class="gray">///</span><span class="green"> demonstration of concept only. Use at own risk.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">RibbonMoveExampleApp</span> : <span class="teal">IExternalApplication</span>
+&nbsp; {
+&nbsp;
+&nbsp; &nbsp; <span class="green">// System tab and panel ids to use as targets for the </span>
+&nbsp; &nbsp; <span class="green">// demo to find other valid ids for system tabs and </span>
+&nbsp; &nbsp; <span class="green">// panels, simply dump out the id of each item visited </span>
+&nbsp; &nbsp; <span class="green">// in the foreach loops below</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> SystemTabId = <span class="maroon">&quot;Manage&quot;</span>;
+&nbsp; &nbsp; <span class="teal">String</span> SystemPanelId = <span class="maroon">&quot;settings_shr&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Example names of API created tabs, panels and buttons</span>
+&nbsp; &nbsp; <span class="green">// To try this demo on ribbon items already created by </span>
+&nbsp; &nbsp; <span class="green">// another loaded addin, enter the appropriate details </span>
+&nbsp; &nbsp; <span class="green">// here and comment out everything in the OnStartup method </span>
+&nbsp; &nbsp; <span class="green">// except for the ApplicationInitialized registration</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">String</span> ApiTabName = <span class="maroon">&quot;New Tab&quot;</span>;
+&nbsp; &nbsp; <span class="teal">String</span> ApiPanelName = <span class="maroon">&quot;New Panel&quot;</span>;
+&nbsp; &nbsp; <span class="teal">String</span> ApiButtonName = <span class="maroon">&quot;NewButton&quot;</span>;
+&nbsp; &nbsp; <span class="teal">String</span> ApiButtonText = <span class="maroon">&quot;New\nButton&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIControlledApplication</span> uiConApp )
+&nbsp; &nbsp; {
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Add our own tab, panel and command button </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// to the ribbon using the API</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uiConApp.CreateRibbonTab( ApiTabName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">RibbonPanel</span> apiRibbonPanel = uiConApp.CreateRibbonPanel(
+&nbsp; &nbsp; &nbsp; &nbsp; ApiTabName, ApiPanelName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PushButtonData</span> buttonDataTest = <span class="blue">new</span> <span class="teal">PushButtonData</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; ApiButtonName, ApiButtonText,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Assembly</span>.GetExecutingAssembly().Location,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;RibbonMoveExample.ExampleCommand&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; buttonDataTest.AvailabilityClassName
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="maroon">&quot;RibbonMoveExample.ExampleCommand_Availability&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; apiRibbonPanel.AddItem( buttonDataTest );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Subscribe to the &quot;ApplicationInitialized&quot; event </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// then continue from there once it is fired.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// This is to ensure that the ribbon is fully </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// populated before we mess with it.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; uiConApp.ControlledApplication.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.Events.<span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Find a system ribbon tab and panel to house </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// our API items</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Also find our API tab, panel and button within </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the Autodesk.Windows.RibbonControl context</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonControl</span> adWinRibbon
+&nbsp; &nbsp; &nbsp; &nbsp; = adWin.<span class="teal">ComponentManager</span>.Ribbon;
+&nbsp;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonTab</span> adWinSysTab = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonPanel</span> adWinSysPanel = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonTab</span> adWinApiTab = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonPanel</span> adWinApiPanel = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; adWin.<span class="teal">RibbonItem</span> adWinApiItem = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonTab</span> ribbonTab
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> adWinRibbon.Tabs )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look for the specified system tab</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonTab.Id == SystemTabId )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWinSysTab = ribbonTab;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonPanel</span> ribbonPanel
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> ribbonTab.Panels )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look for the specified panel </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// within the system tab</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonPanel.Source.Id == SystemPanelId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWinSysPanel = ribbonPanel;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look for our API tab</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonTab.Id == ApiTabName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWinApiTab = ribbonTab;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonPanel</span> ribbonPanel
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> ribbonTab.Panels )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look for our API panel.&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The Source.Id property of an API created </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// ribbon panel has the following format: </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// CustomCtrl_%[TabName]%[PanelName]</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Where PanelName correlates with the string </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// entered as the name of the panel at creation</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The Source.AutomationName property can also </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// be used as it is also a direct correlation </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// of the panel name, but without all the cruft</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Be sure to include any new line characters </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// (\n) used for the panel name at creation as </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// they still form part of the Id &amp; AutomationName</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//if(ribbonPanel.Source.AutomationName </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; == ApiPanelName) // Alternative method</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonPanel.Source.Id ==
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CustomCtrl_%&quot;</span> + ApiTabName + <span class="maroon">&quot;%&quot;</span> + ApiPanelName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWinApiPanel = ribbonPanel;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( adWin.<span class="teal">RibbonItem</span> ribbonItem
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> ribbonPanel.Source.Items )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Look for our command button</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The Id property of an API created ribbon </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// item has the following format: </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// CustomCtrl_%CustomCtrl_%[TabName]%[PanelName]%[ItemName]</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Where ItemName correlates with the string </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// entered as the first parameter (name) </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// of the PushButtonData() constructor</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// While AutomationName correlates with </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the string entered as the second </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// parameter (text) of the PushButtonData() </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// constructor</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Be sure to include any new line </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// characters (\n) used for the button </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// name and text at creation as they </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// still form part of the ItemName </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// &amp; AutomationName</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//if(ribbonItem.AutomationName </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; == ApiButtonText) // alternative method</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ribbonItem.Id
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="maroon">&quot;CustomCtrl_%CustomCtrl_%&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ApiTabName + <span class="maroon">&quot;%&quot;</span> + ApiPanelName
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;%&quot;</span> + ApiButtonName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; adWinApiItem = ribbonItem;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Make sure we got everything we need</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( adWinSysTab != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; adWinSysPanel != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; adWinApiTab != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; adWinApiPanel != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; adWinApiItem != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// First we'll add the whole panel including </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the button to the system tab</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; adWinSysTab.Panels.Add( adWinApiPanel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// now lets also add the button itself </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to a system panel</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; adWinSysPanel.Source.Items.Add( adWinApiItem );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Remove panel from original API tab</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// It can also be left there if needed, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// there doesn't seem to be any problems with</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// duplicate panels / buttons on seperate tabs </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// / panels respectively</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; adWinApiTab.Panels.Remove( adWinApiPanel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Remove our original API tab from the ribbon</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; adWinRibbon.Tabs.Remove( adWinApiTab );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// A new panel should now be added to the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// specified system tab. Its command buttons </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// will behave as they normally would, including </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// API access and ExternalCommandAvailability tests. </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// There will also be a second copy of the command </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// button from the panel added to the specified </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// system panel.</span>
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to Scott for this very creative workaround!</p>
+
+
+<a name="6"></a>
+
+<h4>Use at Your Own Risk</h4>
+
+<p>By the way, please note our standard
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">disclaimer</a>.</p>
+
+<p>The Revit API development team have good reasons for limiting the places that an add-in can place its command buttons.</p>
+
+<p>You work around those limitations at your own risk.</p>
+
+<p>This functionality may very well be disabled at any time with no warning.</p>

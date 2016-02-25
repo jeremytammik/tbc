@@ -1,0 +1,157 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08663114 [How to offset a chain of curves?]
+
+Santiago DiazPerkins/Will Inc
+
+0038 -- http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html
+
+-->
+
+<h3>Creating an Offset Wall</h3>
+
+<p>Here is an issue we have not looked at in a long time, brought up again by the following query:</p>
+
+<p><strong>Question:</strong> I am creating a tool to generate a BIM from CAD data.</p>
+
+<p>One of the steps involves generating a floor slab, and then placing exterior walls along its edge.</p>
+
+<p>The tool begins by using model lines and arcs as a profile to generate the floor.</p>
+
+<p>Unfortunately, that generates walls that resting half on and half off the slab:</p>
+
+<center>
+<img src="img/sd_offset_wall.png" alt="Offset wall half on and half off slab" width="120"/>
+</center>
+
+<p>How can I fix this, please?</p>
+
+<p><strong>Answer:</strong> The wall creation will always be based on the wall centre line.</p>
+
+<p>After creating the wall, you can adjust the wall's "Location Line" parameter to one of the following options:</p>
+
+<ol start="0">
+<li>Wall Centerline</li>
+<li>Core Centerline</li>
+<li>Finish Face: Exterior</li>
+<li>Finish Face: Interior</li>
+<li>Core Face: Exterior</li>
+<li>Core Face: Interior</li>
+</ol>
+
+<p>Then the wall will align according to the location line you specified.</p>
+
+<p>In this way, the wall exterior face can be aligned to the floor profile edge after creating the wall using the floor profile edges.</p>
+
+<p>A little note on how to determine and assign one of the options to the "Location Line" parameter:</p>
+
+<p>Each option is mapped to an integer value.
+You can determine the specific values by looking them up using the RevitLookup tool after changing the settings back and forth manually in the user interface.</p>
+
+<p>And then set the "Location Line" value.</p>
+
+<p>For example:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Wall</span> wall = ...
+&nbsp;
+&nbsp; Parameter param = wall.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.WALL_KEY_REF_PARAM);
+&nbsp;
+&nbsp; param.Set(2); <span class="green">// Finish Face: Exterior</span>
+&nbsp; param.Set(1); <span class="green">// Core Centerline</span>
+</pre>
+
+<p>Note that this is an application of the principles we discussed way back in the year 2008, explaining the old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+wall compound layers</a> and
+
+brought up in a comment by Berria on that post:</p>
+
+<p><strong>Question:</strong> How can I specify that my walls Line Location are 'Finish Face: Exterior'.</p>
+
+<p><strong>Answer:</strong> You need to be very precise with what you mean by wall location line.
+As
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+mentioned</a>,
+
+there is a difference between the wall.Location line that you see in the API and the 'Location Line' visible in the user interface.
+The former cannot be changed, it is always in the middle of the wall.
+The position of the latter can be adjusted using the WALL_KEY_REF_PARAM parameter.</p>
+
+<p>A bit later, Mike posted a similar
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html?cid=6a00e553e1689788330115722cf638970b#comment-6a00e553e1689788330115722cf638970b">
+query</a> on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-wall-with-a-sloped-profile.html">
+creating a wall with a sloped profile</a>:</p>
+
+<p><strong>Question:</strong> I am struggling to figure out how to set a wall's 'Location Line' to 'Finish Face: Interior' in code prior to drawing the wall.
+I would like the interior face of the wall to be at the coordinate points I supply instead of the default 'Wall Centerline'.</p>
+
+<p><strong>Answer:</strong> You can explore this as follows:</p>
+
+<p>Create a new wall and look at its parameters, e.g. using RevitLookup or the Revit API Introduction labs
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/built-in-parameter-enumeration-duplicates-and-bipchecker-update.html">
+built-in parameter checker</a>.
+
+One of the parameters is</p>
+
+<ul>
+<li>WALL_KEY_REF_PARAM &ndash; Location Line &ndash; int read-write</p>
+</ul>
+
+<p>It has an initial value of zero.
+Looking at the wall properties in the user interface, I see that the location line property is set to centre line.
+If I manually change the property to 'Finish Face: Interior' and then look at the parameter again, its value has now changed to 3.</p>
+
+<p>You can invert this process, i.e. set the built-in parameter WALL_KEY_REF_PARAM to have a value of 3 through the API, which  corresponds to 'Finish Face: Interior'.</p>
+
+<!--
+
+<hr/>
+
+<a href="">
+</a>
+
+<p><strong>Question:</strong>
+
+<p><strong>Answer:</strong>
+
+<pre class="code">
+</pre>
+
+
+<p>To make the wall's exterior face or interior face to be accurate as the offset value you want to specify, you can just achieve that by calculating the required wall type width.</p>
+
+<p>You can create new WallType object by WallType.Duplicate(newWallTypeName) method. And then change the wall's width by specify its layers' width and material.  This can also be achieved by WallType.GetCompoundStructure(), and WallType.SetCompoundStructure() method, and method of CompoundStructure, and methods of CompoundStructureLayer class.</p>
+
+<p>After creating the required wall type, you can create the wall along the floor edge using the newly created wall type.</p>
+<p>The walls will be connected automatically.</p>
+
+[Q]
+
+<p>The wall centerline is actually not based on the floor profile.</p>
+
+<p>I've attached some images to explain myself.</p>
+
+<p>In the image "capture 19 - section view.JPG":</p>
+
+- Since the wall centerline is currently aligned with the floor pfoile, now half of the wall hangs beyond the floor. This is incorrect, and instead, the floor should extend out until it is flush with the outside face of the wall. I've shaded that extension in red so that you see what I mean.
+
+<p>I'd like to solve this first, before solving the other issues I mentioned in my previous comment. Once I learn how to offset a chain of curves, the other requirements will be easy to solve.</p>
+
+[A]
+
+<p>When creating a wall using the Wall.Create method, by default, the center line of the created wall is the line you passed in to it.</p>
+
+-->

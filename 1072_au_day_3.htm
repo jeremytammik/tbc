@@ -1,0 +1,221 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>AU Day 3, ReCap and Cloud-based Round-trip 2D Model Editing</h3>
+
+<p>When you get to read this, I will be sitting in a plane at 30'000 feet over the middle of the Atlantic Ocean... or somewhere over Greenland, whatever.</p>
+
+<p>Thursday was the third and last day of Autodesk University.</p>
+
+<p>I went out for a quick beer with some of my ex-Autodesk-colleagues from decades ago on Wednesday evening, and a very nice time was had by all.</p>
+
+<p>It turned out to be not quite so quick, however, and not just one beer, and I woke up next morning suffering dire consequences.</p>
+
+<p>I would strongly sustain that they were due to the fact that the brews I sampled to not adhere to the strict and sensible
+
+<a href="http://en.wikipedia.org/wiki/Reinheitsgebot">purity rules</a>.
+
+I would never have expected such a huge difference in after effects.</p>
+
+<p>Luckily, though, I did wake up, initially thinking that my
+
+<a href="#2">cloud-based round-trip 2D Revit model editing</a> class would be later in the day.
+Even more luckily, I decided to switch on the computer and look at the schedule.</p>
+
+<p>Imagine my shock to discover that it was scheduled for 8:00 am.</p>
+
+<p>Anyway, I made it, and everything went really well, and now I am sitting at the airport and the plane is delayed.</p>
+
+<p>These are my main activities of the day:</p>
+
+<ul>
+<li><a href="#2">Cloud-based round-trip 2D Revit model editing</a></li>
+<li><a href="#3">Replace Idling by an External Event</a></li>
+<li><a href="#4">ReCap reality capture and its REST API</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Cloud-based Round-trip 2D Revit Model Editing</h4>
+
+<p>I presented my class
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=3176">
+DV1736 &ndash; Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device</a>.</p>
+
+<p>This is the second time I present my super simple solution open source based solution for this task.</p>
+
+<p>The first was at the Autodesk internal Tech Summit in June
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2013/05/my-cloud-based-2d-editor-implementation-status.html#2">overview</a>,
+
+30-minute
+
+<a href="http://thebuildingcoder.typepad.com/room_editor_preview/index.html">pre-recorded video</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/correct-detail-component-rotation-in-elevation-view.html#6">live recording</a>).</p>
+
+<p>This time around, I had 90 minutes &ndash; instead of 30 &ndash; to discuss the topic in much more completeness and detail, which felt very good.</p>
+
+<p>Here is the class
+
+<a href="http://thebuildingcoder.typepad.com/au/2013/dv1736_2d_revit_model_editor_handout.pdf">
+handout</a> and
+
+<a href="http://thebuildingcoder.typepad.com/au/2013/dv1736_2d_revit_model_editor_slides.pdf">
+slide deck</a>.</p>
+
+<p>A recording will come later, once the AU technical staff have completed and made it available.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Replace Idling by an External Event</h4>
+
+<p>During the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html#6">
+Revit API roundtable</a> on
+
+Wednesday, I finally realised what I should have been doing all along instead of fiddling with the Idling event.</p>
+
+<p>I wish someone else would have noticed, thought of this, told me much earlier, and we would not all have had to wait until I finally thought of it myself.</p>
+
+<p>This planet sure can feel like a lonely place sometimes.</p>
+
+<p>Anyway, I now realised that I can significantly reduce the overhead and sluggishness of the Idling event by using an external event instead that I define myself.</p>
+
+<p>An external event would allow me to vary the number of checks I make per second freely, relinquishing control in between, and only bother Revit when there really is something for it to do, i.e. a pending database update to be integrated into the BIM.</p>
+
+<p>I can't wait to implement and test this!</p>
+
+
+
+<a name="4"></a>
+
+<h4>ReCap reality capture and its REST API</h4>
+
+<p>At the last moment before leaving for the return flight, I discovered the class by Stephane Negri, Software Development Manager, Autodesk,
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=3176">
+RC3176 &ndash; Put Your Mind at REST: Extend Your Application to Reality Capture</a>:</p>
+
+<p>The reality capture group at Autodesk is working on ways to acquire, manipulate, or analyse real scene data using laser scans or photos through Autodesk ReCap products.
+While several AU classes demonstrate ReCap use and workflows associated with these products, this class focuses on how to programmatically access the reality capture web API to create or extend an application.
+We start with a quick overview of basic photogrammetry concepts and image parameters, then approach the reality capture REST API and discuss how to define a photo scene from multiple photos and create a dense 3D mesh, also covering some of the advanced features that are available to customize and refine the process.
+The class concludes with a complete example written in PHP.</p>
+
+<p>I already mentioned this topic in my overview of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#4">
+cloud & mobile platform web service APIs</a> provided
+
+during the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#2">
+ADN DevDay conference</a> on
+
+Monday.</p>
+
+<p>Here are my notes from Stephane's class, with absolutely no guarantee for correctness:</p>
+
+<p>Autodesk offers several different browser-based user interfaces for different reality capture scenarios.</p>
+
+<p>They all use the same underlying ReCap REST API.</p>
+
+<p>You need a special developer key to make use of the API. To obtain one, please contact ADN and ask to become a pilot partner.</p>
+
+<p>Stephane presented a manual demo to clarify the user interface, available functionality and usage workflow.</p>
+
+<p>You sign in with the standard Autodesk single sign-in.</p>
+
+<p>The project gallery presents impressive examples of the kind of models that can be achieved.</p>
+
+<p>He created a new project using only three photos.</p>
+
+<p>Very simple workflow: create a new project, upload photos, wait and retrieve the result.</p>
+
+<p>Photos must be of high quality, good lighting and equipment and overlapping, e.g. with each point visible in at least three pictures.</p>
+
+<p>Quality is more important than quantity.</p>
+
+<p>ReCap is built on Amazon web services, using queues to manage jobs.</p>
+
+<p>The basic API workflow matches the manual approach: create photoscene, upload files, progress check, retrieve results.</p>
+
+<p>Authentication using Oxygen, and Autodesk service based on OAuth 1.0, a three-legged authentication based on HTTP header data.</p>
+
+<p>Documentation is public and embedded in the service, generated by the
+
+<a href="https://developers.helloreverb.com/swagger">Swagger</a>
+
+framework for describing, producing, consuming, and visualizing RESTful web services.</p>
+
+<p>You can easily try out the UI workflow via the API using manual REST calls.</p>
+
+<p>The results of each REST call are returned in either JSON or XML.</p>
+
+<p>For more information, please contact <a href="mailto:recap.api@autodesk.com">recap.api@autodesk.com</a>.</p>
+
+<p>Stephane also presented some of the current pilot partners and their work, some of which was also being shown in the AU exhibition:</p>
+
+<ul>
+
+<li><a href="http://www.soundfit.co">SoundFit</a> custom fit ear gear, creating a precise model of the inner space within the ear for prosthetics, a fully automated complete custom application.</li>
+
+<li><a href="http://www.kubit-software.com">Kubit</a>, dealing with AutoCAD applications for real-world as-built capturing.</li>
+
+<li><a href="https://www.skycatch.com">Skycatch</a>, providing a low cost, highly flexible, intelligent & scalable aerial robotics platform.</li>
+
+</ul>
+
+<p>Tilo Pfliegner of Kubit demonstrated easy integration of calibrated photos, point clouds and ReCap models into AutoCAD.</p>
+
+<p>Point clouds are sometimes too imprecise for modelling needs.
+Using photos directly instead is better, because they are often more precise, and the photo quality is often better than the generated point cloud. He listed the following applications:</p>
+
+<ul>
+<li>Photo modelling</li>
+<ul>
+<li>Phototracing</li>
+<li>Monoplotting</li>
+</ul>
+<li>Creation of image plans</li>
+<ul>
+<li>Orthophotos</li>
+<li>Unwinding</li>
+</ul>
+</ul>
+
+<p>Chris Bumgardner of SkyCatch presented their Recap API integration for fully autonomous unmanned flying vehicles.</p>
+
+<p>A typical use case might be the generation of daily 3D models for construction customers.</p>
+
+<p>They have implemented a server-to-server integration using Recap 3.1 API, Node.js server-side JavaScript, OAuth, request etc.</p>
+
+<p>You can use a viewer such as <a href="https://sketchfab.com">Sketchfab</a> to view the resulting OBJ model.
+Sketchfab is a web service to publish and display interactive 3D models.
+No plugin required: upload your model, embed it, share it, done.</p>
+
+<p>This makes it extremely easy to embed the resulting model into web browser, for example.</p>
+
+<p>Again, high quality images are more important than quantity, e.g., four images may be perfectly sufficient.</p>
+
+<p>Use high-resolution images.
+The resulting accuracy may reach down to one single pixel level.
+Go closer if you use low resolution.</p>
+
+<p>How to scale the resulting model properly to the real world?
+You can use a template file, have known camera positions, set GPS coordinates, measure the real-world sample, etc.</p>
+
+<p>GoPro has a fisheye distortion; switch it off with <code>StitchingCreateInputFile = 1</code>.</p>
+
+<p>The Exif data within each image tells you the source of it, e.g. to recognize GoPro images.</p>
+
+<p>You don't have to add any marker points, just make sure the surfaces are not too bland and uniform.</p>
+
+<p>Many thanks to Stephane, Tilo and Chris for the interesting presentation.</p>

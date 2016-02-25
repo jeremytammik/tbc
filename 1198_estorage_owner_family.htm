@@ -1,0 +1,223 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09871195 [Extensible storage entities in dynamic updaters problem]
+
+REVIT-45277 [API: reading extensible storage from owner family in iupdater fails]
+
+REVIT-45328 [Extensible storage on OwnerFamily cannot be accessed from project family is loaded to; regression from 2014; the entity "is invalid" in the project].
+
+09914990 [Extensible Storage (PIM)]
+
+-->
+
+<h3>Accessing Extensible Storage on OwnerFamily in Project</h3>
+
+<p>A couple of developers reported a problem accessing extensible storage data on families when they are loaded into a project in Revit 2015.
+This problem did not occur in previous versions.</p>
+
+<p>Luckily, a workaround is possible right now, designed and implemented by Alexander Ignatovich, Александр Игнатович, of
+
+<a href="http://www.iv-com.ru">
+Investicionnaya Venchurnaya Companiya</a>.</p>
+
+<p>Alexander already made a number of other complex and powerful contributions to The Building Coder in the past:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">Exporting Image and Setting a Default 3D View Orientation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">Intimate Revit Database Exploration with the Python Shell</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">Multi-Version Visual Studio Revit Add-In Wizard</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/03/another-balloon-tip-implementation.html">Another Balloon Tip Implementation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/03/category-analysis-with-and-without-python.html">Category Analysis with and without Python</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control.html">WPF Fill Pattern Viewer Control</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/getting-serious-adding-new-materials-from-list.html">Getting Serious Adding New Materials from List</a></li>
+</ul>
+
+<p>Here is Alexander's description of the problem and workaround:</p>
+
+<a name="2"></a>
+
+<h4>Revit 2015 Extensible Storage Access on Document OwnerFamily</h4>
+
+<p>The problem occurs when accessing extensible storage data on a family from a project environment via the Document.OwnerFamily property.</p>
+
+<p>Let's start off with the source code referred to below: here is
+
+<a href="zip/EstorageOnOwnerFamilyWorkaround.zip">EstorageOnOwnerFamilyWorkaround.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest of the projects discussed below.</p>
+
+<p>I faced a big problem migrating my add-ins working with extensible storage tied to families to Revit 2015: extensible storage on an OwnerFamily object cannot be accessed from the project family it is loaded into. Vice versa, the same thing: extensible storage created in a project, cannot be read through doc.OwnerFamily in the family editor environment.</p>
+
+<p>Let's take a closer look at this problem.
+First of all, let's create a SchemaHelper &ndash; a piece of code to simplify our next investigations.
+We define a simple extensible storage schema that contains one single field Id of type Guid.
+See the project named "Common", SchemaHelper.cs, in the attached sample source code.</p>
+
+<p>The method SchemaHelper.CreateSchema looks up or creates our extensible storage schema:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="teal">Schema</span> CreateSchema()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> buider = <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( GetSchemaId() );
+&nbsp; &nbsp; buider.SetSchemaName( <span class="maroon">&quot;FamilyTestSchema&quot;</span> );
+&nbsp; &nbsp; buider.AddSimpleField( <span class="maroon">&quot;Id&quot;</span>, <span class="blue">typeof</span>( <span class="teal">Guid</span> ) );
+&nbsp; &nbsp; <span class="blue">return</span> buider.Finish();
+&nbsp; }
+</pre>
+
+<p>Now, let's implement a command that writes data to the extensible storage.
+Please refer to the ExtStoragesFirstStep project.
+It adds a new simple "Create test extensible storage data" command.
+It writes data to the doc.OwnerFamily if the current document is a family, otherwise it writes data to all project families:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( doc.IsFamilyDocument )
+&nbsp; &nbsp; SetEntityToOwnerFamily( doc );
+&nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; SetEntityToDocumentFamilies( doc );
+</pre>
+
+<p>So let us see how this works and what is the source of problem: open any family in the family editor, invoke the command "Create test extensible storage data", ensure, that extensible storage entity exists in the family (for example, using RevitLookup, or just write another simple command), load the family to any other document (Project or family) and look at the loaded family in RevitLookup.
+You will see no "FamilyTestSchema" extensible storage entities inside the family.</p>
+
+<p>Now, invoke this command in any project document, look at the families in RevitLookup.
+None of the families will contain "FamilyTestSchema" extensible storage entities.
+Open any family from this project in the family editor.
+There will be no entity of our schema on the document.OwnerFamily object.</p>
+
+<p>The same code for Revit 2014 works fine; this is a regression in Revit 2015.
+Another problem concerns getting extensible storage entity from family in dynamic updater; we also cannot read extensible storage data in families.
+I suppose that when the transaction is "almost done" in the dynamic updater, Revit tries to read data from the family in the document in a similar way.</p>
+
+<h4>Workaround</h4>
+
+<p>I found a partial workaround for this problem.
+In our add-ins, the most important case is when we set extensible storage entity in the family editor through the doc.Owner family and later retrieve this data in the Revit project.</p>
+
+<p>The idea is to use the new FamilyLoadingIntoDocument and FamilyLoadedIntoDocument events provided by the ControlledApplication class.
+I have investigated that the family being loaded always exists already in the application.Documents collection.
+In the FamilyLoadingIntoDocument event we can retrieve the FamilyPath and FamilyName property values.
+In the FamilyLoadedIntoDocument event handler, we are permitted to make modifications to the document.
+So let me show you the code &ndash; for the full version, please refer to the module MoveExtensibleStorageDataApplication.cs in the ExtStorageSecondStep project in the attached source code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">string</span> GetFamilyFileName(
+&nbsp; &nbsp; <span class="teal">FamilyLoadingIntoDocumentEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}.rfa&quot;</span>, e.FamilyName );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Document</span> GetFamilyDocument(
+&nbsp; &nbsp; <span class="teal">FamilyLoadingIntoDocumentEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> document = e.Document;
+&nbsp; &nbsp; <span class="blue">var</span> application = document.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> documents = application.Documents
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Document</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> familyname = GetFamilyFileName( e );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If e.FamilyPath is not empty it is simple: </span>
+&nbsp; &nbsp; <span class="green">// just retrieve from the documents collection </span>
+&nbsp; &nbsp; <span class="green">// by document PathName;</span>
+&nbsp; &nbsp; <span class="green">// otherwise, get the document by title </span>
+&nbsp; &nbsp; <span class="green">// (it can be with or without *.rfa).</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.IsNullOrWhiteSpace( e.FamilyPath )
+&nbsp;
+&nbsp; &nbsp; &nbsp; ? documents.FirstOrDefault(
+&nbsp; &nbsp; &nbsp; &nbsp; x =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.IsNullOrWhiteSpace( x.PathName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( x.Title == e.FamilyName
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || x.Title == familyname ) )
+&nbsp;
+&nbsp; &nbsp; &nbsp; : documents.FirstOrDefault(
+&nbsp; &nbsp; &nbsp; &nbsp; x =&gt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x.PathName == <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.FamilyPath, familyname ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> OnFamilyLoadingIntoDocument(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">FamilyLoadingIntoDocumentEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> familyDocument = GetFamilyDocument( e );
+&nbsp; &nbsp; <span class="blue">var</span> family = familyDocument.OwnerFamily;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> schema = <span class="teal">SchemaHelper</span>.GetFamilySchema();
+&nbsp; &nbsp; <span class="blue">var</span> entity = family.GetEntity( schema );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If the entity is valid, store it in </span>
+&nbsp; &nbsp; <span class="green">// the idToMove class property.</span>
+&nbsp;
+&nbsp; &nbsp; idToMove = entity.IsValid()
+&nbsp; &nbsp; &nbsp; ? entity.Get&lt;<span class="teal">Guid</span>&gt;( <span class="maroon">&quot;Id&quot;</span> )
+&nbsp; &nbsp; &nbsp; : (<span class="teal">Guid</span>?) <span class="blue">null</span>;
+&nbsp; }
+</pre>
+
+<p>So, if the family has extensible storage, we will read its Id from the entity and save it to the idToMove field.
+Now let us write it back to the document:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> OnFamilyLoadedIntoDocument(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">FamilyLoadedIntoDocumentEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// The event can be cancelled or loading family </span>
+&nbsp; &nbsp; <span class="green">// can be without extensible storage entity.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( e.IsCancelled()
+&nbsp; &nbsp; &nbsp; || e.Status != <span class="teal">RevitAPIEventStatus</span>.Succeeded
+&nbsp; &nbsp; &nbsp; || !idToMove.HasValue )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> transaction = <span class="blue">new</span> <span class="teal">SubTransaction</span>( e.Document ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; transaction.Start();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> familyId =
+&nbsp; &nbsp; &nbsp; &nbsp; e.NewFamilyId == <span class="teal">ElementId</span>.InvalidElementId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? e.OriginalFamilyId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : e.NewFamilyId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> family = e.Document.GetElement( familyId );
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> schema = <span class="teal">SchemaHelper</span>.GetFamilySchema();
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>( schema );
+&nbsp; &nbsp; &nbsp; entity.Set( <span class="maroon">&quot;Id&quot;</span>, idToMove.Value );
+&nbsp; &nbsp; &nbsp; family.SetEntity( entity );
+&nbsp; &nbsp; &nbsp; transaction.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>To test this, you can manually copy the add-in manifest ExtStorageSecondStep.addin to the Revit Addins folder and restart Revit.
+Repeat the load family sequence with our extensible storage entity to the document.
+Now it has our entity.
+We do not need to check nested families; they work fine.</p>
+
+<p>In summary: the new family loading and loaded events allow you to retrieve the data from the family and write it back to the project; you may also need to rewrite your dynamic updaters that work with families &ndash; for example, in some cases, you can call e.Cancel in the FamilyLoadingIntoDocument event to prohibit a family from being loaded into the document.</p>
+
+<p>Another case (when you set some data to project families) is more complex, and has no solution in the general case, but in some cases the algorithm can be adapted.
+One of my add-in goals was to permit family loading to some projects, but excluding families that were already contained in the project.</p>
+
+<p>The idea of the code was to calculate some "key" entity for the project &ndash; e.g., the central model path, or local path if the file is not workshared, and a couple of project information parameters &ndash; and write it to all families in the document.
+In the dynamic updater, check if the key derived from the family is equal to the key derived from document.
+The new approach is to get family and all nested shared families from the document in the  FamilyLoadedIntoDocument event.
+If they all exist, allow this action, otherwise cancel it.
+Of course, it is not very good permanent solution, but it is an acceptable temporary workaround.
+In this document, you can only load a family with a name that already exists; no new family can be loaded, unless it is nested.</p>
+
+<p>Many thanks to Alexander for his in-depth research and crucial and creative stopgap workaround.</p>
+
+<p>By the way, it also highlights the importance and usefulness of the new family loading events.</p>
+
+<p>We are obviously working on an internal fix to remove the need for this as soon as possible.</p>

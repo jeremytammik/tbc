@@ -1,0 +1,297 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+REVIT-24299 [unsubscribing from Idling event has no effect]
+
+-->
+
+<h3>Singleton Application versus Multiple Command Instances</h3>
+
+<p>I recently discussed the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-architecture-and-external-application.html">
+RoomEditorApp</a> external
+
+application, the Revit add-in part of my cloud-based real-time round-trip 2D Revit model editing application, while creating the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a> and
+
+migrating it to Revit 2014.</p>
+
+<p>I also mentioned that I was mysteriously
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-architecture-and-external-application.html#4">
+unable to unsubscribe from the Idling event</a>.</p>
+
+<p>I raised this <a href="#2">mystifying question</a> with the development team and received a very <a href="#3">satisfying answer</a>, which includes some important information on how external applications and commands are handled and instantiated by the Revit API.</p>
+
+
+<a name="2"></a>
+
+<h4>Unsubscribing from the Idling Event Fails</h4>
+
+<p>I created a simplified version of the external application named TestIdlingUnsubscribe to demonstrate how my attempt to unsubscribe from the Idling event fails.</p>
+
+<p>It consists of an external application handling the subscription and an external command to toggle the subscription on and off.
+
+<p>The application defines a public method ToggleSubscription providing access to that functionality like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Are we currently subscribed to the Idling event?</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> Subscribed = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Our one and only Revit-provided </span>
+&nbsp; <span class="gray">///</span><span class="green"> UIControlledApplication instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">UIControlledApplication</span> _uiapp;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle on and off subscription to </span>
+&nbsp; <span class="gray">///</span><span class="green"> automatic cloud updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt; handler )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling -= handler;
+&nbsp; &nbsp; &nbsp; Subscribed = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling += handler;
+&nbsp; &nbsp; &nbsp; Subscribed = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _uiapp = a;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp.Idling
+&nbsp; &nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( sender, ea ) =&gt; { } );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The external command defines the Idling event handler, reports the current status and makes calls to the App ToggleSubscription method:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> How many Idling calls to wait before reporting</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">int</span> _message_interval = 100;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Number of Idling calls received in this session</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _counter = 0;
+&nbsp;
+&nbsp; <span class="blue">void</span> OnIdling(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">IdlingEventArgs</span> ea )
+&nbsp; {
+&nbsp; &nbsp; ++_counter;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == ( _counter % _message_interval ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} OnIdling called {1} times&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DateTime</span>.Now.ToString( <span class="maroon">&quot;HH:mm:ss.fff&quot;</span> ),
+&nbsp; &nbsp; &nbsp; &nbsp; _counter );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; ea.SetRaiseWithoutDelay();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;We are currently {0}subscribed to the Idling event.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">App</span>.Subscribed ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;not &quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">App</span>.ToggleSubscription( OnIdling );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>You can see how the command logs its activity and the Idling event handler logs the calls it receives to the Visual Studio debug output console window.</p>
+
+<p>Here is a partial log of the command being executed twice, once to subscribe and once to unsubscribe:</p>
+
+<pre>
+  We are currently not subscribed to the Idling event.
+  Subscribing...
+  Subscribed.
+  16:58:39.816 OnIdling called 100 times
+  16:58:39.836 OnIdling called 200 times
+  16:58:40.662 OnIdling called 300 times
+  16:58:40.684 OnIdling called 400 times
+  We are currently subscribed to the Idling event.
+  Unsubscribing...
+  Unsubscribed.
+  16:58:42.230 OnIdling called 500 times
+  16:58:42.250 OnIdling called 600 times
+  16:58:42.270 OnIdling called 700 times
+  ...
+  16:58:44.465 OnIdling called 6200 times
+</pre>
+
+<p>Very strange!</p>
+
+<p>The Idling event continues receiving calls even after unsubscribing.</p>
+
+<p>The entire source code, Visual Studio solution and add-in manifest for this Revit add-in is published in the
+
+<a href="https://github.com/jeremytammik/TestIdlingUnsubscribe">TestIdlingUnsubscribe GitHub repository</a>,
+
+and the failing version described above is released as
+
+<a href="https://github.com/jeremytammik/TestIdlingUnsubscribe/releases/tag/2014.0.0.0">version 2014.0.0.0</a>.</p>
+
+<p>How can I unsubscribe successfully from the Idling event, and why is it failing?</p>
+
+
+<a name="3"></a>
+
+<h4>Successful Unsubscription and Instantiation Details of the External Application and External Command</h4>
+
+<p>I discussed this with the Revit API development team, represented by Scott Conover, who replied:</p>
+
+<p>What an interesting issue.</p>
+
+<p>The good news &ndash; it has nothing to do with your machine configuration, using Parallels etc.</p>
+
+<p>More good news &ndash; it is not related to any issues in the Revit API.</p>
+
+<p>When a standalone ExternalCommand is added to Revit, Revit assumes that the command is entirely self-contained.
+When the command is invoked &ndash; Revit instantiates an instance of the class implementing IExternalCommand, calls execute, and discards the reference.</p>
+
+<p>Subsequent calls to the same command do the same thing &ndash; instantiate, invoke, discard.</p>
+
+<p>Why it matters in your case &ndash; the Idling event handler you use is an instance method of the IExternalCommand class.
+So the first invocation subscribes and it begins to run.
+The second invocation instantiates a new IExternalCommand and attempts to unsubscribe &ndash; but to .NET this is a different method than was used to subscribe so the original keeps going.</p>
+
+<p>To fix it, either:</p>
+
+<ul>
+<li>Make the event handler static.</li>
+
+<li>Hold your own reference to the command or other instance class that contains the handler, and use it to unsubscribe.</li>
+</ul>
+
+<p>Note that Revit does not do this for ExternalApps, another reason to use them over ExternalCommands.
+The app instance created to run OnStartup is held by Revit for event invocation of OnShutdown.
+So another approach would be to use an instance method of the app (but this probably applies more to events which are not Idling, which should not remain active for the entire session anyway).</p>
+
+<p>Many thanks to Scott for this important clarification.</p>
+
+<p>I implemented a variation of the second approach he suggests, by storing the event handler method delegate that I use to subscribe with directly in a static variable in the external application.</p>
+
+<p>I use that to redefine the Subscribe variable as a read-only property as well like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the Idling event handler when subscribed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt; _handler = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Are we currently subscribed to the Idling event?</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> Subscribed
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != _handler;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Our one and only Revit-provided </span>
+&nbsp; <span class="gray">///</span><span class="green"> UIControlledApplication instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">UIControlledApplication</span> _uiapp;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle on and off subscription to </span>
+&nbsp; <span class="gray">///</span><span class="green"> automatic cloud updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt; handler )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling -= _handler;
+&nbsp; &nbsp; &nbsp; _handler = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling += handler;
+&nbsp; &nbsp; &nbsp; _handler = handler;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _uiapp = a;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp.Idling -= _handler;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Since the external application is only instantiated as a singleton instance, I could basically remove all those 'static' qualifiers, but that would require an application instance variable for the external command to access them, so I left them in for the moment.</p>
+
+<p>Note that the client code remains completely unaffected by this internal improvement, so the external command implementation is not changed at all.</p>
+
+<p>The working solution above is provided in the repository as
+
+<a href="https://github.com/jeremytammik/TestIdlingUnsubscribe/releases/tag/2014.0.0.1">release 2014.0.0.1</a>.</p>
+
+<p>I hope you find this as interesting and illuminating as I do.</p>

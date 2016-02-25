@@ -1,0 +1,172 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Berlin Hackathon</h3>
+
+<p>I arrived safe and sound for the Berlin hackathon. Topics for today, three on the Revit API and three not:</p>
+
+<ul>
+<li><a href="#2">Traffic jams and too many cars</a></li>
+<li><a href="#3">Intro to functional programming in JavaScript</a></li>
+<li><a href="#4">Aligning multiple elements</a></li>
+<li><a href="#5">Render to PDF</a></li>
+<li><a href="#6">Displaying transient graphics in a preview control</a></li>
+<li><a href="#7">Berlin hackathon beginning</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Traffic Jams and Too Many Cars</h4>
+
+<p>Yesterday, on a Friday afternoon &ndash; bad timing &ndash; my colleague Peter Schlipf and I travelled from Darmstadt to Berlin by car, about 600 km.</p>
+
+<p>It took us eight hours, with several accidents and traffic jams on the way.</p>
+
+<p>I gratefully acknowledge that I do not own a car myself.</p>
+
+<p>I also gratefully realise that all four of my kids have no car either, in spite of &ndash; or not in spite of, as an aspect of? &ndash; all being totally hip and professional.</p>
+
+<p>It seems to me that more people in Germany travel by car than in Switzerland.
+I hope that this kind of individual locomotion is in decline.</p>
+
+<p>I'll try to take the train next time.
+I obviously also want to avoid flying, since that is ecologically catastrophical.</p>
+
+<p>I am also grateful to have the luxury of hardly ever needing to use a mobile phone... and not owning a smartphone... although I do admit to rather a lot of Internet activity...  :-)</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Intro to Functional Programming in JavaScript</h4>
+
+<p>One thing I am looking forward to when I get back home is the
+
+<a href="http://www.meetup.com/basel-js/events/213653852/?a=uc1_vm&read=1&_af_eid=213653852&_af=event">
+intro to functional programming in JavaScript</a> meetup
+
+coming up in Basel, a hands on workshop presented by Lukasz Gintowt to "learn functional techniques to develop and debug much faster, learn to produce clean and testable code and become a JavaScript wizard".</p>
+
+<p>Lukasz presents a js framework he developed for real-time distributed calculations.
+He realized that there were some core concepts in the framework that were really important for people to understand beforehand, namely functional programming techniques. Et voila &ndash; this prequel was born.</p>
+
+<p>Here are a few links to both easy and serious reading on this topic:</p>
+
+<ul>
+<li><a href="http://worrydream.com/refs/Hughes-WhyFunctionalProgrammingMatters.pdf">Why functional programming matters</a> by John Hughes</li>
+<li><a href="http://web.stanford.edu/class/cs242/readings/backus.pdf">Can Programming Be Liberated from the von Neumann Style? A Functional Style and Its Algebra of Programs</a> &ndash; classic paper by John Backus</li>
+<li><a href="zip/imperative_functional_programming.pdf">Imperative Functional Programming</a> (<a href="http://research.microsoft.com/pubs/67066/imperative.ps.z">original</a>) &ndash; research paper by Simon L. Peyton Jones and Philip Wadler.</li>
+<li><a href="http://stackoverflow.com/questions/36504/why-functional-languages">Why functional languages?</a> &ndash; functional properties presented like lazy evaluations are universal and always relevant.</li>
+<li><a href="http://learnyouahaskell.com/chapters">Haskell tutorial</a> &ndash; Haskell is a purely functional programming language.</li>
+<li><a href="http://steve-yegge.blogspot.ch/2006/03/execution-in-kingdom-of-nouns.html">Execution in the Kingdom of Nouns</a> &ndash; allegorical JavaScript paradigm criticism</li>
+<li><a href="http://harmful.cat-v.org/software/OO_programming/">Object Oriented Programming is Inherently Harmful</a> &ndash; OO bashing.</li>
+<li><a href="http://doc.cat-v.org/programming/bad_properties_of_OO">Bad Engineering Properties
+of Object-Oriented Languages</a> &ndash; more OO bashing.</li>
+<li><a href="https://sites.google.com/site/steveyegge2/singleton-considered-stupid">Singleton Considered Stupid</a> &ndash; pattern bashing.</li>
+</ul>
+
+
+<a name="4"></a>
+
+<h4>Aligning Multiple Elements</h4>
+
+<p><strong>Question:</strong> I have a product referred to as a Panel that consists of a top cap, end cap, tiles and frames. Each of these are individual elements in the Revit model. For end users, though, all of these comprise of a single Panel.</p>
+
+<p>I need to align this panel (including all the pieces) using the Align post command in one command &ndash; meaning I cannot ask users to select top cap, align, then select tile, align, etc.</p>
+
+<p>The Align post command works with one element at a time and does not support window select. Even if we had all the top cap, end cap, tiles, frames, etc. of this panel selected in one click, on Align command launch, it deselects all the selection and prompts users to select reference plane/line and then each individual element.</p>
+
+<p>Is there any way to align all the selected elements that comprise of a panel in single align command?  I was thinking of grouping these together before align, and after align finishes, ungrouping them &ndash; but since this is done using post commands, it will group, ungroup and then call post command at the end.</p>
+
+<p>How might I achieve this programmatically?</p>
+
+<p><strong>Answer:</strong> You could group the elements, post the command, and then use an updater to ungroup, I suppose.</p>
+
+<p>If the user never created the alignment the updater would not be called, that makes this a bit tricky to manage.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Render to PDF</h4>
+
+<p><strong>Question:</strong> I would like to achieve the following steps using the Revit API.</p>
+
+<ol>
+<li>Rendering the current 3D view.</li>
+<li>Save the result to the project.</li>
+<li>Print out the saved result as a PDF.</li>
+</ol>
+
+<p>Could the CustomExporter class be used for the rendering part?</p>
+
+<p><strong>Answer:</strong> The answer depends on what you mean by 'rendering'. If you mean a process of which result is a rendered image of a 3D view, like if the Render command in Revit is used, then the answer is 'No' &ndash; the Custom Exporter cannot do that. What the Custom Exporter does is hand over all graphic entities visible in a 3D view to the API caller who invoked the Custom Exporter Execute method. It is up to the caller to decide what to do with the information. They can use it to produce a file (e.g. SVG, WebGL, PDF, etc.) or use it to create an image, assuming they have access to some custom render engine. </p>
+
+
+
+<a name="6"></a>
+
+<h4>Displaying Transient Graphics in a Preview Control</h4>
+
+<p><strong>Question:</strong> My add-in uses the PreviewControl class. I can show a normal 3D view in it, of course. I also want to draw other 3D data such as planar polygons in the PreviewControl in my dialogue to simulate something.</p>
+
+<p>Is there currently any way to do that?</p>
+
+<p><strong>Answer:</strong> The Revit API provides two options for displaying temporary transient graphics in any view, including the Preview control:
+
+<ol>
+<li>The Analysis Visualization Framework &ndash; if you can create the shape, it can draw it, use the designated colours etc. This is transient and not saved with the document. It does have limitations on how it can be interacted with.</li>
+<li>The DirectShape element introduced in Revit 2015 &ndash; this can be any desired 3D shape, with any material.  This is saved with the document so the developer would need to manage its lifetime if they don't want it saved.</li>
+</ol>
+
+
+
+<a name="7"></a>
+
+<h4>Berlin Hackathon Beginning</h4>
+
+<p>Back to here and now, the Berlin hackathon just started, with the hashtag
+
+<a href="https://twitter.com/hashtag/tmuhack">#TMUHack</a>.
+
+Here are Peter Schlipf and Cyrille Fauvel presenting once again on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">
+Autodesk View and Data API</a>:</p>
+
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-10-25_berlin_hackathon/616_peter_schlipf_tmuhack_cropped.jpg" alt="Peter Schlipf at TMUHack" width="400"/>
+</center>
+
+<p>Here are some of the ideas being worked on:</p>
+
+<ul>
+<li>Matthias &ndash; text api work cloud, upload article, generate work cloud banner on top of article, click on it to get more info.</li>
+
+<li>Pawan, india &ndash; shopping last minute delivery crowd shipping, people collaborate for shopping, shop for each other.</li>
+
+<li>Achim &ndash; financial services, reinvent banking, real-time, mobile, account statement, plus predictive analysis.</li>
+
+<li>Jan, keyrocket &ndash; with stephan, text api.</li>
+<ol>
+<li>Movie memory game &ndash; summaries of movies, match with movie cover, multiplayer game, one card is dvd cover, the other is data extracted from the summary.</li>
+<li>Style guide &ndash; style guide, trawler, random web sites, get all style elements and eliminate less used styles.</li>
+</ol>
+
+<li>Stephen &ndash; text api plus autodesk, datascapes, human interaction, compare real-time data for user, they need a service or product, pull info from internet and generate profile.</li>
+
+<li>Alex &ndash; quiz generator, test learning, editor.</li>
+
+</ul>
+
+<p>I'm working with the <a href="http://m3my.github.io">MovieMemory</a> team...</p>

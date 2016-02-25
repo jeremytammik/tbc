@@ -1,0 +1,137 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+
+Note: Revit API developer's guide now on Autodesk help
+Users and customers will no longer need the partially functional wikihelp link.
+This is the top level TOC:
+http://help.autodesk.com/view/RVT/2014/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42
+
+08954214 [Dynamic Update and Extensible Storage at family level]
+[Q] Is it possible to use the Dynamic Update and Extensible Storage at family document level, so tracking can be performed automatically like timestamp information for each modification of that family?
+[A] Yes, sure. there is no difference between a project and a family document in this regard. Here are some extensible storage related topics on The Building Coder: 5.23
+
+[Q] Autodesk Provides 3D Design in a Browser, an Industry First
+http://www.revitcommunity.com/feature_full_guest.php?cpfeatureid=78218
+offload all heavy add-in processing to a cloud based instance of Revit and use this new technology to run an extension on the cloud based Revit instance and return the results to the desktop
+[A] This is very much a trial/marketing exercise. The instances will only be available for a short time. However, he's very welcome to rent an instance and test it. If it works then he can then hassle his favorite product manager to modify the EULA to make this legal in future :-)
+We decided not to proactively suggest ADN members try this because the DevTech folk testing found it either a bit confusing or they couldn't get it to work.
+But having said all that, perhaps the Revit team have plans to create a Revit as a Service - like the service being created fo Autocad.
+as far as i know , the revit folks are indeed working on revit as a service. you can ask scott and his team about progress on and access to that.
+
+Smithsonian Now Allows Anyone To 3D Print (Some) Historic Artifacts – Forbes -- http://www.forbes.com/sites/ericmack/2013/11/13/smithsonian-now-allows-anyone-to-3d-print-some-historic-artifacts/
+·         Smithsonian now lets you view artifacts in 3D – CNET News -- http://news.cnet.com/8301-1023_3-57612120-93/smithsonian-now-lets-you-view-artifacts-in-3d/?part=rss&subj=latest-news2&tag=title
+·         The Smithsonian Is Uploading Its Lost Treasures to the Internet – Gizmodo -- http://gizmodo.com/the-smithsonian-is-uploading-its-lost-treasures-to-the-1462571440
+Suggested Tweets:
+·         Read and find out how Smithsonian lets you view their @artifacts in #3D!: http://autode.sk/1eORo8M via @cnet
+·         The #Smithsonian is now collaborating with @Autodesk to upload lost #treasures to the #Internet!: http://autode.sk/1fDmAp8 via @Gizmodo
+
+http://www.cinemablend.com/pop/Comet-ISON-May-Visible-Daylight-2013-50858.html
+
+-->
+
+<h3>The Developer Guide is Back on WikiHelp</h3>
+
+<p>Let's look at a couple of topics today, in order of decreasing relevance to the Revit API:</p>
+
+<ul>
+<li><a href="#2">The Revit API developer's guide on Autodesk help</a></li>
+<li><a href="#3">Using Dynamic Update and Extensible Storage in family documents</a></li>
+<li><a href="#4">3D modelling in a browser</a></li>
+<li><a href="#5">3D access to Smithsonian historic artefacts</a></li>
+<li><a href="#6">Comet ISON may be visible in daylight soon</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>The Revit API Developer's Guide is Live on Autodesk Help</h4>
+
+<p>The title says it all.</p>
+
+<p>Here is the link to the
+
+<a href="http://help.autodesk.com/view/RVT/2014/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">
+Revit 2014 API Developers Guide table of contents</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Using Dynamic Update and Extensible Storage in Family Documents</h4>
+
+<p><strong>Question:</strong> Is it possible to use the Dynamic Update and Extensible Storage at family document level, so tracking can be performed automatically, e.g. adding timestamp information for each modification of that family?</p>
+
+<p><strong>Answer:</strong> Yes, absolutely.
+There is no difference between a project and a family document in this regard.
+Here is a complete list of The Building Coder
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">
+extensible storage related topics</a>.
+
+<p>One of the extensible storage samples in the AU class demonstrates how to transfer extensible storage information from a family definition to the family instances placed in the project environement.</p>
+
+
+<a name="4"></a>
+
+<h4>Autodesk Provides 3D Design in a Browser</h4>
+
+<p>Here is an interesting forward-looking article on Autodesk's collaboration to
+
+<a href="http://www.revitcommunity.com/feature_full_guest.php?cpfeatureid=78218">
+enable powerful 3D modelling in any browser</a>.</p>
+
+<p>The next nice-to-have step for Revit add-in developers would obviously be to offload all heavy processing to a cloud based instance of Revit, use the modelling technology to drive the cloud based Revit instance and return the results to the desktop.</p>
+
+<p>The future will tell.</p>
+
+
+<a name="5"></a>
+
+<h4>3D Access to Smithsonian Historic Artefacts</h4>
+
+<p>Sticking with the theme of cloud-based modelling and viewing, the Smithsonian is now collaborating with Autodesk to upload and provide access to it’s most iconic historic artefacts on the Internet in 3D, ranging from the fossil of a woolly mammoth to the 1903 'Wright Flyer' first flown by the Wright Brothers, using the
+
+<a href="http://3d.si.edu/browser">
+X3D Explorer</a>.</p>
+
+<center>
+<img src="img/smithsonian1.jpeg" alt="Smithsonian artefact" width="400"/>
+</center>
+
+<p>For more details, here are articles on this from
+
+<a href="http://www.forbes.com/sites/ericmack/2013/11/13/smithsonian-now-allows-anyone-to-3d-print-some-historic-artifacts">Forbes</a>,
+
+<a href="http://gizmodo.com/the-smithsonian-is-uploading-its-lost-treasures-to-the-1462571440">Gizmodo</a>,
+
+<a href="http://news.cnet.com/8301-1023_3-57612120-93/smithsonian-now-lets-you-view-artifacts-in-3d">CNET</a>,
+
+<a href="http://www.fastcoexist.com/3021626/explore-the-smithsonians-best-exhibits-in-3-d-from-your-couch">Fast Company</a> and
+
+<a href="http://www.buzzfeed.com/autodesk/visit-the-smithsonian-from-your-couch-or-classroo-b3y4">BuzzFeed</a>.</p>
+
+<center>
+<img src="img/smithsonian2.jpeg" alt="Smithsonian artefact" width="400"/>
+</center>
+
+
+<a name="6"></a>
+
+<h4>Comet ISON</h4>
+
+<p>Let's end off by returning back from the digital world to Mother Nature, and getting ready to admire the
+
+<a href="http://www.cinemablend.com/pop/Comet-ISON-May-Visible-Daylight-2013-50858.html">comet ISON</a>,
+
+which may soon be visible in daylight in 2013.</p>
+
+<p>This is a chance in a lifetime.</p>
+
+<p>Pray for a clear sky.</p>

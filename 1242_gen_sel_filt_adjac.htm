@@ -1,0 +1,146 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+-->
+
+<h3>Selection Filters, Adjacency and the Good Universe</h3>
+
+<p>Today, let's look at:</p>
+
+<ul>
+<li><a href="#2">A generic selection filter implementation</a></li>
+<li><a href="#3">Determining adjacent rooms and spaces</a></li>
+<li><a href="#4">The good universe</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>A Generic Selection Filter Implementation</h4>
+
+<p>Yesterday, I presented my new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/picking-pairs-and-dimensioning-family-instance-origin.html#4">
+JtPairPicker element pair selection utility class</a>.
+
+It included a templated selection filter class.
+I later realised that I could make use of that in several other places as well, replacing the existing explicit Wall, CurveElement and Pipe selection filters by a generic JtElementsOfClassSelectionFilter&lt;T&gt; one instead:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Allow selection of elements of type T only.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">JtElementsOfClassSelectionFilter</span>&lt;T&gt;
+&nbsp; &nbsp; : <span class="teal">ISelectionFilter</span> <span class="blue">where</span> T : <span class="teal">Element</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> T;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Pretty trivial, but still, it pleases me to replace three other classes with this single one.</p>
+
+<p>It also took a moment to figure out how to correctly string together the sequence <code>... : <span class="teal">ISelectionFilter</span> <span class="blue">where</span> T : <span class="teal">Element</span></code>...</p>
+
+<p>As always, the most up to date version of The Building Coder samples is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version including the new JtElementsOfClassSelectionFilter class described above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.3">
+release 2015.0.116.3</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Determining Adjacent Rooms and Spaces</h4>
+
+<p>Another question that regularly comes up is on determining the relationship between neighbouring rooms and spaces:</p>
+
+<p><strong>Question:</strong> I am looking at the acquisition of energetic data from Revit building models.
+For a given room or space, I would like to obtain all the adjacent rooms and spaces on the same level and the ones directly above and below, together with their respective intersecting areas.</p>
+
+<p>I was thinking of gathering all of them with their respective boundary faces, then searching for adjacencies and calculating potential neighbouring intersection areas in a second step. However, I am afraid that this could quickly get quite complicated and consequently slow.</p>
+
+<p>Is there a quicker way to find adjacent rooms and spaces within a certain range? Could bounding box intersection filters help, for instance?</p>
+
+<p><strong>Answer:</strong> Congratulations on starting work on such an interesting problem.</p>
+
+<p>You should definitely do some additional exploration from an end user point of view, asking product usage experts and application engineers.</p>
+
+<p>As far as I know, some of this kind of data is available from the Revit BIM with no programming required, e.g. via the gbXML file.</p>
+
+<p>Please also take a deep look at the tools and results provided by the
+
+<a href="http://autodesk.typepad.com/bpa">
+BPA team</a> for
+
+building performance analysis.</p>
+
+<p>As far as I know, <a href="http://dynamobim.org">Dynamo</a> also provides a good entry point for that.</p>
+
+<p>I would be surprised &ndash; and impressed &ndash; if you are aiming to implement anything &ndash; in the beginning stages or your exploration, in any case &ndash; that has not already been addressed by the BPA and Dynamo communities.</p>
+
+<p>Finally, from the pure Revit API point of view, The Building Coder provides a topic list 5.2 on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2">
+2D Booleans and Adjacent Areas</a> that I just updated for you and lists some previous discussions and explorations in this area.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Arno Gruen on the Good Universe</h4>
+
+<p>Almost the only regular journalistic media production that I enjoy reading is
+
+<a href="http://blog.dasmagazin.ch">Das Magazin</a>,
+
+a Saturday supplement included with several major Swiss daily newspapers.
+I love it.</p>
+
+<p>The last issue,
+
+<a href="http://blog.dasmagazin.ch/aktuelles_heft/n-45-2">nr. 45, November 8, 2014</a>
+
+(<a href="http://blog.dasmagazin.ch/wp-content/uploads/2014/11/ma1445.pdf">PDF</a>),
+
+included an interview with
+
+<a href="http://en.wikipedia.org/wiki/Arno_Gruen">Arno Gruen</a>,
+
+<i>Ueber das Boese</i>.</p>
+
+<p>It ends on such a nice optimistic note that I would like to share my translation from German of it with you:</p>
+
+<!--
+<p>Darf ich Ihnen noch die Gretchenfrage stellen: Wie haben Sies mit der Religion?</p>
+<p>Ich habe nichts gegen religiöse Gefühle. Mich stören Religionen, die selber eine Machtstruktur sind, mit dem Zweck, andere Menschen zu beherrschen und ihr Denken zu verformen.</p>
+<p>Ist das nicht bei allen Religionen so?</p>
+<p>Nein. Als C. G. Jung in Amerika war, traf er auf Puebloindianer, die jeden Morgen in Richtung eines Berges beteten. Der Häuptling sagte ihm: «Unsere Gebete helfen Gott, die Sonne über den Berg zu hieven.» Jung bemerkte dazu treffend, dass sich diese Menschen ihrem Gott ebenbürtig fühlen. Und das ist etwas ganz anderes, als wenn man zum Sklaven seiner Religion wird. Man muss Gott in sich selber finden, wie schon ein alter deutscher Mystiker sagte.</p>
+<p>Und wie ist das nun bei Ihnen persönlich?</p>
+<p>Ich denke, übrigens genau wie Einstein, dass die Welt nicht sinnlos ist. Das ist durchaus ein religiöses Gefühl.</p>
+<p>Und worin besteht dieser Sinn?</p>
+<p>Die Welt ist nicht zufällig. Sie ist so gebaut, dass es eine Entwicklung in Richtung des Guten gibt.</p>
+
+<p>Here is my translation of this:</p>
+-->
+
+<p>May I ask you a final crucial question: what is your stand on religion? &nbsp; &mdash; I have nothing against religious feelings. I am not in favour of religions maintaining a power structure with the purpose of controlling people and distorting their thinking.</p>
+<p>Aren't all religions like that? &nbsp; &mdash; No. In America, C.G. Jung met some Pueblo Indians who prayed every morning towards a neighbouring mountain. The chief told him, "Our prayers help God heave the sun over the mountain." Jung aptly commented that these people felt equal to their God. That is something completely different from becoming a slave of one's religion. You have to find God in yourself, as already stated by many mystics in the past.</p>
+<p>And how is it for you personally? &nbsp; &mdash; I agree with Einstein that the universe is not without meaning. That is quite a religious feeling.</p>
+<p>And what is that meaning? &nbsp; &mdash; The world is not random. It is constructed to encourage development of the good.</p>
+

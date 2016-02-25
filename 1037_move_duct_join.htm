@@ -1,0 +1,488 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08841664 [move the join of the 2 ducts] - MoveDuctJoin
+
+-->
+
+<h3>Move Duct Join with Video and GitHub Support</h3>
+
+<p>I am always happy to take a look at a real MEP issue, so this case caught my eye and prompted me to sit down and do some actual coding again for a change:</p>
+
+
+<p><strong>Question:</strong> How can I programmatically move the join of two ducts, effectively changing their end points?</p>
+
+<p>I do not want to delete and re-enter them because they will normally be connected at the other end as well.</p>
+
+
+<p><strong>Answer:</strong> In general, when working on programmatic manipulation of duct system geometry, you have two options for driving the desired changes:</p>
+
+<ul>
+<li>Define the ducts, and let Revit automatically insert the required fittings when you ask them to be connected.</li>
+<li>Define the fittings, and let Revit automatically create the required ducts when you ask them to be connected.</li>
+</ul>
+
+<p>This issue is a little bit different, in that all the required components are already present, and you just want to move them around relatively to another.</p>
+
+<p>I took a look at it and implemented an add-in named MoveDuctJoin defining two separate external commands, because they illustrate the different options so clearly:</p>
+
+<ul>
+<li><a href="#4">CmdDisconnect</a> &ndash; this command just moves one duct connector, so the link to the neighbouring duct is broken, causing a disconnect.</li>
+<li><a href="#5">CmdReconnect</a> &ndash; this command moves the fitting between the two ducts. That keeps the system connected.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Mini Demo and Some Video Options</h4>
+
+<p>To keep things brief, here is a 25 second video that hopefully explains it all:</p>
+
+<p>By the way, since this is so small and short and sweet, I really wanted to embed it inline, which is most easily achieved by converting it to GIF file format.</p>
+
+<p>Camtasia for Windows supports conversion of MP4 to GIF, but Camtasia for Mac does not.</p>
+
+<p>However, I just uploaded it to the
+
+<a href="http://www.zamzar.com">Zamzar online converter</a> and
+
+received back the converted GIF file result within a minute or two, so that was that.</p>
+
+<p>Oops.
+Well, maybe not quite.
+It took a lot longer than that, and the resulting GIF file is 386 MB in size, whereas the original MP4 was smaller than 1 MB.
+Maybe I won't post it after all.
+In fact, I even cancelled the download before it finished.</p>
+
+<p>Instead, I uploaded the video to
+
+<a href="http://screencast.com">Screencast.com</a>,
+
+to compare it with YouTube, which I used in the past.</p>
+
+<p>Here is the
+
+<a href="http://www.screencast.com/t/4wGPF9f5DN">result on Screencast.com</a>:</p>
+
+<center>
+<object id="scPlayer"  width="420" height="315" type="application/x-shockwave-flash" data="http://content.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/scplayer.swf" >
+<param name="movie" value="http://content.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/scplayer.swf" />
+<param name="quality" value="high" />
+<param name="bgcolor" value="#FFFFFF" />
+<param name="flashVars" value="thumb=http://content.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/FirstFrame.jpg&containerwidth=800&containerheight=600&xmp=sc.xmp&content=http://content.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/MoveDuctJoin.mp4&blurover=false" />
+<param name="allowFullScreen" value="true" />
+<param name="scale" value="showall" />
+<param name="allowScriptAccess" value="always" />
+<param name="base" value="http://content.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/" />
+<iframe type="text/html" frameborder="0" scrolling="no" style="overflow:hidden;" src="http://www.screencast.com/users/jeremytammik/folders/Default/media/bd999b95-965f-4bf4-b09f-deff4b3f2ff5/embed" height="315" width="420" ></iframe>
+</object>
+</center>
+
+<p>For comparison purposes, here is the same
+
+<a href="http://www.youtube.com/watch?v=kCpAymJkNrc">video hosted on YouTube</a>:</p>
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/kCpAymJkNrc" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Actually, I find the latter slightly handier, so far.</p>
+
+<p>I wish either of them would scale up the video, or at least pad it in white and not waste all that space with the huge black border around it.</p>
+
+<a name="3"></a>
+
+<h4>External Command User Interaction</h4>
+
+<p>The user interaction of both external commands consists of exactly three clicks:</p>
+
+<ul>
+<li>Launch the command.</li>
+<li>Click a duct close to the source connector to be relocated.</li>
+<li>Pick another point on the duct close to the target point to move it to.</li>
+</ul>
+
+<p>Just for the sake of completeness, or in case the videos above do not display correctly, here are three screen snapshots showing the original situation and the result of running CmdDisconnect and CmdReconnect on it, respectively:</p>
+
+<center>
+<img src="img/two_ducts_original.png" alt="Two original ducts"/>
+</center>
+
+<p>As said, CmdDisconnect just moves the connector of the selected duct, breaking its link to the neighbouring fitting:</p>
+
+<center>
+<img src="img/two_ducts_disconnect.png" alt="CmdDisconnect result"/>
+</center>
+
+<p>CmdReconnect moves the fitting instead, retaining its links to both neighbouring ducts:</p>
+
+<center>
+<img src="img/two_ducts_reconnect.png" alt="CmdReconnect result"/>
+</center>
+
+<p>Now let's look at how that is implemented, and the similarities and differences between the two approaches.</p>
+
+
+<a name="4"></a>
+
+<h4>CmdDisconnect &ndash; Move the Connector</h4>
+
+<p>The differences between the two commands are very small, so most of the code is duplicated, I'm afraid.</p>
+
+<p>CmdDisconnect implements the following steps:</p>
+
+<ul>
+<li>Prompt user to pick duct close to the source connector to be moved.</li>
+<li>Prompt user to pick target point on duct to move it to.</li>
+<li>Determine the connector object closest to first point.</li>
+<li>Project the second point onto the duct centre line.</li>
+<li>Move the connector to the projected target point.</li>
+</ul>
+
+<p>The first four items are reused unchanged for the other command as well.</p>
+
+<p>Only the last item does any real work and thus requires a transaction:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> External command to move a duct connector </span>
+<span class="gray">///</span><span class="green"> away from its original position along the</span>
+<span class="gray">///</span><span class="green"> duct centre line, disconnecting from the</span>
+<span class="gray">///</span><span class="green"> neighbour element.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdDisconnect</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pFrom = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pTo = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">DuctSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a duct at the &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;connection to move.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; duct = doc.GetElement( r.ElementId ) <span class="blue">as</span> <span class="teal">Duct</span>;
+&nbsp; &nbsp; &nbsp; pFrom = r.GlobalPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">DuctSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a target point on the &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;duct to move the connection to.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; pTo = r.GlobalPoint;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine connector closest to picked point</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors
+&nbsp; &nbsp; &nbsp; = duct.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> con = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">double</span> d, dmin = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = pFrom.DistanceTo( c.Origin );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; dmin )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; dmin = d;
+&nbsp; &nbsp; &nbsp; &nbsp; con = c;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine target point to move it to</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> cs = con.CoordinateSystem;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; con.Origin.IsAlmostEqualTo( cs.Origin ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same origin&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateUnbound( cs.Origin, cs.BasisZ );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> ir = line.Project( pTo );
+&nbsp;
+&nbsp; &nbsp; pTo = ir.XYZPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( line.Distance( pTo ) &lt; 1e-9,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected projected point on line&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Move Duct Connector&quot;</span> );
+&nbsp; &nbsp; &nbsp; con.Origin = pTo;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>CmdReconnect &ndash; Move the Fitting</h4>
+
+<p>CmdReconnect implements the following steps, which include the first four from above unchanged:</p>
+
+<ul>
+<li>Prompt user to pick duct close to the source connector to be moved.</li>
+<li>Prompt user to pick target point on duct to move it to.</li>
+<li>Determine the connector object closest to first point.</li>
+<li>Project the second point onto the duct centre line.</li>
+<li>Determine translation vector from the source to the projected target point.</li>
+<li>Determine the neighbouring fitting.</li>
+<li>Move the fitting to the projected target point.</li>
+</ul>
+
+<p>We access the neighbouring fitting by first retrieving one of its connectors, which is connected to the duct one closest to the first picked point.
+The fitting element itself is then provided by the Connector.Owner property.</p>
+
+<p>This is achieved using the GetConnectedConnector method adapted from the TraversalTree.cs module of the TraverseSystem SDK sample:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the connector </span>
+&nbsp; <span class="gray">///</span><span class="green"> connected to the one given.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Connector</span> GetConnectedConnector(
+&nbsp; &nbsp; <span class="teal">Connector</span> con )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Connector</span> neighbour = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> ownerId = con.Owner.Id.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> refs = con.AllRefs;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> refs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Ignore non-End connectors and&nbsp; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// connectors on the same element</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( c.ConnectorType == <span class="teal">ConnectorType</span>.End
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !ownerId.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c.Owner.Id.IntegerValue ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; neighbour = c;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> neighbour;
+&nbsp; }
+</pre>
+
+<p>With that in place, the rest of the command implementation looks like this:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> External command to move a duct connector </span>
+<span class="gray">///</span><span class="green"> away from its original position along the</span>
+<span class="gray">///</span><span class="green"> duct centre line, disconnecting from the</span>
+<span class="gray">///</span><span class="green"> neighbour element.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdReconnect</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pFrom = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pTo = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">DuctSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a duct at the &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;connection to move.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; duct = doc.GetElement( r.ElementId ) <span class="blue">as</span> <span class="teal">Duct</span>;
+&nbsp; &nbsp; &nbsp; pFrom = r.GlobalPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">DuctSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick a target point on the &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;duct to move the connection to.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; pTo = r.GlobalPoint;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine connector closest to picked point</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors
+&nbsp; &nbsp; &nbsp; = duct.ConnectorManager.Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> con = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">double</span> d, dmin = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = pFrom.DistanceTo( c.Origin );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; dmin )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; dmin = d;
+&nbsp; &nbsp; &nbsp; &nbsp; con = c;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine target point to move it to</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> cs = con.CoordinateSystem;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; con.Origin.IsAlmostEqualTo( cs.Origin ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same origin&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateUnbound( cs.Origin, cs.BasisZ );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> ir = line.Project( pTo );
+&nbsp;
+&nbsp; &nbsp; pTo = ir.XYZPoint;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( line.Distance( pTo ) &lt; 1e-9,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected projected point on line&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine translation vector</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = pTo - pFrom;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine neighbouring fitting connector</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> neighbour
+&nbsp; &nbsp; &nbsp; = GetConnectedConnector( con );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Move Fitting&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.MoveElement(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, neighbour.Owner.Id, v );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Note the similarities and differences between the two commands, and their different effects.</p>
+
+
+<a name="6"></a>
+
+<h4>The MoveDuctJoin GitHub Repository</h4>
+
+<p>At this point, I would normally be attaching the complete project including source code, Visual Studio solution and add-in manifest as an archive file.</p>
+
+<p>For the first time, however, I am doing the right thing instead, which means creating a GitHub repository for it and not forgetting to attach a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-building-coder-samples-on-github.html#2">
+license</a>.</p>
+
+<p>Here are the steps I performed to create and properly populate the MoveDuctJoin GitHub repository:</p>
+
+<ol>
+<li>Create a new repository on
+
+<a href="https://github.com">GitHub</a> and
+
+initialise it with a readme, license and C# .gitignore file.</li>
+
+<li><a href="http://gitref.org/creating/#clone">Clone</a> it to the local system:
+<pre>
+git clone repository_url
+</pre>
+</li>
+
+<li><a href="http://gitref.org/basic/#add">Add</a> all the add-in source files to it:
+<pre>
+git add .
+</pre>
+</li>
+
+<li><a href="http://gitref.org/basic/#commit">Commit</a> the changes, optionally preconfiguring your user name and email address:
+<pre>
+git commit
+</pre>
+</li>
+
+<li><a href="http://gitref.org/basic/#push">Push</a> the changes back to the server:
+<pre>
+/v/C/a/vs/MoveDuctJoin/ $ git push
+Username for 'https://github.com': jeremytammik
+Password for 'https://jeremytammik@github.com':
+Counting objects: 13, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (10/10), done.
+Writing objects: 100% (11/11), 5.26 KiB, done.
+Total 11 (delta 0), reused 0 (delta 0)
+To https://github.com/jeremytammik/MoveDuctJoin
+   944fbf8..7eb010f  master -> master
+</pre>
+</li>
+</ol>
+
+<p>There you are.
+You now have the
+
+<a href="https://github.com/jeremytammik/MoveDuctJoin">MoveDuctJoin</a> repository,
+
+including the direct link to download the
+
+<a href="https://github.com/jeremytammik/MoveDuctJoin/archive/master.zip">
+latest version</a>.</p>
+
+<p>Keeping in mind our future generations, as discussed yesterday on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-building-coder-samples-on-github.html#4">
+branching and tagging</a>,
+
+I also created an official first Revit 2014 release of it,
+
+<a href="https://github.com/jeremytammik/MoveDuctJoin/archive/2014.0.0.0.zip">version 2014.0.0.0</a>,
+
+in case somebody wants to retrieve that specific release sometime later on.</p>
+

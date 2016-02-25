@@ -1,0 +1,442 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+-->
+
+<h3>Lots of Clouds</h3>
+
+<p>Let me recapitulate my cloud related explorations for my simplified 2D BIM editor, since I will be discussing it again at a web-based BIM workshop later this week.</p>
+
+<p>Before getting to that, though, talking about cloud related topics reminds me of some others of completely different nature that are near and dear to me:</p>
+
+<u>
+<li><a href="#2">Clouds in La Palma</a></li>
+<li><a href="#3">Cloud Atlas</a></li>
+<li><a href="#4">Cloud-based simplified BIM editor</a></li>
+<li><a href="#5">Autodesk cloud service overview</a></li>
+<li><a href="#6">Updated RevitLookup on GitHub</a></li>
+</u>
+
+
+<a name="2"></a>
+
+<h4>Above, in and under the Clouds of la Palma</h4>
+
+<p>My hiking trip on La Palma was definitely on interesting study of clouds, from close and afar, inside and out.</p>
+
+<p>Happily, I was mostly above them, e.g. wandering the sunny ridge around the
+
+<a href="http://en.wikipedia.org/wiki/Parque_Nacional_de_la_Caldera_de_Taburiente">
+Caldera de Taburiente National Park</a>,
+
+reaching its highest point at the
+
+<a href="http://en.wikipedia.org/wiki/Roque_de_los_Muchachos">
+Roque de los Muchachos</a>,
+
+looking back over the roiling clouds and the ridge in the east that we walked along for three days, with the
+
+<a href="http://en.wikipedia.org/wiki/Teide">Mount Teide</a> of
+
+Teneriffa in the background far behind it, 90 km distant:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-01-24_la_palma/272_jeremy_los_muchachos_teide_cropped.jpg" alt="Roque de los Muchachos and the eastern ridge surrounded by clouds" width="400"/>
+</center>
+
+<p>From there we descended into the depths of the Caldera itself and admired the same ridge from below, assailed by clouds as ever:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-01-24_la_palma/404_la_caldera.jpg" alt="La Caldera and the eastern ridge in clouds from below" width="400"/>
+</center>
+
+<p>We emerged from the Caldera to cross the impressive volcanoes in the parque natural de
+
+<a href="http://en.wikipedia.org/wiki/Cumbre_Vieja">
+Cumbre Vieja</a> in the south, again above the clouds, looking back northwards at the ever cloud-filled and overspilling Caldera:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-01-24_la_palma/516_volcanoes_cumbre_vieja_cropped.jpg" alt="The volcanoes of the Cumbre Vieja and la caldera in clouds" width="400"/>
+</center>
+
+<p>After spending the night up on the volcanoes, we were decisively chased away by more aggressive clouds backed up by strong and cold storm winds:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-01-24_la_palma/629_storm_and_clouds_over_cumbre_vieja_cropped.jpg" alt="Storm and clouds over the Cumbre Vieja" width="400"/>
+</center>
+
+<p>Happily, we made it down to a warm and sunny beach to dry off and recuperate a bit before starting the long journey back home again.</p>
+
+
+<a name="3"></a>
+
+<h4>Cloud Atlas by David Mitchell</h4>
+
+<p>Another highly recommended cloud related topic is the extremely impressive and wonderful book
+
+<a href="http://en.wikipedia.org/wiki/Cloud_Atlas_%28novel%29">
+Cloud Atlas</a>
+
+by David Mitchell, recently and almost equally impressively converted to
+
+<a href="http://en.wikipedia.org/wiki/Cloud_Atlas_%28film%29">
+a film</a> by
+
+Lana Wachowski, Andrew Wachowski and Tom Tykwer.
+I absolutely loved them both.
+I found the book revolutionary.
+I never read anything like it.
+The film is revolutionary as well, and an
+
+<a href="http://www.theguardian.com/film/2013/feb/24/cloud-atlas-review-philip-french">unbelievable feat</a>.
+
+Tykwer and the Wachowskis met for a week in isolation to hatch ideas, then visited the book author Mitchell to hear what he thought of them.
+It helps to read the book first, though, to understand anything at all about what is going on in there.</p>
+
+
+<a name="4"></a>
+
+<h4>Cloud-based Real-time Round-trip Simplified 2D BIM Model Editor</h4>
+
+<p>I'm attending a cloud workshop in the next few days, so I dug out the recordings from my Autodesk Tech Summit and Autodesk University presentation
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1736">DV1736</a> &ndash;
+Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device.
+
+Here is the class summary:</p>
+
+<p>This class demonstrates real-time, round-trip editing of a simplified 2D rendering of an Autodesk Revit intelligent model on any mobile device with no need to install any additional software whatsoever beyond a web browser. How can this be achieved? A Revit software add-in exports polygon renderings of room boundaries and other elements such as furniture and equipment to a cloud-based repository that is implemented using an Apache CouchDB NoSQL database. On the mobile device, the repository is queried and the data rendered in a standard browser using server-side generated JavaScript and SVG. The rendering supports graphical editing, specifically translation and rotation of the furniture and equipment. Modified transformations are saved back to the cloud database. The Revit add-in picks up these changes and updates the Revit intelligent model in real-time. All of the components used are completely open source, except for Revit itself.</p>
+
+<p>Here are direct download links to all the class materials:</p>
+
+<ul>
+<li><a href="file:////a/doc/revit/au/2013/doc/dv1736_2d_revit_model_editor_handout.pdf">Handout</a></li>
+<li><a href="file:////a/doc/revit/au/2013/doc/dv1736_2d_revit_model_editor_slides.pdf">Slide deck</a></li>
+<!-- http://au.autodesk.com > AU 2013 classes now online, Find a class > 1736 -->
+<li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2013/building-design-suite/dv1736">AU recording</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/room_editor_live/index.html">Live recording</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/room_editor_preview/index.html">Preview recording</a></li>
+<li><a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp &ndash; Revit add-in desktop component</a></li>
+<li><a href="https://github.com/jeremytammik/roomedit">roomedit &ndash; CouchDB cloud database source code</a></li>
+</ul>
+
+<p>I already discussed all the details of all the different components here on The Building Coder, and that just about covers what I personally have to contribute right now to cloud and mobile applications interacting directly with Revit.</p>
+
+
+
+
+<a name="5"></a>
+
+<h4>Autodesk Cloud Service Overview</h4>
+
+<p>Obviously, Revit itself is making more and more use of cloud-based services, and the offerings provided by Autodesk are growing in all directions as well;
+here is a good overview website for all
+
+<a href="http://www.autodesk.com/360-cloud">
+currently available Autodesk services</a>:
+
+<a href="http://www.autodesk.com/360-cloud">
+autodesk.com/360-cloud</a>.</p>
+
+<p>For a quick text-based overview, here is my list from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#4">
+cloud & mobile platform web service API</a> presentation
+
+given at AU:</p>
+
+<ul>
+
+<li>Identity</li>
+<ul>
+<li>Autodesk Single Sign-On Services</li>
+<ul>
+<li>OAuth &ndash; i</li>
+<li>Federated Sign-On</li>
+</ul>
+</ul>
+
+<li>Viewing</li>
+<ul>
+<li>Viewing Services</li>
+<li>Translation Services</li>
+</ul>
+
+<li>Creation</li>
+<ul>
+<li>AutoCAD 360 Services</li>
+<li>Fusion 360 Services</li>
+<li>InfraWorks Services</li>
+<li>ReCap Photo Services &ndash; ii</li>
+<li>AutoCAD Core Engine Services (ACES)</li>
+</ul>
+
+<li>Simulation</li>
+<ul>
+<li>Render Services</li>
+<li>Building Performance, Green Building Studio Services</li>
+</ul>
+
+<li>Collaboration (Social)</li>
+<ul>
+<li>Autodesk 360 (Pro) Services</li>
+<li>BIM 360 (Glue + Field) Services &ndash; ii</li>
+<li>PLM 360 Services</li>
+</ul>
+
+<li>Business</li>
+<ul>
+<li>Licensing Services</li>
+<li>Exchange</li>
+</ul>
+</ul>
+
+<p>As always, Autodesk is interested in making APIs available for these services, just like all other products, to provide a strong platform for automation of the related tasks.
+I added an 'i' to the ones already providing a deep and broad API, and an 'ii' to the ones already equipped with a maturing API.
+The rest are still under consideration.</p>
+
+<p>The existing APIs are not accessible yet, though, either, since we are still working on
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/bim-360-glue-api-pilot-and-updated-samples.html">
+pilot programs</a> to
+
+get them ready for public consumption.</p>
+
+
+<!--
+</p>
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/99/handout_1736_dv1736_2d_revit_model_editor_handout.pdf">handout</a> and
+<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/104/presentation_1736_dv1736_2d_revit_model_editor_slides.pdf">slides</a>).</li>
+</ul>
+
+</p>
+<p>0959_rotat_detail_comp_elev.htm room editor recordings:</p>
+
+<ul>
+<li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2013/building-design-suite/dv1736">live recording (official AU version)</a></li>
+<li><a href="">live recording (by Jeremy)</a></li>
+<li><a href="">preview recording</a></li>
+</ul>
+
+<p>http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-idling-and-benchmarking-timer.html</p>
+
+<ul>
+<li><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1736">DV1736</a></b> –
+Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device –
+This presentation demonstrates real-time, round-trip editing of a simplified 2D rendering of an Autodesk Revit intelligent model on any mobile device with no need to install any additional software whatsoever beyond a web browser. How can this be achieved? A Revit software add-in exports polygon renderings of room boundaries and other elements such as furniture and equipment to a cloud-based repository that is implemented using an Apache CouchDB NoSQL database. On the mobile device, the repository is queried and the data rendered in a standard browser using server-side generated JavaScript and SVG. The rendering supports graphical editing, specifically translation and rotation of the furniture and equipment. Modified transformations are saved back to the cloud database. The Revit add-in picks up these changes and updates the Revit intelligent model in real-time. All of the components used are completely open source, except for Revit itself. This is an advanced class for experienced programmers
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/99/handout_1736_dv1736_2d_revit_model_editor_handout.pdf">handout</a> and
+<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/104/presentation_1736_dv1736_2d_revit_model_editor_slides.pdf">slides</a>).</li>
+</ul>
+
+<a href="file:////a/doc/revit/au/2013/doc/dv1736_2d_revit_model_editor_handout.pdf">handout</a>
+<a href="file:////a/doc/revit/au/2013/doc/dv1736_2d_revit_model_editor_slides.pdf">slides</a>
+
+-->
+
+
+
+
+<a name="6"></a>
+
+<h4>Updated RevitLookup on GitHub</h4>
+
+<p>Finally, as you hopefully already know,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/revitlookup-on-github-and-invitation-to-collaborate.html">
+RevitLookup now lives on GitHub</a>,
+
+also up in the cloud somewhere, so to speak, accessible to all.</p>
+
+<p>This vastly simplifies collaboration, and you are heartily invited to participate in improving it.</p>
+
+<p>One friendly supporter is Florian Schmid of
+
+<a href="http://www.sofistik.com">SOFiSTiK AG</a>.</p>
+
+<p>He future-proofed RevitLookup by removing compiler warnings, and significantly extended the functionality for snooping of geometry, FormatOptions and RevitLinkInstances.</p>
+
+<p>Another step of future-proofing that I performed was to bump the years listed in the copyright notices from 2013 to 2014, and, for the first time, incrementing the build version number.</p>
+
+<p>The current version right now is thus
+
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2014.0.1.0">
+release 2014.0.1.0</a>.</p>
+
+<p>You should probably always go for the most up-to-date
+
+<a href="https://github.com/jeremytammik/RevitLookup">master branch</a> when
+
+downloading.</p>
+
+
+<hr/>
+
+<a name="6"></a>
+
+<h4>Autodesk 360 Platform Web Service API Overview</h4>
+
+<!--
+
+/a/j/adn/devdays/2013/2 - DevDays 2013 Cloud and Mobile.pptx
+
+The Autodesk 360 Platform – When?
+
+The foundation for the next generation of design and engineering tools
+
+Identity
+Autodesk Single Sign-On Services
+OAuth
+Federated Sign-On
+Viewing
+Viewing Services
+Translation Services
+Creation
+AutoCAD 360 Services
+Fusion 360 Services
+InfraWorks Services
+ReCap Photo Services
+AutoCAD Core Engine Services (ACES)
+More
+
+Simulation
+Render Services
+Building Performance/        Green Building Studio Services
+More
+Collaboration (Social)
+Autodesk 360 (Pro) Svcs
+BIM 360 (Glue+Field) Svcs
+PLM 360 Services
+Business
+Licensing Services
+Exchange (sales+mktg)
+
+Deep+Broad Implementation Now
+Maturing Implementation Now
+Starter Implementation Now
+Medium to Long Term Plans
+
+-->
+
+<p>Here is an overview of the API coverage level currently provided by the different Autodesk 360 Platform Web Services, with the level API support ranging from a to d according to the following scale:</p>
+
+<ol type="i">
+<li>Deep and broad</li>
+<li>Maturing</li>
+<li>Starter</li>
+<li>Medium to Long Term Plans</li>
+</ol>
+
+<p>None of these are accessible, yet, though, since we are still working on pilot programs to get them ready for public consumption.</p>
+
+<ul>
+
+<li>Identity</li>
+<ul>
+<li>Autodesk Single Sign-On Services</li>
+<ul>
+<li>OAuth &ndash; i</li>
+<li>Federated Sign-On &ndash; iv</li>
+</ul>
+</ul>
+
+<li>Viewing</li>
+<ul>
+<li>Viewing Services &ndash; iii</li>
+<li>Translation Services &ndash; iv</li>
+</ul>
+
+<li>Creation</li>
+<ul>
+<li>AutoCAD 360 Services &ndash; iii</li>
+<li>Fusion 360 Services &ndash; iv</li>
+<li>InfraWorks Services &ndash; iii</li>
+<li>ReCap Photo Services &ndash; ii</li>
+<li>AutoCAD Core Engine Services (ACES) &ndash; iv</li>
+</ul>
+
+<li>Simulation</li>
+<ul>
+<li>Render Services &ndash; iii</li>
+<li>Building Performance, Green Building Studio Services &ndash; iii</li>
+</ul>
+
+<li>Collaboration (Social)</li>
+<ul>
+<li>Autodesk 360 (Pro) Services &ndash; iv</li>
+<li>BIM 360 (Glue + Field) Services &ndash; ii</li>
+<li>PLM 360 Services &ndash; iii</li>
+</ul>
+
+<li>Business</li>
+<ul>
+<li>Licensing Services &ndash; iv</li>
+<li>Exchange (sales + mktg) &ndash; iii</li>
+</ul>
+</ul>
+
+
+<hr/>
+
+
+<ol type="i">
+<li>Deep and broad</li>
+<li>Maturing</li>
+<li>Starter</li>
+<li>Medium to Long Term Plans</li>
+</ol>
+
+<p>Most of these are not accessible yet, though, since we are still working on
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/bim-360-glue-api-pilot-and-updated-samples.html">
+pilot programs</a> to
+
+get them ready for public consumption.</p>
+
+<ul>
+
+<li>Identity</li>
+<ul>
+<li>Autodesk Single Sign-On Services</li>
+<ul>
+<li>OAuth &ndash; i</li>
+<li>Federated Sign-On &ndash; iv</li>
+</ul>
+</ul>
+
+<li>Viewing</li>
+<ul>
+<li>Viewing Services &ndash; iii</li>
+<li>Translation Services &ndash; iv</li>
+</ul>
+
+<li>Creation</li>
+<ul>
+<li>AutoCAD 360 Services &ndash; iii</li>
+<li>Fusion 360 Services &ndash; iv</li>
+<li>InfraWorks Services &ndash; iii</li>
+<li>ReCap Photo Services &ndash; ii</li>
+<li>AutoCAD Core Engine Services (ACES) &ndash; iv</li>
+</ul>
+
+<li>Simulation</li>
+<ul>
+<li>Render Services &ndash; iii</li>
+<li>Building Performance, Green Building Studio Services &ndash; iii</li>
+</ul>
+
+<li>Collaboration (Social)</li>
+<ul>
+<li>Autodesk 360 (Pro) Services &ndash; iv</li>
+<li>BIM 360 (Glue+Field) Services &ndash; ii</li>
+<li>PLM 360 Services &ndash; iii</li>
+</ul>
+
+<li>Business</li>
+<ul>
+<li>Licensing Services &ndash; iv</li>
+<li>Exchange (sales + mktg) &ndash; iii</li>
+</ul>
+</ul>

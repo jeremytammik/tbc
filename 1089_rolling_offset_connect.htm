@@ -1,0 +1,217 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+-->
+
+<h3>Connecting the Rolling Offset Pipe to its Neighbour Pipes</h3>
+
+<p>I continue the work on my MEP
+
+<a href="http://content.case-inc.com/au-hackathon-2013">
+CASE BIM Hackathon</a> project to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+calculate a rolling offset</a> between
+
+two pipes and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+insert the rolling offset pipe segment</a>.</p>
+
+<p>The next step consists in connecting the pipes with each other.</p>
+
+<p>Until just now, I was under the false assumption that just connecting the pipes with each other would automatically place the appropriate fittings in between.</p>
+
+<p>That appears to be wrong.</p>
+
+
+<a name="2"></a>
+
+<h4>MEP Connector Utilities</h4>
+
+<p>I created the following new MEP utility methods for The Building Coder samples:</p>
+
+<ul>
+<li>GetConnectorManager:
+return the given element's connector manager,
+using either the family instance MEPModel property or
+directly from the MEPCurve connector manager
+for ducts and pipes.</li>
+
+<li>GetConnectorClosestTo:
+return the connector set element
+closest to the given point.</li>
+
+<li>Connect: connect two MEP elements at a given point.</li>
+</ul>
+
+<p>The API methods required to access a Revit element connector manager differ, depending on whether it is a duct or pipe, i.e., a MEPCurve object, or a fitting, which is a family instance.
+The GetConnectorManager helper method wraps and hides this difference to avoid having to remember which access method to use.
+This also enables the implementation of generic methods that work on the connectors of all types of MEP elements, such as Connect.</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the given element's connector manager, </span>
+&nbsp; <span class="gray">///</span><span class="green"> using either the family instance MEPModel or </span>
+&nbsp; <span class="gray">///</span><span class="green"> directly from the MEPCurve connector manager</span>
+&nbsp; <span class="gray">///</span><span class="green"> for ducts and pipes.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ConnectorManager</span> GetConnectorManager(
+&nbsp; &nbsp; <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MEPCurve</span> mc = e <span class="blue">as</span> <span class="teal">MEPCurve</span>;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == mc &amp;&amp; <span class="blue">null</span> == fi )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element is neither an MEP curve nor a fitting.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> == mc
+&nbsp; &nbsp; &nbsp; ? fi.MEPModel.ConnectorManager
+&nbsp; &nbsp; &nbsp; : mc.ConnectorManager;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the connector in the set</span>
+&nbsp; <span class="gray">///</span><span class="green"> closest to the given point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Connector</span> GetConnectorClosestTo(
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Connector</span> targetConnector = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">double</span> minDist = <span class="blue">double</span>.MaxValue;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> d = c.Origin.DistanceTo( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &lt; minDist )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; targetConnector = c;
+&nbsp; &nbsp; &nbsp; &nbsp; minDist = d;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> targetConnector;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Connect the two given elements at point p.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;exception cref=&quot;ArgumentException&quot;&gt;</span><span class="green">Thrown if</span>
+&nbsp; <span class="gray">///</span><span class="green"> one of the given elements lacks connectors.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/exception&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> Connect(
+&nbsp; &nbsp; <span class="teal">XYZ</span> p,
+&nbsp; &nbsp; <span class="teal">Element</span> a,
+&nbsp; &nbsp; <span class="teal">Element</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ConnectorManager</span> cm = GetConnectorManager( a );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == cm )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element a has no connectors.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> ca = GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; cm.Connectors, p );
+&nbsp;
+&nbsp; &nbsp; cm = GetConnectorManager( b );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == cm )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element b has no connectors.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> cb = GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; cm.Connectors, p );
+&nbsp;
+&nbsp; &nbsp; ca.ConnectTo( cb );
+&nbsp; &nbsp; <span class="green">//cb.ConnectTo( ca );</span>
+&nbsp; }
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Connecting two Pipes Directly</h4>
+
+<p>I can make use of the connect method defined above very simply to connect the two original pipes with the rolling offset pipe in between, where the former are provided by the array elements <code>pipes[0]</code> and <code>pipes[1]</code>, the latter is stored in the variable <code>pipe</code>, and q0 and q1 are its start and end points, coinciding with the end and start points of the other two, respectively:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pipe )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Connect rolling offset pipe segment</span>
+&nbsp; &nbsp; <span class="green">// with its neighbours</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.Connect( q0, pipes[0], pipe );
+&nbsp; &nbsp; <span class="teal">Util</span>.Connect( q1, pipe, pipes[1] );
+&nbsp; }
+</pre>
+
+<p>The visual result of running the command is the same as before.
+Assume we start off with the two original pipes like this:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_1.png" alt="Two original pipes"/>
+</center>
+
+<p>The rolling offset is placed between them, and their endpoints are moved to match:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_2.png" alt="Two original pipe plus rolling offset"/>
+</center>
+
+<p>Before the Connect method was implemented, I could simply move the pipes apart after creating the rolling offset, and they separate, because they have no relationship with each other:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_3.png" alt="Original pipe separated from rolling offset" width="318">
+</center>
+
+<p>Implementing and calling the Connect method as shown above to connect the rolling offset with its neighbours ensures that the system remains connected, so moving one of the original pipes away drags the connected rolling offset endpoint along with it:</p>
+
+<center>
+<img src="img/rolling_offset_pipe_4.png" alt="Original pipe connected with rolling offset" width="357">
+</center>
+
+
+<a name="4"></a>
+
+<h4>Where are the Fittings?</h4>
+
+<p>The resulting system is still far from perfect, though.
+Although the pipes are connected with each other, no suitable fittings have been inserted.</p>
+
+<p>I was expecting that to happen automatically.
+There are a number of possible reasons why this did not happen, e.g.:</p>
+
+<ul>
+<li>This is not intended at all.</li>
+<li>The pipes being connected meet at an angle for which no appropriate fitting is available.</li>
+</ul>
+
+<p>The fittings to use for specific pipes are defined by the PipeSettings class.
+The description for its GetSpecificFittingAngles method clearly states that "Revit will only use the angles specified during the pipe layout or modifying the pipe layout. When laying out the pipes, if the angle between two pipes is close to the allowed angle, the specific angle is used for that pipe fitting."</p>
+
+<p>So there is still room for further exploration and development.</p>
+
+<p>Anyway, I am perfectly happy to conclude for today with the fact that the pipes have been successfully connected and the helper methods presented above do their job.</p>
+
+<p>The code to connect the rolling offset is included in the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, in the external command CmdRollingOffset, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.3">
+release 2014.0.106.3</a>.</p>

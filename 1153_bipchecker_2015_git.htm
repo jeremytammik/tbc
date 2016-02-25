@@ -1,0 +1,112 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Project Solon and BipChecker for Revit 2015 on GitHub</h3>
+
+<p>One of the handful of Revit database exploration tools that I use on a regular basis is
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.34">
+BipChecker</a>,
+
+the Revit built-in parameter checker, so that is a pretty obvious candidate for migration to Revit 2015... <a href="#3">see below</a>.</p>
+
+<p>Before I get to that, let me mention some new Revit energy analysis functionality that you might want to check out:</p>
+
+
+<a name="2"></a>
+
+<h4>Simple Interactive Energy Analysis in Revit with Project Solon</h4>
+
+<p><a href="http://autodesk.typepad.com/bpa/2014/04/project-solon-beta-arrives-in-revit-get-more-interactive-energy-analysis-results-create-your-own-and-publish-them-to-revit.html">
+Project Solon beta arrives in Revit</a>,
+
+providing more interactive energy analysis results, the ability to create your own and publish them to Revit.</p>
+
+<p><a href="https://gbs.autodesk.com/GBS">Autodesk Green Building Studio</a> (GBS) has released the Beta version of Analysis Application Dashboard in
+
+<a href="http://help.autodesk.com/view/BUILDING_PERFORMANCE_ANALYSIS/ENU/?guid=GUID-80C2B132-8472-4C0B-A711-699AB22A4B90">
+Project Solon</a>:
+
+You can now author your Revit model once and deliver energy analysis results to your software application, web, and mobile device. Project Solon delivers responsive results designs for your energy analysis, with customized dynamic charts of energy results.</p>
+
+<p>Read all about it on the
+
+<a href="http://autodesk.typepad.com/bpa/2014/04/project-solon-beta-arrives-in-revit-get-more-interactive-energy-analysis-results-create-your-own-and-publish-them-to-revit.html">
+Building Perfomance Analysis blog</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>BipChecker GitHub Repository and Migration to Revit 2015</h4>
+
+<p>Back to the BipChecker migration: while I was at it, I also created the
+
+<a href="https://github.com/jeremytammik/BipChecker">
+BipChecker GitHub repository</a> to
+
+host it, and the initial
+
+<a href="https://github.com/jeremytammik/BipChecker/releases/tag/2014.0.0.3">
+release 2014.0.0.3</a> based
+
+on the existing Revit 2014 code.</p>
+
+<p>Once again, the migration was very straightforward: change the .NET framework and update the Revit API assembly reference paths.</p>
+
+<p>The initial flat migration is available as
+
+<a href="https://github.com/jeremytammik/BipChecker/releases/tag/2015.0.0.3">
+release 2015.0.0.3</a> and generates just
+
+<a href="zip/BipChecker_2015a.txt">
+two compilation warnings</a> concerning
+
+the use of the UIDocument.Selection.Elements property:</p>
+
+<ul><li>Warning CS0618: 'Autodesk.Revit.UI.Selection.Selection.Elements' is obsolete: 'This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.'
+</li></ul>
+
+<p>Here is one example of the Revit 2014 code causing the warning, from the GetSingleSelectedElementOrPrompt method:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span>
+&nbsp; &nbsp; GetSingleSelectedElementOrPrompt(
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">ElementSet</span> ss = uidoc.Selection.Elements;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 == ss.Size )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSetIterator</span> iter = ss.ForwardIterator();
+&nbsp; &nbsp; &nbsp; iter.MoveNext();
+&nbsp; &nbsp; &nbsp; e = iter.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// . . .</span>
+</pre>
+
+<p>Moving this to Revit 2015 to eliminate the warning is straightforward &ndash; and the result looks better &nbsp; :-)</p>
+
+<pre class="code">
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = uidoc.Selection.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 == ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e = uidoc.Document.GetElement( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+</pre>
+
+<p>I fixed that and published the result as
+
+<a href="https://github.com/jeremytammik/BipChecker/releases/tag/2015.0.0.4">
+BipChecker release 2015.0.0.4</a>,
+
+which now compiles with zero wrnings.</p>
+
+<p>Of course, you should normally always go for the most up-to-date master branch, though, to pick up possible later enhancements as well.</p>

@@ -1,0 +1,267 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09902986 [Orient to View]
+
+-->
+
+<h3>Setting up a 3D View like a Section View</h3>
+
+<p>Lots of add-in developers have struggled with various aspects of setting up cameras and views.</p>
+
+<p>I summarised a number of them in two new topic groups:</p>
+
+<ul style="list-style: none">
+<li>5.37. <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.37">Creating and Setting Up a 3D View</a></li>
+<li>5.38. <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.37">Creating and Setting Up a Section View</a></li>
+</ul>
+
+<p>I keep hoping that they cover everything one needs to know in this area, together with Steve Mycynek's all-encompassing AU class
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-the-view-mep-and-link-apis.html#2">
+CP3133 Using the Revit Schedule and View APIs</a>.</p>
+
+<p>Here is one recent example proving that this sometimes holds true, and yet finding the exact right approach for your particular case may require some research and effort on your side as well:</p>
+
+<p><strong>Question:</strong> I want to orient a 3D view like a section view.</p>
+
+<p>Does the Revit API provide a ready-made function for this?</p>
+<p>If not, how can I set the SectionBox of the 3D view to be like the section view?</p>
+<p>I tried to set its Min, Max, and Transform properties, but the result is not the same.</p>
+<p>Note: what I want to achieve is to set the section box of 3D view like the Revit 'Orient to view' command.</p>
+
+
+<p><strong>Answer:</strong> Thank you for your query.</p>
+
+<p>I hope that the following two explanations by The Building Coder provide all you need:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html">Setting up your ViewOrientation3D</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">Exporting Image and Setting a Default 3D View Orientation</a></li>
+</ul>
+
+<p>If not, please provide a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#1b">
+reproducible case</a> for us to look at.</p>
+
+<p>What follows now is a rather lengthy and all-to-typical repetition of where to look for answers, how to research the required settings and explore the results of the various settings ... you may want to simply skip right down to the
+
+<a href="#2">solution</a>...</p>
+
+
+
+<p><strong>Update 2014-8-20 10:47:</strong> Ok, thank you.</p>
+
+<p>I provided the Revit File and Visual Studio project.</p>
+
+<p>Steps: First I want to select the section view from Floor Plan view and run the add-in.</p>
+
+<p>The add-in will create the 3D view and set its section box to be like the selected SectionView and then open this 3D view and the section view to check the result.</p>
+
+<p>Expected result: when I pick the section box from 3D view to see its highlighted representation it has to be the same as the section view's on the floor plan and section view.</p>
+
+<p>Observed result: the section box is shifted.</p>
+
+<center>
+<img src="img/section_box_from_section_view.png" alt="Section box from section view" width="842"/>
+</center>
+
+
+<p><strong>Update 2014-8-25 10:46:</strong> Can you please help? I did what you told me, describing the add-in steps and attaching the source code and Revit file. Thank you</p>
+
+<p><strong>Answer:</strong> Thank you for your update and image.</p>
+
+<p>Unfortunately, I do not see the sample code or Revit file that you mention attached to the case.</p>
+
+<p>All I see is your screen snapshot.</p>
+
+<p>Did you follow the explanations by The Building Coder that I pointed out?</p>
+
+<p>Did they not help resolve the issue?</p>
+
+<p>What are your observations on that, please?</p>
+
+<p>If that does not help, please try again to attach the required material in order for us to be able to reproduce and analyse the issue in more depth at our end.</p>
+
+
+<p><strong>Update 2014-8-25 11:07:</strong> Thank you, Jeremy.
+Before I asked you, I used The Building Coder, but this time I didn't find an answer to my question.
+I attached the files.</p>
+
+
+<p><strong>Answer:</strong> Thank you for your update and appreciation.</p>
+
+<p>I see the sample code attached now.</p>
+
+<p>I unpacked, installed and tested your sample add-in and can run and debug it successfully.</p>
+
+<p>Apparently, it expects me to pre-select the section view symbol on level 1 before launching the command.</p>
+
+<p>When I do so, it creates a new 3D view named '3D View 1'.</p>
+
+<p>Now, what is your problem, please?</p>
+
+<p>What is the difference between the observed behaviour and the results you would expect?</p>
+
+<p>How can these differences be measured and visualised?</p>
+
+<p><strong>Update 2014-8-25 11:58:</strong> Thank you, Jeremy.
+The problem is that the section box of the created '3D View 1' is not the same as the section view, as you can see from the screen snapshot above.</p>
+
+
+<p><strong>Answer:</strong> I can indeed see certain differences in the PNG image.</p>
+
+<p>However, in the real live 3D view, I cannot see anything similar.</p>
+
+<p>How can I tell in the live 3D view whether the intended settings have been achieved?</p>
+
+<p>How can I tell that they have not been achieved?  :-)</p>
+
+<p>For me, the way it currently appears looks totally all right. I assume that is not your intention, though  :-)</p>
+
+<p><strong>Update 2014-8-25 13:18:</strong> Ok, perfect.
+First, you have to open three views:</p>
+
+<ol>
+<li>Floor plan of Level 1, defining the section view</li>
+
+<li>Created 3D view created by the add-in, "3D View 1"</li>
+
+<li>Section view "Section 1": select the section view on the floor plan and right click 'go to view'</li>
+</ol>
+
+<p>Then select the section box of the 3D view "3D View 1".</p>
+
+<p>You will see this section box highlighted in the two other views and can compare it with the section view boundary.</p>
+
+<p>I hope you can understand me, and thank you again.</p>
+
+<p><strong>Update 2014-8-26 11:50:</strong> Dear Jeremy, can you update me if you understand me, or you need more explanation?
+Thank you</p>
+
+<p><strong>Answer:</strong> Yes, of course.</p>
+
+<p>I believe I understand you perfectly well now.</p>
+
+<p>You are creating a new 3D view using the View3D.CreateIsometric method, and would like to set up the newly created view's section box in a certain manner.</p>
+
+<p>I published a number of articles on The Building Coder discussing this very issue.</p>
+
+<p>For your and other's convenience, I now summarised them all as a new separate topic group on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.37">
+creating and setting up 3D views</a>.</p>
+
+<p>You have not yet explained to me in what way you have made use of the available information, and what is causing difficulties for you.</p>
+
+<p>Please read the available information, explore how you can make use of it, and let me know the results.</p>
+
+<p>So far, I am still pretty sure that all the information required is already published.</p>
+
+<p>I will happily add your example to the blog once we resolve it, so do please let us continue working on this together.</p>
+
+<p>One step forward might be to add some element, e.g. one single wall, to the sample project, making it easier to determine exactly how the 3D view is unintentionally offset from the desired location and how to improve it.</p>
+
+<p>I used a similar technique when developing the code to define a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/create-section-view-parallel-to-wall.html">
+section view exactly around a specific wall</a>.</p>
+
+<p>Maybe that exploration will help in this case as well.</p>
+
+<p>This other approach might also be useful, where I explored how to set up a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html">
+section view to match a given scope box</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/set-view-section-box-to-match-scope-box-for-revit-2014.html">
+migrate it to Revit 2014</a>.</p>
+
+<p>Actually, come to think of it, I assembled another topic group for you as well, including these samples, on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.38">
+creating and setting up section views</a>.</p>
+
+<p>Please have a go at cracking this yourself and let us know how it goes.</p>
+
+<p>I am sure you can succeed.</p>
+
+<p><strong>Update 2014-8-26 13:45:</strong> Thank you very much</p>
+
+<p>I think there is a misunderstanding; the aim of this add-in is like you said, "to set up the newly created view's section box in a certain manner".</p>
+
+<p>This manner is the section view and I use The Building Coder links that you sent me.</p>
+
+<p>But the result is not the same; they have the same origin point, but differ at the UI "Section box, section view".</p>
+
+<p>I wish I could make it easy for you to understand everything.</p>
+
+<p><strong>Update 2014-8-26 13:55:</strong> I think the discussion that you pointed to above is like what I need, but replacing the Scope Box by section view</p>
+
+<p><strong>Update 2014-8-27 11:58:</strong> Dear Jeremy, any good news?</p>
+
+<p><strong>Update 2014-8-27 19:25:</strong> Thank you, Jeremy, I did it, you can close the case.</p>
+
+<p><strong>Answer:</strong> Thank you for your updates.</p>
+
+<p>Congratulations on solving this!</p>
+
+<p>Would you like to share how you ended up doing it?</p>
+
+<p>What steps did you take to research and discover the cause of the problem?</p>
+
+<p>What was the problem in the end?</p>
+
+<p>How did you resolve it?</p>
+
+<p><strong>Update 2014-8-28 18:59:</strong> Yes, sure.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Solution</h4>
+
+<p>First I was straightforward and set the bounding box of the section box like the bounding box of the section view using the Min, Max and Transformation properties.</p>
+
+<p>The result was: Volume was right and the position was right but the Rotation or the direction was wrong; the Z and Y directions were swapped.</p>
+
+<p>So I tried to replace them like the code I sent to you.</p>
+
+<p>The result was: Volume was right, the position was wrong, the rotation or the direction was right.</p>
+
+<p>Finally I found that the first was right but wrong direction, the second was right but wrong position so I realised that I have to get the common factor from the two approaches: the right position from the first method and the right direction from the second method.</p>
+
+<p>Here is the final code:</p>
+
+<pre class="code">
+  double yl = Math.Sqrt(BB.Min.Y * BB.Min.Y)
+    + Math.Sqrt(BB.Max.Y * BB.Max.Y);
+
+  double zl = Math.Sqrt(BB.Min.Z * BB.Min.Z)
+    + Math.Sqrt(BB.Max.Z * BB.Max.Z);
+
+  yl = yl / 2;
+  zl = zl / 2;
+
+  double YM = BB.Min.Y + (BB.Max.Y - BB.Min.Y)/2;
+  double ZM = BB.Min.Z + (BB.Max.Z - BB.Min.Z)/2;
+
+  NEWBB.Max = new XYZ(BB.Max.X, YM+zl, ZM+yl);
+  NEWBB.Min = new XYZ(BB.Min.X, YM-zl, ZM-yl);
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Conclusion</h4>
+
+<p>As said above, I hope that the available material covers all the typical needs for setting up views.</p>
+
+<p><b>And</b> finding the right approach for your particular case may require some research and effort on your side as well.</p>

@@ -1,0 +1,188 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+08499005 [Getting Sketch Curves From Solids]
+Nihal Samarabandu Model Arc Center Point reference
+/a/doc/revit/blog/img/getting_element_by_ref.png
+
+09101761 [Creating Schedules on Sheets]
+
+- http://en.wikipedia.org/wiki/Buffalo_buffalo_Buffalo_buffalo_buffalo_buffalo_Buffalo_buffalo
+
+/j/photo/jeremy/2013/2013-12-31_wildhaus/256.jpg
+
+/j/photo/jeremy/2013/2013-12-31_wildhaus/247_cropped.jpg
+
+
+-->
+
+<h3>Happy New Year!</h3>
+
+<p>Welcome back after the break and</p>
+
+<p style="text-align:center; font-size:xx-large; font-weight:bold; color:orange; text-decoration:blink;">Happy New Year!</p>
+
+<p>I have already been busily answering cases for the past few days.</p>
+
+<p>Here are two of the topics that came up:</p>
+
+<ul>
+<li><a href="#2">Access to model arc centre point reference</a></li>
+<li><a href="#3">API-generated schedules on sheets lack title</a></li>
+</ul>
+
+<p>Before getting to those, let me present a photo and an interesting syntactic challenge from my non-technical activities in the past ten days.</p>
+
+<p>I spent some time after Christmas in the hills in Toggenburg, and we had some very fine weather and views:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-12-31_wildhaus/256.jpg" alt="Winter scene in Toggenburg" width="400"/>
+</center>
+
+<p>The syntactic challenge is perfectly normal English, and simply consists in understanding the following valid sentence:
+Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo.</p>
+
+<p>For a few hints, please refer to this interesting
+
+<a href="http://en.wikipedia.org/wiki/Buffalo_buffalo_Buffalo_buffalo_buffalo_buffalo_Buffalo_buffalo">
+explanation on Wikipedia</a>.</p>
+
+<p>Back to the Revit API...</p>
+
+
+<a name="2"></a>
+
+<h4>Access to Model Arc Centre Point Reference</h4>
+
+<p><strong>Question:</strong> How can I obtain a valid reference to a model arc centre point?</p>
+
+<p>Given an extrusion element in a family file, you can access its sketch and individual geometric sketch curve elements like this in managed C++:</p>
+
+<pre class="code">
+  Extrusion ^ext = createExtrusion(...)
+
+  CurveArrArray ^sketchCvArrArr = ext-&gt;Sketch-&gt;Profile;
+
+  for each( CurveArray ^oneCvLoop in sketchCvArrArr )
+  {
+    for each( Curve ^oneSketchCv in oneCvLoop )
+    {
+
+      // ...
+
+    }
+  }
+</pre>
+
+<p>The curve end point references are provided by the Curve::EndPointReference property and can be used to constrain profile curves to reference planes, for example.</p>
+
+<p>However, we could not find a way to obtain a centre point reference for arc sketch curves.</p>
+
+<p>The ModelArc class provides a CenterPointReference property.</p>
+
+<p>However, attempting to cast a geometric curve to a model curve obviously returns a null result.</p>
+
+<p>Our goal is to lock the arc centre to the intersection point of two reference planes.</p>
+
+<p>Can you suggest any way to achieve this?</p>
+
+<p><strong>Answer:</strong> Looking at the Model Curve and Curve class hierarchy shows that the direct conversion is not possible.</p>
+
+<p>The CenterPointReference property is declared at CurveElement, so ModelCurve will also have it.
+You can create a ModelArc with a geometric arc (Curve), but it will appear in the project (be added to the database).</p>
+
+<p>The Curve itself is in-memory only.
+From a Curve, you can call Document.Create.NewModelCurve, which will add a new model curve and modify the document.
+However, that will still not provide the reference that you are after.</p>
+
+<p>On the other hand, the geometric sketch curve itself also provides a Reference property, and that can be used to access the existing model curve in the sketch.
+From that, you can obtain the centre point reference, in case of an arc element.</p>
+
+<p>Here is a snapshot of the debugger showing code that retrieves the sketch model curve in order to get the model arc centre point reference that can be used to create a radial dimension:</p>
+
+<center>
+<img src="img/getting_element_by_ref.png" alt="Getting element by reference" width="400"/>
+</center>
+
+<p>This method is perfectly reliable, since Document::GetElement(Reference) always returns the actual model curve element itself.</p>
+
+<!--
+<p>The CenterPointReference of the geometry arc eliminates the need of getting sketch model curves from the document as geometry curves already contains Reference and End Point References.</p>
+-->
+
+
+
+<a name="3"></a>
+
+<h4>API-generated Schedules on Sheets Lack Title</h4>
+
+<p><strong>Question:</strong> I am working on a project that involves building schedules and placing them on sheets programmatically.
+The ones I create with the API don't include a title.</p>
+
+<p>The issue can be illustrated with the Revit SDK ScheduleCreation sample project.</p>
+
+<p>Here is a snapshot of a manually created schedule:</p>
+
+<center>
+<img src="img/schedule_created_manually.jpg" alt="Schedule created manually" width="500"/>
+</center>
+
+<p></p>
+
+<p>The programmatically generated one looks like this:</p>
+
+<center>
+<img src="img/schedule_created_through_api.jpg" alt="Schedule created through API" width="500"/>
+</center>
+
+
+<p><strong>Answer:</strong> Let's start by reiterating the history of this feature:
+the Schedule API was initially introduced in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">
+Revit 2013</a>,
+
+enabling an add-in to create schedules and add or remove fields and filters, control sorting and grouping, add, read, place a schedule on a sheet or modify its placement, and access all the schedule data, e.g. to export to a text file.</p>
+
+<p>In
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html">
+Revit 2014</a> (fourth
+
+bullet item), it was enhanced to provide formatting control and read-write access to individual data items.
+More details on the feature are provided there by the Revit 2014 DevDays presentation, recording and sample code.</p>
+
+<p>It is also discussed in the overview of the 'ViewSchedule changes' in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014</a>.</p>
+
+<p>The Schedule API functionality is illustrated by the Revit 2013 ScheduleCreation that you tested and the Revit 2014 ScheduleAutomaticFormatter and ScheduleToHTML SDK samples.</p>
+
+<p>Now, to address your actual question:</p>
+
+<p>The issue you encountered is known and was resolved in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/revit-2014-update-release-1.html#2">
+Revit 2014 update release 1</a>:</p>
+
+<ul>
+<li>Creates the default schedule header automatically when schedules are created by ViewSchedule.Create methods.</li>
+<li>Allows ViewSchedule.GroupHeaders to succeed even if the schedule is not active.</li>
+</ul>
+
+<p>Have you installed the update release 1, or, better still, 2?</p>
+
+<p>I would recommend installing each update release as soon as it becomes available, if you can.</p>
+
+<p><strong>Response:</strong> Applying the Update Release 2 patch fixed the title problem.
+
+<p>Thank you, and I will add keeping up on these to my New Year's resolutions!</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2013/2013-12-31_wildhaus/247_cropped.jpg" alt="Raring to go on towards new challenges in the New Year" width="300"/>
+</center>

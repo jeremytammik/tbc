@@ -1,0 +1,138 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+- 10793298 [Get the element properties of a model]
+  ArchSample, never mentioned before, part of the ADN training labs
+
+#revitapi #adsk #bim #adskdevnetwrk #geometry #3dwebcoder
+#augi #au2015 #dotnet #csharp
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>ArchSample, Active Transaction and AdnRme for 2016</h3>
+
+<p>Today, let me point out ArchSample, a heretofore unmentioned Revit SDK sample that I happened to notice answering a recent case, how to determine a currently active transaction, and an update to the ADN Revit MEP sample AdnRme:</p>
+
+<ul>
+<li><a href="#2">ArchSample and Retrieving Element Properties</a></li>
+<li><a href="#3">How to determine active or current transaction</a></li>
+<li><a href="#4">AdnRme for Revit MEP 2016</a></li>
+</ul>
+
+<p>Before getting to those, let me add that I am still travelling in Greece, heading back to Athens now from the Greek island of
+<a href="https://en.wikipedia.org/wiki/Euboea">Euboea</a> on my way to the second
+<a href="http://www.meetup.com/I-love-3D-Athens">I love 3D &ndash; Athens</a> meetup
+this evening, followed by the
+<a href="http://angelhack.com/hackathon/athens-2015">AngelHack hackathon</a> this weekend.
+For more details, please refer to
+<a href="http://the3dwebcoder.typepad.com/blog/2015/06/athens-angelhack-hackathon-and-nodejs-rest-workshop.html#2">
+The 3D Web Coder</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>ArchSample and Retrieving Element Properties</h4>
+
+<p>This was prompted by a recent case on retrieving the element properties of a model:</p>
+
+<p><strong>Question:</strong>
+
+I am trying to traverse the Revit model to access all element properties.</p>
+
+<p>For this, I am retrieving the elements from a filtered element collector.</p>
+
+<p>Now I would like to get the data shown in the property palette for each element.</p>
+
+<p>Is there any way to get the collection of all the properties associated with an element?</p>
+
+
+<p><strong>Answer:</strong>
+
+Yes, certainly; this is pretty easy.</p>
+
+<p>In fact, it is covered by the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a>.</p>
+
+<p>Please work through that and you will see for yourself.</p>
+
+<p>Thank you!</p>
+
+<p>In short, there are a couple of properties and methods on the Revit Element class to look at, e.g., Parameters and the various overloads of GetParameter.
+Read about those in the Revit API help file RevitAPI.chm.</p>
+
+<p>Once you have done that, you can take a look at the Revit SDK ArchSample sample add-in &ndash; I believe it already does almost exactly what you are asking for.</p>
+
+<p>It is very similar to the external command Lab4_2_ExportParametersToExcel defined in both C# and VB by the
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/adn-labs-xtra-on-github-and-rvtva3c-in-threejs.html#4">
+ADN Revit API Xtra training material</a>... not yet migrated to Revit 2016, though.</p>
+
+<p>The FireRating Revit SDK sample demonstrates both export and import, in VB, of a custom shared parameter.</p>
+
+<p>This functionality is also duplicated in C# by three ADN Xtra commands:</p>
+
+<ul>
+<li>Lab4_3_1_CreateAndBindSharedParam</li>
+<li>Lab4_3_2_ExportSharedParamToExcel</li>
+<li>Lab4_3_3_ImportSharedParamFromExcel</li>
+</ul>
+
+<p>Actually, you can search the Revit SDK main Visual Studio solution globally for 'Excel' and other keywords to find several further related samples.</p>
+
+<p>I hope this helps.</p>
+
+
+
+<a name="3"></a>
+
+<h4>How to Determine if there is an Active or Current Transaction</h4>
+
+<p>Yet another helpful clarification on transactions by Arno&scaron;t L&ouml;bel:</p>
+
+<p><strong>Question:</strong>
+
+Is there any way to determine if there is an active or current transaction?</p>
+
+<p><strong>Answer:</strong>
+
+Yes, there is. However, the answer depends on what you mean by active and current transaction. Should I assume you mean the same thing by both the words &ndash; that is the active transaction that may be currently open (i.e. between Start and either Commit or RollBack) in a given document?</p>
+
+<p>If so, there is a way:</p>
+
+<p>If Document.IsModifiable returns TRUE, then there is an active transaction open in that document.</p>
+
+<p>However, if IsModifiable returns FALSE, it does not necessarily mean there is no active transaction.
+It can also mean that there is a transaction except that the document cannot be modified regardless, for example during a failure resolution.
+A true indicator of a situation when there is no active transaction in a document is that when both IsModifiable and IsReadOnly returns FALSE.</p>
+
+<p>You should also read the remarks on the Document.IsModifiable property in the Revit API help file RevitAPI.chm:</p>
+
+<p>"This is not a permanent state such as, for example IsReadOnlyFile.
+Value of this property can change dynamically multiple times within the lifetime of an open document.
+Regardless of the mode a document is opened with, the model can only be modified inside an open transaction.
+Furthermore, even with a transaction open, the model is not always modifiable.
+Though this is rather a rare situation, it can happen, most likely during model regeneration, failure processing, or some events.
+An attempt to modify a non-modifiable document will result in throwing a ModificationOutsideTransactionException."</p>
+
+
+<a name="4"></a>
+
+<h4>AdnRme for Revit MEP 2016</h4>
+
+<p>I migrated the ADN MEP sample AdnRme to Revit MEP 2016.</p>
+
+<p>The migration was absolutely trivial, simply changing the Revit API assembly references to point to the new version.</p>
+
+<p>Zero errors and zero warnings.</p>
+
+<p>The most up-to-date version is always provided in the
+<a href="https://github.com/jeremytammik/AdnRme">AdnRme GitHub repository</a>,
+and the first Revit 2016 version is now available from there as
+<a href="https://github.com/jeremytammik/AdnRme/releases/tag/2016.0.0.0">release 2016.0.0.0</a>.</p>

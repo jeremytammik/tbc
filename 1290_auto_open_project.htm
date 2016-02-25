@@ -1,0 +1,344 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- opening a document
+  using external event and xaml:
+  http://forums.autodesk.com/t5/revit-api/switching-active-documents-is-not-allowed-during-api-event/m-p/5498500
+  https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle
+  using ApplicationInitialized:
+  http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878
+  C:\a\vs\OpenProject\OpenProject.sln
+
+- SolidArray removal
+
+-->
+
+<h3>Automatically Open a Project on Startup</h3>
+
+<p>Yesterday, I talked about the interesting activity, numerous answers and my participation in the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> and
+
+edited the thread and GitHub solution for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/opening-and-activating-document-in-an-event-handler.html">
+opening and activating a Revit document in an event handler</a>.</p>
+
+<p>Today, we look at the related issue of
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878">
+loading a Revit RVT project file automatically on start-up</a>.</p>
+
+<p>Before getting into that, here is a quick note on the deprecated SolidArray class:</p>
+
+
+<a name="2"></a>
+
+<h4>SolidArray Removal</h4>
+
+<p>In the long distant past, the Revit API defined a considerable number of custom collection classes, many of them equipped with their own custom iterators and loads of other stuff.</p>
+
+<p>We have been in the process of removing these custom collection classes for several years now.</p>
+
+<p>They are being systematically replaced by generic .NET collection classes.</p>
+
+<p>Some vestiges still remain, though.</p>
+
+<p>One of them is the SolidArray.</p>
+
+<p>The Revit 2015 API still defines the SolidArray class, and an example of using it is shown in the Element.Geometry property description sample code snippet.</p>
+
+<p>However, this class is not used anywhere at all in the Revit API any longer.</p>
+
+<p>Just like all other custom collection classes, it should be replaced by a generic .NET collection instead, e.g. <code>List&lt;Autodesk.Revit.DB.Solid&gt;</code>, since it will disappear in the near future.</p>
+
+<p>Yet another little step to take in the efforts to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/determining-intersecting-elements-and-continued-futureproofing.html">
+future-proof your add-in</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Loading a RVT Project File Automatically on Start-up</h4>
+
+<p>Let us continue with the main topic at hand, yet again based on a thread raised in the discussion forum and with a solution posted to GitHub, on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5500878">
+loading a Revit RVT project file automatically on start-up</a>:</p>
+
+<p>Yesterday's solution for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/opening-and-activating-document-in-an-event-handler.html">
+opening and activating a Revit document in an event handler</a> made
+
+use of an external event driven by VB.NET and XAML code, demonstrated by the
+
+<a href="https://github.com/LiFeleSs/RevitOpenAndActivateDuringIdle">VB.NET RevitOpenAndActivateDuringIdle sample on GitHub</a>.</p>
+
+<p>The solution to load a file on startup is simpler still, making use of the ApplicationInitialized event.</p>
+
+<p>It took some iterations to arrive at that conclusion, though, and a few more to nail down the final solution.</p>
+
+<p>I actually already published the beginning of this thread and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/02/family-instance-area-and-auto-loading-a-project-file.html#3">initial answers</a> by
+
+Arno&scaron;t and me a month ago, but there was much more and the real solution to come later, so I need to pick it up again where I left off back then...</p>
+
+
+<p><strong>Question:</strong> I wonder how can I load a Revit file automatically when starting the Revit system.</p>
+<p>Since the UIControlledApplication is the only parameter of the OnStartup function of the IExternalApplication class, while the OpenAndActivateDocument is the function of the UIApplication but not of the UIControlledApplication.</p>
+<p>How can I invoke the UIApplication.OpenAndActivateDocument method in the OnStartup function? Or is there some other method to address the problem?</p>
+
+<p><strong>Answer:</strong> The UIControlledApplication controlled application provided in the OnStartup method cannot open a document, because Revit is still in the process of starting up and is not ready to open and process project files yet.</p>
+
+<p>In the OnStartup method, you can set up a system to open the project document later on, when Revit has finished loading.</p>
+
+<p>Before getting to that, though, let me point out that the easiest way to start up Revit with a project file loaded is to use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/using-processstart-to-open-a-project-or-family.html">
+Process.Start</a>.</p>
+
+<p>Once Revit is up and running, as you have pointed out yourself, you can also use the UIApplication.OpenAndActivateDocument method, as demonstrated in this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/closing-the-active-document.html">closing the active document</a>.</p>
+
+<p>You can prepare a call to this method from within the OnStartup method by temporarily subscribing to the Idling event in the OnStartup method, then unsubscribing from Idling in the Idling event handler, opening the document and doing whatever else you want at that point.</p>
+
+<p>That should give you a couple of useful options to choose from.</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t L&ouml;bel: The Revit API now provides another solution for the problem besides using the Idling event.
+Three years ago, the Idling event may have been the only work-around, but there is a better solution now: a better way of opening a document on start-up is via the ApplicationInitialized event.
+Like with the Idling event, an application subscribes to it during the OnStartup call.
+Revit will raise this event a bit later, when the Revit application start-up has completed.
+Remember, just as with the Idling event, the OpenAndActivateDocument method can be used only as long there is no active document in Revit yet.</p>
+
+
+<p><strong>Response:</strong>
+
+Thank you very much for your prompt and detailed solution.</p>
+
+<p>However, when I tested the System.Diagnostics.Process.Start method, the Revit file can be opened when start the Revit but disappear only straight away.</p>
+
+<p>And I don't know how to test the Idling event and how to use the UIApplication.OpenAndActivateDocument method in OnStartup since I have no access to the UIApplication there.</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+As I tried to explain but failed, apparently, please do not use the Idling event. Use the ApplicationInitialized event instead.
+Subscribe to it during the OnStartup method of your external application, then from within the event's handler invoke the OpenAndActivateDocument method.</p>
+
+<p><strong>Response:</strong>
+
+Thx! I'll try this solution...</p>
+
+<p>When I used the event ApplicationInitialized and the System.Diagnostics.Process.Start in the event handler, it works now.</p>
+
+<p>Thx for ur kindness direction!!</p>
+
+
+
+<p><strong>Question:</strong> by Matt:
+
+I'm not sure if I understand your suggestion to use the ApplicationInitialized event.
+While I agree that event is the right one to use for the timing of when it executes, it doesn't seem like we have access to the right contexts at the right time?</p>
+
+<ul>
+<li>If we register it during startup, we're registering it against the ControlledApplication class.</li>
+<li>When we are in the callback after, we're in the callback of the ControlledApplication class.</li>
+</ul>
+
+<p>When we're in that callback &ndash; how would we have access to the UIApplication object so that we could call OpenAndActivate?</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+I may be wrong, but I think it works differently than what you guessed. The object inside the OnStartup is indeed a ControlledApplication, but it ought to be an Application instance as the sender argument of the ApplicationInitialized event handler. With that you will be able to construct an instance of UIApplication and use its methods.  (Unfortunately, most of us New Englanders are working from their homes  today due to a storm, and I am trying to limit my debugging sessions to a minimum! If it turns out it is not working for you as I suggested, however, let me know and ’ll debug it myself by tomorrow or Wednesday.)</p>
+
+<p>Just as a side note: it does not matter whether an event handler subscribes to an event using ControlledApplication or Application. The repository of application event delegates are always with the Application instance (internally).</p>
+
+<p><strong>Answer:</strong>
+
+You make it sound so easy...</p>
+
+<p>Here we are, an hour or two later:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _test_project_filepath
+&nbsp; &nbsp; = <span class="maroon">&quot;Z:/a/rvt/CurvedWall.rvt&quot;</span>;
+&nbsp;
+&nbsp; UIApplication _uiapp;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Retrieving UIApplication from UIControlledApplication
+&nbsp; &nbsp; <span class="green">// These attempts to access a UIApplication</span>
+&nbsp; &nbsp; <span class="green">// or Application instance are all in vain:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//_uiapp = (UIApplication) a;</span>
+&nbsp; &nbsp; <span class="green">//_uiapp = (UIApplication) a.ControlledApplication;</span>
+&nbsp; &nbsp; <span class="green">//Application app = (Application) a;</span>
+&nbsp; &nbsp; <span class="green">//Application app2 = (Application) a.ControlledApplication;</span>
+&nbsp; &nbsp; <span class="green">//Application app3 = a.m_application;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Using Reflection works, though:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Type</span> type = a.GetType();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Not useful in this case, but interesting:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] publicMembers = type.GetMembers();
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] nonPublicMembers = type.GetMembers( <span class="teal">BindingFlags</span>.NonPublic );
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] staticMembers = type.GetMembers( <span class="teal">BindingFlags</span>.Static );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// This is the call that finally yields useful results:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BindingFlags</span> flags = <span class="teal">BindingFlags</span>.Public
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.NonPublic
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.GetProperty
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.Instance;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">MemberInfo</span>[] propertyMembers = type.GetMembers(
+&nbsp; &nbsp; &nbsp; flags );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Note that the field &quot;m_application&quot; is listed</span>
+&nbsp; &nbsp; <span class="green">// in the propertyMembers array, and also the </span>
+&nbsp; &nbsp; <span class="green">// method &quot;getUIApp&quot;... let's grab the field:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> propertyName = <span class="maroon">&quot;m_application&quot;</span>;
+&nbsp; &nbsp; flags = <span class="teal">BindingFlags</span>.Public | <span class="teal">BindingFlags</span>.NonPublic
+&nbsp; &nbsp; &nbsp; | <span class="teal">BindingFlags</span>.GetField | <span class="teal">BindingFlags</span>.Instance;
+&nbsp; &nbsp; <span class="teal">Binder</span> binder = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">object</span>[] args = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">object</span> result = type.InvokeMember(
+&nbsp; &nbsp; &nbsp; &nbsp; propertyName, flags, binder, a, args );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> _uiapp;
+&nbsp;
+&nbsp; &nbsp; _uiapp = (<span class="teal">UIApplication</span>) result;
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Retrieving UIApplication from UIControlledApplication</span>
+&nbsp;
+&nbsp; &nbsp; _uiapp.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// This does not work, because the sender is</span>
+&nbsp; &nbsp; <span class="green">// an Application instance, not UIApplication.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//UIApplication uiapp = sender as UIApplication;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Sender is an Application instance:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// However, UIApplication can be </span>
+&nbsp; &nbsp; <span class="green">// instantiated from Application.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; uiapp.OpenAndActivateDocument(
+&nbsp; &nbsp; &nbsp; _test_project_filepath );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>It works!</p>
+
+<p>Is that what you intended?</p>
+
+<p><strong>Response:</strong>
+
+Thanks!
+You are correct; the sender of the ApplicationInitialized event callback is the Application (not the controlled application).
+So my quest of a non-hacky way to transition between the ControlledApplication and the Application is finally solved!</p>
+
+<p>Jeremy &ndash; I'm not sure that the reflection was actually necessary? Was that just exploration?</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t:
+
+Perhaps I made it sound simple because it is in fact rather simple. Indeed, as Matt already noted, no reflection is necessary.
+In the OnStartup you get UIControlledApplication, from which you can get ControlledApplication (the latter always exists if the former does), and on that you subscribe to the ApplicationInitialized.
+Keep in mind you cannot cast a ControlledApplication to Application &ndash; that is the ControlledApplication’s very point of existence.</p>
+
+<p>Then in the event handler the sender should be an instance of Application, which can be used to instantiate a UIApplication, on which the OpenAndActivateDocument method can be invoked. Like I said, quite simple. ;-) Each of the two methods is only a few lines of code.</p>
+
+<p><strong>Answer:</strong>
+
+Oh dear. What a waste.</p>
+
+<p>Yes, of course, given the UIApplication constructor taking an Application argument, all is clear and the Reflection is not needed. I did not notice that, and what I described was the first alternative I could find  :-)</p>
+
+<p>Well, well, apparently all roads lead to Rome after all... but it saves effort taking the easiest path.</p>
+
+<p>For the sake of completeness and those that trust nothing but source code, here is the complete solution without using Reflection, showing just how short and simple it can be:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _test_project_filepath
+&nbsp; &nbsp; = <span class="maroon">&quot;Z:/a/rvt/CurvedWall.rvt&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.ControlledApplication.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Sender is an Application instance:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = sender <span class="blue">as</span> <span class="teal">Application</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// However, UIApplication can be </span>
+&nbsp; &nbsp; <span class="green">// instantiated from Application.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = <span class="blue">new</span> <span class="teal">UIApplication</span>( app );
+&nbsp;
+&nbsp; &nbsp; uiapp.OpenAndActivateDocument(
+&nbsp; &nbsp; &nbsp; _test_project_filepath );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<p>The complete source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/OpenProject">
+OpenProject GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/OpenProject/releases/tag/2015.0.0.0">
+release 2015.0.0.0</a>.</p>
+
+<p>It could also be noted, for the sake of completeness, that in the majority of application events, the sender is the Application object.
+There are only a handful (if at all that much) of events that are raised by the UIApplication.
+Those are more like exceptions to the rule, as documented in the Revit API help file RevitAPI.chm in the SDK.</p>

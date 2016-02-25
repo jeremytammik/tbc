@@ -1,0 +1,149 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- 10281714 [Manage links] RevitLinkType Load and Unload
+
+- 10148201 [DirectShape texture assignment] we recently discussed ... unfortunately material manipulation programmatically inaccessible
+
+- Re: Revit 2015 SDK for R2 and UR4, Lester Grace 
+
+-->
+
+<h3>DevDays in Milano, Links, Textures, UR4 vs R2</h3>
+
+<p>Today we are holding the last Western European DevDays conference in Milano before the winter break.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/12/milano-meetups-and-my-new-nfc-business-card.html">
+Milano meetups</a> last
+
+night met with great interest and enthusiasm, so I will probably be returning here next year to present and conduct workshops on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">
+Autodesk View and Data API</a> in
+
+more depth.</p>
+
+<p>Right now, we are in the middle of Jim's morning session:</p>
+
+<center>
+<img src="img/2014-12-17_devdays_milano.jpeg" alt="DevDays conference in Milano" width="400"/>
+</center>
+
+
+<p>Independently of that, here are a few other miscellaneous topics that cropped up in the past few days:</p>
+
+<ul>
+<li><a href="#2">Loading and unloading Revit links</a></li>
+<li><a href="#3">Currently no programmatic texture assignment</a></li>
+<li><a href="#4">Revit 2015 R2 and UR API updates</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Loading and Unloading Revit Links</h4>
+
+<p><strong>Question:</strong> How can I 'reload from' or 'remove' a link?</p>
+
+<p>All I can see is ReloadLatest. </p>
+
+<p><strong>Answer:</strong> I would suggest starting by looking at the Revit API help file RevitAPI.chm.
+Have you done that?</p>
+
+<p>I looked at the Document.ReloadLatest method that fetches changes from central (due to one or more synchronisations with central) and merges them into the current session.</p>
+
+<p>That has to do with central files, not links.</p>
+
+<p>Searching a bit further for 'link', 'load', etc., I discovered the RevitLinkType.Load method that loads or reloads the Revit link from its currently-stored location.</p>
+
+<p>It also provides the RevitLinkType.Unload method that unloads the Revit link.</p>
+
+<p>Could that be what you are looking for?</p>
+
+<p>This functionality was introduced in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+Revit 2014 API</a>;
+
+search for 'enhancements to interactions with links'.</p>
+
+<p>Here is another aspect of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/06/technical-summit-day-1-and-removing-rvt-references.html#7">
+removing RVT links</a>.</p>
+
+<p>You might also want to take a look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#4.03">
+link API additions</a> in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">
+Revit API 2015 news</a>.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Currently No Programmatic Texture Assignment</h4>
+
+<p>I recently discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/directshape-versus-families-category-and-texture.html#4">
+DirectShape texture assignment</a>,
+
+leading to this obvious follow-up query:</p>
+
+<p><strong>Question:</strong> Thanks for the answer, it was very helpful!</p>
+
+<p>I used the TessellatedFace.MaterialId method and it works well.</p>
+
+<p>I now have a few follow-up questions: How can I rotate and scale a material (texture) on a face? Is there a way to map a texture to a face, like mapping texture coordinates [u,v] to face coordinates [x,y,z]? How does Revit map a material (texture) to a face?</p>
+
+<p><strong>Answer:</strong> In the UI, you can affect the texture mapping by selecting the material asset in the Materials dialogue, clicking the Appearance tab, clicking the pull-down to the right of the Image display, clicking Edit Image, and editing the properties of that image.</p>
+
+<p>I am sorry to report that there is currently no API support for setting these properties, just as there is no API support for editing visual material properties in general.</p>
+
+<p>Unfortunately, material manipulation is currently programmatically inaccessible.</p>
+
+<p>By the way, talking about DirectShape elements, you absolutely have to check out
+
+<a href="https://github.com/jeremytammik/DirectObjLoader">DirectObjLoader</a>,
+
+my new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/12/devdays-github-stl-and-obj-model-import.html#3">
+OBJ to DirectShape import utility add-in</a>.</p>
+
+
+<a name="4"></a>
+
+<h4>Revit 2015 R2 and UR API Updates</h4>
+
+<p>The Revit 2015 R2 subscription release included both new product functionality and some API enhancements, which led to the
+
+<a href=http://thebuildingcoder.typepad.com/blog/2014/10/updated-sdks-for-revit-2015-r2-and-ur4.html">
+updated SDKs for Revit 2015 R2 and UR4</a> and
+
+the following query:</p>
+
+<p><strong>Question:</strong> How do I tell which SDK to choose for download?</p>
+
+<p><strong>Answer:</strong> Which SDK you choose is pretty irrelevant.
+It only contains documentation and sample code.</p>
+
+<p>The Revit API .NET assembly DLLs provide the actual API, and they are all included with the Revit installation.</p>
+
+<p>There are only some minute enhancements in Revit 2015 R2 over Revit 2015, e.g. access to the Workflow.Create and modification methods, as discussed in the Revit API discussion forum threads on
+
+<a href="http://forums.autodesk.com/t5/revit-api/worksets/m-p/5360275">worksets</a> and
+
+<a href="http://forums.autodesk.com/t5/revit-api/r2-vs-ur4/m-p/5439929">R2 vs. UR4</a>.</p>
+
+<p>All the rest is identical.</p>

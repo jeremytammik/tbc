@@ -1,0 +1,341 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+hans sen 89 acad revit
+peter blixt cadpoint revit
+anders 99 2008 civil naviate
+ole andersson 2010 vault
+lars radman acad cpm 84 elschema 2006 cadq sequi revit licensering patch
+tommy strom norsk revit programmering
+timmy runesson java cadq 2007 web baserat doc handling projektnavet
+anders bengtsson cadpoint 98 web baserat doc handling licensering patch vault arx
+samir b r&d bim web portaler network revit naviate
+tore i marthinsen 
+
+a360
+  web services
+  api
+  http://thebuildingcoder.typepad.com/blog/2014/01/lots-of-clouds.html#5
+
+rest
+  <ul>
+  <<a href="http://thebuildingcoder.typepad.com/blog/2011/11/revit-server-rest-api.html">Revit Server REST API</a></li>
+  <li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/copy-a-model-from-a-revit-server.html">Copy a Model from a Revit Server</a></li>
+  <li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">The BIM 360 Glue Viewer and REST API</a></li>
+  <li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">BIM 360 Glue REST API Authentication Using Python</a></li>
+  </ul>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/revit-server-rest-api.html">Revit Server REST API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/copy-a-model-from-a-revit-server.html">Copy a Model from a Revit Server</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">The BIM 360 Glue Viewer and REST API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">BIM 360 Glue REST API Authentication Using Python</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">The Revit Server REST API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/01/rest-post-request-to-revit-server-2014.html">REST POST Request to Revit Server 2014</a></li>
+</ul>
+
+
+revit och cloud
+  revit server
+  daylighting
+  bpa/gbs
+  mep calculations
+  external file references
+
+simplified 2d bim model editor
+  round trip
+  real-time
+
+ideas
+  simplified cloud based 2D sheet view viewer
+  simplified cloud based plan view viewer with metadata
+
+-->
+
+<h3>Web Workshop, Tech Summit Plans and Security</h3>
+
+<p>Last week, I mentioned my short visit to Gothenburg, Sweden, for a mini web workshop hosted by
+
+<a href="http://www.cad-q.com">CAD-Q</a> and
+
+promised you more information about it anon.</p>
+
+<p>Well, the time has come to summarise the results from that venue, and also start planning my internal Autodesk Tech Summit proposal, due today, February 7, at the latest.</p>
+
+<p>I was a bit surprised by the contents of the web workshop.
+I had expected to contribute my part, for an hour or two, and then hear something from the others as well.
+It ended up running from Thursday at two in the afternoon until after six, and continuing on Friday.
+Unfortunately, I had to return to Switzerland already Friday morning, and, unexpectedly, the one and only scheduled presenter for Thursday afternoon was me  :-)</p>
+
+<center>
+<img src="img/web_workshop_agenda_jt.png" alt="Web workshop agenda" width="400"/>
+</center>
+
+<p>I ended up presenting on the following topics:</p>
+
+<ul>
+<li><a href="#2">Autodesk 360 Web Services</a></li>
+<li><a href="#3">REST API Programming</a></li>
+<li><a href="#4">Revit and the Cloud</a></li>
+<li><a href="#5">RoomEditor &ndash; my Cloud-based 2D BIM Model Editor</a></li>
+<li><a href="#6">Future Plans and Ideas</a></li>
+<li><a href="#7">WhiteHat Security Presentation</a></li>
+</ul>
+
+<p>All except the last two have already been covered extensively on the blog, so I had no problem filling the four hours ad hoc.</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk 360 Web Services</h4>
+
+<p>In preparation for this workshop, I put together an
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/lots-of-clouds.html#5">
+overview of the A360 web services</a> and
+
+their API coverage last week, mainly gleaned from the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#4">
+cloud &amp; mobile platform web service API overview</a> presented
+
+at the DevDay@AU in December 2013.</p>
+
+<p>As said, if you are interested in making use of any of the available APIs, please apply to join one of the
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/bim-360-glue-api-pilot-and-updated-samples.html">
+pilot programs</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>REST API Programming</h4>
+
+<p>Here are some of the explorations I made so far in various areas of REST API programming:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/revit-server-rest-api.html">
+Revit Server REST API</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/copy-a-model-from-a-revit-server.html">
+Copy a model from a Revit Server</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-python-ui-server-and-framework-apis.html#3">
+AU Class CP3093 &ndash; My first cloud/mobile app with Revit Server &ndash; by Adam Nagy</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/the-bim-360-glue-viewer-and-rest-api.html">
+The BIM 360 Glue viewer and REST API</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/12/bim-360-glue-rest-api-authentication-using-python.html">
+BIM 360 Glue REST API authentication using Python</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/url-and-other-buttons-xyz-points-and-vectors.html#6">
+The Green Building Studio GBS REST API</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/cloud-mobile-extensible-storage-data-use-in-schedules.html">
+Cloud &amp; mobile topics</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-editor-project-overview-and-couchdb-configuration.html">
+Room editor project overview and CouchDB configuration</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/couchdb-implementation-and-github-repository.html">
+CouchDB implementation</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/the-revit-server-rest-api.html">
+The Revit Server REST API</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/revit-server-api-access-and-vbscript.html">
+Revit Server API access and VBScript</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/text-file-driven-automatic-placement-of-family-instances.html#9">
+BIM 360 Glue API pilot and updated samples</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#4">
+Cloud &amp; mobile platform web service APIs</a>  presented at the DevDay@AU</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-3-recap-cloud-based-round-trip-model-editing.html">
+ReCap web service & cloud-based round-trip model editing</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/01/rest-post-request-to-revit-server-2014.html">
+REST POST request to Revit Server 2014</a></li>
+</ul>
+
+<p>Wow, that is a bit more than I expected, actually.
+Please note that most REST APIs are very simple to use.
+Pick a service that is useful to you and start exploring!</p>
+
+
+<a name="4"></a>
+
+<h4>Revit and the Cloud</h4>
+
+<p>Revit is evolving slowly but surely (well, actually not so slowly at all) towards a structure that can be split into separate components, and enables individual bits of functionality to be replaced by custom implementations, which may or may not be remote and cloud based, just as you prefer, e.g.:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/user-mep-calculation-sample.html">
+User MEP calculations</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2013/11/user-mep-calculation-sample-on-github.html">on GitHub</a>)</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/starting-to-clean-up-for-the-break.html#3">
+Building Performance Analysis</a> web services</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/starting-to-clean-up-for-the-break.html#4">
+Daylighting analysis</a></li>
+</ul>
+
+<p>I think we can expect the use of these kind of externalised services to continue growing rapidly, presenting lots of new customisation and maintenance enhancement opportunities.</p>
+
+<a name="5"></a>
+
+<h4>RoomEditor &ndash; my Cloud-based 2D BIM Model Editor</h4>
+
+<p>Also in preparation for this workshop, I summarised the available source code and presentation recordings for my RoomEditor, a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/lots-of-clouds.html#4">
+cloud-based real-time round-trip simplified 2D BIM model editor</a>.</p>
+
+<p>Most of the work I completed to implement it has been presented extensively by The Building Coder under the
+
+<a href="http://thebuildingcoder.typepad.com/blog/cloud">cloud</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/desktop">desktop</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/mobile">mobile</a> categories.</p>
+
+
+<a name="6"></a>
+
+<h4>Future Plans and Ideas</h4>
+
+<p>As said, I am still in the process of submitting a proposal for the internal Autodesk Tech Summit.</p>
+
+<p>I have two ideas in mind:</p>
+
+<ul>
+<li><a href="#6.1">Adding security related functionality to the existing RoomEditor</a></li>
+<li><a href="#6.2">Implementing a new more generic cloud-based round-trip real-time simplified 2D Revit BIM editor</a></li>
+</ul>
+
+
+<a name="6.1"></a>
+
+<h4>Adding Security to the Existing RoomEditor</h4>
+
+<p>I talked this over with my colleague Gopinath Taget.
+Here is a quick summary of our discussion:</p>
+
+<p><strong>Question:</strong> What security options would you suggest adding to the room editor?</p>
+
+<p>Currently, it consists of two components:</p>
+
+<ul>
+<li>Revit add-in, connecting to the cloud database via REST.</li>
+<li>Apache CouchDB cloud database with server-side scripting in HTML and JavaScript.</li>
+</ul>
+
+<p>I have not set up any security at all yet.</p>
+
+<p>When setting up a new CouchDB database, it is originally set up as a so-called
+
+<a href="http://guide.couchdb.org/draft/security.html">admin party</a>,
+
+a free-for-all setting with no access restrictions whatsoever.
+Anybody can go to the cloud database and has complete admin rights.</p>
+
+<p>The first step would obviously be to switch on users management and credential handling in the cloud database.</p>
+
+<p><strong>Answer:</strong> I think the basics would be:</p>
+
+<ul>
+<li>Separate login/password to the DB with enough rights to access, e.g. separate read and write permissions, distinct from the admin privileges.</li>
+<li>Using SSH to communicate with the REST API.</li>
+</ul>
+
+<p>It is unclear how to secure the REST API itself though.
+A web API can never be private, unlike a web page that can use login/password authentication.
+At most, you can require public/private certificates to identify the user making the calls.</p>
+
+<p>You could use certificates to identify the API user and certificates for SSH.</p>
+
+<p>Of course, more complex the app, the more potential for security holes.</p>
+
+<p>Two of the most common vulnerabilities for many web applications are SQL injection (if it uses stored procedures in databases) and cross-site scripting, i.e. someone intercepting the user communication and injecting malicious code into it.</p>
+
+<p>I don't think there is any danger of this scenario in your architecture.</p>
+
+<p><strong>Question:</strong> No. 1 is definitely top of the list, as I already stated.</p>
+
+<p>No. 2 also seems high priority and may be covered by CouchDB itself.</p>
+
+<p>I have no SQL, since I am using a NoSQL database, so the injection issue is moot.</p>
+
+<p><strong>Conclusion:</strong> Not much to do, really, beyond setting up the access rights and credential handling on the database, which is awfully obvious and very standard.</p>
+
+<p>So maybe I'll skip this idea and go for the second one instead:</p>
+
+
+
+<a name="6.2"></a>
+
+<h4>Implementing a New More Generic BIM Editor</h4>
+
+<p>The current RoomEditor generates its own simplified 2D plan view by determining room boundaries and projecting 3D family instances onto the XY plane.</p>
+
+<p>A more useful and generic approach might base a similar cloud-based real-time round-trip simplified 2D BIM model editor on selected plan views in Revit instead.
+It might also add an option to include other additional non-graphical properties and parameters, besides the pure minimal graphical data required to interactively manipulate the furniture placement.</p>
+
+<p>Here is a suggestion for such an approach by Samir Balicevac of
+
+<a href="http://www.cad-q.com">CAD-Q</a>:</p>
+
+<ul>
+<li>In Revit, select the plan views and specific categories to export, e.g., walls, furniture, etc.</li>
+<li>Export the non-graphical data, e.g. properties and parameters, plus the graphical data to 2D SVG.</li>
+<li>Import the graphical and non-graphical data into a NoSQL cloud database using the Revit unique id as a common key.</li>
+<li>Display the 2D plans in a graphical viewer in a web browser.</li>
+<li>Implement picking an element in the viewer, selecting it and displaying a modal window with non-graphical data.</li>
+<li>The non-graphical data can be edited and the selected element location modified by dragging, updating the cloud database.</li>
+<li>Update the Revit BIM model from the cloud database, including both graphical and non-graphical data.</li>
+</ul>
+
+<p>This has a strong similarity to the existing implementation, plus several important advantages, e.g.:</p>
+
+<ul>
+<li>There is a real use case and strong need for such functionality; almost any application developer could make use of such a component in one, several, or all typical workflows.</li>
+<li>Non-graphical data could be handled in a generic, customisable, flexible manner, in addition to the current graphical location and rotation functionality.</li>
+</ul>
+
+<p>Well, I only have a few more hours until the tech summit proposal submission deadline, so I had better start deciding fast.</p>
+
+
+
+<a name="7"></a>
+
+<h4>WhiteHat Security Presentation</h4>
+
+<p>Talking about web application security above, did you ever wonder how hackers find vulnerable websites?
+Or how much your personal data is worth?</p>
+
+<p>Here is a pretty short and very instructive presentation on these topics by Ashley Hamilton,
+
+<a href="http://www.whitehatsec.com">
+WhiteHat Security</a> Application Security Engineer, covering the whole range of security from exploit to marketplace and demonstrating:</p>
+
+<ul>
+<li>How hackers locate vulnerable websites</li>
+<li>The tools they use to find and search your database</li>
+<li>How hackers determine risk versus reward</li>
+<li>How they sell your data and how much you’re worth</li>
+</ul>
+
+<p>Here are the direct links to the:</p>
+
+<ul>
+<li><a href="http://go.whitehatsec.com/675YBI6740001te004F9G00">Webinar recording (38 minutes)</a></li>
+<li><a href="http://go.whitehatsec.com/675YBI6740001tf004F9G00">Presentation slide deck</a></li>
+</ul>

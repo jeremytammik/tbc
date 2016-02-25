@@ -1,0 +1,151 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+Michael Goehring Re: 141013_Revit MEP Telko vom 19.09.2014
+
+-->
+
+<h3>Brussels Hackathon, Pipe Wall Thickness and Voids</h3>
+
+<p>I received an email asking whether it is possible to determine the Revit MEP <a href="#3">pipe element wall thickness</a>, and also about the API access to <a href="#4">voids in the family editor</a>.</p>
+
+<p>Before getting to that, let me mention that I am now in Brussels at the <a href="#2">Open Data Hackathon</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Hackathon Open Data Brussels</h4>
+
+<p>I arrived in Gent last night and returned to Brussels this morning for the
+
+<a href="http://www.transformabxl.be/agenda/event/hackathon-open-data-brussels">
+Hackathon Open Data Brussels</a> taking
+
+place today and tomorrow, October 17-18 2014.</p>
+
+<p>It is intended to promote the use of open data:</p>
+
+<ul>
+<li><a href="https://twitter.com/hashtag/hackabxl">#hackabxl</a></li>
+<li><a href="https://twitter.com/hashtag/opendata">#opendata</a></li>
+</ul>
+
+<p>The
+
+<a href="http://www.transformabxl.be/blog/post/hackathon-open-data-brussels-list-of-available-datasets">
+list of available data sets</a> is
+
+huge, comprising thousands &ndash; if not tens of thousands &ndash; of databases.</p>
+
+<p>So far, this led me to take quick looks at a number of fascinating new topics and tools, e.g.:</p>
+
+<ul>
+<li>The <a href="http://cran.r-project.org">R programming language</a> for statistics and mapping</li>
+<li>The <a href="http://kartograph.org">Kartograph</a> framework for building interactive map applications</li>
+<li><a href="http://square.github.io/crossfilter">Crossfilter</a>, fast multidimensional filtering for coordinated views</li>
+<li>The <a href="http://d3js.org">D3.js</a> JavaScript library for manipulating documents based on data</li>
+</ul>
+
+<p>Me and Cyrille co-initiated and joined the
+
+<a href="https://github.com/PoiPointer">PoiPointer</a> project,
+
+with a goal of implementing an app pointing out points of interest.</p>
+
+<p>Backend probably based on <a href="http://www.elasticsearch.org">ElasticSearch</a>.</p>
+
+<p>Cyrille also presented our standard spiel on the Autodesk Data and View API:</p>
+
+<!--
+/a/doc/revit/blog/ $ ls *adva*
+1179_adva.htm			1207_adva_webinar.htm
+1188_adva_demo_material.htm	1219_adva_free_au.htm
+1195_adva_hack_va3c.htm		1226_adva_hackzrh.htm
+/a/doc/revit/blog/ $ bl 1179 1188 1195 1207 1219
+1179 1188 1195 1207 1219
+-->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/autodesk-view-and-data-api.html">Autodesk View and Data API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/view-and-data-api-presentation-material.html">View and Data API Presentation Material</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/autodesk-view-and-data-api-webinar.html">Autodesk View and Data API Webinar</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/adva-webinar-free-student-software-and-au.html#2">ADVA Webinar notes</a></li>
+</ul>
+
+<p>I'll stop here and report more on this later.</p>
+
+<p>Back to the Revit API...</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Determining Pipe Wall Thickness</h4>
+
+<p><strong>Question:</strong> I would like to compute the wall thickness of a given Revit MEP pipe instance and populate this value so it can be tagged on the pipe.</p>
+
+<p>The desired output could be something like 'OD x WT', i.e. outer diameter x wall thickness, e.g. '21.3 x 2.0' for a DN15 pipe.</p>
+
+<p>Is it possible to get at the necessary data through the API?</p>
+
+
+<p><strong>Answer:</strong> Revit does not provide a wall thickness parameter, but it can easily be derived from other data available and accessible in the model:</p>
+
+<ul>
+<li>The pipe instance has Pipe Segment and Diameter parameters.</li>
+<li>Manage &gt; MEP Settings &gt; Mechanical Settings &gt; Pipe Settings &gt; Segments and Sizes displays a drop list for each Pipe Segment</li>
+<li>Each pipe segment has a properties specifying its nominal, inside and outside diameters: Nominal (Diameter), ID (Inside diameter) and OD (Outside Diameter).</li>
+<li>The desired value WT (wall thickness) = (ID – OD) / 2.</li>
+</ul>
+
+<p>Most Revit element properties are stored in parameters.</p>
+
+<p>When possible, the parameter values should be access using the language independent and more efficient built-in parameter enumeration values instead of the language dependent display strings displayed to the used.</p>
+
+<p>In this case, the built-in parameter enumeration values RBS_PIPE_INNER_DIAM_PARAM and RBS_PIPE_OUTER_DIAMETER can be used, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="teal">BuiltInParameter</span> bipDiameterInner
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.RBS_PIPE_INNER_DIAM_PARAM;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="teal">BuiltInParameter</span> bipDiameterOuter
+&nbsp; &nbsp; = <span class="teal">BuiltInParameter</span>.RBS_PIPE_OUTER_DIAMETER;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> GetWallThickness( <span class="teal">Pipe</span> pipe )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> dinner = pipe.get_Parameter(
+&nbsp; &nbsp; &nbsp; bipDiameterInner ).AsDouble();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> douter = pipe.get_Parameter(
+&nbsp; &nbsp; &nbsp; bipDiameterOuter ).AsDouble();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> 0.5 * ( douter - dinner );
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Voids in the Family Editor</h4>
+
+<p><strong>Question:</strong> Are voids available in Revit 2015 through API?</p>
+
+<p>I need programmatic access to the ability to create Void geometry in Family Editor.</p>
+
+<p>It is required in order to create native geometry within a family, including some voids to get the right graphical representation.</p>
+
+<p><strong>Answer:</strong> Yes, sure.</p>
+
+<p>An example of making use of programmatically created voids is given by the recent discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/instancevoidcututils-and-need-for-regeneration.html">
+InstanceVoidCutUtils</a>.</p>
+
+<p>The actual programmatic generation of families is illustrated by various examples making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.25">Family API</a>.</p>

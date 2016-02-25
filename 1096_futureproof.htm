@@ -1,0 +1,334 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+/a/doc/revit/blog/ $ lb future.*proof
+0326_revit_2011.htm:1
+0330_port_bc_2011.htm:1
+0652_modeless_loose_connectors.htm:1
+0713_compiler_warnings.htm:1 ***
+0898_compiler_warnings.htm:1 *** clean up our usage of deprecated methods in the Revit 2012 API.
+1035_geo_bound_box.htm:1
+1094_clouds.htm:2
+1095_futureproof.htm:2
+comment.txt:2
+
+-->
+
+<h3>Future Proofing The Building Coder Samples</h3>
+
+<p>We've reached the add-in future-proofing season again, the time of year to eliminate compiler warnings and deprecated calls for easier migration to an updated API, just like last year in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/eliminating-compiler-warnings-and-deprecated-calls.html">January</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/eliminating-compiler-warnings-and-deprecated-calls.html">February</a>.</p>
+
+<p>It is very easy this time around, since we only have
+
+<a href="zip/bc_migr_2014_j.txt">
+two warnings</a> left,
+
+about use of the obsolete TitleBlocks property and FindReferencesWithContextByDirection method:</p>
+
+<ul>
+<li>CmdSheetSize.cs: 'Autodesk.Revit.DB.Document.TitleBlocks' is obsolete: 'This method is obsolete in Revit 2014. Use FilteredElementCollector with a FamilySymbol class filter and an appropriate category filter instead.'</li>
+<li>CmdDimensionWallsFindRefs.cs: 'Autodesk.Revit.DB.Document.FindReferencesWithContextByDirection(Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.XYZ, Autodesk.Revit.DB.View3D)' is obsolete: 'This method is deprecated in Revit 2014.  Use the ReferenceIntersector class instead.'</li>
+</ul>
+
+<p>The former warning is caused by code explicitly left in for comparison with the new suggested workaround listed in the warning message, so we can leave it there as long as it still compiles, until the very last minute.</p>
+
+<p>I fixed the latter by updating the CmdDimensionWallsFindRefs external command implementation, simply following the suggestion to replace the obsolete FindReferencesWithContextByDirection by the simplified interface provided by the ReferenceIntersector wrapper class.</p>
+
+<p>The original CmdDimensionWallsFindRefs implementation showed how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-using-findreferencesbydirection.html">
+dimension walls using FindReferencesByDirection</a>.</p>
+
+<p>I later updated it, replacing the FindReferencesByDirection method by FindReferencesWithContextByDirection when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">
+migrating to the Revit 2012 API</a>.</p>
+
+<p>This newest update makes it much shorter and simpler, since the ReferenceIntersector.FindNearest method enables us to eliminate all the code previously needed to determine the closest reference ourselves.</p>
+
+<p>Here is the new code:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Dimension two opposing parallel walls.</span>
+<span class="gray">///</span><span class="green"> Prompt user to select the first wall, and</span>
+<span class="gray">///</span><span class="green"> the second at the point at which to create</span>
+<span class="gray">///</span><span class="green"> the dimensioning. Use FindReferencesByDirection</span>
+<span class="gray">///</span><span class="green"> to determine the wall face references.</span>
+<span class="gray">///</span>
+<span class="gray">///</span><span class="green"> Second sample solution for case 1263303 [Case</span>
+<span class="gray">///</span><span class="green"> Number 1263071 [Revit 2011 Dimension Wall]].</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdDimensionWallsFindRefs</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; &nbsp; = <span class="maroon">&quot;Please select two parallel straight walls&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; with a partial projected overlap.&quot;</span>;
+&nbsp;
+<span class="blue">&nbsp; #region</span> WallSelectionFilter
+&nbsp; <span class="blue">class</span> <span class="teal">WallSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// WallSelectionFilter</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Get3DView
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a 3D view from the given document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="teal">View3D</span> Get3DView( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View3D</span> v <span class="blue">in</span> collector )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// skip view templates here because they</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// are invisible in project browsers:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( v != <span class="blue">null</span> &amp;&amp; !v.IsTemplate &amp;&amp; v.Name == <span class="maroon">&quot;{3D}&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> v;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Get3DView</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Select two walls and the dimension line point:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">ReferenceArray</span> refs = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">WallSelectionFilter</span> f
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">WallSelectionFilter</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; refs.Append( sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, f,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select first wall&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; refs.Append( sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, f,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick dimension line &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;point on second wall&quot;</span> ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No two walls selected&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Ensure the two selected walls are straight and</span>
+&nbsp; &nbsp; <span class="green">// parallel; determine their mutual normal vector</span>
+&nbsp; &nbsp; <span class="green">// and a point on each wall for distance</span>
+&nbsp; &nbsp; <span class="green">// calculations:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span>[] walls = <span class="blue">new</span> <span class="teal">Wall</span>[2];
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; ids = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;( 2 );
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[2];
+&nbsp; &nbsp; <span class="teal">Line</span>[] lines = <span class="blue">new</span> <span class="teal">Line</span>[2];
+&nbsp; &nbsp; <span class="teal">IntersectionResult</span> ir;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Reference</span> r <span class="blue">in</span> refs )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// 'Autodesk.Revit.DB.Reference.Element' is</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// obsolete: Property will be removed. Use</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Document.GetElement(Reference) instead.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//Wall wall = r.Element as Wall; // 2011</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Wall</span> wall = doc.GetElement( r ) <span class="blue">as</span> <span class="teal">Wall</span>; <span class="green">// 2012</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; walls[i] = wall;
+&nbsp; &nbsp; &nbsp; ids.Add( wall.Id.IntegerValue );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Obtain location curve and</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// check that it is straight:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = wall.Location
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> curve = lc.Curve;
+&nbsp; &nbsp; &nbsp; lines[i] = curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == lines[i] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Obtain normal vectors</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and ensure that they are equal,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// i.e. walls are parallel:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == normal )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = <span class="teal">Util</span>.Normal( lines[i] );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsParallel( normal,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Normal( lines[i] ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Obtain pick points and project</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// onto wall location lines:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = r.GlobalPoint;
+&nbsp; &nbsp; &nbsp; ir = lines[i].Project( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ir )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to project pick point {0} &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;onto wall location line.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; pts[i] = ir.XYZPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Wall {0} id {1} at {2}, {3} --&gt; point {4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; i, wall.Id.IntegerValue,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( lines[i].GetEndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( lines[i].GetEndPoint( 1 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[i] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Project dimension point selected on second wall</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// back onto first wall, and ensure that normal</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// points from second wall to first:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ir = lines[0].Project( pts[1] );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ir )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to project selected dimension &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;line point {0} on second wall onto &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;first wall's location line.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[1] ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; pts[0] = ir.XYZPoint;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++i;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = pts[0] - pts[1];
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; v.DotProduct( normal ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; normal = -normal;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Shoot a ray back from the second </span>
+&nbsp; &nbsp; <span class="green">// picked wall towards first:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Shooting ray from {0} in direction {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( pts[1] ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">View3D</span> view = Get3DView( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;No 3D view named '{3D}' found; &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;run the View &gt; 3D View command once &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;to generate it.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">//refs = doc.FindReferencesByDirection(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; pts[1], normal, view ); // 2011</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//IList&lt;ReferenceWithContext&gt; refs2</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; = doc.FindReferencesWithContextByDirection(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; pts[1], normal, view ); // 2012</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// In the Revit 2014 API, the call to</span>
+&nbsp; &nbsp; <span class="green">// FindReferencesWithContextByDirection causes a </span>
+&nbsp; &nbsp; <span class="green">// warning saying:</span>
+&nbsp; &nbsp; <span class="green">// &quot;FindReferencesWithContextByDirection is obsolete:</span>
+&nbsp; &nbsp; <span class="green">// This method is deprecated in Revit 2014.&nbsp; </span>
+&nbsp; &nbsp; <span class="green">// Use the ReferenceIntersector class instead.&quot;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceIntersector</span> ri
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; walls[0].Id, <span class="teal">FindReferenceTarget</span>.Element, view );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceWithContext</span> ref2
+&nbsp; &nbsp; &nbsp; = ri.FindNearest( pts[1], normal );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == ref2 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;ReferenceIntersector.FindNearest&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; returned null!&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CmdDimensionWallsIterateFaces</span>
+&nbsp; &nbsp; &nbsp; .CreateDimensionElement( doc.ActiveView,
+&nbsp; &nbsp; &nbsp; pts[0], ref2.GetReference(), pts[1], refs.get_Item( 1 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>I committed those changes to The Building Coder samples
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.7">release 2014.0.106.7</a>.</p>
+
+<p>In a second step, I also incremented the copyright year from 2013 to 2014, affecting all the modules, and saved that as
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.8">release 2014.0.106.8</a>.</p>
+
+<p>Normally, you would simply grab
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> current
+
+master branch, of course.</p>

@@ -1,0 +1,110 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+- Scott Adams: How to Fail at Almost Everything and Still Win Big [en] [very original ideas on success, underlining the importance of systematic approaches, reprogramming yourself and your habits, health, exercise and failure - a present from Steven Mycynek at the Autodesk Technical Summit Toronto]
+
+- http://adndevblog.typepad.com/aec/2014/08/handling-duplicate-types-on-copyelements.html
+
+-->
+
+<h3>How to Fail, Still Win Big and Handle Duplicate Types</h3>
+
+<p>Let's start this week with a couple of interesting recent topics that have been hanging around a while up, one Revit API related and not:</p>
+
+<ul>
+<li><a href="#2">How to fail at almost everything and still win big</a></li>
+<li><a href="#3">Handling duplicate types when copying elements</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>How to Fail at Almost Everything and Still Win Big</h4>
+
+<p>I received a very nice present from my colleague Steve Mycynek, Principal Engineer of the Revit API development team, at the Autodesk
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/06/technical-summit-day-1-and-removing-rvt-references.html">Technical Summit</a> in
+
+Toronto:
+
+<a href="http://dilbert.com/blog/entry/how_to_fail_at_almost_everything_and_still_win_big_kind_of_the_story_of_my_life">How to Fail at Almost Everything and Still Win Big: Kind of the Story of My Life</a>,
+
+by Scott Adams, author of the famous
+
+<a href="http://dilbert.com">Dilbert</a> comic series.</p>
+
+<p>I was surprised how much I liked the book, and how impressed I am by Adams' original and creative way to analyse and pursue the topic of success.</p>
+
+<p>He underlines the importance of systematic approaches, reprogramming yourself and your habits, especially regarding health, exercise and failure.</p>
+
+<p>Here are Steve's thoughts on and motivation for his generosity:</p>
+
+<p>Scott Adams claims that most people’s definition of 'genius' is 'someone who thinks just like they do, only better'.  In that way, because often Adams says what I’m thinking, but with style and lots of best-selling book money, I, by his definition, think he’s a genius, especially when he makes serious comments about life, work, and happiness   :-)</p>
+
+<p>One point Adams makes is that 'every skill you have doubles your chances of success'.  I see this over and over again.  For example, a few years back, I created an interactive Ruby read-eval-print loop for a special programming environment within another application to work with various API-related data structures at the command line.  Not much came of it, but recently, when learning Ruby-on-Rails, I came across the 'rails console' tool, which is, what-do-you-know, a 'read-eval-print loop for Ruby with all of your rails application data-structures pre-loaded so you can interactively query, edit, and create data via code fragments.'  I was instantly motivated to use this to learn, develop, and debug rails issues, but I probably wouldn’t have gotten on board with the rails console with such enthusiasm if I hadn’t spent time building silly read-eval-print loop applications years earlier.</p>
+
+<p>I’ll admit that I have sort of an addiction to skill building and bit of a manic survival instinct when it comes to learning in general.  One thing that really helps with this is all the insight Adam has into health.  I find that the better my diet and the more exercise I get, the more I can get up early and have energy to quickly try out a new library or introduce a new feature into a toy application I’m working on.</p>
+
+<p>This gets into a later point that Adams makes, which is 'health + freedom = happiness.'  If you’re not well, nothing will make you happy, even if you have millions of dollars.  If you’re basically healthy but chained to a job you hate &ndash; pretty much the same thing.   So, I come full circle, trying to be as healthy as possible so I can have as many skills as possible so that I can have the most opportunities and ultimately freedom as possible &ndash; so I can be as happy as possible.</p>
+
+<p>There’s more to it than that, and if you want more Adams insight, check out 'God’s Debris' and 'Stick to Drawing Cartoons, Monkey Brain' &ndash; more of his philosophy is covered there.  In a nutshell, Adams is the self-help guru that engineers can stomach, right up there with Steve McConnell of 'Code Complete' fame.  He’s sort of the 'wise uncle' of XKCD.  That’s why I started the tradition of giving his non-fiction books to co-workers &ndash; I hope he writes more so I can keep doing it.</p>
+
+<p>Thank you very much, Steve, for this wonderful and enriching gift!</p>
+
+<!--
+
+<a name="3"></a>
+
+<h4>Reducing PowerPoint File Size</h4>
+
+<p>Here is a very simple trick that I was not previously aware of and that might help you to  drastically reduce the size of your PowerPoint files.</p>
+
+Everyone knows how much adding a picture or two can dress up PowerPoint slides and make them easier to read. We also know the impact pictures can have by drastically increasing the file size of your document. However, there is a really simple little mechanism for reducing the size of your PowerPoint file.
+
+In PowerPoint, click File / Save As.
+Select the 'Tools' button next to the 'Save' button.
+Tools.png
+
+Click 'Compress Pictures...'.
+compress picture.png
+
+Choose 'Email (96ppi)' as the Target output and click OK.
+email 96 ppi.png
+
+This causes no visible loss of quality when projected or displayed on-screen, and the savings in file size can be dramatic. This is because in PowerPoint, the default resolution for pictures is 220dpi, which is designed for print.
+
+This little trick generally reduces my 10Mb presentations down to half of their original file size.
+
+-->
+
+
+<a name="3"></a>
+
+<h4>Handling Duplicate Types When Copying Elements</h4>
+
+<p>Another colleague of mine,
+
+<a href="http://adndevblog.typepad.com/aec/augusto-goncalves.html">Augusto Gon&ccedil;alves</a> of
+
+the ADN developer support team, presented a useful note on
+
+<a href="http://adndevblog.typepad.com/aec/2014/08/handling-duplicate-types-on-copyelements.html">
+handling duplicate types on CopyElements</a>,
+
+which can raise a 'Duplicate Types' warning saying 'The following Types already exist but are different...':</p>
+
+<center>
+<img src="img/duplicate_types.png" alt="'Duplicate Types' warning" width="388"/>
+</center>
+
+<p>It is based on an answer by Arno&scaron;t L&ouml;bel, Sr. Principal Engineer of the Revit development team, on the Revit API discussion forum thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-implement-iduplicatetypesnamehandler-for-the/m-p/4926792">how to implement IDuplicateTypesNameHandler for the CopyPasteOptions class</a>.</p>
+
+<p>It shows a use of the CopyPasteOptions class and a custom duplicate type names handler &ndash; another one is provided by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/copy-and-paste-api-applications-and-modeless-assertion.html#2.1">DuplicateViews SDK sample</a>.

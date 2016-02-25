@@ -1,0 +1,617 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Replacing an Idling Event Handler by an External Event</h3>
+
+<p>I arrived back in Europe safe and sound from America.</p>
+
+<p>Healthy, as well, in spite of air conditioning and the freezing temperatures in some of the Autodesk University conference rooms.</p>
+
+<p>Thank God, I went well prepared with long-sleeved woollen underwear and thick heavy sweaters to face the arctic challenges of the desert town.</p>
+
+<p>As I hinted at when describing my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-3-recap-cloud-based-round-trip-model-editing.html">
+last day at AU</a>,
+
+I realised that I can significantly improve the implementation of the RoomEditorApp subscription to real-time database changes by replacing the Idling event I was using previously by an external event:</p>
+
+<ul>
+<li><a href="#2">Idling versus an external event</a></li>
+<li><a href="#3">Implementing the RoomEditorApp external event</a></li>
+<li><a href="#4">Implementing the IExternalEventHandler interface</a></li>
+<li><a href="#5">External event creation and disposal</a></li>
+<li><a href="#6">Creating and managing the external event</a></li>
+<li><a href="#7">Checking for pending database changes in a separate thread</a></li>
+<li><a href="#8">Waiting for Revit to react</a></li>
+<li><a href="#9">Differences, download and conclusion</a></li>
+<li><a href="#10">Revit requires focus</a></li>
+<!-- <li><a href="#9">Triggering immediate external event processing</a></li> -->
+</ul>
+
+<p>I implemented that during the trip home, actually, in a very few hours.</p>
+
+<p>I spent significantly more time over the weekend putting together the following detailed documentation, so I really hope you enjoy and appreciate it.</p>
+
+<p>That obviously means that I had less time to prepare for the series of European DevDays conferences starting Monday morning in Paris.</p>
+
+<p>I'll have to wing it somehow, I guess.</p>
+
+<p>Here is the sequence of stops I will attend:</p>
+
+<ul>
+<li>2013-12-09 &ndash; DevDay, Paris, France</li>
+<li>2013-12-10 &ndash; DevDay, Milan, Italy</li>
+<li>2013-12-11 &ndash; DevDay, Farnborough, United Kingdom</li>
+<li>2013-12-12 &ndash; DevDay, Munich, Germany</li>
+<li>2013-12-13 &ndash; DevLab, Munich, Germany</li>
+<li>2013-12-16 &ndash; DevDay, Gothenburg, Sweden</li>
+</ul>
+
+<p>If you are interested in the full list of events, please look at the complete
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/back-and-preparing-the-au-and-devdays-conferences.html#2">
+DevDays schedule</a>.
+
+As said,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/invitation-to-autodesk-devdays-2013.html">
+you are welcome to join</a>,
+
+regardless of ADN membership.</p>
+
+<p>By the time you read this, the DevDay conference in Paris will already be in full tilt.</p>
+
+<p>Back to the topic at hand:</p>
+
+
+
+<a name="2"></a>
+
+<h4>Idling versus an External Event</h4>
+
+<p>In fact, maybe it is best to avoid using the Idling event completely when you require a continuous check for external changes to react to, since it only gives you the choice between either calling SetRaiseWithoutDelay or not.</p>
+
+<p>If you call it, Revit will hog the processor and bring down the system performance.</p>
+
+<p>If you do not, you will only be called once every time Revit enters the Idling state.</p>
+
+<p>A new Idling state can be triggered in Revit by just moving the cursor across its graphics screen.
+That effect is described and used by Joe Ye to implement a programmatic
+
+<a href="http://adndevblog.typepad.com/aec/2013/07/tricks-to-force-trigger-idling-event.html">
+trick to trigger the Idling event</a>,
+
+as briefly mentioned as a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/curve-length-idling-units-and-revitpythonshell.html#3">
+potential SetRaiseWithoutDelay workaround</a>.</p>
+
+<p>Use of an external event instead of Idling gives an add-in much more control over the timing behaviour.</p>
+
+<p>You can run your external check in a separate thread, make full use of the various .NET or Windows threading options to make regular checks for pending updates at specified intervals and totally relinquish control of the CPU in between, avoiding the performance hit of using SetRaiseWithoutDelay and yet activating the check as often as desired.</p>
+
+<p>I rewrote the RoomEditorApp check for database updates using an external event instead of Idling as described below.</p>
+
+<p>After completing that and getting it to work perfectly, just the way I want, I noticed one unexpected little drawback:</p>
+
+<p>When I raise the external event with nothing else happening in the system, Revit does not react immediately.
+It just sits there doing nothing, although I can see from my debugging messages that the external event I registered and raised is pending.</p>
+
+<p>If I move the cursor over the Revit screen, the pending external event is processed almost immediately.</p>
+
+<p>Sometimes Revit decides to process it without moving the cursor, but hardly ever right away.</p>
+
+<p>This prompted me to remember the trick described above, and the next step I plan is to update the RoomEditorApp to trigger immediate external event processing by simulating a mouse move event in the Revit graphics screen.</p>
+
+<p>Let's look at the individual steps in detail.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Implementing the RoomEditorApp External Event</h4>
+
+<p>An external event is created by the Revit API by calling the static ExternalEvent.Create method and passing in the custom event handler to it, represented by an instance of a class implementing the IExternalEventHandler interface.</p>
+
+<p>The previous RoomEditorApp implementation working with the Idling event handler already defined a DbUpdater class providing a UpdateBim method that was called by the handler when it determined the presence of pending database updates.</p>
+
+<p>That represents an obvious candidate for implementing the new external event handler interface, so I added IExternalEventHandler as a new DbUpdater base class:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">DbUpdater</span> : <span class="teal">IExternalEventHandler</span>
+</pre>
+
+<p>The Idling version of the DbUpdater class kept track of the current Revit document in a dedicated member variable _doc.</p>
+
+<p>The new version is more or less document independent &ndash; I hope!
+It stores the Revit UI application instead and retrieves the currently active document from that when needed.
+This will certainly work fine when you are only working with one single document, as is the case in my testing scenario:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Current Revit project document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="green">//Document _doc = null;</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Revit UI application.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">UIApplication</span> _uiapp = <span class="blue">null</span>;
+</pre>
+
+<p>Except for that modification, the <b>existing</b> DbUpdater class implementation remains unchanged.</p>
+
+<p>The new <b>additional</b> methods handle two aspects:</p>
+
+<ul>
+<li><a href="#4">Implementing the IExternalEventHandler interface</a></li>
+<li><a href="#6">Checking for pending database changes in a separate thread</a></li>
+</ul>
+
+
+
+<a name="4"></a>
+
+<h4>Implementing the IExternalEventHandler Interface</h4>
+
+<p>The IExternalEventHandler interface is pretty minimal.</p>
+
+<p>All it requires is the implementation of two methods:</p>
+
+<ul>
+<li>The <b>Execute</b> method invoked by Revit via the external event as a reaction to a call to its Raise method.</li>
+<li>The <b>GetName</b> method returning a descriptive name.</li>
+</ul>
+
+<p>This is what they look like in my case:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Execute method invoked by Revit via the </span>
+&nbsp; <span class="gray">///</span><span class="green"> external event as a reaction to a call </span>
+&nbsp; <span class="gray">///</span><span class="green"> to its Raise method.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( <span class="teal">UIApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// As far as I can tell, the external event </span>
+&nbsp; &nbsp; <span class="green">// should work fine even when switching between</span>
+&nbsp; &nbsp; <span class="green">// different documents. That, however, remains</span>
+&nbsp; &nbsp; <span class="green">// to be tested in more depth (or at all).</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Document doc = a.ActiveUIDocument.Document;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//Debug.Assert( doc.Title.Equals( _doc.Title ),</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; &quot;oops ... different documents ... test this&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; UpdateBim();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Required IExternalEventHandler interface </span>
+&nbsp; <span class="gray">///</span><span class="green"> method returning a descriptive name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> GetName()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} DbUpdater&quot;</span>, <span class="teal">App</span>.Caption );
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>External event creation and disposal</h4>
+
+<p>The creation and disposal of the external event is more trivial still.</p>
+
+<p>Just like the Idling event subscription, I decided to handle it in the main add-in external application implementation.</p>
+
+<p>Instead of keeping track of the Idling event handler, it now holds on to an instance of the external event it creates:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the Idling event handler when subscribed.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="green">//static EventHandler&lt;IdlingEventArgs&gt; _handler = null;</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the external event.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ExternalEvent</span> _event = <span class="blue">null</span>;
+</pre>
+
+<p>The actual creation and disposal in achieved by the ToggleSubscription that was already in place for the Idling event subscription:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle on and off subscription to </span>
+&nbsp; <span class="gray">///</span><span class="green"> automatic cloud updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ExternalEvent</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="green">// EventHandler&lt;IdlingEventArgs&gt; handler</span>
+&nbsp; &nbsp; <span class="teal">IExternalEventHandler</span> handler )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="green">//_uiapp.Idling -= _handler; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//_handler = null; </span>
+&nbsp; &nbsp; &nbsp; _event.Dispose();
+&nbsp; &nbsp; &nbsp; _event = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _subscribe;
+&nbsp; &nbsp; &nbsp; _timer.Stop();
+&nbsp; &nbsp; &nbsp; _timer.Report( <span class="maroon">&quot;Subscription timing&quot;</span> );
+&nbsp; &nbsp; &nbsp; _timer = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="green">//_uiapp.Idling += handler;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//_handler = handler;</span>
+&nbsp; &nbsp; &nbsp; _event = <span class="teal">ExternalEvent</span>.Create( handler );
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _unsubscribe;
+&nbsp; &nbsp; &nbsp; _timer = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Subscription&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> _event;
+&nbsp; }
+</pre>
+
+
+
+<a name="6"></a>
+
+<h4>Creating and Managing the External Event</h4>
+
+<p>OK, OK, so all the above is obvious and trivial, you say?</p>
+
+<p>So where is the challenge, what is the interesting part, where is the use and big advantage of all this?</p>
+
+<p>Well, that is the part we address now:</p>
+
+<p>By escaping from the Idling event invoked by Revit internally as it sees fit, with the minimal timing control provided by the SetRaiseWithoutDelay method, we gain several advantages:</p>
+
+<ul>
+<li>We have full control over the timing of our calls to the external event Raise method.</li>
+<li>We have full access to the methods provided by the Windows and .NET APIs, e.g. Sleep, timers, threads etc.</li>
+<li>We can run the check for external changes that need to be reacted on in a separate thread!</li>
+</ul>
+
+<p>Instead of calling the main external application's ToggleSubscription method directly and passing in the Idling event handler, the external command to subscribe to database changes now calls an intermediate ToggleSubscription method implemented by the DbUpdater class that forwards it to App.ToggleSubscription and simultaneously launches the separate thread.</p>
+
+<p>The entire read-only CmdSubscribe implementation thus now looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">App</span>.Subscribed
+&nbsp; &nbsp; &nbsp; &amp;&amp; -1 == <span class="teal">DbUpdater</span>.LastSequence )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DbUpdater</span>.SetLastSequence();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">//App.ToggleSubscription( OnIdling );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">DbUpdater</span>.ToggleSubscription(
+&nbsp; &nbsp; &nbsp; commandData.Application );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>The DbUpdater.ToggleSubscription method thus achieves the following:</p>
+
+<ul>
+<li>Toggle subscription to automatic database updates.</li>
+<li>Forward the call to the external application that creates the external event.</li>
+<li>Store the external event.</li>
+<li>Launch a separate thread checking for database updates.</li>
+<li>On Detecting pending changes, invoke the external event Raise method.</li>
+</ul>
+
+<p>The code to achieve this is actually more succinct than the verbal description:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle subscription to automatic database </span>
+&nbsp; <span class="gray">///</span><span class="green"> updates. Forward the call to the external </span>
+&nbsp; <span class="gray">///</span><span class="green"> application that creates the external event,</span>
+&nbsp; <span class="gray">///</span><span class="green"> store it and launch a separate thread checking </span>
+&nbsp; <span class="gray">///</span><span class="green"> for database updates. When changes are pending,</span>
+&nbsp; <span class="gray">///</span><span class="green"> invoke the external event Raise method.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; _event = <span class="teal">App</span>.ToggleSubscription(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">DbUpdater</span>( uiapp ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _event )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _thread.Abort();
+&nbsp; &nbsp; &nbsp; _thread = <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Start a new thread to regularly check the</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// database status and raise the external event</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// when updates are pending.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; _thread = <span class="blue">new</span> <span class="teal">Thread</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; CheckForPendingDatabaseChanges );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _thread.Start();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Checking for Pending Database Changes in a Separate Thread</h4>
+
+<p>So, we started a new thread to check for database changes.</p>
+
+<p>That was awfully simple, wasn't it?</p>
+
+<p>When creating it, we pass in a method to execute.</p>
+
+<p>It is not complicated either.</p>
+
+<p>In fact, it is completely trivial as well, and just slightly bloated by debug and log messages for monitoring its behaviour.</p>
+
+<p>It currently looks like this, including a couple of bookkeeping and tweaking variables that might come in handy for measuring and optimising performance:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Count total number of checks for</span>
+&nbsp; <span class="gray">///</span><span class="green"> database updates made so far.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _nLoopCount = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Count total number of checks for</span>
+&nbsp; <span class="gray">///</span><span class="green"> database updates made so far.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _nCheckCount = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Count total number of database </span>
+&nbsp; <span class="gray">///</span><span class="green"> updates requested so far.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _nUpdatesRequested = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Number of milliseconds to wait and relinquish</span>
+&nbsp; <span class="gray">///</span><span class="green"> CPU control before next check for pending</span>
+&nbsp; <span class="gray">///</span><span class="green"> database updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _timeout = 100;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Repeatedly check database status and raise </span>
+&nbsp; <span class="gray">///</span><span class="green"> external event when updates are pending.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Relinquish control and wait for timeout</span>
+&nbsp; <span class="gray">///</span><span class="green"> period between each attempt. Run in a </span>
+&nbsp; <span class="gray">///</span><span class="green"> separate thread.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> CheckForPendingDatabaseChanges()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">true</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++_nLoopCount;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != _event,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected non-null external event&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _event.IsPending )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CheckForPendingDatabaseChanges loop {0} - &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;database update event is pending&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _nLoopCount ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CheckForPendingDatabaseChanges&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++_nCheckCount;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CheckForPendingDatabaseChanges loop {0} - &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;check for changes {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _nLoopCount, _nCheckCount ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RoomEditorDb</span> rdb = <span class="blue">new</span> <span class="teal">RoomEditorDb</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( rdb.LastSequenceNumberChanged(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DbUpdater</span>.LastSequence ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _event.Raise();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++_nUpdatesRequested;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;database update pending event raised {0} times&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _nUpdatesRequested ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Wait a moment and relinquish control before</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// next check for pending database updates.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( _timeout );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Most significantly, of course, the _timeout variable controls the number of milliseconds to wait between each repetition of the database check for pending updates.</p>
+
+
+<a name="8"></a>
+
+<h4>Waiting for Revit to React</h4>
+
+<p>As I mentioned in the beginning of this discussion, when the external event has been raised, Revit does not actually call the external event Execute method until a cursor movement or some other system event wakes it up.</p>
+
+<p>Here is an extract from a sample log file demonstrating this.
+I generated it by making changes to the cloud database via the browser, observing that the external event is raised immediately, waiting for a while and then moving the mouse to trigger Revit to forward the notification by calling the external event (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+19:12:16.796 CheckForPendingDatabaseChanges loop 1 - check for changes 1
+19:12:17.075 CheckForPendingDatabaseChanges loop 2 - check for changes 2
+19:12:17.224 CheckForPendingDatabaseChanges loop 3 - check for changes 3
+. . .
+19:12:28.227 CheckForPendingDatabaseChanges loop 105 - check for changes 105
+19:12:28.332 CheckForPendingDatabaseChanges loop 106 - check for changes 106
+19:12:33.189 database update pending event raised 1 times
+19:12:33.291 CheckForPendingDatabaseChanges loop 107 - database update event is pending
+19:12:33.394 CheckForPendingDatabaseChanges loop 108 - database update event is pending
+19:12:33.496 CheckForPendingDatabaseChanges loop 109 - database update event is pending
+. . .
+19:12:34.825 CheckForPendingDatabaseChanges loop 122 - database update event is pending
+19:12:34.927 CheckForPendingDatabaseChanges loop 123 - database update event is pending
+19:12:35.067 CheckForPendingDatabaseChanges loop 124 - check for changes 107
+19:12:35.177 CheckForPendingDatabaseChanges loop 125 - check for changes 108
+19:12:35.283 CheckForPendingDatabaseChanges loop 126 - check for changes 109
+. . .
+19:12:51.476 CheckForPendingDatabaseChanges loop 276 - check for changes 259
+19:12:51.581 CheckForPendingDatabaseChanges loop 277 - check for changes 260
+19:12:51.584 database update pending event raised 2 times
+19:12:51.686 CheckForPendingDatabaseChanges loop 278 - database update event is pending
+19:12:51.789 CheckForPendingDatabaseChanges loop 279 - database update event is pending
+19:12:51.891 CheckForPendingDatabaseChanges loop 280 - database update event is pending
+. . .
+19:13:11.498 CheckForPendingDatabaseChanges loop 470 - database update event is pending
+19:13:11.613 CheckForPendingDatabaseChanges loop 471 - database update event is pending
+19:13:11.725 CheckForPendingDatabaseChanges loop 472 - check for changes 261
+19:13:11.833 CheckForPendingDatabaseChanges loop 473 - check for changes 262
+19:13:11.938 CheckForPendingDatabaseChanges loop 474 - check for changes 263
+. . .
+19:13:32.217 CheckForPendingDatabaseChanges loop 660 - check for changes 449
+19:13:32.222 database update pending event raised 3 times
+19:13:32.326 CheckForPendingDatabaseChanges loop 661 - database update event is pending
+19:13:32.427 CheckForPendingDatabaseChanges loop 662 - database update event is pending
+19:13:32.530 CheckForPendingDatabaseChanges loop 663 - database update event is pending
+. . .
+19:13:37.188 CheckForPendingDatabaseChanges loop 708 - database update event is pending
+19:13:37.291 CheckForPendingDatabaseChanges loop 709 - database update event is pending
+19:13:37.470 CheckForPendingDatabaseChanges loop 710 - check for changes 450
+19:13:37.587 CheckForPendingDatabaseChanges loop 711 - check for changes 451
+19:13:37.692 CheckForPendingDatabaseChanges loop 712 - check for changes 452
+. . .
+19:13:45.076 CheckForPendingDatabaseChanges loop 780 - check for changes 520
+19:13:45.184 CheckForPendingDatabaseChanges loop 781 - check for changes 521
+19:13:45.188 database update pending event raised 4 times
+19:13:45.291 CheckForPendingDatabaseChanges loop 782 - database update event is pending
+19:13:45.444 CheckForPendingDatabaseChanges loop 783 - database update event is pending
+19:13:45.838 CheckForPendingDatabaseChanges loop 784 - database update event is pending
+. . .
+19:13:47.967 CheckForPendingDatabaseChanges loop 789 - database update event is pending
+19:13:48.387 CheckForPendingDatabaseChanges loop 790 - database update event is pending
+19:13:48.989 CheckForPendingDatabaseChanges loop 791 - check for changes 522
+19:13:49.613 CheckForPendingDatabaseChanges loop 792 - check for changes 523
+</pre>
+
+<p>As you can see, there is sometimes a significant delay between the moments when the database update pending event is raised and when it is actually forwarded by Revit to the external event Execute method, at which point the code switches back to check for new changes again.</p>
+
+<p>In most cases, it was possible to trigger the forwarding simply by moving the cursor on the screen.</p>
+
+<p>A similar effect is described and used by Joe Ye to implement the programmatic
+
+<a href="http://adndevblog.typepad.com/aec/2013/07/tricks-to-force-trigger-idling-event.html">
+trick to trigger the Idling event</a>,
+
+as briefly mentioned as a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/curve-length-idling-units-and-revitpythonshell.html#3">
+potential SetRaiseWithoutDelay workaround</a>.</p>
+
+<p>That is obviously the next step I will explore to complete my understanding, perfect this application and make optimal use of the external event mechanism.</p>
+
+<p>For now, though, I think this is enough for today.</p>
+
+
+<a name="9"></a>
+
+<h4>Differences, Download and Conclusion</h4>
+
+<p>I hope this pretty exhaustive description is clear.</p>
+
+<p>As you can see, I think this is a very important and interesting topic, so I really want to get the message across.</p>
+
+<p>I committed the changes implementing this version in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>
+
+(<a href="http://thebuildingcoder.typepad.com/blog/2013/10/roomeditorapp-for-revit-2014-on-github.html">description</a>) as
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.18">
+release 2014.0.0.18</a>.
+
+<!-- the label 'derive DbUpdater from external event and replace Idling' -->
+
+<p>If you are interested in the exact differences between the versions using the Idling event versus the new external event, here is an
+
+<a href="zip/roomedit_extern_event_diff_edited.txt">edited version</a> and the
+
+<a href="zip/roomedit_extern_event_diff_original.txt">full list of differences</a> reported
+
+by the git diff tool.</p>
+
+<p>I hope you have fun with all this, and please wish me lots of luck for the DevDays conferences.</p>
+
+<!--
+
+<a name="9"></a>
+
+<h4>Triggering Immediate External Event Processing</h4>
+
+<a href="">
+</a>
+
+<pre class="code">
+</pre>
+
+A: In my previous reply, I shared an article that can make revit idling event triggered continiously by changing the mouse position left and right. So the ildling event can be triggered ceaselessly.
+
+The other method is in the end of the idling event handling calling SetRaiseWithoutDelay method to trigger the event handler without break. This is also annoy when the end-user is back to his table and star to work using Revit, they cannot stop that lenghy process at once.  Well, I think we have a trick here. In the Idling event handler before you call the SetRaiseWithoutDelay() method, we can check if the mouse position is different from its previous position( say greater than 2 pixel), then you stop calling the SetRaiseWithoutDelay() method.
+
+In your Idling event hander, you can also calculate how long that the end-user didn't move the mouse, say 10 seconds, then you can start to do the lengthy job.
+
+-->
+
+<a name="10"></a>
+
+<h4>Addendum &ndash; Revit Requires Focus</h4>
+
+<p>Guy Robinson has some comments on this and says:</p>
+
+<p>Here are a few more things to consider:</p>
+
+<ul>
+<li>External events won't fire if Revit doesn't have focus.</li>
+<li>Because they're managed by the OS if you try raising external events continuously the period grows increasingly large as it tries to ensure the external events aren't hogging the system.
+At least that's my explanation of the result.</li>
+</ul>
+
+<p>Admittedly it's been a while since I was experimenting with this.
+But I think the behaviour will be the same.
+I found I had to keep using Idling because external events couldn't replicate the high frequency firing possible with Idling.</p>
+
+<p>Many thanks to Guy for this valuable input!</p>
+
+<p>It matches my findings.
+I still hope to find a way to stick with external events, though, to avoid the Idling event hogging the system.</p>
+
+<p>I also noticed that Revit needs focus to actually forward the external event Raise invocation to call its Execute method.
+I am still hoping to find an easy clean way to trigger that programmatically from outside...</p>

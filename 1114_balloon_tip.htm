@@ -1,0 +1,239 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Revit-API/Using-the-status-prompt-in-Revit/m-p/4829579#U4829579
+
+Revitalizer
+Re: Using the status prompt in Revit
+2014-02-21 09:13 AM in reply to: R.van.den.Bor
+
+Hi Remy,
+
+if you just want to display a message in a non-blocking manner, you also could use a BalloonTip.
+
+To use this, add a reference to AdWindows.dll to your VS project.
+
+You can find it in the Revit program folder.
+
+Then you could do this, for example as a static method in a "Utils" class:
+
+public static void ShowBalloonTip(string category, string title, string text)
+{
+Autodesk.Internal.InfoCenter.ResultItem ri = new Autodesk.Internal.InfoCenter.ResultItem();
+
+ri.Category = category;
+ri.Title = title;
+ri.TooltipText = text;
+
+// optional: provide a URL, e.g. a website containing furter information
+ri.Uri = new System.Uri("http://www.yourContextualHelp.de");
+
+ri.IsFavorite = true;
+ri.IsNew = true;
+
+// you also could add a click event
+ri.ResultClicked += new EventHandler<Autodesk.Internal.InfoCenter.ResultClickEventArgs>(ri_ResultClicked);
+
+Autodesk.Windows.ComponentManager.InfoCenterPaletteManager.ShowBalloon(ri);
+}
+
+private static void ri_ResultClicked(object sender, Autodesk.Internal.InfoCenter.ResultClickEventArgs e)
+{
+// do some stuff...
+}
+
+Note that using functions of Revit's AdWindows.dll is not supported by Autodesk officially.
+
+But since AutoCAD has its own version of that library, which is used by ACAD developers since many years, it seem to be a valid way.
+
+http://through-the-interface.typepad.com/through_the_interface/2008/04/the-new-ribbonb.html
+
+Cheers,
+
+Revitalizer
+
+augusto.goncalves
+Re: Using the status prompt in Revit
+2014-02-20 06:22 PM in reply to: R.van.den.Bor
+
+Hi,
+
+Check this post:
+
+http://thebuildingcoder.typepad.com/blog/2011/02/status-bar-text.html
+
+Regards,
+Augusto Goncalves
+
+R.van.den.Bor
+Using the status prompt in Revit
+2014-02-19 02:58 PM
+
+Does anybody know if (and how) it is possible to use the status prompt for your own custom messages ?
+
+When you let your user select some elements, you can use the statusprompt easely like so :
+
+IList<Element> PickSelection= sel.PickElementsByRectangle("Select by rectangle my highly appreciated user");
+
+But what if I want to use the status prompt for telling the user a certain action has ended. What I am trying to avoid is an anoying message box to inform the user an action has ended.
+
+Is there soemthing like StatusPrompt.Show("Action completed"); ?
+
+Kind regards,
+
+Remy van den Bor
+ICN Solutions b.v.
+
+-->
+
+<h3>Using Balloon Tips in Revit</h3>
+
+<p>Here is another tip from
+
+Rudolf 'Revitalizer' Honke of <a href="http://www.acadgraph.de">Mensch und Maschine acadGraph</a>,
+
+who provided most of the tips in the past making use of undocumented .NET and Autodesk API functionality provided by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">UI Automation and AdWindows</a> libraries, on using
+
+<a href="#3">.NET Balloon Tips</a> in a Revit add-in.</p>
+
+<p>First, however, let me mention some dates for the international AU events.</p>
+
+
+
+<a name="2"></a>
+
+<h4>International Autodesk University Event Locations and Dates</h4>
+
+<p>Some
+
+<a href="http://au.autodesk.com/las-vegas/international">
+Autodesk University international</a> and
+
+AU Extension locations and dates for 2014 have been settled, so you can already mark your calendar:</p>
+
+<ul>
+<li>AU International</li>
+<ul>
+<li>August 29 &ndash; Tokyo, Japan</li>
+<li>October 2-3 &ndash; Moscow, Russia</li>
+<li>October 7-8 &ndash; Sao Paulo, Brazil</li>
+<li>October 23-24 &ndash; Frankfurt/Darmstadt, Germany</li>
+<li>October 27-28 &ndash; Beijing, China</li>
+<li>December 2-4 &ndash; Las Vegas, USA</li>
+</ul>
+<li>AU Extension (dates open)</li>
+<ul>
+<li>September &ndash; Johannesburg, South Africa</li>
+<li>October &ndash; Turkey</li>
+<li>December &ndash; Dubai, UAE</li>
+</ul>
+</ul>
+
+<p>Locations and dates for Mexico City, Mumbai and Australia are also still open.</p>
+
+<center>
+<img src="img/au_2014_locations.jpeg" alt="AU 2014 locations" width="400"/>
+</center>
+
+<p>Back to the Revit API related stuff:</p>
+
+
+<a name="3"></a>
+
+<h4>Using .NET Balloon Tips in a Revit Add-in</h4>
+
+<p>This tip comes straight from the Revit API discussion forum thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Using-the-status-prompt-in-Revit/m-p/4829579#U4829579">
+using the status prompt in Revit</a> initiated by
+
+Remy van den Bor of <a href="http://www.icnsolutions.net">ICN Solutions</a>:</p>
+
+
+<p><strong>Question:</strong> Does anybody know if (and how) it is possible to use the status prompt for your own custom messages?</p>
+
+<p>When you let your user select some elements, you can use the status prompt easily like so:</p>
+
+<pre class="code">
+&nbsp; IList&lt;<span class="teal">Element</span>&gt; PickSelection
+&nbsp; &nbsp; = sel.PickElementsByRectangle(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select by rectangle my highly appreciated user&quot;</span> );
+</pre>
+
+<p>But what if I want to use the status prompt to tell the user a certain action has ended.
+What I am trying to avoid is an annoying message box to inform the user an action has ended.</p>
+
+<p>Is there something like <code>StatusPrompt.Show("Action completed")</code>?</p>
+
+
+<p><strong>Answer:</strong> On one hand, we already pointed out how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/status-bar-text.html">
+set the status bar text</a> using
+
+P/Invoke to call the standard Windows API methods provided in user32.dll.</p>
+
+<p>On the other hand, if you just want to display a message in a non-blocking manner, you also could use a BalloonTip.</p>
+
+<p>To do so, add a reference to AdWindows.dll to your VS project.</p>
+
+<p>You can find it in the Revit program folder.</p>
+
+<p>Then you could add code like this, for example as a static method in a "Utils" class:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ShowBalloonTip(
+&nbsp; &nbsp; <span class="blue">string</span> category,
+&nbsp; &nbsp; <span class="blue">string</span> title,
+&nbsp; &nbsp; <span class="blue">string</span> text )
+&nbsp; {
+&nbsp; &nbsp; Autodesk.Internal.InfoCenter.ResultItem ri
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Autodesk.Internal.InfoCenter.ResultItem();
+&nbsp;
+&nbsp; &nbsp; ri.Category = category;
+&nbsp; &nbsp; ri.Title = title;
+&nbsp; &nbsp; ri.TooltipText = text;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Optional: provide a URL, e.g. a </span>
+&nbsp; &nbsp; <span class="green">// website containing further information.</span>
+&nbsp;
+&nbsp; &nbsp; ri.Uri = <span class="blue">new</span> System.<span class="teal">Uri</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;http://www.yourContextualHelp.de&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; ri.IsFavorite = <span class="blue">true</span>;
+&nbsp; &nbsp; ri.IsNew = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// You also could add a click event.</span>
+&nbsp;
+&nbsp; &nbsp; ri.ResultClicked += <span class="blue">new</span> <span class="teal">EventHandler</span>&lt;
+&nbsp; &nbsp; &nbsp; Autodesk.Internal.InfoCenter.ResultClickEventArgs&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; ri_ResultClicked );
+&nbsp;
+&nbsp; &nbsp; Autodesk.Windows.ComponentManager
+&nbsp; &nbsp; &nbsp; .InfoCenterPaletteManager.ShowBalloon( ri );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> ri_ResultClicked(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; Autodesk.Internal.InfoCenter.ResultClickEventArgs e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// do some stuff...</span>
+&nbsp; }
+</pre>
+
+<p>Note that using functions provided by Revit's AdWindows.dll library is not officially supported by Autodesk
+
+(<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">disclaimer</a>).</p>
+
+<p>But since AutoCAD also provides its own version of that library, which has been used officially by AutoCAD add-in developers for many years, e.g. to access the
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2008/04/the-new-ribbonb.html">
+RibbonBar API in AutoCAD 2009</a>,
+
+it seem to be a valid way.</p>

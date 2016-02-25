@@ -1,0 +1,634 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+1224_slanted_mass_wall.htm
+
+09964010 [Create FaceWall using Reference at link]
+07905454 [Create wall by face]
+09980174 [Sloped Walls]
+
+- 10017243 [Could not construct a proper face with the input curves to create a floor correctly]
+  add an explanation that floortype must not be foundation slab when creating a floor.
+
+
+C:\a\vs\NewExtrusionRoof\NewExtrusionRoof\Command.cs
+
+Document.Create can only be used with project documents. Use Document.FamilyCreate in the Family Editor.
+
+
+-->
+
+<h3>Creating a Sloped Wall</h3>
+
+<p>Several questions concerning programmatic creation of sloped walls came up recently, so let's take a look at that, point to some existing samples, and implement a fantastic new one that does it all, including mass family creation, instance insertion and face creation in one fell swoop:</p>
+
+<ul>
+<li><a href="#2">How to programmatically create a sloped wall</a></li>
+<li><a href="#3">Sloped wall versus sloped slab</a></li>
+<li><a href="#4">Creating a sloped wall from mass</a></li>
+<li><a href="#5">The Creator CreateModelLine method</a></li>
+<li><a href="#6">The Building Coder Samples download</a></li>
+<li><a href="#7">Floor creation fails for foundation floor types</a></li>
+</ul>
+
+<p>Before getting to that, I'll just mention my outing last weekend.</p>
+
+<p>Last weekend saw splendid weather in all of Switzerland, for a change.</p>
+
+<p>I grabbed the chance to go on a tour with my friend Nik.</p>
+
+<p>We walked up from the Kandersteg train station to the Blümlisalphütte mountain lodge at 2834 m in the dark, arriving at midnight.</p>
+
+<p>Next day, we climbed the Wildi Frau, 3274 m, via its south ridge, finding our own route, because we stupidly missed the normal ascent starting point at the north end of the west wall.
+It is an easy climb, and was exciting and novel for Nik, being his first alpine one ever:</p>
+
+<center>
+<img src="file:///j/photo/jeremy/2014/2014-09-27_wildi_frau/20140927_101419_wildi_frau_suedgrat_cropped.jpg" alt="Wildi Frau south ridge" width="612"/>
+</center>
+
+<a name="2"></a>
+
+<h4>How to Programmatically Create a Sloped Wall</h4>
+
+<p>In the user interface, a sloped wall must be hosted on face of a mass and assigned the wall category.</p>
+
+<p>This functionality was made available programmatically by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">
+Revit 2011 API</a>:</p>
+
+<blockquote style="color: darkblue">
+<h4>Create sloped wall on mass face</h4>
+<p>The method</p>
+
+<ul>
+<li>FaceWall.Create()
+</ul>
+
+<p>creates a new instance of a face wall on the sloped face of a mass.</p>
+</blockquote>
+
+<p>We discussed it twice already, looking at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/03/the-facewall-class-and-slanted-walls.html">
+the FaceWall class, slanted walls</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/create-facewall-on-slanted-mass-face.html">
+creating a FaceWall on a slanted mass face</a>.</p>
+
+<p>It was probably a mistake to use the word 'slanted' instead of 'sloped', I'm afraid.</p>
+
+<p>So now we get to revisit the question again:</p>
+
+
+<a name="3"></a>
+
+<h4>Sloped Wall versus Sloped Slab</h4>
+
+<p><strong>Question:</strong> The wall creation method in the Revit API does not take in a slope:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Wall</span>.Create( revitDoc, curves, wallType.Id,
+&nbsp; &nbsp; level.Id, isStructural );
+</pre>
+
+<p>However, you can create a sloped floor slab:</p>
+
+<pre class="code">
+&nbsp; doc.Create.NewSlab( profile, level, slopedArrow,
+&nbsp; &nbsp; slope, isStructural );
+</pre>
+
+<p>We often model structures with walls that are not quite vertical, and when transferring these to Revit they become floors, which I would like to avoid.</p>
+
+<p>Is there a way to create sloped walls through the Revit API?</p>
+
+<p><strong>Answer:</strong> The usual Revit way for making non-vertical walls is to take the face of a mass and create the wall on its face.</p>
+
+<p>In the API this involves creating a mass family that has the face at the target slope, placing the mass instance in the project, and then creating the wall with FaceWall.Create.</p>
+
+<p>For more details, take a look at the sample below.</p>
+
+
+<a name="4"></a>
+
+<h4>Creating a Sloped Wall from Mass</h4>
+
+<p>Here is an interesting discussion on creating a slanted wall from a mass element raising and expanding a number of important Revit API aspects, some of which we have touched on in the past, such as
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/03/the-facewall-class-and-slanted-walls.html">The FaceWall class and slanted walls</a></li>
+<li>Creating and inserting a mass family to replace an in-place mass</li>
+<li>Need for intermediate regeneration</li>
+<li>Optimising filtering</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/05/iteration-and-springtime-change-is-the-only-constant.html">Iteration order</a></li>
+</ul>
+
+<p>The answer was originally written by Adam Nagy way back in the Revit 2012 timeframe, and the code in the query is also that old.</p>
+
+<p>I updated the code in the answer, though, and integrated it into The Building Coder samples, in a new command CmdFaceWall.</p>
+
+<p><strong>Question:</strong> I'd like to create sloped walls through the API.
+In the user interface, this can be achieved by creating a mass object and then selecting its face for the wall.</p>
+
+<p>It seem impossible to create an in-place mass element through the API, so I'm creating a mass family programmatically and then inserting an instance of it in the project instead.
+For some reason, however, its geometry always returns null.</p>
+
+<p>Here is the code (copy and paste to an editor to see the truncated lines in full):</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> SlopedWallTest(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> revit )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> massDoc = revit.Application.Application.NewFamilyDocument(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">@&quot;C:\ProgramData\Autodesk\RAC 2012\Family Templates\English_I\Conceptual Mass\Mass.rft&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>( massDoc );
+&nbsp; &nbsp; transaction.SetName( <span class="maroon">&quot;TEST&quot;</span> );
+&nbsp; &nbsp; transaction.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> cdata = revit;
+&nbsp; &nbsp; Autodesk.Revit.ApplicationServices.<span class="teal">Application</span> app = revit.Application.Application;
+&nbsp; &nbsp; app = revit.Application.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create one profile</span>
+&nbsp; &nbsp; <span class="teal">ReferenceArray</span> ref_ar = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; &nbsp; Autodesk.Revit.DB.<span class="teal">XYZ</span> ptA = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> ptB = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 30, 0 );
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> modelcurve = MakeLine( revit.Application, ptA, ptB, massDoc );
+&nbsp; &nbsp; ref_ar.Append( modelcurve.GeometryCurve.Reference );
+&nbsp;
+&nbsp; &nbsp; ptA = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 30, 0 );
+&nbsp; &nbsp; ptB = <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 30, 0 );
+&nbsp; &nbsp; modelcurve = MakeLine( revit.Application, ptA, ptB, massDoc );
+&nbsp; &nbsp; ref_ar.Append( modelcurve.GeometryCurve.Reference );
+&nbsp;
+&nbsp; &nbsp; ptA = <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 30, 0 );
+&nbsp; &nbsp; ptB = <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 0, 0 );
+&nbsp; &nbsp; modelcurve = MakeLine( revit.Application, ptA, ptB, massDoc );
+&nbsp; &nbsp; ref_ar.Append( modelcurve.GeometryCurve.Reference );
+&nbsp;
+&nbsp; &nbsp; ptA = <span class="blue">new</span> <span class="teal">XYZ</span>( 2, 0, 0 );
+&nbsp; &nbsp; ptB = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 );
+&nbsp; &nbsp; modelcurve = MakeLine( revit.Application, ptA, ptB, massDoc );
+&nbsp; &nbsp; ref_ar.Append( modelcurve.GeometryCurve.Reference );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// The extrusion form direction</span>
+&nbsp; &nbsp; <span class="teal">XYZ</span> direction = <span class="blue">new</span> <span class="teal">XYZ</span>( -6, 0, 50 );
+&nbsp; &nbsp; <span class="teal">Form</span> form = massDoc.FamilyCreate.NewExtrusionForm( <span class="blue">true</span>, ref_ar, direction );
+&nbsp; &nbsp; transaction.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">File</span>.Exists( <span class="maroon">@&quot;C:\TestFamily.rfa&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; <span class="teal">File</span>.Delete( <span class="maroon">@&quot;C:\TestFamily.rfa&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; massDoc.SaveAs( <span class="maroon">@&quot;C:\TestFamily.rfa&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !revit.Application.ActiveUIDocument.Document.LoadFamily( <span class="maroon">@&quot;C:\TestFamily.rfa&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;DID NOT LOAD FAMILY&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Family</span> family = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> el <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; revit.Application.ActiveUIDocument.Document ).WhereElementIsNotElementType().ToElements() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( el <span class="blue">is</span> <span class="teal">Family</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( (<span class="teal">Family</span>) el ).Name.ToUpper().Trim().StartsWith( <span class="maroon">&quot;TEST&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; family = (<span class="teal">Family</span>) el;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> sym <span class="blue">in</span> family.Symbols )
+&nbsp; &nbsp; &nbsp; fs = sym;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create a family instance.</span>
+&nbsp; &nbsp; revit.Application.ActiveUIDocument.Document.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 ), fs, revit.Application.ActiveUIDocument.Document.ActiveView.Level,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WallType</span> wallType = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">WallType</span> wt <span class="blue">in</span> revit.Application.ActiveUIDocument.Document.WallTypes )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">FaceWall</span>.IsWallTypeValidForFaceWall( revit.Application.ActiveUIDocument.Document, wt.Id ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; wallType = wt;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> el <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; revit.Application.ActiveUIDocument.Document ).WhereElementIsNotElementType().ToElements() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( el <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( (<span class="teal">FamilyInstance</span>) el ).Symbol.Family.Name.ToUpper().StartsWith( <span class="maroon">&quot;TEST&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Options</span> options = revit.Application.Application.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; options.ComputeReferences = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; options.View = revit.Application.ActiveUIDocument.Document.ActiveView;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geoel = el.get_Geometry( options );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Attempt to create a slopped wall from the geometry.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; geoel.Objects.Size; i++ )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( geoel.Objects.get_Item( i ) <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = (<span class="teal">Solid</span>) geoel.Objects.get_Item( i );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; solid.Faces.Size; j++ )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid.Faces.get_Item( i ).Reference != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FaceWall</span>.Create( revit.Application.ActiveUIDocument.Document,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wallType.Id, <span class="teal">WallLocationLine</span>.CoreCenterline,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solid.Faces.get_Item( i ).Reference );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">Exception</span> e )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show( e.Message );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ModelCurve</span> MakeLine( <span class="teal">UIApplication</span> app, <span class="teal">XYZ</span> ptA, <span class="teal">XYZ</span> ptB, <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create plane by the points</span>
+&nbsp; &nbsp; <span class="teal">Line</span> line = app.Application.Create.NewLine( ptA, ptB, <span class="blue">true</span> );
+&nbsp; &nbsp; <span class="teal">XYZ</span> norm = ptA.CrossProduct( ptB );
+&nbsp; &nbsp; <span class="blue">if</span>( norm.GetLength() == 0 ) norm = <span class="teal">XYZ</span>.BasisZ;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = app.Application.Create.NewPlane( norm, ptB );
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> skplane = doc.FamilyCreate.NewSketchPlane( plane );
+&nbsp; &nbsp; <span class="green">// Create line here</span>
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> modelcurve = doc.FamilyCreate.NewModelCurve( line, skplane );
+&nbsp; &nbsp; <span class="blue">return</span> modelcurve;
+&nbsp; }
+</pre>
+
+
+<p><strong>Answer:</strong> You always need to call the Document.Regenerate method if you wish to use information from the database that was created as a result of the changes you made inside the transaction.</p>
+
+<p>If not, you will be accessing so-called 'stale' information.</p>
+
+<p>The Building Coder defines a whole topic list on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">
+need to regenerate</a>.</p>
+
+<p>Once I added that call to the code after inserting the mass instance, the desired geometry was returned.</p>
+
+<p>I also modified the filtering part of your code to make it more effective.</p>
+
+<p>The more you narrow down the selection using the Revit API, the faster your code will be.</p>
+
+<p>Another problem with your code is in the iteration part.</p>
+
+<p>Many objects give back a new instance each time you call them.</p>
+
+<p>In the case of collections, the objects inside these instances might be in a different order each time.</p>
+
+<p>For instance, instead of making an iteration loop and keep calling solid.Faces.get_Item(i), which will return a new different collection of the solids faces on each call, you should make one single call to and save a reference to the result of the solid.Faces collection and then iterate through that.</p>
+
+<p>A nice way to achieve this is by simply using a foreach statement on it.</p>
+
+<p>Also, instead of passing in ActiveView.Level as the owner for the mass instance you should pass in ActiveView.GenLevel.</p>
+
+<p>If the mass has no owner, the API is not able to create a FaceWall on the mass face.</p>
+
+<p>In fact, if you try it using ActiveView.Level, the call to FaceWall.Create will throw an exception saying, "Could not create a face wall."</p>
+
+<p>Here is the code updated accordingly and migrated to Revit 2015:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _conceptual_mass_template_path
+&nbsp; &nbsp; = <span class="maroon">&quot;C:/ProgramData/Autodesk/RVT 2015&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;/Family Templates/English/Conceptual Mass&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;/Metric Mass.rft&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _family_name = <span class="maroon">&quot;TestFamily&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _family_path = <span class="maroon">&quot;C:/&quot;</span> + _family_name + <span class="maroon">&quot;.rfa&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="teal">ModelCurve</span> MakeLine(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p,
+&nbsp; &nbsp; <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create plane by the points</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( p, q );
+&nbsp; &nbsp; <span class="teal">XYZ</span> norm = p.CrossProduct( q );
+&nbsp; &nbsp; <span class="blue">if</span>( norm.GetLength() == 0 ) { norm = <span class="teal">XYZ</span>.BasisZ; }
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( norm, q );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> skplane = <span class="teal">SketchPlane</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, plane );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create line</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> doc.FamilyCreate.NewModelCurve(
+&nbsp; &nbsp; &nbsp; line, skplane );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create an extrusion form in the given</span>
+&nbsp; <span class="gray">///</span><span class="green"> conceptual mass family document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> CreateMassExtrusion(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Mass&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create profile</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ReferenceArray</span> refar = <span class="blue">new</span> <span class="teal">ReferenceArray</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[] {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( -10, -10, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( +10, -10, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( +10, +10, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( -10, +10, 0 ) };
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> j, n = pts.Length;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; j = i + 1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( j &gt;= n ) { j = 0; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// The Creator.CreateModelLine method creates </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// pretty arbitrary sketch planes, which causes</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the NewExtrusionForm method to fail, saying </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// &quot;Cannot create extrude form.&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//ModelCurve c = Creator.CreateModelLine( doc, pts[i], pts[j] );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ModelCurve</span> c = MakeLine( doc, pts[i], pts[j] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; refar.Append( c.GeometryCurve.Reference );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//doc.Regenerate();</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The extrusion form direction and length.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// The direction must be perpendicular to the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// plane determined by profile. The length </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// must be non-zero.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> direction = <span class="blue">new</span> <span class="teal">XYZ</span>( <span class="green">/*-6*/</span> 0, 0, 20 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Form</span> form = doc.FamilyCreate.NewExtrusionForm( <span class="green">// Cannot create extrude form.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">true</span>, refar, direction );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> CreateFaceWalls(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> massDoc = app.NewFamilyDocument(
+&nbsp; &nbsp; &nbsp; _conceptual_mass_template_path );
+&nbsp;
+&nbsp; &nbsp; CreateMassExtrusion( massDoc );
+&nbsp;
+&nbsp; &nbsp; <span class="green">//if( File.Exists( _family_path ) )</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; File.Delete( _family_path );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SaveAsOptions</span> opt = <span class="blue">new</span> <span class="teal">SaveAsOptions</span>();
+&nbsp; &nbsp; opt.OverwriteExistingFile = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; massDoc.SaveAs( _family_path, opt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create FaceWall&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !doc.LoadFamily( _family_path ) )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>( <span class="maroon">&quot;DID NOT LOAD FAMILY&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Family</span> family = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Element</span>&gt;( x =&gt; x.Name.Equals( _family_name ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Family</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; family.GetFamilySymbolIds().First&lt;<span class="teal">ElementId</span>&gt;() )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create a family instance</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Level</span> level = doc.ActiveView.GenLevel;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.Zero, fs, level, <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Regenerate(); <span class="green">// required to generate the geometry!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine wall type.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">WallType</span> wallType = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">WallType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">WallType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">WallType</span>&gt;( x =&gt; <span class="teal">FaceWall</span>.IsWallTypeValidForFaceWall( doc, x.Id ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve mass element geometry.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> options = app.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; options.ComputeReferences = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//options.View = doc.ActiveView; // conceptual mass is not visible in default view</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = fi.get_Geometry( options );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create a sloped wall from the geometry.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != f.Reference,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;we asked for references, didn't we?&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = pf.Normal;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Errors:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Could not create a face wall.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Caused by using ActiveView.Level </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// instead of ActiveView.GenLevel.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This reference cannot be applied to a face wall.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Caused by using this on a horizontal face.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsVertical( v ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FaceWall</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, wallType.Id,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">WallLocationLine</span>.CoreCenterline,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f.Reference );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Many thanks to Adam for this insightful solution!</p>
+
+<p>Note that I discovered another situation that can cause the FaceWall.Create method to fail saying, "This reference cannot be applied to a face wall", namely a horizontal face.</p>
+
+<p>After eliminating the two horizontal faces on the cube that I defined, the resulting four face walls finally look like this:</p>
+
+<center>
+<img src="img/FaceWall.png" alt="FaceWall" width="309"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>The Creator CreateModelLine Method</h4>
+
+<p>I struggled with several issues getting this to run in Revit 2015 and in The Building Coder sample add-in.</p>
+
+<p>One really hard problem that I created for myself was caused by switching away from the MakeLine method shown above.</p>
+
+<p>It was originally defined in one of the Revit SDK NewForm massing samples, in the module SDK/Samples/Massing/NewForm/CS/Command.cs.</p>
+
+<p>Since the Creator class in The Building Coder samples already defines a similar method, CreateModelLine, I decided to use that instead.</p>
+
+<p>This required a modification to work in a family document &ndash; it was previously only usable in the project environment.</p>
+
+<p>The new version looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create a model line between the two given points.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Internally, it creates an arbitrary sketch</span>
+&nbsp; <span class="gray">///</span><span class="green"> plane given the model line end points.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">ModelLine</span> CreateModelLine(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p,
+&nbsp; &nbsp; <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.DistanceTo( q ) &lt; <span class="teal">Util</span>.MinLineLength ) <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create sketch plane; for non-vertical lines,</span>
+&nbsp; &nbsp; <span class="green">// use Z-axis to span the plane, otherwise Y-axis:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> dxy = <span class="teal">Math</span>.Abs( v.X ) + <span class="teal">Math</span>.Abs( v.Y );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> w = ( dxy &gt; <span class="teal">Util</span>.TolPointOnPlane )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">XYZ</span>.BasisZ
+&nbsp; &nbsp; &nbsp; : <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> norm = v.CrossProduct( w ).Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( norm, p );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> sketchPlane = <span class="teal">SketchPlane</span>.Create( doc, plane );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( p, q );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ModelCurve</span> curve = doc.IsFamilyDocument
+&nbsp; &nbsp; &nbsp; ? doc.FamilyCreate.NewModelCurve( line, sketchPlane )
+&nbsp; &nbsp; &nbsp; : doc.Create.NewModelCurve( line, sketchPlane );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> curve <span class="blue">as</span> <span class="teal">ModelLine</span>;
+&nbsp; }
+</pre>
+
+<p>It now checks whether the document is a family and uses either doc.Create or doc.FamilyCreate, as appropriate.</p>
+
+<p>So far, so good.</p>
+
+<p>However, try as I might, the extrusion creation call to NewExtrusionForm always failed saying, "Cannot create extrude form."</p>
+
+<p>I debugged myself stupid, tested that code in the Massing NewForm SDK sample achieved its goal, and tediously eliminated all the differences between that implementation and mine until I finally found the reason.</p>
+
+<p>I finally figured out that the arbitrary sketch planes generated by the CreateModelLine method were causing this.</p>
+
+<p>Each of the model lines I used to define the extrusion profile was located on a different sketch plane with wildly different normal vectors.</p>
+
+<p>The MakeLine method is more reliable, and replacing the former by the latter finally solved the problem.</p>
+
+
+
+<a name="6"></a>
+
+<h4>The Building Coder Samples Download</h4>
+
+<p>You can download the most up-to-date version from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.113.1">2015.0.113.1</a>.</p>
+
+
+
+<a name="7"></a>
+
+<h4>Floor Creation Fails for Foundation Floor Types</h4>
+
+<p>After all this talk about walls and the requirement that they not be horizontal, let's mention another rather cryptic and misleading error message that can come up when creating a floor:</p>
+
+<p><strong>Question:</strong> I am using the Document.NewFloor method to create a floor.</p>
+
+<p>However, it is displaying an error message saying, "Could not construct a proper face with the input curves to create a floor correctly".</p>
+
+<p><strong>Answer:</strong> After further debugging, I found that the cause of the error is not the face or curves, but the floor type I am trying to use.</p>
+
+<p>The floor creation does not accept a FloorType with IsFoundationSlab == true.</p>
+
+<p>If I provide a FloorType with IsFoundationSlab == false, then the floor is created successfully.</p>
+
+<p>I would assume that the foundation slab types have to be used with the Document.NewFoundationSlab method, and that there are fundamental differences in behaviour between floor and foundation types.</p>
+
+<p>If possible, it would be nice to update the exception to explain that the FloorType is invalid, not the curves.</p>
+
+<p><strong>Addendum:</strong> Some obvious possible differences might be functionality such as support for a slanted slabs and multiple layers in the compound structure.</p>
+
+<p>When you run into a geometrical error message such as the one mentioned above, you can often obtain more detailed error messages and information on the causes by creating intermediate model lines and then trying to make use of those appropriately via the user interface, as described for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging form creation</a>.</p>

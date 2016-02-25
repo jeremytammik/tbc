@@ -1,0 +1,234 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- Lachmi Khemlani AECbytes semi-annual AEC technology newsletter
+  http://www.aecbytes.com/newsletter/2015/issue_73.html
+
+- AEC hackathon New York
+  https://share.autodesk.com/news/Pages/AEC-Hackathon.aspx
+  http://adndevblog.typepad.com/aec/2015/02/aec-hackathon-new-york-city-20.html
+  http://2build.wordpress.com/2015/02/03/aec-hackathon-nyc-recap
+
+
+http://forums.autodesk.com/t5/revit-api/how-to-assign-keyboard-shortcut-to-external-commands/td-p/5511028
+http://forums.autodesk.com/t5/revit-api/how-to-get-short-key-collection/td-p/5513905
+
+-->
+
+<h3>Keyboard Shortcuts and Other News</h3>
+
+<p>A couple of questions on stackoverflow and the Revit API discussion forum prompted me to pick up the age-old issue of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/addin-keyboard-shortcut.html">keyboard shortcuts</a> again.</p>
+
+<p>Plus, I'd like to point out some news from the AEC Hackathon in New York and the AECbytes newsletter:</p>
+
+<ul>
+<li><a href="#2">AEC Hackathon in New York</a></li>
+<li><a href="#3">AECbytes newsletter</a></li>
+<li><a href="#4">How to programmatically retrieve keyboard shortcuts</a></li>
+<li><a href="#5">How to assign a keyboard shortcut to an external command</a></li>
+<li><a href="#6">How to programmatically create a keyboard shortcut</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>AEC Hackathon in New York</h4>
+
+<p>I attended the AEC Hackathon in New York
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/aec-hackathon-from-the-midst-of-the-fray.html">
+last year</a>,
+
+and one of the numerous results was the vA3C WebGL three.js-based 3D AEC viewer:</p>
+
+<!-- 1157 1159 1195 1231 1268 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/rvtva3c-revit-va3c-generic-aec-viewer-json-export.html">RvtVa3c &ndash; Revit vA3C generic AEC viewer JSON export</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/rvtva3c-assembly-resolver.html">RvtVa3c assembly resolver</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/08/threejs-aec-viewer-progress-on-two-fronts.html">Three.js AEC viewer progress on two fronts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/berlin-hackathon-results-3d-viewer-and-web-news.html#7">Custom user settings storage and RvtVa3c update</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/01/3d-viewing-va3c-and-revitlookup-updates.html">3D Viewing and vA3C updates</a></li>
+</ul>
+
+<p>This time around, my colleague Jaime Rosales Duque participated and shared his experiences on the
+
+<a href="http://adndevblog.typepad.com/aec/2015/02/aec-hackathon-new-york-city-20.html">
+AEC Hackathon New York City 2.0</a>.</p>
+
+<p>For more details on the innovative projects created there, see the
+
+<a href="http://2build.wordpress.com/2015/02/03/aec-hackathon-nyc-recap">
+AEC Hackathon NYC recap</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>AECbytes Newsletter</h4>
+
+<p>For an overview over a couple of exciting AEC happenings that I have not mentioned previously, I find Lachmi Khemlani's semi-annual
+
+<a href="http://www.aecbytes.com/newsletter/2015/issue_73.html">
+AECbytes AEC technology newsletter</a> a
+
+very worthwhile read, mentioning Trimble ProjectSight, AllTrak Cloud and Rapid Positioning System, Newforma SmartUse, Conworld and Aconex Dynamic Manuals.</p>
+
+
+<a name="4"></a>
+
+<h4>How to Programmatically Retrieve Keyboard Shortcuts</h4>
+
+<p>A question was raised on the Revit API discussion forum on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-get-short-key-collection/td-p/5513905">
+how to programmatically retrieve keyboard shortcuts</a>:</p>
+
+<p><strong>Question:</strong>
+
+Please suggest how can I get list of Revit short keys programmatically.
+
+<p><strong>Answer:</strong>
+
+The user interface provides a command to
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-0A6F242A-EBEF-4B9B-B974-23006DC2E882">
+export your shortcut keys</a> to XML.</a></p>
+
+<p>This command may possibly be launched programmatically as well using
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3">PostCommand</a>.</p>
+
+<p>It might be tricky to drive programmatically, though.
+Maybe, you can either use the Revit API PostCommand method, the or .NET UI Automation library to drive the following sequence:</p>
+
+<ul>
+<li>View &gt; Windows &gt; User Interface &gt; Keyboard Shortcuts &gt; Export... &gt; filename input &gt; Save &gt; Cancel</li>
+</ul>
+
+<p>If you use PostCommand, you will have to
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">
+handle all the dialogues</a> that
+
+pop up via the Revit API.</p>
+
+<p><strong>Revitalizer</strong> suggests:
+
+Just read this file:</p>
+
+<ul>
+<li>C:\Users\[YOUR_USER_NAME]\AppData\Roaming\Autodesk\Revit\Autodesk Revit 2015\KeyboardShortcuts.xml</li>
+</ul>
+
+<p>As you can see, this is a per-user-file, so there may be several of them on your system.</p>
+
+<p><strong>Question:</strong>
+
+Is this file always generated automatically, or do you have to launch some Revit command to export it?</p>
+
+<p>Does Revit keep it up to date automatically every time you make a change to the keyboard shortcuts?</p>
+
+<p><strong>Answer:</strong>
+Yes, Revit updates this file just if I change the shortcuts in the GUI.</p>
+
+<p>I don't know if there exists such a file if the user didn't change them yet, but I suppose so since there are not only user defined but also predefined shortcuts, e.g. WF for wireframe display mode.
+
+<p>Further testing shows that the XML file is not present before the use user sets up her first keyboard shortcut.</p>
+
+<p>If it is missing and you use the GUI to make a change to the existing shortcuts, e.g. by adding one, it appears.</p>
+
+<p>Since shortcuts are per user, this information needs to be stored, anyway.</p>
+
+<p>If the user never changed her shortcuts, you can assume that she is using default settings.</p>
+
+<p>To generate a default settings file, you can make a change, retrieve the XML file, and use your newly generated file as a template, minus your change.</p>
+
+<p>Since the KeyboardShortcuts.xml file is localised (CommandName and Paths attributes), one will need to create one template per language.</p>
+
+<p>The CommandId and Shortcuts attributes are language independent.
+In a German XML file, for example, there is a default MD for "modify", "ändern" in German.</p>
+
+<p>If you just want the CommandId-Shortcuts relationship, you need only one file version, since this relation is language independent.</p>
+
+
+
+<a name="5"></a>
+
+<h4>How to Assign a Keyboard Shortcut to an External Command</h4>
+
+<p>Another question on the Revit API discussion forum on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-assign-keyboard-shortcut-to-external-commands/td-p/5511028">
+how to assign a keyboard shortcut to an external command</a>:</p>
+
+<p><strong>Question:</strong>
+
+How to assign keyboard shortcuts for external commands in the Revit 2015?
+
+<p>For example, I have created an external command to display the element location and want to execute this commend using a keyboard shortcut "CP".</p>
+
+<p><strong>Answer:</strong>
+
+Its simple.
+Just go to the Revit Menu and click on options at the bottom right of the popup.
+Then click on User Interface tab and then select the Keyboard Shortcuts in the middle of the dialog on the right side.
+From there you can find your custom command and assign a shortcut to it.
+You can also adjust existing shortcuts and make new shortcuts there for most of the commands in Revit.
+
+<p><strong>Response:</strong>
+
+Thanks for your reply, but I want to do this programmatically.</p>
+
+<p><strong>Answer:</strong>
+
+Here is an old description on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/addin-keyboard-shortcut.html">how to achieve that back in 2009</a>.</p>
+
+<p>Things have changed since then, though.</p>
+
+<p>The Revit 2011 API introduced
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">keyboard shortcut support for API buttons</a>:</p>
+
+<h4 style="color:darkblue">Keyboard shortcut support for API buttons</h4>
+
+<p style="color:darkblue">API buttons found on the Ribbon can be assigned a keyboard shortcut. Buttons created by applications registered using manifest files now use an id based on their application id and button name to provide a unique identifier for the button. The keyboard shortcut will be maintained even if the order of registration of API applications changes.
+</p>
+
+<p>This functionality was overhauled in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">Revit 2013 API</a>:</p>
+
+<h4 style="color:darkblue">Support for Keyboard Shortcuts and Quick Access Toolbar</h4>
+
+<p style="color:darkblue">API commands may now be assigned keyboard shortcuts, and those assignments will be preserved even if add-ins are added, removed or changed in subsequent sessions.</p>
+
+<p style="color:darkblue">API commands may also be moved to the Quick Access Toolbar, and that assignment will also be preserved even if add-ins are added, removed or changed in subsequent sessions.</p>
+
+<p>Unfortunately, it looks as if the actual assignment still is done manually as described in the Revit help topic on
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-39D549F2-75EE-4C06-8B6A-3DADE1FBEF59">Keyboard Shortcuts</a>.</p>
+
+<p>You will obviously be facing the same issues as described above driving this programmatically.</p>
+
+
+<a name="6"></a>
+
+<h4>How to Programmatically Create a Keyboard Shortcut</h4>
+
+<p>A query on stackoverflow on how to
+
+<a href="http://stackoverflow.com/questions/9472227/programmatically-create-a-keyboard-shortcut-in-revit">
+programmatically create a keyboard shortcut in Revit</a>:</p>
+
+<p><strong>Question:</strong> Can I programmatically create a keyboard shortcut for my Revit add-in?</p>
+
+<p><strong>Answer:</strong> As explained by the help topics listed above, this can easily be achieved manually.</p>
+
+<p>Programmatically, again, you will have to tackle the issues described above, as far as I know.</p>

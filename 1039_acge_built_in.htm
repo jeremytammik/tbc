@@ -1,0 +1,168 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+From: Florian Schmid
+Date: Wednesday, June 20, 2012 16:01
+Subject: AcGe in Revit
+
+Hi Jeremy,
+
+as promised, here’s a small proof of concept example showing the usage of AcGe geometry classes in Revit.
+
+The zip contains two Visual Studio projects:
+
+- geometry_acge is a C++/CLI project that links the acge19.lib. The static Converter class provides methods to convert Revit geometry objects to AcGe objects and vice versa. The Helper class provides two higher level methods for curve projection.
+
+- The C# project AcGeTest conatains an ExternalApplication, which uses Geometry.AcGe.Helper.orthoProjectIntoPlane() to project some Revit lines into a plane.
+
+AcGeTest references the geometry_acge assembly, of course.
+
+The AcGe headers and libs are those from the 2013 objectarx installation. No need to do any modifications to them.
+
+The acge19.dll is automatically demand-loaded when the geometry_acge.dll is loaded. Because the acge19.dll lies beneath the Revit.exe, it is found without problems, so no need to manually load the dll.
+
+To get the example working, you’ll have to adjust the “Include Directory” and “Additional Library Directories” of the geometry_acge project so that the objectarx headers and lib can be found on your machine.
+
+Welcome back AcGe, how I’ve missed you!
+
+Mit freundlichen Grüßen - with kind regards
+
+Florian Schmid
+Entwicklung/Development
+SOFiSTiK AG - Oberschleißheim
+
+-->
+
+
+<h3>Using the Built-In Revit AcGe Functionality</h3>
+
+<p>Anyone who ever used the AutoCAD API for geometrical purposes must be enamoured with AcGe.</p>
+
+<p>On the other hand, the Revit geometry library is pretty meagre in comparison.</p>
+
+<p>Wouldn't it be nice to be able to use all that powerful AcGe functionality in Revit as well?</p>
+
+<p>Actually, if you take a look at the support DLLs included in the Revit main executable directory, AcGe is obviously present:</p>
+
+<pre>
+  C:\Program Files\Autodesk\Revit 2014 &gt; dir *acge*
+
+    Directory of C:\Program Files\Autodesk\Revit 2014
+
+  02/05/2013  12:52 PM  1,679,688 acge19.dll
+  02/05/2013  12:52 PM    501,064 acgex19.dll
+
+    2 File(s)      2,180,752 bytes
+</pre>
+
+<p>Wow.
+Wouldn't it be nice to be able to access that?</p>
+
+<p>Well, you can, actually.</p>
+
+<p>Here is a small proof of concept created by Florian Schmid of
+
+<a href="http://www.sofistik.com">SOFiSTiK AG</a> demonstrating showing the usage of AcGe geometry classes in Revit.</p>
+
+<p>He originally provided it for Revit 2013.
+I did not get around to testing and verifying it until now, on Revit 2014, so here are the archive files for both of these versions:</p>
+
+<ul>
+<li><a href="zip/acge_revit_2013.zip">acge_revit_2013.zip</a></li>
+<li><a href="zip/acge_revit_2014.zip">acge_revit_2014.zip</a></li>
+</ul>
+
+<p>The latter contains the Visual Studio solution acge_revit.sln that includes three Visual Studio projects:</p>
+
+<ul>
+<li>geometry_acge &ndash; a C++/CLI project that links with acge19.lib. The static Converter class provides methods to convert Revit geometry objects to AcGe objects and vice versa. The Helper class provides two higher level methods for curve projection.</li>
+<li>AcGeTest &ndash; a C# project implementing an external application that uses the Geometry.AcGe.Helper.orthoProjectIntoPlane method to project some Revit lines into a plane in its OnStartup method.</li>
+<li>AcGeTestCmd &ndash; a C# project implementing an external command providing the same functionality in its Execute mainline.</li>
+</ul>
+
+<p>AcGeTest references the geometry_acge assembly, of course.</p>
+
+<p>The AcGe headers and libs are those from the 2013 ObjectARX or ObjectARX 2014 installations, respectively.
+There is no need to modify them in any way.</p>
+
+<p>The acge19.dll is automatically demand loaded when geometry_acge.dll is loaded.
+Because acge19.dll lives in the same location as revit.exe, it is found without problems, so no need to manually load it.</p>
+
+<p>To get the example working, you have to adjust the 'Include Directory' and 'Additional Library Directories' of the geometry_acge project so that the ObjectARX headers and libraries can be found on your system.</p>
+
+<p>Welcome back AcGe, how we’ve missed you!</p>
+
+<p>Here are the steps I performed to install ObjectARX 2014 and migrate the sample to the new version:</p>
+
+<ul>
+<li>Download and install
+
+<a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&id=785550">ObjectARX</a>.
+
+For all further information on that and self-help resources for AutoCAD software-based development efforts, please visit the
+
+<a href=="http://www.autodesk.com/developautocad">
+AutoCAD Developer Center</a>,
+
+which provides API overviews, getting started presentations, links to API discussion groups and more.</li>
+
+<li>Update the Revit API assembly references from 2013 to 2014.</li>
+
+<li>Migrate obsolete code, e.g. calls to NewLineBound, NewLineUnbound and get_EndPoint were replaced by Line.CreateBound, Line.CreateUnbound and GetEndPoint.
+You might want to take a look at the definition of the Geometry class in the curve_converter.cpp module of the geometry_acge project to see examples of how these calls look in C++.</li>
+
+<li>Fix the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">
+architecture mismatch warning</a>.</li>
+
+</ul>
+
+<p>The result is an error and warning free compilation (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+------ Rebuild All started: Project: geometry_acge, Configuration: Debug x64 ------
+  Stdafx.cpp
+  AssemblyInfo.cpp
+  curve_converter.cpp
+  Generating Code...
+  .NETFramework,Version=v4.0.AssemblyAttributes.cpp
+  geometry_acge.vcxproj -> C:\a\vs\acge_revit\x64\Debug\geometry_acge.dll
+------ Rebuild All started: Project: AcGeTest, Configuration: Debug Any CPU ------
+  AcGeTest -> C:\a\vs\x64\AcGeTest.dll
+========== Rebuild All: 2 succeeded, 0 failed, 0 skipped ==========
+</pre>
+
+<p>There was one more hiccup: the debug version had an erroneous C++ compilation setting, generating a Multi-threaded Debug DLL.
+I had to change that to generate a Multi-threaded DLL instead, to ensure that the correct runtime library is used.</p>
+
+<p>Many thanks to Florian for pointing out and demonstrating the access to this powerful geometry functionality.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Disclaimer</h4>
+
+<p>Note that I am not sure of the legality of making use of this undocumented access.</p>
+
+<p>If you plan to use this approach in a commercial product, I suggest checking with the appropriate Autodesk channels first.</p>
+
+<p>I also took this opportunity of adding a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#3">
+license</a> and a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">
+disclaimer</a> to
+
+this blog itself, covering all its contents.</p>
+
+<p>I recently discovered the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-building-coder-samples-on-github.html#2">
+importance of a license</a> when starting to publish more diligently on GitHub.</p>

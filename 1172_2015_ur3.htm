@@ -1,0 +1,89 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09428038 [TextNote] Egidijus PilelisAGA-CAD Ltd
+09607409 [Create a TextNote in Revit 2015 then the result is different from creating the same textNote in revit 2014 (MK)] René QualmStabiplan BV, Stabiplan_BV
+09656111 [NewTextNote] Matt TaylorWSP
+09712212 [NewTextNote wraps text wrong] Frode TørresdalNorconsult Informasjonssystemer AS
+
+-->
+
+<h3>Revit 2015 Update Release 3</h3>
+
+<p><a href="http://knowledge.autodesk.com/support/revit-products/downloads/caas/downloads/content/autodesk-revit-2015-update-release-3.html">
+Revit 2015 Update Release 3</a> has
+
+been published.</p>
+
+<p>It includes a large number of important new enhancements, as well as the improvements provided by the update releases 1 and 2.</p>
+
+<p>I count the following numbers of bullet items in the
+
+<a href="http://revit.downloads.autodesk.com/download/2015RVT_RTM/UR3/Enhancements_List_RVT_2015_UR3.pdf">
+release notes</a>:</p>
+
+<ul>
+<li>Architecture: 45</li>
+<li>MEP: 18</li>
+<li>Structure 7</li>
+<li>API: 9</li>
+</ul>
+
+<p>Here is the full list of Revit API enhancements:</p>
+
+<ul>
+<li>Improves retention of device connections when using Wire.Create to create new wire connecting to a device.</li>
+<li>Improves display of wire connection points when using Wire.ConnectTo and Connector.Connect.</li>
+<li>Enable changes to MEPSystemType.CalculationLevel via public API.</li>
+<li>Level parameter correctly set when elements are placed via NewFamilyInstance().</li>
+<li>Improves retention of parameters in line boundary condition objects.</li>
+<li>Improves stability when using CompoundStructure.SetLayers.</li>
+<li>Allows proper assignment of a Phase Created value when using DirectShapes.</li>
+<li>Improves alignment of text created via API.</li>
+<li>Improves stability when the API is in Automatic TransactionMode.</li>
+</ul>
+
+<p>The second to last item, especially, is one that many developers encountered and reported, e.g. like this:</p>
+
+
+<a name="2"></a>
+
+<h4>NewTextNote Text Wrapping</h4>
+
+<p><strong>Question:</strong> When I call the NewTextNote method to create a new text note in Revit 2015, it does not fill the text box, but wraps the text around the middle of the text box.</p>
+
+<p>Here is a simple code example:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> origin = <span class="teal">XYZ</span>.Zero;
+&nbsp; <span class="teal">XYZ</span> baseVec = <span class="teal">XYZ</span>.BasisX;
+&nbsp; <span class="teal">XYZ</span> upVec = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; trans.Start( <span class="maroon">&quot;Create text&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">TextNote</span> note = doc.Create.NewTextNote(
+&nbsp; &nbsp; view, origin, baseVec, upVec, 0.3,
+&nbsp; &nbsp; <span class="teal">TextAlignFlags</span>.TEF_ALIGN_BOTTOM | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_LEFT,
+&nbsp; &nbsp; <span class="maroon">&quot;Why is this line too long for the text box!&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">//doc.Regenerate();</span>
+&nbsp; <span class="green">//note.Width = 25;</span>
+&nbsp;
+&nbsp; trans.Commit();
+</pre>
+
+<p>This worked fine in Revit 2014, just as it should, but in Revit 2015 it fails.</p>
+
+<p>I tried to regenerate and set the width after the note creation, but it does not help.</p>
+
+<p>If you click on such a text note manually it fixes.</p>
+
+<p><strong>Answer:</strong> Install
+
+<a href="http://knowledge.autodesk.com/support/revit-products/downloads/caas/downloads/content/autodesk-revit-2015-update-release-3.html">
+Revit 2015 Update Release 3</a>.</p>

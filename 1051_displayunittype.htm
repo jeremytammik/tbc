@@ -1,0 +1,213 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08924098 [Get parameter units]
+
+Jose FandosAndekan LLC
+
+-->
+
+<h3>Mapping Display Unit Type to Unit Types</h3>
+
+<p>Yesterday, we looked at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/unit-abbreviations.html">
+unit abbreviations</a> and
+
+some other aspects of the new Revit 2014
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/unit-abbreviations.html#0">
+Unit API</a>.</p>
+
+<p>I mentioned that one might be able to use the FormatUtils.Format or UnitFormatUtils.Format methods to generate a string representation of a given numeric value, extract a unit abbreviation from it, and that I was not looking further at that option, lacking a UnitType to feed it with, only having a DisplayUnitType to work with.</p>
+
+<p>That led me to wonder whether there might be an easy way to find out what UnitType a given DisplayUnitType corresponds to.</p>
+
+<p>I was naively expecting to be able to find a simple one-to-many correspondence, e.g. a UnitType for length might be mapped to the various display unit types such as mm, cm, m, in, ft, etc., so each display unit type would only be mapped to one single unit type.</p>
+
+<p>As it turns out, this mapping is easy to discover, since a call to the UnitUtils.GetValidDisplayUnits method passing in a given UnitType will return a list of all DisplayUnitTypes that it might be used for.</p>
+
+<p>On the other hand, the mapping is not a simple 1-to-N one, but N-to-N, because the unit types include both the simple basic types, such as length, and complex or specialised ones, such as SheetLength, HVAC_DuctSize etc., so there are a number of different length related unit types, all of which can be expressed in any length unit.</p>
+
+<p>For instance, looking more closely at the display unit type DUT_METERS, there are no less than 21 different valid unit types in which it may appear:</p>
+
+<ul><li>Length, SheetLength, HVAC_DuctSize, HVAC_Roughness, PipeSize, Piping_Roughness, WireSize, DecSheetLength, Electrical_CableTraySize, Electrical_ConduitSize, Reinforcement_Length, HVAC_DuctInsulationThickness, HVAC_DuctLiningThickness, PipeInsulationThickness, Bar_Diameter, Crack_Width, Displacement_Deflection, Reinforcement_Cover, Reinforcement_Spacing, Section_Dimension, Section_Property.</li></ul>
+
+<p>I implemented a mapping dictionary MapDutToUt returning the valid unit types for any given display unit type and added a call to list its results to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/unit-abbreviations.html#4">
+CmdDutAbbreviation external command</a>.</p>
+
+<p>The mapping is initialised by calling the constructor, which is the only method required in addition to the inherited .NET generic dictionary functionality:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Map each DisplayUnitType to a list of all the </span>
+<span class="gray">///</span><span class="green"> UnitType values that it might be used for, e.g.</span>
+<span class="gray">///</span><span class="green"> Meters is mapped to the following 21 values:</span>
+<span class="gray">///</span><span class="green"> Length, SheetLength, HVAC_DuctSize, HVAC_Roughness, </span>
+<span class="gray">///</span><span class="green"> PipeSize, Piping_Roughness, WireSize, DecSheetLength,</span>
+<span class="gray">///</span><span class="green"> Electrical_CableTraySize, Electrical_ConduitSize, </span>
+<span class="gray">///</span><span class="green"> Reinforcement_Length, HVAC_DuctInsulationThickness, </span>
+<span class="gray">///</span><span class="green"> HVAC_DuctLiningThickness, PipeInsulationThickness, </span>
+<span class="gray">///</span><span class="green"> Bar_Diameter, Crack_Width, Displacement_Deflection, </span>
+<span class="gray">///</span><span class="green"> Reinforcement_Cover, Reinforcement_Spacing, </span>
+<span class="gray">///</span><span class="green"> Section_Dimension, Section_Property.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">MapDutToUt</span> : <span class="teal">Dictionary</span>&lt;<span class="teal">DisplayUnitType</span>, <span class="teal">List</span>&lt;<span class="teal">UnitType</span>&gt;&gt;
+{
+&nbsp; <span class="blue">public</span> MapDutToUt()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">DisplayUnitType</span>&gt; duts;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Array</span> a = <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">UnitType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">UnitType</span> ut <span class="blue">in</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Skip the UT_Undefined and UT_Custom entries; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// GetValidDisplayUnits throws ArgumentException </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// on them, saying &quot;unitType is an invalid unit </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// type.&nbsp; See UnitUtils.IsValidUnitType() and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// UnitUtils.GetValidUnitTypes().&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">UnitType</span>.UT_Undefined == ut
+&nbsp; &nbsp; &nbsp; &nbsp; || <span class="teal">UnitType</span>.UT_Custom == ut )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; duts = <span class="teal">UnitUtils</span>.GetValidDisplayUnits( ut );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">DisplayUnitType</span> dut <span class="blue">in</span> duts )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert( !ContainsKey( dut ), </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &quot;unexpected duplicate DisplayUnitType key&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( dut ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Add( dut, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">UnitType</span>&gt;( 1 ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span>[dut].Add( ut );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The UnitUtils.GetValidDisplayUnits method must not be called with the UT_Undefined or UT_Custom entries, or it will throw an ArgumentException saying "unitType is an invalid unit type.  See UnitUtils.IsValidUnitType() and UnitUtils.GetValidUnitTypes()."</p>
+
+<p>I added a call to instantiate this mapping and report its results to the external command like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">MapDutToUt</span> map_dut_to_ut = <span class="blue">new</span> <span class="teal">MapDutToUt</span>();
+&nbsp;
+&nbsp; <span class="teal">DisplayUnitType</span> n
+&nbsp; &nbsp; = <span class="teal">DisplayUnitType</span>.DUT_GALLONS_US;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Here is a list of the first {0} &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;display unit types with The Building Coder &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;abbreviation and the valid unit symbols:\n&quot;</span>,
+&nbsp; &nbsp; (<span class="blue">int</span>) n - 1 );
+&nbsp;
+&nbsp; <span class="blue">string</span> unit_types, valid_unit_symbols;
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="teal">DisplayUnitType</span> i = <span class="teal">DisplayUnitType</span>
+&nbsp; &nbsp; .DUT_METERS; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; uts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; map_dut_to_ut[i]
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">UnitType</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; u =&gt; u.ToString().Substring( 3 ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> m = uts.Count;
+&nbsp;
+&nbsp; &nbsp; unit_types = 4 &gt; m
+&nbsp; &nbsp; &nbsp; ? <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, uts )
+&nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}, {1} and {2} more&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; uts[0], uts[1], m - 2 );
+&nbsp;
+&nbsp; &nbsp; valid_unit_symbols = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">FormatOptions</span>.GetValidUnitSymbols( i )
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">UnitSymbolType</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; u =&gt; <span class="teal">Util</span>.UnitSymbolTypeString( u ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0,6} - {1} - {2}: {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DisplayUnitTypeAbbreviation[(<span class="blue">int</span>) i],
+&nbsp; &nbsp; &nbsp; <span class="teal">LabelUtils</span>.GetLabelFor( i ),
+&nbsp; &nbsp; &nbsp; unit_types,
+&nbsp; &nbsp; &nbsp; valid_unit_symbols );
+&nbsp; }
+</pre>
+
+<p>Note that I did not want to see the entire long list of valid unit types for each display unit type, since some of them are rather lengthy.</p>
+
+<p>Therefore, only the first two or three are displayed, and the number of additional ones mentioned in case there are more, like this (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+    m - Meters - Length, SheetLength and 19 more: none, m
+   cm - Centimeters - Length, SheetLength and 20 more: none, cm
+   mm - Millimeters - Length, SheetLength and 20 more: none, mm
+   ft - Decimal feet - Length, SheetLength and 19 more: none, foot_single_quote, lf
+  N/A - Feet and fractional inches - Length, SheetLength and 19 more: none
+  N/A - Fractional inches - Length, SheetLength and 20 more: none
+   in - Decimal inches - Length, SheetLength and 20 more: none, inch_double_quote
+   ac - Acres - Area, HVAC_CrossSection: none, acres
+   ha - Hectares - Area, HVAC_CrossSection: none, hectares
+  N/A - Meters and centimeters - Length, SheetLength and 17 more: none
+  y^3 - Cubic yards - Volume, Piping_Volume: none, cy
+ ft^2 - Square feet - Area, HVAC_CrossSection and 2 more: none, sf, ft^2
+  m^2 - Square meters - Area, HVAC_CrossSection and 2 more: none, m^2
+ ft^3 - Cubic feet - Volume, Piping_Volume and 2 more: none, cf, ft^3
+  m^3 - Cubic meters - Volume, Piping_Volume and 2 more: none, m^3
+  deg - Decimal degrees - Angle, SiteAngle, Rotation: none, degree_symbol
+  N/A - Degrees minutes seconds - Angle, SiteAngle, Rotation: none
+  N/A - General - Number: none
+  N/A - Fixed - Number, HVAC_Factor, Electrical_Demand_Factor: none
+    % - Percentage - Number, Slope and 4 more: none, percent_sign
+ in^2 - Square inches - Area, HVAC_CrossSection and 2 more: none, in^2
+ cm^2 - Square centimeters - Area, HVAC_CrossSection and 2 more: none, cm^2
+ mm^2 - Square millimeters - Area, HVAC_CrossSection and 2 more: none, mm^2
+ in^3 - Cubic inches - Volume, Piping_Volume and 2 more: none, in^3
+ cm^3 - Cubic centimeters - Volume, Piping_Volume and 2 more: none, cm^3
+ mm^3 - Cubic millimeters - Volume, Piping_Volume, Section_Modulus: none, mm^3
+    l - Liters - Volume, Piping_Volume: none, l
+</pre>
+
+<p>The updated version of the command is available from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a> and
+
+the version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.105.1">
+release 2014.0.105.1</a>.</p>
+
+<p>I found this little exploration very illuminating and hope that you learned something from it as well.</p>
+
+
+<a name="2"></a>
+
+<h4>Why No Backward Compatibility</h4>
+
+<p>Developers occasionally ask why the Revit API does not go to similarly extreme lengths as the AutoCAD API to support backward compatibility.</p>
+
+<p>The simple answer is that this enables to Revit API developers to improve the API better.</p>
+
+<p>It costs a huge amount of additional effort to maintain backwards compatibility in an API.</p>
+
+<p>The Revit API team tries to move forwards faster and not look back all the time.</p>
+
+<p>This hardly ever led to any really significant upheaval, although it does mean that most new major releases require a recompilation.</p>
+
+<p>Most
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/intermediate-api-update-releases.html">
+intermediate API update releases do not</a>,
+
+though.</p>
+

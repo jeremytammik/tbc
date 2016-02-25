@@ -1,0 +1,326 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+From: Limin He 
+Date: Tuesday, February 10, 2015 19:05
+To: Jeremy Tammik Autodesk 
+Subject: RE: [MonitorProgressRevit] migrated to Revit 2015 and tested successfully (#1)
+
+Hi, Jeremy,
+
+I make you one of the collaborator. Not quite familiar  with  github features, hope it works.
+
+Speaking of the description of this repository, I thought your blog provides more detailed information about this issue, since it has the link of your blog, user should be able to get it.
+
+The purpose of my project is to provide a modal dialog with status update when running the Revit API(like update instance parameter), and also user can cancel it during the process.
+
+Thanks,
+
+Limin
+
+- monitor progress
+  https://github.com/jeremytammik/MonitorProgressRevit
+  http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html?cid=6a00e553e16897883301b7c748167a970b#comment-6a00e553e16897883301b7c748167a970b
+
+http://sharadchhetri.com/2013/07/10/convert-video-file-into-gif-file-through-command-line-in-linux/
+
+http://stackoverflow.com/questions/6079150/how-to-generate-gif-from-avi-using-ffmpeg
+
+I compiled and installed gifsicle from the tar.gz package provided by
+http://www.lcdf.org/gifsicle
+and using the build and installation instructions on GitHub:
+https://github.com/kohler/gifsicle
+
+set up a small Revit window width, 884 pixel.
+recorded an mp4 file using camtasia for mac: monitor_progress.mp4, 13831227 bytes
+converted mp4 file to individual GIF images using ffmpeg:
+
+ffmpeg -i monitor_progress.mp4 -r 10 output/out%04d.gif
+
+/a/devdays/2014/online/cam/recording/ $ ls -o output/
+total 153416
+  161986  out0001.gif
+  162589  out0002.gif
+  162555  out0003.gif
+. . .
+  128736  out0594.gif
+  128649  out0595.gif
+  129043  out0596.gif
+
+ca. 77 MB
+
+use gifsicle to create a looping animated gif:
+
+gifsicle -d 10 -l  output/*.gif > monitor_progress.gif
+
+result is monitor_progress.gif, 76869920 bytes in size.
+
+display it in the web browser using the fllowng minima HTML wrapper monitor_progress.html:
+
+<html><body><img src="monitor_progress.gif" width="442"/></body></html>
+
+-->
+
+<h3>Displaying Progress Bar and Generating Animated GIF</h3>
+
+<p>A frequent request for Revit add-ins performing time-consuming tasks is to display a progress bar.</p>
+
+<p>My own progress bar implementation is provided by the ADN MEP sample application
+
+<a href="https://github.com/jeremytammik/AdnRme">
+AdnRme</a>,
+
+originally dating way back to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/mep-sample-ribbon-panel.html">2009</a> and
+
+earlier still.</p>
+
+<p>Now Limin He of <a href="http://www.fmsystems.com">FM:Systems</a> encountered
+
+and resolved an issue with his progress bar in VB.NET, raising the following
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html#comment-6a00e553e16897883301bb07e7bfe3970d">
+comment</a> on
+
+the topic of the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html">
+exceptions raised by multithreading in Revit 2015</a>:</p>
+
+<p><strong>Question:</strong>
+
+We came across the same issue described above and submitted a ticket in ADN.</p>
+
+<p>I tried the workaround you suggested using Application.DoEvents but the problem is the form has to be modeless which is not what we want.</p>
+
+<p>Updating a Revit parameter in the background while running a Windows form with a progress bar did not crash Revit before 2014.</p>
+<p>Any solid workaround for providing status update to the user while calling a time-consuming API at the same time?</p>
+
+<p><strong>Answer:</strong>
+
+You absolutely cannot safely perform any modification on the Revit database or use the Revit API in any way whatsoever, even for read-only purposes, except in a valid Revit API context;
+
+here is the <a href="http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html">final word on that</a>.</p>
+
+<p>A valid Revit API context is provided by Revit by a callback function, e.g. execution of an external command or in an event handler.</p>
+
+<p>The workaround is clear and simple: implement an external event.</p>
+
+<p><strong>Response:</strong>
+
+Thanks for the explanation. But the workaround uses a modeless form, that means user still can make changes through the Revit UI while the .NET API is called &ndash; isn't that less protected?</p>
+
+<p>My project is in fact not multi-threaded, it just uses one single thread with Revit running in the background while a modal Windows form updates the status in the front.
+I'm surprised that it causes Revit 2015 to crash and works fine in previous versions.</p>
+
+<p>In the end, I figured out a workaround to solve the problem.</p>
+
+<p>Here is the <a href="https://github.com/lotusinriver/MonitorProgressRevit">source code</a> that I uploaded to
+
+<a href="https://github.com/lotusinriver/MonitorProgressRevit">update a progress bar from a modal dialogue while calling the Revit API</a>.</p>
+
+<p>I hope it helps others using a similar approach to implement this feature as well.</p>
+
+<p><strong>Answer:</strong>
+
+Your solution caused me some confusion...</p>
+
+<p>For instance, you do not provide an add-in manifest, so I had to write it myself.</p>
+
+<p>The solution name is MonitorProgressRevit, the project name is MonitorProgress.vbproj, and the resulting .NET assembly DLL is MonitorProgess.dll, with one 'r' missing.</p>
+
+<p>It took a few attempts and some time experimenting to figure all this out...</p>
+
+<p>Still working on it, though...</p>
+
+<p>In the end, I got it compiled and tested successfully on Revit 2015.</p>
+
+<p>I created a pull request to update your repository with my changes.</p>
+
+<p>Can you pull it, please?</p>
+
+<p><strong>Response:</strong>
+
+I merged <a href="https://github.com/lotusinriver/MonitorProgressRevit/pull/1">your pull request</a> and
+
+made you a project collaborator.</p>
+
+<p>Regarding the description of this repository, I think your blog provides more detailed information about this issue.
+The repository readme includes the link of your blog, so the user should be able to get it.</p>
+
+<p>The purpose of my project is to provide a modal dialog with status update when running the Revit API (e.g., to update an element instance parameter), and also the user can cancel the action at any time during the process.</p>
+
+<p><strong>Answer:</strong>
+
+Here is a 59-second video demonstrating Limin's add-in modifying a Revit element parameter value and displaying the on-going progress in a live progress bar:</p>
+
+<!--
+<center>
+<img src="img/monitor_progress.gif" alt="MonitorProgress" width="442"/>
+</center>
+-->
+
+<center>
+<img src="img/monitor_progress_442_3.gif" alt="MonitorProgress 3" width="442"/>
+</center>
+
+<p>(Actually, this is not the first 77 MB animated GIF that I produced, but the final optimised 3 MB version discussed below).</p>
+
+<a name="2"></a>
+
+<h4>Command Line Creation of an Animated GIF File</h4>
+
+<p>As you can see above, I created an animated GIF file to display Limin's active progress bar up and running in all its glory.</p>
+
+<p>In the past, I used YouTube to display similar animations.
+The disadvantage of that approach is that it forces you, the user, to click on a button to start the animation running.</p>
+
+<p>The only method to display an animation immediately on a web page with no need for any user interaction whatsoever is the trusty old
+
+<a href="https://en.wikipedia.org/wiki/GIF#Animated_GIF">
+animated GIF</a> format,
+
+dating way back to the late 1980's, initially patented, and now freely useable again, since the patents meanwhile expired.</p>
+
+<p>I use Camtasia on Mac for recording. On Windows, Camtasia can generate animated GIF files, but alas, the Mac version lacks this feature.</p>
+
+<p>So I went ahead and set up a Unix based command line tool or two to create one myself.</p>
+
+<p>As far as I can tell, the simplest way to achieve this is to use ffmpeg and gifsicle as described by Sharad Chhetri in
+
+<a href="http://sharadchhetri.com/2013/07/10/convert-video-file-into-gif-file-through-command-line-in-linux">
+converting a video file into GIF on the Linux command line</a>.</p>
+
+<p>I performed the following steps:</p>
+
+<p><strong>1.</strong>
+
+I compiled and installed gifsicle from the tar.gz package provided by the
+
+<a href="http://www.lcdf.org/gifsicle">
+Gifsicle page on lcdf.org</a>.</p>
+
+<p><strong>2.</strong>
+
+I used the build and installation instructions from the
+
+<a href="https://github.com/kohler/gifsicle">
+Gifsicle GitHub repository</a> to
+
+create my binary Mac OS executable.</p>
+
+<p><strong>3.</strong>
+
+I cloned the <a href="https://github.com/lotusinriver/MonitorProgressRevit">MonitorProgress GitHub project</a>,
+compiled and installed it, started Revit and set up a very small Revit window width of only 884 pixels.</p>
+
+<p><strong>4.</strong> I recorded an MP4 file using Camtasia for Mac, generating the file monitor_progress.mp4, 13831227 bytes in size.</p>
+
+<p><strong>5.</strong> I converted the MP4 file to 596 individual GIF images using ffmpeg:</p>
+
+<pre>
+$ ffmpeg -i monitor_progress.mp4 -r 10 output/out%04d.gif
+
+$ ls -o output/
+total 153416
+  161986  out0001.gif
+  162589  out0002.gif
+  162555  out0003.gif
+. . .
+  128736  out0594.gif
+  128649  out0595.gif
+  129043  out0596.gif
+</pre>
+
+<p>The contents of the output folder are ca. 77 MB in size.</p>
+
+<p><strong>6.</strong> I used gifsicle to create a looping animated gif:</p>
+
+<pre>
+$ gifsicle -d 10 -l  output/*.gif > monitor_progress.gif
+</pre>
+
+<p>The result is one single GIF file, monitor_progress.gif, still 76869920 bytes in size.</p>
+
+<p><strong>7.</strong> You can display it in the web browser using the following minimal HTML wrapper monitor_progress.html:</p>
+
+<pre>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">html</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">body</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; &lt;</span><span class="maroon">img</span><span class="blue"> </span><span class="red">src</span><span class="blue">=</span>&quot;<span class="blue">monitor_progress.gif</span>&quot;<span class="blue"> </span><span class="red">width</span><span class="blue">=</span>&quot;<span class="blue">442</span>&quot;<span class="blue">/&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;/</span><span class="maroon">body</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">html</span><span class="blue">&gt;</span>
+</pre>
+
+<p>This displays the same result in the browser as the animated image above.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Optimise the Animated GIF File Generation</h4>
+
+<p>After working for a while with this 77 MB GIF and noticing that it was creating some sluggishness in the browser interaction, I had another look and found Chris Messina's suggestions on how to
+
+<a href="http://chrismessina.me/b/13913393/mov-to-gif">convert a MOV to a GIF like a boss</a>,
+
+so I repeated the conversion process a second time using the following command line:</p>
+
+<pre>
+$ gifsicle -d 10 -l --optimize=3 --resize-width 442
+  output/*.gif > monitor_progress_2.gif
+</pre>
+
+<p>That produces a warning message saying "gifsicle: warning: huge GIF, conserving memory (processing may take a while)".</p>
+
+<p>The new animated GIF is 2152053 bytes (ca. 2 MB) in size instead of 77 MB.</p>
+
+<p>It looks pretty similar in the browser, except that the grey-scale and light blue gradient colours are somewhat mixed up:</p>
+
+<center>
+<img src="img/monitor_progress_2.gif" alt="MonitorProgress 2" width="442"/>
+</center>
+
+
+
+<a name="4"></a>
+
+<h4>Reduce Size in Camtasia Not Gifsicle</h4>
+
+<p>To avoid the visible quality deterioration in the GIF resized by gifsicle, I decided to make one more attempt reducing size during the initial rendering to MP4 in Camtasia, producing a 442 x 542 pixel video monitor_progress_442.mp4 only 5736643 bytes big, then converting it straight to individual GIF images with ffmpeg and combining them into an animated GIF using gifsicle like this:</p>
+
+<pre>
+$ ffmpeg -i monitor_progress_442.mp4 -r 10 output/out%04d.gif
+$ gifsicle -d 10 -l output/*.gif > monitor_progress_442.gif
+</pre>
+
+<p>Each individual GIF image is about 45641 bytes this time, and the animated GIF monitor_progress_442.gif 26715360 bytes.
+No colour deterioration, but rather large.</p>
+
+<p>Next, I tested the gifsicle optimisation levels without resizing:</p>
+
+<pre>
+$ gifsicle -d 10 -l --optimize=1 output/*.gif > monitor_progress_442_1.gif
+$ gifsicle -d 10 -l --optimize=2 output/*.gif > monitor_progress_442_2.gif
+$ gifsicle -d 10 -l --optimize=3 output/*.gif > monitor_progress_442_3.gif
+</pre>
+
+<p>The resulting file sizes make a surprising jump:</p>
+
+<pre>
+  26715360  monitor_progress_442.gif
+  21314901  monitor_progress_442_1.gif
+   3240386  monitor_progress_442_2.gif
+   3136043  monitor_progress_442_3.gif
+</pre>
+
+<p>Their quality all seems fine; here is the last and smallest of them:</p>
+
+<center>
+<img src="img/monitor_progress_442_3.gif" alt="MonitorProgress 3" width="442"/>
+</center>

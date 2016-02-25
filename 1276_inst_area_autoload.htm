@@ -1,0 +1,209 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/how-to-calculate-model-group-elements-area-using-revit-api/td-p/5492863
+
+http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5494468
+
+- removing obsolete get_parameter calls
+  named versus built-in
+  assert only one exists
+
+-->
+
+<h3>Family Instance Area and Auto-Loading a Project File</h3>
+
+<p>I have been pretty busy answering queries on the Revit API discussion forum in the last few days.</p>
+
+<p>Here are two that I quite like that came up today, on
+
+<a href="#2">calculating areas occupied by furniture and equipment family instances</a> and
+
+<a href="#3">loading a project file automatically on Revit start-up</a>.</p>
+
+
+
+
+<a name="2"></a>
+
+<h4>Calculating Areas Occupied by Furniture and Equipment Family Instances</h4>
+
+<p>This query was raised by Vyom Dixit on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-calculate-model-group-elements-area-using-revit-api/td-p/5492863">
+how to calculate model group elements area</a>:</p>
+
+<p><strong>Question:</strong> I am new to the Revit API. I need to know about following things:</p>
+
+<ol>
+<li>How to calculate model group elements area using Revit API?</li>
+<li>Is this possible using ExtrusionAnalyzer? If yes, then how we can achieve this?</li>
+</ol>
+
+<p>As far as I know, ExtrusionAnalyzer needs a solid type object to draw the shadow, correct me if I am wrong.</p>
+
+<p>From a model group I have extracted the elements that belong to the model group.
+Now the problem is that extracted elements can have different types not necessarily solid type.</p>
+
+<p>Let me know if anyone has any idea about this.</p>
+
+<p>Thanks.</p>
+
+<p><strong>Answer:</strong> It really all depends on what type of elements you are talking about.</p>
+
+<p><strong>Response:</strong> I have model group that can have some equipment like Freezer, WorkTable or any Speciality Equipment, furniture etc.
+I want to calculate the total area occupied by this equipment belonging to the model group.
+Can you suggest any way to achieve this?</p>
+
+<p><strong>Answer:</strong> Once you put it like that, I understand what you need.</p>
+
+<p>I have in fact solved that exact issue, for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.21">
+room editor app</a>, to determine
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">
+boundary loops for equipment and furniture family instances</a>.</p>
+
+<p>In that case, I did in fact use the ExtrusionAnalyzer class to determine the closed loops.</p>
+
+<p>In my case, though, it would probably have been easier just using the 2D plan view of the family instances.</p>
+
+<p>For areas in general, though, the extrusion analyser is probably the right way to go.</p>
+
+<p>At least it is a very generic solution.</p>
+
+<p>As you say, it does indeed require a solid to work on.</p>
+
+<p>If you do not have any solids, you will need to determine a closed 2D polygon from the plan view family instance geometry.</p>
+
+<p>You could determine such a closed 2D polygon either by calculating the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/06/convex-hull-and-volume-computation.html">
+convex 2D hull</a> or using a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/boolean-operations-for-2d-polygons.html">
+2D polygon library</a>.</p>
+
+<p>Once you have a closed polygon, calculating its
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+2D area</a> is pretty straightforward.</p>
+
+<p><strong>Response:</strong> Many thanks to your quick response.
+I have reviewed your post as you mentioned in your last reply.
+In my case, I don't think extrusion analyser approach would work for all the model group elements becuase I am getting an exception to union some solids that belong to family instance.
+So, I want to use the approach you mentioned in your post, "using 2D plan view of the family instances".
+Can you suggest this approach in steps not the code?</p>
+
+<p><strong>Answer:</strong> Please note that I ran into such exceptions when performing the Boolean unions as well and added exception handlers to take care of those cases anyway.</p>
+
+<p>The extrusion handler is fed with 3D solids retrieved from the family instances in a 3D view.</p>
+
+<p>If you retrieve their geometry via a 2D plan view instead, you will get other results and other geometry, presumably mainly consisting of curves.</p>
+
+<ul>
+<li>Element.Geometry Property </li>
+<li>Options Class</li>
+<li>Options.View Property</li>
+<li>The view used for geometry extraction.</li>
+</ul>
+
+<p>Grab those curves and do what thou wilt.</p>
+
+
+<a name="3"></a>
+
+<h4>Loading a Project File Automatically on Revit Start-up</h4>
+
+<p>This query was raised by Davix on
+
+<a href="http://forums.autodesk.com/t5/revit-api/how-to-load-a-rvt-file-automatically-when-start-the-revit/m-p/5494468">
+how to load a RVT file automatically when starting Revit</a>:</p>
+
+<p><strong>Question:</strong> I wonder how can I load a Revit file automatically when starting the Revit system.</p>
+<p>Since the UIControlledApplication is the only parameter of the OnStartup function of the IExternalApplication class, while the OpenAndActivateDocument is the function of the UIApplication but not of the UIControlledApplication.</p>
+<p>How can I invoke the UIApplication.OpenAndActivateDocument method in the OnStartup function? Or is there some other method to address the problem?</p>
+
+<p><strong>Answer:</strong> The UIControlledApplication controlled application provided in the OnStartup method cannot open a document, because Revit is still in the process of starting up and is not ready to open and process project files yet.</p>
+
+<p>In the OnStartup method, you can set up a system to open the project document later on, when Revit has finished loading.</p>
+
+<p>Before getting to that, though, let me point out that the easiest way to start up Revit with a project file loaded is to use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/03/using-processstart-to-open-a-project-or-family.html">
+Process.Start</a>.</p>
+
+<p>Once Revit is up and running, as you have pointed out yourself, you can also use the UIApplication.OpenAndActivateDocument method, as demonstrated in this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/closing-the-active-document.html">closing the active document</a>.</p>
+
+<p>You can prepare a call to this method from within the OnStartup method by temporarily subscribing to the Idling event in the OnStartup method, then unsubscribing from Idling in the Idling event handler, opening the document and doing whatever else you want at that point.</p>
+
+<p>That should give you a couple of useful options to choose from.</p>
+
+<p><strong>Answer</strong> by Arno&scaron;t L&ouml;bel: The Revit API now provides another solution for the problem besides using the Idling event. Three years ago, the Idling event may have been the only work-around, but there is a better solution now: a better way of opening a document on start-up is via the ApplicationInitialized event. Like with the Idling event, an application subscribes to it during the OnStartup call. Revit will raise this event a bit later, when the Revit application start-up has completed. Remember, just as with the Idling event, the OpenAndActivateDocument method can be used only as long there is no active document in Revit yet.</p>
+
+
+<a name="4"></a>
+
+<h4>Updated ADN Revit API Samples GitHub Repository</h4>
+
+<p>I continued working my way through the various Revit API GitHub repositories, eliminating obsolete API usage and updating the sample code copyright years from 2014 to 2015 in readiness for more significant updates later this year.</p>
+
+<p>Yesterday, I updated the
+
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra repository</a>,
+
+including the
+
+<a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">
+standard ADN Revit API training labs</a>
+
+(<a href="http://images.autodesk.com/adsk/files/Revit2015APITraining.zip">zip</a>)
+
+provided by the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Avoid Retrieving a Parameter by Name</h4>
+
+<p>The last couple of fixes that I applied dealt with the
+
+<a href="zip/adn_migr_2015_a.txt">ten warnings</a> caused
+
+by calls to the deprecated Element.Parameter property taking a parameter name as an argument.</p>
+
+<p>This property is now converted to a method named GetParameters returning a list of parameters, since multiple parameters can have the same name.</p>
+
+<p>Retrieving a parameter by name has always been bad practice, since it is language dependent and less efficient than using the other methods, if they apply, e.g. by specifying the parameter definition object, a built-in parameter enumeration value, or a shared parameter GUID.</p>
+
+<p>The only parameters that really have to be retrieved by name are custom family parameters.</p>
+
+<p>From now on, to retrieve a parameter by name, you either call the new GetParamters method returning a list and pick the one you need.</p>
+
+<p>Alternatively, you can call the LookupParameter method that will return the first one encountered and pray that it really is the one you expect.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Jobs@Autodesk</h4>
+
+<p>I just received a message pointing out two exciting new European job opportunities at Autodesk:</p>
+
+<ol>
+<li>Vertical Solution Sales &ndash; Simulation &ndash; Nordics/UK &ndash; REQ #15WD17251:
+<br/>We have a fantastic opportunity for someone to be involved in developing the simulation market with cloud based technology.  With our heavy investment in technologies such as composites, a key theme in the simulation world, we are hoping to kick start and drive fast growth in an exciting market.  Do you  have knowledge in composite, analytics or simulation sales?  Are you interested in being part of a team to spearhead this market with a new innovative approach?</li>
+<li>Territory Sales Manager &ndash; AEC UK/Benelux &ndash; REQ #15WD17282:
+<br/>We have an opportunity for a Territory Sales Manager to head up a hugely successful team focusing on the AEC market.  This role will be based in the UK and also cover the Benelux region.  Do you have what it takes to maintain the momentum?</li>
+</ol>
+
+<p>Please get in touch.</p>

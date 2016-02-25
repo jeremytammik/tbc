@@ -1,0 +1,358 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+#revitapi @jeremytammik #3dwebcoder #svg
+
+-->
+
+
+<h3>Sending a Room Boundary to an SVG Node Web Server</h3>
+
+<p>Yesterday, I implemented and published a simple
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html">
+Node.js web server to display an SVG polygon</a>.</p>
+
+<p>In that post, you can define the polygon path manually in a text box and invoke the web server by clicking a button.</p>
+
+<p>Obviously, the same system can be driven automatically.</p>
+
+<p>Let's look at a way to extract the boundary polygon or a Revit room element, convert that to SVG, and invoke the web server to display it.</p>
+
+<p>Here is the room element in Revit, intentionally weirdly shaped:</p>
+
+<center>
+<img src="img/room_svg_01_model.png" alt="Weird room in Revit" width="590"/>
+</center>
+
+<p>I invoke my new sweet SvgExport Revit add-in in that model, and. lo and behold, up pops the web browser displaying the result returned by my Heroku-hosted Node.js web server:</p>
+
+<center>
+<img src="img/room_svg_01_result.png" alt="Weird room boundary in SVG" width="500"/>
+</center>
+
+<p>How is this achieved?</p>
+
+<p>Well, the
+
+<a href="http://the3dwebcoder.typepad.com">
+The 3D Web Coder</a> discussion
+
+yesterday explains how the
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html">
+Node.js web server to display an SVG polygon</a> is
+
+implemented and provides a simple interactive user interface to test it.</p>
+
+<p>The SvgExport Revit add-in performs the following steps to drive it:</p>
+
+<ul>
+<li>Select a room in the model &ndash; <code>GetRoom</code>.</li>
+<ul>
+<li>If the model only contains one spatial element and it happens to be a room, select that.</li>
+<li>Otherwise, if any elements have been pre-selected, pick the first room encountered among them.</li>
+<li>Otherwise, prompt the user to interactively select a room or a room tag.</li>
+</ul>
+<li>Determine its outer boundary loop.</li>
+<li>Convert that to an SVG path definition.</li>
+<li>Flip the Y coordinates to toggle the up direction.</li>
+<li>Invoke the web server locally or globally.</li>
+</ul>
+
+<p>Here is the entire implementation of the SvgExport external command and its support methods:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Text;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.DB.Architecture;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">using</span> <span class="teal">BoundarySegment</span> = Autodesk.Revit.DB.<span class="teal">BoundarySegment</span>;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> SvgExport
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command01</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">int</span> _target_square_size = 100;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Allow selection of room elements only.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">class</span> <span class="teal">RoomSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get a room from the given document.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> If there is only one single room in the entire</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> model, return that with no further ado. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Otherwise, if any elements have been pre-selected,</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> pick the first room encountered among them.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Otherwise, prompt the user to interactively </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> select a room or a room tag.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="teal">Result</span> GetRoom( <span class="teal">UIDocument</span> uidoc, <span class="blue">out</span> <span class="teal">Room</span> room )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; room = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get all rooms in the model.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> rooms
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 == rooms.Count()
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; rooms.FirstElement() <span class="blue">is</span> <span class="teal">Room</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// If there is only one spatial element</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and that is a room, pick that.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; room = rooms.FirstElement() <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check the preselacted elements.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = sel.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Room</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">RoomTag</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; room = ( e <span class="blue">as</span> <span class="teal">RoomTag</span> ).Room;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == room )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Prompt for interactive selection.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">RoomSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select pick a room&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; room = doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return an SVG representation of the</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> given XYZ point scaled, offset and</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Y flipped to the target square size.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">string</span> GetSvgPointFrom(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p,
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pmid,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> scale )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p -= pmid;
+&nbsp; &nbsp; &nbsp; p *= scale;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> x = (<span class="blue">int</span>) ( p.X + 0.5 );
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> y = (<span class="blue">int</span>) ( p.Y + 0.5 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The Revit Y coordinate points upwards,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the SVG one down.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; y = -y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; x += _target_square_size / 2;
+&nbsp; &nbsp; &nbsp; y += _target_square_size / 2;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> x.ToString() + <span class="maroon">&quot; &quot;</span> + y.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Generate and return an SVG path definition to</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> represent the given room boundary loop, scaled </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> from the given bounding box to fit into a </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> 100 x 100 canvas.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">string</span> GetSvgPathFrom(
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb,
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt; loop )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine scaling and offsets to transform</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// from bounding box to (0,0)-(100,100).</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pmin = bb.Min;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pmax = bb.Max;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> vsize = pmax - pmin;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> pmid = pmin + 0.5 * vsize;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> size = <span class="teal">Math</span>.Max( vsize.X, vsize.Y );
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> scale = _target_square_size / size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">StringBuilder</span> s = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nSegments = loop.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p0 = <span class="blue">null</span>; <span class="green">// loop start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p; <span class="green">// segment start point</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="blue">null</span>; <span class="green">// segment end point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> x, y;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> sxy;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> seg <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Todo: handle non-linear curve.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Especially: if two long lines have a </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// short arc in between them, skip the arc</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and extend both lines.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p = seg.Curve.GetEndPoint( 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == q || q.IsAlmostEqualTo( p ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal current start point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; q = seg.Curve.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p0 = p; <span class="green">// save loop start point</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s.Append( <span class="maroon">&quot;M&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + GetSvgPointFrom( p, pmid, scale ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; s.Append( <span class="maroon">&quot;L&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + GetSvgPointFrom( q, pmid, scale ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; s.Append( <span class="maroon">&quot;Z&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.IsAlmostEqualTo( p0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected last endpoint to equal loop start point&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> s.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Invoke the SVG node.js web server.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Use a local or global base URL and append</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> the SVG path definition as a query string.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Compare this with the JavaScript version used in</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> DisplaySvg( <span class="blue">string</span> path_data )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> local = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> base_url = local
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;http://127.0.0.1:5000&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;https://shielded-hamlet-1585.herokuapp.com&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> d = path_data.Replace( <span class="maroon">' '</span>, <span class="maroon">'+'</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> query_string = <span class="maroon">&quot;d=&quot;</span> + d;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> url = base_url + <span class="maroon">'?'</span> + query_string;
+&nbsp;
+&nbsp; &nbsp; &nbsp; System.Diagnostics.<span class="teal">Process</span>.Start( url );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Room</span> room = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Result</span> rc = GetRoom( uidoc, <span class="blue">out</span> room );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; opt.SpatialElementBoundaryLocation =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SpatialElementBoundaryLocation</span>.Center; <span class="green">// loops closed</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//SpatialElementBoundaryLocation.Finish; // loops not closed</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops
+&nbsp; &nbsp; &nbsp; &nbsp; = room.GetBoundarySegments( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nLoops = loops.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = room.get_BoundingBox( <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path_data = GetSvgPathFrom( bb, loops[0] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; DisplaySvg( path_data );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The method <code>DisplaySvg</code>that invokes the Heroku-hosted web server was copied almost verbatim from the original JavaScript function <code>submit_form_svg_01</code> used to submit the form defined to
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html">
+manually test the node.js server to display an SVG polygon</a>.</p>
+
+<p>It is interesting to compare the two implementations side by side, so that is exactly what I did in the follow-up discussion on
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/driving-the-2d-graphics-svg-node-server-from-a-desktop-app.html">
+driving the SVG node server from a desktop application</a>.</p>
+
+<p>The entire source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/SvgExport">SvgExport GitHub repository</a>,
+
+and the version presented here is
+
+<a href="https://github.com/jeremytammik/SvgExport/releases/tag/2015.0.0.0">release 2015.0.0.0</a>.</p>
+
+<p>As I already pointed out yesterday on The 3D Web Coder, I could just as easily implement this locally in pure JavaScript, of course.</p>
+
+<p>Hosting it in a separate server makes no sense whatsoever as long as it is just for my personal local use.</p>
+
+<p>The server implementation is only of interest once we consider more widespread use, e.g., globally accessible sharing of data retrieved from multiple projects for multiple interested parties.</p>
+
+<p>That is where we are headed as soon as we can &nbsp; :-)</p>

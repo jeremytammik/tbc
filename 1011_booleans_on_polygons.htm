@@ -1,0 +1,520 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+08698897 [GetExtrusionBase issue]
+
+Ning Zhou, Ong & Ong Pte Ltd
+
+-->
+
+<h3>Boolean Operations for 2D Polygons</h3>
+
+<p>Once again, I have a special titbit for you to start the week.
+Enjoy!</p>
+
+<p>Some of the most important utility tools for analysis of BIM and CAD models in general need to determine simple properties of and relationships between 2D points and polygons, e.g. point in polygon determination, area calculation and Boolean operations for overlapping areas, for instance for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacent-area.html">
+room and wall adjacent area</a> calculations.</p>
+
+<p>Some of these, but not all, are covered by the Revit API, though often only for a specialised context.</p>
+
+<p>Any serious BIM coder will require generic versions of these tools, and the most reliable way to ensure that is as all-too-often to
+
+<a href="http://en.wikipedia.org/wiki/Do_it_yourself">DIY</a>.</p>
+
+<p>The Building Coder did so right from the beginning of its existence, e.g. for</p>
+
+<ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/point-in-polygon-containment-algorithm.html">
+Point in polygon containment</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+2D polygon areas and outer loop</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">
+3D polygon areas</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+Boolean operations for 2D polygons</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html">
+GetPolygon extension methods</a></li>
+
+</ul>
+
+<p>For the point containment check and area calculation, it is easy enough to implement a reliable stand-alone solution for yourself.</p>
+
+<p>Boolean operations on polygons are a bit harder, however, and back in 2009 we took recourse to an external library to address that.</p>
+
+<p>Here is an update and hopefully improvement to the solution provided then, prompted by the following query:</p>
+
+<p><strong>Question:</strong> I tried to use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html">
+GpcNET Boolean operation for polygon</a> solution
+
+that you provided.
+
+<p>I cannot make it work, even though I updated it to the Revit 2014 version:</p>
+
+<center>
+<img src="img/gpcnet_exception.jpg" alt="GpcNET exception" width="400"/>
+</center>
+
+<p>I tried switching between x86 and x64 configuration in Visual Studio, but that did not help.</p>
+
+<p>Is there a fix for this, or an updated GPC DLL?</p>
+
+<p>Or does the Revit API provide any similar tool to perform 2D polygon Boolean operations?</p>
+
+
+
+<p><strong>Answer:</strong> Actually, I think it would be your job to create that kind of stuff for yourself, especially since you have my previous blog post at hand, showing you how easy it is to do, and listing almost exactly which steps to take.</p>
+
+<p>It is definitely an extremely important tool to have, though, so in this specific case, I will be happy to explore the issue and provide an update to the previous example.</p>
+
+<p>The blog post you refer to is rather old, from the year 2009.</p>
+
+<p>Maybe there is something better around now?</p>
+
+<p>I spent a few moments researching this.
+I performed a simple search for
+
+<a href="http://lmgtfy.com/?q=open+source+boolean+operation+2d+polygon">
+open source boolean operation 2d polygon</a>.</p>
+
+<p>That took me to the well-known Wikipedia article on
+
+<a href="http://en.wikipedia.org/wiki/Boolean_operations_on_polygons">
+Boolean operations on polygons</a>.</p>
+
+<p>In it, Michael Leonov's
+
+<a href="http://www.complex-a5.ru/polyboolean/comp.html">
+comparison of polygon clippers</a> is too old by now, from 1998.</p>
+
+<p>Angus Johnson's
+
+<a href="http://angusj.com/delphi/clipper.php#features">
+comparison</a> was
+
+updated in 2013 and led me to download the
+
+<a href="http://angusj.com/delphi/clipper.php">
+Clipper polygon clipping library</a>.</p>
+
+<p>It is written in Delphi, C++, C# and Python and is currently at version 5.1.6, updated on May 23 2013.
+It is freeware for both open source and commercial applications, equipped with the Boost Software License.</p>
+
+<p>I downloaded and unzipped clipper_ver5.1.6.zip, loaded the C# GuiDemo solution into Visual Studio, hit F5 to debug, and had a result within a few minutes of starting to answer your case:</p>
+
+<center>
+<img src="img/clipper_gui_demo.png" alt="Clipper GUI demo" width="400"/>
+</center>
+
+<p>Since this is C# code, you can easily integrate it into your Revit add-in.</p>
+
+<p>Now comes the fun part :-)</p>
+
+<p>Hack, hack, hack.</p>
+
+<p>Ok, I completed my sample app.
+It implements an external command named RvtClipper that intersects two slabs, which can be floors or ceilings, and creates a new floor representing the result:</p>
+
+<center>
+<img src="img/clipper_floor_intersection.png" alt="RvtClipper floor intersection" width="400"/>
+</center>
+
+<p>Let's take a quick look at the code to achieve this:</p>
+
+<ul>
+<li><a href="#2">Clipper library project integration</a>.</li>
+<li><a href="#3">Clipper and Revit point class translation</a>.</li>
+<li><a href="#4">GetBoundaryLoops</a> &ndash; return horizontal slab boundary loops.</li>
+<li><a href="#5">Select two slabs in the BIM</a>.</li>
+<li><a href="#6">Retrieve boundaries, intersect and create a floor</a>.</li>
+<li><a href="#7">Download</a>.</li>
+</ul>
+
+
+<a name="2">
+
+<h4>Clipper Library Project Integration</h4>
+
+<p>The Clipper GUI demo sample application solution contains two projects: one for the GUI demo itself, and the other to generate the Clipper library from its one and only C# source code module.</p>
+
+<p>I therefore simply copied that entire project into my add-in solution, made my add-in dependent on the Clipper library and added a reference to its .NET assembly:</p>
+
+<center>
+<img src="img/clipper_library_integration.png" alt="Clipper library integration"/>
+</center>
+
+
+
+<a name="3">
+
+
+<h4>Clipper and Revit Point Class Translation</h4>
+
+<p>Part of the Clipper speed and reliability presumably stems from the fact that it is integer-based, eliminating all the rounding problems dealing with real numbers.</p>
+
+<p>It uses an IntPoint class with two Int64 X and Y coordinates.</p>
+
+<p>I have often approximated Revit XYZ vertices using integer-based point classes in the past, so this seems pretty appropriate for me.</p>
+
+<p>Once again, I decided to simply convert the Revit XYZ imperial coordinates to millimetres.
+That choice is completely arbitrary.
+If you prefer higher precision, please be my guest.</p>
+
+<p>Here is the code I use to convert back and forth between the two systems:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Consider a Revit length zero </span>
+&nbsp; <span class="gray">///</span><span class="green"> if is smaller than this.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _eps = 1.0e-9;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Conversion factor from feet to millimetres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _feet_to_mm = 25.4 * 12;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Conversion a given length value </span>
+&nbsp; <span class="gray">///</span><span class="green"> from feet to millimetres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">long</span> ConvertFeetToMillimetres( <span class="blue">double</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; d )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _eps &gt; d
+&nbsp; &nbsp; &nbsp; &nbsp; ? 0
+&nbsp; &nbsp; &nbsp; &nbsp; : (<span class="blue">long</span>) ( _feet_to_mm * d + 0.5 );
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _eps &gt; -d
+&nbsp; &nbsp; &nbsp; &nbsp; ? 0
+&nbsp; &nbsp; &nbsp; &nbsp; : (<span class="blue">long</span>) ( _feet_to_mm * d - 0.5 );
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Conversion a given length value </span>
+&nbsp; <span class="gray">///</span><span class="green"> from millimetres to feet.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> ConvertMillimetresToFeet( <span class="blue">long</span> d )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> d / _feet_to_mm;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a clipper integer point </span>
+&nbsp; <span class="gray">///</span><span class="green"> from a Revit model space one.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Do so by dropping the Z coordinate</span>
+&nbsp; <span class="gray">///</span><span class="green"> and converting from imperial feet </span>
+&nbsp; <span class="gray">///</span><span class="green"> to millimetres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">IntPoint</span> GetIntPoint( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">IntPoint</span>(
+&nbsp; &nbsp; &nbsp; ConvertFeetToMillimetres( p.X ),
+&nbsp; &nbsp; &nbsp; ConvertFeetToMillimetres( p.Y ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a Revit model space point </span>
+&nbsp; <span class="gray">///</span><span class="green"> from a clipper integer one.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Do so by adding a zero Z coordinate</span>
+&nbsp; <span class="gray">///</span><span class="green"> and converting from millimetres to</span>
+&nbsp; <span class="gray">///</span><span class="green"> imperial feet.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">XYZ</span> GetXyzPoint( <span class="teal">IntPoint</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; ConvertMillimetresToFeet( p.X ),
+&nbsp; &nbsp; &nbsp; ConvertMillimetresToFeet( p.Y ),
+&nbsp; &nbsp; &nbsp; 0.0 );
+&nbsp; }
+</pre>
+
+
+<a name="4">
+
+<h4>GetBoundaryLoops &ndash; Return Horizontal Slab Boundary Loops</h4>
+
+<p>Ok, so we now know how to convert a Revit point to a Clipper one.</p>
+
+<p>How do we represent an entire boundary loop, and how can that data be retrieved from a BIM slab?</p>
+
+<p>That is achieved in one fell swoop by the GetBoundaryLoops method, returning a collection of Clipper polygons.</p>
+
+<p>A single slab may generate multiple loops, both due to holes in its interior and due to consisting of several separate pieces:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve the boundary loops of the given slab </span>
+<span class="gray">///</span><span class="green"> top face, which is assumed to be horizontal.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="teal">Polygons</span> GetBoundaryLoops( <span class="teal">CeilingAndFloor</span> slab )
+{
+&nbsp; <span class="blue">int</span> n;
+&nbsp; <span class="teal">Polygons</span> polys = <span class="blue">null</span>;
+&nbsp; <span class="teal">Document</span> doc = slab.Document;
+&nbsp; <span class="teal">Application</span> app = doc.Application;
+&nbsp;
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geo = slab.get_Geometry( opt );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = face <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; pf.Normal.IsAlmostEqualTo( <span class="teal">XYZ</span>.BasisZ ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> loops = pf.EdgeLoops;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = loops.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; polys = <span class="blue">new</span> <span class="teal">Polygons</span>( n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = loop.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Polygon</span> poly = <span class="blue">new</span> <span class="teal">Polygon</span>( n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; pts = edge.Tessellate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = pts.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> pts )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; poly.Add( GetIntPoint( p ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; polys.Add( poly );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> polys;
+}
+</pre>
+
+<p>With all of that in place, we have nothing more to do before proceeding with the external command mainline.</p>
+
+<p>As mostly, it consists of two parts: the user interface to select the two slabs to intersect, and the worker code to do the job.</p>
+
+
+
+<a name="5">
+
+<h4>Select Two Slabs in the BIM</h4>
+
+<p>The selection supports both pre- and post-selection.</p>
+
+<p>You can select a bunch of elements before launching the command.
+In that case, the first two slabs encountered in the selection will be picked.</p>
+
+<p>If you pre-select nothing, all floor elements in the entire model will be retrieved and the first two encountered selected.</p>
+
+<p>As you may have gathered, this is more geared towards effective simple testing than production use:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Two slabs to intersect.</span>
+&nbsp;
+&nbsp; <span class="teal">CeilingAndFloor</span>[] slab
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">CeilingAndFloor</span>[2] { <span class="blue">null</span>, <span class="blue">null</span> };
+&nbsp;
+&nbsp; <span class="green">// Access current selection</span>
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == slab[0] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; slab[0] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == slab[1] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; slab[1] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == slab[0] || <span class="blue">null</span> == slab[1] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select two floor or ceiling slabs to intersect.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Retrieve elements from database</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> floors
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsNotElementType()
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_Floors );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> floors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == slab[0] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; slab[0] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == slab[1] )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; slab[1] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == slab[0] || <span class="blue">null</span> == slab[1] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Unable to find two floors in project to intersect.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+
+<a name="6">
+
+<h4>Retrieve Boundaries, Intersect and Create a Floor</h4>
+
+<p>We have our two slabs.</p>
+
+<p>Let's go ahead and do the job.</p>
+
+<p>The Revit API imposes one unfortunate caveat: the doc.Create.NewFloor
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/create-a-floor-with-an-opening-or-complex-boundary.html">
+floor creation method can only handle a single exterior loop</a>.
+
+<p>We therefore ignore all but the first boundary loop returned in the intersection result, and don't even care what that actually represents.</p>
+
+<p>See how simple this is:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Retrieve the two slabs' boundary loops</span>
+&nbsp;
+&nbsp; <span class="teal">Polygons</span> subj = GetBoundaryLoops( slab[0] );
+&nbsp; <span class="teal">Polygons</span> clip = GetBoundaryLoops( slab[1] );
+&nbsp;
+&nbsp; <span class="green">// Calculate the intersection</span>
+&nbsp;
+&nbsp; <span class="teal">Polygons</span> intersection = <span class="blue">new</span> <span class="teal">Polygons</span>();
+&nbsp;
+&nbsp; <span class="teal">Clipper</span> c = <span class="blue">new</span> <span class="teal">Clipper</span>();
+&nbsp;
+&nbsp; c.AddPolygons( subj, <span class="teal">PolyType</span>.ptSubject );
+&nbsp;
+&nbsp; c.AddPolygons( clip, <span class="teal">PolyType</span>.ptClip );
+&nbsp;
+&nbsp; c.Execute( <span class="teal">ClipType</span>.ctIntersection, intersection,
+&nbsp; &nbsp; <span class="teal">PolyFillType</span>.pftEvenOdd, <span class="teal">PolyFillType</span>.pftEvenOdd );
+&nbsp;
+&nbsp; <span class="green">// Check for a valid intersection</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; intersection.Count )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Determine new intersection floor boundary</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We can only handle a single exterior loop </span>
+&nbsp; &nbsp; <span class="green">// here, unfortunately; cf.</span>
+&nbsp; &nbsp; <span class="green">// http://thebuildingcoder.typepad.com/blog/2013/07\</span>
+&nbsp; &nbsp; <span class="green">// /create-a-floor-with-an-opening-or-complex-boundary.html</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curves = app.Create.NewCurveArray();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Polygon</span> poly = intersection[0];
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IntPoint</span>? p0 = <span class="blue">null</span>; <span class="green">// first</span>
+&nbsp; &nbsp; <span class="teal">IntPoint</span>? p = <span class="blue">null</span>; <span class="green">// previous</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IntPoint</span> q <span class="blue">in</span> poly )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; p0 = q;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != p )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; curves.Append(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span>.CreateBound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetXyzPoint( p.Value ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetXyzPoint( q ) ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; p = q;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Do the dirty deed</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create Intersection Floor&quot;</span> );
+&nbsp; &nbsp; &nbsp; doc.Create.NewFloor( curves, <span class="blue">false</span> );
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I showed you the result above.</p>
+
+<p>Pretty nifty, huh?</p>
+
+<p>Oh yes, please also note my first use of
+
+<a href="http://stackoverflow.com/questions/2735638/nullable-integer-in-net">
+nullable values</a>.
+
+Very useful indeed  :-)</p>
+
+
+
+<a name="7">
+
+<h4>Download</h4>
+
+<p>One nice aspect of this version is that the C# version of the Clipper library is provided in its entirety by the clipper_library project included in my add-in Visual Studio solution, so you do not even need to download it separately yourself to make use of this.</p>
+
+<p>You do need to ensure that the Clipper .NET assembly is located where the add-in assembly can find it, though.
+I'll leave that up to you, of course.</p>
+
+<p>Here is
+
+<a href="zip/RvtClipper.zip">RvtClipper.zip</a> containing
+
+the complete add-in and library source code, solution, and add-in manifest.</p>
+
+<p>I wish you lots of fun and success making use of this, and please let us know what experiences you make and what nice uses you put it to.
+Thank you.</p>

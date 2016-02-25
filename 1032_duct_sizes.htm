@@ -1,0 +1,104 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Martin Schmid : Re: Duct Sizes in Revit
+
+-->
+
+<h3>Programmatic Access to Duct Sizes</h3>
+
+<p>Here is a nice little MEP related blog post on accessing duct sizes through the API to round off the week.</p>
+
+<p>It was provided by our MEP expert Martin Schmid, who says:</p>
+
+<blockquote>
+
+<p>I recently heard from a couple of developers that they had difficulties accessing the Duct Size settings in Revit.</p>
+
+<p>In the user interface, you can see them by selecting Manage &gt; MEP Settings &gt; Mechanical Settings &gt; Duct Settings &gt; Round/Oval/Rectangular.</p>
+
+<p>I threw together a macro to check for myself... maybe this would be helpful to publish so the results turn up in web searches...</p>
+
+</blockquote>
+
+<p>I think this is a great idea and completely agree, so I implemented an external command ListDuctSizes calling Martin's method of the same name to share with you:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List all duct sizes, thus proving that the duct </span>
+&nbsp; <span class="gray">///</span><span class="green"> size settings available in the Revit UI through </span>
+&nbsp; <span class="gray">///</span><span class="green"> Manage &gt; MEP Settings &gt; Mechanical Settings &gt; </span>
+&nbsp; <span class="gray">///</span><span class="green"> Duct Settings &gt; Round/Oval/Rectangular are </span>
+&nbsp; <span class="gray">///</span><span class="green"> indeed available via the API.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> ListDuctSizes( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DuctSizeSettings</span> settings
+&nbsp; &nbsp; &nbsp; = <span class="teal">DuctSizeSettings</span>.GetDuctSizeSettings( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">KeyValuePair</span>&lt;<span class="teal">DuctShape</span>, <span class="teal">DuctSizes</span>&gt; pair
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> settings )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( pair.Key.ToString() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">MEPSize</span> size <span class="blue">in</span> pair.Value )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> value = <span class="teal">FormatUtils</span>.Format( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UnitType</span>.UT_HVAC_DuctSize,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; size.NominalDiameter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; {0}: used in size lists/sizing: {1}/{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; value,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; size.UsedInSizeLists.ToString(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; size.UsedInSizing.ToString() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Here is some of the output that it generates in the Visual Studio debug output window:</p>
+
+<pre>
+Round
+  3": used in size lists/sizing: True/True
+  4": used in size lists/sizing: True/True
+  4": used in size lists/sizing: True/True
+  ...
+  88": used in size lists/sizing: True/True
+  90": used in size lists/sizing: True/True
+Rectangular
+  3": used in size lists/sizing: True/True
+  4": used in size lists/sizing: True/True
+  4": used in size lists/sizing: True/True
+  ...
+  94": used in size lists/sizing: True/True
+  96": used in size lists/sizing: True/True
+Oval
+  3": used in size lists/sizing: True/True
+  4": used in size lists/sizing: True/True
+  5": used in size lists/sizing: True/True
+  ...
+  143": used in size lists/sizing: True/True
+  144": used in size lists/sizing: True/True
+</pre>
+
+<p>For the sake of completeness, here is
+
+<a href="zip/ListDuctSizes.zip">ListDuctSizes.zip</a> containing
+
+the full source code, Visual Studio solution and add-in manifest for this simple command.</p>
+
+<p>Many thanks to Martin for sharing this, and a happy weekend to all!</p>
+
+
+<a name="2"></a>
+
+<h4></h4>
+
+<a href="">
+</a>

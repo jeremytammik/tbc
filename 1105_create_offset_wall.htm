@@ -1,0 +1,62 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+creating a wall by specifying the finish face location line instead of the center line
+http://thebuildingcoder.typepad.com/blog/2013/09/creating-an-offset-wall.html?cid=6a00e553e16897883301a73d7387f4970d#comment-6a00e553e16897883301a73d7387f4970d
+http://bim42.com/2014/02/09/modellingskirtingboards
+Simon Moreau has left you a comment:
+
+-->
+
+<h3>Creating an Offset Wall Solution</h3>
+
+<p>Happy
+
+<a href="http://en.wikipedia.org/wiki/Valentine%27s_Day">
+St. Valentine's Day</a>!</p>
+
+<center>
+<img src="img/linas_hand_heart.png" alt="A heart of hands" width="430"/>
+</center>
+
+<p>As we all know and have known for a long time from the exploration of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+wall compound layers</a>,
+
+the Revit API wall location line is at the centre of the wall.</p>
+
+<p>There is no way to change that, and it is important to note that the API location line is completely separate from the one whose location can be controlled through the user interface, and also through the built-in parameter WALL_KEY_REF_PARAM, but only after the wall has been created.</p>
+
+<p>When creating a new wall, the location line you specify is always the wall centre line.</p>
+
+<p>This has sometimes been an issue for people wishing to programmatically
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/creating-an-offset-wall.html">
+create an offset wall</a> along
+
+an edge, e.g. on top of a given slab, so that the wall finish coincides with the slab edge.</p>
+
+<p>Well, the best solutions are always the simplest, and now Simon Moreau seems to have come up with the long-awaited ultimate one for this situation in his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/creating-an-offset-wall.html?cid=6a00e553e16897883301a73d7387f4970d#comment-6a00e553e16897883301a73d7387f4970d">
+comment</a> on
+
+the topic pointing out how he solves this to
+
+<a href="http://bim42.com/2014/02/09/modellingskirtingboards">model skirting boards</a>:</p>
+
+<p>"I just found a workaround for creating walls with the location line set to 'Finish Face' (for example) on creation.
+I just first create a wall two times thicker, change the location line position, and finally change my wall type to its final thickness."</p>
+
+<center>
+<img src="img/wall_creation_baseline_workaround.png" alt="Wall creation workaround" width="500"/>
+</center>
+
+<p>Many thanks to Simon for his clever simple idea and sharing this thought!</p>
+
+<p>I bet some readers wish they had thought of this themselves when needing it...</p>

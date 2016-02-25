@@ -1,0 +1,519 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08897403 [BoundarySegment.Element gibt Nullreferenzen zurück]
+
+Carsten KlempinMensch und Maschine acadGraph GmbH, Mensch_und_Maschine_acadGraph_GmbH
+
+Rudolf Honke Re: BoundarySegment.Element
+
+nick b Re: Hope all is going well - I have a Revit API question
+
+-->
+
+<h3>Determining Room Boundary Segment Generating Element</h3>
+
+<!--
+ and Hiding a Recently Opened File
+
+<p>Today we look at two issues:</p>
+
+<ul>
+<li>How to <a href="#2">determine the neighbouring BIM element of a room boundary segment</a>, given that the BoundarySegment.Element may erroneously return null.</li>
+<li>How to <a href="#3">prevent a model from appearing in the 'Recent documents' list</a> when opened by a Revit add-in.</li>
+</ul>
+
+<p>One implements a nice little Revit API workaround using the ReferenceIntersector, the other goes a completely different path beyond the API.</p>
+
+
+<a name="2"></a>
+
+<h4>Determining the Neighbouring BIM Element of a Room Boundary Segment</h4>
+-->
+
+<p>Today we look at how to determine the neighbouring BIM element of a room boundary segment using the ReferenceIntersector to shoot a ray from the room interior into the bounding element.</p>
+
+<p>There should not really be any need to implement such functionality ourselves, because the BoundarySegment class already provides an Element property that should return the BIM element generating the given boundary segment.</p>
+
+<p>However, unfortunately, the BoundarySegment.Element may erroneously return null under certain specific conditions, and we present a nice little Revit API workaround that can be triggered when the Element property fails.</p>
+
+<p>Here are a couple of examples of retrieving room boundaries that we discussed in the past:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/accessing-room-data.html">Accessing room data</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/graphically-display-area-boundary-loops.html">Graphically display area boundary loops</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/room-in-area-predicate-via-point-in-polygon-test.html">Room in area predicate via point in polygon test</a></li>
+<li>Analysis of Room and Space 3D geometry in the <a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">Revit 2012 API news</a></li>
+<li>New GetBoundarySegments method in the <a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">Revit 2013 API news</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#3">Retrieving plan view room boundary polygon loops</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/room-neighbours.html">Room neighbours</a></li>
+</ul>
+
+<p>We also looked at several ray shooting examples to discover neighbouring elements, e.g.</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/01/identifying-wall-compound-layers-and-parts.html">Identifying wall compound layers and parts</a></li>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#3">ReferenceIntersector class</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/10/wall-footing-relationship-revisited.html">Wall footing relationship</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html">UIView, Windows Coordinates, ReferenceIntersector and My Own Tooltip</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html#2">Determining the columns supporting a beam</a> by
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html#8">ray casting</a>
+</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/football-and-space-adjacency-for-heat-load-calculation.html#3">Space adjacency for heat load calculation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/room-neighbours.html">Room neighbours</a></li>
+</ul>
+
+<p>Note that the recent
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/room-neighbours.html">
+room neighbour</a> discussion
+
+belongs to both of these two groups and is actually very similar to the bounding element sample we discuss here.</p>
+
+<p>The former shoots a ray from the room through the midpoint of each boundary segment to find the neighbouring room, whereas this example stops a bit shorter and determines the element in between instead.</p>
+
+<p>Rudolf Honke of
+
+<a href="http://www.acadgraph.de">
+Mensch und Maschine acadGraph</a> raised
+
+this issue in his interminable list of what he calls unreliable properties:</p>
+
+<p><strong>Question:</strong> I want to retrieve each Element alongside a room’s boundary.</p>
+
+<p>However, I have an issue with all walls protruding into a room like this:</p>
+
+<center>
+<img src="img/GetBoundarySegmentElement.png" alt="Boundary segment lacking Element" width="400"/>
+</center>
+
+<p>The marked boundary segment has no Element associated with it, according to the BoundarySegment.Element property, which returns null for it.</p>
+
+<p>I can reproduce this behaviour in several files, so I think this is the API default behaviour.</p>
+
+<p><strong>Answer:</strong> Let's look for a workaround.</p>
+
+<p>For instance, if you look at the ordered list of segments going around the room, and the preceding and succeeding segments both belong to the same element, then you can assume that the segment in between with a null element pointer also belongs to that same element?</p>
+
+<p><strong>Response:</strong> No, there can be situations like this, where predecessor and successor are different elements:</p>
+
+<center>
+<img src="img/GetBoundarySegmentElement2.png" alt="Boundary segment lacking Element" width="400"/>
+</center>
+
+<p><strong>Answer:</strong> OK, I see that your example cannot be solved looking at the predecessor and successor segments.</p>
+
+<p>Next suggestion, also very simple to implement:</p>
+
+<ol>
+<li>For each segment with a null element pointer:</li>
+<li>Determine which direction faces into the room</li>
+<li>Determine a point in the room, slightly inside, offset from the segment midpoint.</li>
+<li>Shoot a ray from that point through the segment midpoint.</li>
+<li>Ensure that an element is hit in the segment midpoint. If not, something is strange.</li>
+<li>The element hit is the element you are looking for.</li>
+</ol>
+
+<p><strong>Response:</strong> Thank you for the hint; I already had nearly the same idea of shooting laser rays ;-)</p>
+
+<p>Using your approach, I finally got it.</p>
+
+<p>No need to look at the neighbouring BoundarySegments any more.</p>
+
+
+<a name="2"></a>
+
+<h4>GetElementByRay Implementation</h4>
+
+<p>Rudolf provided this implementation of the suggested algorithm:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return direction turning 90 degrees </span>
+&nbsp; <span class="gray">///</span><span class="green"> left from given input vector.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> GetLeftDirection( <span class="teal">XYZ</span> direction )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> x = -direction.Y;
+&nbsp; &nbsp; <span class="blue">double</span> y = direction.X;
+&nbsp; &nbsp; <span class="blue">double</span> z = direction.Z;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, z );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return direction turning 90 degrees </span>
+&nbsp; <span class="gray">///</span><span class="green"> right from given input vector.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">XYZ</span> GetRightDirection( <span class="teal">XYZ</span> direction )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> GetLeftDirection( direction.Negate() );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the neighbouring BIM element generating </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given room boundary curve c, assuming it</span>
+&nbsp; <span class="gray">///</span><span class="green"> is oriented counter-clockwise around the room</span>
+&nbsp; <span class="gray">///</span><span class="green"> if part of an interior loop, and vice versa.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Element</span> GetElementByRay(
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app,
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">View3D</span> view3d,
+&nbsp; &nbsp; <span class="teal">Curve</span> c )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> boundaryElement = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Tolerances</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> minTolerance = 0.00000001;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> maxTolerance = 0.01;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Height of ray above room level:</span>
+&nbsp; &nbsp; <span class="green">// ray starts from one foot above room level</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> elevation = 1;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Ray starts not directly from the room border</span>
+&nbsp; &nbsp; <span class="green">// but from a point offset slightly into it.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> stepInRoom = 0.1;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We could use Line.Direction if Curve c is a </span>
+&nbsp; &nbsp; <span class="green">// Line, but since c also might be an Arc, we </span>
+&nbsp; &nbsp; <span class="green">// calculate direction like this:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> lineDirection
+&nbsp; &nbsp; &nbsp; = ( c.GetEndPoint( 1 ) - c.GetEndPoint( 0 ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> upDir = elevation * <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Assume that the room is on the left side of </span>
+&nbsp; &nbsp; <span class="green">// the room boundary curve and wall on the right.</span>
+&nbsp; &nbsp; <span class="green">// This is valid for both outer and inner room </span>
+&nbsp; &nbsp; <span class="green">// boundaries (outer are counter-clockwise, inner </span>
+&nbsp; &nbsp; <span class="green">// are clockwise). Start point is slightly inside </span>
+&nbsp; &nbsp; <span class="green">// the room, one foot above room level.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> toRoomVec = stepInRoom * GetLeftDirection(
+&nbsp; &nbsp; &nbsp; lineDirection );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pointBottomInRoom = c.Evaluate( 0.5, <span class="blue">true</span> )
+&nbsp; &nbsp; &nbsp; + toRoomVec;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> startPoint = pointBottomInRoom + upDir;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We are searching for walls only</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementFilter</span> wallFilter
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Walls );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceIntersector</span> intersector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ReferenceIntersector</span>( wallFilter,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FindReferenceTarget</span>.Element, view3d );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// We don't want to find elements in linked files</span>
+&nbsp;
+&nbsp; &nbsp; intersector.FindReferencesInRevitLinks = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> toWallDir = GetRightDirection(
+&nbsp; &nbsp; &nbsp; lineDirection );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ReferenceWithContext</span> context = intersector
+&nbsp; &nbsp; &nbsp; .FindNearest( startPoint, toWallDir );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> closestReference = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( context != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( context.Proximity &gt; minTolerance )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( context.Proximity &lt; maxTolerance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + stepInRoom ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; closestReference = context.GetReference();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( closestReference != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; boundaryElement = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; closestReference );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> boundaryElement;
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>GetBoundarySegmentElement External Command Implementation</h4>
+
+<p>I implemented an add-in named GetBoundarySegmentElement and added the following read-only external command implementation to drive it:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Room</span>&gt; rooms = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Room</span>&gt;(
+&nbsp; &nbsp; sel.Elements.Cast&lt;<span class="teal">Room</span>&gt;() );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 1 != rooms.Count )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Please select exactly one room.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">View3D</span> view3d
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">View3D</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">View3D</span>&gt;()
+&nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">View3D</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name.Equals( <span class="maroon">&quot;{3D}&quot;</span> ) );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == view3d )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;No 3D view named '{3D}' found.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> room <span class="blue">in</span> rooms )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops
+&nbsp; &nbsp; &nbsp; = room.GetBoundarySegments(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = loops.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Room {0} has {1} loop{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; room.Name, n, PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> i = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt; loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; n = loop.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; Loop {0} has {1} segment{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; i++, n, PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> j = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> seg <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = seg.Element;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="maroon">&quot;Element property&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="maroon">&quot;GetElementByRay&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e = GetElementByRay( uiapp, doc, view3d,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; seg.Curve );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; &nbsp; Segment {0}: {1} element {2} returned by {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; j++, CurveString( seg.Curve ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( e ), s );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>As always, 45% of the code is input validation, 45% output reporting, and about 10% or less the real thing.
+That's life.</p>
+
+<p>Here is the result of running the GetBoundarySegmentElement command on the simple sample model shown above:</p>
+
+<pre>
+Room Test 1 has 1 loop:
+  Loop 0 has 8 segments:
+    Segment 0: line (-13.95,23.02,0) --> (-21.99,23.02,0)
+      wall 326988 MW 24.0 WD 12.0 returned by Element property
+    Segment 1: line (-21.99,23.02,0) --> (-21.99,13.04,0)
+      wall 327085 MW 24.0 WD 12.0 returned by Element property
+    Segment 2: line (-21.99,13.04,0) --> (-3.81,13.04,0)
+      wall 327055 MW 24.0 WD 12.0 returned by Element property
+    Segment 3: line (-3.81,13.04,0) --> (-3.81,23.02,0)
+      wall 327018 MW 24.0 WD 12.0 returned by Element property
+    Segment 4: line (-3.81,23.02,0) --> (-12.97,23.02,0)
+      wall 326988 MW 24.0 WD 12.0 returned by Element property
+    Segment 5: line (-12.97,23.02,0) --> (-12.97,17.44,0)
+      wall 327196 STB 30.0 returned by Element property
+    Segment 6: line (-12.97,17.44,0) --> (-13.95,17.44,0)
+      wall 327196 STB 30.0 <b>returned by GetElementByRay</b>
+    Segment 7: line (-13.95,17.44,0) --> (-13.95,23.02,0)
+      wall 327196 STB 30.0 returned by Element property
+</pre>
+
+<p>Note that the BoundarySegment Element property returned null for the next to last segment 6, and the GetElementByRay method was used instead to retrieve the correct wall.</p>
+
+
+<a name="4"></a>
+
+<h4>SpatialElementBoundaryLocation Enumeration</h4>
+
+<p><strong>Response:</strong> When reading the blog post draft, I see:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> room <span class="blue">in</span> rooms )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops
+&nbsp; &nbsp; &nbsp; = room.GetBoundarySegments(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>() );
+</pre>
+
+<p>I would have thought that we need to tell the SpatialElementBoundaryOptions what sort of SpatialElementBoundaryLocation we want; we need Finish:</p>
+
+<center>
+<img src="img/GetBoundarySegmentElement3.png" alt="SpatialElementBoundaryLocation enumeration" width="460"/>
+</center>
+
+<p>Here is a suitable code snippet:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; opt.SpatialElementBoundaryLocation
+&nbsp; &nbsp; = <span class="teal">SpatialElementBoundaryLocation</span>.Finish;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops
+&nbsp; &nbsp; = room.GetBoundarySegments( opt );
+</pre>
+
+<p>Of course it may be that SpatialElementBoundaryOptions are already initialized with Finish by default, but the Revit API help file RevitAPI.chm does not mention that in the object’s constructor documentation.</p>
+
+<p>Otherwise, room boundaries might be inside the boundary elements, which would affect the result.</p>
+
+<p>SpatialElementBoundaryLocation.Center might return something like these red lines:</p>
+
+<center>
+<img src="img/GetBoundarySegmentElement4.png" alt="Room boundaries at SpatialElementBoundaryLocation.Center" width="400"/>
+</center>
+
+<p>In this case, there would be no line to get the wall’s small front face from.</p>
+
+
+<p><strong>Answer:</strong> I added the suggested setting and re-ran the test, producing the following output:</p>
+
+<pre>
+Room Test 1 has 1 loop:
+  Loop 0 has 8 segments:
+    Segment 0: line (-13.95,23.02,0) --> (-21.99,23.02,0)
+      wall 326988 MW 24.0 WD 12.0 returned by Element property
+    Segment 1: line (-21.99,23.02,0) --> (-21.99,13.04,0)
+      wall 327085 MW 24.0 WD 12.0 returned by Element property
+    Segment 2: line (-21.99,13.04,0) --> (-3.81,13.04,0)
+      wall 327055 MW 24.0 WD 12.0 returned by Element property
+    Segment 3: line (-3.81,13.04,0) --> (-3.81,23.02,0)
+      wall 327018 MW 24.0 WD 12.0 returned by Element property
+    Segment 4: line (-3.81,23.02,0) --> (-12.97,23.02,0)
+      wall 326988 MW 24.0 WD 12.0 returned by Element property
+    Segment 5: line (-12.97,23.02,0) --> (-12.97,17.44,0)
+      wall 327196 STB 30.0 returned by Element property
+    Segment 6: line (-12.97,17.44,0) --> (-13.95,17.44,0)
+      wall 327196 STB 30.0 returned by GetElementByRay
+    Segment 7: line (-13.95,17.44,0) --> (-13.95,23.02,0)
+      wall 327196 STB 30.0 returned by Element property
+</pre>
+
+<p>The results and the coordinates look exactly the same, so apparently the interior finish is indeed the default setting for the spatial element boundary location.</p>
+
+
+<p><strong>Response:</strong> Yes, Finish is the default value.</p>
+
+<p>Just after creating a new SpatialElementBoundaryOptions object, I see the following in the Visual Studio debugger:</p>
+
+<center>
+<img src="img/GetBoundarySegmentElement5.png" alt="SpatialElementBoundaryLocation.Finish default setting"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>To see the whole thing in context and try it out for yourself, here is
+
+<a href="zip/GetBoundarySegmentElement.zip">GetBoundarySegmentElement.zip</a> containing
+
+the full source code, Visual Studio solution and add-in manifest for the GetBoundarySegmentElement external command.</p>
+
+<p>Many thanks to Rudolf for pointing out this flaw in the BoundarySegment.Element property, implementing and testing the workaround, and the fruitful discussion!</p>
+
+
+<!--
+
+<a name="3"></a>
+
+<h4>Prevent a Model from Appearing in the 'Recent Documents' List</h4>
+
+<p>Here is a neat little issue that has been mentioned now and again in the past, raised again by an unnamed friend from down under, with a suggestion for a workaround that shows an example of thinking outside the box:</p>
+
+<p><strong>Question:</strong> Hope all is going well, your blog is looking great as all ways.</p>
+
+<p>I have a question that I have been researching for a little while, with no success.</p>
+
+<p>How can you open a document through the API without it appearing in the 'Recent documents' list?</p>
+
+<p>I’m working on a plug-in at the moment that opens a family, modifies it, saves it and loads it into the project.</p>
+
+<p>Unfortunately, as a side effect of this, the family keeps appearing in the Recent Documents List.</p>
+
+<p>I would prefer it not appearing there, since I don’t want users clicking on it and modifying it in any way.</p>
+
+<p>Any thoughts on a workaround or fix for this?</p>
+
+<p><strong>Answer:</strong> All I can suggest are things that you have certainly thought of yourself already.</p>
+
+<p>OK, I read it through one more time, and here is my first, last and one and only offer:</p>
+
+<p>On your file system, create a unique empty family file named do-not-touch or f..k-off or what ever you like to dissuade everyone from touching it.
+Let's call it 'A'.</p>
+
+<p>It is however only a dummy.</p>
+
+<p>Your real family file is somewhere completely different and named something else.</p>
+
+<p>To edit your file, you simply move it to A, edit, save and move  it away again to your hidden protected place.</p>
+
+<p>If the user ever tries to edit A, Revit says 'file not found' and everybody is happy.</p>
+
+<p><strong>Response:</strong> Your comments are always fantastic!</p>
+
+<p>This bit being my favourite "do-not-touch or f..k-off".</p>
+
+<p>This is a great idea and the family name in the recent files list just gives the app more exposure.</p>
+
+<p>I can't wait to share this app I'm working on with you, it should be released in late January or February 2014.</p>
+
+<p><strong>Update:</strong> The BEST bit of your suggestion of copying and deleting the Family: it is not showing up in the Recent File menu at all now!
+I  think Revit does a "File Exists" check before displaying the results in the "Recent documents" page.
+If you dont mind waiting a day or so befroe publishing it I will put together some sampe code and do some testing.
+Happy to provide all this info for the Blog. =)
+
+-->
+

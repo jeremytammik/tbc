@@ -1,0 +1,110 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09174040 [Failures API]
+
+Stephen FaustRevolution Design, Inc.
+
+-->
+
+<h3>Skip Invalid Element Generation Using Failure API</h3>
+
+<p>We already took a couple of looks at the Failure API in the past, e.g.:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/failure-api.html">Failure API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/failure-api-take-two.html">Failure API Take Two</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/failure-rollback.html">Failure Rollback</a></li>
+</ul>
+
+<p>Here is a slightly more convoluted situation that motivates revisiting the topic from a new angle, raised and solved by Stephen Faust of
+
+<a href="http://www.revolutiondesign.biz/">
+Revolution Design, Inc.</a> together
+
+with Arno&scaron;t L&ouml;bel of the Revit API development team, who also invested significant time and research in the issue:</p>
+
+<p><strong>Question:</strong> I am generating some floor objects from rooms in a project.
+In certain cases the sketch is not valid because of some oddities in the rooms.
+This is OK if I can just delete or not create the floors and hopefully not show a dialogue to the user.
+Without any failure handling it gives the user the 'can't make extrusion' error, but you can hit delete elements and be on your way.
+I thought I could do this with a failures preprocessor, but it doesn't seem to be working the way I hoped.
+Here is the functional part of my class that inherits IFailuresPreProcessor:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; fmas
+&nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; <span class="blue">if</span>( fmas.Count == 0 )
+&nbsp; { <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> fma <span class="blue">in</span> fmas )
+&nbsp; { failuresAccessor.ResolveFailure( fma ); }
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.ProceedWithCommit;
+</pre>
+
+<p>When I use this with the transaction, it still gives me an error dialog, only this time it shows (Deleted) next to all of the elements.
+The only thing I can do is cancel, which is actually worse, because then you don't get any of the floors.
+What am I doing wrong here?
+What do I need to do to just handle the dialog and tell it to remove those floors that aren't valid?</p>
+
+
+<p><strong>Answer:</strong> What you probably need to do is to set the resolution on each failure.</p>
+
+<p>There are also some checks required to avoid attempting to resolve a failure that may not be resolved (anymore).</p>
+
+<p>I suggest the following starting point for an approach, plus further experimenting with it:</p>
+
+<ul>
+<li>Test if invalid elements (floors) can actually be deleted by calling FailuresAccessors.IsElementsDeletionPermitted.</li>
+<li>Possibly, for each failure, it may be tested if its resolution by deleting the invalid elements is permitted. The method to do so is FailuresAccessors.IsFailureResolutionPermitted taking a FailureResolutionType.DeleteElements argument.</li>
+<li>Assuming you can, failures should be resolved by FailuresAccessors.ResolveFailures.</li>
+<li>I am also guessing that before returning ProceedWitCommit, FailuresAccessors.IsTransactionBeingCommitted is tested.</li>
+<li>Return ProceedWitCommit.</li>
+</ul>
+
+
+<p><strong>Response:</strong> Thanks for the tips.</p>
+
+<p>Here is what I ended up doing that seems to be working:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( failuresAccessor.GetTransactionName()
+&nbsp; &nbsp; == <span class="maroon">&quot;Create Temporary Roofs&quot;</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; fmas
+&nbsp; &nbsp; &nbsp; = failuresAccessor.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fmas.Count == 0 )
+&nbsp; &nbsp; { <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> fma <span class="blue">in</span> fmas )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FailureSeverity</span> s = fma.GetSeverity();
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( s == <span class="teal">FailureSeverity</span>.Warning )
+&nbsp; &nbsp; &nbsp; { failuresAccessor.DeleteWarning( fma ); }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( s == <span class="teal">FailureSeverity</span>.Error )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( failuresAccessor
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .IsElementsDeletionPermitted(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fma.GetFailingElementIds().ToList() ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.DeleteElements(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fma.GetFailingElementIds().ToList() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; failuresAccessor.ResolveFailure( fma );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.ProceedWithCommit;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; { <span class="blue">return</span> <span class="teal">FailureProcessingResult</span>.Continue; }
+</pre>
+
+<p>Basically I separated out warnings from errors.
+Then warnings can be deleted, errors can be processed and delete elements can be directly called for specific elements causing the error.</p>

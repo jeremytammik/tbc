@@ -1,0 +1,370 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Selecting Sheets instead of Views for the Simplified BIM Editor</h3>
+
+<p>Today I look at interactively picking sheets to export, instead of views.</p>
+
+<p>First, however, I must mention the
+
+<a href="http://adndevblog.typepad.com/autocad/2014/04/feeling-foolish.html">
+list of April Fool's posts</a> compiled
+
+by
+
+<a href="http://adndevblog.typepad.com/autocad/stephen-preston.html">Stephen Preston</a>,
+
+including my own visionary idea to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/automating-large-scale-waste-recycling-and-sustainability.html">
+recycle waste as insulation and curtain wall material</a> around
+
+the building producing it.
+Personally, I like Stephen's own post on the
+
+<a href="http://adndevblog.typepad.com/autocad/2014/03/autodesk-announces-microsuites-1.html">
+Autodesk Toilet Design Suite</a> product much better  :-)</p>
+
+<p>Back to picking sheets...</p>
+
+<p>This is the third instalment of implementing the new RoomEditorApp features required for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/back-from-desert-and-two-happy-events.html#3">
+generic 2D simplified BIM editor</a> Tech
+
+Summit presentation, including a change of plan and some additional complexity, as we shall see below.</p>
+
+<p>Inspired by input from interested developers, I opted to base the simplified BIM cloud database and mobile device visualisation on sheets instead of floor plans.</p>
+
+<p>Steps 1, 2 and 3 in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html">
+previous tentative workflow</a> refer
+
+to plan views, and actually floor plans, to be specific.</p>
+
+<p>I switch those to select sheets instead.</p>
+
+<p>Additional complexity is thus introduced, since each sheet can contain and display multiple views, and each view will have its own location and scale within the sheet.</p>
+
+<p>It will be interesting to see how to accurately represent the multiple nested transformations required to get from the Revit coordinate system to the views, sheets, cloud database, SVG editor final destination and all the way back again.</p>
+
+
+<a name="2"></a>
+
+<h4>Tentative Workflow</h4>
+
+<p>Meanwhile, here is the updated plan:</p>
+
+<ol>
+<li>Launch the RoomEditorApp export sheets command.</li>
+<li>Display a list of view sheets in a popup window.</li>
+<li>Select sheets to be exported and click OK.</li>
+<li>Determine all the floor plan views displayed in the selected sheets.</li>
+<li>Determine all the categories used in those views.</li>
+<li>Display a list of those categories in a popup window.</li>
+<li>Select categories to be exported and click OK.</li>
+<li>Determine location and scaling of the floor plan views within the selected sheets.</li>
+<li>Store relevant graphical and non-graphical information in a cloud database.</li>
+<li>Navigate and display simplified model on mobile device.</li>
+<li>Edit graphical and non-graphical information.</li>
+<li>Update Revit BIM either interactively or real-time.</li>
+</ol>
+
+<p>Here and now, I'll discuss the new steps 1-4.</p>
+
+<p>The steps 5, 6 and 7 correspond to the steps 4 and 5 in the previous tentative workflow, were addressed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/selecting-visible-categories-from-a-set-of-views.html">
+selecting visible categories from a set of views</a>,
+
+and can easily be adapted to the new workflow.</p>
+
+<p>Here are the new methods and classes required:</p>
+
+<ul>
+
+<li><a href="#3">ElementEqualityComparer</a> &ndash; an equality comparer ensuring that elements with the same element id compare equal.</li>
+
+<li><a href="#4">FrmSelectSheets</a> &ndash; interactive sheet view selection form.</li>
+
+<li><a href="#5">IsSameOrSubclassOf</a> &ndash; check whether class is subclass of OR equal to the class itself.</li>
+
+<li><a href="#6">CmdUploadSheets</a> &ndash; drive the sheet and category selection and list the results.</li>
+
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>ElementEqualityComparer</h4>
+
+<p>After selecting the sheets, I want to determine which floor plan views they contain.</p>
+
+<p>I stuff all the views as keys into a dictionary.</p>
+
+<p>To ensure that the views compare properly with each other, I need to supply a comparison operator that compares their element ids, not the objects themselves.</p>
+
+<p>This is obviously very similar to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/selecting-visible-categories-from-a-set-of-views.html#3">
+CategoryEqualityComparer</a> introduced
+
+in the last instalment.
+The similarity lies in the fact that categories also have an Id property, but are not derived from the Revit Element class, so that property represents a category id, not an element id.</p>
+
+
+
+<a name="4"></a>
+
+<h4>FrmSelectSheets</h4>
+
+<p>I edited the previous
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html#2">
+FrmSelectViews</a> to
+
+select view sheets instead of floor plan views,
+
+e.g., replacing ViewPlan by ViewSheet, ViewType.FloorPlan by ViewType.DrawingSheet, etc.</p>
+
+<p>The selection result is now obviously a list of sheets, from which the floor plan views need to be extracted.</p>
+
+
+<a name="5"></a>
+
+<h4>IsSameOrSubclassOf</h4>
+
+<p>I initially tried to use the .NET IsSubclassOf method to check for views of type ViewPlan in the sheets, only to notice once again that this method only returns true for true non-equal subclasses.</p>
+
+<p>I therefore defined a new utility method IsSameOrSubclassOf to do what I really want, as suggested by Lasse V. Karlsen in
+
+<a href="http://stackoverflow.com/questions/2742276/in-c-how-do-i-check-if-a-type-is-a-subtype-or-the-type-of-an-object">
+stackoverflow.com</a>:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if the type b is either a </span>
+&nbsp; <span class="gray">///</span><span class="green"> subclass of OR equal to the base class itself.</span>
+&nbsp; <span class="gray">///</span><span class="green"> IsSubclassOf returns false if the two types</span>
+&nbsp; <span class="gray">///</span><span class="green"> are the same. It only returns true for true</span>
+&nbsp; <span class="gray">///</span><span class="green"> non-equal subclasses.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> IsSameOrSubclassOf(
+&nbsp; &nbsp; <span class="teal">Type</span> a,
+&nbsp; &nbsp; <span class="teal">Type</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> a.IsSubclassOf( b ) || a == b;
+&nbsp; }
+</pre>
+
+
+
+<a name="6"></a>
+
+<h4>CmdUploadSheets</h4>
+
+<p>The previous
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html#3">
+CmdUploadViews</a> is
+
+also renamed, and this is obviously the place where the interesting changes need to be applied.</p>
+
+<p>This is still the skeleton of the final command, currently just driving the sheet and category selection and listing the results.</p>
+
+<p>The most interesting new part is the determination of the views displayed within the sheets.</p>
+
+<p>For details on the rest, please refer to the initial
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html#3">
+CmdUploadViews description</a>.</p>
+
+<p>Here is the entire implementation of the external command Execute method:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Interactive sheet selection.</span>
+&nbsp;
+&nbsp; <span class="teal">FrmSelectSheets</span> form = <span class="blue">new</span> <span class="teal">FrmSelectSheets</span>( doc );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == form.ShowDialog(
+&nbsp; &nbsp; revit_window ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewSheet</span>&gt; sheets
+&nbsp; &nbsp; &nbsp; = form.GetSelectedSheets();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = sheets.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} Sheet{1} Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; sheets.Select&lt;<span class="teal">Element</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) ) + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine all views displayed </span>
+&nbsp; &nbsp; <span class="green">// in the selected sheets.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">View</span>, <span class="blue">int</span>&gt; views
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">View</span>, <span class="blue">int</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementEqualityComparer</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nFloorPlans = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewSheet</span> sheet <span class="blue">in</span> sheets )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> sheet.Views )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !views.ContainsKey( v ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsSameOrSubclassOf(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v.GetType(), <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; v.CanBePrinted
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">ViewType</span>.FloorPlan == v.ViewType )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nFloorPlans;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; views.Add( v, 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; ++views[v];
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; msg += ( 1 == n )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;\nIt contains&quot;</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;\nThey contain&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; n = views.Count;
+&nbsp;
+&nbsp; &nbsp; msg += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot; {0} view{1} including {2} floor plan{3}: &quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), nFloorPlans,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( nFloorPlans ) );
+&nbsp;
+&nbsp; &nbsp; msg += <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; views.Keys.Select&lt;<span class="teal">Element</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) ) + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg2( caption, msg );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine all categories occurring</span>
+&nbsp; &nbsp; <span class="green">// in the views displayed by the sheets.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Category</span>&gt; categories
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Category</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CategoryCollector</span>( views.Keys ).Keys );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Sort categories alphabetically by name</span>
+&nbsp; &nbsp; <span class="green">// to display them in selection form.</span>
+&nbsp;
+&nbsp; &nbsp; categories.Sort(
+&nbsp; &nbsp; &nbsp; <span class="blue">delegate</span>( <span class="teal">Category</span> c1, <span class="teal">Category</span> c2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Compare( c1.Name, c2.Name );
+&nbsp; &nbsp; &nbsp; } );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Interactive category selection.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FrmSelectCategories</span> form2
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FrmSelectCategories</span>( categories );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == form2.ShowDialog(
+&nbsp; &nbsp; &nbsp; revit_window ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; categories = form2.GetSelectedCategories();
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = categories.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} Categor{1} Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffixY( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; msg = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; categories.Select&lt;<span class="teal">Category</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) ) + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg2( caption, msg );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>I ran the command in a super simple model with the following views and sheets:</p>
+
+<center>
+<img src="img/sheet_select_1.png" alt="Project browser with views and sheets" width="269"/>
+</center>
+
+<p>The three sheets are offered for selection in the check box list:</p>
+
+<center>
+<img src="img/sheet_select_2.png" alt="Selecting sheets" width="217"/>
+</center>
+
+<p>Simply hitting OK selects all three.
+They are listed together with the views and count of floor plans they contain:</p>
+
+<pre>
+  3 Sheets Selected: Sheet view of Level 0 and 1,
+  3D, Level 0 Duplicate.
+
+  They contain 4 views including 3 floor plans:
+  Level 0, Level 1, {3D}, Dependent on Level 0.
+</pre>
+
+<center>
+<img src="img/sheet_select_3.png" alt="Selected sheets and the views they contain" width="366"/>
+</center>
+
+<p>The three sheets are offered for selection in the check box list:</p>
+
+<center>
+<img src="img/sheet_select_4.png" alt="Selecting categories" width="217"/>
+</center>
+
+<p>Simply hitting OK selects all five, and they are listed:</p>
+
+<pre>
+  Selected 5 categories from 4 views displaying
+  1692 elements, 821 with HasMaterialQuantities=true
+
+  5 Categories Selected: Curtain Panels, Doors,
+  Furniture, Structural Columns, Walls.
+</pre>
+
+<center>
+<img src="img/sheet_select_5.png" alt="Selected categories" width="366"/>
+</center>
+
+
+<a name="7"></a>
+
+<h4>Download</h4>
+
+<p>For the complete source code, Visual Studio solution and add-in manifest, please refer to the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is stored as
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.2.3">release 2014.0.2.3</a>.</p>

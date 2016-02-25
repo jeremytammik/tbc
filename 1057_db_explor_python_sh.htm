@@ -1,0 +1,352 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+08856126 [What is wrong with family instance?]
+
+/a/j/adn/case/sfdc/08856126/attach/using_python_shell.txt
+/a/j/adn/case/sfdc/08856126/attach/categories.py
+
+-->
+
+<h3>Revit Database Exploration Tools and the Python Shell</h3>
+
+<p>I keep repeating the importance of being able to explore the Revit database model efficiently to understand what is going on.
+
+<p>This can even be important for end users, and is certainly much more so for developers.</p>
+
+<p>The first and foremost important tool is obviously RevitLookup.</p>
+
+<p>The BipChecker is less important and yet also handy for exploring element parameters.</p>
+
+<p>The disadvantage of these two is that they only explore existing values provided by properties and parameters.</p>
+
+<p>They do not offer much support for evaluating methods or exploring dynamically changing relationships.</p>
+
+<p>This mostly requires active programming, e.g. in the Revit macro environment, or hard-core implementation and debugging of an external add-in.</p>
+
+<p>It would be very nice to be able to interact directly with the Revit database using the API hands-on, interpreted, not compiled or packaged in a static macro.</p>
+
+<p>Well, as we have mentioned several times, you can, twice over, using the
+
+<a href="http://code.google.com/p/revitpythonshell">
+Revit Python Shell</a> or
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+Revit Ruby Shell</a>.</p>
+
+<p>We look at the
+
+<a href="http://code.google.com/p/revitpythonshell">RevitPythonShell</a> below,
+
+since we are not as knowledgeable in Ruby as in Python.</p>
+
+<p>Personally, I would actually prefer the Ruby language to Python, though, for its more modern architecture.</p>
+
+<p>To run the tests described below, I downloaded and ran the
+
+<a href="http://revitpythonshell.googlecode.com/files/Setup_RevitPythonShell_2014.exe">
+installer for RevitPythonShell for Revit 2014 (r186)</a> and
+
+the
+
+<a href="http://ironpython.net">IronPython</a>
+
+<a href="http://ironpython.codeplex.com/downloads/get/723206">installer</a>.</p>
+
+<p>That was it, no further configuration of any kind required:</p>
+
+<center>
+<img src="img/rps201401.png" alt="Say hello to Revit Python Shell"/>
+</center>
+
+<p>Alexander Ignatovich of
+
+<a href="http://www.iv-com.ru">
+Investicionnaya Venchurnaya Companiya</a> very
+
+kindly describes in more detail how these tools can be used for highly efficient exploration and API testing in the Revit database:</p>
+
+<a name="2"></a>
+
+<h4>Interactive Revit Database Exploration Using the Revit Python Shell</h4>
+
+<p>First of all, about RevitLookup. I don't know what to say about it, except I can't imagine my work without this tool now ;-)</p>
+
+<p>I also explored its source, when I began to work with Revit API and needed to realize some functionality.</p>
+
+<p>I use two good tools that let you not waste time waiting for Revit to load and some project you need to open or create:
+
+<ul>
+<li>Revit Python Shell</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/external-command-lister-and-adding-ribbon-commands.html">
+External Command Listener</a></li>
+</ul>
+
+<p>These are fantastically effective for API exploration, testing some algorithm parts and preparing complex environment for your add-ins.</p>
+
+<p>I mean, for example, creating thousands of family instances in your test.rvt, changing something that you cannot change manually through the interface, for example, extensible storages entities and so on.</p>
+
+<p>I also created some lightweight tools that can point out some pieces of information about project or its specific elements, related to our products, which also cannot be extracted from the interface.
+They also help me provide product support.</p>
+
+<p>The criteria for your choices depend only your own practice.
+I use the Python shell when the script code:</p>
+
+<ul>
+<li>Should not exceed 1/2 &ndash; 2/3 of the screen height.</li>
+<li>Should not use your own assemblies (yes, you can load assemblies and add references in your Python script, but our project contains multiple assemblies with dependences and sometimes they read their configuration files, so it's much quicker to create new project in Visual Studio and use External Command Listener to test some functionality).</li>
+<li>Should not react to Revit events, contains dynamic updaters or failure processing.</li>
+<li>Should prepare the environment for you. In this case the first rule can be ignored.</li>
+</ul>
+
+<p>In other cases I use the External Command Listener (but again, it cannot be used if your code needs to react to events, use dynamic updaters or failure processing).</p>
+
+<p>I like Python.
+Its syntax is very simple.</p>
+
+<p>If you know any programming language, you can immediately write something on Python, even if all you ever read about it is here in this post.</p>
+
+<p>I'll show some examples of scripts.</p>
+
+<p>So, let's start to explore this tools.
+Start the extension, copy this script to console and press F5 (copy and paste the following code snippets somewhere or view source to see truncated lines in full):</p>
+
+<pre class="prettyprint">
+print "Path:", doc.PathName
+if doc.GetWorksharingCentralModelPath() != None:
+  print "Central model path:", ModelPathUtils.ConvertModelPathToUserVisiblePath(doc.GetWorksharingCentralModelPath())
+else:
+  print "The project is not work-sharing"
+
+print dir(uidoc)
+
+for elem in selection:
+  print elem, elem.Id
+</pre>
+
+<p>First of all, the script prints RVT path and the path of central file.
+Practically, it's the first useful lightweight tool in your arsenal.
+You can quickly copy RVT file and central model paths of an opened project.</p>
+
+<p>Secondly, it prints a list of all properties and methods of Autodesk.Revit.UI.UIDocument, which is sometimes useful.</p>
+
+<p>It uses the pre-defined variable uidoc to access the currently active UIDocument.
+It is defined like this:</p>
+
+<pre class="prettyprint">
+uidoc = __revit__.ActiveUIDocument
+</pre>
+
+<p>The last thing shown in this simple example that I use in 95% of my scripts &ndash; iterating through the collection of selected elements.</p>
+
+<p>There is absolutely no magic in the doc, uidoc and selection variables.
+If you click the Revit Python Shell "Configure..." command and open the InitScript tab, you'll see:</p>
+
+<pre class="prettyprint">
+# these commands get executed in the current scope
+# of each new shell (but not for canned commands)
+import clr
+clr.AddReference('RevitAPI')
+clr.AddReference('RevitAPIUI')
+from Autodesk.Revit.DB import *
+from Autodesk.Revit.DB.Architecture import *
+from Autodesk.Revit.DB.Analysis import *
+
+uidoc = __revit__.ActiveUIDocument
+doc = __revit__.ActiveUIDocument.Document
+selection = list(__revit__.ActiveUIDocument.Selection.Elements)
+...
+</pre>
+
+<p>This also provides an example of how to add additional references in your scripts, and the C# "using" keyword analogue.</p>
+
+<p>The second very often useful thing is filtering elements from the model:</p>
+
+<pre class="prettyprint">
+collector = FilteredElementCollector(doc)
+linkedElements = collector
+  .OfClass(RevitLinkType).ToElements()
+
+for elem in linkedElements:
+  efr = elem.GetExternalFileReference()
+  print ModelPathUtils.ConvertModelPathToUserVisiblePath(
+    efr.GetAbsolutePath())
+  print "---------"
+</pre>
+
+<p>This is simple.
+Just notice that Python requires no "new" keyword.</p>
+
+<p>So we created a filtered element collector for our opened document, retrieved all RevitLinkType elements and iterated through the elements list.</p>
+
+<!--
+<p>**Jeremy, I don't know exactly, how the ELEM_PARTITION_PARAM is named in Revit properties tab in English version, correct it, if it is not named as "Work set", please</p>
+-->
+
+<p>Let's go deeper and see something more complicated.</p>
+
+<p>Some months ago I needed to prepare some model elements information, grouped by worksets.
+Back in those fabled times I didn't know how to do it :-)</p>
+
+<p>I noticed that elements in the model have a "work set" parameter, so I selected an element, executed the RevitLookup "Snoop current selection..." command, went to the parameters field, found "work set" parameter, noticed that it has integer value, went to it's definition and found out that its built-in parameter name is ELEM_PARTITION_PARAM.</p>
+
+<p>I deduced that if we get all worksets from model, we can get their elements by using an ElementParameterFilter.</p>
+
+<p>At this point, I went to
+
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a>,
+
+searched it for "document workset table" and found the post on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/read-only-workset-api.html">workset API</a>.</p>
+
+<p>I learned that I should use a FilteredWorksetCollector. So let's try:</p>
+
+<pre class="prettyprint">
+worksets = FilteredWorksetCollector( doc )
+worksets.OfKind( WorksetKind.UserWorkset );
+
+for elem in worksets:
+  print elem.Name
+</pre>
+
+<p>We got it!
+They are not sorted, but remember, we are only exploring to find a way to solve the problem, and it is not the production code.</p>
+
+<p>So, continuing to explore how to retrieve the elements from the model that belong to a specific workset.</p>
+
+<p>Let's write a function that filters elements for a specific workset.</p>
+
+<p>The filtered element "work set" parameter should be equal to the Workset.Id.Integer value.
+We'll pass it to the function as wId:</p>
+
+<pre class="prettyprint">
+def FindElementsByWorkset(wId):
+  worksetI = int(BuiltInParameter.ELEM_PARTITION_PARAM) # convert enumeration element to an integer
+  worksetE = ElementId(worksetI) # and create element id from it
+
+  provider = ParameterValueProvider(worksetE) # the parameter should be BuiltInParameter.ELEM_PARTITION_PARAM
+  evaluator = FilterNumericEquals() # the value should be equal
+  rule = FilterIntegerRule(provider, evaluator, wId) # to wId
+
+  parafilter = ElementParameterFilter(rule); # create filter parameter
+  collector = FilteredElementCollector(doc) # create collector
+  collector.WherePasses(parafilter) # and filter elements
+
+  # iterate through the elements
+  for elem in collector:
+    print "\t", elem.Id, elem.GetType().Name
+</pre>
+
+<p>This function should be placed before our previous code that retrieves the worksets from the model.</p>
+
+<p>The last thing is to invoke our function in a loop:</p>
+
+<pre class="prettyprint">
+for elem in worksets:
+  print elem.Name
+  FindElementsByWorkset(elem.Id.IntegerValue)
+</pre>
+
+<p>As you can easily imagine, I would have spent <b><i>much</i></b> more time if I were forced to restart Revit every time I changed something in this code analogue.</p>
+
+<p>The advantages of using this kind of tools are completely obvious, aren't they?</p>
+
+<p>The remaining examples will cover some non-obvious things, that you would need to search for, when you face them.
+And you <b>will</b> face them :-)</p>
+
+<p>These things include GUIDs and generic methods.
+This example shows using such things.
+It finds an extensible storage schema with a specific name, gets doc.OwnerFamily entity of the schema found and retrieves the "FamilyId" field of Guid type.</p>
+
+<pre class="prettyprint">
+from Autodesk.Revit.DB.ExtensibleStorage import *
+from System import Guid # you need to import this, when you work with Guids!
+for sch in Schema.ListSchemas():
+  if sch.SchemaName == "CatalogFamilyInfoEntity": # looking for the schema
+    schema = sch
+print schema.SchemaName
+entity = doc.OwnerFamily.GetEntity(schema)
+print entity.IsValid()
+print entity.Get[Guid]("FamilyId") # generic method public FieldType Get FieldType (string fieldName)
+</pre>
+
+<!--
+<p>***Jeremy, I remember, that there was a problem in subscription site with angular brackets (around FieldType), may be just in browser, so I didn't write them</p>
+-->
+
+<p>Another non-obvious thing is creating a new Guid for something.
+If you already know your Guid value, you may use something like this:</p>
+
+<pre class="prettyprint">
+import System
+parameterId = System.Guid("0ce6f957-070e-4e1b-8f33-7a9d95cf1142")
+print "parameter", doc.ProjectInformation.get_Parameter(parameterId).AsString() # I've got shared parameter with this id in the RVT file, you should use your own Guid
+</pre>
+
+<p>If you want to create an absolutely new Guid:</p>
+
+<pre class="prettyprint">
+from System.Guid import NewGuid
+print NewGuid()
+</pre>
+
+<p>The (almost) last example shows how to automatically create thousands of family instances of different family types of a specific family.
+The code is not very good, but it is not the production, it's only for me and I seldom use it.
+This script will create a layer of rng * rng family instances for each family symbol of specific family:</p>
+
+<pre class="prettyprint">
+collector = FilteredElementCollector(doc)
+collector.OfCategory(BuiltInCategory.OST_StructuralFraming) # my family in this category, just remove this or change to the category of family you want to place in the document
+elems = collector.OfClass(FamilySymbol).ToElements() # we get all family symbols in this category
+
+rng = 80 # 80*80 elements of each family symbol
+dist = 5 # distance between elements
+
+t = Transaction(doc, 'Create multiple family instances.')
+t.Start()
+
+z = 0
+for elem in elems:
+  if elem.Family.Name == "Enter your family name here":
+    for i in range(0,rng):
+      for j in range(0,rng):
+        loc = XYZ((i*dist),(j*dist),(z*dist))
+        familyInst = doc.Create.NewFamilyInstance(loc, elem, Structure.StructuralType.NonStructural)
+    z = z + 1
+
+t.Commit()
+</pre>
+
+<p>Let's end with one additional Python script that demonstrates working with LINQ and enumerations:</p>
+
+<pre class="prettyprint">
+from System import *
+clr.AddReference("System.Core")
+from System.Collections.Generic import *
+import System
+clr.ImportExtensions(System.Linq)
+from System.Linq import Enumerable
+
+def printSubCategories(elem, n):
+  tab = ""
+  for i in range(1, n):
+    tab = tab + "\t"
+  print tab, elem.Name, Enum.ToObject(BuiltInCategory, elem.Id.IntegerValue), elem.Id
+  for child in elem.SubCategories:
+    printSubCategories(child, n + 1)
+
+for elem in Enumerable.ToList[Category](doc.Settings.Categories).OrderBy(lambda x: x.Name):
+  print elem.Name, Enum.ToObject(BuiltInCategory, elem.Id.IntegerValue), elem.Id
+  printSubCategories(elem, 1)
+  print "---"
+</pre>
+
+<p>Very many thanks to Alexander for these nice examples!</p>
+
+<p>I hope that everybody takes this chance to really dig deep into intimate direct API interaction with Revit.</p>

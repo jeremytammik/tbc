@@ -1,0 +1,635 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- adva:
+  demo site
+  current status on keys
+  documentation, quick start
+  github samples
+  go public now
+  cross-origin resource script error cors
+  run demos:
+  curl scripts
+  blog post:
+  blurb by stephen - in ppt
+  demo by jim - /a/src/web/viewer/demo/jim_quanci_demo_script.txt
+  slides - /a/src/web/viewer/doc/adva_jeremy.txt
+  curl shell scripts - on github
+
+- viewer sponsors pitch repo
+  https://internal.autodesk360beta.com/portal/groups/2013071140751/pages/PG5a730QTbf0022d07518e0c9408d36974bb
+
+- /a/doc/hack/2014-07-30_basel_js_meetup.txt
+
+-->
+
+
+<h3>View and Data API Presentation Material</h3>
+
+<p>I presented the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/autodesk-view-and-data-api.html">
+Autodesk View and Data API</a> at the
+
+<a href="http://www.meetup.com/basel-js/events/192651262">Basel.js meetup</a> yesterday evening.</p>
+
+<p>Now I would like to share the material that I showed with you as well:</p>
+
+<ul>
+<li><a href="#2">Appetiser demos</a></li>
+<li><a href="#3">Introduction</a></li>
+<li><a href="#4">Slide deck and notes</a></li>
+<li><a href="#5">Curl shell scripts for authorisation, model upload and translation</a></li>
+<li><a href="#6">Demo script</a></li>
+<!-- <li><a href="#7">Chrome demo bookmark XML file</a></li> -->
+<li><a href="#7">Resources</a></li>
+<li><a href="#8">Holiday and vacation</a></li>
+</ul>
+
+<p>This should provide a handy snapshot and point of reference for my colleagues as well  :-)</p>
+
+
+<a name="2"></a>
+
+<h4>Appetiser Demos</h4>
+
+<!--
+
+show:
+
+Tractor
+Waltham
+Morgan
+
+You should show a few demos at the start to get people interested before you go into the detail. I’d suggest the following three:
+
+Frontloader demo – show zoom, rotate, isolate, focus explode, data embedded in model.
+Waltham office
+Steampunk demo – talk about customizing UI.
+SAP demo – talk about linking to external database.
+
+-->
+
+<p>Before we even start talking about this, let's take a really quick look at a couple of samples that show what it is all about:</p>
+
+<ul>
+
+<li><a href="https://s3.amazonaws.com/FastViewer/index.html?file=frontloader/0.svf">
+Frontloader tractor</a> &ndash;
+Zoom, rotate, isolate, focus, explode, embedded data.
+
+<li><a href="https://s3.amazonaws.com/FastViewer/index.html?file=Waltham/0.svf">
+Waltham office building</a> &ndash;
+Large building model, explore structure.
+
+<li><a href="http://54.191.41.170/sapdemo">
+SAP</a> &ndash;
+Link to external database, double click headrest, look at the linked SAP database data displayed in a separate property palette, edit the price in the database view at the bottom, and watch the properties update immediately.
+
+<li><a href="http://safe-reef-1847.herokuapp.com">
+Morgan steampunk</a> &ndash;
+Huge model with highly customised UI.
+
+</ul>
+
+
+<a name="3"></a>
+
+<h4>Introduction &ndash; aka Stephen's Spiel</h4>
+
+<p>Note that the viewer is currently still in preview mode.</p>
+
+<p>The general public will be able to request developer keys and make complete use it within the next few weeks.</p>
+
+<p>There was a time when everybody <b><i>knew</i></b> the earth was flat. They <b><i>knew</i></b> that if you sailed far enough, you'd fall off the edge of the world. But things change, and by the fifteenth century it was generally accepted that the earth was a sphere. In 1492, Christopher Columbus tried to take advantage of this 3D world to find a westerly trade route to the East Indies. Instead he discovered the Americas. European settlers quickly followed him, and a few hundred years and several genocides later we ended up here &ndash; in Silicon Valley.</p>
+
+<p>And then we programmers invented another world &ndash; the worldwide web. And just like our ancestors, we all thought it was flat. If you moved your mouse far enough it would fall off the edge of the screen. A few people thought this new world shouldn't be flat, but 3D on the web was hard &ndash; you had to download a huge client-side executable, or you had to write a lot of code &ndash; so most web developers were happy with their two-dimensional webpages. Just think for a moment how a seller on Amazon or eBay shows you what their product looks like &ndash; you have to click through a set of photos taken from different angles. Why can't I see that product in 3D &ndash; and zoom it and pan it and rotate it? And maybe even explode it to see what it looks like on the inside?</p>
+
+<p>But the world is changing. Today, all the important browsers support WebGL natively (so there's no need for customers to download a nasty plugin), and we have robust libraries like THREE.js that greatly simplify creating 3D web apps. For the first time, it’s not only possible for us to create 3D content &ndash; but we can be confident that our customers can actually view it.</p>
+
+<p>But 3D still isn't that easy. You have to design your model somewhere and then you have to translate it into a format that your WebGL-enabled app can understand. And that's where Autodesk comes in. Our goal is to make 3D on the web so easy that it’s a no-brainer. We are launching our new 3D viewer API, which consists of a state-of-the-art zero-client, WebGL viewer and a REST API that allows you to translate and view almost any 3D file format. Let’s see what it can do.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Slide Deck and Notes</h4>
+
+<p>Here is the Autodesk Web Services View and Data API presentation
+
+<a href="http://thebuildingcoder.typepad.com/adva/2014-07/adva_jeremy.pdf">slide deck</a>,
+
+shown at the Basel.js meetup on July 30, 2014, based on work by Daniel and Cyrille with some additional notes by Jeremy:</p>
+
+<p>The Challenge &ndash; Big Data, 2D and/or 3D:  Autodesk Large Model Viewer.</p>
+
+<p>Add interactive 3D viewing to your web application.</p>
+
+<p>Single pipeline for integrated interactive viewing, search and data: extend it, find it, see it.</p>
+
+<p>The same pipeline feeds search and viewing.</p>
+
+<p>Two APIs available:</p>
+
+<ul>
+<li><b>REST</b> Server and Management API</li>
+<ul>
+
+<li>Authenticate using oAuth 2.0</li>
+
+<li>Upload and translate files</li>
+
+<li>Manage access rights</li>
+</ul>
+
+<li><b>JavaScript</b> Web Client API</li>
+<ul>
+
+<li>Viewing technology based on Three.js</li>
+
+<li>Embed and control viewer in HTML5 applications</li>
+
+<li>Implement user interaction, access documents, manipulate objects, camera...</li>
+</ul>
+</ul>
+
+
+<p>Empowered by
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/WebGL">
+WEBGL</a> and
+
+<a href="http://threejs.org">Three.js</a>.</p>
+
+<p>3D First &ndash; focus is currently on getting the 3D functionality out there first.</p>
+
+<ul>
+<li>3D Functionality</li>
+
+<ul>
+<li>Select, view properties, zoom, pan, orbit, isolate, focus, highlight</li>
+
+<li>Access to underlying 3D model, e.g. meshes and materials</li>
+</ul>
+
+<li>2D Functionality</li>
+
+<ul>
+<li>Raster image &ndash; zoom and pan only</li>
+
+<li>Later: Vector graphics soon &ndash; select, view properties, zoom, pan, isolate, focus, highlight</li>
+</ul>
+</ul>
+
+<p>Currently supported formats:</p>
+
+<ul>
+<li>dwg</li>
+<li>dwt</li>
+<li>dwf</li>
+<li>dwfx</li>
+<li>rvt</li>
+<li>iam</li>
+<li>ipt</li>
+<li>nwc</li>
+<li>nwd</li>
+<li>f3d</li>
+<li>fbx</li>
+<li>3ds</li>
+<li>dae</li>
+<li>obj</li>
+<li>zip</li>
+<li>stl</li>
+<li>ifc</li>
+<li>ige</li>
+<li>iges</li>
+<li>igs</li>
+<li>3dm</li>
+<li>asm</li>
+<li>catpart</li>
+<li>catproduct</li>
+<li>cgr</li>
+<li>dlv3</li>
+<li>exp</li>
+<li>g</li>
+<li>jt</li>
+<li>model</li>
+<li>neu</li>
+<li>prt</li>
+<li>sab</li>
+<li>sat</li>
+<li>session</li>
+<li>skp</li>
+<li>sldasm</li>
+<li>sldprt</li>
+<li>smb</li>
+<li>smt</li>
+<li>ste</li>
+<li>step</li>
+<li>stla</li>
+<li>stlb</li>
+<li>stp</li>
+<li>wire</li>
+<li>x_b</li>
+<li>x_t</li>
+<li>xas</li>
+<li>xpr</li>
+<li>cam360</li>
+<li>sim</li>
+<li>sim360</li>
+</ul>
+
+
+<p>Getting started &ndash; server side REST server and management workflow:</p>
+
+<ul>
+<li>Register an account and create an application.</li>
+
+<li>Use the authentication API to get an access token. The access token is required for all other API calls.</li>
+
+<li>Create a bucket in which to store your objects.</li>
+
+<li>Upload an object to the bucket and request that it be translated into a "bubble" for the viewing service.</li>
+
+<li>At this point you have a uniform resource name (URN) for your object, which you pass to the viewing client.</li>
+</ul>
+
+<p>Here are the steps in more detail:</p>
+
+<ul>
+<li>Step 1: Register and Create an Application</li>
+
+<li>List of Registered Applications</li>
+
+<li>Step 2: Obtain an Access Token</li>
+
+<li>Step 3: Create a Bucket</li>
+
+<li>Bucket Policy:</li>
+
+<ul>
+<li>Transient: persists for 24 hours</li>
+
+<li>Temporary: persists for 30 days</li>
+
+<li>Persistent: persists until deleted</li>
+</ul>
+
+<li>Step 4: Upload a Model File</li>
+
+<li>Response to Upload Request</li>
+
+<li>Determine the URN from the upload response: the URN is the Base64 encoded id.</li>
+
+<li>Step 5: Register the Model for Viewing</li>
+
+<li>Check Progress: you can start viewing the object as soon as some parts have a 'complete' status</li>
+
+<li>Retrieve Thumbnail Image</li>
+</ul>
+
+<p>This whole sequence is demonstrated most effectively by the <a href="#5">curl shell scripts</a> available from GitHub.</p>
+
+
+
+<p>Getting Started &ndash; Client Side JavaScript</p>
+
+
+<p>Compatibility Requirements: the A360 Viewer requires a WebGL canvas compatible browser, such as:</p>
+
+<ul>
+<li>Internet Explorer 11.0+</li>
+
+<li>Chrome 18.0+</li>
+
+<li>Opera 15.0+</li>
+
+<li>Firefox 4.0+</li>
+
+<li>Chrome on Android</li>
+</ul>
+
+<p>Load URN in JavaScript Viewer.</p>
+
+<p>Create a html5 page or web application.</p>
+
+<p>Add references to CSS style sheet and JavaScript library:</p>
+
+<pre>
+  &lt;link rel="stylesheet"
+    href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css"
+    type="text/css"&gt;
+
+  &lt;script
+    src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"&gt;
+  &lt;/script&gt;
+</pre>
+
+<p>JavaScript Client Side Extension</p>
+
+<ul>
+<li>Model hierarchy</li>
+
+<li>Metadata and properties</li>
+
+<li>Events</li>
+
+<li>Camera / Zoom / Navigation</li>
+
+<li>Access to geometry, textures...</li>
+
+<li>etc.</li>
+</ul>
+
+
+<p>Questions and Answers:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/06/technical-summit-day-1-and-removing-rvt-references.html#2">Rendering optimisations</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/06/technical-summit-day-1-and-removing-rvt-references.html#3">JavaScript optimisations</a></li>
+<li><strong>[Q]</strong> Is this for anyone and everyone? &ndash; <strong>[A]</strong> Yes, sure, not just large complex models; everybody's models, cf. 3D printing, SAT, anything.</li>
+<li><strong>[Q]</strong> Other use cases? &ndash; <strong>[A]</strong> Any 3D model; every situation where you can replace a bunch of stupid 2D photos or flat plans by something more real and interactive.</li>
+</ul>
+
+
+
+
+
+
+
+<a name="5"></a>
+
+<h4>Curl Shell Scripts for Authorisation, Model Upload and Translation</h4>
+
+<p>Look at Cyrille's
+
+<a href="https://github.com/Developer-Autodesk/workflow-curl-view.and.data.api">
+curl shell scripts</a> that
+
+provide a very practical, efficient, interactive and direct method to step through the entire authorisation, upload and translation process.</p>
+
+<p>Here is an example of uploading, translating and viewing a Revit model test.rvt:</p>
+
+<pre>
+./viewerAPI auth
+./viewerAPI bucketCreate my_bucket_name
+./viewerAPI upload samples/test.rvt
+./viewerAPI register test.rvt
+./viewerAPI registerProgress test.rvt
+./viewerAPI registerProgress test.rvt
+./viewerAPI thumbnail test.rvt
+sudo ./viewerAPI html test.rvt
+</pre>
+
+<p>Please refer to the GitHub
+
+<a href="https://github.com/Developer-Autodesk/workflow-curl-view.and.data.api">
+readme</a> for
+
+a more detailed description.</p>
+
+
+<a name="6"></a>
+
+<h4>Demo Script and Demos Embedded Everywhere</h4>
+
+<p>The viewer can be embedded in almost any web application.</p>
+
+<p>The sample applications presented here include embedding in blogs, Facebook, TypePad, Sharepoint, mechanical models, AEC (architectural, engineering, construction), HVAC (mechanical equipment in buildings), Infraworks (infrastructure and GIS), database integration	(SAP), etc.</p>
+
+<!-- /a/src/web/viewer/demo/jim_quanci_demo_script.txt -->
+
+<p>Here are some notes from a demo held by Jim Quanci in the end of June:</p>
+
+<p>Remember ahead of time that you need decent Internet access.</p>
+
+<p>Attached is a recording where I walked through a typical View and Data web service internal demo including the URLs I used.</p>
+
+<p>Note I have all these set-up as default tabs in chrome, as some of these take a minute to load.</p>
+
+<p>These are also in the order I show them, starting with simple and getting gradually more complex.</p>
+
+<p>And remember:</p>
+
+<ul>
+<li>Zero client</li>
+<li>HTML5 and JavaScript based (open source) &ndash; which means runs on most browsers (IE coming very soon) &ndash; and is easy to customize/extend/hack</li>
+<li>WebGL (and three.js for the 3D web fluent)</li>
+<li>Industry standard architecture &ndash; REST and JSON</li>
+<li>Streaming &ndash; so big models</li>
+<li>Integrates easily with external data</li>
+<li>60+ file formats supported &ndash; so developers and customers avoid the messiness of having to worry about file formats &ndash; including support for lots of general industry formats like OBJ, FBX, DWG, SketchUp &ndash; and competitive formats like SWX, CATIA, NX, etc.</li>
+</ul>
+
+<p>Here are the demo links:</p>
+
+<ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/05/a-sneak-peek-at-the-new-autodesk-360-viewer.html
+">Blog</a></li>
+<li><a href="https://www.facebook.com/a360viewer
+">Facebook</a></li>
+<li><a href="http://adndevblog.typepad.com/cloud_and_mobile/stephens-test-page.html
+">TypePad</a></li>
+<li><a href="https://share.autodesk.com/IPG/CloudPlatforms/SitePages/Test%20Page.aspx
+">Sharepoint</a></li>
+<li><a href="https://s3.amazonaws.com/FastViewer/index.html?file=frontloader/0.svf
+">Model</a></li>
+<li><a href="https://s3.amazonaws.com/FastViewer/index.html?file=Revit_Kitchen/0.svf
+">Architectural, Engineering, Construction, HVAC, Mechanical Equipment in Buildings</a></li>
+<li><a href="https://s3.amazonaws.com/FastViewer/index.html?file=Waltham/0.svf
+">Waltham &ndash; large office building</a></li>
+<li><a href="https://s3.amazonaws.com/autodesk.viewingservice.viewers.prod/0.1.68/viewer3d.html?&file=https://s3.amazonaws.com/temporary-model-artifact-storage/11044/LMVGeneratorPlugin/proposals/master/model.svf
+">Infraworks model &ndash; city planning</a></li>
+<li><a href="http://54.191.41.170/sapdemo2
+">SAP Database Integration</a></li>
+</ul>
+
+<p>Finally, here is Philippe's new slick UI viewer
+
+<a href="http://54.191.41.170:3003/nodeview/bootstrap">nodeview/bootstrap</a> sample:</p>
+
+<ul>
+
+<li>Full JavaScript client/server</li>
+
+<li>Integration of multiple js UI libs</li>
+
+<li>Bootstrap, jquery layout, slickgrid, jsTree</li>
+
+<li>Load/upload of 2D and 3D models</li>
+
+<li>Save/load of named views in MongoDB</li>
+</ul>
+
+<!--
+
+https://s3.amazonaws.com/FastViewer/index.html?file=frontloader/0.svf -- Front Loader Full Canvas
+http://viewing-dev.api.autodesk.com/viewingservice/v1/viewers/index.html?svf=urn:dXJuOmFkc2suczM6ZnMuZmlsZTp2aWV3aW5nc2VydmljZS92MS92aWV3ZXJzL3NhbXBsZS5kd2Y -- Model car with partial text search (a bit unreliable)
+https://s3.amazonaws.com/FastViewer/index.html?file=Waltham/0.svf -- Waltham Full Canvas
+https://s3.amazonaws.com/FastViewer/index.html?file=Revit_Kitchen/0.svf -- Beautiful Revit House You Can Explode
+https://share.autodesk.com/IPG/CloudPlatforms/SitePages/Test%20Page.aspx -- Ditch Digger Embedded in SharePoint
+http://adndevblog.typepad.com/cloud_and_mobile/stephens-test-page.html -- Embedded in a Typepad blog (there have been Denial Of Service Attacks at times on TypePad)
+https://www.facebook.com/a360viewer -- Facebook page that takes you to Viewer embedded in Facebook – and showing off external data in Azure (use the link by the shaver)
+http://autodesk360viewer.azurewebsites.net/?_sm_au_=iVV0JNDJ6PjPHQRP -- Shaver (in case Facebook site is not working)
+http://coinsautodeskviewertest.azurewebsites.net/?_sm_au_=iVV0JNDJ6PjPHQRP -- COINS demo – it’s not just Autodesk… this is a partner learning how to use the View API – with “test harness” like features
+http://s3.amazonaws.com/FastViewer/fydo/viewer3d.html?svf=fydo/CivilSample/2/fydo/primaryGraphics_default.fydo -- 2D Vector (this is still alpha/beta)
+http://23.23.212.64/gwpa -- SAP Demo (double click on left hand tree items to focus and zoom – see SAP data; if you get daring, change the cost in the SAP table and then see it has updated in the Viewer)
+https://s3.amazonaws.com/autodesk.viewingservice.viewers.prod/0.1.68/viewer3d.html?&file=https://s3.amazonaws.com/temporary-model-artifact-storage/11044/LMVGeneratorPlugin/proposals/master/model.svf -- InfraWorks model (slow loading so be patient; zoom into the tall office towers to see reasonably good detail)
+https://developer.autodesk.com/ -- Web Services API portal – show them the docs area (browse a few docs so they can see code samples), point out this goes live in mid-July
+-->
+
+Transcript of the Demo:
+
+<ol>
+<li>startup chrome and shrink to get tabs</li>
+<li>all tabs are pre-setup in the same order as the email</li>
+<li>depends on audience which demos are shown</li>
+<li>some of the tabs do not come up right away</li>
+<li>figure out what is working beforehand, refresh and wait</li>
+<li>plm360 tab has not worked for the last week &ndash; kill it</li>
+<li>refresh some tabs now and then</li>
+<li>sap demo one needs several refreshes</li>
+<li>all tabs set up, check them all quickly, remove ones that don't work</li>
+<li>often the demo is used for a MeetUp and you want to set up quickly</li>
+<li>start with the tractor, not embedded, full screen canvas, zero client, html5, pure chrome, api is js, standard, mostly open source, pretty big model, source model is 2 GB</li>
+<li>tractor has structure from mechanical design, metadata, often equally important as graphics</li>
+<li>everything is built on the api and can be changed</li>
+<li>go back to the full loader</li>
+<li>sometimes escape-escape to clear selection</li>
+<li>explode, mech design, assemblies, subassemblies, etc., and explode follows same order</li>
+<li>next demo is car with metadata to demo search, find batteries, wheels</li>
+<li>look at 2D drawings, not just 3D models</li>
+<li>move on to architectural samples, e.g. autodesk waltham office</li>
+<li>very large model, go to structure, look at plumbing, electrical</li>
+<li>this is a very large model, we use streaming to show something right away in viewer</li>
+<li>right click on an air handler, look at the details</li>
+<li>the id is included, and guid, for linking to the model and other databases for permanent links with external data</li>
+<li>go to office, see textures, chairs, focus on a table, round, third floor, data, guid</li>
+<li>good combination of quality and performance</li>
+<li>give me all the doors, for example</li>
+<li>next: embedding</li>
+<li>mostly you are building some kind of app</li>
+<li>here is an example of embedding in SharePoint</li>
+<li>explode, people like that</li>
+<li>here is a Revit house, look at the materials and textures</li>
+<li>you don't explode building, that is for mechanical, but let's do that here too</li>
+<li>we saw SolidWorks, inventor, Revit</li>
+<li>we support 50 file formats, both adsk and non-proprietary such as OBJ</li>
+<li>here is a Typepad blog embedding, and this can be achieved in ten minutes</li>
+<li>Facebook sample: this will be popular for students</li>
+<li>here is a Facebook page with the viewer embedded, the shaver</li>
+<li>the model is actually in DropBox, the viewer in Facebook</li>
+<li>we are looking at federated data with different sources</li>
+<li>currently mostly adsk servers</li>
+<li>look at the external info presented here coming from a db on azure</li>
+<li>here is other data from the model itself</li>
+<li>this is powerful stuff: help access and relate to metadata</li>
+<li>explode this too</li>
+<li>so far the samples were adsk</li>
+<li>here is a sample by a partner called coins in the uk, pilot partner</li>
+<li>this is just a test, a hospital</li>
+<li>show level 2, level 5, navigate, all columns, simply testing how to drive the view based on bits of metadata</li>
+<li>search all the glazing</li>
+<li>some underlying technology is three.js, open source library</li>
+<li>this viewer is very hackable, you can do interesting things</li>
+<li>revit ids for all glazing, to connect with external db</li>
+<li>oauth is our security system, used widely in the web</li>
+<li>here is another 2D sample</li>
+<li>we can select vectors, relate metadata</li>
+<li>I cannot yet select entities, we are working on that</li>
+<li>you can flip the 2D to 3D also</li>
+<li>this is all zero client</li>
+<li>I am showing on chrome, it works on Firefox, currently not on ie11</li>
+<li>we want to enable you to deliver this viewing everywhere you need it</li>
+<li>protected by password or open, however you need it</li>
+<li>on the mobile side, we are building sdks for iOS and android</li>
+<li>this stuff works on mobile devices, but still a bit clunky lacking a mouse</li>
+<li>here is a code sample showing how to hook it up with SAP</li>
+<li>the chair is from inventor</li>
+<li>double click to isolate</li>
+<li>here is the sap data, straight out of an sap enterprise database online</li>
+<li>change the pricing here to $500 in the sap data</li>
+<li>return to the graphics pane, back out, go back to 5468, and here is the new updated pricing, $500</li>
+<li>this demo was put together by Philippe in two days</li>
+<li>he does have prior experience, but it was one of his first viewer samples</li>
+<li>large scale urban planning, InfraWorks</li>
+<li>here is a pretty big model of an apartment block</li>
+<li>how do you get involved?</li>
+<li>url</li>
+<li>get started</li>
+<li>request access key</li>
+<li>documentation is partially there</li>
+<li>rest and js api</li>
+<li>supported file formats</li>
+<li>details on each api call</li>
+<li>security mechanism</li>
+<li>how to register and process a model</li>
+<li>here is everything you need to get started</li>
+<li>I hope this motivates you to do so</li>
+<li>last thing: here are the different file formats:</li>
+<li>url, spreadsheet?</li>
+<li>as a user, you do not have to worry about the format</li>
+<li>you push it up and we convert it automatically</li>
+<li>extra complications with compound models</li>
+<li>also if you have files with supporting files</li>
+<li>you need to know which file to push up</li>
+<li>federated data coming oauth2 is security mechanism</li>
+<li>source files are only stored temporarily, we do not keep the source file</li>
+<li>you should feel comfortable making the viewable public</li>
+<li>the source seed binary is destroyed</li>
+<li>easy</li>
+<li>zero client, rest based, js, html 5, use your favorite ui tools and libraries</li>
+<li>one question: business model</li>
+<li>we are currently thinking a certain number of free file uploads per month, e.g. x MB</li>
+<li>if you exceed the limit, it may cost, e.g. $100 for a couple of GB</li>
+<li>zero charge for viewing, view as much as you want, unlimited</li>
+<li>encourage people to stick 3D models everywhere, Facebook, Typepad, anywhere</li>
+<li>the web is pretty cool these days</li>
+<li>html 5 gibes some flashiness and interactivity, but it is still rather flat</li>
+<li>young folks are used to 3D games and are not impressed by a flat 2D world</li>
+<li>time to change that</li>
+</ol>
+
+
+<a name="7"></a>
+
+<h4>Resources</h4>
+
+<p>Here is an overview of the main resources:</p>
+
+<ul>
+<li><a href="http://developer.autodesk.com">Getting started material, registration and full documentation</a></li>
+<li><a href="http://autode.sk/viewerapisamples">autode.sk/viewerapisamples</a> &ndash; demo code and <a href="https://github.com/developer-autodesk">viewer sample applications</a> on GitHub</li>
+<li><a href="https://developer.autodesk.com/api-console">API Console</a> &ndash; test the View and Data API services online</li>
+<li>Autodesk <a href="http://adndevblog.typepad.com/cloud_and_mobile">Cloud and Mobile DevBlog</a></li>
+<li><a href="http://forums.autodesk.com">Autodesk Community</a>
+&gt; <a href="http://forums.autodesk.com/t5/Web-Services-API/ct-p/94">Web Services API</a>
+&gt; <a href="http://forums.autodesk.com/t5/View-and-Data-API/bd-p/95">
+View and Data API discussion forum</a></li>
+</ul>
+
+<p>As said, please note that the View and Data API is still in pilot program mode right now, so you cannot yet apply for an API key.
+We expect that to come within the next week or two.</p>
+
+<p>There you are.</p>
+
+<p>That just about covers what we have right now.</p>
+
+<p>I look forward to seeing wat you can do with all this once you have access to the developer keys.</p>
+
+<p>Good luck, much success, and have fun!</p>
+
+
+<a name="8"></a>
+
+<h4>Holiday and Vacation</h4>
+
+<p>By the way, tomorrow is the first of August, a public holiday in Switzerland, and I am on vacation next week, so I hope this will help keep you entertained in the meantime.</p>
+
+<p>The public developer key access may even be live by the time I return.</p>
+
+<p>I'll keep my fingers crossed for that.</p>

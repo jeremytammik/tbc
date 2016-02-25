@@ -1,0 +1,172 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+Set View Section Box to Match Scope Box
+
+http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html
+
+http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html?cid=6a00e553e168978833019aff6c2563970d#comment-6a00e553e168978833019aff6c2563970d
+
+Dan R http://blog.bvn-usyd.com
+
+/a/doc/revit/blog/zip/SetSectionBox2014.zip
+
+http://www.bvn.com.au/contact.html
+
+-->
+
+<h3>Set View Section Box to Match Scope Box Updated for Revit 2014</h3>
+
+<p>A year ago, we looked at
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html">
+setting the view section box to match its scope box</a>,
+
+in particular:</p>
+
+<ul>
+<li>How to retrieve the exact geometric location, size and orientation of the scope box.</li>
+<li>How to set the exact geometric location, size and orientation of the 3D view section box.</li>
+</ul>
+
+<p>Dan Rumery of
+
+<a href="http://www.bvn.com.au">
+BVN Donovan Hill</a> recently
+
+submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html?cid=6a00e553e168978833019aff6c2563970d#comment-6a00e553e168978833019aff6c2563970d">
+comment</a> to
+
+point out an error in the code presented there:</p>
+
+<blockquote>
+
+<p>I think you'll find there's a bug in both versions of your code above where you're setting the bounding box maximum to the sum of the three basis vectors. What that gives you is the maximum point in world space when it should be the maximum point in the local space of the bounding box. This is probably why people were having trouble getting this code to work correctly for the general case.</p>
+
+<p>I believe changing the offending line to the following makes both of your solutions work in all cases:</p>
+
+<pre class="code">
+  bbox.Max = new XYZ(vx.GetLength(),
+    vy.GetLength(), vz.GetLength())
+</pre>
+
+<p>Happy days!</p>
+
+</blockquote>
+
+<p>Since several others tried to use the code and it appears to be of general interest, I took this opportunity to fix the error and update the add-in for Revit 2014.</p>
+
+<p>Here is
+
+<a href="zip/SetSectionBox2014.zip">SetSectionBox2014.zip</a> containing
+
+the full new source code, Visual Studio solution and add-in manifest.</p>
+
+<p>Dan very kindly checked that the new setting is correct and adds:</p>
+
+<p>Your code does indeed appear to work, at least the version that uses the GetSectionBoundingBoxFromScopeBox method.</p>
+
+<p>An example that exhibits the bug in question is if you move the scope box away from the origin and / or rotate the scope box around the Z axis so that it no longer aligns to the X and Y axes.
+The fixed version of the code handles this case perfectly.</p>
+
+<p>For reference, here's a similar implementation in Python that does not rely on supplying a view direction to the function (copy and paste to an editor or view source to see the truncated lines in full):</p>
+
+<pre class="prettyprint">
+# Get the line endpoint that has the lowest Z value.
+def GetLowerZEndPoint(line):
+  return line.get_EndPoint(0 if line.Direction.Z > 0 else 1)
+
+# Determine if the line is vertical (parallel to the Z axis).
+def IsVerticalLine(line):
+  return line.Direction.CrossProduct(XYZ.BasisZ).IsAlmostEqualTo(XYZ.Zero)
+
+# Determine if the vector represented by an XYZ value is oriented vertically up (parallel to the Z axis).
+def IsUpVector(xyz):
+  return xyz.Normalize().IsAlmostEqualTo(XYZ.BasisZ)
+
+# Get a list of lines representing the scope box geometry.
+def GetScopeBoxLines(scopeBox):
+  return list(scopeBox.get_Geometry(Options()))
+
+# Given a line and one of its end points, return the other end point.
+def GetOppositeEndPoint(line, endPoint):
+  ep1 = line.get_EndPoint(0)
+  ep2 = line.get_EndPoint(1)
+  return ep1 if ep2.IsAlmostEqualTo(endPoint) else ep2 if ep1.IsAlmostEqualTo(endPoint) else None
+
+# Given an origin and three vectors representing the direction and lengths of three dimensions,
+# return a bounding box with an appropriate transform, min and max values.
+def GetBoundingBoxXYZ(origin, v_x, v_y, v_z):
+  t = Transform.Identity
+  t.Origin = origin
+  t.BasisX = v_x.Normalize()
+  t.BasisY = v_y.Normalize()
+  t.BasisZ = v_z.Normalize()
+  bbox = BoundingBoxXYZ()
+  bbox.Transform = t
+  bbox.Min = XYZ.Zero
+  bbox.Max = XYZ(v_x.GetLength(), v_y.GetLength(), v_z.GetLength())
+  return bbox
+
+# Given a scope box element, return a bounding box matching the scope box geometry.
+def GetScopeBoxBoundingBoxXYZ(scopeBox):
+  lines = GetScopeBoxLines(scopeBox)
+  # Choose an appropriate origin point.
+  verticalLines = list(l for l in lines if IsVerticalLine(l))
+  origin = GetLowerZEndPoint(verticalLines[0])
+  # Compute a list of vectors representing the length and orientation of scope box lines emanating
+  # from the chosen origin point. These vectors represent the three dimensions of the scope box.
+  originVectors = list(p - origin for p in (GetOppositeEndPoint(l, origin) for l in lines) if p is not None)
+  # Choose the vector that points up from the origin. This vector serves as the Z dimension of the bounding box.
+  v_z = list(v for v in originVectors if IsUpVector(v))[0]
+  # Choose the other two vectors representing the X and Y dimensions of the bounding box.
+  v1, v2 = list(v for v in originVectors if not v.IsAlmostEqualTo(v_z))
+  # Which vector is the X dimension and which is the Y dimension depends on their cross product.
+  # The three dimension vectors must form a right handed coordinate system.
+  v_x, v_y = (v1, v2) if v1.CrossProduct(v2).Normalize().IsAlmostEqualTo(v_z.Normalize()) else (v2, v1)
+  # Construct a bounding box representing the scope box geometry.
+  return GetBoundingBoxXYZ(origin, v_x, v_y, v_z)
+
+# Set 3D view's section box to match the specified scope box element extents.
+def Test(scopeBox, view3d):
+  bbox = GetScopeBoxBoundingBoxXYZ(scopeBox)
+  tranny = Transaction(doc, "set view section box to scope box extents")
+  tranny.Start()
+  view3d.SectionBox = bbox
+  tranny.Commit()
+  return tranny.GetStatus()
+
+# Before running the following sample code, ensure the active view is a 3D view,
+# and ensure that you've selected exactly one scope box in the view.
+
+#scopeBox = selection[0]
+#view3d = doc.ActiveView
+#Test(scopeBox, view3d)
+</pre>
+
+<p>Here is the raw Python file
+
+<a href="zip/bbox_from_scope_box.py.txt">
+bbox_from_scope_box.py</a>.</p>
+
+<p>You can run this code in the Revit Python Shell.
+It should work on both Revit 2013 and Revit 2014.
+Test code and instructions are included at the end of the script.
+Uncomment the three last lines to test that it works.
+It requires a 3D view active and exactly one scope box selected in it, and assumes the first element of the selection set is a scope box element.</p>
+
+<p>Please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html">
+original post</a> for
+
+all further details and a usage example.
+
+<p>Many thanks to Dan for the fix, testing and nice Python sample!</p>

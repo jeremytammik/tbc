@@ -1,0 +1,75 @@
+<head>
+<meta http-equicenter="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+11000801 [Solid/BREP's of cylindrical elements]
+
+#revitapi #adsk #bim #geometry #aec #adskdevnetwrk
+#3dwebcoder #cloud #restapi #python
+#3dwebcoder #grevit
+#dotnet #csharp
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Revit Geometry Kernel Cylinder Faces</h3>
+
+<p>One of the cases that I answered yesterday evoked a very interesting response from the development team that I want to share with you:
+
+<p><strong>Question:</strong>
+
+When traversing the faces in the boundary representation of a cylinder solid in Revit, I find that it contains two planar faces (top and bottom of the cylinder), and two cylinder faces (two half-cylinders). I examined many different circular solids in Revit and noticed that all of them split into 2 or 4 half/quarter cylinders. Why is this?</p>
+
+<p>When looking at the BREPs in other CAD tools, like Inventor or AutoCAD, these types of Solids usually consist of a single full cylinder face in these cases.</p>
+
+<p>Is there a way to make the Revit API output full cylinder faces in this case? If not, is it possible to somehow merge them into a single cylinder face?</p>
+
+<p><strong>Answer:</strong>
+
+Yes, simple geometric arcs and model arc elements used to demonstrate the same behaviour, i.e., you needed two 180 degree arcs to define a full circle.</p>
+
+<p>I believe that the 2D arcs now do support full circles.</p>
+
+<p>However, apparently, solids still split the cylinders into two parts.</p>
+
+<p>I am now aware of any possibility to modify this behaviour.</p>
+
+<p>The Revit API has very little to do with this; it is simply reproducing the internal Revit database model.</p>
+
+<p>Please forget any and all comparisons between Revit and other CAD systems; <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">Revit is a completely different animal</a>, and has to be, to fully and efficiently support the parametric BIM:</p>
+
+<p>I am afraid that this is another case of abiding by the old adage <a href="https://en.wikipedia.org/wiki/The_Charge_of_the_Light_Brigade_(poem)">formulated by Alfred Lord Tennyson</a>, "ours is not to wonder why, ours is but to do or die":</p>
+
+<p>Or, as the Germans say, a little bit more harshly, "friss oder stirb".</p>
+
+<p><strong>Update:</strong>
+
+John Mitchell of the Revit development team responded to my initial rather brief and useless answer, and added the following interesting background information:</p>
+
+<p>In designing a geometry modeller such as Revit’s geometry kernel, one has to make certain choices that involve trade-offs in convenience versus maintainability, etc. One such choice is whether or not to allow closed, periodic edges and faces (e.g. a cylindrical face that wraps around to meet itself along a linear 'seam' edge, or perhaps with no seam at all).</p>
+
+<p>Revit uses parametrised curves and surfaces to represent edge and face geometry, respectively. For example, a spherical surface essentially uses latitude and longitude as coordinates. Suppose we allowed a full spherical face that wraps around the north-south axis to meet itself at the Greenwich meridian, and suppose we need to determine the longitude of a point on the Greenwich meridian (as just one example). The answer is ambiguous &ndash; is it 0 degrees, or 360 degrees, or -360 degrees, or what? Even if we restrict the longitude to the range [0, 360] (in angular degrees), there’s still ambiguity &ndash; is the answer 0 or 360?</p>
+
+<p>On the other hand, if we disallowed closed faces and edges, we would represent the sphere using two hemispherical faces, such as one that has longitude ranging from 0 to 180 degrees and another that has longitude ranging from 180 to 360 degrees (this is in fact what Revit does). For either face, if we need to determine the latitude and longitude of a 3D point on the face, for example, there is no ambiguity. For example, if the point lies on the Greenwich meridian, for the first face the longitude is 0, while for the second face it’s 360. The fact that the two faces use different coordinates is not a problem, as faces do not 'intermingle' their coordinates.</p>
+
+<p>Actually, you may have noticed that even if we use two hemispherical faces for a sphere, there is still ambiguity at the north and south poles, since the longitude is not well defined there. This, however, is a separate problem &ndash; the problem of dealing with singularities.</p>
+
+<p>You may also have noticed that there may be ambiguities in the latitude. This issue is typically dealt with by restricting that coordinate to a range such as [-90, 90] that avoids ambiguities (except perhaps at singularities).</p>
+
+<p>There are several such basic choices one must make in designing a geometry modeller. The choice to prohibit closed edges and faces in Revit’s geometry kernel was made long ago, and it has advantages and disadvantages, as would the opposite choice. It’s not really feasible (or desirable) to overhaul a mature modeller’s geometry kernel to change such a basic choice whose influence has since propagated throughout the system.</p>
+
+<p>In principle, it might be possible to provide an interface that converts back and forth between a public 'view' where closed edges and faces are allowed and the internal 'view' where they are disallowed, but Revit’s API does not attempt to do this. There is in fact some internal code that does just that, allowing Revit users to sketch closed curves in some situations; the closed curves are split in two before they are passed to the geometry kernel. But this is a complex task in general, subject to the kinds of trade-offs mentioned above. Also, the Revit UI does this to some extent, though not completely. For example, it visually hides the 'seam' edges of a solid cylinder or sphere (at least for certain view settings).</p>
+
+<p>I am sure this explanation is much more palatable than my first response, even if the end result is exactly the same &nbsp; :-)</p>

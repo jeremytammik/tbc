@@ -1,0 +1,55 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09947674 [Getting camera from Revit.]
+
+-->
+
+<h3>Custom Exporter GetCameraInfo</h3>
+
+<p>Here is a simple yet longstanding question with a surprisingly simple answer that should prove extremely helpful for all those who really need it, presumably including Mohan Sawant, who raised this issue in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/dwf-view-definition.html?cid=6a00e553e16897883301b8d061675b970c#comment-6a00e553e16897883301b8d061675b970c">
+comment</a> on
+
+the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/04/dwf-view-definition.html">
+DWF view definition</a> and
+
+its camera settings:</p>
+
+<p><strong>Question:</strong> Is there any programmatic access to the Revit camera target and
+
+<a href="http://en.wikipedia.org/wiki/Field_of_view">
+FOV</a>?</p>
+
+<p>For my application, I have to define a camera using position, target, up vector, projection type and field of view.</p>
+
+<p>I tried to read the camera parameters from the View3d object returned by the filtered element collector. From this I can get the up vector and position.</p>
+
+<p>How can I determine the other parameters for the camera object, especially the target and FOV?</p>
+
+
+<p><strong>Answer by Arno&scaron;t L&ouml;bel:</strong> The only way I know of is using a custom exporter.</p>
+
+<p>When a view is processed and run through a custom context, its properties will be used to populate a ViewNode instance.</p>
+
+<p>One of its methods is GetCameraInfo, which provides information that ought to cover everything you need to know about the view's camera.</p>
+
+<p>Granted, this is not the most straightforward way to get the information, but keep in mind that the exporter itself would be very simple and would not need to do anything else whatsoever.</p>
+
+
+<p>Many thanks, Arno&scaron;t, for your help!</p>
+
+<p>I put together a list of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">
+custom exporter</a> discussions
+
+that you can refer to for example implementations.</p>

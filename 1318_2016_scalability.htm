@@ -1,0 +1,309 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/elementtransformutils-copyelements-from-linked-document/m-p/5574351
+only use the views argument for ElementTransformUtils.CopyElements for view dependent elements, i.e., 2D elements
+
+http://www.youtube.com/watch?v=fo55QTwBdBM&google_comment_id=z13riljqnrmycdanv23wwzeh3vmrvjrit04&google_view_type#gpluscomments
+kondaments
+At 6:23 and later, what are the specs of the machine(s) used? Graphics card and processor etc.
+RE: question on machine specs in Revit 2016 API News video
+Sasha Crotty
+Anthony Hauck
+Andrzej Trelinski
+Scott Blouin
+Piotr Zoladz
+
+#revitapi #adsk #bim #adskdevnetwrk
+#3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>CopyElements, Revit 2016 Scalability, Python and Ruby</h3>
+
+<p>Here are a bunch of infos on and updates for Revit 2016, as well as some important hints on the use of the ElementTransformUtils.CopyElements method:</p>
+
+<ul>
+<li><a href="#2">CopyElements view argument is for 2D only</a></li>
+<li><a href="#3">Revit 2016 scalability enhancements</a></li>
+<li><a href="#4">Revit 2016 Python shell</a></li>
+<li><a href="#5">Revit 2016 Ruby shell</a></li>
+<li><a href="#6">RevitLookup for Revit 2016</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>CopyElements View Argument is for 2D only</h4>
+
+<p>You should only use the ElementTransformUtils.CopyElements views argument when working with view dependent elements, i.e., 2D elements.</p>
+
+<p>This was pointed out by Arno&scaron;t L&ouml;bel in the Revit API discussion forum thread raised by HD12310 on using
+<a href="http://forums.autodesk.com/t5/revit-api/elementtransformutils-copyelements-from-linked-document/m-p/5574351">
+ElementTransformUtils.CopyElements from a linked document</a>,
+who also points out some other important usage considerations:</p>
+
+<p><strong>Question:</strong>
+I am trying to copy paste linked elements into the active document.</p>
+<p>This is something that Revit can do manually: select a linked element, then ctrl + c and ctrl + v.</p>
+<p>But I guess there is an API reason why this won't work:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementTransformUtils</span>.CopyElements( view3DInLink,
+&nbsp; &nbsp; ids, view3DInHost, <span class="blue">null</span>, <span class="blue">new</span> <span class="teal">CopyPasteOptions</span>() );
+</pre>
+
+<p>It errors out on "The specified view cannot be used as a source or destination for copying elements between two views." (Which I presume is the linked view.)</p>
+
+<p>It does work if you just want to copy the families from the link (without placing them) like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementTransformUtils</span>.CopyElements( linkedDoc, ids,
+&nbsp; &nbsp; thisDoc, <span class="blue">null</span>, <span class="blue">new</span> <span class="teal">CopyPasteOptions</span>() );
+</pre>
+
+<p>Is there any other method that will copy and paste linked elements, or should this work?</p>
+<p>If not, then Create.NewFamilyInstance is probably the only option here &nbsp; :-)</p>
+
+<p><strong>Answer:</strong>
+
+Afaik it should work.</p>
+
+<p>Maybe it will help if you do it in several separate steps, e.g. first some supporting elements, like styles, etc., then the instances?</p>
+
+<p>It is probably not entirely obvious from the documentation, but the Copy method that takes views as arguments only work for copying of view-specific elements. And, indirectly, since 3D views &ndash; which is what I assume you are copying between &ndash; cannot even have view-specific elements, they can never be used in that particular Copy method. That is why you see the error you got even before Revit went on testing whether the elements themselves were view-specific or not.</p>
+
+<p>The work-around is simple: Use the Copy method that takes two documents instead. That should work.</p>
+
+<p><strong>Response:</strong>
+Thanks for the replies.</p>
+<p>I finally found my mistake... finally, at 00:25 :-)</p>
+<p>I read somewhere that you needed to supply the FamilySymbolIds.</p>
+<p>Which is what I did, so I got the family types, not the instances.</p>
+<p>(Cool enough, since Transfer Project Standards doesn't transfer families.)</p>
+<p>But then I realized you probably get what you ask for here.</p>
+<p>So I supplied the element ids of the linked family instances and voila, they pasted right in :-)</p>
+<p>It even works on workplane based families; haven't tried face based yet.</p>
+<p>For anyone interested, here's the code:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Collections;
+<span class="blue">using</span> System.Collections.ObjectModel;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Text;
+<span class="blue">using</span> System.Threading.Tasks;
+<span class="blue">using</span> System.Windows;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+
+<span class="blue">namespace</span> TransferFamilys
+{
+&nbsp; [<span class="teal">TransactionAttribute</span>(<span class="teal">TransactionMode</span>.Manual)]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CopyPasteFamilys</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CopyUseDestination</span>
+&nbsp; &nbsp; &nbsp; : <span class="teal">IDuplicateTypeNamesHandler</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="teal">DuplicateTypeAction</span>
+&nbsp; &nbsp; &nbsp; &nbsp; OnDuplicateTypeNamesFound(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DuplicateTypeNamesHandlerArgs</span> args )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">DuplicateTypeAction</span>.UseDestinationTypes;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> hostDoc = commandData.Application
+&nbsp; &nbsp; &nbsp; &nbsp; .ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get the link</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> links
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( hostDoc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">RevitLinkInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> linkedDoc = links.Cast&lt;<span class="teal">RevitLinkInstance</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault().GetLinkDocument();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get familys in link</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> linkedFamCollector
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( linkedDoc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = linkedFamCollector
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfCategory( <span class="teal">BuiltInCategory</span>.OST_GenericModel )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ids.Count == 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Copy Paste&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The link does not contain the specified elements.&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> targetTrans
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Transaction</span>( hostDoc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CopyPasteOptions</span> copyOptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">CopyPasteOptions</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; copyOptions.SetDuplicateTypeNamesHandler(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CopyUseDestination</span>() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; targetTrans.Start(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Copy and paste linked families&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementTransformUtils</span>.CopyElements(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; linkedDoc, ids, hostDoc, <span class="blue">null</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; copyOptions );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//hostDoc.Regenerate();</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; targetTrans.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to HD12310 for raising this and sharing the solution!</p>
+
+
+
+<a name="3"></a>
+
+<h4>Revit 2016 Scalability Enhancements</h4>
+
+<p>This topic was raised by kondaments'
+<a href="http://www.youtube.com/watch?v=fo55QTwBdBM&google_comment_id=z13riljqnrmycdanv23wwzeh3vmrvjrit04">
+query</a> on the
+<a href="http://www.youtube.com/watch?v=fo55QTwBdBM">Revit 2016 API News video</a> provided with the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/revit-2016-api-news-and-devdays-online-recording.html">
+DevDays Online Recording</a>:</p>
+
+<p><strong>Question:</strong>
+
+At 6:23 and later, what are the specs of the machine(s) used? Graphics card, processor etc.?</p>
+
+
+<p><strong>Answer:</strong>
+
+Thank you for your query.</p></p>
+
+<p>This actually provides a great chance to talk about how the Revit 2016 scalability enhancements are machine independent and actually make the specs of the specific machines involved less important. Unlike some of our competitors we are being smarter about how we process data, rather than trying to process more data faster.</p>
+
+<p>The person creating the demo likely used their own machine to create the video &ndash; actually, different demos may have been created by different people.
+I think most machines are HP Z600's or the newer Dell Precision 7810 (or higher).</p>
+
+<p>The significant performance improvements in Revit 2016 should be seen with a wide array of hardware and are not limited to any particular technology.</p>
+
+
+
+<a name="4"></a>
+<h4>Revit 2016 Python Shell</h4>
+
+<p>Daren Thomas updated
+<a href="https://github.com/architecture-building-systems/revitpythonshell">RevitPythonShell</a> for
+Revit 2016, and it now lives on GitHub:
+
+<p><strong>Daren:</strong>
+
+RPS is now on GitHub at <a href="https://github.com/architecture-building-systems/revitpythonshell">github.com/architecture-building-systems/revitpythonshell</a>.</p>
+
+<p>I just created an installer for Revit 2016 for it.</p>
+
+<p>A couple of users have been pushing the boundaries.
+Maybe you have heard of the non-modal shell, that I think could be quite interesting for interactive development.</p>
+
+<p>I would like to include your RevitLookup tool in RPS, with a function like snoop(Element) &ndash; according to the license, that should be ok.
+What do you think?</p>
+
+<p><strong>Jeremy:</strong> Actually, that raises several topics I would like to address:</p>
+
+<h4>Revit Python Shell</h4>
+
+<p>Congratulations on moving to GitHub.
+I think that is a great choice.</p>
+Your home page there looks great.</p>
+
+<p>Congratulations on migrating to Revit 2016.</p>
+
+<p>Congratulations on the modeless shell. I was not aware of that.</p>
+
+<h4>Revit Ruby Shell</h4>
+
+<p>Have you looked at the <a href="https://github.com/hakonhc/RevitRubyShell">Revit Ruby Shell</a>?</p>
+
+<p>It has a modeless shell too, afaik.
+I hope you are already in touch and sharing with that project.
+If not, you absolutely should be!
+These two projects have so much in common!
+And are both so great!</p>
+
+<h4>RevitLookup</h4>
+
+<p>Yes, of course you can incorporate RevitLookup into the Revit Python Shell.</p>
+
+<p>It is on GitHub too, at <a href="https://github.com/jeremytammik/RevitLookup">github.com/jeremytammik/RevitLookup</a>.</p>
+
+<p>Please do not just copy the code and paste it into the Python shell!</p>
+
+<p>Instead, let us define an API for it and use that to incorporate it more professionally as a separate component.</p>
+
+<p>I will happily work together with you on that.</p>
+
+<p>That would be fun!</p>
+
+<h4>GeoSnoop</h4>
+
+<p>Another thing that I was thinking of adding to RevitLookup is a functionality to snoop geometry, viewing it as geometry, not numerical data, i.e. curves and stuff.</p>
+
+<p>Maybe two viewers, a 2D one for planar things and a 3D one for solids.</p>
+
+<p>The 2D one is named GeoSnoop and has been implemented for ages but not incorporated into RevitLookup yet, e.g., in these discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/determining-the-size-and-location-of-viewports-on-a-sheet.html">Size and location of viewports on a sheet</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html#7">Room and furniture loops using symbols</a></li>
+</ul>
+
+
+<a name="5"></a>
+
+<h4>Revit 2016 Ruby Shell</h4>
+
+<p><a href="https://github.com/hakonhc">Håkon Clausen</a> just updated the
+<a href="https://github.com/hakonhc/RevitRubyShell">Revit Ruby Shell</a> for Revit 2016 as well.</p>
+
+
+<a name="6"></a>
+
+<h4>RevitLookup for Revit 2016</h4>
+
+<p>Last but not least, I published a minor update to <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> today:</p>
+
+<p>The previous version was referring to the Revit Copernicus pre-release assembly DLL locations in <code>C:\Program Files\Autodesk\Revit Copernicus</code>.</p>
+
+<p>I now installed the final official version of Revit 2016 and changed the location to <code>C:\Program Files\Autodesk\Revit 2016</code>.</p>
+
+<p>Enjoy!</p>

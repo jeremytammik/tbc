@@ -1,0 +1,348 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09406242 [Determine if Category supports Type parameter binding]
+
+Todd JacobsGannett Fleming, Inc., Gannett_Fleming_Inc
+
+http://forums.autodesk.com/t5/Revit-API/Determine-if-Category-supports-Type-parameter-binding/m-p/4918068
+
+-->
+
+<h3>Category Support for Shared Type and Instance Parameters</h3>
+
+<p>Welcome to my last post on the Revit 2014 API, and one final new external command and update of The Building Coder sample collection before we migrate to Revit 2015.</p>
+
+<p>Revit 2015 was
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revit-2015-released.html">
+released last week, the Revit SDK was posted and updated</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-revit-2015.html">
+RevitLookup for Revit 2015 is available on GitHub</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revit-2015-api-news-devdays-online-recording.html">
+DevDays Online presentation</a> on
+
+the new API functionality is available.</p>
+
+<p>Before migrating The Building Coder samples from Revit 2014 to Revit 2015, let's add one last external command to it, supporting us in taking a detailed look at how to determine whether a category provides support for instance versus type parameters.</p>
+
+<p>This topic arose in the Revit API discussion forum, where Todd Jacobs of
+
+<a href="http://www.gfnet.com/">Gannett Fleming, Inc.</a> started a thread to
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Determine-if-Category-supports-Type-parameter-binding/m-p/4918068">
+determine if a category supports type parameter binding</a>:</p>
+
+<p><strong>Question:</strong> I can get a list of categories that support bound parameters like this.</p>
+
+<pre class="code">
+&nbsp; <span class="teal">SortedList</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt; CatList
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SortedList</span>&lt;<span class="blue">string</span>, <span class="teal">Category</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Categories</span> cats = doc.Settings.Categories;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Category</span> cat <span class="blue">in</span> cats )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( cat.AllowsBoundParameters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CatList.Add( cat.Name, cat );
+&nbsp; &nbsp; }
+&nbsp; }&nbsp; &nbsp;
+</pre>
+
+<p>But how can I tell from this list which categories allow Type bound parameters vs. Instance bound parameters?</p>
+
+<p>I would like to produce two lists, similar to the UI for adding project parameters when switching from Type to Instance; the Categories list updates with the available categories for the given selection, not interested in sub-categories at the moment.</p>
+
+<p>As an example:</p>
+
+<p>The Sheets category shows up only when created shared Instance parameters:</p>
+
+<center>
+<img src="img/category_instance_param_list.png" alt="Categories supporting instance parameters"/>
+</center>
+
+<p>It is not displayed at all when selecting Type parameter properties:</p>
+
+<center>
+<img src="img/category_type_param_list.png" alt="Categories supporting type parameters"/>
+</center>
+
+
+
+<p><strong>Answer:</strong> Do the suggestions on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/category-analysis-with-and-without-python.html">
+category analysis with and without Python</a> help?
+
+
+<p><strong>Response:</strong> No, not really, unfortunately.</p>
+
+<p>How does Revit do it internally? Is it a static list?</p>
+
+<p>Here is where I want to be:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Create a Category Set containing only </span>
+&nbsp; <span class="green">// categories that allow Type bound parameters</span>
+&nbsp;
+&nbsp; <span class="teal">Categories</span> cats = doc.Settings.Categories;
+&nbsp;
+&nbsp; Autodesk.Revit.DB.<span class="teal">CategorySet</span> catSetTypeOnly
+&nbsp; &nbsp; = doc.Application.Create.NewCategorySet();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Category</span> cat <span class="blue">in</span> cats )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// This property exists.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( cat.AllowsBoundParameters )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// This property is needed.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( cat.AllowsTypeBoundParameters )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; catSetTypeOnly.Insert( cat );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Then I could produce the same list as Revit for these, like this:</p>
+
+<center>
+<img src="img/category_type_instance_param_list.png" alt="Categories supporting type and instance parameters"/>
+</center>
+
+
+
+<p><strong>Answer:</strong> I am sorry to say the Revit API does not currently provide this functionality, so I submitted the wish list item CF-1079 [API wish: access to CategoryInfo hasSymbols -- 09406242] on your behalf for it.</p>
+
+
+<p><strong>Response:</strong> For our immediate needs we developed a set of hardcoded enum's for this task as a workaround.</p>
+
+<p>Please be advised that Equality checks will fail without casting, and Type Safe concerns are not addressed.</p>
+
+<p>Please see attached
+
+<a href="zip/category_type_instance_param_code_example.txt">CodeExample.txt</a>.</p>
+
+
+<p><strong>Answer:</strong> Congratulations on putting together these two useful lists, and thank you very much for sharing them.</p>
+
+<p>I simplified your sample code, and pondered your choice of enum.</p>
+
+<p>I wonder whether it is more efficient performance-wise to use an enumeration of a dictionary for looking up the built-in categories to find out whether they support type or instance parameters, respectively.</p>
+
+<p>Basically, this can be seen as two dictionaries mapping a built-in category to a Boolean yes-no value.</p>
+
+<p>Or just mapping to a yes value, and no answer stands for no.</p>
+
+<p>I looked at a stackoverflow discussion on
+
+<a href="http://stackoverflow.com/questions/3256713/enum-and-performance">
+enum and performance</a>.
+
+<p>In the end, I lean towards the dictionary solution.</p>
+
+<p>I therefore reused your two lists to convert them to dictionaries and define two Boolean predicate methods:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">BuiltInCategory</span> bic = ...;
+&nbsp;
+&nbsp; <span class="blue">bool</span> bType = BicSupportsTypeParameters( bic );
+&nbsp; <span class="blue">bool</span> bInstance = BicSupportsInstanceParameters( bic );
+</pre>
+
+<p>I implemented a new external command CmdCategorySupportsTypeParameter in The Building Coder samples to test them.</p>
+
+<p>I use two simple arrays to store the collections of built-in categories supporting type and instance parameters, respectively:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">#region</span> Built-in categories supporting type parameters
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">BuiltInCategory</span>[]
+&nbsp; &nbsp; _bicAllowsBoundParametersAsType
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BuiltInCategory</span>[]
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Analytical Links</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_LinksAnalytical,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Structural Connections</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_StructConnections,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Structural Fabric Areas</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_FabricAreas,
+
+        . . .
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Walls</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Walls
+&nbsp; &nbsp; &nbsp; };
+&nbsp; <span class="blue">#endregion</span> <span class="green">// Built-in categories supporting type parameters</span>
+
+&nbsp; <span class="blue">#region</span> Built-in categories supporting instance parameters
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">BuiltInCategory</span>[]
+&nbsp; &nbsp; _bicAllowsBoundParametersAsInstance
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">BuiltInCategory</span>[]
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Analytical Links</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_LinksAnalytical,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Analytical Nodes</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_AnalyticalNodes,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Analytical Foundation Slabs</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_FoundationSlabAnalytical,
+
+        . . .
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="gray">///&lt;summary&gt;</span><span class="green">Walls</span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Walls
+&nbsp; &nbsp; &nbsp; };
+&nbsp; <span class="blue">#endregion</span> <span class="green">// Built-in categories supporting instance parameters</span>
+</pre>
+
+<p>They are used to define dictionaries for faster lookup:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">readonly</span> <span class="teal">Dictionary</span>&lt;<span class="teal">BuiltInCategory</span>, <span class="teal">BuiltInCategory</span>&gt;
+&nbsp; &nbsp; _bicSupportsTypeParameters
+&nbsp; &nbsp; &nbsp; = _bicAllowsBoundParametersAsType
+&nbsp; &nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">BuiltInCategory</span>, <span class="teal">BuiltInCategory</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c =&gt; c );
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">readonly</span> <span class="teal">Dictionary</span>&lt;<span class="teal">BuiltInCategory</span>, <span class="teal">BuiltInCategory</span>&gt;
+&nbsp; &nbsp; _bicSupportsInstanceParameters
+&nbsp; &nbsp; &nbsp; = _bicAllowsBoundParametersAsInstance
+&nbsp; &nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">BuiltInCategory</span>, <span class="teal">BuiltInCategory</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c =&gt; c );
+</pre>
+
+<p>These in turn are used to define two efficient Boolean predicate lookup functions:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if the given built-in </span>
+&nbsp; <span class="gray">///</span><span class="green"> category supports type parameters.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> BicSupportsTypeParameters(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _bicSupportsTypeParameters.ContainsKey(
+&nbsp; &nbsp; &nbsp; bic );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if the given built-in </span>
+&nbsp; <span class="gray">///</span><span class="green"> category supports instance parameters.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> BicSupportsInstanceParameters(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span> bic )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> _bicSupportsInstanceParameters.ContainsKey(
+&nbsp; &nbsp; &nbsp; bic );
+&nbsp; }
+</pre>
+
+<p>Here is the external command Execute method implementation to exercise them:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> SupportsOrNotString( <span class="blue">bool</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> b
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;supports&quot;</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;does not support&quot;</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> revit,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = revit.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nCategories = 0;
+&nbsp; &nbsp; <span class="blue">int</span> nSupportType = 0;
+&nbsp; &nbsp; <span class="blue">int</span> nSupportInstance = 0;
+&nbsp; &nbsp; <span class="blue">bool</span> bType, bInstance;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BuiltInCategory</span> bic <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Enum</span>.GetValues( <span class="blue">typeof</span>( <span class="teal">BuiltInCategory</span> ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; bType = BicSupportsTypeParameters( bic );
+&nbsp; &nbsp; &nbsp; bInstance = BicSupportsInstanceParameters( bic );
+&nbsp;
+&nbsp; &nbsp; &nbsp; ++nCategories;
+&nbsp; &nbsp; &nbsp; nSupportType += bType ? 1 : 0;
+&nbsp; &nbsp; &nbsp; nSupportInstance += bInstance ? 1 : 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} {1} instance and {2} type parameters&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; bic,
+&nbsp; &nbsp; &nbsp; &nbsp; SupportsOrNotString( bInstance ),
+&nbsp; &nbsp; &nbsp; &nbsp; SupportsOrNotString( bType ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> caption = <span class="maroon">&quot;Categories supporting type &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;and instance parameters&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Tested {0} built-in categories &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in total, {1} supporting instance and {2} &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;supporting type parameters.&quot;</span>, nCategories,
+&nbsp; &nbsp; &nbsp; nSupportInstance, nSupportType );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;\n&quot;</span> + caption + <span class="maroon">&quot;:\n&quot;</span> + msg );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( caption, msg );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>It tests their return value for each and every built-in category enumeration value and prints a report like this to the Visual Studio debug output window:</p>
+
+<pre>
+  OST_StackedWalls_Obsolete_IdInWrongRange does not
+    support instance and does not support type parameters
+  OST_MassTags_Obsolete_IdInWrongRange does not
+    support instance and does not support type parameters
+  OST_MassSurface_Obsolete_IdInWrongRange
+    does not support instance and does not support type parameters
+  . . .
+  OST_LinksAnalytical supports instance and
+    supports type parameters
+  . . .
+  OST_AnalyticalNodes supports instance and
+    does not support type parameters
+  . . .
+  OST_MatchAll does not support instance and
+    does not support type parameters
+  INVALID does not support instance and
+    does not support type parameters
+
+  Categories supporting type and instance parameters:
+  Tested 919 built-in categories in total,
+  128 supporting instance and 91 supporting type parameters.
+</pre>
+
+<p>I do not see any categories at all that support type parameters and not instance parameters.</p>
+
+<p>Here is the task dialogue summarising the results:</p>
+
+<center>
+<img src="img/category_type_instance_param_report.png" alt="Report on categories supporting type and instance parameters" width="366"/>
+</center>
+
+<p>I published the full source code in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.109.0">
+release 2014.0.109.0</a>.</p>
+
+<p>Many thanks to Todd for providing these two important lists of categories.</p>

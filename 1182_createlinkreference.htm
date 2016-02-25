@@ -1,0 +1,187 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08252121 [Revit API 2014 - create instance on linked face]
+
+08655771 [Reference.CreateLinkReference(RevitLinkInstance) and NewFamilyInstance on linked face]
+
+REVIT-17265 [Reference.CreateLinkReference — 08655771]
+
+REVIT-26646
+
+http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-6a00e553e16897883301a511dae999970c
+
+http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html?cid=6a00e553e16897883301a73dee4fed970d#comment-6a00e553e16897883301a73dee4fed970d
+
+09815448 [IUpdater linked to specific elements?]
+
+Eric AnastasSkidmore, Owings & Merrill LLP
+
+-->
+
+<h3>CreateLinkReference Sample Code</h3>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+Revit 2014 API</a> introduced
+
+a whole bunch of linked RVT document interaction enhancements:</p>
+
+<ul>
+<li>Identifying links</li>
+<li>Obtaining linked documents</li>
+<li>Link creation</li>
+<li>Link load and unload</li>
+<li>Link path type</li>
+<li>Conversion of geometric references</li>
+<li>Room tag creation from linked rooms</li>
+<li>Picking in links</li>
+</ul>
+
+<p>They all provide important and useful functionality.</p>
+
+<p>Let's take a look at one of them in particular as well as another issue that just cropped up:</p>
+
+<ul>
+<li><a href="#2">Conversion of a geometric reference</a> in a linked RVT model</li>
+<li><a href="#3">Triggering a dynamic model updater by specific element ids</a></li>
+</ul>
+
+
+
+
+<a name="2"></a>
+
+<h4>Conversion of a Geometric Reference in a Linked RVT Model</h4>
+
+<p>As stated in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014 API</a>,
+
+"these methods enable conversion between Reference objects that reference the contents of the link and the host, respectively:</p>
+
+<ul>
+<li>Reference.LinkedElementId</li>
+<li>Reference.CreateLinkReference</li>
+<li>Reference.CreateReferenceInLink</li>
+</ul>
+
+<p>This allows an application, for example, to look at the geometry in the link, find the needed face, and convert the reference to that face into a reference in the host suitable for use to place a face-based instance.
+Also, they enable you to obtain a reference in the host (e.g. from a dimension or family) and convert it to a reference in the link, suitable for use in Element.GetGeometryObjectFromReference."</p>
+
+<p>This functionality raised some questions, though, e.g. in the recent comments on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html">
+selecting a face in a linked file</a> by
+
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html?cid=6a00e553e16897883301a511dae999970c#comment-6a00e553e16897883301a511dae999970c">
+Rolando</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html?cid=6a00e553e16897883301a73dee4fed970d#comment-6a00e553e16897883301a73dee4fed970d">
+Paul Marsland</a>:</p>
+
+<p><strong>Question:</strong> Could you please give some example code about the use of Reference.CreateLinkReference(RvtLink) to place a face based family in a linked model.</p>
+
+<p><strong>Question:</strong> Like Rolando, I have been toying (unsuccessfully) with CreateLinkReference since it appeared in the API, documentation and examples of how this is implemented are virtually non existent. I would greatly appreciate a code example showing how a face based family can be attached to a face in a linked file.</p>
+
+<p><strong>Answer:</strong> Here is a sample code snippet from the development team exercising this functionality.
+Note that it includes hard-coded element ids from a specific sample model that you obviously need to modify to suit your own context:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> AddFaceBasedFamilyToLinks( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementId</span> alignedLinkId = <span class="blue">new</span> <span class="teal">ElementId</span>( 125929 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get symbol</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementId</span> symbolId = <span class="blue">new</span> <span class="teal">ElementId</span>( 126580 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> fs = doc.GetElement( symbolId )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Aligned</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">RevitLinkInstance</span> linkInstance = doc.GetElement(
+&nbsp; &nbsp; &nbsp; alignedLinkId ) <span class="blue">as</span> <span class="teal">RevitLinkInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> linkDocument = linkInstance
+&nbsp; &nbsp; &nbsp; .GetLinkDocument();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> wallCollector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( linkDocument );
+&nbsp;
+&nbsp; &nbsp; wallCollector.OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> targetWall = wallCollector.FirstElement()
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> exteriorFaceRef
+&nbsp; &nbsp; &nbsp; = <span class="teal">HostObjectUtils</span>.GetSideFaces(
+&nbsp; &nbsp; &nbsp; &nbsp; targetWall, <span class="teal">ShellLayerType</span>.Exterior )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .First&lt;<span class="teal">Reference</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> linkToExteriorFaceRef
+&nbsp; &nbsp; &nbsp; = exteriorFaceRef.CreateLinkReference(
+&nbsp; &nbsp; &nbsp; &nbsp; linkInstance );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Line</span> wallLine = ( targetWall.Location
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span> ).Curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> wallVector = ( wallLine.GetEndPoint( 1 )
+&nbsp; &nbsp; &nbsp; - wallLine.GetEndPoint( 0 ) ).Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Add to face&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; linkToExteriorFaceRef, <span class="teal">XYZ</span>.Zero,
+&nbsp; &nbsp; &nbsp; &nbsp; wallVector, fs );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+
+
+<a name="3"></a>
+
+<h4>How to Trigger a Dynamic Model Updater by Specific Element Ids</h4>
+
+<p><strong>Question:</strong> Is it possible to create an IUpdater triggered by changes to specific elements?
+Or, in other words, is there a way to make an ElementFilter that only passes a predefined list of element ids?</p>
+
+<p><strong>Answer:</strong> This query is actually answered by a brief glance at the basic IUpdater documentation:</p>
+
+<p>All updaters are activated based on triggers, defined by calling one of the
+
+<a href="http://revitapisearch.com/html/018aac7e-0c20-c988-b6ab-f592d61a4772.htm">
+overloads of the UpdaterRegistry.AddTrigger method</a>.</p>
+
+<p>They all take an ElementFilter argument specifying what criteria the modified elements need to fulfil in order to trigger the event.</p>
+
+<p>The element filter can be as specific as you like, e.g. be based on a list of element ids, a single element id, etc., as you can see from the list of
+
+<a href="http://help.autodesk.com/view/RVT/2014/ENU/?guid=GUID-97F6B396-94D0-4BEC-A4CE-206D24C9F56D">ElementFilter constructors</a>.</p>
+
+<p>The situation where an updated is triggered by changes to one single specific element defined by its element id is illustrated by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/associative-section-view-fix.html#2">
+DynamicModelUpdate AssociativeSection SDK sample</a>.</p>
+
+<p>Here is an overview of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">
+other discussions on the Dynamic Model Updater framework</a>.</p>
+
+
+

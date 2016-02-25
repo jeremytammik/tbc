@@ -1,0 +1,125 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Add-In Wizards for Revit 2015</h3>
+
+<p>I updated my Visual Studio Revit add-in wizards for Revit 2015.</p>
+
+<p>The 2015 version generates the same boilerplate code as the reliable old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+Revit 2014</a> one and its
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#2">
+update</a> did,
+
+which can be simply deleted if not needed.</p>
+
+<p>I selflessly also implemented and tested the Visual Basic version right away.</p>
+
+
+<a name="2"></a>
+
+<h4>Revit Add-in Wizard Customisation</h4>
+
+<p>As I keep pointing out, it is important to understand how easy it is to modify the wizards for your own needs, and make copies with variations to support different requirements.</p>
+
+<p>Here is an overview of previous explanations of various aspects that also show how to create your own flavours:</p>
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64-bit versions</a> for C# and VB.
+
+<li>Support for the
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012 API</a> for
+
+C# and VB.
+
+<li>Updated C# and VB versions placing
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#3">
+assembly DLL alongside add-in manifest</a>.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/add-in-wizard-for-revit-2013.html">
+Revit 2013 C#</a> version including more skeleton code.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/update-api-assembly-references-and-wizards.html#4">
+Revit 2013 VB</a> version.</li>
+
+<li>C# and VB
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+add-in wizards for Revit 2014</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#2">
+Wizard update</a>
+
+suppressing the processor architecture mismatch warning and referring to Revit Onebox instead of the architectural flavour.</li>
+
+<li>Wizard generating a
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">
+multi-version add-in</a>  supporting
+
+both Revit 2013 and 2014.</li>
+
+</ul>
+
+<p>Just like for Revit 2014, the Revit 2015 add-in wizard uses the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html#2">
+$(ProgramW6432)</a> Visual Studio project template variable to determine where to locate the Revit API assembly files for referencing and the Revit.exe executable for debugging.</p>
+
+
+<a name="3"></a>
+
+<h4>Revit Add-in Wizard Usage</h4>
+
+<p>Simply install the wizard zip files you need in the appropriate locations, start up Visual Studio, create a new C# or VB Revit add-in project using the wizard default settings, and immediately hit F5 to start up Revit.exe in the debugger.
+
+<p>The wizards perform the following functions for C# and VB, respectively:</p>
+
+<ul>
+<li>Generate the skeleton source code, Visual Studio solution and add-in manifest.</li>
+<li>On successful build, copy the add-in assembly DLL and add-in manifest to the Revit add-in folder, thus automatically installing it for Revit to pick up and load.</li>
+<li>Define the add-in debugging settings to start up the Revit.exe program.</li>
+</ul>
+
+<p>Therefore, immediately after the initial add-in creation, you can immediately launch the debugger.
+The add-in is compiled, Revit is started up, the add-in is loaded, you can select the new external command in the External Tools menu, launch and test it immediately without entering one single further keystroke yourself.</p>
+
+<p>The new command even executes in zero document state, although the default external command skeleton implementation throws an exception trying to access a property on the current UI document, which is null.
+It shows you that everything is working correctly right away, though.</p>
+
+
+<a name="4"></a>
+
+<h4>Wizard Download and Installation</h4>
+
+<p>The appropriate locations to install the wizards for Visual Studio to pick them up are language dependent.</p>
+
+<p>Copy the zip file of your choice to the matching Visual Studio project template folder in your local file system:
+
+<ul>
+<li>C# &ndash; copy <a href="zip/Revit2015AddinWizardCs1.zip">Revit2015AddinWizardCs1.zip</a> to
+<br>[My Documents]\Visual Studio 2012\Templates\ProjectTemplates\Visual C#
+<li>Visual Basic &ndash; copy <a href="zip/Revit2015AddinWizardVb1.zip">Revit2015AddinWizardVb1.zip</a> to
+<br>[My Documents]\Visual Studio 2012\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>I hope you find this useful and look forward to hearing any suggestions for improvement you come up with.</p>
+
+<p>Better still, implement them yourself and let us know where to pick them up  :-)</p>

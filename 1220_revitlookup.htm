@@ -1,0 +1,174 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+10040469 [Target .NET framework for Addin compatible with Revit 2013, 2014, and 2015]
+
+-->
+
+<h3>Past, Future, Frameworks, RevitLookup and Hackathon</h3>
+
+<p>Today, let me ask you to test my <a href="#2">RevitLookup future-proofing update</a> and mention a discussion on the use of the <a href="#3">.NET 4.5 framework for Revit 2013, 2014 and 2015</a>.</p>
+
+<p>I am sitting here writing this among the swans and gulls, squinting in the autumn sunshine on the shore of the Zurich Lake.</p>
+
+<p>Later, I visited the nearby
+
+<a href="http://www.kronenhalle.ch">Kronenhalle</a>,
+
+a rather exclusive restaurant highly praised year in and year out by gourmet Christian Seiler, e.g.
+
+<!-- in the Magazin -->
+
+<a href="http://www.christianseiler.com/zurichs-legende.html">2011</a>,
+<a href="http://www.christianseiler.com/das-tor-zur-schweiz.html">2012</a> and
+<a href="http://blog.dasmagazin.ch/2014/09/20/kronenhalle-der-schoepfung">2014</a>.</p>
+
+<p>With all that praise I had to take a look and have a last quick bite before diving into the
+
+<a href="http://hackzurich.com">HackZurich</a> hackathon
+
+for the rest of the weekend.</p>
+
+<p>It turned out not to be my cup of tea, though; dark, too carnivorous, no vegetarian dishes.
+I ended up having just a tomato soup, dessert and coffee  :-)</p>
+
+
+<a name="2"></a>
+
+<h4>Future Proofing RevitLookup</h4>
+
+<p>I updated RevitLookup to eliminate the compiler warnings due to deprecated and obsolete Revit API usage.</p>
+
+<p>These are the warnings I addressed, with the Selection.Elements one occurring in numerous locations:</p>
+
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewViewDrafting() is obsolete: This method is obsolete in Revit 2015.  Use ViewDrafting.Create() instead.</li>
+<li>Autodesk.Revit.DB.Definitions.Create(string, Autodesk.Revit.DB.ParameterType, bool) is obsolete: This method is deprecated in Revit 2015. Use Create(Autodesk.Revit.DB.ExternalDefinitonCreationOptions) instead</li>
+<li>Autodesk.Revit.DB.Family.Symbols is obsolete: This property is obsolete in Revit 2015.  Use Family.GetFamilySymbolIds() instead.</li>
+<li>Autodesk.Revit.DB.FormatOptions.GetName() is obsolete: This method is deprecated in Revit 2015.  Use UnitUtils.GetTypeCatalogString(DisplayUnitType) instead.</li>
+<li>Autodesk.Revit.UI.Selection.SelElementSet is obsolete: This class is deprecated in Revit 2015. Use Selection.SetElementIds() and Selection.GetElementIds() instead.</li>
+<li>Autodesk.Revit.UI.Selection.Selection.Elements is obsolete: This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.</li>
+</ul>
+
+<p>The complete updated source code, Visual Studio solution and add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>,
+
+and the current future-proofed version is stored there as
+
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2015.0.0.2">release 2015.0.0.2</a>.</p>
+
+<p>By the way, I am very surprised that nobody at all has reported any bugs or improvements on the last version.</p>
+
+<p>What's up, guys 'n gals?</p>
+
+<p>Please download, install and use this version to ensure that I did not introduce any errors is it.</p>
+
+<p>And please let me know about any problems, solutions and enhancements.</p>
+
+<p>Thank you!</p>
+
+<p>I had another interesting conversation related to future (and past-) proofing and supporting multiple version add-ins in the past few days:</p>
+
+
+<a name="3"></a>
+
+<h4>Compiling Using .NET 4.5 for Revit 2013, 2014 and 2015</h4>
+
+
+<p><strong>Question:</strong> The SDK documentation for Revit 2013 explicitly requires compiling to .NET Framework 4.0, while the Revit 2015 SDK explicitly requires Framework 4.5.</p>
+
+<p>As far as I can tell, the .NET framework 4.5 is
+
+<a href="http://msdn.microsoft.com/en-us/library/ff602939(v=vs.110).aspx">
+backwards compatible</a> with
+
+apps built in Framework 4.0.</p>
+
+<p>Therefore, is there any issue with compiling an app for all three Revit versions, 2013, 2014 and 2015, using the 4.5 framework?</p>
+
+
+<p><strong>Answer:</strong> It is probably possible to compile a Revit add-in with the .NET 4.5 framework and load it into all three versions of Revit, provided that there have been no changes in any of the Revit API interfaces that it uses.</p>
+
+<p>In fact, I demonstrated a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/multi-version-add-in.html">
+multi-version add-in</a> that
+
+was compiled for both Revit 2012 and 2013.</p>
+
+<p>It even uses reflection to check which of the two it is running in, and access new Revit 2013 API functionality, if available, reverting to implementing equivalent functionality for itself if not.</p>
+
+<p>However, I can give you no guarantees whatsoever, and you are doing this completely at your own risk.</p>
+
+<p>In a way, the question is pointless, since you will have to try it out for yourself anyway.</p>
+
+<p>There is a significant risk that you will run into Revit API functionality that you cannot avoid using and whose signature has changed between these three releases.</p>
+
+<p>Such changes can be handled: every such access will require the use of .NET reflection to determine which API version you need to address and access it appropriately.</p>
+
+<p>Two releases can be easily bridged. Three will be a bit more work.</p>
+
+<p>The standard solution used by developers supporting several versions of Revit is to recompile the add-in for each version, but use one single code base and possibly even define all the different Revit versions as separate targets within one single Visual Studio solution.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">
+multi-version wizard</a> generates
+
+a complete Visual Studio solution supporting several Revit target releases for you with a single click.</p>
+
+
+
+<p><strong>Response:</strong> Thanks for your help. Indeed it seems to be working just fine in all three versions when I target 4.5.</p>
+
+<p>It does make use of version-specific Revit API assembly DLLs, since it uses a handful of commands that changed across versions:</p>
+
+<ul>
+<li>Doc.ActiveView.IsolateElementsTemporary(iCollIds) vs doc.ActiveView.IsolateElementsTemporary(listIds)</li>
+
+<li>Element.GetMaterialArea(materialId, false) vs element.GetMaterialArea(material)</li>
+
+<li>Element.GetMaterialVolume(materialId) vs element.GetMaterialVolume(material)</li>
+
+<li>Element.GetMaterialIds vs element.Materials</li>
+
+<li>LinkInstance.GetLinkDocument().Title vs ModelPathUtils.ConvertModelPathToUserVisiblePath(linkInstance.GetExternalFileReference().GetAbsolutePath())</li>
+</ul>
+
+<p>What I was more concerned with was whether I needed to change nuget packages as well based on different target .NET frameworks.</p>
+
+<p>Apparently, given my testing thus far, the add-ins for Revit 2013, 2014 and 2015 API can all be compiled, loaded and executed correctly targeting the .NET 4.5 framework.</p>
+
+<p>This is obviously not a 100% sure thing, given that there may be some edge cases from which conflicts arise.</p>
+
+<p>I found it helpful to set up a static class with regions called “Revit2013”, “Revit2014”, and “Revit2015”, each of which contains static methods that are appropriate only to that particular Revit API version. That way, when I change out which Revit API version is referenced, I can just comment in and comment out a few lines. Since it’s just a handful of methods that vary, I can the vast majority of my code base is version agnostic and hence much easier to manage.</p>
+
+<p><strong>Answer:</strong> Yes, when targeting several different versions with small variations, it is definitely important to isolate and manage the differences well and effectively.</p>
+
+<p>You could also use pre-processor pragmas, e.g. #define REVIT_2015_TARGET and #if REVIT_2015_TARGET, to switch on and off certain sections of code.</p>
+
+<p>Commenting and uncommenting them sounds a bit error prone to me, or anyway like a manual and thus potentially fallible approach.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/multi-version-add-in.html">
+multi-version add-in</a> compiled
+
+for Revit 2012 and 2013 avoids making use of compile-time pragmas, because it differentiates at run time and sets a Boolean variable instead.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">
+multi-version Visual Studio solution wizard</a> does
+
+use them, though.</p>
+
+<p>Possibly, a combination of the static classes you describe with pre-processor pragmas could provide the most efficient solution.</p>
+
+<p>As soon as you notice these pragmas being sprinkled around the code all too liberally, it is best to implement a method that isolates the respective code differences into one of the static version-specific helper classes.</p>

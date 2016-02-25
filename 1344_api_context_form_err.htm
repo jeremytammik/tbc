@@ -1,0 +1,172 @@
+<head>
+<meta http-equicenter="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+http://stackoverflow.com/questions/31490990/starting-a-transaction-from-an-external-application-running-outside-of-api-conte
+
+#revitapi #adsk #bim #geometry #aec #python #adskdevnetwrk
+#3dwebcoder #cloud #restapi
+#3dwebcoder #grevit
+#dotnet #csharp
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Revit API Context and Form Creation</h3>
+
+<p>I am back from my vacation.
+I had a wonderful time.</p>
+
+<p>Now, let's look at two important recurring topics that came up while I was away:</p>
+
+<ul>
+<li><a href="#2">Revit API Context Summary</a>.</li>
+<li><a href="#3">Detailed Form Creation Error Information</a>.</li>
+</ul>
+
+
+<a name="1"></a>
+
+<p>Before getting to those, let me mention some of the nice places and mountain tours I was blessed with in the past few weeks:</p>
+
+<ul>
+<li>Pallanza and the Lago Maggiore:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-07-14_pallanza/722_sunset.jpg" alt="Pallanza sunset" width="300"/>
+</center>
+
+
+
+<li>Mont Blanc, mountaneering and climbing around the Cabane d'Orny:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-07-18_mont_blanc/jogi/2015-07-18_HT_038.jpg" alt="Sunrise on the glacier above Cabane d'Orny" width="300"/>
+</center>
+
+
+<li>Monte Leone above Locarno (<a href="https://www.facebook.com/media/set/?set=a.10206313375086153.1073741837.1019863650&type=1&l=46a726a900">photo album)</a>:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-07-22_monte_leone/770.jpg" alt="Monte Leone" width="300"/>
+</center>
+
+
+<li>Pizzo Stella and Pizzo Groppera:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-07-25_pizzo_stella/michael/3732.jpg" alt="Pizzo Stella" width="300"/>
+</center>
+
+
+<li>Les Monnins Dessous and some creative art:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-08-01_jusoca/moni/20150803_190352.jpg" alt="Painting with Moni at les Monnins Dessous" width="300"/>
+</center>
+
+<li>Levantina and Val Sambuco, hiking, cooking, bivouacing:</li>
+
+<center style="margin-top:0.4em">
+<img src="file:////j/photo/jeremy/2015/2015-08-08_sambuco_levantina/franziska/3668_jeremy.jpg" alt="Between Levantina and Val Sambuco" width="300"/>
+</center>
+
+
+</ul>
+
+<p>Now I am refreshed and happily back at work, so let's continue with the
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">
+Revit API discussion forum</a> and
+look at those Revit API issues:</p>
+
+
+<a name="2"></a>
+
+<h4>Revit API Context Summary</h4>
+
+<p>This kind of question comes up on a regular basis, and is discussed in the topic group on
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+driving Revit from outside</a>;
+now Daren Thomas provided a beautifully succinct answer that says it all in the StackOverflow discussion on
+<a href="http://stackoverflow.com/questions/31490990/starting-a-transaction-from-an-external-application-running-outside-of-api-conte">
+starting a transaction from an external application running outside of API context is not allowed</a>:</p>
+
+<p><strong>Question:</strong>
+
+Starting a transaction from an external application running outside of API context is not allowed.
+Cannot start transaction.</p>
+
+<p><strong>Answer:</strong>
+
+Using my magic psychic crystal ball to guess you are asking how to avoid getting this error message in your Revit / RPS plugins, here is a short bit of extra information:</p>
+
+<ul>
+<li>all Revit API calls should happen inside the "API context"</li>
+<li>this "API context" lives in a special thread</li>
+<li>you are probably accessing the API from another thread</li>
+<li>this often happens when you make a <code>Form</code> and call into the API from one of the events, e.g., <code>Button.OnClick</code></li>
+</ul>
+
+<p>What you want to do is figure out how to get back into the API context to execute your code.
+There are two main methods for doing this, assuming you have already left the <code>IExternalCommand.Execute</code> context:</p>
+
+<ul>
+<li>polling for jobs inside the <code>Idling</code> event</li>
+<li>using an <code>ExternalEvent</code></li>
+</ul>
+
+<p>Since you mentioned RevitPythonShell in the tags, why don't you check out how I used
+<a href="http://darenatwork.blogspot.ch/2015/06/embedding-webserver-in-autodesk-revit_30.html">
+external events in my web server example</a>.</p>
+
+<ul>
+<li>create an IExternalEventHandler</li>
+<li>implement its Execute method, which runs in the Revit API context</li>
+<li>create an <code>ExternalEvent</code> (using the event handler just created)</li>
+<li>when you need to do something in the Revit API context, notify the external event via <code>my_external_event.Raise()</code></li>
+</ul>
+
+<p>As said, The Building Coder provides more details and other samples in the topic group on
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+driving Revit from outside</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Detailed Form Creation Error Information</h4>
+
+<p><strong>Question:</strong>
+
+How can I receive detailed error messages from failed geometry creation calls?</p>
+
+<p>I'm making a call to the doc.FamilyCreate.NewSweptBlendForm method.</p>
+
+<p>However, it throws an exception: Autodesk.Revit.Exceptions.InvalidOperationException.</p>
+
+<p>Unfortunately, the message of the exception is "Cannot create swept blend form."</p>
+
+<p>This does not provide much information, and it's difficult to debug with just this in hand.</p>
+
+<p>Is there any more detailed information that I can access when a call like this fails?</p>
+
+<p><strong>Answer:</strong>
+
+Unfortunately, the answer is No, not at this moment. The API method makes a direct call to a native method in Revit core which returns an error value, which &ndash; again unfortunately &ndash; seem to be only either SUCCESS or FAILURE. Additional observation can be made by debugging the concrete case, but for the caller, there is no additional info Revit API can provide. Sorry about that.</p>
+
+<p>The best approach for now might be to create model lines from the input that you are passing into the NewSweptBlendForm method and then execute the sweep in the manual user interface instead. That often provides more detailed info on what is going wrong, as explained in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/debug-geometric-form-creation.html">
+debugging geometric form creation</a>.</p>

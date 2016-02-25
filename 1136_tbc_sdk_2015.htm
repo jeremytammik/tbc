@@ -1,0 +1,231 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Compiling the Revit 2015 SDK and Migrating Bc Samples</h3>
+
+<p>As I announced yesterday, Revit 2015 was
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revit-2015-released.html">
+released last week, the Revit SDK was posted and updated</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-revit-2015.html">
+RevitLookup for Revit 2015 is available on GitHub</a>,
+
+the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revit-2015-api-news-devdays-online-recording.html">
+DevDays Online presentation</a> on
+
+the new API functionality is available, and I migrated The Building Coder samples to Revit 2015.</p>
+
+<p>After doing so, I went out and spent a few hours on a hill enjoying the full moon &ndash; enjoying nature, some time, some space for myself &ndash; ca. 380.000 km of space in the direction of the moon, a bit more in some other directions  :-)
+This picture was taken by my friend Anja the day before:</p>
+
+<center>
+<img src="img/pre_full_moon_2014-04.jpeg" alt="The almost full moon in April 2014" width="300"/>
+</center>
+
+
+<p>Here is an overview of the steps I took, some of which you probably need to take as well to set yourself up ship-shape for Revit 2015 add-in development:</p>
+
+<ul>
+<li><a href="#2">Download, compile and install RevitLookup</a></li>
+<li><a href="#3">Compile the Revit 2015 SDK</a></li>
+<li><a href="#4">Set up RvtSamples</a></li>
+<li><a href="#5">Migrate The Building Coder samples</a></li>
+<li><a href="#6">Download The Building Coder samples</a></li>
+</ul>
+
+<p>For more details and other approaches, please refer back to my description of the steps to achieve more or less the same goals when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/compiling-the-revit-2014-sdk.html">
+compiling the Revit 2014 SDK</a>.
+
+You can bet I did some of it differently last time around.</p>
+
+<p>By the way, the good news is that it is much simpler this time, and getting simpler every release.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Download, Compile and Install RevitLookup</h4>
+
+<p>All you need to do for RevitLookup is clone the
+
+<a href="https://github.com/jeremytammik/RevitLookup">
+RevitLookup GitHub repository</a>,
+
+compile and install as usual.</p>
+
+
+<a name="3"></a>
+
+<h4>Compiling the Revit 2015 SDK</h4>
+
+<p>Before migrating The Building Coder samples, I downloaded and compiled the updated Revit 2015 SDK from the
+
+<a href="http://www.autodesk.com/developrevit">
+Revit Developer Centre</a>:</p>
+
+<ul>
+<li><a href="http://images.autodesk.com/adsk/files/REVIT2015SDK0.msi">
+Revit 2015 SDK (Update April 11, 2014)</a> (msi - 242779Kb)</li>
+</ul>
+
+<p>The Revit SDK includes a master Visual Studio solution file SDKSamples2015.sln, so you basically just have to open that in Visual Studio 2012 and say 'build all'.</p>
+
+<p>There is one small issue to deal with first, though: where are your Revit API assemblies located, and where do the Visual Studio project files expect them to be?</p>
+
+<p>The latter is defined by the HintPath tag in the project files.
+Go take a look in one of them with a text editor, e.g. Notepad.</p>
+
+<p>I currently only have Revit Architecture 2015 installed, and the SDK apparently assumes by default that you have Revit One-box installed, so I needed to update all the Revit API references &ndash; or find another solution to ensure they are found.</p>
+
+<p>The most stupid approach would be to go and manually edit each and every one of the over hundred Revit SDK project files using the Visual Studio IDE.</p>
+
+<p>A less stupid approach would be to edit all the project files globally in an editor, e.g. using search and replace functionality to modify the HintPath tag value.</p>
+
+<p>This can also be done for you fully programmatically, e.g. by my jhint utility, or using the RevitAPIDllsPathUpdater.exe utility provided in the Revit SDK.</p>
+
+<p>I implemented jhint back in the year 2008, to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/the-sdk-samples.html">
+process the Revit 2009 SDK project files</a>.</p>
+
+<p>Yet another option, and possibly the most elegant of all, is to simply copy the Revit API assemblies into the expected locations and avoid modifying any project files at all, as I explained when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/update-api-assembly-references-and-wizards.html#2">
+updating the API assembly references</a> for
+
+the Autodesk Building Design Suite Ultimate 2013.</p>
+
+<p>That is what I did this time around, after checking the current values of the HintPath tags using jhint.exe.</p>
+
+<p>I thus executed the following commands to discover the required assembly reference paths and ensure that they are found where expected:</p>
+
+<pre>
+  cd C:\a\lib\revit\2015\SDK\Samples
+
+  jhint -v -r *proj | sort | uniq
+
+  cd C:\Program Files\Autodesk\Revit Architecture 2015
+
+  cp RevitAddInUtility.dll RevitAPI.dll RevitAPIIFC.dll
+    RevitAPIUI.dll "..\Revit 2015"
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Setting up RvtSamples</h4>
+
+<p>If you want to run and test any of the SDK samples, you again have a choice between the laborious approach and the automated one.</p>
+
+<p>It would be rather laborious to install a separate add-in manifest for each of the over hundred external commands defined by the Revit SDK samples.</p>
+
+<p>You can save yourself the effort by installing one single external application instead, RvtSamples.</p>
+
+<p>It reads a text file defining the path and external command implementation name of each of the samples and sets up one big menu of them all for you.</p>
+
+<p>As always, I added the add-in manifest RvtSamples.addin and the input text file RvtSamples.txt to the RvtSamples project files to make them easier to open and manipulate.</p>
+
+<p>In RvtSamples.txt, I replaced the default Revit SDK installation location by my personal installation folder, i.e. search and replace globally</p>
+
+<pre>
+  C:\Revit 2015 SDK\
+  --&gt;
+  C:\a\lib\revit\2015\SDK\
+</pre>
+
+<p>That was it, and here is the ribbon panel containing the RvtSamples top level menu:</p>
+
+<center>
+<img src="img/2015_rvtsamples.png" alt="RvtSamples in Revit 2015"/>
+</center>
+
+
+
+<a name="5"></a>
+
+<h4>Migrating The Building Coder Samples</h4>
+
+<p>We should be pretty well set for the migration, having already
+
+<!--
+<a href="http://thebuildingcoder.typepad.com/blog/2013/02/eliminating-compiler-warnings-and-deprecated-calls.html">
+eliminated all the compiler warnings</a> beforehand.</p>
+-->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/future-proofing-the-building-coder-samples.html">
+future proofed The Building Coder samples</a>.</p>
+
+<p>All I have to do is perform the same steps I already described for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revitlookup-for-revit-2015.html">migration of RevitLookup to Revit 2015</a>:</p>
+
+<ul>
+<li>Update the RevitAPI.dll and RevitAPIUI.dll references.</li>
+<li>Change the .NET framework from 4.0 to 4.5.</li>
+<li>Updated the version number to 2015.0.109.0.</li>
+<li>Rebuild all.</li>
+</ul>
+
+<p>As expected, an error is generated in the CmdSheetSize.cs module:</p>
+
+<ul>
+<li>'Autodesk.Revit.DB.Document' does not contain a definition for 'TitleBlocks' and no extension method 'TitleBlocks' accepting a first argument of type 'Autodesk.Revit.DB.Document' could be found (are you missing a using directive or an assembly reference?)
+<br/>CmdSheetSize.cs line 86</li>
+</ul>
+
+<p>The TitleBlocks property was declared deprecated in the Revit 2014 API, and removed in Revit 2015, so we now have no choice but to remove it.</p>
+
+<p>The replacement code using a filtered element collector is already in place, and has been so for years now.</p>
+
+<p>That done, the project compiles successfully, still generating
+
+<a href="zip/bc_migr_2015_a.txt">72 warnings</a>.</p>
+
+<p>I will happily leave them in for now.</p>
+
+<p>In order to test the samples, we need to update the RvtSamples include file BcSamples.txt, and adapt RvtSamples.txt to refer to and include it.</p>
+
+<p>I added the following line to the end of RvtSamples.txt:</p>
+
+<pre>
+  #include C:\a\lib\revit\2015\bc\BcSamples.txt
+</pre>
+
+<p>In BcSamples.txt, I updated the paths referring to all the external commands we define, just like above for RvtSamples.txt itself, by globally replacing the 110 occurrences of the old root path by the new:</p>
+
+<pre>
+  C:\a\lib\revit\2014\bc\
+  --&gt;
+  C:\a\lib\revit\2015\bc\
+</pre>
+
+<p>Starting up Revit 2015 and looking at the menu generated by the RvtSamples external application, you now see the two entries with over one hundred sub-entries added by The Building Coder samples via the BcSamples.txt include file:</p>
+
+<center>
+<img src="img/2015_rvtsamples_plus_bc.png" alt="RvtSamples including The Building Coder samples for Revit 2015"/>
+</center>
+
+
+
+<a name="6"></a>
+
+<h4>Download The Building Coder Samples</h4>
+
+<p>The complete source code, Visual Studio solution and RvtSamples include file is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.109.0">
+release 2015.0.109.0</a>.</p>
+
+<p>I wish you good luck, lots of fun and zero hassles getting started with Revit 2015 and migrating your applications.</p>

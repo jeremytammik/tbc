@@ -1,0 +1,131 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>DevDays Conference and Meetup in Paris</h3>
+
+<p>I left Autodesk University, Las Vegas, and travelled to Paris via London.</p>
+
+
+<a name="2"></a>
+
+<h4>DevDay and Meetup</h4>
+
+<p>Today, we held the first West European
+
+<a href="https://twitter.com/hashtag/devdays2014">
+DevDays</a> conference
+
+here, followed by a meetup on reality capture, 3D on the web and 3D printing in the
+
+<a href="https://en.wikipedia.org/wiki/Ecole_des_ingenieurs_de_la_Ville_de_Paris">
+Ecole des ingenieurs de la Ville de Paris</a> (<a href="http://www.eivp-paris.fr">eivp-paris.fr</a>).</p>
+
+<p>From here, we continue to
+
+<a href="file:///a/doc/revit/blog/1199_devdays_hack_calendar.htm#2">London, Gothenburg, Munich and Milano</a> during the coming ten days.</p>
+
+
+<a name="3"></a>
+
+<h4>Jasper</h4>
+
+<p>Unexpectedly, I got to meet Jasper Desmet, whom I previously only knew by email.
+Last year, he presented his
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/football-and-space-adjacency-for-heat-load-calculation.html#3">
+space adjacency for heat load calculation</a> here
+
+on The Building Coder.
+He is now studying at
+
+<a href="http://en.wikipedia.org/wiki/42_(school)">
+ecole 42</a> (<a href="http://www.42.fr">42.fr</a>),
+
+an exciting programming school inspired by new modern learning methods including peer-to-peer pedagogy, adding some programming experience to his construction engineering knowledge to create interesting opportunities in CAD.</p>
+
+<a name="4"></a>
+
+<h4>Vélib'</h4>
+
+<p>Once again &ndash; like a couple of years ago, in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/filtered-element-collector-sample-overview.html">December 2010</a> &ndash;
+
+I have been making extensive use of the wonderful Parisian
+
+<a href="http://en.wikipedia.org/wiki/V%C3%A9lib%27">
+Vélib'</a> bicycle
+
+rental system, e.g. here at the
+
+<a href="https://en.wikipedia.org/wiki/Centre_Georges_Pompidou">Centre Pompidou</a>:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-12-06_paris/20141206_130423_cropped.jpg" alt="Vélib' rental station at Centre Pompidou" width="426"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Aaron Lu's New Posts</h4>
+
+<p>While I was underway at Autodesk University and getting here, my new colleague
+
+<a href="http://adndevblog.typepad.com/aec/aaron-lu.html">Aaron Lu</a> in China has been very productive, publishing 12 articles on the Chinese blog and 3 on the international AEC DevBlog:</p>
+
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-how-to-get-dwgexportoptions.html">How to get DWGExportOptions</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-how-to-get-switch-system-from-familyinstance.html">How to get MEP switch system from FamilyInstance</a></li>
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/code-formatting-in-typepad-blog.html">Code formatting for blog publication</a></li>
+</ul>
+
+
+<a name="6"></a>
+
+<h4>Round Window Opening Geometry &ndash; Or Not</h4>
+
+<p>Pretty obvious, once you think about it: if an element has no solid geometry of its own, you cannot retrieve any solid for it:</p>
+
+<p><strong>Question:</strong> I have a round window opening in a wall like this:</p>
+
+<center>
+<img src="img/get_round_window_geometry.jpg" alt="Round window opening" width="300"/>
+</center>
+
+<p>However, I am unable to obtain any geometry information from this family instance and the round shape window symbol.
+I was able to retrieve their solids, but they have are no faces or edges.
+You can also see it using RevitLookup and the ElementViewer SDK sample.</p>
+
+<p>Is there any way to get the geometry information for these round shaped windows?</p>
+
+<p><strong>Answer:</strong> There should be no trouble reading the geometry of this type of window.
+It will either contain solids or a GeometryInstance or both.
+If you only find empty solids, please provide the sample model for us to explore.</p>
+
+<p><strong>Response:</strong> I explored this window opening with the ElementViewer sample and it still seems to have an empty solid.</p>
+
+<p><strong>Answer:</strong> Ahaaa... this window is just a cut-out &ndash; there is no glass or other substance here.
+Therefore, the family instance does not have any own geometry, just a void.
+The only way to determine the shape of the void is to look at what it does to its host.</p>
+
+
+<a name="7"></a>
+
+<h4>DuckDuckGo</h4>
+
+<p>By the way, talking about searching for answers...</p>
+
+<p>My son recommended that I boycott Google and start using the
+
+<a href="https://duckduckgo.com">DuckDuckGo</a> search engine instead.</p>
+
+<p>They guarantee not to track your information (or any information whatsoever, for that matter), provide more transparent search algorithms, are completely open source and
+
+<a href="http://duckduckhack.com">
+easily extensible</a>.</p>
+
+<p>So far, I like it very much!</p>
+
+<p>Tomorrow, we'll take off for the next venue in good old Blighty.</p>

@@ -1,0 +1,209 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10227186 [壁の元形状の取得方法]
+
+-->
+
+<h3>DevDays Conference at Autodesk University</h3>
+
+<p>Today we held the DevDay Conference at AU.
+Exciting stuff.</p>
+
+<p>Before getting to that, let me add one little Revit API exploration that I performed much later in the day, getting closer to midnight, after the ADN party;
+prompted by my colleague Katsuaki Takamizawa in Japan, I migrated the old Revit 2012 GeometryPartsAnalyzer add-in analysing detailed part layer geometry by splitting selected walls into parts in a temporary transaction using PartUtils.CreateParts to Revit 2015.</p>
+
+<ul>
+<li><a href="#1">GeometryPartsAnalyzer retrieving detailed wall layer geometry migrated</a></li>
+<li><a href="#2">The DevDays 10x theme</a></li>
+<li><a href="#3">Autodesk Exchange</a></li>
+<li><a href="#4">Fusion 360</a></li>
+<li><a href="#5">The A360 platform &ndash; from beta to production</a></li>
+<li><a href="#6">Virtual reality for the masses &ndash; and you too!</a></li>
+<li><a href="#7">Afternoon breakout sessions for desktop platforms</a></li>
+<li><a href="#8">Still a chance to join!</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>GeometryPartsAnalyzer Retrieving Detailed Wall Layer Geometry Migrated</h4>
+
+<p>Back in the Revit 2012 time frame, Marcelo Quevedo implemented the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">
+GeometryPartsAnalyzer add-in for retrieving detailed wall layer geometry</a>.</p>
+
+<p>That is an interesting tool and demonstrates interesting technology that is still useful and important today, touching on the topics of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">
+retrieving detailed wall layer geometry</a>,
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.39">
+splitting an element into parts</a> and making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html">
+temporary transaction trick</a>.
+
+<p>To migrate to the current version and keep clear track of the exact steps taken, I published it in its own new
+
+<a href="https://github.com/jeremytammik/GeometryPartsAnalyzer">
+GeometryPartsAnalyzer GitHub repository</a> and
+
+created a release before and after each migration step, so you can now easily see the exact differences caused by moving
+
+<a href="https://github.com/jeremytammik/GeometryPartsAnalyzer/compare/2012.0.0.0...2014.0.0.0">from Revit 2012 to Revit 2014</a> and
+
+<a href="https://github.com/jeremytammik/GeometryPartsAnalyzer/compare/2014.0.0.0...2015.0.0.0">from Revit 2014 to Revit 2015</a>.</p>
+
+<p>OK, so much for that.
+Back to the main event of the day:</p>
+
+
+<center>
+<img src="img/DevDays_2014_2b.png" alt="DevDays 2014" width="400"/>
+</center>
+
+<a name="2"></a>
+
+<h4>The DevDays 10x Theme</h4>
+
+<p>This year's DevDays conference theme is <span style="font-size:1000%; font-weight:bold; color:orange; text-decoration:blink;">10x</span></p>
+
+<p>A fundamental disruption of the software industry is happening right now, and there is no way for anyone to avoid it.</p>
+
+<p>Let's examine this opportunity for Autodesk and all partners to take advantage of it to grow our customer base by 10x and revenue by 2x &ndash; an opportunity like this only comes by once in twenty years &ndash; seize it now or risk becoming irrelevant in the next couple of years.</p>
+
+<p>Our tour of DevDays 2014 developer conferences completed in Asia and Australia in November.</p>
+
+<p>I am attending it here at Autodesk University in Las Vegas today and in the Western European venues in the coming two weeks: Paris, London, Gothenburg, Munich and Milano.</p>
+
+<p>There is still time to apply to join us there (cf. <a href="#8">below</a>) &ndash; come and learn how you can take advantage of new technologies to grow your business reach by a factor of ten.</p>
+
+<p>The DevDays events have always been the best way for Autodesk Developer Network partners keep up to date with new and upcoming technology and features.  Now let's leverage what we are doing to expand with new technology and to new customers.</p>
+
+<p>We cover the Autodesk cloud and mobile APIs and, of course, new features and APIs for the desktop products too.</p>
+
+<!--
+<p>Even if you are not an ADN member and are interested in this event, we invite you view the information, locations and schedule at
+
+<a href="http://www.autodeskdevdays.com">www.autodeskdevdays.com</a>.
+
+ADN members can register via that website.
+Non-ADN members can contact us at <a href="mailto:devdaysinfo@autodesk.com">devdaysinfo@autodesk.com</a>.
+Material demonstrated and discussed at DevDays is confidential and under Non-disclosure Agreement.</p>
+
+<p>Actually, it is interesting to note that the orientation towards cloud and mobile is reducing the amount of confidentiality.</p>
+
+<p>Most of the material discussed is not all that confidential after all.</p>
+
+-->
+
+
+<center>
+<img src="img/devday_au_2014.jpg" alt="DevDays at AU 2014" width="400"/>
+</center>
+
+<a name="3"></a>
+
+<h4>Autodesk Exchange</h4>
+
+<p>Jim discussed improvements made to the Autodesk Exchange AppStore, current trends, how to grow towards more sales.</p>
+
+<p>Philippe demonstrated real code showing how to maximise sales by taking advantage of the
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/03/how-to-protect-my-intellectual-property-of-my-app-on-autodesk-exchange-part-1.html">
+term based sales and entitlement REST API</a>
+
+(<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/04/how-to-protect-my-intellectual-property-of-my-app-on-autodesk-exchange-part-2.html">2</a>,
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/05/how-to-protect-my-intellectual-property-of-my-app-on-autodesk-exchange-part-3.html">3</a>) and
+
+how to
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/04/autodesk-exchange-selling-your-web-services-on-a-monthly-subscription.html">
+sell web services on the store</a>.</p>
+
+
+<a name="4"></a>
+
+<h4>Fusion 360</h4>
+
+<p>Jim demonstrated <a href="http://fusion360.autodesk.com">Fusion 360</a> as an example of powerful 3D design in a browser and as a web platform.</p>
+
+<p>It supports mixed direct and parametric modelling with tightly integrated advanced T-spline based surfacing.</p>
+
+<p>Using Fusion 360 and a desktop 3D printer, Jim shows how 'rapid' rapid prototyping really can be today.</p>
+
+<p>The platform supports
+
+<a href="http://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/WritingDebugging.htm">
+JavaScript and Python scripting</a>
+
+(cf. <a href="http://fusion360.autodesk.com/resources">Fusion 360 Learning and Resources</a> &gt;
+Programming Interface) based on the open source <a href="http://brackets.io">Brackets</a> IDE.</p>
+
+<p>Back to the
+
+Autodesk <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">View and Data API</a>,
+
+Jim demonstrated live publishing of 3D models in both a blog hosted by Typepad and his personal Facebook page.
+Less than 60 seconds each.</p>
+
+<p>As Jim keeps saying, "Easy &ndash; why would anyone nowadays want to publish any model in anything but 3D?"</p>
+
+
+<a name="5"></a>
+
+<h4>The A360 Platform &ndash; from Beta to Production</h4>
+
+<p>The
+
+<a href="http://www.autodesk.com/products/a360/overview">Autodesk A360 platform</a> includes
+
+web services for Identity, View and Data, Create, Simulate, Collaborate and Business.</p>
+
+<p>The Identity and View &amp; Data web services are now going into production, so we looked at code samples for that.</p>
+
+
+<a name="6"></a>
+
+<h4>Virtual Reality for the Masses &ndash; and You Too!</h4>
+
+<p>DIY virtual reality is easily achievable today using the View and Data web service API in conjunction with the low or zero cost
+
+<a href="https://cardboard.withgoogle.com">
+Google Cardboard</a> system.</p>
+
+<p>Surprise and impress your friends, colleagues and &ndash; above all &ndash; customers by delivering your models in stereographic 3D virtual reality with just a few hours or less of work.</p>
+
+
+<a name="7"></a>
+
+<h4>Afternoon Breakout Sessions for Desktop Platforms</h4>
+
+<p>In the afternoon, we split into three separate parallel tracks: desktop, cloud and mobile and the 'programmers corner'.</p>
+
+<p>The desktop track focuses on news concerning the AutoCAD, Civil 3D, Inventor, Revit, Vault desktop products and their API enhancements.</p>
+
+<p>In cloud and mobile, we take an in-depth look at BIM 360, Field, Glue, Fusion 360, and View &amp; Data future directions and yet more code samples.</p>
+
+<p>The programmers corner is for anyone who wants to chat with ADN and other engineers and is momentarily not interested in the other sessions.</p>
+
+<p>I can't say much more about these here and now in public, obviously... if you have not been to DevDays yet and there is still one coming somewhere close to you in the next few weeks, i.e., if you are located in Europe, grab the chance to come and see for yourself &ndash; and say hello:</p>
+
+
+<a name="8"></a>
+
+<h4>Still a Chance to Join!</h4>
+
+<p>Look for more information, locations and schedule at
+
+<a href="http://www.autodeskdevdays.com">www.autodeskdevdays.com</a>.
+
+ADN members, register via that website.
+Non-ADN members, please contact us at <a href="mailto:devdaysinfo@autodesk.com">devdaysinfo@autodesk.com</a>.
+Material demonstrated and discussed at DevDays is confidential and under Non-Disclosure Agreement.</p>

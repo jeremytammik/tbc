@@ -1,0 +1,378 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Harry Mattison 
+Matthew Nelson 
+
+Re: CASE at AU Events
+
+-->
+
+<h3>Calculating a Rolling Offset Between Two Pipes</h3>
+
+<p>Here is a nice little MEP related external command that I implemented to
+
+<a href="http://www.plumbinghelp.ca/plumbing-math-rolling-offsets.php">
+calculate</a> a
+
+<a href="http://602apprentice.blogspot.ch/2011/01/rolling-offsets.html">
+rolling offset</a> for
+
+pipes at the
+
+<a href="http://content.case-inc.com/au-hackathon-2013">
+CASE BIM Hackathon</a> at
+
+AU, prompted by a suggestion by Harry Mattison and Matthew Nelson.</p>
+
+<p>It calculates the rolling offset between two selected pipes and generates a model line in the Revit model to display the result.</p>
+
+<p>In brief, a rolling offset is an angled pipe segment that connects two pipes with each other.</p>
+
+<p>For instance, imagine a situation with two parallel horizontal pipes, offset from each other in all three directions, X, Y and Z.</p>
+
+<p>The task consists in calculating the appropriate angled segment to connect the two.</p>
+
+<p>Maybe the best way to explain the task is to show the solution in action before looking at the detailed implementation.</p>
+
+<p>Given the two parallel offset pipes, one needs to decide how far along the axis defined by their common direction to place the angled segment.</p>
+
+<p>I decided to choose the midpoint defined by the two pipes' endpoints that are farthest apart, and place the angled segment so that its midpoint coincides with that.</p>
+
+<p>Here is a 52-second <a href="http://youtu.be/huxn3ga2Ly4">video</a> of the rolling offset add-in recorded live in situ at the CASE BIM Hackathon:</p>
+
+<center>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/huxn3ga2Ly4" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>In case you prefer stills, here are six screen snapshots highlighting the situation, three before and three after executing the command:</p>
+
+<center>
+<img src="img/rolling_offset_1_3d.png" alt="3D situation before calculating rolling offset" width="450"/>
+<p style="text-align:center"><i>3D view before</i></p>
+
+<img src="img/rolling_offset_2_east_cropped.png" alt="East elevation before calculating rolling offset"/>
+<p style="text-align:center"><i>East view before</i></p>
+
+<img src="img/rolling_offset_3_north_cropped.png" alt="North elevation before calculating rolling offset"/>
+<p style="text-align:center"><i>North view before</i></p>
+
+<img src="img/rolling_offset_4_3d.png" alt="3D situation after calculating rolling offset" width="481"/>
+<p style="text-align:center"><i>3D view after</i></p>
+
+<img src="img/rolling_offset_5_east.png" alt="East elevation after calculating rolling offset"/>
+<p style="text-align:center"><i>East view after</i></p>
+
+<img src="img/rolling_offset_6_north.png" alt="North elevation after calculating rolling offset"/>
+<p style="text-align:center"><i>North view after</i></p>
+</center>
+
+<p>If you look carefully, you will notice that both selected pipes are shortened by the external command.
+A model line is drawn at a 45-degree angle to the existing pipes to connect the two correspondingly adjusted endpoints.</p>
+
+<p>The algorithm supports any other angle as well, of course, e.g. 30 or 60 degrees; it is currently hard coded.</p>
+
+
+<a name="2"></a>
+
+<h4>Rolling Offset Calculation Implementation</h4>
+
+<p>I implemented the external code calculating the rolling offset and generating a model line to represent the result as a new external command CmdRollingOffset in The Building Coder samples.</p>
+
+<p>For a maximum of flexibility, comfort and efficiency in testing it, it supports three different possibilities for selecting the two pipes:</p>
+
+<ul>
+<li>Run in a model containing exactly two parallel offset pipe elements, they will be automatically selected.</li>
+<li>Pre-select two pipes before launching the command.</li>
+<li>Post-select them when prompted.</li>
+</ul>
+
+<p>Here is the entire command implementation:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdRollingOffset</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; &nbsp; = <span class="maroon">&quot;Please run this in a model containing &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;exactly two parallel offset pipe elements, &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;and they will be &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;automatically selected. Alternatively, pre-&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;select two pipe elements before launching &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;this command, or post-select them when &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;prompted.&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Allow selection of curve elements only.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">PipeElementSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> <span class="teal">Pipe</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Select all pipes in the entire model.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Pipe</span>&gt; pipes = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Pipe</span>&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Pipe</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Pipe</span>&gt;() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = pipes.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are less than two, </span>
+&nbsp; &nbsp; <span class="green">// there is nothing we can do.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 &gt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are exactly two, pick those.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Else, check for a pre-selection.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; pipes.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} pre-selected elements.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// If two or more model pipes were pre-</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// selected, use the first two encountered.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 &lt; n )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> c = e <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != c )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipes.Add( c );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 == pipes.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Found two model pipes, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;ignoring everything else.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Else, prompt for an </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// interactive post-selection.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 != pipes.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; pipes.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PipeElementSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick first pipe.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipes.Add( doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Pipe</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">PipeElementSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick second pipe.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pipes.Add( doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">Pipe</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Extract data from the two selected pipes.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Curve</span> c0 = (pipes[0].Location <span class="blue">as</span> <span class="teal">LocationCurve</span>).Curve;
+&nbsp; &nbsp; <span class="teal">Curve</span> c1 = (pipes[1].Location <span class="blue">as</span> <span class="teal">LocationCurve</span>).Curve;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !(c0 <span class="blue">is</span> <span class="teal">Line</span>) || !(c1 <span class="blue">is</span> <span class="teal">Line</span>) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Expected straight pipes.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p00 = c0.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p01 = c0.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p10 = c1.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p11 = c1.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v0 = p01 - p00;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v1 = p11 - p10;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsParallel( v0, v1 ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = _prompt
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Expected parallel pipes.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Select the two pipe endpoints that are </span>
+&nbsp; &nbsp; <span class="green">// farthest apart.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p0 = p00.DistanceTo( p10 ) &gt; p01.DistanceTo( p10 )
+&nbsp; &nbsp; &nbsp; ? p00
+&nbsp; &nbsp; &nbsp; : p01;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = p10.DistanceTo( p0 ) &gt; p11.DistanceTo( p0 )
+&nbsp; &nbsp; &nbsp; ? p10
+&nbsp; &nbsp; &nbsp; : p11;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pm = 0.5 * ( p0 + p1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = p1 - p0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsParallel( v, v0 ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;The selected pipes are colinear.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> z = v.CrossProduct( v1 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> w = z.CrossProduct( v1 ).Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Offset distance perpendicular to pipe direction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> distanceAcross = <span class="teal">Math</span>.Abs(
+&nbsp; &nbsp; &nbsp; v.DotProduct( w ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Distance between endpoints parallel </span>
+&nbsp; &nbsp; <span class="green">// to pipe direction</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> distanceAlong = <span class="teal">Math</span>.Abs(
+&nbsp; &nbsp; &nbsp; v.DotProduct( v1.Normalize() ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">Util</span>.IsEqual( v.GetLength(),
+&nbsp; &nbsp; &nbsp; <span class="teal">Math</span>.Sqrt( distanceAcross * distanceAcross
+&nbsp; &nbsp; &nbsp; &nbsp; + distanceAlong * distanceAlong ) ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected Pythagorean equality here&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// The required offset pipe angle.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> angle = 45 * <span class="teal">Math</span>.PI / 180.0;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// The angle on the other side.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> angle2 = 0.5 * <span class="teal">Math</span>.PI - angle;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> length = distanceAcross * <span class="teal">Math</span>.Tan( angle2 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> halfLength = 0.5 * length;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// How long should the pipe stubs become?</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> remainingPipeLength
+&nbsp; &nbsp; &nbsp; = 0.5 * (distanceAlong - length);
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; v1.DotProduct( v ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; v1.Negate();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; v1 = v1.Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> q0 = p0 + remainingPipeLength * v1;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> q1 = p1 - remainingPipeLength * v1;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Rolling Offset&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Trim or extend existing pipes</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; (pipes[0].Location <span class="blue">as</span> <span class="teal">LocationCurve</span>).Curve
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Line</span>.CreateBound( p0, q0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; (pipes[1].Location <span class="blue">as</span> <span class="teal">LocationCurve</span>).Curve
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Line</span>.CreateBound( p1, q1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Add a model line for the rolling offset pipe</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( q0, q1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; creator.CreateModelCurve( line );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>I hope you find this interesting and useful.</p>
+
+<p>Here are two comments I received on this from Harry and Matt:</p>
+
+<ul>
+<li>I'm pretty sure this is the most bad-ass thing anyone did at the Hackathon. Nice work Jeremy!</li>
+<li>I second that! I wasn't there but I will pretend I was!</li>
+</ul>
+
+<p>The code presented above is available from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.1">
+release 2014.0.106.1</a>.</p>
+
+<p>Tere hommikust!</p>

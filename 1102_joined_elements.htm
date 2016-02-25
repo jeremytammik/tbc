@@ -1,0 +1,156 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+09188250 [Getting Joined Elements]
+
+Winston YawRisa Technologies
+
+-->
+
+<h3>Getting Two Different Kinds of Joined Elements</h3>
+
+<p>Revit loves creating and maintaining relationships, e.g. by joining elements and their geometry.</p>
+
+<p>Here are a couple of element joining topics that we touched on in the past:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/autojoinelements.html">AutoJoinElements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/joined-beam-geometry-access.html">Joined Beam Geometry Access</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/08/wall-joins-and-geometry.html">Wall Joins and Geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/move-duct-join-add-in-with-video-and-github-support.html">Move Duct Join Add-In with Video and GitHub Support</a></li>
+</ul>
+
+<p>The user interface also includes functionality related to this and explicitly labelled Join Geometry:</p>
+
+<center>
+<img src="img/JoinedElements.jpeg" alt="Join Geometry in the Revit user interface"/> <!-- width="400"/ -->
+</center>
+
+<p>The same functionality uses slightly different nomenclature in the API, though, which might prove a bit confusing.</p>
+
+<p>Here is a recent developer query to prove the point, with a nice clear answer by my colleague Akira Kudo:</p>
+
+
+<p><strong>Question:</strong> I am trying to use the JoinGeometryUtils.GetJoinedElements method with little success.</p>
+
+<p>When passed in an existing element that has another element joined to it, the method still returns an empty collection.</p>
+
+<p>However, if I right click one of the elements in the user interface and then 'Select Joined Elements', both elements are selected.</p>
+
+
+<p><strong>Answer:</strong> The GetJoinedElements method only returns elements that share a <code><b>GeomJoin</b></code>.</p>
+
+<p>A GeomJoin is a pair-wise cut of geometry from one element to another.</p>
+
+<p>To try this out, you can use the attached sample code and Revit model in
+
+<a href="zip/JoinedElements1.zip">JoinedElements1.zip</a>,
+implementing the following external command:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> ref1 = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;pick an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = doc.GetElement( ref1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; the_list_of_the_joined
+&nbsp; &nbsp; &nbsp; = <span class="teal">JoinGeometryUtils</span>.GetJoinedElements(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, elem );
+&nbsp;
+&nbsp; &nbsp; System.Windows.Forms.<span class="teal">MessageBox</span>.Show(
+&nbsp; &nbsp; &nbsp; the_list_of_the_joined.Count.ToString() );
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Clear();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> the_list_of_the_joined )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uidoc.Selection.Elements.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; doc.GetElement( id ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>As said, this is completely different from 'Select Joined Elements' in the user interface.</p>
+
+<p>That UI functionality is available through the API via the LocationCurve.get_ElementsAtJoin method.
+It determines elements joined to the current one at the end of its location curve and also enables changing their joining behaviour and order.</p>
+
+<!--
+For programmatically retrieve the joined elements in the manner done by , you can use
+like code below to get joining to the end of this element's location curve or change the order of elements participation in the end join with this location curve's end.
+-->
+
+<p>You can try this out as well using the attached sample code and Revit model in
+
+<a href="zip/JoinedElements2.zip">JoinedElements2.zip</a>,
+
+implementing this different external command:</p>
+
+
+<p>Please also find the sample project in the JoinedElements2.zip.</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> ref1 = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;pick an element&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> elem = doc.GetElement( ref1 );
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = elem <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = fi.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; uidoc.Selection.Elements.Clear();
+&nbsp; &nbsp; <span class="teal">ElementArray</span> startarray = lc
+&nbsp; &nbsp; &nbsp; .get_ElementsAtJoin( 0 ); <span class="green">// start</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> elem1 <span class="blue">in</span> startarray )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uidoc.Selection.Elements.Add( elem1 );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ElementArray</span> endarray = lc
+&nbsp; &nbsp; &nbsp; .get_ElementsAtJoin( 1 ); <span class="green">// end</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> elem2 <span class="blue">in</span> endarray )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; uidoc.Selection.Elements.Add( elem2 );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>You should also check out the code provided by the Revit SDK sample ProximityDetection_WallJoinControl in the GeometryAPI subfolder.</p>
+
+<!--
+/a/doc/revit/blog/zip/
+
+<p>mv GetJoinedElements.zip JoinedElements1.zip</p>
+<p>mv SelectJoinedElements.zip JoinedElements2.zip</p>
+
+<p>JoinedElements1.zip</p>
+<p>JoinedElements2.zip</p>
+
+/a/doc/revit/blog/img/JoinedElements.jpeg
+
+-->

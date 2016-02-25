@@ -1,0 +1,56 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+08576310 [Error creating parameter in family]
+
+09319970 [Loren Cook Add-In Issue]
+
+http://forums.autodesk.com/t5/Revit-API/Cannot-Get-Bindingmap-of-a-family-Document-Error-2014/m-p/4317835
+
+-->
+
+<h3>Cannot Get BindingMap of a Family Document</h3>
+
+<p>Here is an issue trying to access the binding map of a family document that just re-arose as a new ADN support case.</p>
+
+<p>It took me a while (thank you,
+
+<a href="http://lmgtfy.com/?q=revit+api+"Cannot+get+BindingMap+of+a+family">Google</a>)
+
+to discover that I had actually already answered the very same issue in the past in the Revit API forum discussion thread
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Cannot-Get-Bindingmap-of-a-family-Document-Error-2014/m-p/4317835">
+cannot get binding map of a family document error 2014</a>.</p>
+
+<p>Therefore, I think it is best for both you and me if I promote it to a blog post here and now to ensure it gets found more easily in future:</p>
+
+<p><strong>Question:</strong> My add-in adds a shared parameter to a family document.
+It has been working perfectly for years now, ever since 2009, in fact.
+In Revit 2014, however, it fails and throws an exception saying "Cannot get BindingMap of a family document."</p>
+
+<p>Simply accessing the Document.ParameterBindings property causes this error.</p>
+
+<p>What is the problem, please?</p>
+
+<p>Above all, how can I fix it?</p>
+
+
+<p><strong>Answer:</strong> The possibility to add a shared parameter via the binding map was removed for families in Revit 2014.</p>
+
+<p>The reason for this is that you can use an overload of the FamilyManager.AddParameter method instead.</p>
+
+<p>In your code, you are setting up a shared parameter definition, creating a category set, and adding a shared parameter binding using code that only applies to the project environment, not in the family context.</p>
+
+<p>In a family document, you can simply use the appropriate overload of the AddParameter method to do all these things for you in one single fell swoop.</p>
+
+<p>The Revit 2014 API help file RevitAPI.chm entry on the Document.ParameterBindings property explicitly states that it throws an Autodesk.Revit.Exceptions.InvalidOperationException when the document is a family document.</p>
+
+<p>Sorry that this affects your existing code.</p>
+
+<p>The modification to fix the error should be easy.</p>
+
+<p>Just remove the part of the code that accesses the binding map and tries to bind the parameter to the family document, call the AddParameter overload to add a shared parameter and achieve all the required steps for you automatically, including setting up a category set and an instance binding, and all should be well.</p>

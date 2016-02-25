@@ -1,0 +1,131 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Autodesk-Revit-API/An-Example-for-using-MultiReferenceAnnotation/td-p/4412817
+
+An Example for using MultiReferenceAnnotation?
+
+-->
+
+<h3>MultiReferenceAnnotation Example</h3>
+
+<p>Miguel Angel Alanis asked on the Autodesk Revit API discussion forum for an
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/An-Example-for-using-MultiReferenceAnnotation/td-p/4412817">
+example of making use of the new MultiReferenceAnnotation</a>.
+
+<p>I put together this blog post to make sure the solution is easily found.</p>
+
+<p>First, a note on something more imminent:</p>
+
+<a name="2"></a>
+
+<h4>Portathon Day 1</h4>
+
+<p>Today is the first day of the Portathon!</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/earn-100-submitting-an-autodesk-exchange-app.html">Earn $100 Submitting an Autodesk Exchange App</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/exchange-app-videos-and-devtv-youtube-channel.html">Exchange App Videos</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/adn-training-material-on-github-and-portathon-reminder.html#2">Portathon reminder and video</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/cloud-and-appstore-usage-grows-portathon-reminder.html">Cloud and AppStore usage growth</a></li>
+</ul>
+
+<p>Wish us all luck and much success, please.</p>
+
+<p>Looking forward to seeing you there!</p>
+
+
+
+<a name="3"></a>
+
+<h4>MultiReferenceAnnotation Creation Sample Code</h4>
+
+<p>Back to the main topic:</p>
+
+<p><strong>Question:</strong> Is it possible to get an example to create a multi-rebar annotation?
+
+<p>I searched the Revit SDK and found I have to use the MultiReferenceAnnotation class, but I can't build an example with the current information.</p>
+
+<p>I use the Autodesk.Revit.Creation.Document.Create.NewTag method to create a normal rebar tag, and I notice the independent tag has a property named MultiReferenceAnnotationId.</p>
+
+
+<p><strong>Answer:</strong> Please note the MultiReferenceAnnotation.Create method taking a MultiReferenceAnnotationOptions argument.</p>
+
+<p>The minimum options are probably the type and ElementsToDimension.</p>
+
+<p>Here is an excerpt from an internal test suite.
+It refers to a couple of hardcoded element ids.
+Use the documentation to figure out their use:</p>
+
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> view = GetElement&lt;<span class="teal">View</span>&gt;( 124186 );
+&nbsp;
+&nbsp; <span class="blue">var</span> rebarList = GetElements&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; doc, <span class="blue">new</span>[] { 280427 } ).ToList();
+&nbsp;
+&nbsp; Assert.IsTrue( rebarList.Count &gt; 0,
+&nbsp; &nbsp; <span class="maroon">&quot;There are no rebars in the document!&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; elementIds
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> rebar <span class="blue">in</span> rebarList )
+&nbsp; {
+&nbsp; &nbsp; elementIds.Add( rebar.Id );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">MultiReferenceAnnotationType</span> type
+&nbsp; &nbsp; = GetElement&lt;<span class="teal">MultiReferenceAnnotationType</span>&gt;(
+&nbsp; &nbsp; &nbsp; doc, 260544 );
+&nbsp;
+&nbsp; Assert.IsNotNull( type,
+&nbsp; &nbsp; <span class="maroon">&quot;the MultiReferenceAnnotationType does not exist!&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">MultiReferenceAnnotationOptions</span> options
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">MultiReferenceAnnotationOptions</span>( type );
+&nbsp;
+&nbsp; options.TagHeadPosition = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 100, 0 );
+&nbsp; options.DimensionLineOrigin = <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 5, 1 );
+&nbsp; options.DimensionLineDirection = <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 1, 0 );
+&nbsp; options.DimensionPlaneNormal = view.ViewDirection;
+&nbsp; options.SetElementsToDimension( elementIds );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tran = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tran.Start( <span class="maroon">&quot;Create_Rebar_Vertical&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> mra = <span class="teal">MultiReferenceAnnotation</span>.Create(
+&nbsp; &nbsp; &nbsp; doc, view.Id, options );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> dimension = GetElement&lt;<span class="teal">Dimension</span>&gt;(
+&nbsp; &nbsp; &nbsp; doc, mra.DimensionId );
+&nbsp;
+&nbsp; &nbsp; tran.Commit();
+&nbsp; }
+</pre>
+
+<p>Many thanks to Miguel Angel for raising this issue.</p>
+
+
+<a name="4"></a>
+
+<h4>Case Newsletter</h4>
+
+<p>By the way, I really enjoy the
+
+<a href="http://us1.campaign-archive1.com/?u=18e743860774ed83e735552b4&id=e3e9f3aaeb&e=c5bd394c2a">
+case newsletter</a> and
+
+the fun items it points to, for instance this
+
+<a href="http://woodgears.ca/eyeball/index.html">mental eyeballing exercise</a> and
+
+<a href="http://www.youtube.com/embed/p7l3_THa-Yk?rel=0">lawn chair magic video</a>.</p>
+
+<p>Besides the fun stuff, it presents a lot of useful architectural programming news as well.</p>

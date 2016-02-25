@@ -1,0 +1,508 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+-->
+
+<h3>Profiling Revit Add-ins and RoomEditorApp Enhancements</h3>
+
+<p>Today we take a look a
+
+<a href="#2">
+profiling tool</a> that
+
+works with Revit add-ins, and a few small new
+
+<a href="#5">
+enhancements to my RoomEditorApp</a>.</p>
+
+<p>The entire following article was contributed by
+
+<a href="mailto:ben.bishoff@ideateinc.com">
+Ben Bishoff</a> of
+
+<a href="http://www.ideatesoftware.com">Ideate Software</a>:
+
+<!--
+, saying:
+
+<blockquote>
+<p>I have very much appreciated the knowledge I have gained from your blog and the community it has engendered.
+I am happy to contribute and hopefully help my fellow Revit developers.</p>
+</blockquote>
+
+<p>Thank you very much for your appreciation, Ben, and thank you even more for this fine and important article!</p>
+
+<p>I hope it encourages others to profile and optimise their add-ins as well.</p>
+-->
+
+
+<a name="2"></a>
+
+<h4>Profiling Revit Add-ins using GlowCode</h4>
+
+<p>Performance profiling tools allow you to increase the speed of your code by pinpointing slow methods and methods that are called excessively.  For the past several releases, we have successfully used GlowCode real-time performance profiler (<a href="http://www.glowcode.com">www.glowcode.com</a>) to analyse and improve the speed of our Revit add-ins.</p>
+
+<p>Unfortunately, since at least Revit 2011, we have been unable to profile our add-ins using standard .NET profiling tools like ANTS Performance Profiler.  I suspect this is caused by the way the managed .NET Revit API is connected to the underlying native Revit code base.</p>
+
+<p>GlowCode is unique among profiling tools in that it can profile both managed (.NET) and native (C++) applications.  It appears that the ability to work in a mixed code environment allows GlowCode to drill through and profile the managed add-in code hosted inside the native Revit application.</p>
+
+<p>After setting up a GlowCode project (see below), you launch Revit through GlowCode and run your add-in.  Among other statistics, GlowCode will record the time spent within each code method and the number of times each code method was visited.  From there, there are many ways to 'slice and dice' the information GlowCode records.  In general, you are presented with tree views you can use to drill-down and find slow methods.</p>
+
+<center>
+<img src="img/glowcode1.png" alt="GlowCode call tree and summary"/>
+</center>
+
+<p>And here is where the detective work (and fun) begins!  It is always eye opening to actually see where your code spends its time.  Two of the biggest gotchas we have encountered in our code have been repetitive API calls, and reading and writing large collections of data.</p>
+
+<p>Using profiling, we have identified places in our code where we make repetitive calls to the same Revit API method to get the same static information.  In this case, it makes sense to cache the data in a collection and later retrieve the data from that collection instead of through a Revit API call.  Using the proper data structure to the store data, however, is crucial.</p>
+
+<p>If you never learned the concepts of Big O notation, or it has been a while since Computer Science 101, now is the time to refresh your knowledge.  Googling 'Big O notation' will return many good basic tutorials, but here is the core idea: the time it takes to read and write data to a collection of data greatly depends on the type of data structure you use. An <b>array</b> or <b>list</b> data structure, while easy to create, is slow to search.  In general, the time it takes to search a list depends directly on the size of the list.   In contrast, a <b>hash</b> data structure (or its variant the <b>dictionary</b>), while more complex to set up, is much faster to read.  If done right and you have defined an appropriate hash method for the data you are storing, retrieving data from a hash can approach near constant time.  In other words, searching for data in a hash of 10 objects takes almost the same amount of time as in a hash storing thousands of objects.  In short, learn to love hashes.</p>
+
+<p>GlowCode has a 21-day free trial, standalone license are $499 USD.  We have found it well worth the investment - if you don't profile your code you're flying blind.  Case in point, using profiling we have found commands that slowed down by a factor of 10x or more due to innocent changes made during a release.  Profiling quickly identified these bottlenecks, and many times changing just a few lines of code remedied the problem.</p>
+
+<p>What follows are screenshots of the GlowCode project settings I have used to successfully profile our Revit add-ins.  For detailed set up see GlowCode Help see topic:</p>
+
+<ul>
+<li>How To &gt; Profile Performance &gt; (Native & Managed) &gt; Tutorial: Quickstart profiling instructions</li>
+</ul>
+
+<center>
+<img src="img/glowcode2.png" alt="Open profiler" width="400"/>
+</center>
+
+<p>Note that the profiler must launch Revit, cf. Target tab &gt; Start mode &gt; Launch.  Unlike debugging in Microsoft Visual Studio, the .NET framework  does not support profiling applications by attaching to applications that are already running.</p>
+
+<center>
+<img src="img/glowcode3.png" alt="Profiler target" width="400"/>
+</center>
+
+<p>Managed setup options:</p>
+
+<center>
+<img src="img/glowcode4.png" alt="Profiler setup managed" width="400"/>
+</center>
+
+<p>Viewer setup:</p>
+
+<center>
+<img src="img/glowcode5.png" alt="Profiler viewers" width="400"/>
+</center>
+
+<p>Thank you very much for this fine and important article, Ben!</p>
+
+<p>I hope it encourages others to profile and optimise their add-ins as well.</p>
+
+
+
+<a name="5"></a>
+
+<h4>RoomEditorApp Inches Forward</h4>
+
+<p>The Tech Summit in June is nearing inexorably.</p>
+
+<p>The last date to submit my presentation is end of next week, which is getting closer even faster.</p>
+
+<p>I barely started development yet.</p>
+
+<p>My goals:</p>
+
+<ul>
+<li>Display sheet, views and floor plan geometry</li>
+<li>Store, edit and update non-graphical property data</li>
+<li>Improve the 2D graphical editing</li>
+</ul>
+
+<p>After a ten-day pause in development, I picked it up again and posted two new releases yesterday to the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>:</p>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.2.4">2014.0.2.4</a></li>
+<ul>
+<li><a href="#5.1">Multi-category filter</a></li>
+<li><a href="#5.2">UploadSheet method outline</a></li>
+</ul>
+<li><a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.2.5">2014.0.2.5</a></li>
+<ul>
+<li><a href="#5.3">Split Point2dIntLoop.cs module</a></li>
+<li><a href="#5.4">Support both open and closed loops</a></li>
+</ul>
+</ul>
+
+
+<a name="5.1"></a>
+
+<h4>Multi-Category Filter</h4>
+
+<p>One of the steps I discussed in the previous instalments was the interactive
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/selecting-visible-categories-from-a-set-of-views.html">
+selection of categories</a> to
+
+export, returning a list of category objects, i.e. <code><span class="teal">List</span>&lt;<span class="teal">Category</span>&gt; categories</code>.</p>
+
+<p>I initially thought of converting the list to a dictionary for faster lookup when filtering for elements to export.</p>
+
+<p>A dictionary can be generated from a list by calling the ToDictionary method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Convert category list to a dictionary for </span>
+&nbsp; <span class="green">// more effective repeated lookup.</span>
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">Category</span>&gt; catLookup =
+&nbsp; &nbsp; categories.ToDictionary&lt;<span class="teal">Category</span>, <span class="teal">ElementId</span>&gt;(
+&nbsp; &nbsp; &nbsp; c =&gt; c.Id );
+</pre>
+
+<p>However, no post processing will ever be as fast as supplying an element filter to the Revit filtered element collector.</p>
+
+<p>So how can I effectively convert a list of categories to an appropriate element filter?</p>
+
+<p>Well, easily, in one single line of code, albeit rather lengthy when unravelled:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// No, much better: set up a reusable element </span>
+&nbsp; <span class="green">// filter for the categories of interest:</span>
+&nbsp;
+&nbsp; <span class="teal">ElementFilter</span> categoryFilter
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">LogicalOrFilter</span>( categories
+&nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Category</span>, <span class="teal">ElementCategoryFilter</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; c =&gt; <span class="blue">new</span> <span class="teal">ElementCategoryFilter</span>( c.Id ) )
+&nbsp; &nbsp; &nbsp; .ToList&lt;<span class="teal">ElementFilter</span>&gt;() );
+</pre>
+
+<p>What does this line of code do?</p>
+
+<p>For each category, it creates a corresponding category filter.</p>
+
+<p>All of these filters are collected into a list used to initialise a Boolean OR of them all.</p>
+
+<p>In the end, any element that matches one of the listed categories will pass the filter.</p>
+
+<p>All of the filters involved are quick filters.</p>
+
+
+<a name="5.2"></a>
+
+<h4>UploadSheet Method Outline</h4>
+
+<p>I started implementing the UploadSheet method to upload a sheet, the views it contains, and all the elements displayed in them, ignoring elements not belonging to one of the selected categories.</p>
+
+<p>What it does in this state is traverse the given structures and access the relevant geometry.</p>
+
+<p>It shows how the category filter is applied to retrieve the view specific geometry for the elements of interest, and how the family instance location transformation and element geometry can be handled.</p>
+
+<p>The logic to create a dictionary of the symbol geometry and only process each symbol once is in place.</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Upload given sheet and the views it contains</span>
+&nbsp; <span class="gray">///</span><span class="green"> to the cloud repository, ignoring all elements</span>
+&nbsp; <span class="gray">///</span><span class="green"> not belonging to one of the selected categories.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> UploadSheet(
+&nbsp; &nbsp; <span class="teal">ViewSheet</span> sheet,
+&nbsp; &nbsp; <span class="teal">ElementFilter</span> categoryFilter )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> list_ignored_elements = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = sheet.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Map symbol UniqueId to symbol geometry</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt; symbolGeometry
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">JtLoop</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// List of instances referring to symbols</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt; familyInstances
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">JtPlacement2dInt</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// There is no need and no possibility to set </span>
+&nbsp; &nbsp; <span class="green">// the detail level when retrieving view geometry.</span>
+&nbsp; &nbsp; <span class="green">// An attempt to specify the detail level will </span>
+&nbsp; &nbsp; <span class="green">// cause writing the opt.View property to throw</span>
+&nbsp; &nbsp; <span class="green">// &quot;DetailLevel is already set. When DetailLevel </span>
+&nbsp; &nbsp; <span class="green">// is set view-specific geometry can't be </span>
+&nbsp; &nbsp; <span class="green">// extracted.&quot;</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//opt.DetailLevel = ViewDetailLevel.Coarse;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( sheet.Name );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ViewPlan</span> v <span class="blue">in</span> sheet.Views
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">ViewPlan</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">ViewPlan</span>&gt;( v =&gt; IsFloorPlan( v ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &quot;</span> + v.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; opt.View = v;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> els
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc, v.Id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WherePasses( categoryFilter );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> els )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Print( &quot;&nbsp; &quot; + e.Name );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Call GetTransformed on family instance geo.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This converts it from GeometryInstance to ?</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> f = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != f )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Location</span> loc = e.Location;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Simply ignore family instances that</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// have no valid location, e.g. panel.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == loc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( list_ignored_elements )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; ... ignored &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + e.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyInstances.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">JtPlacement2dInt</span>( f ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> s = f.Symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> uid = s.UniqueId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( symbolGeometry.ContainsKey( uid ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( list_ignored_elements )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; ... already handled &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + e.Name + <span class="maroon">&quot; --&gt; &quot;</span> + s.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Replace this later to add real geometry.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; symbolGeometry.Add( uid, <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve family instance geometry </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// transformed back to symbol definition</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// coordinate space by inverting the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// family instance placement transformation</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = e.Location
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> t = <span class="teal">Transform</span>.CreateTranslation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -lp.Point );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> r = <span class="teal">Transform</span>.CreateRotationAtPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, -lp.Rotation, lp.Point );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; geo = geo.GetTransformed( t * r );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; &quot;</span> + e.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This was true before calling GetTransformed.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert( obj is Solid || obj is GeometryInstance, &quot;expected only solids and instances&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This was true before calling GetTransformed.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Assert( ( obj is GeometryInstance ) == ( e is FamilyInstance ), &quot;expected all family instances to have geometry instance&quot; ); </span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( obj <span class="blue">is</span> <span class="teal">Solid</span> || obj <span class="blue">is</span> <span class="teal">Line</span>, <span class="maroon">&quot;expected only solids and lines after calling GetTransformed on instances&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">Visibility</span>.Visible == obj.Visibility, <span class="maroon">&quot;expected only visible geometry objects&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( obj.IsElementGeometry, <span class="maroon">&quot;expected only element geometry&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//bool isElementGeometry = obj.IsElementGeometry;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Do we need the graphics style?</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// It might give us horrible things like</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// colours etc.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = obj.GraphicsStyleId;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Debug.Print( &quot;&nbsp; &nbsp; &nbsp; &quot; + obj.GetType().Name );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == solid )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; &quot;</span> + obj.GetType().Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = solid.Edges.Size;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; solid with {0} edges&quot;</span>, n );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> solid.Edges )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Curve</span> c = edge.AsCurve();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;&nbsp; &nbsp; &nbsp; &nbsp; &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + edge.GetType().Name + <span class="maroon">&quot;: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + c.GetType().Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Here is an excerpt of the output it generates for a sheet containing two views, one of them displaying a wall of type 'Cav - 102 75i 100 p - Lwt', a desk and a chair, among many other things:</p>
+
+<pre>
+Sheet view of Level 0 and 1
+  Level 0
+    Cav - 102 75i 100 p - Lwt
+      solid with 12 edges
+        Edge: Line
+        ...
+        Edge: Line
+    1525 x 762mm
+      Line
+      Line
+      Line
+      Line
+    Office Chair
+      solid with 12 edges
+        Edge: Line
+        ...
+        Edge: Line
+      solid with 4 edges
+        Edge: Line
+        Edge: Line
+        Edge: Line
+        Edge: Line
+</pre>
+
+<p>Lots more processing to do here before I have this displaying properly in SVG in the browser, plus I need to work out all the proper scalings and transformations from Revit model space to the view, the size and location of the views on the sheet, and the sheet placement in the browser SVG canvas.</p>
+
+
+
+<a name="5.3"></a>
+
+<h4>Split Point2dIntLoop.cs Module</h4>
+
+<p>The SVG generation is implemented in the JtLoop and JtLoops classes, which were defined in a C# module named Point2dIntLoop.cs.</p>
+
+<p>To simplify navigation, I split that module into two new modules and named them the same as the classes they define, making the structure simpler to understand.</p>
+
+
+<a name="5.4"></a>
+
+<h4>Support both Open and Closed Loops</h4>
+
+<p>In its previous incarnation, the room editor exported only closed loops.</p>
+
+<p>I am not certain that the 2D geometry I am considering now will always define closed loops, so I took a look at how deeply buried that assumption might be in the JtLoop class.</p>
+
+<p>Happily, as it turns out, not deeply at all, so here is an updated version that supports both open and closed loops, and therefore actually should be renamed to 'polyline' instead of 'loop':</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> A closed or open polygon boundary loop.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">JtLoop</span> : <span class="teal">List</span>&lt;<span class="teal">Point2dInt</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Closed { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> JtLoop( <span class="blue">int</span> capacity )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( capacity )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Closed = <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Add another point to the collection.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> If the new point is identical to the last,</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> ignore it. This will automatically suppress</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> really small boundary segment fragments.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">new</span> <span class="blue">void</span> Add( <span class="teal">Point2dInt</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == Count
+&nbsp; &nbsp; &nbsp; &nbsp; || 0 != p.CompareTo( <span class="blue">this</span>[Count - 1] ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">base</span>.Add( p );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Display as a string.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">override</span> <span class="blue">string</span> ToString()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>, <span class="blue">this</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return suitable input for the .NET </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> GraphicsPath.AddLines method to display this </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> loop in a form. Note that a closing segment </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> to connect the last point back to the first</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> is added.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Point</span>[] GetGraphicsPathLines()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( Closed ) { ++n; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Point</span>[] loop = <span class="blue">new</span> <span class="teal">Point</span>[n];
+&nbsp;
+&nbsp; &nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Point2dInt</span> p <span class="blue">in</span> <span class="blue">this</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; loop[i++] = <span class="blue">new</span> <span class="teal">Point</span>( p.X, p.Y );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( Closed ) { loop[i] = loop[0]; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> loop;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return an SVG path specification, c.f.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> http://www.w3.org/TR/SVG/paths.html</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> M [0] L [1] [2] ... [n-1] Z</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> SvgPath
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot; &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">this</span>.Select&lt;<span class="teal">Point2dInt</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( p, i ) =&gt; p.SvgPath( i ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ( Closed ? <span class="maroon">&quot;Z&quot;</span> : <span class="maroon">&quot;&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I set it up to be closed by default, and existing code will work properly with no modification.</p>
+
+<p>New code can toggle the public Closed property, which affects the SVG and GraphicsPath output, and nothing else.</p>

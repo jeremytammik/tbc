@@ -1,0 +1,219 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08720371 [PromptForFamilyInstancePlacement - Active View]
+
+Matt Taylor, WSP
+
+-->
+
+<h3>Set a Suitable View for Family Instance Placement</h3>
+
+<p>Matt Taylor of <a href="http://www.wspgroup.com">WSP</a> raised
+
+an issue related to the use of the PromptForFamilyInstancePlacement method, now that API access is also possible in the project browser view.</p>
+
+<p>He also went right ahead to suggest and implement a solution:</p>
+
+
+<p><strong>Question:</strong> One of the new features of the Revit 2014 API is the possibility to select elements within the Project Browser view.</p>
+
+<p>If the Project Browser view is active, selecting a ribbon control that uses PromptForFamilyInstancePlacement will fail because the user will try to pick in the active drawing view to place the family instance.</p>
+
+<p>According to the help for PromptForFamilyInstancePlacement: "Users are not permitted to change the active view during this placement operation (the operation will be completed)."</p>
+
+<p>If there is only one active UIView, it's easy to just set it to active prior to calling PromptForFamilyInstancePlacement. If more than one view is open, how can I get the last active drawing view (prior to the Project Browser)?</p>
+
+<p>Short of implementing a ViewActivated event (seems like overkill), or prompting the user to click in a view before using PromptForFamilyInstancePlacement (not always required, inconsistent across 2011/2012/2013), what can be done?</p>
+
+
+<p><strong>Answer:</strong> It should be possible and not an all-to-big effort to implement a ViewActivated event handler and simply make a note of each view activated. Then, before calling PromptForFamilyInstancePlacement, revert to the last valid one for that operation. Would that solve the issue for you?</p>
+
+
+<p><strong>Response:</strong> Here is the
+
+<a href="zip/mt_suitable_view.zip">
+zipped view activated solution</a>,
+
+mainly copied from your blog’s example, though in VB.NET.</p>
+
+<p>It was substantially simpler than I envisaged &ndash; an hour of work to implement.</p>
+
+<p>In OnStartup, we instantiate a dictionary mapping each document to the last valid PromptForFamilyInstancePlacement view and subscribe to the view activated event:</p>
+
+<pre class="code">
+&nbsp; <span class="green">''' </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="green">''' Map document title to last valid view element id</span>
+&nbsp; <span class="green">''' </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">Public</span> <span class="blue">Shared</span> viewHash <span class="blue">As</span> <span class="teal">Hashtable</span>
+&nbsp;
+&nbsp; <span class="blue">Public</span> <span class="blue">Function</span> OnStartup( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> application <span class="blue">As</span> <span class="teal">UIControlledApplication</span>) _
+&nbsp; <span class="blue">As</span> <span class="teal">Result</span> <span class="blue">Implements</span> <span class="teal">IExternalApplication</span>.OnStartup
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; &nbsp; viewHash = <span class="blue">New</span> <span class="teal">Hashtable</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">AddHandler</span> application.ViewActivated,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">AddressOf</span> OnViewActivated
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Succeeded
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> <span class="teal">Exception</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Return</span> <span class="teal">Result</span>.Failed
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>In the view activated event handler, we simply make a note of the last view activated for each document, provided it is a valid view to call the PromptForFamilyInstancePlacement in, i.e. not a system browser or project browser view:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Private</span> <span class="blue">Shared</span> <span class="blue">Function</span> ViewDescription( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> v <span class="blue">As</span> DB.<span class="teal">View</span>) <span class="blue">As</span> <span class="blue">String</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> <span class="blue">String</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;view '{0}' in document '{1}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; v.Name, v.Document.Title)
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Function</span>
+&nbsp;
+&nbsp; <span class="blue">Private</span> <span class="blue">Sub</span> OnViewActivated( _
+&nbsp; &nbsp; <span class="blue">ByVal</span> sender <span class="blue">As</span> <span class="blue">Object</span>,
+&nbsp; &nbsp; <span class="blue">ByVal</span> e <span class="blue">As</span> UI.Events.<span class="teal">ViewActivatedEventArgs</span>)
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> docTitle <span class="blue">As</span> <span class="blue">String</span> = e.Document.Title
+&nbsp; &nbsp; <span class="blue">Dim</span> vPrevious <span class="blue">As</span> DB.<span class="teal">View</span> = e.PreviousActiveView
+&nbsp; &nbsp; <span class="blue">Dim</span> vCurrent <span class="blue">As</span> DB.<span class="teal">View</span> = e.CurrentActiveView
+&nbsp; &nbsp; <span class="blue">If</span> <span class="blue">Not</span> (vCurrent.ViewType = <span class="teal">ViewType</span>.SystemBrowser _
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">OrElse</span> vCurrent.ViewType = <span class="teal">ViewType</span>.ProjectBrowser) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> viewHash.ContainsKey(docTitle) <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; viewHash.Item(docTitle) = vCurrent.Id
+&nbsp; &nbsp; &nbsp; <span class="blue">Else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; viewHash.Add(docTitle, vCurrent.Id)
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Dim</span> s <span class="blue">As</span> <span class="blue">String</span> = <span class="blue">If</span>(
+&nbsp; &nbsp; &nbsp; (vPrevious <span class="blue">Is</span> <span class="blue">Nothing</span>),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;no view at all&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;previous &quot;</span> + ViewDescription(vPrevious))
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="blue">String</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Switching from {0} to new {1}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; s, ViewDescription(vCurrent)))
+&nbsp;
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+<p>With that information available, we can always switch to the last valid view before calling the PromptForFamilyInstancePlacement method, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">' According to the help for </span>
+&nbsp; <span class="green">' PromptForFamilyInstancePlacement:</span>
+&nbsp; <span class="green">' &quot;Users are not permitted to change the active </span>
+&nbsp; <span class="green">' view during this placement operation (the </span>
+&nbsp; <span class="green">' operation will be completed).&quot;</span>
+&nbsp; <span class="green">' Here's the fix, which only needs to work for 2014.</span>
+&nbsp; <span class="green">' (With previous versions, the ribbon items are </span>
+&nbsp; <span class="green">' greyed out if the project browser is active.)</span>
+&nbsp;
+&nbsp; <span class="blue">Dim</span> actView <span class="blue">As</span> DB.<span class="teal">View</span> = doc.ActiveView
+&nbsp;
+&nbsp; <span class="blue">If</span> actView.ViewType = DB.<span class="teal">ViewType</span>.SystemBrowser _
+&nbsp; &nbsp; <span class="blue">OrElse</span> actView.ViewType = DB.<span class="teal">ViewType</span>.ProjectBrowser <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">' Get stored view id.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">If</span> AppCommand.viewHash.ContainsKey(doc.Title) <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> prevValidViewId <span class="blue">As</span> DB.<span class="teal">ElementId</span> _
+&nbsp; &nbsp; &nbsp; &nbsp; = AppCommand.viewHash.Item(doc.Title)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> elem <span class="blue">As</span> DB.<span class="teal">Element</span> = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; prevValidViewId)
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> elem <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> view <span class="blue">As</span> DB.<span class="teal">View</span> = <span class="blue">TryCast</span>(elem, DB.<span class="teal">View</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">If</span> view <span class="blue">IsNot</span> <span class="blue">Nothing</span> <span class="blue">Then</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' TODO: Check that view is valid for the </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' placement of this type of family symbol, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' otherwise get another view.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' (Likely to be the case, as the user </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' will normally click a ribbon item as </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">' part of the context of what they're doing.)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; docUI.ActiveView = view
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp;
+&nbsp; docUI.PromptForFamilyInstancePlacement(
+&nbsp; &nbsp; familySymbol)
+</pre>
+
+<p>Many thanks to Matt for pointing this out and providing such a nice solution!</p>
+
+<p>I'll add a couple of non-Revit-API-related notes:</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk University Brazil</h4>
+
+<p><a href="http://aubrasil.autodesk.com">Autodesk University Brazil</a> is taking place in São Paulo on October 10, 2013.
+Explore the program, mark your calendar and register at <a href="http://aubrasil.autodesk.com">aubrasil.autodesk.com</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Building Performance Analysis Certificate Program</h4>
+
+<p>Autodesk launched the
+
+<a href="http://sustainabilityworkshop.autodesk.com/bpac">
+Building Performance Analysis (BPA) Certificate Program</a>.</p>
+
+<p>This free online course for architecture and engineering students teaches the building science fundamentals for designing high-performance buildings.
+Through self-paced online tutorials, quizzes and Autodesk software exercises, the BPA Certificate Program gives students the skills to help drive an industry-wide transition to performance-based sustainable design.
+It provides:</p>
+
+<ul>
+<li>Seven modules that include climate analysis, sun path studies, building massing and orientation, solar radiation analysis, wind analysis, and more.</li>
+<li>A clear 'introduction to software' section within each of the seven modules.</li>
+<li>Small clusters of content and quizzes that students can complete in short amounts at a time.</li>
+<li>Case-based examples and questions.</li>
+<li>Content focused on energy fundamentals and modeling with detailed Revit models.</li>
+<li>Application of Revit-based tools including Revit, Vasari and Green Building Studio.</li>
+</ul>
+
+<p>This program takes an estimated 20 hours to complete.
+Following successful completion, students are issued a certificate and a badge that they can place on their resume, LinkedIn profile or portfolio.
+Students will improve and prove their fluency in sustainable building design strategies and tools.</p>
+
+
+<a name="4"></a>
+
+<h4>Factory Design Mobile App</h4>
+
+<p>The
+
+<a href="https://itunes.apple.com/us/app/autodesk-factory-design/id657389678?ls=1&mt=8">
+Factory Design Mobile</a>,
+
+available on the Apple App Store, enables iPad users to create and review factory layouts in the field.</p>
+
+<p>It presents a 2D layout environment to conceptualize designs, adjust them based on field observations and collaborate with partners.</p>
+
+<p>Besides being an independent conceptual design tool for factory layouts, FDM also supports synchronization with existing designs.
+You can review your design live on the factory floor and synchronize changes from the floor to the final design, including updating both 2D and 3D representations of the factory.</p>

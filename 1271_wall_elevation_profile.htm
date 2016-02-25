@@ -1,0 +1,183 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Getting Wall Elevation Profile
+Katsuaki Takamizawa
+
+-->
+
+
+<h3>Getting the Wall Elevation Profile</h3>
+
+<p>I am back from the vacation in Italy, which I enjoyed very much, especially another visit to the wonderful coast of Amalfi.</p>
+
+<p>To quickly share an interesting new result using the Revit API, here is a solution by Katsuaki Takamizawa to retrieve the wall elevation profile.</p>
+
+<p>It also provides a nice little example of using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/01/exporterifcutils-curve-loop-sort-and-validate.html">
+ExporterIFCUtils.SortCurveLoops method</a> that
+
+we just recently documented.</p>
+
+<p>Says Katsu:</p>
+
+<p>I created some sample code for finding the wall elevation profile and determining its outer and inner loops.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+wall elevation profile</a> topic
+
+was already discussed way back in 2008, followed by determination of the related polygon areas.</p>
+
+<p>This sample uses newer methods and the code is much simpler.</p>
+
+<p>The sample draws model lines based on the existing wall elevation profile.</p>
+
+<p>The outer edge loop is colored in red.</p>
+
+<p>It uses the ExporterIFCUtils.SortCurveLoops method to sort the outer and inner loops.</p>
+
+<p>The outer loop is always counter-clockwise oriented, so we can use the IsCounterclockwise method to detect it.</p>
+
+<p>The result of running the command on a simple wall with a door and two windows looks like this:</p>
+
+<center>
+<img src="img/GetWallProfile.png" alt="Wall elevation profile" width="347"/>
+</center>
+
+<p>Here is the entire implementation of the external command Execute method:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creapp
+&nbsp; &nbsp; = app.Create;
+&nbsp;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> credoc
+&nbsp; &nbsp; = doc.Create;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;Select a wall&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = uidoc.Document.GetElement( r );
+&nbsp;
+&nbsp; <span class="teal">Wall</span> wall = e <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Wall Profile&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get the external wall face for the profile</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; sideFaces
+&nbsp; &nbsp; &nbsp; = <span class="teal">HostObjectUtils</span>.GetSideFaces( wall,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ShellLayerType</span>.Exterior );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e2 = doc.GetElement( sideFaces[0] );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Face</span> face = e2.GetGeometryObjectFromReference(
+&nbsp; &nbsp; &nbsp; sideFaces[0] ) <span class="blue">as</span> <span class="teal">Face</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// The normal of the wall external face.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = face.ComputeNormal( <span class="blue">new</span> <span class="teal">UV</span>( 0, 0 ) );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Offset curve copies for visibility.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> offset = <span class="teal">Transform</span>.CreateTranslation(
+&nbsp; &nbsp; &nbsp; 5 * normal );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If the curve loop direction is counter-</span>
+&nbsp; &nbsp; <span class="green">// clockwise, change its color to RED.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Color</span> colorRed = <span class="blue">new</span> <span class="teal">Color</span>( 255, 0, 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get edge loops as curve loops.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; curveLoops
+&nbsp; &nbsp; &nbsp; = face.GetEdgesAsCurveLoops();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// ExporterIFCUtils class can also be used for </span>
+&nbsp; &nbsp; <span class="green">// non-IFC purposes. The SortCurveLoops method </span>
+&nbsp; &nbsp; <span class="green">// sorts curve loops (edge loops) so that the </span>
+&nbsp; &nbsp; <span class="green">// outer loops come first.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt;&gt; curveLoopLoop
+&nbsp; &nbsp; &nbsp; = <span class="teal">ExporterIFCUtils</span>.SortCurveLoops(
+&nbsp; &nbsp; &nbsp; &nbsp; curveLoops );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; curveLoops2
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> curveLoopLoop )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CurveLoop</span> curveLoop2 <span class="blue">in</span> curveLoops2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Check if curve loop is counter-clockwise.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">bool</span> isCCW = curveLoop2.IsCounterclockwise(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; normal );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CurveArray</span> curves = creapp.NewCurveArray();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Curve</span> curve <span class="blue">in</span> curveLoop2 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; curves.Append( curve.CreateTransformed( offset ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Create model lines for an curve loop.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Plane</span> plane = creapp.NewPlane( curves );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SketchPlane</span> sketchPlane
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">SketchPlane</span>.Create( doc, plane );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ModelCurveArray</span> curveElements
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = credoc.NewModelCurveArray( curves,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sketchPlane );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( isCCW )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ModelCurve</span> mcurve <span class="blue">in</span> curveElements )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">OverrideGraphicSettings</span> overrides
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = view.GetElementOverrides(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; mcurve.Id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; overrides.SetProjectionLineColor(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; colorRed );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; view.SetElementOverrides(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; mcurve.Id, overrides );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>I initially tried to move the model lines using the ElementTransformUtils.MoveElement method to offset them for better visibility.</p>
+
+<p>That did not work.</p>
+
+<p>It seems that these model lines are attached to the wall face, and the MoveElement method cannot move them away from the wall.</p>
+
+<p>So I modified the underlying geometry curves first, before creating model lines from them.</p>
+
+<p>Here is
+
+<a href="zip/GetWallProfileJt.zip">GetWallProfile.zip</a> containing
+
+the entire Visual Studio solution, external command source code and add-in manifest.</p>
+
+<p>Many thanks to Katsu-san for implementing and sharing this!</p>

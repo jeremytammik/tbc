@@ -1,0 +1,124 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Functional Programming, View and Data API Demos</h3>
+
+<p>I spent Monday evening at the interesting meetup workshop on
+
+<a href="http://www.meetup.com/basel-js/events/213653852">
+functional programming in JavaScript</a> led
+
+by basel.js meetup group regular Lukasz Gintowt.</p>
+
+<p>All available seats were taken with 20 participants.</p>
+
+<p>Follow the link above to get to all the interesting material we looked at.</p>
+
+<p>It reminded me somewhat of the early days of AutoCAD programming, where the more elegant AutoLISP solutions tended towards functional programming...
+Remember car, cdr, mapcar, apply and lambda?</p>
+
+<p>Basically, that is part of what we talked about.</p>
+
+<p>Look up <a href="http://en.wikipedia.org/wiki/Haskell_Curry">
+Haskell Brooks Curry</a>,
+
+mathematician and logician, with three programming languages named after him,
+
+<a href="http://en.wikipedia.org/wiki/Haskell_(programming_language)">
+Haskell</a>,
+
+<a href="http://en.wikipedia.org/wiki/Brooks_(programming_language)">
+Brooks</a> and
+
+<a href="http://en.wikipedia.org/wiki/Curry_(programming_language)">
+Curry</a>,
+
+as well as the concept of
+
+<a href="http://en.wikipedia.org/wiki/Currying">
+currying</a>,
+
+a technique used for transforming functions in mathematics and computer science.</p>
+
+<p>We went through a number of cool hand-on JavaScript exercises listed in Lukasz'
+
+<a href="https://codeeval-c9-syzer.c9.io/functional">slides</a>.</p>
+
+<p>Here are some of the additional notes I took:</p>
+
+<ul>
+<li>A highly recommended JavaScript book: <a href="https://github.com/getify/You-Dont-Know-JS">You Don't Know JS</a>.</li>
+
+<li><a href="http://underscorejs.org">Underscore</a> is an interesting and well-known JavaScript library providing functional programming helpers.
+<a href="https://lodash.com/">Lo-dash</a> is similar and better in some respects.</li>
+
+<li><a href="http://en.wikipedia.org/wiki/Idempotence">Idempotency</a> is recommended for all REST call implementations, i.e., repeated calls to the same REST URL should return the same consistent result.
+For instance, if a first call to a URL ending in /delete/id returns the response 'deleted' or 'OK', i.e. 200, then all the further calls to the same URL should return the same value.
+Many implementations return something different, e.g. 'not found' on the second and all following calls.
+That is wrong; they should also return deleted or OK, or the idempotency will be violated.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Cool View and Data API Demos</h4>
+
+<p><a href="http://www.davidveld.nl">David In't Veld</a> posted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-view-and-data-api-notes-and-samples.html?cid=6a00e553e16897883301bb079df784970d#comment-6a00e553e16897883301bb079df784970d">
+comment</a> on
+
+the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-view-and-data-api-notes-and-samples.html">
+View and Data API notes and samples</a> asking for some simple demos:</p>
+
+<p><strong>Question:</strong> Is there any 'Demo' webpage to show-off what this View API can do?</p>
+
+<p>It's a pity there are almost zero sample projects in an actually working Internet environment.
+I thought by now this would have been set up.
+Because clearly there has been a lot of work been put into this...
+The website <a href="https://developer.autodesk.com">developer.autodesk.com</a> simply points to GitHub but those samples require some study to make them work... even images on the Autodesk website are not working API but simple images.</p>
+
+<p>Our company is investing in new ways of showing our Revit models, and I suggested the View API, however since I could not show any impressive working model.
+I cannot convince anyone to invest in this...</p>
+
+<p>Probably not the best place to mention this, but its frustrating every time I see View API in the title.
+Would like to see more demo pages...</p>
+
+<p><strong>Answer:</strong> The best place to ask for more appropriate samples is in the dedicated Autodesk View and Data API discussion forum:
+
+<a href="http://forums.autodesk.com">Autodesk Community</a> &ndash;&gt;
+<a href="http://forums.autodesk.com/t5/Web-Services-API/ct-p/94">Web Services API</a> &ndash;&gt;
+<a href="http://forums.autodesk.com/t5/View-and-Data-API/bd-p/95">View and Data API discussion forum</a>.</p>
+
+<p>I would suggest submitting this comment there as well and see what the team has to say.</p>
+
+<p>Here is a bunch of publicly accessible demo pages that will hopefully help fulfil your need, partially equipped with source code on GitHub to look at as well:</p>
+
+<ul>
+<li><a href="http://gallery.autodesk.io">gallery.autodesk.io</a></li>
+<li><a href="http://mountcomp-stg.autodesk.io">mountcomp-stg.autodesk.io</a> &ndash; <a href="https://github.com/Developer-Autodesk/client-mountsimulation-view.and.data.api">github.com/Developer-Autodesk/client-mountsimulation-view.and.data.api</a></li>
+<li><a href="http://timeliner.autodesk.io">timeliner.autodesk.io</a> &ndash; <a href="https://github.com/Developer-Autodesk/client-timeliner-view.and.data.api">github.com/Developer-Autodesk/client-timeliner-view.and.data.api</a></li>
+<li><a href="http://octoviewer.autodesk.io">octoviewer.autodesk.io</a></li>
+<li><a href="http://checkoutmymodel.autodesk.io">checkoutmymodel.autodesk.io</a> &ndash; <a href="https://github.com/Developer-Autodesk/workflow-aspnet-webform-view.and.data.api">github.com/Developer-Autodesk/workflow-aspnet-webform-view.and.data.api</a></li>
+<li><a href="http://sapdemo.autodesk.io">sapdemo.autodesk.io</a> &ndash; <a href="https://github.com/Developer-Autodesk/integration-sap-view.and.data.api">github.com/Developer-Autodesk/integration-sap-view.and.data.api</a></li>
+<li><a href="http://viewer.autodesk.io/bingmapintegration/">viewer.autodesk.io/bingmapintegration/</a></li>
+<li>Steampunk &ndash; <a href="http://autode.sk/m3w">autode.sk/m3w</a></li>
+<li>Tractor &ndash; <a href="https://s3.amazonaws.com/FastViewer/index.html?file=frontloader/0.svf">s3.amazonaws.com/FastViewer/index.html?file=frontloader/0.svf</a></li>
+<li>Office &ndash; <a href="https://s3.amazonaws.com/FastViewer/index.html?file=Waltham/0.svf">s3.amazonaws.com/FastViewer/index.html?file=Waltham/0.svf</a></li>
+<li>Blog &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/stephens-test-page.html">adndevblog.typepad.com/cloud_and_mobile/stephens-test-page.html</a></li>
+</ul>
+
+<p>By the way, I looked at David's <a href="http://www.davidveld.nl">web site</a> and really like the photos.</p>
+
+<p>Another example of combining photography and Revit API programming, just like my colleague
+
+<a href="http://adndevblog.typepad.com/aec/jaime-rosales.html">Jaime</a>.</p>

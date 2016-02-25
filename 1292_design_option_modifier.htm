@@ -1,0 +1,537 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Rudolf Honke 
+AW: AW: Thin Lines: Get, Set, Toggle
+Re: Switch DesignOptions
+
+- https://en.wikipedia.org/wiki/David_Nutt
+  Alcohol causes more harm than any other drug.
+  The sport of horse riding is more dangerous than taking ecstasy.
+  magazin
+
+-->
+
+<h3>List and Switch Design Options Using UI Automation</h3>
+
+<p>Yesterday, we discussed a Revit add-in using .NET UI Automation to retrieve the current state of the Revit thin lines setting.</p>
+
+<p>Today, let's look at another application demonstrating use of that functionality to determine, list and set the Revit design options from a stand-alone executable application.</p>
+
+<p>Once again, this sample is presented by
+
+<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">Revitalizer</a>, aka
+
+Rudolf Honke of <a href="http://www.acadgraph.de">Mensch und Maschine acadGraph</a>,
+
+who already contributed numerous other examples making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/automation">
+.NET UI Automation library</a> to
+
+hack the Revit user interface.</p>
+
+<p>Please note once again
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">The Building Coder Disclaimer</a>:
+
+in the following, we present a going beyond the officially supported Revit API, leading to an experimental implementation suitable only for a personal controlled usage that should not be relied upon for production use.</p>
+
+
+<a name="2"></a>
+
+<h4>Revitalizer Implementation Notes</h4>
+
+<p><strong>Rudolf says:</strong>
+
+Here is a tool for switching between DesignOptions.</p>
+
+<p>This is a stand-alone application that gets and sets DesignOptions.</p>
+
+<p>Since it works very, very slowly, it is not too useful for everyday professional work.</p>
+
+<center>
+<img src="img/DesignOptionModifier_main_form.png" alt="DesignOptionModifier main form" width="269"/>
+</center>
+
+<p>It just reads and sets the ComboBox, but reading the items requires expanding them all first, which costs several seconds each time.</p>
+
+<center>
+<img src="img/DesignOptionModifier_revit.png" alt="Revit Design Option combo box" width="678"/>
+</center>
+
+<p>To test it, just start a Revit project containing a few DesignOptions.</p>
+<p>Then start the DesignOptionModifier program.</p>
+<p>You can drive Revit from outside this way.</p>
+<p>Please also note that DesignOption groups are displayed in the DesignOptionModifier program listbox as well.</p>
+<p>As far as I know, there is no way to check if entries are greyed out in the Revit combobox.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Sample Run</h4>
+
+<p>This is a stand-alone executable application presenting one single Windows form.</p>
+
+<p>It implements two buttons:</p>
+
+<ul>
+<li>Retrieve the current design options defined in Revit.</li>
+<li>Set the current Revit design option to the selected list entry.</li>
+</ul>
+
+<p>Here is an example of running it after starting up Revit, defining a couple of new design options and clicking the 'Get' button:</p>
+
+<center>
+<img src="img/DesignOptionModifier_form_2.png" alt="DesignOptionModifier retrieving design options" width="256"/>
+</center>
+
+<p>After selecting the second entry and clicking 'Set', the selected entry is activated in Revit:</p>
+
+<center>
+<img src="img/DesignOptionModifier_revit_2.png" alt="DesignOptionModifier modified the  design option" width="473"/>
+</center>
+
+<a name="4"></a>
+
+<h4>Implementation Notes</h4>
+
+<p>The program mainline is trivial, because all action is implemented by the form implementation:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Windows.Forms;
+&nbsp;
+<span class="blue">namespace</span> DesignOptionModifier
+{
+&nbsp; <span class="blue">static</span> <span class="blue">class</span> <span class="teal">Program</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Der Haupteinstiegspunkt f&#252;r die Anwendung.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; [<span class="teal">STAThread</span>]
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">void</span> Main()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span>.EnableVisualStyles();
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span>.SetCompatibleTextRenderingDefault(<span class="blue">false</span>);
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span>.Run(<span class="blue">new</span> <span class="teal">Form1</span>());
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The form implementation demonstrates how to:</p>
+
+<ul>
+<li>Use P/Invoke to access and make use of the Windows API functionality defined in User32.dll to find and enumerate specific windows.</li>
+<li>Find the design option combo box in the Revit main window status bar.</li>
+<li>Read the current design option from the Revit combo box.</li>
+<li>Update the value of the Revit combo box to modify the selected design option.</li>
+<li>Handle the form button clicks.</li>
+<li>Control the foreground window, etc.</li>
+</ul>
+
+<p>Here is the form source code:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.ComponentModel;
+<span class="blue">using</span> System.Data;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Drawing;
+<span class="blue">using</span> System.Runtime.InteropServices;
+<span class="blue">using</span> System.Text;
+<span class="blue">using</span> System.Windows.Automation;
+<span class="blue">using</span> System.Windows.Forms;
+<span class="blue">using</span> System.Windows.Input;
+&nbsp;
+<span class="blue">namespace</span> DesignOptionModifier
+{
+&nbsp; <span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">Form1</span> : <span class="teal">Form</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Windows API
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; [<span class="blue">return</span>: <span class="teal">MarshalAs</span>( <span class="teal">UnmanagedType</span>.Bool )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> SetForegroundWindow(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span>, CharSet = <span class="teal">CharSet</span>.Auto )]
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> GetWindowText(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, [<span class="teal">Out</span>] <span class="teal">StringBuilder</span> lpString,
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> nMaxCount );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span>, CharSet = <span class="teal">CharSet</span>.Auto )]
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> GetWindowTextLength(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; &nbsp; [<span class="blue">return</span>: <span class="teal">MarshalAs</span>( <span class="teal">UnmanagedType</span>.Bool )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> EnumChildWindows(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> window, <span class="teal">EnumWindowProc</span> callback, <span class="teal">IntPtr</span> i );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, EntryPoint = <span class="maroon">&quot;GetClassName&quot;</span> )]
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">int</span> GetClass(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, <span class="teal">StringBuilder</span> className, <span class="blue">int</span> nMaxCount );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">delegate</span> <span class="blue">bool</span> <span class="teal">EnumWindowProc</span>(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, <span class="teal">IntPtr</span> parameter );
+&nbsp;
+&nbsp; &nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span>, SetLastError = <span class="blue">true</span> )]
+&nbsp; &nbsp; [<span class="blue">return</span>: <span class="teal">MarshalAs</span>( <span class="teal">UnmanagedType</span>.Bool )]
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> GetWindowRect(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd, <span class="blue">out</span> <span class="teal">RECT</span> lpRect );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> GetText( <span class="teal">IntPtr</span> hWnd )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> length = GetWindowTextLength( hWnd );
+&nbsp; &nbsp; &nbsp; <span class="teal">StringBuilder</span> sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>( length + 1 );
+&nbsp; &nbsp; &nbsp; GetWindowText( hWnd, sb, sb.Capacity );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> sb.ToString();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">bool</span> EnumWindow(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> handle,
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> pointer )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">GCHandle</span> gch = <span class="teal">GCHandle</span>.FromIntPtr( pointer );
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; list = gch.Target <span class="blue">as</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt;;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( list != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; list.Add( handle );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; GetChildWindows(
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> parent )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; result = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="teal">GCHandle</span> listHandle = <span class="teal">GCHandle</span>.Alloc( result );
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">EnumWindowProc</span> childProc = <span class="blue">new</span> <span class="teal">EnumWindowProc</span>( EnumWindow );
+&nbsp; &nbsp; &nbsp; &nbsp; EnumChildWindows( parent, childProc, <span class="teal">GCHandle</span>.ToIntPtr( listHandle ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">finally</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listHandle.IsAllocated )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listHandle.Free();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> result;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">internal</span> <span class="blue">struct</span> <span class="teal">RECT</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Left;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Top;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Right;
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Bottom;
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Cache combobox</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">AutomationElement</span> comboBoxElement = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> Form1()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; InitializeComponent();
+&nbsp;
+&nbsp; &nbsp; &nbsp; GetComboBox();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> button_ok_Click(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; Close();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> GetComboBox()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> maxX = -1;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Process</span>[] revits = <span class="teal">Process</span>.GetProcessesByName(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Revit&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IntPtr</span> cb = <span class="teal">IntPtr</span>.Zero;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( revits.Length &gt; 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; children = GetChildWindows(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; revits[0].MainWindowHandle );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IntPtr</span> child <span class="blue">in</span> children )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StringBuilder</span> classNameBuffer
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">StringBuilder</span>( 100 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> className = GetClass( child,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; classNameBuffer, 100 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( classNameBuffer.ToString().Contains(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;msctls_statusbar32&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">IntPtr</span>&gt; grandChildren
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = GetChildWindows( child );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IntPtr</span> grandChild <span class="blue">in</span> grandChildren )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">StringBuilder</span> classNameBuffer2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">StringBuilder</span>( 100 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> className2 = GetClass( grandChild,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; classNameBuffer2, 100 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( classNameBuffer2.ToString().Contains(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ComboBox&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RECT</span> r;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetWindowRect( grandChild, <span class="blue">out</span> r );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// There are at least two comboboxes, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// and we want the rightmost one.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r.Left &gt; maxX )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; maxX = r.Left;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cb = grandChild;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( cb != <span class="teal">IntPtr</span>.Zero )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; comboBoxElement = <span class="teal">AutomationElement</span>.FromHandle(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cb );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> buttonGet_Click(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( comboBoxElement != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( comboBoxElement.Current.IsEnabled ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExpandCollapsePattern</span> expandPattern
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">ExpandCollapsePattern</span>) comboBoxElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetCurrentPattern(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExpandCollapsePattern</span>.Pattern );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; expandPattern.Expand();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; listBox1.Items.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CacheRequest</span> cacheRequest = <span class="blue">new</span> <span class="teal">CacheRequest</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; cacheRequest.Add( <span class="teal">AutomationElement</span>.NameProperty );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; cacheRequest.TreeScope = <span class="teal">TreeScope</span>.Element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TreeScope</span>.Children;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> comboboxItems = comboBoxElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetUpdatedCache( cacheRequest );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> item
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> comboboxItems.CachedChildren )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( item.Current.Name == <span class="maroon">&quot;&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CacheRequest</span> cacheRequest2 = <span class="blue">new</span> <span class="teal">CacheRequest</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cacheRequest2.Add( <span class="teal">AutomationElement</span>.NameProperty );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cacheRequest2.TreeScope = <span class="teal">TreeScope</span>.Element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TreeScope</span>.Children;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> comboboxItems2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = item.GetUpdatedCache( cacheRequest );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> item2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> comboboxItems2.CachedChildren )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listBox1.Items.Add( item2.Current.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; expandPattern.Collapse();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; GetSelection();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> GetSelection()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( comboBoxElement != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( comboBoxElement.Current.IsEnabled ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelectionPattern</span> selPattern = comboBoxElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetCurrentPattern( <span class="teal">SelectionPattern</span>.Pattern )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">SelectionPattern</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span>[] items = selPattern.Current
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetSelection();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> item <span class="blue">in</span> items )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> index = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> listItem <span class="blue">in</span> listBox1.Items )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( (<span class="blue">string</span>) listItem == item.Current.Name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listBox1.SelectedIndex = index;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; index++;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( <span class="blue">this</span>.Handle );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> SetSelection( <span class="blue">string</span> option )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( comboBoxElement != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; ( comboBoxElement.Current.IsEnabled ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> sel = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExpandCollapsePattern</span> expandPattern
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="teal">ExpandCollapsePattern</span>) comboBoxElement
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetCurrentPattern(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExpandCollapsePattern</span>.Pattern );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; expandPattern.Expand();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CacheRequest</span> cacheRequest = <span class="blue">new</span> <span class="teal">CacheRequest</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; cacheRequest.Add( <span class="teal">AutomationElement</span>.NameProperty );
+&nbsp; &nbsp; &nbsp; &nbsp; cacheRequest.TreeScope = <span class="teal">TreeScope</span>.Element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TreeScope</span>.Children;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> comboboxItems
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = comboBoxElement.GetUpdatedCache(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cacheRequest );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> item
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> comboboxItems.CachedChildren )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( item.Current.Name == <span class="maroon">&quot;&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CacheRequest</span> cacheRequest2 = <span class="blue">new</span> <span class="teal">CacheRequest</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cacheRequest2.Add( <span class="teal">AutomationElement</span>.NameProperty );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; cacheRequest2.TreeScope = <span class="teal">TreeScope</span>.Element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <span class="teal">TreeScope</span>.Children;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">AutomationElement</span> comboboxItems2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = item.GetUpdatedCache( cacheRequest );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">AutomationElement</span> item2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> comboboxItems2.CachedChildren )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( item2.Current.Name == option )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sel = item2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( sel != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelectionItemPattern</span> select =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="teal">SelectionItemPattern</span>) sel.GetCurrentPattern(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">SelectionItemPattern</span>.Pattern );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; select.Select();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; expandPattern.Collapse();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( <span class="blue">this</span>.Handle );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> buttonSet_Click(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listBox1.Items.Count &gt; 0
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; listBox1.SelectedIndex &gt; -1 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> option = (<span class="blue">string</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listBox1.Items[listBox1.SelectedIndex];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; SetSelection( option );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( <span class="blue">this</span>.Handle );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>The complete source code and Visual Studio solution are provided in the
+
+<a href="https://github.com/jeremytammik/DesignOptionModifier">
+DesignOptionModifier GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/DesignOptionModifier/releases/tag/2015.0.0.0">
+release 2015.0.0.0</a>.</p>
+
+<p>As said, please be aware of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#4">The Building Coder Disclaimer</a> before
+
+you even dream of making use of this.</p>
+
+<p>Many thanks to Rudi for his research and nice, clean implementation!</p>
+
+
+<a name="6"></a>
+
+<h4>Dr. Nutt on the Harm Caused by Alcohol</h4>
+
+<p>Before closing, let me add a note on something completely different.</p>
+
+<p>I enjoy reading
+
+<a href="http://blog.dasmagazin.ch">Das Magazin</a>,
+
+a Saturday supplement to several major Swiss daily newspapers.</p>
+
+<p>The current issue,
+
+<a href="http://blog.dasmagazin.ch/aktuelles_heft/10">nr. 10, March 6, 2015</a>
+
+(<a href="http://blog.dasmagazin.ch/wp-content/uploads/2015/03/ma1510.pdf">PDF</a>),
+
+includes an interview with
+
+<a href="https://en.wikipedia.org/wiki/David_Nutt">Dr. David Nutt</a> on
+
+the harm caused by alcohol and other drugs and the legislation and politics we put in place to deal with it.</p>
+
+<p>The succinct summary is surprising, funny and scary:</p>
+
+<ul>
+<li>Alcohol causes more harm worldwide than any other known drug.</li>
+<li>The sport of horse riding is more dangerous than taking ecstasy.</li>
+<li>Some politicians deny rational analysis and science and refuse to work towards achieving the best for society and us citizens, putting higher priorities on other agenda.</li>
+</ul>
+
+<p>As said, pretty scary and shocking stuff, especially the way we as a society and our politicians deal with the issue.</p>

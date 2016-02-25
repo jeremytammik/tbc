@@ -1,0 +1,171 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09686203 [Refresh The Selection]
+
+Katsuaki Takamizawa (Contingent) RE: Finding the height of the schedule in a sheet
+
+Theo Armour Re: Update 2014-06-25 ~ Many Things
+
+-->
+
+<h3>Refresh Element Graphics Display</h3>
+
+<p>I talked about how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/refresh-element-graphics-display.html">
+refresh element graphics display</a> back
+
+in 2011, and it seems like the time has come to revisit that topic.</p>
+
+<p>After that, I also want to mention an approach to
+
+<a href="#3">determine the height of a schedule in a sheet</a> and
+
+how to
+
+<a href="#4">avoid running a web server</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Refresh Element Graphics Display</h4>
+
+<p>Afshin just submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html?cid=6a00e553e16897883301a3fd2391f5970b#comment-6a00e553e16897883301a3fd2391f5970b">
+comment</a> about this on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html">
+replacing an Idling event handler by an external event</a>,
+
+and another developer asked something similar today, so here goes:</p>
+
+<p>I am aware of several different possible ways to trigger a graphical refresh, e.g.:</p>
+
+<ul>
+<li>Call UIDocument.RefreshActiveView</li>
+<li>Call Document.Regenerate</li>
+<li>Commit a sub-transaction</li>
+<li>Commit a transaction</li>
+<li>Commit a transaction group</li>
+</ul>
+
+<p>I would expect the various approaches to become more expensive in the order listed above.</p>
+
+<p>You will have to try out what works best for you in your specific context.</p>
+
+<p>If you have a specific element that you want refreshed and nothing else helps, I used the following neat
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/07/refresh-element-graphics-display.html">
+temporary translation approach</a> successfully
+
+in various CAD systems:</p>
+
+<ul>
+<li>Move an element by a zero length vector</li>
+<li>Move an element by a non-zero distance, and then back again</li>
+</ul>
+
+<p>I can think off-hand of two very nice samples that demonstrate refreshing the graphics screen programmatically, the DisplacementElementAnimation SDK sample and the kinetic facade sample.</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/animation-and-the-displacementelement-class.html">
+DisplacementElementAnimation sample</a> makes
+
+use of the DisplacementElement class to create an automated real-time animation of exploding a building.</p>
+
+<p>It is pretty radical, since it works with the Idling event to modify the model quite significantly to displace elements in each step, and achieves the graphics update by committing a transact5ion for each animation step:</p>
+
+<p>The
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/devcamp-and-refresh-display-for-a-kinetic-facade.html">
+kinetic facade sample</a> is
+
+a bit simpler.
+It does not use Idling, performs a fixed number of animation steps, and uses sub-transactions to refresh:</p>
+
+<p><strong>Addendum:</strong> Arno&scaron;t L&ouml;bel addded some important clarifications and corrections to the statements above:</p>
+
+<p>Palette update will probably not work in the middle of a command without adding new internal Revit support for it.
+It is a modeless window reacting to messages sent to the Revit's message queue, and processing of messages from the queue is probably suspended until an external command finishes. Therefore, if you need the palette to refresh, you have to refactor the application around some modeless concept and give the palette a chance to update regularly.</p>
+
+<p>Regarding the 'possible several ways' to trigger graphical refresh listed above:</p>
+
+<ul>
+<li>Committing a sub-transaction and transaction group does absolutely nothing in that regard.</li>
+<li>Regeneration might, but probably does not trigger anything in most cases, since regeneration itself is a pure DB operation.</li>
+<li>Committing a transaction mostly does trigger UI update, but probably not all of all possible UI items and controls.</li>
+<li>RefreshActiveView should trigger necessary UI refresh, naturally.</li>
+</ul>
+
+<p>The 'zero move' trick that apparently works in some other CAD systems is not recommended.
+If committing a transaction does not work, this would not help.</p>
+
+<p>The properties palette does not update to the current situation if an external command is running.</p>
+
+<p>In summary, the approach illustrated by the DisplacementElementAnimation SDK sample is probably best.</p>
+
+
+<a name="3"></a>
+
+<h4>Determine the Height of a Schedule in a Sheet</h4>
+
+<p><strong>Question:</strong> How can I determine the height of a schedule, i.e. a ScheduleSheetInstance element, placed on a sheet?</p>
+
+<p>I need to find the height of several schedules in order to place them on the sheet without overlapping each other.</p>
+
+<p>The sum of the row heights returned by the TableSectionData.GetRowHeight method does not match the total schedule height.</p>
+
+<p>Is it possible to find their height from the ViewSchedule elements before placing them in a sheet?</p>
+
+
+<p><strong>Answer:</strong> Yes, the TableSectionData.GetRowHeight method returns the row height in the schedule/template view.</p>
+
+<p>When a schedule is inserted into a sheet, the sizing is dynamically recalculated based on the section row height, text size,  schema type, frozen control, split control, etc.</p>
+
+<p>The final values of the row heights are not stored or exposed.</p>
+
+<p>Therefore, the only way to find the total height is by using the ScheduleSheetInstance boundary box.</p>
+
+
+<a name="4"></a>
+
+<h4>Avoid Running a Server</h4>
+
+<p><strong>Question:</strong> Do I have to run a web server to open files on the local file system in JavaScript?</p>
+
+<p><strong>Answer:</strong> You do not have to, but some people do.</p>
+
+<p>Here's why:</p>
+
+<p>The browser has to be very careful about what is allowed to open files and where.</p>
+
+<p>Everybody is scared of the consequences of a remote app running or opening files on your local machine.</p>
+
+<p>Therefore, in general, the <a href="http://en.wikipedia.org/wiki/Same_origin_policy">same-origin policy</a> is enforced.</p>
+
+<p>Some restrictions can be worked around using CORS, <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">cross-origin resource sharing</a>.</p>
+
+<p>Basically, a client-side HTML file is really limited as to what it can access.</p>
+
+<p>So many people do run web servers locally in order to open images etc.</p>
+
+<p>Of course, that adds complexity.</p>
+
+<p>On a Windows machine using Chrome, it can be avoided by adding a command line argument when starting up the browser, like this:</p>
+
+<ul>
+<li>"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --allow-file-access-from-files</li>
+</ul>
+
+<p>With this argument specified, you can do just about anything with JavaScript that you can on a server.</p>
+
+<p>Thanks to Theo Armour and Mr.doob for showing
+
+<a href="https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally">
+how to run things locally</a>.</p>

@@ -1,0 +1,327 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+#revitapi @jeremytammik #3dwebcoder #webgl #3dweb #html5
+
+akn_include
+
+-->
+
+
+<h3>Exporting 3D Element Geometry to a WebGL Viewer</h3>
+
+<p>Yesterday, I discussed
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-101-getting-started.html">
+how to get started with WebGL</a> and
+
+demonstrated a simple 3D viewer making use of the Tiny WebGL helper Library <a href="http://twgljs.org">TWGL</a>.</p>
+
+<p>Today, I present the TwglExport Revit add-in to select an individual element and populate the viewer with that.</p>
+
+<p>To drive the WebGL viewer, we just need a bunch of vertex locations, normal vectors in each vertex, and face definitions hooking them up with each other.</p>
+
+<p>TwglExport achieves exactly that though the following steps:</p>
+
+<ul>
+<li>Retrieve the pre-selected element.</li>
+<li>Determine its bounding box and geometry.</li>
+<li>Loop through the geometry objects, ignoring everything except solids.</li>
+<li>Loop through the solid faces.</li>
+<li>For each face, request a triangulated mesh.</li>
+<li>For each mesh triangle, export its three corners and its normals at each one.</li>
+<li>Add the indices of the resulting vertex and normal coordinate entries to the face definition list.</li>
+</ul>
+
+<p>I already implemented a number of similar algorithms and add-ins in the past, e.g., the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">OBJ model exporter</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html">ADN mesh data custom exporter to JSON</a>.</p>
+
+<p>Please be aware that for most serious uses, you will wish to export multiple elements that may have a complicated nested geometric structure, e.g. family instances, or an entire building model.</p>
+
+<p>In those cases, you will almost certainly save a lot of effort by making use of a
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">custom exporter</a> instead
+
+of traversing individual element geometry like I am doing here for this trivial single-element case.</p>
+
+<p>The element geometry that I retrieve from the Revit database is all in feet.</p>
+
+<p>For the sake of simplicity and efficiency &ndash; and maybe show the imperialists that I am in control here :-) &ndash; I convert it to the revolutionary and republican metric millimetres &ndash; Liberté, égalité, fraternité!</p>
+
+<p>In case you were not aware of it, the
+<a href="https://en.wikipedia.org/wiki/Metric_system">metric system</a> was introduced during the
+<a href="https://en.wikipedia.org/wiki/French_Revolution">French Revolution</a>, by the
+<a href="https://en.wikipedia.org/wiki/French_First_Republic">French First Republic</a>,
+in 1799.</p>
+
+<p>I also find that having my geometric data in integers instead of real numbers makes it much easier to read and understand while debugging.</p>
+
+<p>Furthermore, I translate it all from the midpoint of the selected element's bounding box to the origin.</p>
+
+<p>Right at the end of the process, I convert it back to real numbers again to fit it into a unit cube &ndash; actually a 2-cube from -1 to 1 in all three dimensions &ndash; centred around the origin.</p>
+
+<p>Here is the entire code of the read-only TwglExport external command that achieves all this:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> If true, individual curved surface facets are</span>
+&nbsp; <span class="gray">///</span><span class="green"> retained, otherwise (default) smoothing is </span>
+&nbsp; <span class="gray">///</span><span class="green"> applied.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> RetainCurvedSurfaceFacets = <span class="blue">false</span>;
+&nbsp;
+&nbsp; <span class="green">// Unit conversion factors.</span>
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _mm_per_inch = 25.4;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _inch_per_foot = 12;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _foot_to_mm = _inch_per_foot * _mm_per_inch;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert the given value from </span>
+&nbsp; <span class="gray">///</span><span class="green"> imperial feet to metric millimetres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> FootToMm( <span class="blue">double</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> one_half = a &gt; 0 ? 0.5 : -0.5;
+&nbsp; &nbsp; <span class="blue">return</span> (<span class="blue">int</span>) (a * _foot_to_mm + one_half);
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the maximum absolute coordinate </span>
+&nbsp; <span class="gray">///</span><span class="green"> of the given point or vector.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> MaxCoord( <span class="teal">XYZ</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> d = <span class="teal">Math</span>.Abs( a.X );
+&nbsp; &nbsp; d = <span class="teal">Math</span>.Max( d, <span class="teal">Math</span>.Abs( a.Y ) );
+&nbsp; &nbsp; d = <span class="teal">Math</span>.Max( d, <span class="teal">Math</span>.Abs( a.Z ) );
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = sel.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 != ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select an element to export to TWGL.&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = doc.GetElement( id );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Determine bounding box in order to translate</span>
+&nbsp; &nbsp; <span class="green">// all coordinates to bounding box midpoint.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bb = e.get_BoundingBox( <span class="blue">null</span> );
+&nbsp; &nbsp; <span class="teal">XYZ</span> pmin = bb.Min;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pmax = bb.Max;
+&nbsp; &nbsp; <span class="teal">XYZ</span> vsize = pmax - pmin;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pmid = pmin + 0.5 * vsize;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; faceIndices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; faceVertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; faceNormals = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; &nbsp; <span class="blue">int</span>[] triangleIndices = <span class="blue">new</span> <span class="blue">int</span>[3];
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] triangleCorners = <span class="blue">new</span> <span class="teal">XYZ</span>[3];
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; faceIndices.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; faceVertices.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Mesh</span> mesh = face.Triangulate();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nTriangles = mesh.NumTriangles;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; vertices = mesh.Vertices;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nVertices = vertices.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; vertexCoordsMm = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;( 3 * nVertices );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// A vertex may be reused several times with </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// different normals for different faces, so </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// we cannot precalculate normals per vertex.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//List&lt;double&gt; normals = new List&lt;double&gt;( 3 * nVertices );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> v <span class="blue">in</span> vertices )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Translate the entire element geometry</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to the bounding box midpoint and scale </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to metric millimetres.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = v - pmid;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertexCoordsMm.Add( FootToMm( p.X ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertexCoordsMm.Add( FootToMm( p.Y ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertexCoordsMm.Add( FootToMm( p.Z ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; nTriangles; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MeshTriangle</span> triangle = mesh.get_Triangle( i );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; 3; ++j )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> k = (<span class="blue">int</span>) triangle.get_Index( j );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; triangleIndices[j] = k;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; triangleCorners[j] = vertices[k];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Calculate constant triangle facet normal.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = triangleCorners[1]
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; - triangleCorners[0];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> w = triangleCorners[2]
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; - triangleCorners[0];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> triangleNormal = v
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CrossProduct( w )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Normalize();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> j = 0; j &lt; 3; ++j )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nFaceVertices = faceVertices.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( nFaceVertices.Equals( faceNormals.Count ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected equal number of face vertex and normal coordinates&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceIndices.Add( nFaceVertices / 3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> i3 = triangleIndices[j] * 3;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Rotate the X, Y and Z directions, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// since the Z direction points upward </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// in Revit as opposed to sideways or</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// outwards or forwards in WebGL.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceVertices.Add( vertexCoordsMm[i3 + 1] );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceVertices.Add( vertexCoordsMm[i3 + 2] );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceVertices.Add( vertexCoordsMm[i3] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( RetainCurvedSurfaceFacets )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( triangleNormal.Y );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( triangleNormal.Z );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( triangleNormal.X );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">UV</span> uv = face.Project(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; triangleCorners[j] ).UVPoint;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = face.ComputeNormal( uv );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( normal.Y );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( normal.Z );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.Add( normal.X );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Scale the vertices to a [-1,1] cube </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// centered around the origin. Translation</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to the origin was already performed above.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> scale = 2.0 / FootToMm( MaxCoord( vsize ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;position: [{0}],&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceVertices.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i =&gt; ( i * scale ).ToString( <span class="maroon">&quot;0.##&quot;</span> ) ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;normal: [{0}],&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceNormals.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f =&gt; f.ToString( <span class="maroon">&quot;0.##&quot;</span> ) ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;indices: [{0}],&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; faceIndices.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i =&gt; i.ToString() ) ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>It also includes a smoothing option controlled by the setting of the Boolean RetainCurvedSurfaceFacets variable that defines whether curved faces display each of their individual facets or appear as one single nice and smooth organic surface.</p>
+
+<p>I tested this on the model recently submitted by Alexander to test the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/curved-wall-elevation-profile-and-creator-class-update.html">
+curved wall elevation profile and creator class enhancements</a>:</p>
+
+<center>
+<img src="img/twgl_export_model.png" alt="TwglExport sample model" width="578"/>
+</center>
+
+<p>From it, I picked three walls of the four for testing, one of them in two flavours:</p>
+
+<ol>
+<li>Simple wall with no openings</li>
+<li>Straight wall with a funny cloud-shaped window</li>
+<li>Curved wall with a rounded window, faceted</li>
+<li>Curved wall with a rounded window, smooth</li>
+</ol>
+
+<p>Here is the result, enabling you to choose between these four options &ndash; click 'Render' to begin and when you switch your wall selection:</p>
+
+<center>
+<iframe src="http://thebuildingcoder.typepad.com/webgl/twgl01/index.html" style="width: 450px; height: 450px;"></iframe>
+</center>
+
+<p>Please be my guest and feel perfectly free to explore how this <a href="http://twgljs.org">TWGL</a>-based WebGL viewer is implemented by viewing the HTML and JavaScript source code of this page.</p>
+
+<p>The entire TwglExport source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/TwglExport">TwglExport GitHub repository</a>,
+
+and the version presented here is
+
+<a href="https://github.com/jeremytammik/TwglExport/releases/tag/2015.0.0.1">release 2015.0.0.1</a>.</p>
+
+<p>I'll dive into more detail and make this functionality available as a node.js web server anon, in happy cooperation with the
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-101-getting-started.html">
+getting started series</a> that
+
+I am putting together on
+
+<a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a>.</p>
+
+<p>Stay tuned...</p>

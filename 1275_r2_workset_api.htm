@@ -1,0 +1,128 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- R2 versus UR4
+  10161408 [R2 vs. UR4] augusto
+  10123532 [Worksets] jaime
+  http://forums.autodesk.com/t5/revit-api/r2-vs-ur4/m-p/5382029
+  http://forums.autodesk.com/t5/revit-api/worksets/td-p/5360275
+
+- 10407591 [Revit API]
+
+- updated RevitLookup
+
+-->
+
+<h3>Revit 2015 R2 and the Read-Write Workset API</h3>
+
+<p>Finally, the Revit API provides a complete Workset API including creation and modification capabilities.</p>
+
+<p>The one snag is that it is currently limited to the subscription update release <a href="#3">Revit 2015 R2</a>.</p>
+
+<p>This issue was discussed a while back on the Revit API discussion forum, in the threads on
+
+<a href="http://forums.autodesk.com/t5/revit-api/r2-vs-ur4/m-p/5382029">R2 versus UR4</a> and
+
+<a href="http://forums.autodesk.com/t5/revit-api/worksets/td-p/5360275">worksets</a>;
+
+I searched and re-searched for them frequently enough now to finally decide to promote the gist to a main blog post topic.</p>
+
+
+
+<a name="2"></a>
+
+<h4>Read-Write Workset API</h4>
+
+<p><a href="http://thebuildingcoder.typepad.com/blog/2011/11/read-only-workset-api.html">The Workset API</a> was a very long time coming.</p>
+
+<p>Until now, it was still read-only. Now we can also create a workset, rename and activate:</p>
+
+<ul>
+<li>Creation:</li>
+<ul>
+<li>The new static method: Workset.Create</li>
+</ul>
+<li>Workset Modification:</li>
+<ul>
+<li>New method: WorksetTable.RenameWorkset</li>
+<li>New method: WorksetTable.SetActiveWorksetId</li>
+</ul>
+</ul>
+
+<p>Making use of the new workset creation method in VB might look like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">Private</span> <span class="blue">Sub</span> CreateWorkset(name <span class="blue">As</span> <span class="blue">String</span>)
+&nbsp; &nbsp; <span class="blue">Using</span> t <span class="blue">As</span> <span class="blue">New</span> <span class="teal">Transaction</span>(m_Doc)
+&nbsp; &nbsp; &nbsp; t.Start(<span class="maroon">&quot;Create Workset&quot;</span>)
+&nbsp; &nbsp; &nbsp; <span class="teal">Workset</span>.Create(m_Doc, name)
+&nbsp; &nbsp; &nbsp; t.Commit()
+&nbsp; &nbsp; <span class="blue">End</span> <span class="blue">Using</span>
+&nbsp; <span class="blue">End</span> <span class="blue">Sub</span>
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Revit 2015 R2</h4>
+
+<p>Revit 2015 R2 is a file format compatible subscription update release and was made available towards the end of 2014.</p>
+
+<p>The other efficiency and productivity enhancements it provides are user features including improvements to rendering, enhancements to documentation and schedules, performance improvements, etc.:</p>
+
+<ul>
+<li>Platform & Architectural enhancements</li>
+<ul>
+<li>Batch wall join editing</li>
+<li>Schedules</li>
+<li>Shaft openings</li>
+<li>Perspective views editing tools</li>
+<li>Reference other view</li>
+<li>View updates</li>
+<li>Select host for tags</li>
+<li>Annotate stair treads and risers</li>
+</ul>
+<li>For Structural engineers</li>
+<ul>
+<li>Rebar placement</li>
+<li>Reverse the orientation of structural framing elements</li>
+<li>Snapping to model lines</li>
+<li>Setback reference enhancements</li>
+<li>User interface for structural elements</li>
+</ul>
+<li>For MEP engineers</li>
+<ul>
+<li>Panel list search enhancement</li>
+<li>Most recently used panel list</li>
+<li>Circuit default to last used</li>
+<li>Move circuits in panel schedule enhancement</li>
+<li>Pressure loss table visibility</li>
+</ul>
+</ul>
+
+<p>Exceptionally, this subscription release includes the small API enhancement noted above.
+Therefore, the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a> provides a separate SDK for it as well.</p>
+
+
+
+
+
+
+
+<a name="4"></a>
+
+<h4>RevitLookup and Other GitHub Repository Updates</h4>
+
+<p>I am gradually working my way through the various Revit API GitHub repositories and updating the sample code copyright years from 2014 to 2015 in readiness for more significant updates later this year.</p>
+
+<p>Yesterday, I updated
+
+<a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>,
+
+the interactive Revit BIM database exploration tool to view and navigate element properties and relationships, and
+
+<a href="https://github.com/jeremytammik/AdnRme">AdnRme</a>, the ADN sample add-in for Revit MEP HVAC and electrical.</p>

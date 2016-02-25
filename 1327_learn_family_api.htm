@@ -1,0 +1,200 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+10790357 [GeometryCreationUtilities] > http://thebuildingcoder.typepad.com/blog/2015/05/geometry-creation-and-line-intersection-exceptions.html#3
+10793482 [the object that we create in Revit is too large]
+10797802 [Tool to generate rfa-files using the APIs]
+10816753 [Family Types]
+
+#revitapi #adsk #bim #adskdevnetwrk
+#augi #au2015 #dotnet #csharp #3dwebcoder #geometry
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Getting Started Creating Families and RFA Files</h3>
+
+<p>Here are some more pointers for getting started generating family definitions and RFA files programmatically:</p>
+
+<ul>
+<li><a href="#2">Family types and parameters</a></li>
+<li><a href="#3">Imperial internal Revit database length units</a></li>
+<li><a href="#4">Programmatically generating Revit family RFA files</a></li>
+</ul>
+
+<p>I am writing this from the Greek island of
+<a href="https://en.wikipedia.org/wiki/Euboea">Euboea</a>,
+on which I already
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/associative-section-view-fix.html">visited</a>
+<a href="http://en.wikipedia.org/wiki/Limni,_Euboea">Limni</a> or
+<a href="http://en.wikipedia.org/wiki/Limni,_Euboea">Λιμνι</a> on
+the north end a couple of years ago.</p>
+
+<p>This time, I am heading towards its east and south end instead, on my way to the second
+<a href="http://www.meetup.com/I-love-3D-Athens">I love 3D &ndash; Athens</a> meetup
+on June 5, followed by the
+<a href="http://angelhack.com/hackathon/athens-2015">AngelHack hackathon</a> coming weekend.</p>
+
+<p>For more details, please refer to
+<a href="http://the3dwebcoder.typepad.com/blog/2015/06/athens-angelhack-hackathon-and-nodejs-rest-workshop.html#2">
+The 3D Web Coder</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Family Types and Parameters</h4>
+
+<p><strong>Question:</strong>
+
+I am just getting started programmatically creating Revit families.</p>
+
+<p>Where can I find information about the following topics?</p>
+
+<ul>
+<li>How to use create RFA files using the Revit API</li>
+<li>Which parameters to use</li>
+</ul>
+
+<p><strong>Answer:</strong>
+
+There is lots of information available about these topics.</p>
+
+<p>Much too much for me to list here, or point out to you individually.</p>
+
+<p>Actually, it would be preferable for you to ask your questions in the public
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">
+Revit API discussion forum</a> instead of raising individual cases for each.</p>
+
+<p>That way, other developers could chip in and help you as well, and our discussions would be visible for others to share and learn from.</p>
+
+<p>All that I can say about using Revit families programmatically via the Revit API is published by
+<a href="http://thebuildingcoder.typepad.com">
+The Building Coder</a>.</p>
+
+<p>Search for 'family' or 'families' in the
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">
+list of topic groups</a>.</p>
+
+<p>The most effective way to determine which parameters you can use in your specific context is to create a BIM manually and then explore that using RevitLookup, BipChecker, and other, more intimate,
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">
+database exploration tools such as the Revit Python and Ruby shells</a>.</p>
+
+<p>The advantage of the Python and Ruby shells is that they enable you to navigate interactively through the model using all the available API constructs, including method calls, iteration, etc., whereas an exploration based on RevitLookup only has access to statically compiled properties that allow navigation by clicking buttons in automatically generated data grid view forms.</p>
+
+
+<a name="3"></a>
+
+<h4>Imperial Internal Revit Database Length Units</h4>
+
+<p><strong>Question:</strong>
+
+I am working in Germany.</p>
+
+<p>For me, one drawing unit is one mm.</p>
+
+<p>If I generate a Revit family definition RFA file with the APIs, 1 mm turns into more than 3000 mm.</p>
+
+<p>Does this have something to do with the American Unit?</p>
+
+<p>What can I do to fix this?</p>
+
+<p>Is there some parameter that I can use to initialise the variable or switch between European and American units?</p>
+
+<p><strong>Answer:</strong>
+
+Please do confirm that you are in fact aware of the wealth of online information available on Revit before I answer your question.</p>
+
+<p>Have you worked through the
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">
+getting started material</a>?</p>
+
+<p>Have you performed an Internet search to answer this question of yours?</p>
+
+<p>One of the main entry points for these kind of questions is the
+<a href="http://forums.autodesk.com/t5/Revit-API/bd-p/160">
+Revit API discussion forum</a>.</p>
+
+<p>Aaaw, I can't resist...</p>
+
+<p>Here are some direct pointers for you:</p>
+
+<!-- 0011 0196 0526 0553 0882 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/units.html">Units</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/unit-conversion.html">Unit Conversion</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/unit-conversion-and-new-blogs.html">Unit Conversion and New Blogs</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">Internal Imperial Units</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/revit-2013-unit-conversion-utility.html">Revit 2013 Unit Conversion Utility</a></li>
+</ul>
+
+<p>Please search for yourself next time before asking.</p>
+
+<p>Please note that I am perfectly happy to support you in all your questions, but it is a total waste of both your time and ours if you do not do any research yourself at all.</p>
+
+<p><strong>Response:</strong>
+
+My question is:</p>
+
+<p>How can I scale the Revit object?</p>
+
+<p>If I have an object that is 1 m long and export it to Revit, it shows up as over 3000 m in length.</p>
+
+<p>I think the problem is the difference between the metric and imperial systems.</p>
+
+<p>Do I have to scale the object when exporting, or is some other possibility, e.g., using some property?</p>
+
+<p><strong>Answer:</strong>
+
+The <a href="http://thebuildingcoder.typepad.com/blog/2011/03/internal-imperial-units.html">
+internal Revit database unit for length is imperial feet</a>.</p>
+
+<p>This cannot be changed.</p>
+
+<p>Revit does not support scaling of building elements, since it represents a realistic BIM model.</p>
+
+<p>In reality, you cannot take an existing wall, window or door and simply scale it up by a factor of 2.</p>
+
+<p>You have to change the wall, window or door type to something larger.</p>
+
+<p>Therefore, that is not possible to scale the building elements in Revit either.</p>
+
+<p>Here is a more detailed explanation on
+<a href="http://thebuildingcoder.typepad.com/blog/2009/05/transform-an-element.html">
+transforming an element</a>.</p>
+
+<p>Therefore, you have to convert your geometry to feet before you create it.</p>
+
+<p>The Building Coder provides a large number of examples of how this can be achieved.</p>
+
+
+<a name="4"></a>
+
+<h4>Programmatically Generating Revit Family RFA Files</h4>
+
+<p><strong>Question:</strong>
+
+I am currently producing Revit families at runtime using the APIs of the Revit installation on the client computer.</p>
+
+<p>In the future I would like to create the complete Revit model at runtime on my server.</p>
+
+<p>Are there any Autodesk tools that I can install on my server to generate Revit RFA files without the Revit API?</p>
+
+<p><strong>Answer:</strong>
+
+The only tools that I am aware of that fall into the categories you are asking about are the sample add-ins provided in the various software developer kits, e.g. the Revit SDK available from the
+<a href="http://www.autodesk.com/developrevit">
+Revit Developer Centre</a>.</p>
+
+<p>They all require the Revit API, i.e., a full Revit installation on the computer and an instance of Revit up and running to provide a valid Revit API context.</p>
+
+<p>Please look at the family creation samples listed in Revit SDK sample readme file <code>SamplesReadMe.htm</code> and The Building Coder topic group on the
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.25">
+Family API</a>.</p>

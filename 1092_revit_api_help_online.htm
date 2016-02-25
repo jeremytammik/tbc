@@ -1,0 +1,148 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+From: Peter Boyer
+Sent: Thursday, January 16, 2014 9:15 AM
+To: Jeremy Tammik
+Subject: revitapisearch.com
+
+Hi Jeremy,
+
+I’m a software developer on the Dynamo team working on visual programming for Revit.
+
+We use the Revit API docs a lot, so I decided to build a website that basically just makes the chm file bundled with the Revit SDK more visible.
+
+http://www.revitapisearch.com
+
+I found it makes it easier to point other developers to the documentation and greatly improves search speed and quality of results in comparison to the chm file.
+
+Maybe some of your blog followers would be interested?  J
+
+Let me know if you run into any issues, or have any questions.
+
+Thanks,
+Peter
+
+From: Ian Keough 
+Date: Thursday, January 16, 2014 17:18
+To: Peter Boyer , Jeremy Tammik 
+Subject: RE: revitapisearch.com
+
+I think he means "visual programming for REVIT." :)
+
+Ian Keough
+Principal Engineer
+IPG - Building & Collaboration Products Group
+
+Autodesk, Inc.
+1560 Trapelo Road
+Waltham, MA 02451
+
+Mobile 646.621.0026
+
+-->
+
+<h3>Revit API Help Online and Hiking on La Palma</h3>
+
+<p>Good news for all Revit add-in developers from Peter Boyer of the Dynamo team, working on visual programming for Revit, who brought you the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-dynamo-revit-unit-test-framework.html">
+Dynamo Revit Unit Test Framework</a>.</p>
+
+<p>He says:</p>
+
+<p>We use the Revit API docs a lot, so I decided to build a website that basically just makes the Revit API help file RevitAPI.chm file provided with the Revit SDK more visible on the web:</p>
+
+<p style="text-align:center;font-size:x-large;color:darkblue"><a href="http://www.revitapisearch.com">
+revitapisearch.com</a></p>
+<br/>
+
+<p>I found it makes it easier to point other developers to the documentation and greatly improves search speed and quality of results in comparison to the CHM file.</p>
+
+<p>I hope other Revit add-in developers find this useful as well.</p>
+
+<p>Please post a comment if you run into any issues, or have any questions.</p>
+
+
+<a name="2"></a>
+
+<h4>Disassembling a CHM and Creating a Searchable Amazon S3 Site</h4>
+
+<p><strong>Question:</strong>
+How did you create revitapisearch.com?
+Did you have access to the RevitAPI.chm source documents, or did you extract them from the public CHM?
+Did you use any interesting tools, tool chain or other techniques worth noting?
+Would you mind very briefly outlining the process?</p>
+
+<p><strong>Answer:</strong> Three easy steps:</p>
+
+<ul>
+<li>Decompile the CHM</li>
+<li>Upload to Amazon S3</li>
+<li>Set up a Google custom search</li>
+</ul>
+
+<p>It is quite straightforward to
+
+<a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms524369(v=vs.85).aspx">
+decompile a CHM file</a>.
+
+All you need to do is enter the following on the (Windows) command line:</p>
+
+<pre>
+  hh.exe –decompile targetfolder RevitAPI.chm
+</pre>
+
+<p>Try it out.
+You will find the output quite easy to deal with &ndash; just a bunch of HTML files named by GUID.</p>
+
+<p>From there, I went through the rather arduous process of uploading everything to Amazon S3.
+It’s arduous because there are so many individual files.
+Then, there are a few little steps to
+
+<a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html">
+set up an S3 'bucket' as a file server</a>,
+
+but it’s not too tough.</p>
+
+<p>Finally I had to make sure Google had an entry point to index.
+I used Google Custom Search, which you can just Google to learn more about. </p>
+
+<p>Many thanks to Peter for his great work and the nice succinct explanation!</p>
+
+
+<a name="3"></a>
+
+<h4>A Week of Walking</h4>
+
+<p>On that happy note, let me bid you farewell for a week.</p>
+
+<p>I am going hiking on
+
+<a href="http://en.wikipedia.org/wiki/La_Palma">
+La Palma</a>,
+
+the most northwestern of the <a href="http://en.wikipedia.org/wiki/Canary_Islands">
+Canary Islands</a>,
+
+Spain.</p>
+
+<center>
+<img src="img/la_palma_caldera_de_taburiente.jpg" alt="Caldera de Taburiente, La Palma" width="359"/>
+</center>
+
+<p>Get into nature, away from concrete, cars, electricity, masses of people.</p>
+
+<center>
+<img src="img/la_palma_el_roque_los_muchachos.jpg" alt="El Roque los Muchachos, La Palma" width="400"/>
+</center>
+
+<p>See some stars, enjoy the full (tonight) and then waning moon.</p>
+
+<p>No computer, no Internet!</p>
+
+<p>I wish you lots of fun while I'm gone, and develop oodles of exciting add-ins!</p>

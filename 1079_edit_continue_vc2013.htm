@@ -1,0 +1,40 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Visual Studio 2013 May Partially Support Edit and Continue</h3>
+
+<p>The West European DevDays conferences are completed.
+I am on my way back from Gothenburg to Switzerland.
+En route, I would like to share this strange and useful discovery by Peter Muigg of
+
+<a href="http://www.muigg.com">CAD Anwendungen Muigg</a>, who says:</p>
+
+<p>In spite of what was said in the article on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/debugging-revit-2014-api-with-visual-studio-2013.html">
+debugging Revit 2014 API with Visual Studio 2013</a> and
+
+the
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Debugging-Revit-2014-API-with-Visual-Studio-2013/td-p/4574097">
+Revit API discussion thread</a> on
+
+the same topic, Visual Studio 2013 does in fact partially support edit and continue.</p>
+
+<p>Just as stated there, the add-in ribbon items are disabled when you launch Revit in the Visual Studio 2013 debugger.</p>
+
+<p>However, that is only true in the graphical views.</p>
+
+<p>If you switch to a schedule view, they become enabled, the add-in can be launched, debugged, and the edit and continue feature works.</p>
+
+<p>If you absolutely require running the add-in in a graphical view, you have to start Revit from Visual Studio without debugging and then attach to process afterwards, in which case the edit and continue functionality is lost again.</p>
+
+<p>I have not personally been able to test any of this, not having Visual Studio 2013 installed, but would love to hear from others if they can confirm these findings.</p>
+
+<p>Thank you, Peter, for this exciting discovery, and thank you, reader, for testing and confirming.</p>
+
+<p>Now to get back home and start my Christmas
+
+<a href="http://als.wikipedia.org/wiki/Keks">Guetzli</a> baking.</p>

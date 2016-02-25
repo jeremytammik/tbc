@@ -1,0 +1,156 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+10030015 [Cannot find elements partly inside crop box]
+
+-->
+
+<h3>Is a Given Element Hidden in a View?</h3>
+
+<p>Lately, several people have asked about how to determine the visibility of an element relative to a given view crop box.</p>
+
+<p>Here is a nice little stand-alone method IsElementHiddenInView that can be plugged in to any add-in to answer that question, plus a couple of others as well, shared by
+
+Frode Tørresdal of
+
+<a href="https://www.nois.no">
+Norconsult Informasjonssystemer AS</a>.</p>
+
+<p>For any given element e and view v, it returns true if e is hidden in v.</p>
+
+<p>This is determined by performing the following checks:</p>
+
+<ul>
+<li>Does v have a crop box defined? Does e lies completely outside it? If not, is less that 25 &percnt; of the element bounding box contained within the view crop box?</li>
+<li>Is e specifically hidden in the view, by element?</li>
+<li>Is the category of e or one of its parent categories hidden in v?</li>
+</ul>
+
+<p>Here is the code:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if the given element e is hidden</span>
+&nbsp; <span class="gray">///</span><span class="green"> in the view v. This might be due to:</span>
+&nbsp; <span class="gray">///</span><span class="green"> - e lies outside the view crop box</span>
+&nbsp; <span class="gray">///</span><span class="green"> - e is specifically hidden in the view, by element</span>
+&nbsp; <span class="gray">///</span><span class="green"> - the category of e or one of its parent </span>
+&nbsp; <span class="gray">///</span><span class="green"> categories is hidden in v.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">bool</span> IsElementHiddenInView(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">View</span> v )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( v.CropBoxActive )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> viewBox = v.CropBox;
+&nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> elBox = e.get_BoundingBox( v );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> transInv = v.CropBox.Transform.Inverse;
+&nbsp;
+&nbsp; &nbsp; &nbsp; elBox.Max = transInv.OfPoint( elBox.Max );
+&nbsp; &nbsp; &nbsp; elBox.Min = transInv.OfPoint( elBox.Min );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The transform above might switch </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// max and min values.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Min.X &gt; elBox.Max.X )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> tmpP = elBox.Min;
+&nbsp; &nbsp; &nbsp; &nbsp; elBox.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( elBox.Max.X, elBox.Min.Y, 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; elBox.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( tmpP.X, elBox.Max.Y, 0 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Min.Y &gt; elBox.Max.Y )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> tmpP = elBox.Min;
+&nbsp; &nbsp; &nbsp; &nbsp; elBox.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( elBox.Min.X, elBox.Max.Y, 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; elBox.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( tmpP.X, elBox.Min.Y, 0 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Min.X &gt; viewBox.Max.X
+&nbsp; &nbsp; &nbsp; &nbsp; || elBox.Max.X &lt; viewBox.Min.X
+&nbsp; &nbsp; &nbsp; &nbsp; || elBox.Min.Y &gt; viewBox.Max.Y
+&nbsp; &nbsp; &nbsp; &nbsp; || elBox.Max.Y &lt; viewBox.Min.Y )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> inside = <span class="blue">new</span> <span class="teal">BoundingBoxXYZ</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> x, y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; x = elBox.Max.X;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Max.X &gt; viewBox.Max.X )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x = viewBox.Max.X;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; y = elBox.Max.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Max.Y &gt; viewBox.Max.Y )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; y = viewBox.Max.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; inside.Max = <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; x = elBox.Min.X;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Min.X &lt; viewBox.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x = viewBox.Min.X;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; y = elBox.Min.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( elBox.Min.Y &lt; viewBox.Min.Y )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; y = viewBox.Min.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; inside.Min = <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> eBBArea = ( elBox.Max.X - elBox.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * ( elBox.Max.Y - elBox.Min.Y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> einsideArea =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( inside.Max.X - inside.Min.X )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * ( inside.Max.Y - inside.Min.Y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> factor = einsideArea / eBBArea;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( factor &lt; 0.25 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> hidden = e.IsHidden( v );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !hidden )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = e.Category;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">null</span> != cat &amp;&amp; !hidden )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; hidden = !cat.get_Visible( v );
+&nbsp; &nbsp; &nbsp; &nbsp; cat = cat.Parent;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> hidden;
+&nbsp; }
+</pre>
+
+<p>One especially noteworthy feature worth pointing out here is the element bounding box and view crop box comparison:</p>
+
+<p>To compare the element bounding box with the view crop box, the inverse of the crop box transform needs to be applied.</p>
+
+<p>It may swap the relative positions of the bounding box min and max values, so we need to check for that and correct it.</p>
+
+<p>Many thanks to Frode for sharing this.</p>
+
+<p>I added this method to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a>
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.113.2">release 2015.0.113.2</a>.</p>

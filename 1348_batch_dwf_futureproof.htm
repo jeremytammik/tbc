@@ -1,0 +1,218 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+#revitapi #adsk #bim #aec #revitpythonshell #dotnet #cloud
+#adskdevnetwrk #csharp #restapi #python
+#geometry
+#3dwebcoder #cloud #restapi #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+<h3>Batch Processing, DWFx Links, Future-Proofing</h3>
+
+<p>The never-ending stream of Revit API topics continues.</p>
+
+<p>Today, let's look at:</p>
+
+<ul>
+<li><a href="#2">Unrestricted VendorId</a>.</li>
+<li><a href="#3">Retrieving DWFx links</a>.</li>
+<li><a href="#4">Batch processing Revit documents</a>.</li>
+<li><a href="#5">Future-proofing The Building Coder samples</a>.</li>
+<li>Recent Revit API AEC DevBlog posts:</li>
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2015/08/delete-custom-familyparameter.html">Delete custom family parameter</a>.</li>
+<li><a href="http://adndevblog.typepad.com/aec/2015/08/joingeometry-for-walls-and-columns.html">JoinGeometryUtils.JoinGeometry for walls and columns</a>.</li>
+<li><a href="http://adndevblog.typepad.com/aec/2015/07/reading-gross-and-rentable-area-elements.html">Reading gross and rentable area elements</a>.</li>
+</ul>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Unrestricted VendorId</h4>
+
+<p>In the past, we recommended using an Autodesk registered developer symbol or RDS as your vendor id, stored in the add-in manifest <code>VendorId</code> tag
+(starting from the <a href="http://thebuildingcoder.typepad.com/blog/2011/03/revit-2012-api-features.html">Revit 2012</a>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">extensible storage</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">add-in wizard</a>).</p>
+
+<p>Autodesk registered developer symbols are very limited, though, consisting of only four characters from a restricted set, [A-Z], [0-9], minus '-' and underscore '_'.</p>
+
+<p>The Autodesk registered developer symbol usage is now deprecated, so this restriction has been lifted for the Revit VendorId specification.</p>
+
+<p>This liberalisation is already documented in the developer guide, in the
+<a href="http://help.autodesk.com/view/RVT/2016/ENU">Revit 2016 online help</a> &gt;
+Developers &gt; Revit API Developers Guide &gt; Introduction &gt; Add-In Integration &gt;
+<a href="http://help.autodesk.com/view/RVT/2016/ENU/?guid=GUID-4FFDB03E-6936-417C-9772-8FC258A261F7">Add-in Registration</a>:</p>
+
+<ul><li><strong>VendorId</strong> &ndash;
+A unique vendor identifier that may be used by some operations in Revit (such as identification of extensible storage). This must be unique, and thus we recommend using reversed version of your domain name, for example, com.autodesk or uk.co.autodesk.</li>
+</li></ul>
+
+<p>Accordingly, I should update my <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit add-in wizard</a> to use <code>com.typepad.thebuildingcoder</code> instead of the current RDS <code>TBC_</code>... to be done asap.</p>
+
+
+<a name="3"></a>
+
+<h4>Retrieving DWFx Links</h4>
+
+<p>Let's look at how to retrieve DWFx links from the current Revit project.</p>
+
+<p>This question was raised and solved by Daniel in the Revit API discussion forum thread on
+<a href="http://forums.autodesk.com/t5/revit-api/get-all-linked-dwfx-files-from-in-revit-document/m-p/5769622">getting all linked DWFx files in the Revit document</a>:</p>
+
+<p><strong>Question:</strong>
+
+I'm trying to list all links in a document using filtered element collectors.</p>
+
+<p>I get the RVT links (Revit and IFC) through the built-in category; DWG links also work fine using the <code>ofClass(typeof(importInstance))</code> filter.</p>
+
+<p>I thought that DWFx and point clouds also should be listed under this filter?</p>
+
+<p>It seems not, though.
+I can't get them through that filter, and I can't see any other type to use.</p>
+
+<p><strong>Answer:</strong>
+
+While working on creating a minimal reproducible sample, I found the error.</p>
+
+<p>It's kind of simple. DWFx files are not linked, even though they appear to be so.</p>
+
+<p>When I changed from:</p>
+
+<pre class="code">
+  var dwgLinks = fecDwgLinks
+    .OfClass(typeof(ImportInstance))
+    .ToElements()
+    .Cast&lt;ImportInstance&gt;()
+    .Where(f=> f.IsLinked);
+</pre>
+
+<p>To:</p>
+
+<pre class="code">
+  var dwgLinks = fecDwgLinks
+    .OfClass(typeof(ImportInstance))
+    .ToElements()
+    .Cast&lt;ImportInstance&gt;();
+</pre>
+
+<p>Things worked fine.</p>
+
+<p>This code returns other links as well, but that is how I want it.</p>
+
+<p>I am creating a tool that lists all the links.</p>
+
+<p>When I use the collected elements, I use the category name, which contains the filename extension, to group the different types of links:</p>
+
+<pre class="code">
+  var namearray = importlink.Category.Name.Split('.');
+  var name = namearray.FirstOrDefault();
+  var extension = string.Empty;
+  if (namearray.LastOrDefault() != null)
+    extension = namearray.Last();
+</pre>
+
+<p>I have created an Enum to group a list on:</p>
+
+<pre class="code">
+  GroupingEnum lType = GroupingEnum.Unknown;
+  if (extension.ToLower().Contains("dwg"))
+    lType = GroupingEnum.Dwg;
+  else if (extension.ToLower().Contains("dwf"))
+    lType = GroupingEnum.Dwf;
+</pre>
+
+<p>This is used to group a list so that it is easy to choose the wanted elements.</p>
+
+
+<a name="4"></a>
+
+<h4>Batch Processing Revit Documents</h4>
+
+<p><strong>Question:</strong>
+
+I'm looking at building a Revit service that processes Revit families on demand and extracts Revit family information.</p>
+<p>Do you know of anyone who has done this before? </p>
+
+<p>I have been reading the discussion on <a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">
+driving Revit through a WCF service</a>.</p>
+
+<p>I'm stuck on the problem that I will run into Revit errors that can't be handled through the API or Revit will eventually crash.</p>
+<p>I will have to kill the Revit process, skip the family and start another Revit process.</p>
+<p>How will I detect that Revit has stopped working?</p>
+
+<p>Here is my proposed architecture:</p>
+
+<ul>
+<li>Install Revit on a server.</li>
+<li>Build a Revit plugin that extracts Revit family information, also the plugin subscribe to the Idling event and checks a WCF queue.</li>
+<li>Build some queue managing software on the server that receives the Revit family and add it to the WCF queue.</li>
+<li>Revit Idling event processes the families in the queue and adds the results to a database.</li>
+</ul>
+
+<p>Easy so far.</p>
+
+<p>But how do I catch in the queue managing software if Revit crashes or a warning dialogue pops up and stops Revit?</p>
+<p>I could use time if Revit takes more than 2 minutes to process a family than it is not responding end the Revit process (crash it), skip this family and start up another Revit session.</p>
+
+<p>How would you detect if Revit is not responding?</p>
+
+<p><strong>Answer:</strong>
+
+I think the blog post you point to is a good starting point.</p>
+
+<p>You might also want to check out Daren Thomas' recent contributions on this topic, discussing the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/07/firerating-and-the-revit-python-shell-in-the-cloud-as-web-servers.html#5">
+Revit Python shell in the cloud as a web server</a> and explaining the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/08/revit-api-context-and-form-creation-errors.html#2">
+Revit API context</a>.</p>
+
+<p>I have summarised several other related discussions in The Building Coder topic group on
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events for modeless access and driving Revit from outside</a>.</p>
+
+<p>By the way, I recommend never using the Idling event, if it can possibly be avoided.
+External events are more flexible and do not block the entire system, like the Idling event sometimes does.</p>
+
+<p>Otherwise, your architecture sounds absolutely fine to me.</p>
+
+<p>Yes, you should assume that Revit will stop working after a while when driven in this manner.</p>
+
+<p>That is to be expected, since it is implemented to be driven in a completely different manner, interactively, by a human user.</p>
+
+<p>How to check when it stops working?</p>
+
+<p>Probably the best approach is indeed to implement a timer and see how long it takes to complete the current request.</p>
+
+<p>Once the timeout is exceeded, assume it died, kill it properly, and restart at that point.</p>
+
+<p>This is a standard approach for
+<a href="http://thebuildingcoder.typepad.com/blog/2014/12/au-ends-and-batch-rendering-across-several-projects.html">
+driving lengthy complex batch processes</a>.</p>
+
+
+
+
+<a name="5"></a>
+
+<h4>Future-Proofing The Building Coder Samples</h4>
+
+<p>I continued in my perpetual struggle to future-proof
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> by
+eliminating all deprecated API usage.</p>
+
+<p>The result of my latest effort is
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.120.9">release 2016.0.120.9</a>,
+which compiles once again with zero warnings.</p>

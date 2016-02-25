@@ -1,0 +1,286 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>AU Day 2, Worksharing and Revit 2014 API Roundtable Sessions</h3>
+
+<p>Here is my report on Wednesday at Autodesk University, following the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html">
+DevDay</a> pre-event
+
+conference on Monday and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-1-revit-2014-api-class-and-bounding-box-rotation.html">
+the first real day at AU</a> on
+
+Tuesday.
+
+<p>These are my main activities of the day in chronological order, plus pointers to a fantastic class or two that I missed and want to highlight anyway:</p>
+
+<!--
+
+au@venetian
+7:30-8:30 emea breakfast
+10:00-11:30 scott murano 3205 DV1888 Revit Add-ins That Cooperate with Worksharing
+13:00 DV3464-R roundtable co Zeno 4601
+14:30 DV1914 roundtable primary Marcello 4404
+18:00 itw@bassano 2605 Level 2
+20:00 guido@el segundo sol
+case party
+22:00 cyrille@poker
+abel smit, kean et al
+
+MP2845 Virtually Human: Modeling the Human Body Inside and Out Using BIM Platforms
+DV1888 Facing the Elephant in the Room: Making Revit Add-ins That Cooperate with Worksharing
+DV3464-R Making Revit Add-ins That Cooperate with Worksharing: A Roundtable Session
+FB2938 Design to Fabrication: Design, Validate, and Fabricate Anything Between Autodesk® Revit® and Autodesk® Inventor®
+
+-->
+
+<ul>
+<li><a href="#2">Virtually human &ndash; modelling the human body using BIM</a></li>
+<li><a href="#3">Design to fabrication</a></li>
+<li><a href="#4">Revit add-ins that cooperate with worksharing</a></li>
+<li><a href="#5">Worksharing roundtable</a></li>
+<li><a href="#6">Revit API roundtable</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Virtually human &ndash; modelling the human body using BIM</h4>
+
+<p>This is an utterly fantastic presentation on highly professional worldwide BIM collaboration for fun by Mike Slessor, Jonathan Lock, Ken Enright and Casey Rutland of ARUP.
+I was unfortunately unable to attend, since it took place at the exact same time as my first class on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-1-revit-2014-api-class-and-bounding-box-rotation.html#2">
+advanced Revit 2014 API features and samples</a> early
+
+Tuesday morning:
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=2845">
+MP2845 &ndash; Virtually Human: Modelling the Human Body Inside and Out Using BIM Platforms</a>.
+
+They say:</p>
+
+<p>The study of human anatomy has traditionally been the domain of physicians, dentists, physiotherapists, nurses, paramedics, and other health professionals.
+What happens when you let building designers have a crack at replicating it?
+This class provides you with the opportunity to meet Project OVE, Arup’s virtual human.
+OVE has a full structural skeleton and respiratory system.
+OVE sweats, gets hungry, and even has a heart.
+We are still working on the operating system but OVE has a huge brain that will act as the main control centre when finished.
+However, OVE is also more than just an artificial replication of the human body.
+Creating an intelligent version of OVE required us to exploit the full potential of Revit as a state-of-the-art BIM (Body Information Modelling) tool.</p>
+
+<p>Here is the 161-page class
+
+<a href="http://thebuildingcoder.typepad.com/au/2013/mp2845_virtually_human_modeling_the_human_body_inside_and_out_using_bim_platforms.pdf">
+handout PDF</a>,
+
+which I find absolutely fascinating.</p>
+
+
+<a name="3"></a>
+
+<h4>Design to Fabrication</h4>
+
+<p>Another class that I was unfortunately unable to attend yet take a special interest in is William Spier's
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=2938">
+FB2938 &ndash; Design to Fabrication: Design, Validate, and Fabricate Anything Between Revit and Inventor</a>.</p>
+
+<p>William asked me to implement the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/exportcncfab-on-github-and-revitlookup-update.html">
+ExportCncFab</a> add-in,
+
+originally published in March under the name ExportWallboard to automatically isolate and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html">
+export wall parts individually to DXF</a> for
+
+CNC fabrication.</p>
+
+<p>Now, after a minute last-minute hiccup that we solved end of last week and over the weekend, the add-in is up and running as expected, including the external application driving the user interface and the new shared parameter generation command.</p>
+
+<p>The updated version is available from the
+
+<a href="https://github.com/jeremytammik/ExportCncFab">
+ExportCncFab GitHub repository</a>,
+
+and the current version is
+
+<a href="https://github.com/jeremytammik/ExportCncFab/releases/tag/2014.0.0.11">
+release 2014.0.0.11</a>.</p>
+
+<p>This is only one of the many powerful fabrication solutions and paths that William developed and presents, though.</p>
+
+<p>Here is current version of his complete
+
+<!-- http://thebuildingcoder.typepad.com/au/2013/fb2938_design_to_fabrication_handout_wspier.pdf -->
+
+<a href="file:///a/doc/revit/au/2013/doc2/fb2938_design_to_fabrication_handout_wspier.pdf">
+handout</a> and
+
+<!-- http://thebuildingcoder.typepad.com/au/2013/fb2938_design_to_fabrication_powerpoint_wspier.pdf -->
+
+<a href="file:///a/doc/revit/au/2013/doc2/fb2938_design_to_fabrication_powerpoint_wspier.pdf">
+slide deck</a>.</p>
+
+
+
+
+<a name="4"></a>
+
+<h4>Revit Add-ins that Cooperate with Worksharing</h4>
+
+<p>The one and only class that I was able to participate in so far without carrying any responsibility whatsoever for myself was Scott Conover's
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1888">
+DV1888 &ndash; Facing the Elephant in the Room: Making Revit Add-ins That Cooperate with Worksharing</a>.</p>
+
+<p>I am so glad that I did, because the information presented there is absolutely invaluable.</p>
+
+<p>At the moment, it is available only from the Autodesk University site.</p>
+
+<p>We will certainly return to this topic and publish all the material as soon as it is finalised.</p>
+
+<p>This is too important to ignore, and too complex to understand without some expert guidance.</p>
+
+
+<a name="5"></a>
+
+<h4>Worksharing Roundtable</h4>
+
+<p>The worksharing class was followed by the roundtable session
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=3464">
+DV3464-R &ndash; Making Revit Add-ins That Cooperate with Worksharing</a>
+
+with a dozen expert Revit API and product users plus Sasha, Scott and Jeremy.</p>
+
+<p>I took some notes, and so did Sasha and Scott, so we will wait with publishing those until they have been consolidated.</p>
+
+
+<!--
+
+/a/doc/au/2013/doc/dv3464-r_making_revit_add-ins_cooperate_with_worksharing_roundtable.rtf
+
+-->
+
+<a name="6"></a>
+
+<h4>Revit API Roundtable</h4>
+
+<p>The next class that I took responsibility for myself is the
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1914">
+DV1914 Revit API roundtable</a> inviting
+
+the participants to interact with a panel of Revit API experts from Autodesk to get answers to their questions and discuss all relevant customisation topics of their choice.
+This is the perfect forum to get to know better some of the people who shape the APIs you work with and to explain your views, ideas, and problems directly face-to-face.</p>
+
+<p>Many thanks to all the more than 50 participants of this session, and especially to the following panellists who collectively answered the many interesting questions that were raised:</p>
+
+<ul>
+<li>Angel Velez, Revit Development</li>
+<li>Augusto Gonçalves, ADN</li>
+<li>Jeremy Tammik, ADN</li>
+<li>Miroslav Schonauer, Autodesk Consulting</li>
+<li>Scott Conover, Revit Development</li>
+<li>Sasha Crotty, Revit Development</li>
+</ul>
+
+<p>This session was recorded.
+I uploaded a rather low quality version of the
+
+<a href="http://thebuildingcoder.typepad.com/au/2013/dv1914_revit_api_expert_roundtable_recording.mp3">
+60-minute recording</a>.
+
+Luckily, a better quality one was made in parallel by the AU technical staff, and we will have to wait a while for that to become available.</p>
+
+<p>Here are the questions and answers brought up during this roundtable session, almost unchanged from the original form they were jotted down in, and also added to the
+
+<a href="http://thebuildingcoder.typepad.com/au/2013/dv1914_revit_api_expert_roundtable_handout.pdf">updated handout</a>:</p>
+
+<p><b>[q]</b> modify visibility of linked files per view?
+<br/><b>[a]</b> currently no API access.</p>
+
+<p><b>[q]</b> modify selection from a modeless context, how to update view?
+<br/><b>[a]</b> check it out in UR2, it should be fixed.</p>
+
+<p><b>[q]</b> Revit materials. when i try to read bitmap from asset, the bitmap path in the asset property is not consistent. for some materials you can access the full bitmap path, but sometimes there is no entry for the bitmap itself. is there a better way to get the bitmap from materials?
+<br/><b>[a]</b> going forward, we definitely are looking at better access to material asset info.</p>
+
+<p><b>[q]</b> Revit API preview window to display sheets will not dynamically update when we change sheet name or number, so we have to create a new sheet in order to force it to update. part 2: preview window. will it be made more dynamic?
+<br/><b>[a]</b> i am not aware of any such issue, please report to ADN, we want to hear about this. post it on the forum so we can track it. we will research and submit an issue if needed. part 2, improvements: we can discuss a little more what you are looking for. some of our exports use the preview window, you can toggle things on and off, we need to hear what you need.</p>
+
+<p><b>[q]</b> acad has COM + .NET interface to access from outside, open and close documents and start up and shut down autocad. is this possible in Revit?
+<br/><b>[a]</b> we do not currently have that. use the external event mechanism instead.</p>
+
+<p><b>[q]</b> i have an app that opens Revit and configures worksets. it crashes now and again and the problem is reproducible. response: it only happens when you are using Revit server, and the API is not fully supported for that.
+<br/><b>[a]</b> the API should support that, there are no limitations for Revit server.</p>
+
+<p><b>[q]</b> working with schedules and accessing a parameter from schedule or from an element there is a difference. the id is the same. wanted to distinguish between a project and a shared param with the same name.
+<br/><b>[a]</b> element ids are used to represent elements, parameters and categories. for params, the id may be negative, e.g. bip, or non-negative, custom or shared. when you call get element on that id, it returns the parameter definition. probably that object does not have an exposed subclass in that context. there is difference between newer and older environments, and the schedule API is newer.</p>
+
+<p><b>[q]</b> use cut and paste API to import new sheets. the DuplicateViews SDK sample does drafting views and schedules. any advice for sheets?
+<br/><b>[a]</b> the mechanics for sheets would be the same. probably best to copy them together, because then Revit can do an optimal job of maintaining relationships. bring in the empty drafting views and settings all together. DuplicateViews demonstrates these two steps.</p>
+
+<p><b>[q]</b> any plans for enhancing this?
+<br/><b>[a]</b> it is already perfect. Revit uses it internally also.</p>
+
+<p><b>[q]</b> non-technical: collaboration between dynamo and API team?
+<br/><b>[a]</b> there is a group of dynamo guys all around us, they are in the same office. we try to expand Revit development in all directions.</p>
+
+<p><b>[q]</b> purge all. any chance of exposing that, purge unused?
+<br/><b>[a]</b> who needs a purge API? lots.</p>
+
+<p><b>[q]</b> convert an element from linked file and put them into the host document. can i do that?
+<br/><b>[a]</b> copy monitor approach lets them remain in the link, and the copy paste API can bring them in properly. use copy paste and then delete the linked element. that will require unloading it. depending on what element you ant to bring over, it may run into problems trying to separate it from its relationships. it might bring it in with the right shape. otherwise you might need to read boundaries and recreate it. if you bring it in as is it will be looking for sketch curves in the wrong place.</p>
+
+<p><b>[q]</b> macro ide. structural company, little API programs passed out to customers, using macro to transfer to customer, but it is not so simple. to transfer macros to customer it is a bit more complicated.
+<br/><b>[a]</b> you could use the python shell. why not make it an external command and send the dll? then the user does not have to touch anything. you can embed the macro in the model, and then there is no code to transfer. the macro does actually generate a mini little hidden DLL that you can transfer to the customer.</p>
+
+<p><b>[q]</b> add-in existing with a project. can they be bundled?
+<br/><b>[a]</b> only macros and dynamo scripts. the exchange store is actually the most official avenue. we are interested in people sharing code, but it also worries some. you have many options.</p>
+
+<p><b>[q]</b> furniture in Revit families including 150 types. easy way to create blocks of every time. create a symbol library. can that be dome programmatically?
+<br/><b>[a]</b> yes, simple to solve, has been published.</p>
+
+<p><b>[q]</b> reload the keynote file?
+<br/><b>[a]</b> yes, we are looking at that for the future. right now it can be solved using an autohotkey script. in 2014 you can also post the command.</p>
+
+<p><b>[q]</b> can i access the Revit line pattern from a Revit style? line weight is available.
+<br/><b>[a]</b> augusto wrote a code about that a few weeks ago. you have to search the assets.</p>
+
+<p><b>[q]</b> create or control underlays in a section view, like the ones you have in plan view? structural engineering in chile requires you to show the projected elements in front and behind. underlays in the views would solve this.
+<br/><b>[a]</b> probably not exposed. that si a good request to make. we have 11500methods and classes, we do not always know. augosto saw a solution involving moving the selection a bit. this is not API functionality, but basic Revit platform functionality expansion request, been requested for ten years.</p>
+
+<p><b>[q]</b> extensible storage available in families?
+<br/><b>[a]</b> yes. there is a sample that demonstrates this in the original estorage au materials.</p>
+
+<p><b>[q]</b> basic file info, transmission data. can a few more areas be opened up, e.g. view sheet list? now i have to open the file, export the view list, close the file.
+<br/><b>[a]</b> yes, that is the current approach. file a request, please.</p>
+
+<p><b>[q]</b> furniture geometry has a huge amount of unique vertices. how can i reduce that? i need it for a webgl viewer.
+<br/><b>[a]</b> Revit is good at optimising. something is curved. Revit likes to triangulate things. there are some knobs that you can use to turn down the triangulation. ifc uses the solid tessellation routine added in 2014. if you are exporting solids, take a look at that. the normal tessellation routines do not line up adjacent faces. doing the whole solid in one go is better. another approach is the custom exporter. then you do not need to think about each element.</p>
+
+<p><b>[q]</b> document changed event tracks changes. how do i know exactly what changed, and what the old value was?
+<br/><b>[a]</b> you have to cache all the values of interest beforehand. we have a similar request around what was deleted.</p>
+
+<p><b>[q]</b> dual monitor support, how can i take some things outside of the Revit window? it seems to work on autocad.
+<br/><b>[a]</b> you can create a modeless dialogue, attach it to the Revit parent window and drag it off the screen.</p>
+
+<p><b>[q]</b> single core. multicore machine. how can i know what thread Revit is using?
+<br/><b>[a]</b> the windows processes can be queried. look for the revit.exe process and the .NET Process library. this is Windows API, not Revit API.</p>
+
+<p><b>[q]</b> some params have type of colour and bring up a dialogue when the user edits them. can i create a shared param to store a colour as well?
+<br/><b>[a]</b> Revit implements some parameters that map to custom behaviour and launch dialogue. this is not accessible programmatically.</p>
+
+<p><b>[q]</b> can i raycast onto a non-planar surface?
+<br/><b>[a]</b> the ReferenceIntersector ray cast utility can be used, but only ray by ray. the extrusion analyser only goes onto a flat plane. you could make repeated calls to the extrusion analyser call for each facet of the tessellated surface.</p>
+
+<p>Many thanks to all who joined in here!</p>

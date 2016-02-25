@@ -1,0 +1,143 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Jasper Desmet 
+
+Re: Translated Shared Parameter File GUID Problem
+
+-->
+
+<h3>Translated Shared Parameter GUID Consolidation</h3>
+
+<p>Obviously, a language independent application is much easier to implement and maintain than a language dependent one, once you have the internationalisation framework for it in place.</p>
+
+
+<p>By the way, I took this opportunity to add the new category
+
+<a href="http://en.wikipedia.org/wiki/Internationalization_and_localization">I18n</a>
+
+to this blog to collect these kind of topics.</p>
+
+<p>The Revit API offers support for creating language independent add-ins, e.g. by using the built-in parameter and category enumeration values instead of localised strings.</p>
+
+<p>For the inverse operation, the LabelUtils and other classes can be used to retrieve localised strings to display in the user interface.</p>
+
+<p>Unfortunately, the whole system of parameters was conceived directly for end users, not applications, and provides little language independence support.</p>
+
+<p>Here is a description of an attempt to address one aspect of this, an arising issue and its solution by Jasper Desmet, who recently also described the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/football-and-space-adjacency-for-heat-load-calculation.html">
+heat load calculation space adjacency algorithm</a> for
+
+his BIM based master thesis.</p>
+
+<p>Situation of the problem: the subject is an application that translates a library of families, according to a translation map (extracted from an Excel-file, but this bears no relevance).
+To fully translate the families, all language dependent names in the shared parameter file need translation as well, e.g., to replace the Dutch shared parameter labels with English or French ones.</p>
+
+<p>This is the root of the trouble: the translated shared parameter file is using the same GUIDs for the parameters, so only the Name of the shared parameter changes (this has to do with tagging, that goes awry otherwise).
+But as the GUID of the translated shared parameter is the same, we found that the Document.FamilyManager.ReplaceParameter method did <b><i>not</i></b> replace the old parameter with the new translated one.
+It was only later we found out this was due to the GUID being the same.
+I expect that the ReplaceParameter method checks the GUID before replacing, and if it’s the same it assumes the parameter to be the same.</p>
+
+<p>We constructed a workaround, where the shared parameter file is translated twice: once with other GUID’s (a dummy shared parameter file), and once with the same GUID’s.
+This enables us to replace the FamilyParameter with the dummy shared parameter first, then replace that with the translated shared parameter with the same GUID.</p>
+
+<p>So when a parameter needs adaptation, but keeping the same GUID for some reason, this workaround is satisfactory.
+I have no idea as to repercussions for performance.</p>
+
+<p>Code:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> AdaptSharedParameterFile(
+&nbsp; &nbsp; <span class="teal">Application</span> app,
+&nbsp; &nbsp; <span class="teal">DefinitionFile</span> originalFile )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Build your new (translated/adapted) </span>
+&nbsp; &nbsp; <span class="green">// Definition file&nbsp; using the Definitions.Create(</span>
+&nbsp; &nbsp; <span class="green">// String, ParameterType, bool, GUID) method to </span>
+&nbsp; &nbsp; <span class="green">// create the shared parameter(s) and the </span>
+&nbsp; &nbsp; <span class="green">// Definition.GUID to obtain the current Shared </span>
+&nbsp; &nbsp; <span class="green">// Parameter GUID</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="blue">void</span> DummySharedParameterFile(
+&nbsp; &nbsp; <span class="teal">Application</span> app,
+&nbsp; &nbsp; <span class="teal">DefinitionFile</span> originalFile )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Build your dummy Definition file, with </span>
+&nbsp; &nbsp; <span class="green">// different GUIDs using the Definitions.Create(</span>
+&nbsp; &nbsp; <span class="green">// String, ParameterType) method to create the </span>
+&nbsp; &nbsp; <span class="green">// shared parameter(s)</span>
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app;
+&nbsp; &nbsp; <span class="teal">Document</span> doc;
+&nbsp; &nbsp; <span class="teal">DefinitionFile</span> originalFile;
+&nbsp;
+&nbsp; &nbsp; AdaptSharedParameterFile( app, originalFile );
+&nbsp; &nbsp; DummySharedParameterFile( app, originalFile );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Replace Parameter&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Query the required Family Parameter</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyParameter</span> fp = myFamilyParameter;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Open the dummy shared parameter file and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// retrieve the required external definition</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; app.SharedParametersFilename
+&nbsp; &nbsp; &nbsp; &nbsp; = sharedParameterFile;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionFile</span> dummyDefFile
+&nbsp; &nbsp; &nbsp; &nbsp; = app.OpenSharedParameterFile();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalDefinition</span> dummyDef
+&nbsp; &nbsp; &nbsp; &nbsp; = dummyDefFile.Groups.get_Item( myGroup.Name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Definitions.get_Item( myAdaptedName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ExternalDefinition</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Replace the parameter with the dummy </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// parameter to change the GUID</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.FamilyManager.ReplaceParameter( fp,
+&nbsp; &nbsp; &nbsp; &nbsp; dummyDef, fp.Definition.ParameterGroup,
+&nbsp; &nbsp; &nbsp; &nbsp; fp.IsInstance );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Open the adapted shared parameter file</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; app.SharedParametersFilename
+&nbsp; &nbsp; &nbsp; &nbsp; = sharedParameterFile;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionFile</span> targetDefFile
+&nbsp; &nbsp; &nbsp; &nbsp; = app.OpenSharedParameterFile();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalDefinition</span> targetDef
+&nbsp; &nbsp; &nbsp; &nbsp; = targetDefFile.Groups.get_Item( myGroup.Name )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Definitions.get_Item( myAdaptedName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">ExternalDefinition</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Replace the dummy-parameter with the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// adapted parameter with the same GUID </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// as the old parameter</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.FamilyManager.ReplaceParameter( fp,
+&nbsp; &nbsp; &nbsp; &nbsp; targetDef, fp.Definition.ParameterGroup,
+&nbsp; &nbsp; &nbsp; &nbsp; fp.IsInstance );
+&nbsp;
+&nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+<p>Many thanks to Jasper for this interesting exploration and workaround!</p>

@@ -1,0 +1,295 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+wall net and gross surface
+http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565
+
+10536988 [Door/Window Areas]
+
+http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html?cid=6a00e553e16897883301b8d0ec5711970c#comment-6a00e553e16897883301b8d0ec5711970c
+
+HostObject.FindInserts
+
+copy "$(ProjectDir)SampleExpIfcUtilsWinArea.addin" "$(AppData)\Autodesk\REVIT\Addins\2015"
+copy "$(ProjectDir)bin\debug\SampleExpIfcUtilsWinArea.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"
+
+#revitapi
+
+-->
+
+<h3>IFCExportUtils Methods Determine Door and Window Area</h3>
+
+<p>Last week we discussed the
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">
+SpatialElementGeometryCalculator sample</a> for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html">
+calculating gross and net wall areas</a> that
+
+in turn led to the discovery of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html">
+FindInserts method to retrieve all openings in a wall</a>.</p>
+
+<p>Both of these were prompted by the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565">door/window areas</a> raised
+
+by Phillip Miller of <a href="">Kiwi Codes Solutions Ltd</a>.</p>
+
+<p>Another question that arose in that thread regards the meaning of the built-in parameter HOST_AREA_COMPUTED and how to best calculate the area of a door or window family instance.</p>
+
+<p>By the way, here are some previous discussions on HOST_AREA_COMPUTED regarding walls:</p>
+
+<!-- grep -i HOST_Area_Computed *htm -- 0010 0076 0090 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/selecting-all-w.html">Selecting all Walls</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">Room and Wall Adjacency</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/compound-wall-layer-volumes.html">Compound Wall Layer Volumes</a></li>
+</ul>
+
+<p>In the thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565">door/window areas</a>,
+
+Phillip wonders about its meaning applied to family instances:</p>
+
+<p><strong>Question:</strong> I need to determine the cut areas of windows and doors in a wall. I thought this would be a simple matter of grabbing the BIP HOST_AREA_COMPUTED as with my testing that was returning the correct area.  It turns out that this is not the case from further testing.</p>
+
+<p>Please refer to the attached RVT file with two doors inserted into a wall.  They look similar but one is reporting through RevitLookup 4m2 and the other 2m2.</p>
+
+<p>Why is this?  What actually is HOST_AREA_COMPUTED reporting?
+What is the most reliable way of getting the cut area of windows and doors?</p>
+
+
+<p><strong>Answer:</strong> We initially avoided looking at the family instance areas directly &ndash; by analysing the wall with and without its openings instead &ndash; leaving two other interesting topics open for further exploration:</p>
+
+<ul>
+<li>The meaning of the HOST_AREA_COMPUTED parameter value.</li>
+<li>The use of the ExporterIFCUtils GetInstanceCutoutFromWall and ComputeAreaOfCurveLoops methods.</li>
+</ul>
+
+<p>Peter
+
+(<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/2663907">pjohan13</a>)
+
+jumped in and answered:</p>
+
+
+<p>Even though you solved the problem (congratulations on that by the way) I might be able to provide some additional info on the subject.</p>
+
+<p>During the last couple of months I've been working with something related. In my case the specific surface area of each window/door is the main interest and I have thus been digging into this topic quite a bit.</p>
+
+<p>My findings suggest that the value of HOST_AREA_COMPUTED in regards to family instances is, what I can best explain as a sum of the geometric objects 'overlapping' the wall geometry in all 3 axes.</p>
+
+<p>Terrible as that explanation might be, consider the following:</p>
+
+<p>A simple 1000 x 1000 mm window family containing only a sheet of glass with a thickness of 100 mm will report an area of 1.2 square meters, equivalent to what could be measured in 2D plan, section and elevation views. If the geometry is copied in the family so that it contains two sweets of glass, HOST_AREA_COMPUTED will report the area of both, adding up to 2.4 square meters. This assumption can be supported by snooping a window hosted by a curtain wall. As the curtain wall has no actual depth/thickness, only one overlapping area exist, e.g. as defined by points the X and Z axes.</p>
+
+<p>Whether I'm right or not doesn't really affect anything, but I thought it was worth sharing anyway &nbsp; :-)</p>
+
+<p>An easy approach to access the actual surface/opening area that I've found extremely useful resides in the Autodesk.Revit.DB.IFC namespace, more specifically in the ExporterIFCUtils class that has provided other interesting features in the past. The methods GetInstanceCutoutFromWall and ComputeAreaOfCurveLoops are able to handle every oddly shaped window I have ever fed them. And especially the latter is handy in a very wide context &nbsp; :-)</p>
+
+<p>Unfortunately I have no sample code related to HOST_AREA_COMPUTED analysis. My findings on the parameter value are based on manual analysis including family editing, measuring, snooping and comparing through a series of small steps. When I eventually stumbled upon the IFCExportUtils methods, that settled my quest for clarity.</p>
+
+<p>The way I have used them, generally, is pretty straightforward. I attached a very simple sample implementing both methods to display the surface areas of selected windows/doors/curtain panels. I've also attached a sample project containing the earlier mentioned 1000 x 1000 mm single sheet window and a 'zig-zag'-shaped window intended to challenge the method a bit &ndash; which it doesn't  &nbsp; :-)</p>
+
+<ul>
+<li><a href="zip/pj_SampleExpIfcUtilsWinArea.zip">SampleExpIfcUtilsWinArea.zip</a></li>
+<li><a href="zip/pj_WallAndWindow.rvt">WallAndWindow.rvt</a></li>
+</ul>
+
+<p>One beauty of the GetInstanceCutoutFromWall method is that it returns the opening boundary as a curve loop and thus provides additional possibilities related to windows/door. For instance, the perimeter is available through curve lengths or sealant area can be calculated by adding a CurveLoop.CreateViaOffset to the list fed into ComputeAreaOfCurveLoops, etc.</p>
+
+<p>I've tested the methods on windows intersecting the vertical join between two different wall types and windows intersecting the horizontal join in stacked walls, in each case with consistent outcome.</p>
+
+<p>Ideally the GetAreaCutoutFromWall would instead be named *FromHost to cover skylights as well. But with solid performance like this I can't really ask for more, except maybe the values exposed directly by the FamilyInstance class or curtain wall's orientation vector updating accordingly when flipped &nbsp; a different discussion, maybe &nbsp; :-)</p>
+
+<p>I hope that the sample can be of use and look forward to seeing more on this matter on The Building Coder.</p>
+
+<p>Please note that this sample is a bit lazy. Normally I would not recommend unit conversion until 'the last moment', e.g. before printing values in the task dialog. Approaches like the one illustrated in the sample could obviously lead to some unintentional 'ft * m' scenarios causing unexpected outcome.</p>
+
+<p>Many thanks to Peter for his research and sample material!</p>
+
+<a name="2"></a>
+
+<h4>Implementation</h4>
+
+<p>I cleaned up his sample code for publication in the
+
+<a href="https://github.com/jeremytammik/ExporterIfcUtilsWinArea">ExporterIfcUtilsWinArea GitHub repository</a>.</p>
+
+<p>As always, the Revit database length unit is imperial feet, and we are interested in seeing the resulting area in square metres, so an approximate conversion factor will come in handy:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _square_feet_to_square_metres
+&nbsp; &nbsp; = 0.09290304;
+</pre>
+
+<p>The algorithm implemented by Peter in the GetInstanceSurfaceAreaMetric method goes like this:</p>
+
+<ul>
+<li>For a family instance hosted by a normal wall, we can make use of the ExporterIFCUtils GetInstanceCutoutFromWall and ComputeAreaOfCurveLoops methods to determine its area quite accurately.</li>
+
+<li>For a curtain wall, we can use the value provided by the HOST_AREA_COMPUTED built-in parameter instead.</li>
+
+<li>Finally, for an unhosted family instance, we use the product of its family symbol width and height parameters.</li>
+</ul>
+
+<p>Here is the implementation of that:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return surface area of given family instance</span>
+&nbsp; <span class="gray">///</span><span class="green"> in square metres.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> GetInstanceSurfaceAreaMetric(
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> familyInstance )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> area_sq_ft = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> wall = familyInstance.Host <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != wall )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wall.WallType.Kind == <span class="teal">WallKind</span>.Curtain )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; area_sq_ft = familyInstance.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = familyInstance.Document;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> basisY = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// using I = Autodesk.Revit.DB.IFC;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CurveLoop</span> curveLoop = I.<span class="teal">ExporterIFCUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetInstanceCutoutFromWall( doc, wall,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; familyInstance, <span class="blue">out</span> basisY );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; loops
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; loops.Add( curveLoop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; area_sq_ft = I.<span class="teal">ExporterIFCUtils</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ComputeAreaOfCurveLoops( loops );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> width
+&nbsp; &nbsp; &nbsp; &nbsp; = familyInstance.Symbol.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FAMILY_WIDTH_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> height
+&nbsp; &nbsp; &nbsp; &nbsp; = familyInstance.Symbol.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FAMILY_HEIGHT_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsDouble();
+&nbsp;
+&nbsp; &nbsp; &nbsp; area_sq_ft = width * height;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> _square_feet_to_square_metres * area_sq_ft;
+&nbsp; }
+</pre>
+
+<p>The element selection and result reporting is handled like this by the external command mainline Execute method:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">StringBuilder</span> sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp; &nbsp; <span class="blue">double</span> areaTotal = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">ElementId</span>&gt; elementIds = sel.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> elementId <span class="blue">in</span> elementIds )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = doc.GetElement( elementId )
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> areaMetric =
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetInstanceSurfaceAreaMetric( fi );
+&nbsp; &nbsp; &nbsp; &nbsp; areaTotal += areaMetric;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> areaRound = <span class="teal">Math</span>.Round( areaMetric, 2 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; sb.AppendLine();
+&nbsp; &nbsp; &nbsp; &nbsp; sb.Append( <span class="maroon">&quot;ElementId: &quot;</span> + fi.Id.IntegerValue );
+&nbsp; &nbsp; &nbsp; &nbsp; sb.Append( <span class="maroon">&quot;&nbsp; Name: &quot;</span> + fi.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; sb.AppendLine( <span class="maroon">&quot;&nbsp; Area: &quot;</span> + areaRound + <span class="maroon">&quot; m2&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">int</span> count = elementIds.Count&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> areaPrintFriendly = <span class="teal">Math</span>.Round( areaTotal, 2 );
+&nbsp;
+&nbsp; &nbsp; sb.AppendLine( <span class="maroon">&quot;\nTotal area: &quot;</span>
+&nbsp; &nbsp; &nbsp; + areaPrintFriendly + <span class="maroon">&quot; m2&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span> taskDialog = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Selection Area&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; taskDialog.MainInstruction = <span class="maroon">&quot;Elements selected: &quot;</span>
+&nbsp; &nbsp; &nbsp; + count;
+&nbsp;
+&nbsp; &nbsp; taskDialog.MainContent = sb.ToString();
+&nbsp;
+&nbsp; &nbsp; taskDialog.Show();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Sample Model</h4>
+
+<p>Peter's sample model contains three different kinds of windows:</p>
+
+<center>
+<img src="img/ExporterIfcUtilsWinArea_model.png" alt="ExporterIFCUtils sample model" width="316"/>
+</center>
+
+<p>The sample code calculates the following resulting areas for it:</p>
+
+<center>
+<img src="img/ExporterIfcUtilsWinArea_result.png" alt="ExporterIFCUtils sample result" width="369"/>
+</center>
+
+
+<a name="4"></a>
+
+<h4>Download</h4>
+
+<p>The entire source code, Visual Studio solution and add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/ExporterIfcUtilsWinArea">ExporterIfcUtilsWinArea GitHub repository</a>,
+
+and the version discussed above is
+
+<a href="https://github.com/jeremytammik/ExporterIfcUtilsWinArea/releases/tag/2015.0.0.1">release 2015.0.0.1</a>.
+</p>

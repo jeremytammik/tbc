@@ -1,0 +1,297 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09922437 [Finding Marks with the API]
+
+-->
+
+<h3>ADN Labs Xtra on GitHub and RvtVa3c in Three.js</h3>
+
+<p>I had several cases recently discussing advanced Revit API exploration issues with experienced application developers new to the Revit API.</p>
+
+<p>Therefore, once again, the topic of available tools and their various uses came up.</p>
+
+<p>One important tool for me is the simple element lister, which is currently still part of the ADN Xtra labs, the precursor to the official ADN Revit API training labs.</p>
+
+<p>I had not yet migrated those to Revit 2015, so I now finally did so and posted them to GitHub.</p>
+
+<p>Another interesting GitHub learning step today was integrating the Revit JSON model exporter RvtVa3c for the vA3C AEC viewer into the official list of three.js exporters.</p>
+
+<p>So this is what I discuss today:</p>
+
+<ul>
+<li><a href="#2">Getting Started with the Revit API</a></li>
+<li><a href="#3">Revit database exploration tools</a></li>
+<li><a href="#4">ADN Revit API Xtra training labs for Revit 2015</a></li>
+<li><a href="#5">Integrating RvtVa3c into three.js</a></li>
+<li><a href="#6">Updated integration of RvtVa3c into three.js</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Getting Started with the Revit API</h4>
+
+<p>One important step before starting to think about working on a Revit add-in is to understand the basic Revit concepts and workflows from a user point of view.</p>
+
+<p>Revit is
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">
+significantly different from most traditional CAD systems</a>,
+
+and this is thoroughly reflected in the Revit API as well.</p>
+
+<p>Once that is understood, the next and obvious step is to work through the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">
+Revit API getting started material</a>.</p>
+
+<p>It provides both a 'My First Revit Plug-in' and DevTV tutorials discussing all the basics of add-in development and leading you through the entire process step by step, including setting up the development environment, SDK, basic tools, understanding the add-in architecture, installation, coding, compilation and main API principles.</p>
+
+<p>Often some research is required to determine how to programmatically address a specific task.</p>
+
+<p>The main important documentation components that you absolutely must be aware of are:</p>
+
+<ul>
+<li>The Revit SDK, including:</li>
+<ul>
+<li>The Revit API help file RevitAPI.chm
+<li>The extensive SDK sample collection and solution SDKSamples2015.sln</li>
+<li>The SDK external application add-in RvtSamples that loads all the external command samples</li>
+</ul>
+<li>The online Revit developer guide</li>
+<li>The database exploration tool RevitLookup</li>
+</ul>
+
+<p>The help file documents all classes, their properties and methods. It does not say much about how they work together, though.</p>
+
+<p>The developer guide explains concepts, workflows, more complex and higher-level relationships, and how the classes, properties and methods work together.</p>
+
+<p>The SDK samples demonstrate real code executing most of the workflows in a simple manner.
+The sample solution file enables compilation and debugging of all samples in one fell swoop, and RvtSamples provides a method to load all external command samples in one go, instead of manually installing a hundred or so separate add-ins.</p>
+
+<p>In addition to this brief overview, please do not miss this
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/getting-started-with-the-revit-api.html">
+more detailed explanation</a> and the recommendations on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html">
+preparing for a hands-on Revit API training</a>.</p>
+
+<p>Even with all the documentation in place and at your disposal, there are a number of undocumented areas and workflows.</p>
+
+<p>You will often need to research properties, relationships and methods used to create and modify the model for your specific needs yourself.</p>
+
+<p>One of the most powerful ways to approach this research is to create a simple sample model manually, store that starting point, perform the required changes by hand in the user interface, store the ending point, and compare the differences.</p>
+
+<p>A detailed comparison of the models before and after requires database exploration tools.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Revit Database Exploration Tools</h4>
+
+<p>The first and foremost Revit database exploration tool is <b>RevitLookup</b>.</p>
+
+<p>You absolutely must install and understand the usage of this tool.
+It is actually also pretty useful for end users.</p>
+
+<p>Here are a number of discussions of various <a href="http://thebuildingcoder.typepad.com/blog/revitlookup">uses of RevitLookup</a>.</p>
+
+<p>It is a simple interactive dialogue based tool that enables you to navigate the Revit database, its elements, their properties and relationships with each other.</p>
+
+<p>It is a statically compiled add-in and provided in source code in the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>.</p>
+
+<p>Once you have found the objects and properties you are interested in via the RevitLookup user interface, you can use the Visual Studio environment and debugger to explore how that property or relationship can be reached programmatically.</p>
+
+<p>Once you have acquainted yourself with that static interactive exploration method and understand the database structure, you can move on to more powerful
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">
+interactive, dynamic, interpreted API interaction</a>, e.g. using the <b>Revit Python or Ruby shells</b>.</p>
+
+<p>Both RevitLookup and the interactive shells will enable you to explore elements and list their parameters. The shells will also allow you to manually set up transactions and modify the database from the command line in real time.</p>
+
+<p>Another statically compiled tool specifically developed for exploring the parameters attached to elements is <b>BipChecker</b>, the built-in parameter checker:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/built-in-parameter-enumeration-duplicates-and-bipchecker-update.html">Duplicate Built-in parameter values and BipChecker update</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/10000000000th-post-and-element-type-parameters.html#2">
+Retrieving ElementType parameters and BipChecker</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/bipchecker-for-revit-2015-on-github.html">BipChecker for Revit 2015 on GitHub</a></li>
+</ul>
+
+<!--
+<p>More in depth and interactive database exploration is possible using one of the Revit Ruby or Python shells.</p>
+
+<p>RevitLookup is a compiled add-in enabling you to interactively navigate your way through the database, all its elements, their properties and relationships.</p>
+
+<p>The Ruby and Python shells however provide a possibility to interact with the Revit API in an interpreted environment instead.
+That gives you total control and flexibility, allowing you to call methods and create queries that are not possible in the static precompiled RevitLookup add-in.</p>
+-->
+
+<p>Yet another very simple and often surprisingly useful tool for me is the <b>element lister</b>.</p>
+
+<p>I recently described its use and pointed to other discussions of it while determining the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html">
+relationship between an image element and the associated ImageType</a>.</p>
+
+
+
+<a name="4"></a>
+
+<h4>ADN Revit API Xtra Training Labs for Revit 2015</h4>
+
+<p>The element lister is part of my ADN Xtra labs:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/xtra-adn-revit-2013-api-training-labs.html">Xtra ADN Revit 2013 API Training Labs</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/exporting-parameter-data-to-excel.html">Exporting Parameter Data to Excel, and Re-importing</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/10000000000th-post-and-element-type-parameters.html#2">
+ADN Xtra Labs and BipChecker for Revit 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/revit-2013-api-developer-guide-pdf.html#3">ADN Revit API Training Material on GitHub</a></li>
+</ul>
+
+<p>Answering one of these cases, I noted that I had not yet migrated them to Revit 2015, and finally got around to doing so.</p>
+
+<p>The migration was pretty straightforward, and the ADN Revit API training material including the unofficial Xtra labs now resides in its own
+
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra GitHub repository</a>.</p>
+
+<p>To avoid confusion and be absolutely clear, I will repeat the contents of the repository readme here:</p>
+
+<blockquote>
+<p>This repository contains the source code and Visual Studio solution of the ADN Revit API Training Labs including the old historical Xtra samples.</p>
+
+<p>The official collection excluding the Xtra labs is available from the Autodesk Developer Network ADN
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer page</a>.
+Look there under Samples and Documentation.
+It lives in its own ADN DevTech
+
+<a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">RevitTrainingMaterial GitHub repository</a>.</p>
+
+<p>If you have no need for the Xtra labs or do not know what they are, please stick with the official version provided there.</p>
+</blockquote>
+
+
+<a name="5"></a>
+
+<h4>Integrating RvtVa3c into Three.js</h4>
+
+<p>I recently mentioned the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/threejs-aec-viewer-progress-on-two-fronts.html#4">
+significant progress on the vA3C project</a>
+
+(<a href="https://va3c.github.io">home</a>, <a href="https://github.com/va3c">git</a>),
+
+the generic three.js based AEC viewer.</p>
+
+<p>One important aspect is the discovery that the vA3C JSON models are fully compatible and can be merged and mingled with standard three.js ones, providing the models are stored as objects, not as scenes, as discussed in the issue
+
+<a href="https://github.com/va3c/va3c.github.io/issues/5">#5 on exporters and JSON output</a>.</p>
+
+<p>I modified
+
+<a href="http://thebuildingcoder.typepad.com/blog/va3c">RvtVa3c</a>,
+
+the Revit vA3C JSON model exporter to produce such a JSON file and tried to add it to the official
+
+<a href="https://github.com/mrdoob/three.js/tree/master/utils/exporters">
+three.js exporter list</a>:</p>
+
+<center>
+<img src="img/three_js_exporters_1.png" alt="Three.js exporters" width="526"/>
+</center>
+
+<p>The way to do this is to fork the repository, apply the required changes, and submit a pull request.</p>
+
+<p>Here is what I ended up doing to hopefully achieve that:</p>
+
+<ul>
+<li>Fork the three.js <code>dev</code> branch into my personal collection of repositories.</li>
+<li>Clone my forked version to my local system:</li>
+<pre>
+$ git clone https://github.com/jeremytammik/three.js
+</pre>
+<li>Add RvtVa3c as a new submodule in the utils/exporters folder:</li>
+<pre>
+$ git submodule add https://github.com/va3c/RvtVa3c utils/exporters/revit
+</pre>
+<li>Commit</li>
+<pre>
+</pre>
+<li>Push</li>
+<li>In the forked repository, click 'Pull request', describe the submission, and submit it.</li>
+</ul>
+
+<p>The result in my local repository looks promising enough:</p>
+
+<center>
+<img src="img/three_js_exporters_2.png" alt="Three.js exporters in my forked repository" width="601"/>
+</center>
+
+<p>I hope it works  :-)</p>
+
+
+<a name="6"></a>
+
+<h4>Updated Integration of RvtVa3c into Three.js</h4>
+
+<p>The linking of the RvtVa3c repository into the list of three.js exporters described above worked, but...</p>
+
+<p>... as discussed in the
+
+<a href="https://github.com/mrdoob/three.js/pull/5297">three.js issue #5297</a>,
+
+mrdoob thinks "the folder approach was better.
+This repo currently has no submodule.
+And submodules don't get included when downloading the zip of the repo...
+the idea of just having a README.md file in a revit/ folder with a url to the other repo should do the trick."</p>
+
+<p>I therefore deleted eveything I did above, reforked the three.js repository to start again from scratch and performed the following steps on it:</p>
+
+<ul>
+<li>Fork the three.js <code>dev</code> branch into my personal collection of repositories.</li>
+<li>Clone my forked version to my local system:</li>
+<pre>
+$ git clone https://github.com/jeremytammik/three.js
+</pre>
+<li>Add a new subfolder 'revit' to the utils/exporters folder:</li>
+<pre>
+$ cd three.js/utils/exporters/
+$ mkdir revit
+</pre>
+<li>Edit and add the readme file</li>
+<pre>
+$ touch README.md
+$ edit README.md
+$ git add .
+</pre>
+<li>Commit</li>
+<pre>
+$ git commit -m "added Revit three.js JSON exporter RvtVa3c"
+</pre>
+<li>Push</li>
+<pre>
+$ git push
+</pre>
+<li>In the forked repository, click 'Pull request', describe the submission, and submit it.</li>
+</ul>
+
+<p>The result is a new pull request
+
+<a href="https://github.com/mrdoob/three.js/pull/5305">#5305</a>
+
+"added the revit exporter RvtVa3c: simply a subfolder utils/exporter/revit with a readme file pointing to the RvtVa3c repository".</p>
+
+<p>I agree that this is simpler, of course, and more suitable, considering the facts stated above.</p>
+
+<p>As an added advantage, I am getting the hang of this now...</p>

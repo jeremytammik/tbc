@@ -1,0 +1,675 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10561705 [ReferencePlane Issues]
+
+/a/case/sfdc/10561705/attach/PlaceLightSample.rvt
+
+Z:\a\case\sfdc\10561705\attach\PlaceLightSample_2015.rvt
+
+-->
+
+
+<h3>Re-Researching Lighting Family Instance Placement</h3>
+
+<p>The placement of family instances can sometimes be a tricky topic in the Revit API.</p>
+
+<p>Programmatically, this is always achieved using the NewFamilyInstance method.</p>
+
+<p>However, this method provides 13 different overloads to choose from, which can be a non-trivial task:</p>
+
+<ul>
+<li>NewFamilyInstance(Face, Line, FamilySymbol) &ndash;  Inserts a new instance of a family onto a face of an existing element, using a line on that face for its position, and a type/symbol.</li>
+<li>NewFamilyInstance(Line, FamilySymbol, View) &ndash;  Add a line based detail family instance into the Autodesk Revit document, using an line and a view where the instance should be placed.</li>
+<li>NewFamilyInstance(Reference, Line, FamilySymbol) &ndash;  Inserts a new instance of a family onto a face referenced by the input Reference instance, using a line on that face for its position, and a type/symbol.</li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a location and a type/symbol.</li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, View) &ndash;  Add a new family instance into the Autodesk Revit document, using an origin and a view where the instance should be placed.</li>
+<li>NewFamilyInstance(Curve, FamilySymbol, Level, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a curve, type/symbol and reference level. </li>
+<li>NewFamilyInstance(Face, XYZ, XYZ, FamilySymbol) &ndash;  Inserts a new instance of a family onto a face of an existing element, using a location, reference direction, and a type/symbol.</li>
+<li>NewFamilyInstance(Reference, XYZ, XYZ, FamilySymbol) &ndash;  Inserts a new instance of a family onto a face referenced by the input Reference instance, using a location, reference direction, and a type/symbol.</li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, Level, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a location, type/symbol and a base level. </li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, Element, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a location, type/symbol, and the host element.</li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, Element, Level, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a location, type/symbol, the host element and a base level. </li>
+<li>NewFamilyInstance(XYZ, FamilySymbol, XYZ, Element, StructuralType) &ndash;  Inserts a new instance of a family into the document, using a location, type/symbol, the host element and a reference direction.</li>
+</ul>
+
+<p>The Building Coder topic group
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.25">
+5.25</a> deals with the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.25">
+Family API and placing family instances</a> in
+
+general and explored the more specialised issue of selecting the correct
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/newfamilyinstance-overloads.html">
+NewFamilyInstance method overload</a> to
+
+use for specific given families way back in 2011.</p>
+
+<p>The addition of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/family-instance-placement.html">
+family instance placement type</a> functionality
+
+with the FamilyPlacementType enumeration and a corresponding property on the Family class simplified this task significantly.</p>
+
+<p>It can still be non-trivial figuring out which overload to use though, especially if you are lazy or forgetful and don't remember all of the possibilities, as in my case.</p>
+
+<p>Here is an interesting example of a completely useless and much too exhaustive search to determine how to create copies of a ceiling hosted light fixture, only to end up with the same result we already published in 2012 on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/hosting-a-light-fitting-on-a-reference-plane.html">
+hosting a light fitting on a reference plane</a>.</p>
+
+<p>Well, hopefully not completely useless, after all, since this exploration does show you several steps and techniques to approach and narrow down the problem to finally rediscover a solution that could also have been found faster and more easily:</p>
+
+
+<p><strong>Question:</strong>
+
+<p>In my add-in I am trying to:</p>
+
+<ol>
+<li>Get user to select light already placed in model.</li>
+<li>Allow user to pick new point to place previously selected light</li>
+<li>Attach light to new point hosted on the same reference plane as the original light.</li>
+</ol>
+
+<p>I have no problems with the first two steps, but the last step that gives me the following error:</p>
+
+<p>"Reference direction is parallel to face normal at insertion point."</p>
+
+<p>I read the discussions on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/hosting-a-light-fitting-on-a-reference-plane.html">
+hosting a light fitting on a reference plane</a> and
+
+<a href="http://forums.autodesk.com/t5/revit-api/family-instance-on-reference-plane-with-api/td-p/4962340">
+family instance on reference plane with API</a>,
+
+but they did not help.</p>
+
+<p>All I can find on-line are more people with the exact same issue and no solutions.</p>
+
+<p>Please can you help?</p>
+
+<p>I provided a minimal sample with a single lighting fixture hosted by a ceiling and an external command that should allow you to select one of the lights, then prompt you to pick a new spot for a copy of it.</p>
+
+<p>The new light should be placed on the same work plane as the original.</p>
+
+
+
+<p><strong>Answer:</strong>
+
+I implemented a complete add-in to test your external command and tried it out in your model:</p>
+
+<center>
+<img src="img/place_light_1_model.png" alt="Minimal sample model" width="465"/>
+</center>
+
+<p>If you look at the lighting fixture in RevitLookup, you will note that it is hosted by the ceiling element and has a valid Level property value:</p>
+
+<center>
+<img src="img/place_light_2_snoop_instance.png" alt="Snoop light fixture family instance" width="650"/>
+</center>
+
+<p>When run the add-in command, it executes fine for me, with no errors produced at all.</p>
+
+<p>However, I do not see anything added to the graphics screen.</p>
+
+<p>There are several things you can and should do at this point to find out more:</p>
+
+<ul>
+<li>Check the return value of the NewFamilyInstance method.</li>
+<li>Use the
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2">
+element lister</a> to see what elements were added to the database, if any.</li>
+</ul>
+
+<p>In this case, I can also simply snoop the database for all family instances:</p>
+
+<center>
+<img src="img/place_light_3_snoop_copy.png" alt="Snoop light fixture family instance copy" width="694"/>
+</center>
+
+<p>There are two of them now.</p>
+
+<p>One of them is the new copy that we successfully created.</p>
+
+<p>The copy, however, is hosted by an abstract reference plane, not by the ceiling element, like the original instance.</p>
+
+<p>Exploring its Level property will show that it has a value of -1, i.e. an invalid element id.</p>
+
+<p>That probably explains why it is not displayed in the Level 1 ceiling plan view like the original instance.</p>
+
+<p>Ah, no, it does not; I see that the original's level property is also -1, so that's apparently not a problem.</p>
+
+<p>Anyway, that is the original implementation.</p>
+
+<p>I created a new
+
+<a href="https://github.com/jeremytammik/PlaceLight">PlaceLight GitHub repository</a> for
+
+this project and saved the initial version is saved as
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.0">release 2015.0.0.0</a>.</p>
+
+<p>Next step: specify the host element when calling NewFamilyInstance:</p>
+
+<pre class="code">
+  static FamilyInstance PlaceALight(
+    XYZ lightPlacePoint,
+    Element host,
+    FamilySymbol lightSymbol )
+  {
+    Document doc = lightSymbol.Document;
+
+    return doc.Create.NewFamilyInstance(
+      lightPlacePoint, lightSymbol, host,
+      Autodesk.Revit.DB.Structure.StructuralType
+        .NonStructural );
+  }
+</pre>
+
+<p>As you can see, it is much simpler to just specify the host rather than create a new reference plane for it.</p>
+
+<p>It is called like this now to pass in the original host:</p>
+
+<pre class="code">
+  PlaceALight( placeXyzPoint, lightFamilyInstance.Host, lightFamilySymbol );
+</pre>
+
+<p>I stored this attempt as
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.1">release 2015.0.0.1</a>.</p>
+
+<p>However, it still does not work perfectly.</p>
+
+<p>Initially, I saw no new element added at all.</p>
+
+<p>Peeping under the ceiling in 3D view showed the new element offset downwards:</p>
+
+<center>
+<img src="img/place_light_4_copy_offset.png" alt="Light fixture copy offset downwards" width="403"/>
+</center>
+
+<p>Why is it offset downwards?</p>
+
+<p>I compared the parameter values of the original and copy using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/bipchecker-for-revit-2015-on-github.html">
+BipChecker</a>.</p>
+
+<p>One difference that I noticed was in the built-in parameter SKETCH_PLANE_PARAM.</p>
+
+<p>I tried to set that as demonstrated in
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.2">
+release 2015.0.0.2</a>.</p>
+
+<p>That throws an exception, because the parameter is read-only.</p>
+
+<p>Next, I tried a much simpler solution:</p>
+
+<p>Still comparing the original with the copy, I notice that the original location point Z value in non-zero, whereas the copy's is zero.</p>
+
+<p>So I simply set the copy's Z value equal to the original before creating the new instance, et voila, it appears to work fine:</p>
+
+<center>
+<img src="img/place_light_5_copy_with_z.png" alt="Light fixture copy with Z elevation" width="463"/>
+</center>
+
+<p>I stored that version as
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.3">
+release 2015.0.0.3</a>, then cleaned it up a bit to illustrate the various failed and successful attempts more clearly, resulting in
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.4">release 2015.0.0.4</a>:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">using</span> <span class="teal">OperationCanceledException</span> = Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span>;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> PlaceLight
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">LightPickFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_LightingFixtures );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">FamilyInstance</span> PlaceALight(
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> lightPlacePoint,
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> host,
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> lightSymbol )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = lightSymbol.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This does not work, because we need to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// specify a valid BIM element host.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//XYZ bubbleEnd = new XYZ( 5, 0, 0 );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//XYZ freeEnd = new XYZ( -5, 0, 0 );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//XYZ thirdPt = new XYZ( 0, 0, 1 );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//ReferencePlane referencePlane </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; = doc.Create.NewReferencePlane2( bubbleEnd, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; freeEnd, thirdPt, doc.ActiveView );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//XYZ xAxisOfPlane = new XYZ( 0, 0, -1 );</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//doc.Create.NewFamilyInstance( </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; referencePlane.Reference, lightPlacePoint, </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; xAxisOfPlane, lightSymbol );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> inst = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; lightPlacePoint, lightSymbol, host,
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.Structure.<span class="teal">StructuralType</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .NonStructural );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This does not work, because the parameter</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// is read-only, so an exception is thrown.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//inst.get_Parameter( </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; BuiltInParameter.SKETCH_PLANE_PARAM )</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; .Set( sketchPlaneName );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> inst;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> uiApp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> doc = uiApp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> selection = uiApp.ActiveUIDocument.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Pick a light fixture.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> pickedLightReference = selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="blue">new</span> <span class="teal">LightPickFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select lighting fixture to place&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( pickedLightReference == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get Family Instance of the selected light reference.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.GetElement( pickedLightReference )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get FamilySymbol of the family instance.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( lightFamilyInstance == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> lightFamilySymbol
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = lightFamilyInstance.Symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Forget this, it is read-only anyway.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//Parameter sketchPlaneParam = lightFamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; .get_Parameter( BuiltInParameter.SKETCH_PLANE_PARAM );</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//string sketchPlaneName = sketchPlaneParam.AsString();</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Get new light location.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> placeXyzPoint = selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select Point to place light:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Assuming the ceiling is horizontal, set</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the location point Z value for the copy</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// equal to the original.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; placeXyzPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( placeXyzPoint.X,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; placeXyzPoint.Y, ( lightFamilyInstance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Location <span class="blue">as</span> <span class="teal">LocationPoint</span> ).Point.Z );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;LightArray&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Start placing lights.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = PlaceALight( placeXyzPoint,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lightFamilyInstance.Host,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lightFamilySymbol );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>As a result of all this, we can remove the PlaceALight method definition, since it has been reduced to a one-liner, and simplify the entire external command implementation to the one and only single Execute method implementation.</p>
+
+<p>I also removed all the unneeded code and comments illustrating the various failed and successful attempts and stored the final minimal working version as
+
+<a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.5">
+release 2015.0.0.5</a>:</p>
+
+<p>Here is the Execute method implementation, with no other helper methods required:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> uiApp = commandData.Application;
+&nbsp; &nbsp; <span class="blue">var</span> doc = uiApp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> selection = uiApp.ActiveUIDocument
+&nbsp; &nbsp; &nbsp; &nbsp; .Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Pick a light fixture.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> pickedLightReference = selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="blue">new</span> <span class="teal">LightPickFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select lighting fixture to place&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pickedLightReference )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get Family Instance of the selected light reference.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.GetElement( pickedLightReference )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get FamilySymbol of the family instance.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( lightFamilyInstance == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> lightFamilySymbol
+&nbsp; &nbsp; &nbsp; &nbsp; = lightFamilyInstance.Symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine the host BIM element.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> host = lightFamilyInstance.Host;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get new light location.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> placeXyzPoint = selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select Point to place light:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Assuming the ceiling is horizontal, set</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the location point Z value for the copy</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// equal to the original.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; placeXyzPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( placeXyzPoint.X,
+&nbsp; &nbsp; &nbsp; &nbsp; placeXyzPoint.Y, ( lightFamilyInstance
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Location <span class="blue">as</span> <span class="teal">LocationPoint</span> ).Point.Z );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// All lighting fixtures are non-strucutral.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.DB.Structure.<span class="teal">StructuralType</span>
+&nbsp; &nbsp; &nbsp; &nbsp; non_structural = Autodesk.Revit.DB.Structure
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">StructuralType</span>.NonStructural;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;LightArray&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Start placing lights.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; placeXyzPoint, lightFamilySymbol,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; host, non_structural );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>To summarise, I never saw the error you reported, but encountered and solved two other fundamental problems:</p>
+
+<ul>
+<li>No BIM element host specified</li>
+<li>No Z elevation value specified</li>
+</ul>
+
+<p>Fixing those two was all it took.</p>
+
+
+
+<p><strong>Response:</strong>
+
+<p>Looking good, however there are a few issues.</p>
+
+<p>I ran the routine and the light was placed as expected.</p>
+
+<p>If you select the newly placed light and bring up its properties the Offset is no longer ‘0’ it is ‘2600’</p>
+
+<p>Also the Work Plane says ‘???’ not Compound Ceiling: Plain (as the original)</p>
+
+<p>Here are the properties displayed for a newly placed light (using the routine):</p>
+
+<center>
+<img src="img/place_light_6_copy_properties.png" alt="Light fixture copy properties" width="399"/>
+</center>
+
+<p>I would expect the light to be placed with the same offset and work plane as the original.</p>
+
+
+<p><strong>Answer:</strong>
+
+I continued research to find the correct solution to your issue, exploring various characteristics obtainable for the lighting instance properties and methods such as GetFamilyPointPlacementReferences, LevelId, HostFace, Location and trying to feed that data into different other overloads of the NewFamilyInstance method.</p>
+
+<p>An important question is the family placement type that can be determined like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">FamilyPlacementType</span> placementType
+&nbsp; &nbsp; = lightFamilySymbol.Family
+&nbsp; &nbsp; &nbsp; .FamilyPlacementType;
+</pre>
+
+<p>In this case, it returns placementType = WorkPlaneBased.</p>
+
+<p>Using that, we can return to the ItemFactoryBase class list of NewFamilyInstance overloads and choose a suitable one for that placement type.</p>
+
+<p>That still leaves several different overloads to choose from.</p>
+
+<p>I finally discovered that I can simply take the reference returned by the HostFace property and feed it into the NewFamilyInstance overload taking a reference, insertion point, direction and the family symbol to use.</p>
+
+<p><a href="https://github.com/jeremytammik/PlaceLight/releases/tag/2015.0.0.6">
+Release 2015.0.0.6</a> shows
+
+the final correctly working solution with parts of the code from previous attempts commented out.</p>
+
+<p>After discovering this, I returned to the old blog post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/hosting-a-light-fitting-on-a-reference-plane.html">
+hosting a light fitting on a reference plane</a> that
+
+you originally mentioned, only to see that it already clearly discusses the importance of choosing the right NewFamilyInstance method overload for the task, and points out that this exact one taking a reference plane, placement point, direction and family symbol is the right one to do the job in this case &ndash; the same result I ended up with after all this exhaustive renewed exploration for your case.</p>
+
+<p>On one hand, I am sorry that I did not take a closer look at it to start with.</p>
+
+<p>I am even more sorry that the post apparently did not get the message across in the first place.</p>
+
+<p>Still, I hope that this renewed research clarifies and adds one or two bits of new interesting information.</p>
+
+<p>It maybe also illustrates that perseverance can pay off, even if you are as stupid as I am and refuse to learn from experience, or refer back to it...  :-)</p>
+
+<p>Here is the final external command implementation after removing all the experimental code snippets:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> selection = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Pick a light fixture.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> pickedLightReference = selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="blue">new</span> <span class="teal">LightPickFilter</span>(),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select lighting fixture to place&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pickedLightReference )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get Family Instance of the selected light reference.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance
+&nbsp; &nbsp; &nbsp; &nbsp; = doc.GetElement( pickedLightReference )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get FamilySymbol of the family instance.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( lightFamilyInstance == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> lightFamilySymbol
+&nbsp; &nbsp; &nbsp; &nbsp; = lightFamilyInstance.Symbol;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine this family's placement type.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// This is an important step towards determining</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// which NewFamilyInstance overload to use to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// place new instances of it.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyPlacementType</span> placementType
+&nbsp; &nbsp; &nbsp; &nbsp; = lightFamilySymbol.Family
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FamilyPlacementType;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Placement type is WorkPlaneBased, so determine</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the host face that defines the work plane.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> hostFace = lightFamilyInstance.HostFace;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Prompt for placement point of copy.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> placeXyzPoint = selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Select point to place new light:&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The location point gives Z elevation value.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationPoint</span> lp = lightFamilyInstance.Location
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationPoint</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Assuming the ceiling is horizontal, set</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the location point Z value for the copy</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// equal to the original.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; placeXyzPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( placeXyzPoint.X,
+&nbsp; &nbsp; &nbsp; &nbsp; placeXyzPoint.Y, lp.Point.Z );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;LightArray&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> lightFamilyInstance2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; hostFace, placeXyzPoint, <span class="teal">XYZ</span>.BasisX,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lightFamilySymbol );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = ex.Message;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>As said, the most up-to-date version is provided by the
+
+<a href="https://github.com/jeremytammik/PlaceLight">PlaceLight GitHub repository</a>.
+
+Here is an overview of the releases so far:</p>
+
+<ul>
+<li>2015.0.0.7 removed obsolete testing and commented code</li>
+<li>2015.0.0.6 finally found right NewFamilyInstance overload to use</li>
+<li>2015.0.0.5 removed unneeded code and comments for final working version</li>
+<li>2015.0.0.4 cleaned up for publication</li>
+<li>2015.0.0.3 just passing in the host and setting the correct Z value seems to work fine</li>
+<li>2015.0.0.2 set SKETCH_PLANE_PARAM, which throws an exception being read-only</li>
+<li>2015.0.0.1 use NewFamilyInstance with a given host BIM element</li>
+<li>2015.0.0.0 initial implementation copies fixture with wrong host</li>
+</ul>
+
+

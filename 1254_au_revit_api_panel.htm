@@ -1,0 +1,111 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>The Revit API Panel at Autodesk University</h3>
+
+<p>The <a href="#1">Revit API expert panel</a> session took place directly after the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/12/autodesk-university-keynote.html">
+keynote sessions</a> and lunch yesterday.</p>
+
+<p>Before getting to that, let me mention that for the first time after half a decade or more of working closely together in the ADN DevTech AEC team, I was finally able to shake hands with my ex-colleague
+
+<a href="http://blog.csdn.net/joexiongjin/article/details/36218457">
+Ye Xiong Jin</a> (叶雄进),
+
+better know to us as
+
+<a href="http://adndevblog.typepad.com/aec/joe-ye.html">
+Joe Ye</a>.</p>
+
+<center>
+<img src="img/joe_ye_au_2014.jpeg" alt="Joe Ye and Jeremy at AU" width="385"/>
+</center>
+
+<p>Joe is now independently active with his own company <a href="http://www.glsbim.com">www.gisbim.com</a> or <i>Mount of Olives</i>, pronounced <i>Gan Lan Shan</i> (橄榄山).</p></p>
+
+<p>It was a great pleasure to finally meet face to face.</p>
+
+<p>Thank you, Joe, for the good times and fruitful projects we shared.</p>
+
+
+<a name="1"></a>
+
+<h4>Revit API Expert Panel</h4>
+
+<p>So, now, here are notes from the AU session
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=5156">
+SD5156 &ndash; Revit API Expert Panel &ndash; Open House on the Factory Floor</a>:</p>
+
+<ul>
+<li><a href="#2">Summary</a></li>
+<li><a href="#3">Panellists</a></li>
+<li><a href="#4">Participating Companies</a></li>
+<li><a href="#5">Notes on the Q &amp; A</a></li>
+</ul>
+
+<a name="2"></a>
+
+<h4>Summary</h4>
+
+<p><strong>SD5156</strong> &nbsp; Interact with a panel of Revit API experts from Autodesk to answer your questions and discuss all relevant topics of your choice. If you are writing add-ins for Revit, then this is the perfect forum to get to know the people who shape the APIs you work with better and explain your views, ideas and needs directly face to face. Please note that prior .NET programming and Revit programming experience is required and that this class is not suitable for beginners.</p>
+
+<a name="3"></a>
+
+<h4>Panellists</h4>
+
+<ul>
+<li>Adam Nagy, ADN</li>
+<li>Andrzej Trelinski, Revit Development</li>
+<li>Angel Velez, Revit Development</li>
+<li>Jeremy Tammik, ADN</li>
+<li>Mikako Harada, ADN</li>
+<li>Miroslav Schonauer, Autodesk Consulting</li>
+<li>Saikat Bhattacharya, Autodesk Consulting</li>
+</ul>
+
+<a name="4"></a>
+
+<h4>Participating Companies</h4>
+
+<p>AE7, aec factory, AECOM, Acco Engineered Systems, Andekan LLC, Ankrom Moisan Architects, Autodesk, BMMPM, Betech Data A/S, Boulder Associates Architect, Building Data LLC, CADtoWIN, CASE Design Inc., CH2M Hill, Cansel, Daiwa House Industry, Design Automation Systems Ltd, dRofus, Dørteknikk AS, E+M Consulting Engineers, EIC Engineers Inc., Environmental Systems Design Inc, Excitech Ltd, First Solar, Gensler, Goettsch Partners, H.H. Angus & Associates Ltd., HDR Engineering Inc., HOK, Halvorson and Partners Structural Engineers, Hankins & Anderson Architects & Engineers Inc., Harley Ellis Devereaux, Henderson Engineers, hsbCAD, Hydratec Inc, ICA BIM, Inviewlabs Ltd, Ideate, Jacobs, KCL, Kozo Keikaku Engineering Inc., KTGY Group Inc, kubit GmbH, L.A. Fuess Partners, LBBAE, Leviton Network Solutions, Lighting Analysts, MARTA, MWH Global, MacDonald-Miller Facility Solutions, Magnusson Klemencic Associates, NBBJ, NetOnApp LLC, Nucor-Vulcraft/Verco, PTAC Consulting Engineers, Permasteelisa Group, Project Frog, Prota Computers Inc., Quickpen, RTKL Associates Inc, RTV Tools, Revolution Design Inc., Rosendin, SGA Design Group, SOFiSTiK AG, STV Inc., Skidmore Owings & Merrill, SmithGroupJJR, Southland Ind., SrinSoft, Stantec, Sumex Design, TLC Engineering for Architecture, Taisei Corporation, Target, Tekfen Engineering, ThyssenKrupp Elevator Americas, URS, Victaulic, Vinci construction france, Weaver Custom Homes, Wegmans Food Markets, Weidlinger Associates, White, Woods Bagot, Wye River Technologies.</p>
+
+<a name="5"></a>
+
+<h4>Notes on the Questions and Answers</h4>
+
+<p>After the fact, I also added two small additions from Arno&scaron;t L&ouml;bel, who was not able to attend in person.</p>
+
+<p><strong>Q:</strong> Performance enhancements, selection sets, deselecting just a few items is very slow, because we seem to be re-selecting all the rest of them. How can we deselect just a couple from hundreds or thousands? It seems to be re-rendering the whole screen.</p>
+<p><strong>A:</strong> We are not aware of this. Please submit a reproducible case for us to explore and fix. We are working hard at improving all aspects of performance, so stay tuned.</p>
+<p><strong>Q:</strong> Read the materials, rendering, texture?</p>
+<p><strong>A:</strong> We have much too limited access to that and are aware of the issue. One hack is through the custom exporter API. You can read the texture image. Read-only, obviously. Background info: this is due to a common Autodesk component used across all products, no API available, we are pushing for more material library access.
+<b>Arno&scaron;t</b> adds:  It is not accurate to claim that you can access visual material images via the custom export. The image available in the MaterialNode is an image of the material tile, intended to be used in the Material dialogue. Even if it is available at all, it can hardly be used to display the material as rendered.</p>
+<p><strong>Q:</strong> Ceiling parameter and elements, trying to find surface loop. I have edges of the 3D solid.</p>
+<p><strong>A:</strong> We can look at your code in the DevHack in a moment, directly after this session. You are looking at the sketch, like for a floor. Here is a workaround to access the sketch model lines: delete this ceiling, monitor the deleted elements, grab their ids, roll back, and use the element ids to access the model curves. You know the solid and have its edges. This gives you the ids of the edges of the sketch. Assuming the ceiling is flat, not wavy, you can use the ExtrusionAnalyzer class to determine the closed loop.</p>
+<p><strong>Q:</strong> A philosophical, future directed question: third party developers can develop and add behaviour to the drawings. You seem to be moving towards the cloud. Where do you see third party developers contributing? Current APIs seem focused on distributing content. We want to add behaviour and logic into the model. Where is the support for that?</p>
+<p><strong>A:</strong> This is the exact optimal point in time to make your suggestion and you will certainly be heard with great interest. There is lots of scope for logic and behaviour in all areas, including cloud and mobile. You need to tell us what you need. Autodesk as a whole is looking for innovative ideas and we are certain that API centric platforms are better than dumb products. Revit is still evolving further in that direction. We cannot imagine all the things you need and are thinking. Let's talk! All our cloud stuff is still very much in an experimental stage, and how to hook up the products with each other. Cloud does not mean desktop is going away. We just have more opportunities to hook up components and do additional stuff. Whether Revit is in the cloud or on the desktop is irrelevant. Same program, no difference, same functionality. Add-ins will have to be supported there too. </p>
+<p><strong>Q:</strong> I find the Revit API very restrictive. That is frustrating.</p>
+<p><strong>A:</strong> This is due to the BIM parametric requirements. Revit requires strong control. History: when Revit started in 1988, there was zero API and the founders were opposed to the whole idea. That changed. We had an initial first stage of hard-wired API development. We have now moved to a second stage where API is automatically generated for all new functionality. Some of us experienced a similar shock moving from e.g. the AutoCAD API to the restrictive Revit one. Revit comes with a quite immense set of rules. You have to accept and get used to this. It has certain advantages. There is no way around it. Can be painful. It will get better, in the end.</p>
+<p><strong>Q:</strong> Regarding cloud: it is not irrelevant whether Revit is in the cloud or not. On my desktop I can install anything I like. If it is on the cloud I can install nothing. How can a developer publish apps on Revit cloud services? Are there plans for that?</p>
+<p><strong>A:</strong> We are pushing for this. We looked at something like this for AppStore published apps. Could we automatically cloud-install such apps? We have not forgotten about this, we are working at it. Big mission to make sure this happens.</p>
+<p><strong>Q:</strong> I am an API novice and I worked with Dynamo. The documentation is in C# and VB. Will there be more in Python?</p>
+<p><strong>A:</strong> No plans that I am aware of. You can compile to IL, .NET intermediate language, and decompile to any other language you please, e.g. using Reflector. Documentation alone is a big thing. Look at the IronPython Revit Python Shell, also Ruby.</p>
+<p><strong>Q:</strong> Does the current API support copy/monitor? I have an architectural model and want to copy/monitor. I can programmatically go in and copy objects, but have not found a way for copy/monitor. I want to copy elements out of a model into another one and monitor them. This is available as a Revit command. We want to drive copy/monitor fully programmatically without the user having to manually select the elements. </p>
+<p><strong>A:</strong> You can copy the elements and add a DMU updater to monitor them. This is a lot of work. Or use the built-in Revit command as is? Hard to drive the Revit built-in command fully automatically, PostCommand switches to the standard user interface and prompts for input, e.g. selection. Maybe you can preselect the elements and then call PostCommand? Nope, apparently not. If not, this might be added as a wish list item. Please submit a reproducible case and a wish list item.</p>
+<p><strong>Q:</strong> We also need copy/monitor. Linked monitor to control visibility of linked model. I have lots of towers, e.g. 20-30. I need to set the visibility of linked structural models. Maybe we have 20 small Revit models. We also need API to select elements in the linked models.</p>
+<p><strong>A:</strong> I want that too in linked IFC files. There is no API for that. Better view visibility control for linked objects is needed. We are expanding the linked API. Linked documents are listed in the application Documents collection. Workaround: You need to unload the link before making modifications to the linked document. We ended up setting up an interface to select elements in a linked model by grabbing the GUID and, behind the scenes, in a new session, bring those GUIDs back in and hide each one individually, then reload. This requires two Revit sessions. I had the same issue of controlling visibility in linked model and the critical issue in my case was we had to wrap individual models and linked views; it was a kind of painful nightmare. The API does in fact provide a method to get the monitored element of another element: Element.GetMonitoredLinkElementIds. However, is there a way to set this? (Thank you, Eric!)</p>
+<p><strong>Q:</strong> How to store changes in the model? Store the changes in a separate external database? Store in Revit parameters?</p>
+<p><strong>A:</strong> I have done this utilising the DocumentChanged event. You can grab the modified element ids and their data. It is just tricky for delete. You would have to cache data for deleted elements before they are deleted. I set up a check box in Revit to let the user control this. There may be an exchange app store add-in already provides this functionality. Joel Spahn can provide info as well  :-)</p>
+<p><strong>Q:</strong> Issues getting access to work lanes. Face based families hosted on the wall. How to find which face of the wall the instance was hosted on?</p>
+<p><strong>A:</strong> Send us a case; we'll take a look.</p>
+<p><strong>Q:</strong> Many pain points are with existing Revit commands lacking an API. Is there an active effort to make absolutely all commands accessible programmatically? I need access to absolutely everything. Can we handle wishes such as this in a public forum, e.g. 'user voice'?</p>
+<p><strong>A:</strong> PostCommand was a big step forward. Request anything you need. Every little thing you need. We cannot know what you need. We just do what we think is important, unless you ask us specifically. Another hard decision: should we rework old API, or just abandon it? Either way somebody will be unhappy. Old things break, or new things are hampered. It is OK to say you want everything missing, but important is also to list the top ten. What will you really use? This is what the yearly API wish list survey is for. We take this very seriously and prioritize based on this input. You can also submit wish list items via the Revit API forum. Mikako will look into this. Andrzej gets wishes from ADN, then if more input is needed looks at the Revit API forum and tries to track the problems there based on frequency and rates their importance accordingly.
+<b>Arno&scaron;t</b> adds: I kind of do not like this answer (or the question, as a matter of fact :-). This is not what the API is for, and it is very hard to bend it that way. The Revit UI was not laid out to be invoked by external applications ad hoc. It was designed to work with the end-user only, and certain workflows are expected (and indeed enforced). In my opinion, if the user wants full-blown script-ability, they can a) use the journal, or b) we would have to develop a completely new scripting platform. I am not saying I do not understand the request and the desire for it &ndash; I just state the facts as they are. Boy I wish I had been there! ;-)</p>
+<p><strong>Q:</strong> Is it possible for the Revit API to expose element relationships? Revit know everything. How can I get access to that information? For example, to re-host a door, to access sketch lines of the floor, a central API to expose all these relationships. If you pick into a system of pipes, you can tab through the selection to get various levels of connectedness.</p>
+<p><strong>A:</strong> Simply let us know what connections and relationships you are looking for. The host property of a door specifies its host. If we find something that you need, we will happily expose it, of course. Or ask for specific needs. It looks as if we are exposing some of this and not all.</p>
+<p>Thank you for participating!</p>
+<p>Keep in touch!</p>

@@ -1,0 +1,202 @@
+<head>
+<meta http-equicenter="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+- type catalogue
+  10647769 [API support for creating type catalog (GK)]
+  10915457 [Type catalog questions - Follow up for case 10647769 (GK)]
+  1259665 [Type Catalog Power units]
+  1257060 [Family Type Catalog]
+
+#revitapi #adsk #bim #3dwebcoder #aec #cloud #restapi #heroku #mongo
+#adskdevnetwrk #geometry
+#dotnet #csharp #python
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #csharp #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Type Catalogues and FireRating in the Cloud</h3>
+
+<p>Let's veer away from the Revit API for a moment and take a look at family type catalogues, since questions on those pop up regularly in connection with programming as well:</p>
+
+<ul>
+<li><a href="#2">Programmatic type catalogue creation</a></li>
+<li><a href="#3">Tweaking type catalogue behaviour</a></li>
+<li><a href="#4">Type catalogue parameters</a></li>
+<li><a href="#5">Type catalogue units</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Programmatic Type Catalogue Creation</h4>
+
+<!-- 10647769 [API support for creating type catalog (GK)] -->
+
+<p><strong>Question:</strong>
+
+Is there any API support (function) to create type catalogues?</p>
+
+<p><strong>Answer:</strong>
+
+As far as I know, there are two ways to create type catalogues, and both are programmatically accessible:</p>
+
+<ul>
+<li>Create a TXT file associated with the family listing the possible combinations of dimensioning parameters.</li>
+
+<li>Create an MEP specific type catalogue for MEP parts.</li>
+</ul>
+
+<p>I assume you are interested in the latter?</p>
+
+<p>I tried searching the Revit API help for 'catalog', and that does indeed not return any relevant results.</p>
+
+<p>However, searching the various
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit API</a> overviews,
+I found the following
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+for Revit 2014</a>:</p>
+
+<span class="darkblue">
+<h4>CSV Fitting Parameter Removal</h4>
+
+<p>Because CSV files are no longer used to drive MEP fitting parameters, Revit supports a new set of APIs to manage fitting parameters through several classes:</p>
+
+<ul>
+<li>FamilySizeTableManager &ndash; manages importing and exporting of legacy CSV data and size tables.</li>
+<li>FamilySizeTable &ndash; manages specific sizes of fittings.</li>
+<li>FamilySizeTableColumn &ndash; manages a specific dimension of a given size in a size table</li>
+<li>FamilySizeTableErrorInfo &ndash; reports any errors when importing an file with CSV size table into a FamilySizeTable</li>
+</ul>
+</span>
+
+<p>Is this possibly what you are looking for?</p>
+
+<p>So maybe what you are after is the FamilySizeTable class and all its associated methods and properties.</p>
+
+<p><strong>Response:</strong>
+
+Actually we are interested in the first item, creating a TXT file associated with the family listing the possible combinations of dimensioning parameters.</p>
+
+<p>Is there a way to create this txt file using Revit API?</p>
+
+<p><strong>Answer:</strong>
+
+That case is quite trivial, as far as I know:</p>
+
+<p>Simply create a TXT file with the same name as the family definition RFA, and it will be picked up automatically by Revit.</p>
+
+<p>I am not aware of any specific Revit API to achieve this or support it in any way.</p>
+
+<p>To create the file, you can use standard .NET functionality, or anything else you like.</p>
+
+<p>Basically this approach is simply making use of the standard family definition user interface functionality.</p>
+
+
+<a name="3"></a>
+
+<h4>Tweaking Type Catalogue Behaviour</h4>
+
+<!-- 1257060 [Family Type Catalog] -->
+
+<p><strong>Question:</strong>
+
+Is there any support for TXT family type catalogue files inside Revit API? </p>
+
+<p>If I use one of the LoadFamily methods and there is a TXT file along with the RFA, will the type selection dialogue pop up automatically? </p>
+
+<p>Is there any way to tweak or suppress this behaviour?</p>
+
+<p><strong>Answer:</strong>
+
+While there isn't any support to handle the family type catalogue TXT files using the API, I was wondering if, instead of using LoadFamily, using LoadFamilySymbol to load up the specific symbols would work for you.</p>
+
+<p>Alternatively, you can also load any single type from the family, programmatically duplicate it and modify the new type's parameters as you like.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Type Catalogue Parameters</h4>
+
+<!-- 10915457 [Type catalog questions - Follow up for case 10647769 (GK)] -->
+
+<p><strong>Question:</strong>
+
+I have three questions related to type catalogues:</p>
+
+<ol>
+<li>The type catalogues created by Revit (using the UI button) have on the first line parameter names plus some extra information, e.g., <code>Type##OTHER##</code> or <code>Thickness##LENGTH##MILLIMETERS</code>.
+What is the logic how that extra information is added and from where?</li>
+
+<li>When I look at the family parameters accessible from the family manager, I see some that are not present in the type catalogue. How do we know which parameters are and are not written to the type catalogue?</li>
+
+<li>Is there a validation mechanism for a type catalogue? How to check if is valid or not?</li>
+</ol>
+
+<p><strong>Answer:</strong>
+
+This information is about standard end user content creation and not at all Revit API related.</p>
+
+<p>Therefore, you can probably find the answers yourself by researching those topics from an end user point of view.</p>
+
+<p>One place to start is obviously the related
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-FFA71D72-D4C5-416D-BF65-1757657C3CE9">
+documentation on type catalogues and their syntax</a> &ndash; by the way, interestingly enough, the same help id also applies for
+<a href="http://help.autodesk.com/view/RVTLT/2016/ENU/?guid=GUID-FFA71D72-D4C5-416D-BF65-1757657C3CE9">LT</a>.</p>
+
+<p>I think this should help with your issues #1 and #2.</p>
+
+<p>Regarding #3: it is indeed possible to create a poorly defined type catalogue.</p>
+
+<p>That will get some sort of warning or error when you try to load such a family.</p>
+
+<p>I am not aware of any other way to check or validate via API or otherwise.</p>
+
+<p>Loading a family with a type catalog displays the dialogue 'Specify Types':</p>
+<center>
+<img src="img/specify_types.png" alt="Specify Types" width="589"/>
+</center>
+<p>The grid under the types section is driven directly from the type catalog.
+If the type catalog includes additional parameters that are not in the family, a warning is displayed and they are ignored.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Type Catalogue Units</h4>
+
+<!-- 1259665 [Type Catalog Power units] -->
+
+<p><strong>Question:</strong>
+
+we're trying to create type catalogue in txt file for Radiator family. We were trying to define a parameter in watt units, with no success. How to define header for this parameter?</p>
+
+<p><strong>Answer:</strong>
+
+Look at page 15 of Martin Schmid's Autodesk University
+<a zip="zip/ME318-1L_Creating_Revit_MEP_Content_for_Engineering_Coordination.pdf">
+class handout</a> on <i>Creating Revit MEP Content for Engineering Coordination</i>.</p>
+
+<p>Here is a sample Exhaust Fan <a href="zip/Exhaust_Fan.rfa">RFA</a> and <a href="zip/Exhaust_Fan.txt">TXT</a> file for you to play with.</p>
+
+<p>They don't use Watts, but should give the idea if you are not already familiar with type catalogues.</p>
+
+<p>Also, the families guide provides a list of the parameter types, namely, for electrical_power: watts, kilowatts, british_thermal_units_per_second, british_thermal_units_per_hour, calories_per_second, kilocalories_per_second, volt_amperes, kilovolt_amperes, horsepower.</p>
+
+<p>Thus, the header definition for such a parameter would be:</p>
+
+<pre>
+[paramname]##electrical_power##watts
+</pre>

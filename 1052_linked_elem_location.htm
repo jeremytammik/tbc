@@ -1,0 +1,298 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08931918 [retrieve object location]
+
+Remy van den BorICN Solutions BV
+
+-->
+
+<h3>Determining Host Document Location of a Linked Element</h3>
+
+<p>It is getting rather cold and wet and dreary outside now, so I spent some time answering the following excellently documented developer query on relating the coordinates of a linked file with its host.</p>
+
+<p>Just as I was about to publish it, Kon raised the very same issue in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/access-to-individual-elements-in-linked-projects.html?cid=6a00e553e168978833019b00b5f467970b#comment-6a00e553e168978833019b00b5f467970b">
+comment</a> on
+
+the recent discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/access-to-individual-elements-in-linked-projects.html?cid=6a00e553e168978833019b00b5f467970b#comment-6a00e553e168978833019b00b5f467970b">
+accessing individual elements in linked projects</a>:
+
+"When I try to relate the 'internal' XYZ LocationPoint of the linked document to the main model, they are 'off', ... How can one relate 2 model's XYZ coordinates accurately, when their 'Internal' 0,0,0 are in different positions ...?"</p>
+
+<p>Here is the first query on the same topic:</p>
+
+
+<p><strong>Question:</strong> I am struggling with linked files in Revit 2014.</p>
+
+<p>I have a wall in a document A that is linked into a project document B.</p>
+
+<p>I read the article on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/list-linked-elements.html">
+listing linked elements</a> and
+
+found it very useful.</p>
+
+<p>However, the method described there returns a list of location points in the linked file itself.</p>
+
+<p>So, lets say I have a linked file with one wall in it.
+In the linked file, the location of this wall is at 100,100,0.</p>
+
+<p>In my main file, I place it at 300,100,0.</p>
+
+<p>I need to determine the location of this "linked" wall inside my main model.
+So I want to retrieve the location 300,100,0.</p>
+
+<p>How can I achieve that, please?</p>
+
+<p>As said, this code from the aforementioned article returns the location of the wall within the link, (100,100,0), and that's not the location I need:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Document</span> d = rvtlink.GetLinkDocument();
+&nbsp; <span class="teal">Element</span> e = d.GetElement( id );
+&nbsp; <span class="teal">LocationCurve</span> curve = e.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp; <span class="teal">XYZ</span> p = curve.Curve.GetEndPoint( 0 );
+&nbsp; <span class="teal">XYZ</span> q = curve.Curve.GetEndPoint( 1 );
+</pre>
+
+<p>To completely describe and reproduce the problem, I set up the following test scenario involving two documents, A and B, and two walls, red and blue.</p>
+
+<p>Document A looks like this:</p>
+
+<center>
+<img src="img/linked_elem_location_1.png" alt="Document A"/>
+</center>
+
+<p>The red wall is situated at the location 0,0,0 in this document, the blue wall at -12000,0,0.</p>
+
+<p>To keep matters simple, that's also where the survey point and project base point lie.</p>
+
+<center>
+<img src="img/linked_elem_location_2.png" alt="Document A base point"/>
+</center>
+
+<p>Document B looks like this: </p>
+
+<center>
+<img src="img/linked_elem_location_3.png" alt="Document B"/>
+</center>
+
+<p>The pink lines show the bounding box of the linked file A in the containing project B. </p>
+
+<p>Document B has the 0,0,0 point lying like below.</p>
+
+<center>
+<img src="img/linked_elem_location_4.png" alt="Document B origin"/>
+</center>
+
+<p>Document A is linked into document B and is situated so that the 0,0,0 location of document A is placed at document B's location 5000,5000,0.</p>
+
+<center>
+<img src="img/linked_elem_location_5.png" alt="Red wall in document B"/>
+</center>
+
+<p>As said, my goal is to retrieve the location of the red wall (from the linked file), but in coordinates related to the 0,0,0 point of document B.</p>
+
+<p>So, I need a routine that tells me that the red wall is situated at location 5000,5000,0 in document B and that the blue wall is situated at -7000, 5000,0.</p>
+
+<p>How can this be done?</p>
+
+<p>Here is my current code attempting to determine this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">LinkSelectionFilter</span>(),
+&nbsp; &nbsp; <span class="maroon">&quot;Please pick an import instance&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">RevitLinkInstance</span> rvtlink = doc.GetElement( r )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="teal">RevitLinkInstance</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span>( rvtlink == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// For this example, just focus on </span>
+&nbsp; <span class="green">// the blue and red walls</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> walls = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; &nbsp; rvtlink.GetLinkDocument() )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Wall</span> ) )
+&nbsp; &nbsp; .Where( c =&gt; c.Id.IntegerValue == 179910
+&nbsp; &nbsp; &nbsp; || c.Id.IntegerValue == 179980 );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Ask Revit for coordinates; these are</span>
+&nbsp; &nbsp; <span class="green">// related to the linked file (Document A).</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> curve = wall.Location
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = curve.Curve.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = curve.Curve.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( wall.Id.IntegerValue == 179910 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;The Red wall&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The red wall is situated at &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + PointString( p ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;The Blue wall&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The blue wall is situated at: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + PointString( p ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// So, how can I determine where the red and </span>
+&nbsp; &nbsp; <span class="green">// blue walls are in the coordinate system of </span>
+&nbsp; &nbsp; <span class="green">// the document B file ?</span>
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>How can I achieve the last step, please?</p>
+
+<p><strong>Answer:</strong> Easy, actually.</p>
+
+<p>Before getting into details, let me mention that I recently also discussed
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/access-to-individual-elements-in-linked-projects.html">
+access to individual elements in linked projects</a> and
+
+point out a number of previous related articles there.</p>
+
+<p>RevitLinkInstance is derived from the Instance class, the base class for all instance objects.
+It provides the methods GetTransform, to retrieve the transform of the instance, and GetTotalTransform that includes the true north transform as well.</p>
+
+<p>As you say, you have the location of your element in the linked file, and all you need to determine is how to transform that to the containing file coordinates.</p>
+
+<p>This can easily be achieved using the location attributes of the RevitLinkInstance to determine its transform, and then apply that to your points.</p>
+
+<p>By the way, let me also point out that you are making your degugging efforts significantly harder by working in millimetres in the user interface, since all the internal database values are stored in imperial feet.</p>
+
+<p>I implemented the following method PointStringMm to display the database units in millimetres to correspond with your description above:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _inch_to_mm = 25.4;
+&nbsp; <span class="blue">const</span> <span class="blue">double</span> _foot_to_mm = 12 * _inch_to_mm;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a string for a real number</span>
+&nbsp; <span class="gray">///</span><span class="green"> formatted to two decimal places.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> RealString( <span class="blue">double</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> a.ToString( <span class="maroon">&quot;0.##&quot;</span> );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a string for an XYZ point</span>
+&nbsp; <span class="gray">///</span><span class="green"> or vector with its coordinates</span>
+&nbsp; <span class="gray">///</span><span class="green"> converted from feet to millimetres</span>
+&nbsp; <span class="gray">///</span><span class="green"> and formatted to two decimal places.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> PointStringMm( <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">&quot;({0},{1},{2})&quot;</span>,
+&nbsp; &nbsp; &nbsp; RealString( p.X * _foot_to_mm ),
+&nbsp; &nbsp; &nbsp; RealString( p.Y * _foot_to_mm ),
+&nbsp; &nbsp; &nbsp; RealString( p.Z * _foot_to_mm ) );
+&nbsp; }
+</pre>
+
+<p>With that in place and the call to retrieve the link transform added, the code lookes like this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Transformation from linked file to host</span>
+&nbsp;
+&nbsp; <span class="teal">Transform</span> t = rvtlink.GetTotalTransform();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Ask Revit for coordinates; these are</span>
+&nbsp; &nbsp; <span class="green">// related to the linked file (Document A).</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> curve = wall.Location
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = curve.Curve.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = curve.Curve.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> title = <span class="maroon">&quot;The {0} Wall&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> msg = <span class="maroon">&quot;The {0} wall is situated at {1} &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in the source document and at {2} in the &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;target one.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> red = ( wall.Id.IntegerValue == 179910 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( title, red ? <span class="maroon">&quot;Red&quot;</span> : <span class="maroon">&quot;Blue&quot;</span> ),
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( msg,
+&nbsp; &nbsp; &nbsp; &nbsp; red ? <span class="maroon">&quot;red&quot;</span> : <span class="maroon">&quot;blue&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; PointStringMm( q ),
+&nbsp; &nbsp; &nbsp; &nbsp; PointStringMm( t.OfPoint( q ) ) ) );
+&nbsp; }
+</pre>
+
+<p>Running this command in the sample model pops up two dialogue boxes, one for each wall.
+Here is the one describing the position of the red wall:</p>
+
+<center>
+<img src="img/linked_elem_location_6.png" alt="Red wall location in target document B"/>
+</center>
+
+<p>Similarly, the one for the blue wall:</p>
+
+<center>
+<img src="img/linked_elem_location_7.png" alt="Blue wall location in target document B"/>
+</center>
+
+<p>I hope this fully answers your question.</p>
+
+<p>Here is
+
+<a href="zip/LinkedElementLocation.zip">LinkedElementLocation.zip</a> containing
+
+the full source code, Visual Studio solution and add-in manifest for this external command.</p>
+
+
+<!-- ADN SFDC case, Scott answer to Gopi: set the family category having started from a generic template -->
+
+<a name="2"></a>
+
+<h4>Modifying a Family Category</h4>
+
+<p>Before we close for today, here is a note to highlight an important new feature that was added to the Revit 2014 API and answers the following query:</p>
+
+<p><strong>Question:</strong> How can I programmatically set the family category having started from a generic model template?</p>
+
+<p>Lacking that functionality, I am forced to I ship various different templates with categories preset.</p>
+
+<p><strong>Answer:</strong> As said, that was enabled in Revit 2014.
+Here is a straight quote from the Revit API help file RevitAPI.chm section on
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014 API</a>:</p>
+
+<h5 style="color:darkblue">Family category</h5>
+<p style="color:darkblue">The property</p>
+<ul>
+<li style="color:darkblue">FamilyBase.FamilyCategory</li>
+</ul>
+<p style="color:darkblue">can now be set.  This allows the category of an family being edited to be changed.</p>

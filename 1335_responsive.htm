@@ -1,0 +1,185 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+make blogs responsive
+
+  https://en.wikipedia.org/wiki/Responsive_web_design
+  http://through-the-interface.typepad.com/through_the_interface/2015/06/through-the-interface-goes-responsive.html
+  tbc font: Muli, Roboto Slab, Roboto Light 300, Domine, Lato
+  https://www.google.com/fonts/specimen/Lato
+  Kean
+  Home -- http://through-the-interface.typepad.com/through_the_interface/
+  Archives -- http://through-the-interface.typepad.com/through_the_interface/archives.html
+  Subscribe -- http://through-the-interface.typepad.com/through_the_interface/atom.xml
+  Autodesk Blogs -- http://blogs.autodesk.com/
+  f g+ in tw
+  Jeremy
+  Home -- http://thebuildingcoder.typepad.com
+  Archives -- http://thebuildingcoder.typepad.com/blog/archives.html
+  About -- http://thebuildingcoder.typepad.com/blog/about-the-author.html
+  Subscribe -- http://thebuildingcoder.typepad.com/blog/atom.xml
+  Autodesk Blogs -- http://blogs.autodesk.com
+  f g+ in tw
+
+div.jumbotron { visibility: hidden }
+div.jumbotron { display: none }
+
+Kean:
+
+<div id="translator" class="module-typelist module">
+<h2 class="module-header">Translator</h2>
+<div class="module-content">
+<ul class="module-list">
+<li class="module-list-item">
+<a href=""></a><br />
+<div id='MicrosoftTranslatorWidget' class='Dark' style='color:white;background-color:#555555'></div>
+<script type='text/javascript'>
+setTimeout(function(){{var s=document.createElement('script');s.type='text/javascript';s.charset='UTF-8';s.src=((location && location.href && location.href.indexOf('https') == 0)?'https://ssl.microsofttranslator.com':'http://www.microsofttranslator.com')
+  +'/ajax/v3/WidgetV3.ashx?siteData=SCbI5QqhB_szyHm_DthE93CT-OhudIAdr6f2c4cMGARi9CLyUkAt9r-2bMFOcN6Vg5cg_A0nj_zCIpYBpOn_LqLaezd3dCSPmXO6Imqb5xyim8y_41yMbT14670V2tux&ctf=True&ui=true&settings=Manual&from=en';var p=document.getElementsByTagName('head')[0]||document.documentElement;p.insertBefore(s,p.firstChild); }},0);</script>
+</li>
+</ul>
+</div>
+</div>
+
+Jeremy:
+
+<div id='MicrosoftTranslatorWidget' class='Dark' style='color:white;background-color:#555555'></div><script type='text/javascript'>setTimeout(function(){{var s=document.createElement('script');s.type='text/javascript';s.charset='UTF-8';s.src=((location && location.href && location.href.indexOf('https') == 0)?'https://ssl.microsofttranslator.com':'http://www.microsofttranslator.com')+'/ajax/v3/WidgetV3.ashx?siteData=p1pPRBHbGxQFzFSXq70m_YlPN-NjuTR4_RViGJhDw8bZjrq50-wcmXMq2BuhATqsz_CTT4xn7iFMZ0aa2SnkSuj8d55DXWl6wQ1ZTOpChQ_MeZg7V8_xbH_Ehz38b0B5&ctf=True&ui=true&settings=Manual&from=en';var p=document.getElementsByTagName('head')[0]||document.documentElement;p.insertBefore(s,p.firstChild); }},0);</script>
+
+<div id='MicrosoftTranslatorWidget' class='Dark' style='color:white;background-color:#555555'></div>
+<script type='text/javascript'>
+setTimeout(function(){{
+var s=document.createElement('script');
+s.type='text/javascript';
+s.charset='UTF-8';
+s.src=((location && location.href && location.href.indexOf('https') == 0)
+  ?'https://ssl.microsofttranslator.com'
+  :'http://www.microsofttranslator.com')
+  +'/ajax/v3/WidgetV3.ashx?siteData=p1pPRBHbGxQFzFSXq70m_YlPN-NjuTR4_RViGJhDw8bZjrq50-wcmXMq2BuhATqsz_CTT4xn7iFMZ0aa2SnkSuj8d55DXWl6wQ1ZTOpChQ_MeZg7V8_xbH_Ehz38b0B5&ctf=True&ui=true&settings=Manual&from=en';var p=document.getElementsByTagName('head')[0]||document.documentElement;p.insertBefore(s,p.firstChild); }},0);</script>
+
+h1, h2, h3, h4, h5, h6, .module-email {
+  font-family: 'Lato', Arial, sans-serif;
+}
+
+h3.entry-header {
+  font-size: 1.8em;
+}
+
+<link href='//fonts.googleapis.com/css?family=Lato|Open+Sans' rel='stylesheet' type='text/css'>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script type="text/javascript">
+var disqus_shortname = 'thebuildingcoder';
+(function () {
+var loaded = false;
+function loadDisqus() {
+if (loaded) return;
+loaded = true;
+var div = document.getElementById('all-comments');
+div.innerHTML = ''; div.id = 'disqus_thread';
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+if ( document.getElementById('all-comments') || document.readyState === "complete" ) {
+return setTimeout( loadDisqus, 1 );
+}
+if ( document.addEventListener ) {
+document.addEventListener( "DOMContentLoaded", loadDisqus, false );
+window.addEventListener( "load", loadDisqus, false );
+} else if ( document.attachEvent ) {
+document.attachEvent( "onreadystatechange", loadDisqus );
+window.attachEvent( "onload", loadDisqus);
+}
+}());
+</script>
+
+#all-comments { display: none !important; }
+.comments-open { display: none !important; }
+
+.comment-content span {}
+
+<center>
+<a href="http://the3dwebcoder.typepad.com/blog/jeremy-tammik.html">
+<img src="http://the3dwebcoder.typepad.com/jeremy-tammik-88x88.jpeg" alt="Jeremy Tammik" title="Jeremy Tammik"></a>
+<p><a href="http://the3dwebcoder.typepad.com/blog/jeremy-tammik.html">About</a></p>
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</center>
+
+http://the3dwebcoder.typepad.com/jeremy-tammik-88x88.jpeg
+
+#revitapi #adsk #bim #3dwebcoder #adskdevnetwrk #aec #responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #csharp #geometry #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>The Responsive Building Coder</h3>
+
+<p>I suffer from acute and chronic responsiveness.</p>
+
+<p>That is unpleasant for me, although hopefully pleasing and useful for the rest of humanity.</p>
+
+<p>What I mean is, I tend to answer other people's questions and needs before taking care of my own.</p>
+
+<p>I am forever trying to stop doing that.</p>
+
+<p>One of these days, I certainly will.</p>
+
+<p>The topic I refer to above is not me, personally, though, but The Building Coder blog.</p>
+
+<p>Nowadays, web pages should be based on a
+<a href="https://en.wikipedia.org/wiki/Responsive_web_design">responsive web design</a> or
+their Google search ranking will suffer.</p>
+
+<p>Kean Walmsley explained the
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/02/reading-from-mobile-devices-time-for-a-redesign.html">
+growing usage of mobile devices</a>, leading to the recent
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/02/reading-from-mobile-devices-time-for-a-redesign.html">
+responsive redesign of Through the Interface</a>.</p>
+
+<p>Following his lead, I switched The Building Coder to a responsive design now as well, as you can see.</p>
+
+<p>I hope you like it!</p>
+
+<p>Just like Kean's blog, I use the Typepad 'Snap' template with Lato and Open Sans fonts.
+The latter requires a reference to the Google font stylesheet.</p>
+
+<p>I struggled a bit with the banner image, especially to suppress the default header text that Typepad generates automatically and puts on top of the image.</p>
+
+<p>I finally found the following simple CSS solution for that:</p>
+
+<pre class="prettyprint">
+.jumbotron h1, .jumbotron h2 { display: none }
+</pre>
+
+<p>The next main issue I had was with the Microsoft Bing translation widget.</p>
+
+<p>I set it up on their web page and added the resulting HTML and JavaScript to my blog design.</p>
+
+<p>It did weird things, and even after significant tweaking was still displaying two user interfaces on top of each other.</p>
+
+<p>After too much of that mess, I opted for the Google translation service instead.</p>
+
+<p>I hope you like the result, especially if you are on a mobile device.</p>
+
+<p>Please do let me know what you think. Thank you!</p>

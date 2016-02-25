@@ -1,0 +1,189 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+#revitapi #adsk #bim #3dwebcoder #adskdevnetwrk #aec #dynamobim
+#ah8 #augi #au2015 #dotnet #csharp #geometry
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Dynamo, Centroid &amp; Volume Calculation Migration Blitz</h3>
+
+<p>My French colleague
+
+<a href="http://villagebim.typepad.com/villagebim/olivier-bayle.html">
+Olivier Bayle</a>,
+
+co-author of the French AEC-related
+
+<a href="http://villagebim.typepad.com">
+Village BIM</a> blog,
+
+just re-raised the topic of my old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html">
+solid centroid and volume calculation</a> add-in.</p>
+
+<p>Let's also point out one or two of the numerous topics we tackled in the past few days on the Revit API discussion forum:</p>
+
+<ul>
+<li><a href="#2">Graphically displaying the centre of gravity using Dynamo</a></li>
+<li><a href="#3">GetCentroid on GitHub and blitz migration across four Revit API releases</a></li>
+<li><a href="#4">Finding the orientation of welded pipe outlets</a></li>
+<li><a href="#5">How to set the change type for DMU AddTrigger</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Graphically Displaying the Centre of Gravity using Dynamo</h4>
+
+<p>Olivier uses the GetCentroid add-in to implement a Dynamo script graphically displaying the centre of gravity of a bunch of selected Revit elements, as demonstrated by his two-minute June 22 YouTube video
+<a href="https://www.youtube.com/watch?v=jBgkhXqWh-w">
+Revit afficher le centre de gravité à l'aide de Dynamo</a>:</p>
+
+<center>
+<iframe width="480" height="360" src="https://www.youtube.com/embed/jBgkhXqWh-w" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Le but de cet article est de vous montrer que Dynamo devient le véritable compagnon de Revit notamment lorsqu’il permet d’accroitre les fonctionnalités de Revit.</p>
+
+<p class="en">We demonstrate how Dynamo is becoming a true companion of Revit, e.g., by enabling addition of enhanced functionality.</p>
+
+<p>Looking forward to seeing the upcoming Village BIM article on this topic &nbsp; :-)</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>GetCentroid on GitHub and Blitz Migration Across Four Revit API Releases</h4>
+
+<p>Prompted by Olivier's request, I created a new home for the original
+<a href="http://thebuildingcoder.typepad.com/blog/2012/12/solid-centroid-and-volume-calculation.html">
+GetCentroid add-in</a> add-in implementation, which now lives in its own cosy little
+<a href="https://github.com/jeremytammik/GetCentroid">GetCentroid GitHub repository</a>.</p>
+
+<p>I performed a 30-minute blitz migration of it from Revit 2013 across all later versions up to Revit 2016:</p>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2013.0.0.0">2013.0.0.0</a> &ndash; initial release from december 2012</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2014.0.0.0">2014.0.0.0</a> &ndash; flat migration to Revit 2014</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2015.0.0.0">2015.0.0.0</a> &ndash; flat migration to Revit 2015</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2015.0.0.1">2015.0.0.1</a> &ndash; suppressed architecture mismatch warning</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2015.0.0.2">2015.0.0.2</a> &ndash; eliminated obsolete API usage</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2016.0.0.0">2016.0.0.0</a> &ndash; flat migration to Revit 2016</li>
+<li><a href="https://github.com/jeremytammik/GetCentroid/releases/tag/2016.0.0.1">2016.0.0.1</a> &ndash; set copy local false on Revit API assemblies</li>
+</ul>
+
+<p>You can use the GitHub diff functionality to see clearly and exactly what changed from version to version, e.g.
+<a href="https://github.com/jeremytammik/GetCentroid/compare/2015.0.0.0...2016.0.0.1">...GetCentroid/compare/2015.0.0.0...2016.0.0.1</a> to
+compare the version 2015.0.0.0 with 2016.0.0.1.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Finding the Orientation of Welded Pipe Outlets</h4>
+
+<p>A quick summary of the Revit API discussion forum thread on
+<a href="http://forums.autodesk.com/t5/revit-api/finding-the-orientation-of-welded-outlets-of-a-pipe/m-p/5688668">
+finding the orientation of welded pipe outlets</a>:</p>
+
+
+<p><strong>Question:</strong>
+
+I have a pipe with several grooved or welded branches and outlets:</p>
+
+<center>
+<img src="img/welded_pipe_outlets.jpeg" alt="Pipe with welded outlets" width="335"/>
+</center>
+
+<p>I would like to programmatically determine the orientation of the outlets.</p>
+
+<p>Please can anyone suggest me how to achieve this?</p>
+
+<p><strong>Answer:</strong>
+
+Each of the branches or outlets is connected to the duct.</p>
+
+<p>Navigate to the corresponding Connection object, e.g. via the FamilyElement > MEPSystem > ConnectionManager properties.</p>
+
+<p>From that, you can determine the connection orientation. Here are three different articles discussing this topic:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/connector-orientation.html">
+Connector orientation (2010)</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/connector-direction-and-createairhandler.html">
+Connector direction (2010)</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/05/connector-orientation.html">
+Connector orientation (2012)</a></li>
+</ul>
+
+
+<a name="5"></a>
+
+<h4>How to Set the Change Type for DMU AddTrigger</h4>
+
+<p>A summary of another Revit API discussion forum thread, on
+<a href="http://forums.autodesk.com/t5/revit-api/how-can-i-use-getchangetype-to-get-change-of-view3d-orientation/m-p/5687401">
+how to use GetChangeType to get change of View3D orientation</a>:</p>
+
+
+<p><strong>Question:</strong>
+
+I am using the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">Dynamic Model Update framework DMU</a> to create a stereo view and want to update the right and left eye views affected by a modification of the source view orientation.</p>
+
+<p>However I have a problem catching 'Orientation modified'.</p>
+
+<p>I want to use this line of code:</p>
+
+<pre>
+  UpdaterRegistry.AddTrigger(
+    m_updaterId, doc, idsToWatch, ??? );
+</pre>
+
+<p><code>idsToWatch</code> is a list of element ids specifying the source view.</p>
+
+<p>What should I use for the last argument?</p>
+
+<p>How can I get view orientation modified?</p>
+
+<p><strong>Answer:</strong>
+
+The last argument to the AddTrigger method is the change type.</p>
+
+<p>The safest change type to specify is the one returned by the Element.GetChangeTypeAny method.</p>
+
+<p>Here are some discussions mentioning the AddTrigger method on The Building Coder:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/08/structural-dynamic-model-update-sample.html">
+Structural Dynamic Model Update Sample</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/access-deleted-element.html">
+Access Deleted Element</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/11/lock-the-model-eg-prevent-deletion.html">
+Lock the Model, e.g. Prevent Deletion</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/documentchanged-versus-dynamic-model-updater.html">
+DocumentChanged versus Dynamic Model Updater</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/createlinkreference-sample-code.html#3">
+How to Trigger a Dynamic Model Updater by Specific Element Ids</a></li>
+</ul>
+
+<p>I hope this helps.</p>

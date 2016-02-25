@@ -1,0 +1,203 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Victor Chekalin 
+Re: AW: (Building Coder) Create a new Floor with Openings based on Complex Boundaries
+
+-->
+
+<h3>The Building Coder Samples on GitHub</h3>
+
+<p>After several prompts from various quarters, I finally got around to publishing
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> on GitHub.</p>
+
+<p>To access them from there, you can either open the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+repository</a> or
+
+grab the code through the direct
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/archive/master.zip">zip file download</a>.</p>
+
+<p>As discussed below in the section on
+
+<a href="#4">branching and tagging</a>,
+
+these links refer to the master branch.</p>
+
+<p>For a specific version of the samples, e.g. from today, please
+
+<a href="#4">see below</a>.</p>
+
+<p>Another important aspect that I discovered in the process and always had suspected in the past is the importance of adding a software license.</p>
+
+
+<a name="2"></a>
+
+<h4>The Importance of a License, Any Old License</h4>
+
+<p>Luckily, I ran into this nice
+
+<a href="http://www.codinghorror.com">
+coding horror</a> admonition
+
+to
+
+<a href="http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html">
+pick a license, any license</a> before
+
+publishing.</p>
+
+<p>If no license is specified, an implicit copyright is asserted.
+People can read the code, but they have no legal right to use it.
+To use it, you must contact the author directly and ask permission.</p>
+
+<p>No serious professional programmer is going to use any published code without explicit permission.</p>
+
+<p>You even have to specify a license to put your code in the
+
+<a href="http://en.wikipedia.org/wiki/Public_domain">
+public domain</a>.
+Alternatively, you can die, and then anybody interested will still have to wait for a long time.</p>
+
+<p>I considered using the
+
+<a href="http://www.wtfpl.net">
+WTFPL</a> advocated
+
+in the coding horror article.</p>
+
+<p>Being a bit leery of the potential reaction of my colleagues, however, who might object to the wording of its name, I desisted and settled for the minimalistic and permissive
+
+<a href="http://en.wikipedia.org/wiki/MIT_License">
+MIT License</a> instead.
+
+
+
+<a name="3"></a>
+
+<h4>Creating a GitHub Repository</h4>
+
+<p>I had initially planned to take notes of every step I made to set up the repository and link it with my local file system, but unfortunately didn't.</p>
+
+<p>I am using the Mac version of git, anyway, so my steps would not be of great interest to the majority of my readers.</p>
+
+<p>However, while prompting me to publish The Building Coder samples to GitHub, Victor Chekalin, or Виктор Чекалин, very kindly listed the detailed steps that he recommends on a Windows platform as follows:</p>
+
+<ol>
+<li>Register on <a href="https://github.com">github</a> if you are not yet registered.</li>
+
+<li>Create new repository on github.
+In the new repository window, type the repository name and select Add .gitignore CSharp.
+.gitignore contains the rules for folders and files that should not be stored in the repository.
+Then click Create Repository.</li>
+
+<li>The repository is created on github. Now is the time to install Git client.</li>
+
+<li>At first install
+
+<a href="http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git">
+mysgit</a>.
+
+This is the official Git client for Windows.
+Download and install it with default settings.</li>
+
+<li>You may already start using git, but mysgit is a console client.
+I use the more comfortable
+
+<a href="http://code.google.com/p/tortoisegit/wiki/Download">
+TortoiseGit</a> Windows
+
+client instead.
+Download and install it with default settings as well.</li>
+
+<li>After you installed TortoiseGit, open the TortoiseGit settings and go to the Git node.
+Type your name and email.</li>
+
+<li>Now we are ready to create local repository in your project folder.</li>
+
+<li>Find the folder where your project is located.
+Right click on this folder and select Git Create repository here...
+In the next window click OK.</li>
+
+<li>Right click on this folder again and select TortoiseGit &gt; Settings.</li>
+
+<li>In the Git &gt; Remote node copy and paste the URL of the github repository you created.
+Click Apply.
+Tortoise Git asks you if you want fetch branches from the remote repo; click No.</li>
+
+<li>Right click on the folder, select the TortoiseGit &gt; pull Command to pull .gitignore from the github and click OK.</li>
+
+<li>Commit your first changes: Git Commit &gt; master.
+Type the commit comment, select all your files to add them to the repository and click OK.</li>
+
+<li>The commit initially only applies to your local repository.
+To commit those changes to the remote repository as well, i.e. on github itself, you have to push them.
+Click Push. Click OK. Type your name and password.</li>
+
+<li>That's it. The code is on github.</li>
+
+<li>When you have made any changes in the code, commit your changes.
+Do not forget add files in the commit window if you add new files.
+Push the changes after committing them locally.</li>
+</ol>
+
+<p>This pretty much matches my Mac experiences as well.</p>
+
+<p>Actually, once I had the github repository up and running and everything safely backed up, I removed my original copy and created a new one in the original location using the following command:</p>
+
+<pre>
+  git clone master_url local_dir
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>Branching and Tagging</h4>
+
+<p>Luckily, I talked again with Victor before going live with this post, and he pointed out yet another very important aspect:</p>
+
+<p>One thing to remember is that when a link to The Building Coder samples GitHub page or to the archive is posted, it generally refers to the main, or master, code stream.</p>
+
+<p>As a result, a post written today, publishing the github link, will refer to something completely different in a year's time.</p>
+
+<p>A user wishing to access the particular version discussed in the post will get the latest version of the examples.
+These may already include a lot of changes.
+As a result, the user sees completely different code than what is described in the post.</p>
+
+<p>One solution is to create a
+
+<a href="http://git-scm.com/book/en/Git-Branching-Basic-Branching-and-Merging">
+branch</a>.</p>
+
+<p>Whenever you publish a github link, create a new branch, e.g., bc_yyyymmdd, and provide a link to this branch.</p>
+
+<p>Perhaps, instead of creating a new branch each time, you may create a tag and provide a link to the specific tag.</p>
+
+<p>This is easier than branching.
+For this case, it is exactly that you need.</p>
+
+<p>Actually, while exploring the tagging mechanism, I discovered the easy method of creating an official
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases">
+release</a> directly
+
+in the github web site, and used one single click to generate
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.104.2">version 2014.0.104.2</a> as
+
+a separate release, the initial github release.</p>
+
+<p>Actually, a release is also simply a special kind of tag.</p>
+
+
+
+<p>Many thanks to Victor for all his support and detailed instructions!</p>

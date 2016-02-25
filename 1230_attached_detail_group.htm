@@ -1,0 +1,72 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09908493 [Attached Detail Groups (PIM)]
+
+http://forums.autodesk.com/t5/revit-api/check-for-attached-detail-group/m-p/5291823
+
+-->
+
+<h3>Attached Detail Groups and Inverse Relationships</h3>
+
+<p>I am still at the
+
+<a href="https://twitter.com/hashtag/tmuhack">Berlin hackathon</a>,
+
+working with the <a href="http://m3my.github.io">MovieMemory</a> team...</p>
+
+<p>In between other tasks, let me mention the interesting discussion and solution by Revitalizer on the Revit API discussion forum to
+
+<a href="http://forums.autodesk.com/t5/revit-api/check-for-attached-detail-group/m-p/5335867">
+check for attached detail groups</a>:</p>
+
+<p><strong>Question:</strong> Can someone tell me, please, how I can find out if a Group (Type) has an Attached Detail Group (Type) via the API?</p>
+
+<p><strong>Answer:</strong> A group of category OST_IOSAttachedDetailGroups has a BuiltInParameter.GROUP_ATTACHED_PARENT_NAME.</p>
+
+<p>This way, you will find matching Model groups.</p>
+
+<p><strong>Response:</strong> Thanks for the answer.</p>
+
+<p>So this would mean that instead of just asking a group Abc for its Attached Detail Groups, I'd have to go over all groups of the right category in the project and check if their parent is group Abc... right?</p>
+
+<p>Well I guess I could  do that &ndash; it just seems a bit complicated.
+I mean, how come an element knows its parent but not its children, and not even whether it has any children in the first place, which is all I actually need to know, in my case?</p>
+
+<p><strong>Answer:</strong> I usually create Dictionaries to store relationships like these so I can access them quickly when needed.</p>
+
+<p>Another point to note:</p>
+
+<p>As you can see, this parameter is of type string; I wonder why it stores a name instead of an element id.</p>
+
+<p>I don't know why...</p>
+
+<p>Many relationships and tips and tricks like this are not officially documented in the Revit API, and require exploration and understanding of the product usage to discover.</p>
+
+<p>Regarding the storage of parent-children relationships:</p>
+
+<p>The approach described above is the standard way of storing such relationships in Revit.</p>
+
+<p>For instance, a door or window hosted by a wall maintains a pointer to the hosting wall via the Element.Host property.</p>
+
+<p>The inverse relationship is not available directly from the API, and probably not stored anywhere at all, since it can always be calculated and saved in a temporary dictionary when needed.</p>
+
+<p>One of the very early discussions on The Building Coder discusses the issue of implementing such a dictionary to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+determine the inverse relationship from host to hosted elements</a>.</p>
+
+<p>In fact, that is blog post number 16 from 2008 :-)</p>
+
+<p>It makes sense for the Revit model to store the relationship one way only, not both ways, to minimise the model data, possibilities for errors and synchronisation issues.</p>
+
+<p>I hope this helps explain.</p>
+
+<p><strong>Response:</strong> Good question indeed...</p>
+
+<p>Once again thanks for the answer! &nbsp; :-)</p>

@@ -1,0 +1,150 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08749760 [Unsafe accessing to Revit model, I can't find in addin source code...]
+
+http://forums.autodesk.com/t5/Revit-API/Edit-existing-slab-boundary/td-p/4407975
+
+http://adndevblog.typepad.com/aec/2013/10/change-the-boundary-of-floorsslabs.html
+
+-->
+
+<h3>Handle Your Own Exceptions and Edit Slab Boundaries</h3>
+
+<p>Today, we continue yesterday's discussion on the need to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/handle-your-own-exceptions.html">
+handle your own exceptions</a> and
+
+mention Joe Ye's solution to
+
+<a href="#3">edit an existing slab boundary</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>How to Handle Your Own Exceptions</h4>
+
+<p>Yesterday we explained why Revit cannot gracefully handle all your exceptions for you and the need to do so yourself in all parts of your Revit add-in, especially the modeless ones that Revit is not even aware of.</p>
+
+<p>Better still, of course, is to avoid all modeless activity completely, if you can.</p>
+
+<p>This led to the following further discussion:</p>
+
+<p><strong>Question:</strong> When I said "unsafe access" I meant accessing the Revit model from a context that Revit is unaware of &ndash; not in event handlers, dynamic updaters, etc.
+This unsafe access could be either direct or indirect: directly, for example by creating a public member <code>public Document Document {get;set;}</code> in a modeless form; indirectly, e.g. by reading some elements from the model, mapping them to another "safe" elements using a lazy query, like <code>elements = elementsFromModel.Select(x => new SomeObject(x))</code> and accessing those from another thread.</p>
+
+<p>The situation with unhandled exceptions is rather clear; I sent you yesterday's add-in just as an interesting example; to fix this particular case, it is enough to simply set Focusable="False" on the hyperlink element.
+The most difficult step to solve it was discovering the action sequences that led to the crash.
+The problem is known and old, as you can see from this discussion on
+
+<a href="http://social.msdn.microsoft.com/Forums/vstudio/en-US/5982cafe-f75b-42b4-99dc-50d3a81b30b0/invalidoperationexception-systemwindowsdocumentshyperlink-is-not-a-visual-or-visual3d">
+InvalidOperationException: 'System.Windows.Documents.Hyperlink' is not a Visual or Visual3D</a> in
+
+the Visual Studio discussion forum.</p>
+
+<p>But I don't know how to remain the modeless form  and properly contain such errors: try-catch is useless, because the error throws in a different thread.</p>
+
+<p>The only approach I found so far is to implement my own exception handler, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> CurrentDomainOnUnhandledException(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">UnhandledExceptionEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> exception = e.ExceptionObject <span class="blue">as</span> <span class="teal">Exception</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( exception == <span class="blue">null</span> ) <span class="blue">return</span>;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;exception&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format( <span class="maroon">&quot;{0}\n{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; exception.Message, exception.StackTrace ) );
+&nbsp; }
+</pre>
+
+<p>I can then subscribe to that in external command Execute method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">AppDomain</span>.CurrentDomain.UnhandledException
+&nbsp; &nbsp; += CurrentDomainOnUnhandledException;
+</pre>
+
+<p>In this case, I can at least see the exception details before Revit crashes.</p>
+
+<p>The question is whether there is any way at all to stop the exception from being passed on up to the main Revit process.</p>
+
+
+<p><strong>Answer:</strong> You could add this question as a comment to the blog post and also open a discussion thread on it in the Revit API forums, e.g. in the Autodesk and AUGI discussion groups, to see what solutions other developers are using.</p>
+
+<p>In C++ I believe you can specify what exception handler to call, so maybe this whole thing can be handled correctly and completely using a mixed mode C++ application.</p>
+
+<p>But, still, why do you have to use any modeless Revit add-ins at all?</p>
+
+<p>If they are modeless, you might as well implement them completely outside of Revit, and only communicate with them via the Idling event:</p>
+
+<ul>
+<li>Remove all the modeless activity from your add-in.</li>
+
+<li>Implement a separate independent stand-alone executable that does all the modeless stuff.</li>
+
+<li>Connect the two in a similar way as you currently do.</li>
+</ul>
+
+<p>That would solve your problem, wouldn't it?</p>
+
+<p>Obviously this is only useful if the application is truly modeless.
+If a modeless dialogue needs to talk to Revit for some reason, you would either have to integrate into your add-in after all, or devise some mechanism to communicate from the stand-alone application with your add-in to extract the required information.</p>
+
+<p>I also discussed the matter further with the development team, and they say:</p>
+
+<p>The only 100% safe approach is not to let the add-in code have unhandled exceptions in the Revit process.</p>
+
+<p>See this MSDN discussion on
+
+<a href="http://blogs.msdn.com/b/clraddins/archive/2007/05/01/using-appdomain-isolation-to-detect-add-in-failures-jesse-kaplan.aspx">
+using AppDomain isolation to detect add-in failures</a>.</p>
+
+<p>Revit currently does not use different AppDomains for add-ins.
+But even if it did, it wouldn't solve this problem:</p>
+
+<p>Unhandled exceptions on add-in originated threads are harder because the host isn't on the stack and can't catch the exceptions.
+Starting with the CLR v2.0, unhandled exceptions on child threads will cause the entire process to be torn down.
+Thus it is impossible for a host to completely recover from this.
+With a little work though, it can detect which AppDomain and &ndash; assuming it gives each add-in its own domain &ndash; add-in caused the problem and log the failure before exiting and even restarting.</p>
+
+<p>If it's unhandled, it's unhandled down to the termination of the host process.
+Thus, surround all possible code with try-catch, or introduce a separate process to do the add-in work to avoid this situation.
+Or do as you suggested and log the unhandled exceptions.
+Possibly, those details could be written to the journal to help understand what happened.</p>
+
+
+<a name="3"></a>
+
+<h4>Editing an Existing Slab Boundary</h4>
+
+<p>After a lengthy Autodesk discussion group thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Edit-existing-slab-boundary/td-p/4407975">
+editing an existing slab boundary</a>,
+
+my colleague
+
+<a href="http://adndevblog.typepad.com/aec/joe-ye.html">Joe Ye</a>
+
+now published a solution on the AEC DevBlog using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html">
+temporary transaction trick</a>:
+
+<a href="http://adndevblog.typepad.com/aec/2013/10/change-the-boundary-of-floorsslabs.html">
+Change the boundary of floors/slabs</a>.</p>
+
+<p>Joe temporarily deletes the slab, which deletes and returns the element ids of the associated boundary lines.</p>
+
+<p>The transaction can be rolled back, so the slab and its boundary remain unchanged.</p>
+
+<p>After that, the boundary lines can be modified in a new transaction, modifying the slab as well.</p>
+
+<p>Many thanks to Joe for solving this!</p>

@@ -1,0 +1,145 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Caroline Ward Re: Autodesk® Developer News - September 8, 2014 - e
+
+09939561 [Panel vs Switchboard]
+
+-->
+
+<h3>Autodesk View and Data API Webinar</h3>
+
+<p>I listed a whole bunch of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/upcoming-event-calendar.html">
+upcoming events</a> last
+
+week.</p>
+
+<p>Now I have yet another one to announce, a <a href="#3">webinar</a> introducing the Autodesk View and Data API, immediately preceding the <a href="#2">exchange apps hackathon</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk Exchange Apps Hackathon &ndash; September 20-21, 2014</h4>
+
+<p>There are less than two weeks left before the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/08/autodesk-exchange-apps-hackathon.html">
+Autodesk Exchange Apps Hackathon</a>,
+
+a two-day virtual web based coding 'festival' that will run from September 20 through to September 21, 2014.</p>
+
+<center>
+<img src="img/exchange_apps_hackathon_2014.jpeg" alt="Autodesk Exchange Apps Hackathon 2014" width="302"/>
+</center>
+
+<p>This year's event is bigger and better than last year's, with new competitions and great prizes.</p>
+
+<p>We've assembled a great line-up of speakers to give presentations and demos on hot topics that will help your overall app development, and technical experts will be on hand to help and guide you.</p>
+
+<p>For full details and registrations, please visit
+
+<a href="http://exchangeapphack.com">
+www.exchangeapphack.com</a>.</p>
+
+<p>Please email
+
+<a href="mailto:exchangeapphack@autodesk.com">exchangeapphack@autodesk.com</a> if
+
+you have any questions on the Hackathon.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Autodesk View and Data API Webinar &ndash; September 18, 2014</h4>
+
+<p>We already looked at several aspects of the Autodesk View and Data API in the past few weeks:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/autodesk-view-and-data-api.html">Autodesk View and Data API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/baseljs-meetup-view-and-data-api-demo.html#2">Basel.js Meetup View and Data API Demo</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/view-and-data-api-presentation-material.html">View and Data API Presentation Material</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/08/threejs-aec-viewer-progress-on-two-fronts.html">Three.js AEC Viewer Progress on Two Fronts</a></li>
+</ul>
+
+<p>The View and Data API
+
+<a href="http://forums.autodesk.com/t5/view-and-data-api/tell-me-when-this-api-is-public/m-p/5150974#U5150974">
+is now public</a>,
+
+and we invite you to attend a one-hour webinar introducing the View and Data API Beta in all its glory on Thursday September 18, 2014 at 8 am PDT.</p>
+
+<p>In case you are not already aware of it, the View and Data web service API is a zero-client, browser-based viewer and associated (server-side) translation engine that will run in any WebGL-enabled browser. The viewer currently supports over 60 widely accepted design and 3D file formats. One advantage of the View and Data API is that the viewer has access to the rich data embedded in the original design, including properties, parameters, inter-object relationships, materials, etc., and that models are streamed, so you can start interacting with a very large model without waiting for the entire file to be downloaded from the server.</p>
+
+<p>APIs include a server-side REST API for uploading, translating and accessing your 3D models, and a client-side JavaScript API that allows fine control of the viewer itself, including:</p>
+
+<ul>
+<li>Responding to events, e.g. selection and view changes.</li>
+<li>Searching and displaying the rich data included in the model.</li>
+<li>Manipulating the camera and view.</li>
+<li>Isolating and highlighting model components based on model data search.</li>
+<li>Loading 3D or 2D model representations.</li>
+<li>Linking 3D model objects to your own data sources.</li>
+</ul>
+
+<p>Webinar details:</p>
+
+<ul>
+<li>Date: Thursday, September 18, 2014</li>
+<li>Time: 8 a.m. PDT &ndash; 4 p.m. BST &ndash; 5 p.m. CET &ndash; 11 a.m. EDT</li>
+<li>Duration: approximately one hour</li>
+</ul>
+
+<p>Registration: To reserve your place, send an email to
+
+<a href="mailto:adn-training-worldwide@autodesk.com">adn-training-worldwide@autodesk.com</a>.</p>
+
+<p>Please make sure you include:</p>
+
+<ul>
+<li>Your full name</li>
+<li>Company name</li>
+<li>ADN Developer ID, if available</li>
+<li>Email address</li>
+</ul>
+
+<p>We look forward to talking with you in the webcast.</p>
+
+<p>If you would like to dive in right away instead of waiting for the webinar, you are welcome to apply for an API key at
+
+<a href="https://developer.autodesk.com">developer.autodesk.com</a> and
+
+start experimenting beforehand.
+Note that the API keys are still approved manually, so please be patient waiting for your approval.</p>
+
+
+<a name="4"></a>
+
+<h4>Toggling Annotation Categories per View</h4>
+
+<p>Let's address one quick little pure Revit API issue before closing again:</p>
+
+
+<p><strong>Question:</strong> What's the right way to tell the difference between a panel and a switchboard using the API?
+For example, in the basic MEP sample project, how do I tell the difference between SWB and MDP-1?</p>
+
+
+<p><strong>Answer:</strong> The class name and category of the two objects are indeed identical.</p>
+
+<p>Therefore, you have to search for some additional differentiating characteristics.</p>
+
+<p>The RevitLookup database exploration tool provides a useful utility for doing so.</p>
+
+<p>Using that, I noticed that the panel has an INSTANCE_SCHEDULE_ONLY_LEVEL_PARAM built-in parameter, which is not present on the switchboard.</p>
+
+<p>You might be able to use this to distinguish between the two.</p>
+
+<p>I would always recommend implementing a test suite, though, to ensure that all the various assumptions like that made by your add-in really remain valid for all of the models you work with.</p>
+
+<p>You may discover that different models and different workflows introduce different sets of parameters on the various elements.</p>

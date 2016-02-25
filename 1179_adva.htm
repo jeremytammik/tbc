@@ -1,0 +1,292 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+and Revit API FAQ
+
+09767571 [How to get the supportedBy information for an element] grabbed this overdue aec case, download, analysis, researched blog, answered case
+09769551 [Inserting families from Type Catalogs] grabbed this overdue aec case, download, analysis, researched blog, answered case
+09779280 [API access to BuiltinPararmeter.PROJECT_REVISION_REVISION_NUM and BuiltinParameter.PROJECT_REVISION_ENUMERATION] grabbed this overdue aec case, download, analysis, researched blog, answered case
+
+http://thebuildingcoder.typepad.com/blog/2013/06/auto-pdf-print-from-revit-2014.html?cid=6a00e553e16897883301a73dec94c3970d#comment-6a00e553e16897883301a73dec94c3970d
+comment by Frédéric
+
+
+-->
+
+
+<h3>Autodesk View and Data API</h3>
+
+<p>I was away for a few days last week in the beautiful Italian speaking southern part of Switzerland.</p>
+
+<p>Back again, as usual, I am confronted with a host of Revit API issues.</p>
+
+<p>The most important event last week for me by far, though, was the release of the Autodesk View and Data API.</p>
+
+<p>Some of my Autodesk University related tasks and upcoming meetup events are also related to that:</p>
+
+<ul>
+<li><a href="#2">Autodesk View and Data API</a></li>
+<li><a href="#3">View and Data API presentations</a></li>
+<li><a href="#4">Autodesk University advance passes</a></li>
+<li><a href="#5">Retrieving support information for an element</a></li>
+<li><a href="#6">Inserting a family symbol from a type catalogue</a></li>
+<li><a href="#7">API access to revision information</a></li>
+<li><a href="#8">Installing a Revit add-in</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Autodesk View and Data API</h4>
+
+<p>As said, Autodesk released its new web based
+
+<a href="https://developer.autodesk.com">View and Data API</a>.</p>
+
+<p>I will not go into any details, because full documentation and samples are provided:</p>
+
+<p>Full API documentation and access to request an API key is provided by the
+
+<a href="http://developer.autodesk.com">Autodesk Developer Portal</a>.</p>
+
+<p>Support is available through the
+
+<a href="http://forums.autodesk.com">
+Autodesk Community</a> &gt;
+
+<a href="http://forums.autodesk.com/t5/Web-Services-API/ct-p/94">
+Web Services API</a> &gt;
+
+<a href="http://forums.autodesk.com/t5/View-and-Data-API/bd-p/95">
+View and Data API</a> discussion
+
+group.</p>
+
+<p>Samples are provided in the GitHub
+
+<a href="https://github.com/Developer-Autodesk">
+View and Data API sample repositories</a>.</p>
+
+<p>The best way to get started is by hitting the appropriately named 'Get Started' button on
+
+<a href="https://developer.autodesk.com">developer.autodesk.com</a> and
+
+working through the seven simple steps in the
+
+<a href="http://developer.api.autodesk.com/documentation/v1/vs_quick_start.html">Quick Start</a> document:</p>
+
+<ol>
+<li>Register for an API key and create an application</li>
+<li>Get your access token</li>
+<li>Create a bucket</li>
+<li>Upload a file</li>
+<li>Set up References Between Multiple Files</li>
+<li>Register Your Data with the Viewing Services</li>
+<li>Load the URN in the JavaScript viewer</li>
+</ol>
+
+<p>Oops.</p>
+
+<p>I said 'released'.
+Reading Stephen Preston's
+
+<a href="http://forums.autodesk.com/t5/View-and-Data-API/Welcome-to-the-Autodesk-View-and-Data-API-forum/td-p/5138486">
+welcome message to the forum</a>,
+
+I note that "we expect the API to become 'public' very soon".
+If you'd like to be informed when that happens, then please reply to the
+
+<a href="http://forums.autodesk.com/t5/View-and-Data-API/Tell-me-when-this-API-is-public/td-p/5150974">
+Tell me when this API is public</a> thread,
+
+making sure to include your name, company and contact details.
+API keys are currently only provided to pilot program participants.</p>
+
+
+
+<a name="3"></a>
+
+<h4>View and Data API Presentation at Basel.js Meetup and Autodesk University</h4>
+
+<p>I'll discuss and demonstrate the new View and Data API at the next Basel.js meetup with the title
+
+<a href="http://www.meetup.com/basel-js/events/192651262">New 3D Geometry Viewer for Web</a>:</p>
+
+<p>"You may have created fantastic 3D designs.
+Isn't it frustrating that your website is all in 2D?
+Now you can very easily embed stunning, interactive, intelligent 3D models into your web page, web application, or desktop application.
+We'll look at some demos showing what is possible, and cover the simple steps to create a 3D-enabled website."</p>
+
+<p>Stephen Preston is presenting on this topic at Autodesk University 2014 in Las Vegas, and I will do the same at the German-speaking event in Darmstadt.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Autodesk University Advance Passes</h4>
+
+<p>By the way, AU attendees can buy Advance Passes before the normal AU registration opens.
+That gives you the following important benefits:</p>
+
+<ul>
+<li>Save $600 off full price of AU Advance Pass: $1,575, AU full price: $2,175)</li>
+<li>Choose classes and hotel a week before general registration opens, giving the attendee a better chance at getting into the classes and hotel he or she wants</li>
+</ul>
+
+<p>Advance Pass holders can register starting on August 20, 2014, one week before Open Registration starts on August 27, 2014.</p>
+
+
+
+
+<a name="5"></a>
+
+<h4>Retrieving Support Information for an Element</h4>
+
+<p><strong>Question:</strong> I would like to know which element sits on top of the other.</p>
+
+<p>For example, I have a floor element sitting on top of 10 columns. I would like to know which columns support the floor.</p>
+<p>Alternatively, if I have 10 columns on top of a floor 'X', I would like to know how to extract the information for each column to know that a floor supports this column and the floor is 'X'.</p>
+<p>Please let me know if this is possible in Revit.</p>
+
+<p><strong>Answer:</strong> Of course, this is definitely possible in Revit.</p>
+
+<p>In a properly designed structural model, you would simply make use of the analytical model to determine this information, e.g. via the AnalyticalModel.GetAnalyticalModelSupports method.</p>
+
+<p>Each AnalyticalModelSupport class instance represents one support for a structural element in the realm of the Analytical Model.</p>
+
+<p>If your model is not structural or has been incompletely specified, there are a number of different approaches available to determine the neighbouring elements below a given element via ray casting or geometrical analysis.</p>
+
+<p>An overview and examples of several different approaches is provided by the analysis of how to determine
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html">supporting columns</a>.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Inserting a Family Symbol from a Type Catalogue</h4>
+
+<p><strong>Question:</strong> Is there any API support for loading a family and creating a symbol from a type catalogue?</p>
+
+<p>If not, I assume that I can write my own code for parsing the catalogue and create the symbol myself. Can you see a problem with that?</p>
+
+<p><strong>Answer:</strong> That sounds perfectly sensible. I see no problem with that whatsoever.</p>
+
+<p>You can load a family, either entirely with all its symbols or just one specific type, using the LoadFamily and LoadFamilySymbol methods. Here are some thoughts and background information on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/05/loading-only-selected-family-types.html">loading selected family types</a>.</p>
+
+<p>By type catalogue, I assume you mean the text file specifying a list of possible dimension combinations?</p>
+
+<p>I do not believe the Revit API provides support for that, so it might indeed be best to parse the file yourself and extract the desired dimensions from it.</p>
+
+<p>You can then load one specific family symbol into the project, duplicate it using the Duplicate method, and set the desired dimensions to the required values.</p>
+
+
+
+<a name="7"></a>
+
+<h4>API Access to Revision Information</h4>
+
+<p><strong>Question:</strong> I am trying to obtain data relating to the revisions present on a ViewSheet.</p>
+
+<p>I can successfully retrieve what looks like the correct information via GetAllProjectRevisionIds, but the PROJECT_REVISION_REVISION_NUM parameter contains no information, and PROJECT_REVISION_REVISION_ENUMERATION always appears to contain '0' (zero) regardless of the Numeric or Alphabetic selection in Sheet Issues/Revisions.</p>
+
+<p>I used a modified version of <a href="http://thebuildingcoder.typepad.com/blog/2013/09/max-revision-wrapper-class.html">Max' revision wrapper class</a> for my tests.</p>
+
+<p>The test sheet in question contains 4 revisions, two of which are alphabetic, and two numeric. The output when I retrieve data using the sample code is:</p>
+
+<pre>
+  Number: Numbering: 0 Description: My description 1, Date: 4/1/14 Sequence: 4
+  Number: Numbering: 0 Description: My description 2, Date: 5/1/14 Sequence: 5
+  Number: Numbering: 0 Description: My description 3, Date: 6/1/14 Sequence: 6
+  Number: Numbering: 0 Description: My description 4, Date: 7/1/14 Sequence: 7
+</pre>
+
+<p>Should I expect to see anything in Number, or do I need to calculate this using the Numbering option and the sequence number? Should I expect to see a different value for Numbering if alpha or numeric values are chosen?</p>
+
+<p><strong>Answer:</strong> In versions prior to Revit 2015, the API provided hardly any access at all to revision data.</p>
+
+<p>One of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3">
+major Revit 2015 API additions</a> is
+
+access to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3.04">
+revision information</a>.</p>
+
+<p>I recently implemented a sample application showing how to use this access to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/06/the-revision-api-and-a-form-on-the-fly.html">read revision data</a> and
+
+display it in a dynamically generated Windows form on the fly.</p>
+
+
+<a name="8"></a>
+
+<h4>Installing a Revit Add-in</h4>
+
+<p>The best way to understand how to install a Revit add-in is to read the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a>.</p>
+
+<p>However, this material is targeted at developers.</p>
+
+<p>I wrote a shorter and simpler answer addressing the minimal basics answering a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/auto-pdf-print-from-revit-2014.html?cid=6a00e553e16897883301a73dec94c3970d#comment-6a00e553e16897883301a73dec94c3970d">comment</a> by
+
+Frédéric on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/auto-pdf-print-from-revit-2014.html">AutoPDF print utility</a>:</p>
+
+<blockquote>
+<p>All Revit add-ins are installed in the same way.</p>
+
+<p>They consist of an add-in manifest with the filename extension *.addin.</p>
+
+<p>It is an XML file that you can edit and contains a tag pointing to the .NET add-in assembly DLL.</p>
+
+<p>The add-in manifest must be located in a folder that Revit searches, e.g. the one you mention.</p>
+
+<p>The add-in assembly can be placed anywhere you like.</p>
+
+<p>I place small simple add-ins in the same folder as the add-in manifest.</p>
+
+<p>Then there is no need to specify the full DLL pathname.</p>
+</blockquote>
+
+<p>I hope this succinct summary is useful for non-developers.</p>
+
+<p>Well, I am back in the rut again now...</p>
+
+<!--
+
+Arnost Lobel Collecting "Frequently Asked Questions"
+
+<a name=""></a>
+
+<h4></h4>
+
+We, at the Revit API group we are currently in process of collecting users’ questions for our new list of FAQ. We are doing it for we realized that the list we once have has been long obsolete and out ever growing base of API users deserve to have some centralized and up-to-date collections of answers to real-world problems. We plan to make this list part of our documentation, both on-line and the SDK.
+
+We already have some questions we think may be important (and we know they are asked on API forums quite frequently), but I am not giving it away yet, because I am interested in your first reaction. Certainly each of you have some questions you feel are those your users ask most often. Please, if you have some we would appreciate if you could send it over to me, even if some of the questions are trivial. We will take a look at each one of them and will sort them out for the final list. Questions are to be about Revit API, not general Revit features.
+
+<a href="">
+</a>
+
+<a name=""></a>
+
+<h4></h4>
+
+
+<pre class="code">
+</pre>
+
+-->

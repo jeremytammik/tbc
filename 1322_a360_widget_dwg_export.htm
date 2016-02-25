@@ -1,0 +1,173 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+#revitapi #adsk #bim #dotnet #adskdevnetwrk #revitlookup
+#apis
+#au2015
+#csharp
+#3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #cloud #mobile #vr #ecommerce
+#adskdevnetwrk
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>A360 Viewer Widget and Selecting a DWG Export Setup</h3>
+
+<p>Today, let's look at the new <a href="#2">A360 embeddable viewer widget</a> and <a href="#3">selecting a DWG export setup</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>A360 Embeddable Viewer Widget</h4>
+
+<p>The Autodesk View and Data API makes easy it to interactively view and explore a 3D model in the browser without any further software whatsoever.</p>
+
+<p>As I just mentioned in the discussion on
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/50-ways-to-view-your-model.html">
+50 ways to view your model</a>,
+the new A360 Viewer Widget simplifies it further still, using a widget that can be embedded in web pages to view design files that are dragged and dropped onto it, enabling you to view them as you would in A360 inside any web page.</p>
+
+<p>Try it out yourself right here; drop any model file of your choice onto this widget:</p>
+
+<center>
+<div id="a360widgetDropAreaContainerTbc" style="width: 450px"></div>
+<script type="text/javascript" src= "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://api.autodesk.com/content/gateway/2013.1.363776.288/z/Scripts/a360Viewer/widget.js"></script>
+<script type="text/javascript">
+var adskViewerWidget = adskViewerWidget();
+if ( 0 == $('#a360widgetDropAreaContainerTbc').children().length ) {
+  adskViewerWidget.Init('#a360widgetDropAreaContainerTbc', true);
+}
+</script>
+</center>
+
+<!--
+var adskViewerWidget = adskViewerWidget();
+$( document ).ready( function() {
+  adskViewerWidget.Init('#a360widgetDropAreaContainerTbc', true);
+});
+-->
+
+<!--
+var done = 0;
+var adskViewerWidget = adskViewerWidget();
+if( !done ) {
+  adskViewerWidget.Init('#a360widgetDropAreaContainerTbc', true);
+  done=1;
+}
+-->
+
+<!--
+var adskViewerWidget = adskViewerWidget();
+if( tbc_variable && !tbc_variable.isLoaded ) {
+  adskViewerWidget.Init('#a360widgetDropAreaContainerTbc', true);
+  tbc_variable.isLoaded = true;
+}
+-->
+
+<p>For all further details, please refer to the discussion on
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/50-ways-to-view-your-model.html">
+50 ways to view your model</a>.</p>
+
+<p><strong>Addendum:</strong> Oops.
+As explained by <a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/05/a360-widget.html">Stephen</a>,
+you might notice that the embedded widget works fine on its home page for all browsers, but drag and drop on Typepad (i.e. the widget above) apparently only works in Chrome.
+The widget should work fine on your own webpage, just not in a (Typepad) blog.
+We've reported the problem to the dev team.</p>
+
+
+<a name="3"></a>
+
+<h4>Selecting a DWG Export Setup</h4>
+
+<p><strong>Question:</strong> How can I access the names of all the ExportLayerTables through the Revit API?</p>
+
+<p>I can see how to get or set one single one for DWGExportOptions but can't see where they are listed.</p>
+
+<p><strong>Answer:</strong> Does this documentation snippet help?</p>
+
+<h4 class="darkblue">Remarks</h4>
+
+<p class="darkblue">This table is structured as a mapping from ExportLayerKey to ExportLayerInfo members.
+The ExportLayerKey contains the identification information for the layer table: the Revit category and subcategory names.
+In addition, the key contains a SpecialType member used only to represent non-Revit categories that can be assigned specific layer information on export.
+The ExportLayerInfo contains the exported layer name, colour name, and layer modifiers for standard and cut representations.</p>
+
+<p class="darkblue">The table can be accessed via direct iteration as a collection of KeyValuePairs, or by traversal of the stored keys obtained from GetKeys(), or via specific lookup of a key constructed externally. In all cases, the ExportLayerInfo returned will be a copy of the ExportLayerInfo from the table. In order to make changes to the ExportLayerInfo and use those settings during export, set the modified ExportLayerInfo back into the table using the same key.</p>
+
+<p><strong>Response:</strong> I don't think so &ndash; that will help me once I have an ExportLayerTable but I need a list of all the ExportLayerTables currently in the project.</p>
+
+<p>Actually I'm not convinced there is such a list.</p>
+
+<p>This will get me all the named Export Setups, e.g., those in the main dialogue:</p>
+
+<center>
+<img src="img/dwg_export_01.png" alt="DWG export" width="400"/>
+</center>
+
+<pre class="code">
+&nbsp; <span class="teal">ExportLayerTable</span> lt;
+&nbsp;
+&nbsp; <span class="blue">var</span> filter2 = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ExportDWGSettings</span> ) );
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> settings
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( mDoc );
+&nbsp;
+&nbsp; settings = settings.WherePasses( filter2 );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ExportDWGSettings</span> element <span class="blue">in</span> settings )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">DWGExportOptions</span> options
+&nbsp; &nbsp; &nbsp; = element.GetDWGExportOptions();
+&nbsp;
+&nbsp; &nbsp; lt = options.GetExportLayerTable();
+&nbsp; &nbsp; <span class="blue">if</span>( lt != <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>But once I have an ExportLayerTable it doesn't have a name, which now is making sense as once you're in the Modify DWG/DXF Export Setup dialog, you can't select the layer mappings by name:</p>
+
+<center>
+<img src="img/dwg_export_02.png" alt="DWG export setup" width="400"/>
+</center>
+
+<p>So I think I was looking for the wrong thing, and can make do by selecting the named ExportDWGSettings.</p>
+
+<p><strong>Later:</strong> I understand this now &ndash; I'd say since it was called an ExportLayerTable I was expecting something AutoCAD like (when will I ever learn :-).</p>
+
+<p>I ended up with:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">var</span> filter2 = <span class="blue">new</span> <span class="teal">ElementClassFilter</span>(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">ExportDWGSettings</span> ) );
+&nbsp;
+&nbsp; mExportDWGSettings = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>(
+&nbsp; &nbsp; mDoc );
+&nbsp;
+&nbsp; mExportDWGSettings = mExportDWGSettings
+&nbsp; &nbsp; .WherePasses( filter2 );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">ExportDWGSettings</span> element
+&nbsp; &nbsp; <span class="blue">in</span> mExportDWGSettings )
+&nbsp; {
+&nbsp; &nbsp; mExportSetupComboBox.Items.Add( element.Name );
+&nbsp; }
+</pre>
+
+<p>That builds me a combo list of all the DWG Export Setups that a user can select.
+That provides the layer table and all the other export settings, which actually makes a lot more sense anyway.</p>
+
+<p>Many thanks to Simon Jones for this little exploration!</p>

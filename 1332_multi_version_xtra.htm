@@ -1,0 +1,147 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+#revitapi #adsk #bim #geometry #3dwebcoder #adskdevnetwrk
+#ah8 #augi #au2015 #dotnet #csharp
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>ADN Labs Xtra, Multi-Version Add-Ins and CNC Direct</h3>
+
+<p>Let's discuss some more Revit add-in migration aspects and yet another completed migration task:</p>
+
+<ul>
+<li><a href="#2">ADN Revit API training labs Xtra migration</a></li>
+<li><a href="#3">Multi-version add-ins and CNC Direct</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>ADN Revit API Training Labs Xtra Migration</h4>
+
+<!--
+Paths:
+Aaron 2016:  Z:\v\C\a\vs\RevitTrainingMaterial\Labs\1_Revit_API_Intro\SourceCS\1_HelloWorld.cs
+Jeremy 2015: Z:\v\C\a\lib\revit\2015\adn\src\AdnRevitApiLabsXtra\1_Revit_API_Intro\SourceCS\1_HelloWorld.cs
+New target:  /v/C/a/lib/revit/2016/adn/src/AdnRevitApiLabsXtra/
+Aaron src:   /v/C/a/vs/RevitTrainingMaterial/Labs/1_Revit_API_Intro, etc.
+windiff C:\a\lib\revit\2016\adn\src\AdnRevitApiLabsXtra C:\a\vs\RevitTrainingMaterial\Labs
+-->
+
+<p>I recently mentioned that the official
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/autodesk-university-q1-adn-labs-and-wizard-update.html#4">
+ADN Revit API Labs Training Material for Revit 2016</a> is
+available from the
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a> and the
+<a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">Revit API Training GitHub repository</a>.</p>
+
+<p>They are used for our standard two- or three-day hands-on Revit API introduction training courses.
+They are also suitable for self-learning and included full step-by-step instructions, separate for both C# and VB add-ins:</p>
+
+<p>As you maybe know, I also maintain an extended version of these including the precursor versions, repackaged in the ADN Revit API Training Labs Xtra modules.</p>
+
+<p>The Xtra version Visual Studio solution implements the following projects:</p>
+
+<center>
+<img src="img/AdnXtra_solution.png" alt="ADN Revit API Training Labs Xtra Visual Studio solution" width="210"/>
+</center>
+
+<p>The first six are the official, standard, ADN training labs to introduce the Revit API basics, UI programming and Family API.</p>
+
+<p>Obviously, the Xtra labs have advantages and disadvantages over the standard labs, so you should check out both and decide which you prefer for yourself.</p>
+
+<p>They also include a couple of additional utilities that I frequently find useful, especially a simplified version of the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/geometry-creation-and-line-intersection-exceptions.html#5">BipChecker</a>
+(<a href="http://thebuildingcoder.typepad.com/blog/2014/05/bipchecker-for-revit-2015-on-github.html#3">2015</a>) and the
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2">element lister</a>.</p>
+
+<!--
+<p>Here are some discussions on using the latter for various purposes:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/xtra-adn-revit-2013-api-training-labs.html">Xtra ADN Revit 2013 API Training Labs</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/exporting-parameter-data-to-excel.html">Exporting Parameter Data to Excel, and Re-importing</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/10000000000th-post-and-element-type-parameters.html#2">
+ADN Xtra Labs and BipChecker for Revit 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/revit-2013-api-developer-guide-pdf.html#3">ADN Revit API Training Material on GitHub</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/adn-labs-xtra-on-github-and-rvtva3c-in-threejs.html#4">ADN Revit API Xtra Training Labs for Revit 2015</a></li>
+</ul>
+-->
+
+<p>I now migrated the Xtra labs to Revit 2016 as well and resynchronised them with the official ADN Revit API Training Labs.</p>
+
+<p>The migration was pretty straightforward.</p>
+
+<!--
+, and the ADN Revit API training material including the unofficial Xtra labs now resides in its own
+
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra GitHub repository</a>.</p>
+
+<p>To avoid confusion and be absolutely clear, I will repeat the contents of the repository readme here:</p>
+
+<p>This repository contains the source code and Visual Studio solution of the ADN Revit API Training Labs including the old historical Xtra samples.</p>
+
+<p>The official collection excluding the Xtra labs is available from the Autodesk Developer Network ADN
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer page</a>.
+Look there under Samples and Documentation.
+It lives in its own ADN DevTech
+
+<a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">RevitTrainingMaterial GitHub repository</a>.</p>
+
+<p>If you have no need for the Xtra labs or do not know what they are, please stick with the official version provided there.</p>
+-->
+
+<p>Here is my external application RvtSamples listing entry points to launch all the Revit SDK, ADN Xtra lab and The Building Coder samples:</p>
+
+<center>
+<img src="img/AdnXtra_2016.png" alt="RvtSamples listing SDK, Adn Xtra and The Building Coder samples" width="452"/>
+</center>
+
+<p>As always, the most up-to-date version of the ADN Revit API Training Labs Xtra is provided in the
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra GitHub repository</a>,
+and the current version right now is
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2016.0.0.6">release 2016.0.0.6</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Multi-Version Add-Ins and CNC Direct</h4>
+
+<p>Talking about migrating between major releases of the Revit API, how about avoiding that issue altogether?</p>
+
+<p>Well, it is definitely achievable, and can even be very easy or come for free in certain simple cases.</p>
+
+<p>For instance, I just discussed the detailed steps required to
+<a href="http://thebuildingcoder.typepad.com/blog/2015/06/cnc-direct-export-wall-parts-to-dxf-and-sat.html">
+migrate the CNC Direct add-in from Revit 2014 to 2015 and 2016</a>.</p>
+
+<p>I was surprised that William never asked me for an add-in update and asked him whether he had done anything himself to maintain or improve it in any way in the meantime, to which he replies, "Glad you liked the YouTube video. I didn't change or compile anything. All I did was add the add-in to the appropriate folder for Revit 2015 and 2016."</p>
+
+<p>In other words, this particular add-in just happens to be upwards compatible across three major releases of Revit.</p>
+
+<p>Of course, this only works if you make no use of any Revit API functionality that was modified between releases.</p>
+
+<p>I recently discussed a
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/compatibilizar-entre-vers%C3%B5es-api-compatibility-helper.html">
+compatibility helper</a> that
+is useful in case do you want implement an single multi-version add-in that does access Revit API functionality that changed across versions.</p>
+
+<p>Here are two other approaches that we discussed to support multiple API versions:</p>
+
+<!-- 0800 1059 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/multi-version-add-in.html">Multi-Version Add-in</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">Multi-Version Visual Studio Revit Add-In Wizard</a></li>
+</ul>

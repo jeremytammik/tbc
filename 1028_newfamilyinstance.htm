@@ -1,0 +1,86 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+524_newfamilyinstance.htm
+07225449 [NewFamilyInstance on RefrencePlane]
+mohammad rahmani asl Re: Revit API family Instance on Face IUpdater Problem
+07578737 [Cutting solids does not work properly via API and manunally]
+
+-->
+
+<h3>Family Instance Placement</h3>
+
+<p>One issue that keeps cropping up is how to determine which
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/newfamilyinstance-overloads.html">
+NewFamilyInstance overload</a> to
+
+use to place an instance of a given family.
+
+<p>As always, you need to first ensure that the desired workflow can be achieved manually through the user interface.</p>
+
+<p>If anything fails in the interactively driven steps, it certainly will not work better when driven programmatically, and the user interface will provide much richer information on possible failure reasons.</p>
+
+<p>The first place to look for information on driving this programmatically this is the Revit API Developer Guide Wikihelp section on
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2014/Help/3661-Developers/0074-Revit_Ge74/0083-Family_I83/0086-FamilyIn86">
+FamilyInstances</a> and
+
+
+<!--
+
+http://wikihelp.autodesk.com/Revit/enu/2013/Help/00006-API_Developer%27s_Guide/0074-Revit_Ge74/0083-Family_I83/0086-FamilyIn86#GUID-5163F12D-96E2-42A3-8B10-FBBCE24A6A12
+
+<div class="ad-import-section"><a name="WS26B5D7A2E3DF764EB1E72C95FFEF292F-0204"></a>
+  <div id="section_14"><span id="Creating_FamilyInstance_Objects"></span>
+    <h2 class="editable"><a name="GUID-5163F12D-96E2-42A3-8B10-FBBCE24A6A12"></a>
+      Creating FamilyInstance Objects</h2>
+    <p><a class="ad-import-alink-anchor ad-import-name-anchor" name="GUID-BBCB4A6C-1D30-44B5-AB8A-01910B210F4F"></a>T
+
+-->
+
+<a href="http://wikihelp.autodesk.com/Revit/enu/2014/Help/3661-Developers/0074-Revit_Ge74/0083-Family_I83/0086-FamilyIn86#GUID-5163F12D-96E2-42A3-8B10-FBBCE24A6A12">
+creating FamilyInstance objects</a>.</p>
+
+<p>We looked at a large number of different examples of programmatic family instance placement and how to determine the correct NewFamilyInstance overload to use in the past, as you can see by simply searching globally for
+
+<a href="http://lmgtfy.com/?q=revit+api+newfamilyinstance+overload">
+revit api newfamilyinstance overload</a>.
+
+<p>Here are two important testing tools for this that were discussed back in 2010:</p>
+
+<ol>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-site-component.html#1">PlaceInstancesOnViews</a>:
+
+This method tests placing a specific family instance in all views, to ensure that an instance can indeed be placed in a view using a specific NewFamilyInstance overload.</li>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/11/place-site-component.html#2">
+TestAllOverloads</a>:
+
+This method calls all possible overloads of NewFamilyInstance in order to find one that works.</li>
+</ol>
+
+<p>Since then, a couple of enhancements have been added to the Revit API to simplify this task.</p>
+
+<p>Here two important pieces of functionality to help clarify the family instance placement type up front, cited from the What's New section of the Revit 2013 API help file RevitAPI.chm:</p>
+
+<h4 style="color:darkblue">NewFamilyInstance validation</h4>
+
+<p style="color:darkblue">Some validation has been added to overloads of NewFamilyInstance.
+This validation is intended to prevent use of the incorrect overload for a given family symbol input.
+For specific details on the exceptional conditions that will be validated, consult the documentation.</p>
+
+<h4 style="color:darkblue">Family.PlacementType</h4>
+
+<p style="color:darkblue">This new property provides information about the placement type for instances of the given family. PlacementType roughly maps to the overloads of NewFamilyInstance.</p>
+
+<p>The first enhancement automatically notifies you if you try to place an instance with some invalid input and can cause issues where previously <i>apparently</i> working code now raises an exception.</p>
+
+<p>The second one is something you have to be aware of yourself, though.</p>
+
+<p>I hope you make a note of these possibilities and find them helpful when you next run into any programmatic family instance placement issues.</p>

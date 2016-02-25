@@ -1,0 +1,146 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Document Version, GUID and Number of Saves</h3>
+
+<p>Alexander Buschmann of the
+
+<a href="http://www.idat.de">IDAT</a> Ingenieurbüro für Datenverarbeitung in der Technik GmbH
+
+added a new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/ifc-guid-algorithm-update-and-family-modification.html?cid=6a00e553e16897883301a73e051b6e970d#comment-6a00e553e16897883301a73e051b6e970d">
+comment</a> to
+
+the interesting discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/ifc-guid-algorithm-update-and-family-modification.html#3">
+detecting family modification</a>:</p>
+
+<blockquote>
+
+<p>I'm a little bit late, but still:</p>
+
+<p>Since Revit2015 there is a class 'DocumentVersion' &ndash; it provides a GUID and the number of saves of the document.</p>
+
+<p>Together, this information should make it possible to identify changes to a document.</p>
+
+<p>Store the data in a read-only parameter, and you should be set, without the need to implement a custom checksum thing.</p>
+
+<p>The DocumentVersion can be obtained by calling BasicFileInfo.GetDocumentVersion.</p>
+
+<p>I have not tried it, but it looks promising.</p>
+
+</blockquote>
+
+<p>Please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/ifc-guid-algorithm-update-and-family-modification.html#comments">
+original discussion thread</a> to
+
+see the other interesting suggestions provided to detect family modification.</p>
+
+
+<a name="2"></a>
+
+<h4>CmdDocumentVersion</h4>
+
+<p>Based on Alexander's suggestion, I implemented this new short and sweet read-only external command CmdDocumentVersion in The Building Coder samples:</p>
+
+<pre class="code">
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">class</span> <span class="teal">CmdDocumentVersion</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> revit,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = revit.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = doc.PathName;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">BasicFileInfo</span> info = <span class="teal">BasicFileInfo</span>.Extract(
+&nbsp; &nbsp; &nbsp; &nbsp; path );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DocumentVersion</span> v = info.GetDocumentVersion();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = v.NumberOfSaves;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Document '{0}' has GUID {1} and {2} save{3}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; path, v.VersionGUID, n,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Running it on my trusty old HVAC sample project that I have been maintaining ever since Revit 2008 produces the following result:</p>
+
+<pre>
+  Document 'Z:\a\rvt\hvac_project_2015.rvt' has GUID
+  6359c822-15f3-44c3-83c5-f9bc258a3f90 and 338 saves.
+</pre>
+
+<p>This information is presented in a dialogue box like this:</p>
+
+<center>
+<img src="img/document_version.png" alt="DocumentVersion GUID and NumberOfSaves" width="374"/>
+</center>
+
+<p>By the way, another noteworthy aspect of this command is that it proves that the basic file info can be read successfully from a currently open document.</p>
+
+<p>Thank you very much, Alexander, for this important hint!</p>
+
+
+<a name="3"></a>
+
+<h4>Other Enhancements and Viewing Diffs in GitHub</h4>
+
+<p>I implemented a couple of other minor enhancements in The Building Coder samples that have not been explicitly pointed out here yet, e.g. a small check for the angle to true north
+
+(<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.110.3">release 2015.0.110.3</a>)
+
+to answer Frank Halliday's
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/rotate-true-north.html?cid=6a00e553e16897883301a73e03c977970d#comment-6a00e553e16897883301a73e03c977970d">comment</a> and
+
+starting work on removing all obsolete API usage.</p>
+
+<p>So far, in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.110.2">
+release 2015.0.110.2</a>, I reduced the warning count from 71 to 67.</p>
+
+<p>The changes made for that can be seen by navigating to
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.110.1">
+release 2015.0.110.1</a> and
+
+clicking on the label saying
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2015.0.110.1...master">
+N commits</a>.</p>
+
+<p>After that, you can edit the exact versions being compared to narrow down the differences to your window of interest, e.g. from 2015.0.110.1 to 2015.0.110.2.</p>
+
+
+<a name="4"></a>
+
+<h4>Download The Building Coder Samples</h4>
+
+<p>The complete source code, Visual Studio solution and RvtSamples include file is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.111.0">
+release 2015.0.111.0</a>.</p>

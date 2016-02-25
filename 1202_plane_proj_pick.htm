@@ -1,0 +1,445 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09916848 [work plane issue] very nice geometry and extension methods
+
+-->
+
+<h3>Planes, Projections and Picking Points</h3>
+
+<p>Here is a query and some sample code from a Revit API newbie that led to several different interesting topics, in particular some ruminations on planes, projections, picking points and common extension methods that I hope will be of use to you too &ndash; yet another Monday monster post:</p>
+
+<p><strong>Question:</strong> The macro below sets a work plane based on the active view and lets the user pick two points to get the area of a rectangle. This works for east and west elevation views, but returns an area of 0 in north and south elevation views. Any idea why this happens? If I set the work plane manually in north and south elevation views and run a version of the macro without the work plane transaction, it works fine.</p>
+
+<p>Also, this macro measures along XYZ axes and won't give the correct area for, say, a wall bearing 45 degrees NE. Any ideas on how to make it more universal?</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> SetWorkPlaneAndPickPointsForArea(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> differenceX;
+&nbsp; &nbsp; <span class="blue">double</span> differenceY;
+&nbsp; &nbsp; <span class="blue">double</span> differenceZ;
+&nbsp; &nbsp; <span class="blue">double</span> area;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Set Work Plane&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; t.Start();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>(
+&nbsp; &nbsp; &nbsp; doc.ActiveView.ViewDirection,
+&nbsp; &nbsp; &nbsp; doc.ActiveView.Origin );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SketchPlane</span> sp = doc.Create.NewSketchPlane(
+&nbsp; &nbsp; &nbsp; plane );
+&nbsp;
+&nbsp; &nbsp; doc.ActiveView.SketchPlane = sp;
+&nbsp; &nbsp; doc.ActiveView.ShowActiveWorkPlane();
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> pt1 = uidoc.Selection.PickPoint();
+&nbsp; &nbsp; <span class="teal">XYZ</span> pt2 = uidoc.Selection.PickPoint();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> pt1x = pt1.X;
+&nbsp; &nbsp; <span class="blue">double</span> pt1y = pt1.Y;
+&nbsp; &nbsp; <span class="blue">double</span> pt1z = pt1.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> pt2x = pt2.X;
+&nbsp; &nbsp; <span class="blue">double</span> pt2y = pt2.Y;
+&nbsp; &nbsp; <span class="blue">double</span> pt2z = pt2.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> b;
+&nbsp; &nbsp; <span class="blue">int</span> caseSwitch = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( b = ( pt1z == pt2z ) )
+&nbsp; &nbsp; { caseSwitch = 1; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( b = ( pt1y == pt2y ) )
+&nbsp; &nbsp; { caseSwitch = 2; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( b = ( pt1x == pt2x ) )
+&nbsp; &nbsp; { caseSwitch = 3; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">switch</span>( caseSwitch )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 1:
+&nbsp; &nbsp; &nbsp; &nbsp; differenceX = pt2x - pt1x;
+&nbsp; &nbsp; &nbsp; &nbsp; differenceY = pt1y - pt2y;
+&nbsp; &nbsp; &nbsp; &nbsp; area = differenceX * differenceY;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">case</span> 2:
+&nbsp; &nbsp; &nbsp; &nbsp; differenceX = pt2x - pt1x;
+&nbsp; &nbsp; &nbsp; &nbsp; differenceZ = pt1z - pt2z;
+&nbsp; &nbsp; &nbsp; &nbsp; area = differenceX * differenceZ;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; differenceY = pt2y - pt1y;
+&nbsp; &nbsp; &nbsp; &nbsp; differenceZ = pt1z - pt2z;
+&nbsp; &nbsp; &nbsp; &nbsp; area = differenceY * differenceZ;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; area = <span class="teal">Math</span>.Round( area, 2 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( area &lt; 0 )
+&nbsp; &nbsp; { area = area * ( -1 ); }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Area&quot;</span>, area.ToString() );
+&nbsp; }
+</pre>
+
+
+
+<p><strong>Answer:</strong> Your query and sample code lead to a whole bunch of topics and suggestions, many of which are of general interest, I hope:</p>
+
+<ul>
+<li><a href="#02">Use the debugger</a></li>
+<li><a href="#03">Encapsulate transaction in 'using' block</a></li>
+<li><a href="#04">Implement read-only commands if possible</a></li>
+<li><a href="#05">Never use direct comparison for floating point numbers</a></li>
+<li><a href="#06">Use XYZ points instead of separate X, Y, Z double variables</a></li>
+<li><a href="#07">The pick point methods throw an exception an cancel</a></li>
+<li><a href="#08">Serious Suggestion for Improvement</a></li>
+<li><a href="#09">Implementing a .NET extension method</a></li>
+<li><a href="#10">Mathematical and Revit plane definition</a></li>
+<li><a href="#11">Signed distance from a 3D point to a plane</a></li>
+<li><a href="#12">Projecting a 3D point onto a plane</a></li>
+<li><a href="#13">Projecting a 3D point into a plane</a></li>
+<li><a href="#14">PickPointsForArea</a></li>
+<li><a href="#15">The Building Coder samples updated</a></li>
+</ul>
+
+
+<a name="02"></a>
+
+<h4>Use the Debugger</h4>
+
+<p>I would suggest you have a look at the points you are picking and their coordinates in the debugger.</p>
+
+<p>That will probably show you the problem immediately.</p>
+
+
+<a name="03"></a>
+
+<h4>Encapsulate Transaction in 'using' Block</h4>
+
+<p>The simplest and safest way to handle transactions in the Revit API is to encapsulate each transaction and transaction group in a 'using' statement, which will
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+automagically handle disposal and roll-back</a> for
+
+you.
+
+
+<a name="04"></a>
+
+<h4>Implement Read-only Commands if Possible</h4>
+
+<p>There is actually no need to construct a plane from the view direction and origin, and then create a sketch plane from that, because the view already has a built-in sketch plane that we can use, and that in turn has a plane defining it.</p>
+
+<p>This again obviates the need for the transaction, so we can make use of this method in a read-only command as well.</p>
+
+
+<a name="05"></a>
+
+<h4>Never use Direct Comparison for Floating Point Numbers</h4>
+
+<p>You use the equality operator == to compare the floating point coordinates of the picked points.</p>
+
+<p>I would recommend never doing that, because they could always be off by an infinitesimal amount, in which case the comparison would return false, even if they are almost equal, within the possible precision. You need ton use fuzzy comparison for floating point numbers. Look at this discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/connector-orientation.html#2">
+real number equality testing</a>.</p>
+
+<p>That may well be the reason for the failures you mention for certain planes.</p>
+
+
+
+
+<a name="06"></a>
+
+<h4>Use XYZ Points Instead of Separate X, Y, Z Double Variables</h4>
+
+<p>Your code could be shortened and made easier to read by using the Revit XYZ class or some other similar utility class instead of managing 3D point X, Y and Z coordinates in separate double variables.</p>
+
+<p>For instance, to calculate the vector v between two given points p1 and p2, you can simply use:</p>
+
+<pre class="code">
+  v = p2 - p1;
+</pre>
+
+<p>Calculating the difference between each of the three coordinates separately and storing each of these in its own double variable would make the code several times longer and much harder to understand.</p>
+
+
+<a name="07"></a>
+
+<h4>The Pick Point Methods Throw an Exception on Cancel</h4>
+
+<p>The Revit API methods prompting the user to pick a point throw an exception if the user cancels the operation.</p>
+
+<p>Unfortunately and admittedly, this totally violates the rule that
+
+<a href="http://www.jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">
+exceptions are and should remain exceptional</a>.</p>
+
+<p>Still, I always add a try-catch block around any pick point and other Revit API selection calls, catching the Autodesk.Revit.Exceptions.OperationCanceledException, terminating the command and returning gracefully with a result code saying Result.Cancelled or Result.Failed, as the case may be.</p>
+
+
+<a name="08"></a>
+
+<h4>Serious Suggestion for Improvement</h4>
+
+<p>The main issue with the current implementation, just as you point out, is the hard-coded dependency on planes exactly aligned with the cardinal axes.
+The current approach will fail if the plane is angled in any way.</p>
+
+<p>A better solution might be to project the two picked points onto the plane (since they are picked in the view plane, they should be located on it anyway) and determine their UV coordinates in it.</p>
+
+<p>That gives you 2D points to play with, and the area calculation is trivial.</p>
+
+<p>You would need something similar to the Revit API Face.Project method, which projects an XYZ point onto a face and returns an IntersectionResult object, from which the 2D UV parameters of the projected point can be determined.</p>
+
+<p>Unfortunately, the Revit API does not provide a similar method for the Plane class, so we have to define it ourselves.</p>
+
+<p>Alternatively, but rather a bit of an overkill, we might be able to make use the AutoCAD ARX
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/using-the-built-in-revit-acge-functionality.html">
+AcGe functionality included with Revit</a>.</p>
+
+<p>It provides the Geometry.AcGe.Helper.orthoProjectIntoPlane method that does exactly what we need in this case.</p>
+
+<p>Since I love geometrical calculations and all too seldom have a chance to get a nice bite of one, I added some code to The Building Coder samples to demonstrate how to implement this for you.</p>
+
+
+<a name="09"></a>
+
+<h4>Implementing a .NET Extension Method</h4>
+
+<p>First, I implemented three helper
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html">
+.NET extension methods</a> for
+
+the Revit API Plane class:</p>
+
+<ul>
+<li>SignedDistanceTo &ndash; return the signed distance from a plane to a given point.</li>
+<li>ProjectOnto &ndash; project a given 3D XYZ point onto the plane.</li>
+<li>ProjectInto &ndash; project a given 3D XYZ point into the plane, returning the UV coordinates of the result in the local 2D plane coordinate system.</li>
+</ul>
+
+<p>To quote the MSDN documentation on <a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx">extension methods</a> in the C# Programming Guide: Extension methods enable you to "add" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are a special kind of static method, but they are called as if they were instance methods on the extended type. For client code written in C# and Visual Basic, there is no apparent difference between calling an extension method and the methods that are actually defined in a type.</p>
+
+<p>To implement an extension method, you create a static class with a static method taking a 'this' pointer to an instance of the class you are extending.
+In my case, I added a class JtPlaneExtensionMethods to The Building Coder samples Util.cs module.</p>
+
+<p>Before getting into the details of implementing these methods, let's mention some basics about planes, their coordinate systems and projection onto them.</p>
+
+
+<a name="10"></a>
+
+<h4>Mathematical and Revit plane definition</h4>
+
+<p>A
+
+<a href="http://en.wikipedia.org/wiki/Plane_(geometry)">
+plane</a> can
+
+be defined by just four real numbers: three specify its normal vector, and a fourth the signed distance from the world coordinate system origin.</p>
+
+<p>Revit planes are overspecified, in a way, since they define an origin plus X and Y vectors specifying the directions of the U and V coordinates of the 2D points in the plane, respectively.</p>
+
+<p>A Revit plane therefore has a well-defined 2D coordinate system embedded in it.</p>
+
+
+<a name="11"></a>
+
+<h4>Signed Distance from a 3D Point to a Plane</h4>
+
+<p>The calculation of the
+
+<a href="http://en.wikipedia.org/wiki/Plane_(geometry)#Distance_from_a_point_to_a_plane">
+distance from a point to a plane</a> is
+
+straightforward using the dot product.</p>
+
+<p>What is the
+
+<a href="http://en.wikipedia.org/wiki/Dot_product">
+dot product</a>?</p>
+
+<p>Geometrically, you can simply see it as the length of the projection of one vector onto another:</p>
+
+<center>
+<img src="img/220px-dot_product.png" alt="Dot product" width="220"/>
+</center>
+
+<p>Calculating the signed distance between a 3D point and a plane in space is easy using this:  determine the vector between the given point and any arbitrary point on the plane, e.g. its origin.
+The dot product between that vector and the plane normal is the signed distance.
+This assumes that the plane normal vector has unit length.
+The result can be either zero, negative or positive, depending on whether the given point lies on the plane or on one or the other side of it.</p>
+
+<p>Here is my Revit API implementation of this; as said, it is a static method on the static JtPlaneExtensionMethods class:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return signed distance from plane to a given point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">double</span> SignedDistanceTo(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Plane</span> plane,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.IsEqual( plane.Normal.GetLength(), 1 ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected normalised plane normal&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = p - plane.Origin;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> plane.Normal.DotProduct( v );
+&nbsp; }
+</pre>
+
+
+<a name="12"></a>
+
+<h4>Projecting a 3D Point Onto a Plane</h4>
+
+<p>ProjectOnto returns a 3D XYZ point representing the projection of a given point in space onto the surface of the plane.
+The result can be easily determined by subtracting the plane normal multiplied by the signed distance from the point:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Project given 3D XYZ point onto plane.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> ProjectOnto(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Plane</span> plane,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> d = plane.SignedDistanceTo( p );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = p + d * plane.Normal;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.IsZero( plane.SignedDistanceTo( q ) ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected point on plane to have zero distance to plane&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> q;
+&nbsp; }
+</pre>
+
+
+<a name="13"></a>
+
+<h4>Projecting a 3D Point Into a Plane</h4>
+
+<p>ProjectInto is similar to ProjectOnto but adds an important twist.
+Instead of a 3D XYZ point, it returns a 2D UV one representing the projection of the given point in the local coordinate system on the surface of the plane.</p>
+
+<p>The 3D point calculated by ProjectOnto above is in global 3D world coordinates.
+The 2D point is in plane coordinates.</p>
+
+<p>It can be determined by calculating the dot product of the vector between the plane origin and the projected point with the plane X and Y vectors, respectively.
+These two vectors determine the direction of the U and V coordinates on the plane surface:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Project given 3D XYZ point into plane, </span>
+&nbsp; <span class="gray">///</span><span class="green"> returning the UV coordinates of the result </span>
+&nbsp; <span class="gray">///</span><span class="green"> in the local 2D plane coordinate system.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">UV</span> ProjectInto(
+&nbsp; &nbsp; <span class="blue">this</span> <span class="teal">Plane</span> plane,
+&nbsp; &nbsp; <span class="teal">XYZ</span> p )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = plane.ProjectOnto( p );
+&nbsp; &nbsp; <span class="teal">XYZ</span> o = plane.Origin;
+&nbsp; &nbsp; <span class="teal">XYZ</span> d = q - o;
+&nbsp; &nbsp; <span class="blue">double</span> u = d.DotProduct( plane.XVec );
+&nbsp; &nbsp; <span class="blue">double</span> v = d.DotProduct( plane.YVec );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">UV</span>( u, v );
+&nbsp; }
+</pre>
+
+
+<a name="14"></a>
+
+<h4>PickPointsForArea</h4>
+
+<p>Wit these helper extension methods in hand, I can reimplement your SetWorkPlaneAndPickPointsForArea method like this, renaming it to PickPointsForArea, since no workplane manipulations are required any longer to achieve the same effect:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> PickPointsForArea(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp; &nbsp; <span class="teal">View</span> view = doc.ActiveView;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1, p2;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; p1 = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick first point for area&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; p2 = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick second point for area&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = view.SketchPlane.GetPlane();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UV</span> q1 = plane.ProjectInto( p1 );
+&nbsp; &nbsp; <span class="teal">UV</span> q2 = plane.ProjectInto( p2 );
+&nbsp; &nbsp; <span class="teal">UV</span> d = q2 - q1;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> area = d.U * d.V;
+&nbsp;
+&nbsp; &nbsp; area = <span class="teal">Math</span>.Round( area, 2 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( area &lt; 0 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; area = area * ( -1 );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Area&quot;</span>, area.ToString() );
+&nbsp; }
+</pre>
+
+
+<a name="15"></a>
+
+<h4>The Building Coder Samples Updated</h4>
+
+<p>I incorporated all the code presented above in The Building Coder samples.</p>
+
+<p>You can download the full solution from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.111.2">2015.0.111.2</a>.</p>
+
+<p>Here are direct links to the
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs">Util</a> and
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPickPoint3d.cs">CmdPickPoint3d</a> modules,
+
+in case you prefer not to clone the whole thing.</p>

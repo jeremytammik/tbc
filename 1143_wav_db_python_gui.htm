@@ -1,0 +1,153 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>WAV Database, Python and GUI Tutorials</h3>
+
+<p>My son Christopher is thinking of creating a music database for his personal use supporting some strict requirements that other databases do not fulfil.</p>
+
+<p>That prompted me to jot down some advice and a couple of starting points.</p>
+
+<p>The initial requirements are simple.</p>
+
+<p><strong>Question:</strong> I am wondering if I should build my own sample management software since it seems to be quite difficult to find anything useful...</p>
+
+<p>My wishes:</p>
+
+<ul>
+<li>Build a database of sounds and tags, categories, comments etc. for WAV files</li>
+<li>Manage several collections (SoundEffects, Fieldrecordings, Music, Interviews)</li>
+<li>Search filenames, tags etc. in certain collection or across all collections</li>
+<li>Copy file from original location to other location</li>
+<li>Export database to file (text?)</li>
+</ul>
+
+<p>One more (advanced) feature would be:</p>
+
+<ul>
+<li>Read embedded Metadata, e.g. INFO and BEXT Chunks in the wave files head</li>
+</ul>
+
+<p>Appendix B in the guidelines on
+
+<a href="http://www.digitizationguidelines.gov/audio-visual/documents/Embed_Intro_090915.pdf">
+Embedding Metadata in Digital Audio Files</a>
+
+might be interesting.</p>
+
+<p>But I still have to figure out how this actually looks in the file itself.</p>
+
+<p>I tested writing some info into a wave file and it shows up somwhere at the beginning (looking at it in notepad++).</p>
+
+<p><strong>Answer:</strong> This should not be too hard.</p>
+
+<p>I love the NoSQL concept and have some small experience using CouchDB.</p>
+
+<p>That would easily do everything you need, and on a web server, as well.</p>
+
+<p>Mediainfo on my mac reads metadata from a WAV file, for instance the title in this case:</p>
+
+<pre>
+/downloads/mh/sailor/ $ mediainfo *wav
+General
+Complete name                            : 3-26 Sailor With the Navy Blue Eyes.wav
+Format                                   : Wave
+File size                                : 27.1 MiB
+Duration                                 : 2mn 40s
+Overall bit rate mode                    : Constant
+Overall bit rate                         : 1 411 Kbps
+Track name                               : Sailor With the Navy Blue Eyes
+
+Audio
+Format                                   : PCM
+Format settings, Endianness              : Little
+Format settings, Sign                    : Signed
+Codec ID                                 : 1
+Duration                                 : 2mn 40s
+Bit rate mode                            : Constant
+Bit rate                                 : 1 411.2 Kbps
+Channel(s)                               : 2 channels
+Sampling rate                            : 44.1 KHz
+Bit depth                                : 16 bits
+Stream size                              : 27.1 MiB (100%)
+
+/downloads/mh/sailor/ $ mediainfo --Version
+MediaInfo Command line,
+MediaInfoLib - v0.7.62
+</pre>
+
+<p>I use
+
+<a href="https://code.google.com/p/mutagen">
+mutagen</a> for
+
+all my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/super-insane-mp3-and-songbird-playlist-exporter.html#6">
+music file analysis needs</a>.</p>
+
+
+<p><strong>Response:</strong> Mutagen only supports id3 tags, which are not supported in WAV.
+The Python
+
+<a href="https://docs.python.org/2/library/chunk.html">chunk library</a> might
+
+be the answer.</p>
+
+<p>I have to look into analysing wave chunks some more...</p>
+
+<p>Here is what mediainfo tells me about my file:</p>
+
+<pre>
+Allgemein
+Complete name                            : F:\Library\_TestFiles\2014_03_20_Nora-Tammik\ZOOM0001\ZOOM0001_LR.WAV
+Format                                   : Wave
+File size                                : 20,6 MiB
+Duration                                 : 1min 15s
+Overall bit rate mode                    : konstant
+Overall bit rate                         : 2 309 Kbps
+Producer                                 : ZOOM Handy Recorder H6
+Description                              : sPROJECT= / sSCENE=1 / sTAKE=1 / sNOTE=nora tammik, first visit, 3 weeks old, moan, press, fart,
+Encoded date                             : 2014-04-20 14:08:39
+Encoding settings                        : A=PCM,F=48000,W=24,M=stereo,T=ZOOM Handy Recorder H6 MS S: +1
+
+Audio
+ID                                       : 0
+Format                                   : PCM
+Format settings, Endianness              : Little
+Codec ID                                 : 1
+Duration                                 : 1min 15s
+Bit rate mode                            : konstant
+Bit rate                                 : 2 304 Kbps
+Channel(s)                               : 2 Kanäle
+Sampling rate                            : 48,0 KHz
+Bit depth                                : 24 bits
+Stream size                              : 20,6 MiB (100%)
+</pre>
+
+<p>The interesting aspects are:</p>
+
+<ul>
+<li>I don't have to analyse anything.</li>
+<li>It tells me everything I want to know.</li>
+<li>The description contains data I entered in a program that edits the wave info chunks I want to read out.</li>
+<li>The file also tells me the length, size, sampling rate, bit depth, file size, path and filename.</li>
+</ul>
+
+<p>How should I start going about this?</p>
+
+<p>I guess I need to build a GUI, have a database and use some libraries handling the file readout and playback?</p>
+
+<p>I'm not quite sure where to start.</p>
+<p>The only things I have written so far are small command line tools and calculators.</p>
+<p>But I would like to do some GUI.</p>
+
+<p><strong>Answer:</strong> Yes, the chunk library looks perfect.</p>
+
+<p>I would start by working through a quick Python tutorial, followed by one of the GUI packages tutorial.
+Tkinter is the most global one, supported on all platforms, built into Python:</p>
+
+<ul>
+<li><a href="http://learnpythonthehardway.org">Learn Python the hard way</a></li>
+<li><a href="http://www.tutorialspoint.com/python/python_gui_programming.htm">Python GUI programming</a></li>
+</ul>

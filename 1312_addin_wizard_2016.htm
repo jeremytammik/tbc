@@ -1,0 +1,245 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- #revitapi #aecdev #bim #revit #revit2016 -->
+
+<h3>Add-in Migration to Revit 2016 and Updated Wizards</h3>
+
+<p>I updated my Visual Studio Revit C# and VB add-in wizards for Revit 2016.</p>
+
+<p>Before presenting them, a quick important note on how to approach resolving issues that you may encounter migrating your existing add-ins:</p>
+
+<ul>
+<li><a href="#2">Please read What's New in the Revit 2016 API!</a></li>
+<li><a href="#3">Revit add-in wizards for Revit 2016</a></li>
+<li><a href="#4">Revit add-in wizard customisation</a></li>
+<li><a href="#5">Revit add-in wizard usage</a></li>
+<li><a href="#6">Download and installation</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Please Read What's New in the Revit 2016 API!</h4>
+
+<p>Every major Revit API release so far enhanced the existing interfaces in various ways.</p>
+
+<p>In order to optimise the developer experience, some of the improvements introduce incompatibilities; for instance, previously deprecated classes and interfaces are removed, and obsolete functionality may be marked as deprecated for removal in a future version.</p>
+
+<p>Whenever you run into an issue migrating your code to newer versions of the API, the first place to look for a solution is in the What's New section of the Revit API help file RevitAPI.chm.</p>
+
+<p>This information is also published in a separate document in the Revit SDK, 'Revit Platform API Changes and Additions.docx'.</p>
+
+<p>To ensure that it is also picked up by web searches, I published it here on The Building Coder, together with the analogue information for previous releases:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+</ul>
+
+<!--
+<p>Here is a typical example of how it might come in handy to provide a quick idea how to address a migration issue:</p>
+
+<p><strong>Question:</strong>
+
+Can you confirm if the 2016 Revit API broke text vertical alignment?</p>
+
+<p>There is a HorizontalAlignment property of the new TextNoteOptions when creating a text note (TextNote.Create), but there is no VerticalAlignment property.</p>
+
+<p>Once the text note is created, there is a VerticalAlignment property, but it is read only.</p>
+
+<p>The new API also broke the vertical alignment of the old .Create.NewTextNote method.  I don't see any way to control the vertical text alignment anymore in the 2016 version.  Can you let me know if it is indeed broken or if I am just missing something?</p>
+
+<pre class="code">
+&nbsp; TextNoteOptions tno = <span class="blue">new</span> TextNoteOptions();
+&nbsp; tno.TypeId = TextTypeID;
+&nbsp; tno.Rotation = 0;
+&nbsp; tno.KeepRotatedTextReadable = <span class="blue">false</span>;
+&nbsp; tno.HorizontalAlignment = HorizontalTextAlignment.Left;
+&nbsp; tno.VerticalAlignment = VerticalTextAlignment.Bottom;
+&nbsp; TextNote tn = <span class="teal">TextNote</span>.Create( _
+&nbsp; &nbsp; CurrentDoc, CurrentView.Id, InsertionPoint, _
+&nbsp; &nbsp; LineWidth, <span class="maroon">&quot;Test&quot;</span>, tno);
+&nbsp; tn.VerticalAlignment = VerticalTextAlignment.Bottom;
+</pre>
+
+<p><strong>Answer:</strong> As underlined above, the first place to look for hints on how to resolve migration problems is to search the What's New section of the Revit API help.</p></p>
+
+<p>In this case,
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">
+What's New in the Revit 2016 API</a> provides
+the following information on
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#4.02">
+TextNote and Leader API behavior and interface changes</a>:</p>
+
+<ul>
+<li>TextElement.HorizontalAlignment &ndash; Horizontal alignment of the text content within the text box of the element.</li>
+<li>TextElement.VerticalAlignment &ndash; Vertical alignment of the text content within the text box of the element.</li>
+<ul>
+<li>Collectively, these two new properties replace <b>TextNote.Align</b></li>
+</ul>
+</ul>
+-->
+
+<p>I hope this helps you tackle any issues you may run into migrating your add-in to the new release.</p>
+
+<p>Good luck and have fun!</p>
+
+
+
+<a name="3"></a>
+
+<h4>Revit Add-in Wizards for Revit 2016</h4>
+
+<p>On the other hand, if you are not migrating an existing Revit add-in, but creating a new one from scratch, the add-in wizards can be of use.</p>
+
+<p>As said, I migrated my Visual Studio Revit add-in wizards to generate skeleton code for Revit 2016.</p>
+
+<center>
+<img src="img/Revit2016AddinWizardCs0.png" alt="Visual Studio Revit add-in wizard for Revit 2016" width="600"/>
+</center>
+
+<p>The 2016 versions generate the same boilerplate snippets as the reliable old
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+Revit 2014</a>
+(<a href="http://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#2">updated</a>)
+and
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/add-in-wizards-for-revit-2015.html">
+Revit 2015</a> ones did.
+Simply delete the parts that you do not need.</p>
+
+<p>Since I am still using the pre-release version codenamed Copernicus, the Revit executable folder name targeted by the wizards is 'Revit Copernicus'.</p>
+
+<p>You may have to change that to something appropriate for your system, e.g. 'Revit 2016', 'Revit 2016 Architecture', etc.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Revit Add-in Wizard Customisation</h4>
+
+<p>It is important to understand how easy it is to modify the wizards for your own needs, and make copies with variations to support different requirements.</p>
+
+<p>Here is an overview of previous explanations showing how to create your own flavours for various uses:</p>
+
+<ul>
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/07/devtv-addin-templates.html">
+Original introduction, benefits, and usage example</a> for C# and VB.
+
+<li>Personalised
+<a href="http://thebuildingcoder.typepad.com/blog/2010/10/revit-2011-devtv.html#2">
+minimal C# version</a> for Revit 2011.
+
+<li>A short additional
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+usage note</a>.
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2011/01/automate-designoption-and-64-bit-add-in-templates.html#2">
+64-bit versions</a> for C# and VB.
+
+<li>Support for the
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/visual-studio-add-in-wizards-for-revit-2012.html">
+Revit 2012 API</a> for
+
+C# and VB.
+
+<li>Updated C# and VB versions placing the
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/product-and-add-in-wizard-updates.html#3">
+assembly DLL alongside the add-in manifest</a>.
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/add-in-wizard-for-revit-2013.html">
+Revit 2013 C#</a> version including more skeleton code.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/update-api-assembly-references-and-wizards.html#4">
+Revit 2013 VB</a> version.</li>
+
+<li>C# and VB
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/add-in-wizards-for-revit-2014-1.html">
+add-in wizards for Revit 2014</a>.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#2">
+Wizard update</a>
+
+suppressing the processor architecture mismatch warning and referring to Revit Onebox instead of the architectural flavour.</li>
+
+<li>Wizard generating a
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">
+multi-version add-in</a>  supporting
+
+both Revit 2013 and 2014.</li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/add-in-wizards-for-revit-2015.html">
+Add-in wizards for Revit 2015</a>.</li>
+
+</ul>
+
+
+
+<a name="5"></a>
+
+<h4>Revit Add-in Wizard Usage</h4>
+
+<p>Simply install the wizard zip files you need in the locations specified <a href="#6">below</a>, start up or restart Visual Studio, create a new C# or VB Revit add-in project using the wizard default settings.</p>
+
+<!--
+<p>Everything is set up fully automatically, so you can immediately hit F5 to perform the followng steps without changing a single thing:</p>
+compile, install and start up Revit.exe in the debugger.
+-->
+
+<p>The wizards fulfil the following tasks for C# and VB, respectively:</p>
+
+<ul>
+<li>Generate the skeleton source code, Visual Studio solution and add-in manifest.</li>
+<li>On successful build, copy the add-in assembly DLL and add-in manifest to the Revit add-in folder, thus automatically installing it for Revit to pick up and load.</li>
+<li>Define the add-in debugging settings to start up the Revit.exe program.</li>
+</ul>
+
+<p>Therefore, right after the initial single-click add-in creation, you can immediately launch the debugger.
+The add-in is compiled, Revit is started up, the add-in is loaded, you can select the new external command in the External Tools menu, launch and test it without entering one single further keystroke yourself.</p>
+
+<p>The new command even executes in zero document state, although the default external command skeleton implementation throws an exception trying to access a property on the current UI document, which is null.
+This is easy to fix in case you need a
+<a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">
+zero document state external command</a>.
+You can use this anyway to immediately check that everything is working correctly.</p>
+
+
+<a name="6"></a>
+
+<h4>Download and Installation</h4>
+
+<p>The proper locations to install the wizards for Visual Studio to pick them up are language dependent.</p>
+
+<p>Copy the zip file of your choice to the matching Visual Studio project template folder in your local file system:
+
+<ul>
+<li>C# &ndash; copy <a href="zip/Revit2016AddinWizardCs0.zip">Revit2016AddinWizardCs0.zip</a> to
+<br>[My Documents]\Visual Studio 2012\Templates\ProjectTemplates\Visual C#
+<li>Visual Basic &ndash; copy <a href="zip/Revit2016AddinWizardVb0.zip">Revit2016AddinWizardVb0.zip</a> to
+<br>[My Documents]\Visual Studio 2012\Templates\ProjectTemplates\Visual Basic
+</ul>
+
+<p>Or, in other words:</p>
+
+<pre>
+  $ cp /a/doc/revit/tbc/zip/Revit2016AddinWizardCs0.zip \
+  "/v/C/Users/tammikj/Documents/Visual Studio \
+  2012/Templates/ProjectTemplates/Visual C#"
+
+  $ cp /a/doc/revit/tbc/zip/Revit2016AddinWizardVb0.zip \
+  "/v/C/Users/tammikj/Documents/Visual Studio \
+  2012/Templates/ProjectTemplates/Visual Basic"
+</pre>
+
+<p>I hope you find this useful and look forward to hearing any suggestions for improvements you come up with.</p>
+
+<p>Better still, implement them yourself and let us know where to pick them up  :-)</p>

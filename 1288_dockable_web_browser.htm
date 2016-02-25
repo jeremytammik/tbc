@@ -1,0 +1,268 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+
+-->
+
+<h3>A Dockable Web Browser</h3>
+
+<p>The Revit API supports add-ins defining their own dockable panels, similar to the built-in Revit project browser and element properties panels.</p>
+
+<p>Here is The Building Coder topic list of <a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">Dockable Panel</a> related discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html">A Simpler Dockable Panel Sample</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/revitrubyshell-for-revit-2014.html">RevitRubyShell for Revit 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/revit-2014-update-release-1.html">Revit 2014 Update Release 1</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/open-mep-connector-warning.html">Open MEP Connector Warning</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/revit-2014-update-release-2.html">Revit 2014 Update Release 2</a></li>
+</ul>
+
+<p>I have repeatedly been asked bow to host a web browser in a dockable panel, and this query yesterday finally prompted me to take the plunge:</p>
+
+<p><strong>Question:</strong>
+
+I am working on a project for Revit learning content and I would like to implement an add-in that opens a dockable window and basically opens a browser in that window that points to a URL (local or internet based).
+I found this post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html">a simpler dockable panel sample</a>.</p>
+
+<p>Through a little bit of hacking I figured out how to make it work for Revit 2015.
+I thought maybe by looking at it I could figure out how the dockable window was populated and figure out how to launch a browser in there, but no luck.
+I really have no clue when it comes to Revit API and coding at all.</p>
+
+<p>Is this something you can help me with?
+I feel like it is probably a pretty simple change to get this sample to open a browser in the window instead of whatever is there.
+I could install the HTML files local I want to point at, but ideally it would allow me to put any URL as the destination.
+I want to point at a specific Learning Content website I am working on, but would also like it to be able to allow a customer to point to their own internal learning content.</p>
+
+<p>Any help you could give would be great.
+I am trying to get a simple mock-up working so I can get someone interested enough in the concept to give me some development resources to make it a real feature in Revit.</p>
+
+
+<p><strong>Answer:</strong>
+
+Here is a bit of research and a pointer to an existing blog post or two that might help answer the question:</p>
+
+<p>First, you need code to open the HTML page.
+That should happen automatically if you launch the HTML page using <code>Process.Start</code>.
+That should open the browser on that page.</p>
+
+<p>The use of <code>Process.Start</code> in a Revit add-in is described in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/07/launching-a-stand-alone-executable.html">launching a stand-alone executable</a>.</p>
+
+<p>Oh dear, I see that you want the browser in your own window.</p>
+
+<p>Cool that you already found and made use of the Simpler Dockable Panel Sample!</p>
+
+<p>I was going to suggest that next.</p>
+
+<p>Well, the third step would be to host a browser in that window.</p>
+
+<p>If IE is enough of a browser for you, you can use the
+
+<a href="https://msdn.microsoft.com/en-us/library/aa752040(v=vs.85).aspx">Microsoft .NET browser control</a>,
+
+e.g. as described by CodeProject on
+
+<a href="http://www.codeproject.com/Articles/1102/Using-the-WebBrowser-control-in-NET">using the WebBrowser control in .NET</a>.</p>
+
+<p>There are alternatives to the built-in IE browser, and they obviously require more work, e.g.,
+
+<a href="http://stackoverflow.com/questions/790542/replacing-net-webbrowser-control-with-a-better-browser-like-chrome">replacing the .NET WebBrowser control with a better browser like Chrome</a>.</p>
+
+<p>Since you went to the effort to migrate the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/05/a-simpler-dockable-panel-sample.html">original DockableDialog sample</a> to
+
+Revit 2015, others will probably be interested in that as well.
+I therefore created a
+
+<a href="https://github.com/jeremytammik/DockableDialog">
+DockableDialog GitHub repository</a> for
+
+it and repeated that exercise.</p>
+
+<p>You say, "Through a little bit of hacking I figured out how to make it work for Revit 2015."</p>
+
+<p>My migration was totally straightforward and required no hacking whatsoever.</p>
+
+<p>You might want to compare your version with mine, and take a look at the minimal changes I made for the migration.</p>
+
+<p>The flat migrated add-in is provided in
+
+<a href="https://github.com/jeremytammik/DockableDialog/releases/tag/2015.0.0.0">version 2015.0.0.0</a>,
+
+and the changes from the Revit 2014 version are encapsulated in
+
+<a href="https://github.com/jeremytammik/DockableDialog/commit/df96cf4f267cce8a98b8baacea57251dfadab463">this commit</a>.</p>
+
+
+<p><strong>Response:</strong>
+
+“Hacking” was probably the wrong word, or means something different to a guy like me who has NEVER written a line of code.
+The ZIP file I downloaded did not want to run in 2015, so I had to figure out how to make changes to get it going.
+It was all I could do to stumble through that.  :-)
+
+<p><strong>Answer:</strong>
+
+Well done!</p>
+
+<p>Next step: I now implemented a web browser in the dockable panel sample.</p>
+
+<p>Check out the GitHub
+
+<a href="https://github.com/jeremytammik/DockableDialog/releases/tag/2015.0.0.1">version 2015.0.0.1</a>.</p>
+
+<p>Added a XAML web browser control, and you can click the buttons at the top to switch between The Building Coder and GitHub:</p>
+
+<center>
+<img src="img/DockableWebBrowser_docked.png" alt="DockableWebBrowser docked" width="526"/>
+</center>
+
+<p>This provides the proof of concept you require.</p>
+
+<p>You could also use WinForms instead of WPF, so more .NET and C# rather than XAML, if you prefer that.</p>
+
+<p>Good luck and have fun!</p>
+
+
+
+<a name="2"></a>
+
+<h4>Script Error</h4>
+
+<p>Displaying The Building Coder web page hosted by Typepad in the WebBrowser control generates an error message saying, "An error has occurred in the script on this page":</p>
+
+<center>
+<img src="img/DockableWebBrowser_script_error.png" alt="DockableWebBrowser script error" width="448"/>
+</center>
+
+<p>I searched for a solution for that.</p>
+
+<p>I started looking up this error and found things like
+
+<a href="http://support.microsoft.com/kb/261003">how to handle script errors as a WebBrowser control host</a> and
+
+<a href="http://stackoverflow.com/questions/3202572/script-error-in-web-browser">script error in web browser</a>.</p>
+
+<p>That was not what I wanted, so I narrowed it down by searching for 'disable' as well, discovering how to
+
+<a href="http://stackoverflow.com/questions/2476360/disable-javascript-error-in-webbrowser-control">
+disable JavaScript error in WebBrowser control</a> and
+
+make use of the
+
+<a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.webbrowser.scripterrorssuppressed(v=vs.110).aspx">
+WebBrowser.ScriptErrorsSuppressed property</a>.</p>
+
+<p>Unfortunately, the WPF control does not implement this property, so a further search for 'wpf web browser control disable script error' turned up numerous solutions such as how to
+
+<a href="http://wpf-tutorial-net.blogspot.de/2013/11/disable-script-errors-webbrowser-wpf.html">disable script errors WebBrowser WPF</a>,
+
+which is exactly what I need.</p>
+
+<p>I added two URL definitions to the add-in XAML code, pointing to
+
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a> and this
+
+<a href="https://github.com/jeremytammik/DockableDialog">DockableDialog sample GitHub repository</a>:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _url_tbc = <span class="maroon">&quot;http://thebuildingcoder.typepad.com&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _url_git = <span class="maroon">&quot;https://github.com/jeremytammik/DockableDialog&quot;</span>;
+</pre>
+
+<p>Here is the resulting XAML driver code driving the buttons to toggle the browser location back and forth between these two URLs and disable the JavaScript warning messages triggered by the Typepad framework hosting The Building Coder:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> PaneInfoButton_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; web_browser.Navigate( _url_tbc );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> wpf_stats_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; web_browser.Navigate( _url_git );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> btn_getById_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; web_browser.Navigate( _url_tbc );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> btn_listTabs_Click(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; web_browser.Navigate( _url_git );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> DockableDialogs_Loaded(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">RoutedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; web_browser.Navigated += <span class="blue">new</span> <span class="teal">NavigatedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; WebBrowser_Navigated );
+&nbsp;
+&nbsp; &nbsp; web_browser.Navigate( _url_tbc );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> WebBrowser_Navigated(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">NavigationEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; HideJsScriptErrors( (<span class="teal">WebBrowser</span>) sender );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> HideJsScriptErrors( <span class="teal">WebBrowser</span> wb )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// IWebBrowser2 interface</span>
+&nbsp; &nbsp; <span class="green">// Exposes methods that are implemented by the </span>
+&nbsp; &nbsp; <span class="green">// WebBrowser control</span>
+&nbsp; &nbsp; <span class="green">// Searches for the specified field, using the </span>
+&nbsp; &nbsp; <span class="green">// specified binding constraints.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FieldInfo</span> fld = <span class="blue">typeof</span>( <span class="teal">WebBrowser</span> ).GetField(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;_axIWebBrowser2&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">BindingFlags</span>.Instance | <span class="teal">BindingFlags</span>.NonPublic );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fld )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> obj = fld.GetValue( wb );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != obj )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Silent: Sets or gets a value that indicates </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// whether the object can display dialog boxes.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// HRESULT IWebBrowser2::get_Silent(VARIANT_BOOL *pbSilent);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// HRESULT IWebBrowser2::put_Silent(VARIANT_BOOL bSilent);</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; obj.GetType().InvokeMember( <span class="maroon">&quot;Silent&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BindingFlags</span>.SetProperty, <span class="blue">null</span>, obj,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="blue">object</span>[] { <span class="blue">true</span> } );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>As said, the complete code for this, Visual Studio solution and add-in manifest is provided in the
+
+<a href="https://github.com/jeremytammik/DockableDialog">
+DockableDialog GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/DockableDialog/releases/tag/2015.0.0.3">
+release 2015.0.0.3</a>.</p>

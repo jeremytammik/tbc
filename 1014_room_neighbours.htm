@@ -1,0 +1,579 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08020340 [Finding room on other side of wall?]
+
+Erik Eriksson, White Architects
+
+-->
+
+<h3>Room Neighbours</h3>
+
+<p>Let's say hello to our neighbours.</p>
+
+<p>This issue was raised and also solved by Erik Eriksson of
+
+<a href="http://www.white.se">
+White Arkitketer AB</a>,
+
+who wishes to determine the neighbouring rooms for any given room.</p>
+
+<p>It is an extension of the very early discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+room and wall adjacency</a> from
+
+January 2009 that just looks at determining the neighbouring walls for a given room.</p>
+
+<p>The Revit API now provides much more powerful tools for this kind of analysis, enabling us to easily go the one step further and find out what the neighbouring room is on the other side of each wall.</p>
+
+<p>In the sample code presented below, this analysis is only performed in the wall midpoint.
+It could easily be extended, though, to determine multiple neighbouring rooms on the other side, splitting the wall location line into a separate interval for each.</p>
+
+
+<p><strong>Question:</strong> I'm trying to find rooms adjacent to other rooms.</p>
+
+<p>Basically the pseudocode would be something like this:</p>
+
+<ul>
+<li>Get all the rooms in the document.</li>
+<li>For each room, find all adjacent rooms (i.e. the room on the other side of the wall) and the wall separating them.</li>
+</ul>
+
+<p>Is there any method for finding adjacent rooms?
+First I was thinking about ReferenceIntersector, but that doesn't work on rooms, right?</p>
+
+<p>Then I was thinking about using the Room.IsPointInRoom method and providing it with a point that I project out from the wall, but this means iterating over all the rooms for each of the walls for each room.
+That feels like it's going to take a while for a large project; for instance, given 1000 rooms with 6 walls each would require 6 000 000 iterations.</p>
+
+
+<p><strong>Answer:</strong> The API does not provide any direct method for obtaining neighbouring rooms.</p>
+
+<p>What you suggest sounds like a good starting point for further analysis to me.</p>
+
+<p>What you need is basically a sort of graph structure.</p>
+
+<p>You could partition the entire 2D plane on any given level into polygons that fall into one of three classes: within a room, within a wall, or outside the building.
+If you then shrink away the walls, all the neighbouring room polygons of any given room are its adjacent rooms.</p>
+
+<p>If you had a 2D geometry library which automatically generated a graph of neighbouring polygons for you, that might be an attractive and reliable way to go.</p>
+
+<p>How to obtain this data most efficiently without going through the 2D geometrical analysis is not obvious to me either.</p>
+
+<p>The Room.IsPointInRoom method that you suggest is definitely not a very good candidate, though, since, as you say, it requires you to know which room you are looking for in advance, or test all rooms, as you suggest, a really bad idea.
+You could also limit the rooms to test to the immediate vicinity of the target room, which would improve performance tremendously, of course.</p>
+
+<p>A much more efficient algorithm could be based on the Document.GetRoomAtPoint method instead, using points projected out of the target room through the bounding walls a certain small distance into the neighbouring space, because that just requires the input point, not a room, and gives you the neighbouring room.</p>
+
+<p>One open question is how to decide the number of attempts to make to find different neighbouring rooms on the other side of any one given wall.</p>
+
+<p>You always know that your rooms are larger than a certain minimum size, because you can simply iterate over them all and find out what the smallest width or height of any room is.</p>
+
+<p>Therefore, you know that you only need to perform the 'project point through wall and determine neighbour from GetRoomAtPoint' at points at a certain given distance, e.g. every 50 cm or so.</p>
+
+<p>This is assuming that you do not have really crazily shaped rooms, such as lots of wedges which all meet at a central small circular room, which then might have a large number of neighbours at arbitrarily small distances around its one and only circular wall.</p>
+
+<p>Here are some related discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+Room and wall adjacency</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacent-area.html">
+Room and wall adjacent area</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/football-and-space-adjacency-for-heat-load-calculation.html">
+Space adjacency for heat load calculation</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<p><strong>Response:</strong> The get room at point method worked great!</p>
+
+<p>I go through all the boundary segments of all the rooms and see if there is a room on the other side.</p>
+
+<p>Here is the method that I use to find the room on the other side at the midpoint of a boundary segment:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the neighbouring room to the given one</span>
+&nbsp; <span class="gray">///</span><span class="green"> on the other side of the midpoint of the given</span>
+&nbsp; <span class="gray">///</span><span class="green"> boundary segment.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">Room</span> GetRoomNeighbourAt(
+&nbsp; &nbsp; <span class="teal">BoundarySegment</span> bs,
+&nbsp; &nbsp; <span class="teal">Room</span> r )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = r.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Wall</span> w = bs.Element <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> wallThickness = w.Width;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> wallLength = ( w.Location <span class="blue">as</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">LocationCurve</span> ).Curve.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> derivatives = bs.Curve
+&nbsp; &nbsp; &nbsp; .ComputeDerivatives(&nbsp; 0.5, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> midPoint = derivatives.Origin;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; midPoint.IsAlmostEqualTo(
+&nbsp; &nbsp; &nbsp; &nbsp; bs.Curve.Evaluate( 0.5, <span class="blue">true</span> ) ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same result from Evaluate and derivatives&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> tangent = derivatives.BasisX.Normalize();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = <span class="blue">new</span> <span class="teal">XYZ</span>( tangent.Y,
+&nbsp; &nbsp; &nbsp; tangent.X * ( -1 ), tangent.Z );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = midPoint + wallThickness * normal;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Room</span> otherRoom = doc.GetRoomAtPoint( p );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != otherRoom )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( otherRoom.Id == r.Id )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; normal = <span class="blue">new</span> <span class="teal">XYZ</span>( tangent.Y * ( -1 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tangent.X, tangent.Z );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; p = midPoint + wallThickness * normal;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; otherRoom = doc.GetRoomAtPoint( p );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == otherRoom
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || otherRoom.Id != r.Id,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected different room on other side&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> otherRoom;
+&nbsp; }
+</pre>
+
+<p>The if-statement makes sure that I'm looking in the correct direction with regard to the wall direction.
+I reverse the vector if the first attempt returns the same room as the one I already have.</p>
+
+<p>Many thanks to Erik for the discussion and solution to this question!</p>
+
+
+<a name="3"></a>
+
+<h4>Room Neighbour External Command</h4>
+
+<p>I added this code to The Building Coder samples as a new command CmdRoomNeighbours.</p>
+
+<p>It reports the neighbouring rooms at the midpoints of all the boundary segments of a user-selected set of rooms.</p>
+
+
+<a name="4"></a>
+
+<h4>JtSelectorMulti &ndash; a Generic Multiple Pre- and Post-Selector Class</h4>
+
+<p>The selection process supports both pre- and post-selection.
+You can optionally select the rooms before launching the command.
+If you do not, you will be prompted to do so interactively by the command itself.</p>
+
+<p>Since I repeatedly mentioned that quite a number of lines of code are required to support pre- and post-selection, I decided to package that into a separate class and implemented a generic templated JtSelectorMulti class for the selection of multiple elements.</p>
+
+<p>It is templated by the type of element to select.
+You can also specify the required built-in category (or null for none) and a freely definable filtering method.</p>
+
+<p>Using that, the pre- and post-selection support in the external command Execute method mainline now just requires these three statements:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Interactively select elements of type Room,</span>
+&nbsp; <span class="green">// either via pre-selection before launching the</span>
+&nbsp; <span class="green">// command, or interactively via post-selection.</span>
+&nbsp;
+&nbsp; <span class="teal">JtSelectorMulti</span>&lt;<span class="teal">Room</span>&gt; selector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtSelectorMulti</span>&lt;<span class="teal">Room</span>&gt;(
+&nbsp; &nbsp; &nbsp; uidoc, <span class="teal">BuiltInCategory</span>.OST_Rooms, <span class="maroon">&quot;room&quot;</span>,
+&nbsp; &nbsp; &nbsp; e =&gt; e <span class="blue">is</span> <span class="teal">Room</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( selector.IsEmpty )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> selector.ShowResult();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Room</span>&gt; rooms = selector.Selected;
+</pre>
+
+<p>Here is the class implementation including some comments:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Select multiple elements of the same type using</span>
+<span class="gray">///</span><span class="green"> either pre-selection, before launching the </span>
+<span class="gray">///</span><span class="green"> command, or post-selection, afterwards.</span>
+<span class="gray">///</span><span class="green"> The element type is determined by the template </span>
+<span class="gray">///</span><span class="green"> parameter. A filtering method must be provided</span>
+<span class="gray">///</span><span class="green"> and is reused for both testing the pre-selection</span>
+<span class="gray">///</span><span class="green"> and defining allowable elements for the post-</span>
+<span class="gray">///</span><span class="green"> selection.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtSelectorMulti</span>&lt;T&gt; <span class="blue">where</span> T : <span class="teal">Element</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Error message in case of invalid pre-selection.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _usage_error = <span class="maroon">&quot;Please pre-select &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;only {0}s before launching this command.&quot;</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine whether the given element is a valid </span>
+&nbsp; <span class="gray">///</span><span class="green"> selectable object. The method passed in is </span>
+&nbsp; <span class="gray">///</span><span class="green"> reused for both the interactive selection</span>
+&nbsp; <span class="gray">///</span><span class="green"> filter and the pre-selection validation.</span>
+&nbsp; <span class="gray">///</span><span class="green"> See below for a sample method.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">delegate</span> <span class="blue">bool</span> <span class="teal">IsSelectable</span>( <span class="teal">Element</span> e );
+&nbsp;
+<span class="blue">&nbsp; #region</span> Sample common filtering helper method
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine whether the given element is valid.</span>
+&nbsp; <span class="gray">///</span><span class="green"> This specific implementation requires a family </span>
+&nbsp; <span class="gray">///</span><span class="green"> instance element of the furniture category </span>
+&nbsp; <span class="gray">///</span><span class="green"> belonging to the named family.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> IsTable( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Category</span> cat = e.Category;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != cat )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( cat.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) <span class="teal">BuiltInCategory</span>.OST_Furniture ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> fname = fi.Symbol.Family.Name;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rc = fname.Equals( <span class="maroon">&quot;SampleTableFamilyName&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Common filtering helper method</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> JtSelectionFilter
+&nbsp; <span class="blue">class</span> <span class="teal">JtSelectionFilter</span> : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Type</span> _t;
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>? _bic;
+&nbsp; &nbsp; <span class="teal">IsSelectable</span> _f;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> JtSelectionFilter(
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t,
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>? bic,
+&nbsp; &nbsp; &nbsp; <span class="teal">IsSelectable</span> f )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _t = t;
+&nbsp; &nbsp; &nbsp; _bic = bic;
+&nbsp; &nbsp; &nbsp; _f = f;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> HasBic( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> == _bic
+&nbsp; &nbsp; &nbsp; &nbsp; || (<span class="blue">null</span> != e.Category
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">int</span>) _bic ));
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> T
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; HasBic( e )
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; _f( e );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// JtSelectionFilter</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;T&gt; _selected;
+&nbsp; <span class="blue">string</span> _msg;
+&nbsp; <span class="teal">Result</span> _result;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Instantiate and run element selector.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;uidoc&quot;&gt;</span><span class="green">UIDocument.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;bic&quot;&gt;</span><span class="green">Built-in category or null.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;description&quot;&gt;</span><span class="green">Description of the elements to select.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;f&quot;&gt;</span><span class="green">Validation method.</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> JtSelectorMulti(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>? bic,
+&nbsp; &nbsp; <span class="blue">string</span> description,
+&nbsp; &nbsp; <span class="teal">IsSelectable</span> f )
+&nbsp; {
+&nbsp; &nbsp; _selected = <span class="blue">null</span>;
+&nbsp; &nbsp; _msg = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _msg = <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span>;
+&nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Check for pre-selected elements</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = sel.Elements.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !f( e ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _usage_error, description );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _selected )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _selected = <span class="blue">new</span> <span class="teal">List</span>&lt;T&gt;( n );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _selected.Add( e <span class="blue">as</span> T );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If no elements were pre-selected, </span>
+&nbsp; &nbsp; <span class="green">// prompt for post-selection</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _selected
+&nbsp; &nbsp; &nbsp; || 0 == _selected.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Reference</span>&gt; refs = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; refs = sel.PickObjects(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">JtSelectionFilter</span>( <span class="blue">typeof</span>( T ), bic, f ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select {0}s.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; description ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _result = <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != refs &amp;&amp; 0 &lt; refs.Count )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _selected = <span class="blue">new</span> <span class="teal">List</span>&lt;T&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; refs.Select&lt;<span class="teal">Reference</span>, T&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; r =&gt; doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> T ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; <span class="blue">null</span> == _selected || 0 &lt; _selected.Count,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;ensure we return only non-empty collections&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; _result = ( <span class="blue">null</span> == _selected )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">Result</span>.Cancelled
+&nbsp; &nbsp; &nbsp; : <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true if nothing was selected.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> IsEmpty
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> == _selected
+&nbsp; &nbsp; &nbsp; &nbsp; || 0 == _selected.Count;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the cancellation or failure code</span>
+&nbsp; <span class="gray">///</span><span class="green"> to Revit and display a message if there</span>
+&nbsp; <span class="gray">///</span><span class="green"> is anything to say.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> ShowResult()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Result</span>.Failed == _result )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 0 &lt; _msg.Length,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a non-empty error message&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( _msg );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> _result;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return selected elements or null.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">IList</span>&lt;T&gt; Selected
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _selected;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>CmdRoomNeighbours External Command Mainline</h4>
+
+<p>Making use of the <a href="#4">JtSelectorMulti</a> pre- and post-selection and the <a href="#2">GetRoomNeighbourAt</a> method to list the results, here is the complete code of the external command mainline.</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Interactively select elements of type Room,</span>
+&nbsp; <span class="green">// either via pre-selection before launching the</span>
+&nbsp; <span class="green">// command, or interactively via post-selection.</span>
+&nbsp;
+&nbsp; <span class="teal">JtSelectorMulti</span>&lt;<span class="teal">Room</span>&gt; selector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtSelectorMulti</span>&lt;<span class="teal">Room</span>&gt;(
+&nbsp; &nbsp; &nbsp; uidoc, <span class="teal">BuiltInCategory</span>.OST_Rooms, <span class="maroon">&quot;room&quot;</span>,
+&nbsp; &nbsp; &nbsp; e =&gt; e <span class="blue">is</span> <span class="teal">Room</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( selector.IsEmpty )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> selector.ShowResult();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Room</span>&gt; rooms = selector.Selected;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; msg = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">int</span> n = rooms.Count;
+&nbsp;
+&nbsp; msg.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} room{1} selected{2}\r\n&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) ) );
+&nbsp;
+&nbsp; <span class="teal">SpatialElementBoundaryOptions</span> opt
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>();
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt;&gt; loops;
+&nbsp;
+&nbsp; <span class="teal">Room</span> neighbour;
+&nbsp; <span class="blue">int</span> i = 0, j, k;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> room <span class="blue">in</span> rooms )
+&nbsp; {
+&nbsp; &nbsp; ++i;
+&nbsp;
+&nbsp; &nbsp; loops = room.GetBoundarySegments( opt );
+&nbsp;
+&nbsp; &nbsp; n = loops.Count;
+&nbsp;
+&nbsp; &nbsp; msg.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0}. {1} has {2} loop{3}{4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; i, <span class="teal">Util</span>.ElementDescription( room ),
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) ) );
+&nbsp;
+&nbsp; &nbsp; j = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">IList</span>&lt;<span class="teal">BoundarySegment</span>&gt; loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++j;
+&nbsp;
+&nbsp; &nbsp; &nbsp; n = loop.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; msg.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; {0}. Loop has {1} boundary segment{2}{3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; j, n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; k = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">BoundarySegment</span> seg <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ++k;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; neighbour = GetRoomNeighbourAt( seg, room );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; msg.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;&nbsp; &nbsp; {0}. Boundary segment has neighbour {1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; k,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<span class="blue">null</span>==neighbour
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;&lt;nil&gt;&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span class="teal">Util</span>.ElementDescription( neighbour )) ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg2( <span class="maroon">&quot;Room Neighbours&quot;</span>,
+&nbsp; &nbsp; <span class="blue">string</span>.Join( <span class="maroon">&quot;\n&quot;</span>, msg.ToArray() ) );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>We use read-only transaction mode for this command, since no database modifications are required.</p>
+
+
+<a name="6"></a>
+
+<h4>Sample Run and Download</h4>
+
+<p>I tested the command selecting room 5 in the following simplistic model:</p>
+
+<center>
+<img src="img/ee_room_neighbours_1.png" alt="Sample model with neighbouring rooms" width="600"/>
+</center>
+
+<p>Its neighbouring rooms are listed in a message box and in the Visual Studio debug output window, which reports:</p>
+
+<pre>
+Room Neighbours
+
+1 room selected:
+
+1. Room Rooms &lt;197109 Room 5&gt; has 1 loop:
+  1. Loop has 4 boundary segments:
+    1. Boundary segment has neighbour &lt;nil&gt;
+    2. Boundary segment has neighbour Room Rooms &lt;197103 Room 3&gt;
+    3. Boundary segment has neighbour Room Rooms &lt;197112 Room 6&gt;
+    4. Boundary segment has neighbour Room Rooms &lt;197115 Room 7&gt;
+</pre>
+
+<p>Here is
+
+<a href="zip/bc_14_103_0.zip">
+version 2014.0.103.0</a> of
+
+The Building Coder samples source code, Visual Studio solution and RvtSamples include file including the new CmdRoomNeighbours command.</p>
+
+<p>I hope you find this useful and thank Erik again for raising this issue.</p>

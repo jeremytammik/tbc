@@ -1,0 +1,61 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+
+
+-->
+
+<h3>Architecture Mismatch Warning Disabler Update</h3>
+
+<p>The default Visual Studio settings will generate a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">
+processor architecture mismatch warning</a> when
+
+compiling a Revit 2014 or 2015 add-in.</p>
+
+<p>Last year, I implemented a utility named DisableMismatchWarning.exe to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">
+recursively disable this warning</a> in
+
+all projects in all subfolders of the current directory.</p>
+
+<p>Now I just happened to receive a new sample add-in project from a developer for testing that was not recognised by this utility, so I implemented an
+
+<a href="#3">update</a> for it.</p>
+
+<p>Before getting to that, let me share some pictures from our full moon fire last night by my friend Anja:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-09-08_tuellinger_full_moon/2014-09-08_20.27.26_moon.jpg" alt="The Moon" width="400"/>
+<p style="font-style:italic;text-align:center;margin-top:0.4em;">The Moon</p>
+</center>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-09-08_tuellinger_full_moon/2014-09-08_20.46.46_fire.jpg" alt="The Fire" width="400"/>
+<p style="font-style:italic;text-align:center;margin-top:0.4em;">The Fire</p>
+</center>
+
+<center>
+<img src="file:////j/photo/jeremy/2014/2014-09-08_tuellinger_full_moon/2014-09-08_20.26.14_moon_cloud_bed.jpg" alt="The Moon Cloud Bed" width="400"/>
+<p style="font-style:italic;text-align:center;margin-top:0.4em;">The Moon Cloud Bed</p>
+</center>
+
+
+<a name="3"></a>
+
+<h4>DisableMismatchWarning Update</h4>
+
+<p>To process the new Visual Studio project file I received, I simply added support for additional Import tags in the first few lines.</p>
+
+<p>This should work fine for both C# and VB projects.</p>
+
+<p>The updated version is available from the
+
+<a href="https://github.com/jeremytammik/DisableMismatchWarning">
+DisableMismatchWarning GitHub repository</a>.</p>

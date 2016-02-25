@@ -1,0 +1,585 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+From: Victor Chekalin 
+Date: Wednesday, January 22, 2014 15:28
+To: Jeremy Tammik 
+Subject: Pipe.Create
+
+Hi Jeremy,
+
+I also could not add comment for you post and write you email.
+
+I wanted to comment your post Simpler Rolling Offset Using NewElbowFitting
+
+Bellow the comment I tried to post:
+---------------------------
+Hi Jeremy!
+
+I don't know that did you do wrong while you were trying to create Pipe using Pipe.Create, but I was able to create a pipe using new method with first attempt.:)
+Here is the full source code of the command:
+
+http://pastebin.com/RZn1WnMW
+
+Hope this would be useful for you.
+
+Regards,
+Victor.
+---------------------------
+
+  // Extract all pipe system types
+  var mepSystemTypes
+    = new FilteredElementCollector(doc)
+      //.WhereElementIsNotElementType()
+      .OfClass(typeof(PipingSystemType))
+      .OfType<PipingSystemType>()
+      .ToList();
+
+  // get the Domestic hot water type
+  var domesticHotWaterSystemType =
+      mepSystemTypes
+          .FirstOrDefault(st => st.SystemClassification == MEPSystemClassification.DomesticHotWater);
+
+  if (domesticHotWaterSystemType == null)
+  {
+      message = "Could not found Domestic Hot Water System Type";
+      return Result.Failed;
+  }
+
+  // looking for the PipeType
+  var pipeTypes =
+      new FilteredElementCollector(doc)
+          .OfClass(typeof (PipeType))
+          .OfType<PipeType>()
+          .ToList();
+
+  // get the first type from the collection
+  var firstPipeType =
+      pipeTypes.FirstOrDefault();
+
+  if (firstPipeType == null)
+  {
+      message = "Could not found Pipe Type";
+      return Result.Failed;
+  }
+
+  var level = uidoc.ActiveView.GenLevel;
+
+  if (level == null)
+  {
+      message = "Wrong Active View";
+      return Result.Failed;
+  }
+
+  var startPoint = XYZ.Zero;
+
+  var endPoint = new XYZ(100, 0, 0);
+
+  using (var t = new Transaction(doc, "Create pipe using Pipe.Create"))
+  {
+      t.Start();
+      var pipe = Pipe.Create(doc,
+          domesticHotWaterSystemType.Id,
+          firstPipeType.Id,
+          level.Id,
+          startPoint,
+          endPoint);
+
+      t.Commit();
+  }
+
+From: Victor Chekalin 
+Date: Friday, January 24, 2014 04:36
+To: Jeremy Tammik 
+Subject: Re: Pipe.Create
+
+Hi Jeremy,
+
+Seems the reason is in the systemTypeId parameter. You passed the wrong id indeed.
+
+At the help file (and in your post) we can see the description for systemTypeId: The id of the piping system type.
+
+The keyword is type. I.e. you should pass the Id of the element of class MEPSystemType or PipingSystemType for pipe.
+
+In your code you take the system, not the type:
+
+  ElementId idSystem = pipe.MEPSystem.Id;
+
+If you want to create the rolling offset pipe with the same system type as the original pipe, you should use the following code:
+
+  ElementId systemIdTypeId = pipe.MEPSystem.GetTypeId();
+
+At the real project at first we should check pipe.MEPSystem for null:
+
+ElementId systemIdTypeId;
+
+  if (pipe.MEPSystem!=null)
+  {
+    systemIdTypeId = pipe.MEPSystem.GetTypeId();
+  }
+  else
+  {
+    // select some default systemTypeId
+    // Extract all pipe system types
+    var mepSystemTypes
+      = new FilteredElementCollector(doc)
+        .OfClass(typeof(PipingSystemType))
+        .OfType<PipingSystemType>()
+        .ToList();
+
+    // get the Domestic hot water type
+    systemIdTypeId=
+      mepSystemTypes
+          .FirstOrDefault(st => st.SystemClassification == MEPSystemClassification.DomesticHotWater);
+  }
+
+Have a nice day,
+Victor.
+
+-->
+
+<h3>Final Rolling Offset Using Pipe.Create</h3>
+
+<p>I am writing this on the way back to Switzerland from my hiking trip on La Palma.
+Actually, lacking good bandwidth during my travels, I actually arrived back before being able to post this...</p>
+
+<p>Even before my return, I already have some good news to share:</p>
+
+<p>Victor Chekalin provided a working sample of using the static Pipe.Create method, so I can update my rolling offset series to make use of that more modern and flexible method rather than the older NewPipe one.</p>
+
+<p>Here are the steps so far in the rolling offset exploration:</p>
+
+
+<ul>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+Calculate a rolling offset</a> between
+
+two pipes</li>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html">
+Insert the rolling offset pipe segment</a></li>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+Connect it to its neighbours</a></li>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/connecting-the-rolling-offset-pipe-to-its-neighbour-pipes.html">
+Explicitly placing elbow fittings</a></li>
+
+<li>
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/newelbowfitting-easily-places-rolling-offset-elbow-fittings.html">
+Simpler fitting placement using NewElbowFitting</a></li>
+
+</ul>
+
+<p>My last words in the last post stated that it just about concludes this project, except for the question on how to use Pipe.Create instead of Document.Create.NewPipe, which is still open.</p>
+
+<p>When exploring the pipe creation, I had a look at using the static Pipe.Create method but quickly resorted to NewPipe instead.</p>
+
+
+<p>Victor very kindly provided a solution and an explanation that forms a useful basis for exploring and solving this in more depth:</p>
+
+<ul>
+<li>A <a href="#2">working sample using Pipe.Create</a></li>
+<li>A <a href="#3">sample of using the View.GenLevel property</a></li>
+<li>An <a href="#4">explanation of the Pipe.Create piping system type argument</a></li>
+<li>The <a href="#5">Pipe.Create level id argument</a></li>
+<li>Retrieving all Pipe.Create argument values <a href="#6">from existing pipe parameters</a></li>
+<li>Updated <a href="#7">rolling offset using Pipe.Create</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>A Working Sample Using Pipe.Create</h4>
+
+<p>Victor responded to my post, saying "I was able to create a pipe using new method with first attempt  :-)"</p>
+
+<p>Here is
+
+<a href="http://pastebin.com/RZn1WnMW">
+Victor's initial code</a>:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Extract all pipe system types</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> mepSystemTypes
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipingSystemType</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">PipingSystemType</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="green">// Get the Domestic hot water type</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> domesticHotWaterSystemType =
+&nbsp; &nbsp; mepSystemTypes.FirstOrDefault(
+&nbsp; &nbsp; &nbsp; st =&gt; st.SystemClassification ==
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MEPSystemClassification</span>.DomesticHotWater );
+&nbsp;
+&nbsp; <span class="blue">if</span>( domesticHotWaterSystemType == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Could not found Domestic Hot Water System Type&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Looking for the PipeType</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> pipeTypes =
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipeType</span> ) )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">PipeType</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; <span class="green">// Get the first type from the collection</span>
+&nbsp;
+&nbsp; <span class="blue">var</span> firstPipeType =
+&nbsp; &nbsp; &nbsp; pipeTypes.FirstOrDefault();
+&nbsp;
+&nbsp; <span class="blue">if</span>( firstPipeType == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Could not found Pipe Type&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> level = uidoc.ActiveView.GenLevel;
+&nbsp;
+&nbsp; <span class="blue">if</span>( level == <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Wrong Active View&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">var</span> startPoint = <span class="teal">XYZ</span>.Zero;
+&nbsp;
+&nbsp; <span class="blue">var</span> endPoint = <span class="blue">new</span> <span class="teal">XYZ</span>( 100, 0, 0 );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="blue">var</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; t.Start( <span class="maroon">&quot;Create pipe using Pipe.Create&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">var</span> pipe = <span class="teal">Pipe</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; domesticHotWaterSystemType.Id,
+&nbsp; &nbsp; &nbsp; firstPipeType.Id,
+&nbsp; &nbsp; &nbsp; level.Id,
+&nbsp; &nbsp; &nbsp; startPoint,
+&nbsp; &nbsp; &nbsp; endPoint );
+&nbsp;
+&nbsp; &nbsp; t.Commit();
+&nbsp; }
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>A Sample of Using the View.GenLevel Property</h4>
+
+<p>The View.GenLevel property is not very richly documented.</p>
+
+<p>This is all the Revit API help file has to say about it:
+"The level for the view.
+This will obtain the level for views related to levels, such as Plan Views.
+If this View is not generated by a level, this property is null."</p>
+
+<p>Note that Victor's code above shows a nice example of making use of that property.</p>
+
+<p>See below for a discussion on how to retrieve the proper level from an existing pipe element.</p>
+
+
+
+
+<a name="4"></a>
+
+<h4>An Explanation of the Pipe.Create Piping System Type Argument</h4>
+
+<p>Victor's explanation:
+The reason for your problem is the systemTypeId parameter.
+You passed the wrong id.</p>
+
+<p>In the help file (and in your post) the description for systemTypeId says it requires "the id of the piping system type".</p>
+
+<p>The keyword here is <i>type</i>, i.e., you should pass the element id of the MEPSystemType or PipingSystemType class for the selected pipe.</p>
+
+<p>Your code attempts to use the system, not the type:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> idSystem = pipe.MEPSystem.Id;
+</pre>
+
+<p>If you want to create the rolling offset pipe with the same system type as the original pipe, you should use the following code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> systemIdTypeId
+&nbsp; &nbsp; = pipe.MEPSystem.GetTypeId();
+</pre>
+
+<p>In a real project, you would presumably first check pipe.MEPSystem for null:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ElementId</span> systemIdTypeId;
+&nbsp;
+&nbsp; <span class="blue">if</span>( pipe.MEPSystem != <span class="blue">null</span> )
+&nbsp; {
+&nbsp; &nbsp; systemIdTypeId = pipe.MEPSystem.GetTypeId();
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Select some default systemTypeId</span>
+&nbsp; &nbsp; <span class="green">// Extract all pipe system types</span>
+&nbsp; &nbsp; <span class="blue">var</span> mepSystemTypes
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipingSystemType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">PipingSystemType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .ToList();
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Get the Domestic hot water type</span>
+&nbsp; &nbsp; systemIdTypeId = mepSystemTypes.FirstOrDefault(
+&nbsp; &nbsp; &nbsp; st =&gt; st.SystemClassification ==
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">MEPSystemClassification</span>.DomesticHotWater );
+&nbsp; }
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Updated Rolling Offset Using Pipe.Create</h4>
+
+<p>Once I had retrieved the MEP system and pipe system types as suggested by Victor, I assumed that I could grab the level from the existing pipe.</p>
+
+<p>My initial attempt, however, using the value of the existing pipe's Element.LevelId property, did that in the wrong manner as well.</p>
+
+<p>It returns an invalid element id for the level, causing the call to Pipe.Create to throw an exception saying, "The level id levelId is not valid. Parameter name: levelId".</p>
+
+<p>I used the BipChecker to look more closely at the existing pipe parameters and discovered a built-in parameter
+RBS_START_LEVEL_PARAM in there with ElementId storage type that returns its 'Reference Level' instead and is not invalid.</p>
+
+<p>As soon as I used that instead, the pipe creation worked.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Retrieving All Pipe.Create Argument Values from an Existing Pipe</h4>
+
+<p>I used the BipChecker on all three pipes to more closely examine their differences and similarities;
+here are the results for the two original ones,
+
+<a href="zip/rolling_offset_pipe1.txt">pipe 1</a>,
+
+<a href="zip/rolling_offset_pipe2.txt">pipe 2</a> and
+
+from the rolling offset
+
+<a href="zip/rolling_offset_pipe3.txt">pipe 3</a>.</p>
+
+<p>It is illuminating to compare these three, so I suggest you do so  :-)</p>
+
+<p>I still need to adjust the new pipe diameter, and I ought to use the same hydronic supply piping system type before trying to connect them.</p>
+
+<p>To summarise my findings and extract all the argument values for the call to Pipe.Create from existing pipe parameters, here are some of your options:</p>
+
+<ul>
+<li>ElementId systemTypeId</li>
+<ul>
+<li>RBS_PIPING_SYSTEM_TYPE_PARAM 'System Type' read-write</li>
+</ul>
+
+<li>ElementId pipeTypeId</li>
+<ul>
+<li>ELEM_FAMILY_AND_TYPE_PARAM 'Family and Type' read-write</li>
+<li>ELEM_FAMILY_PARAM 'Family' read-write</li>
+<li>ELEM_TYPE_PARAM	'Type' read-write</li>
+<li>SYMBOL_ID_PARAM	'Type Id' read-only</li>
+</ul>
+
+<li>ElementId levelId</li>
+<ul>
+<li>RBS_START_LEVEL_PARAM 'Reference Level' read-write</li>
+</ul>
+</ul>
+
+
+<a name="7"></a>
+
+<h4>Updated Rolling Offset Using Pipe.Create</h4>
+
+<p>Putting all of this together, we arrive at the following:</p>
+
+<pre class="code">
+&nbsp; tx.Start( <span class="maroon">&quot;Rolling Offset&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( _place_model_line )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( _place_fittings )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// . . .</span>
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( _use_static_pipe_create )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Element id arguments to Pipe.Create.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idSystem;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idType;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idLevel;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// All these values are invalid for idSystem:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idSystem1 = pipe.MEPSystem.Id;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idSystem2 = <span class="teal">ElementId</span>.InvalidElementId;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idSystem3 = <span class="teal">PipingSystem</span>.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; doc, pipe.MEPSystem.GetTypeId(), <span class="maroon">&quot;Tbc&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// This throws an argument exception saying</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// The systemTypeId is not valid piping system type.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Parameter name: systemTypeId</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//pipe = Pipe.Create( doc, idSystem,</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; idType, idLevel, q0, q1 );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve pipe system type, e.g. </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// hydronic supply.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PipingSystemType</span> pipingSystemType
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipingSystemType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">PipingSystemType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault( st
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; st.SystemClassification
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="teal">MEPSystemClassification</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .SupplyHydronic );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pipingSystemType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Could not find hydronic supply piping system type&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; idSystem = pipingSystemType.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( pipe.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_PIPING_SYSTEM_TYPE_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId().IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; idSystem.IntegerValue ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same piping system element id&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve the PipeType.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">PipeType</span> pipeType =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PipeType</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">PipeType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == pipeType )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Could not find pipe type&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; idType = pipeType.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( pipe.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.ELEM_TYPE_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId().IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; idType.IntegerValue ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same pipe type element id&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( pipe.PipeType.Id.IntegerValue
+&nbsp; &nbsp; &nbsp; &nbsp; .Equals( idType.IntegerValue ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected same pipe type element id&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve the reference level.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// pipe.LevelId is not the correct source!</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; idLevel = pipe.get_Parameter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.RBS_START_LEVEL_PARAM )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .AsElementId();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create the rolling offset pipe.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; pipe = <span class="teal">Pipe</span>.Create( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; idSystem, idType, idLevel, q0, q1 );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pipe = doc.Create.NewPipe( q0, q1,
+&nbsp; &nbsp; &nbsp; &nbsp; pipe_type_standard );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; pipe.get_Parameter( bipDiameter )
+&nbsp; &nbsp; &nbsp; .Set( diameter );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Connect rolling offset pipe segment</span>
+&nbsp; &nbsp; <span class="green">// directly with the neighbouring original</span>
+&nbsp; &nbsp; <span class="green">// pipes</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">//Util.Connect( q0, pipes[0], pipe );</span>
+&nbsp; &nbsp; <span class="green">//Util.Connect( q1, pipe, pipes[1] );</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">// NewElbowFitting performs the following:</span>
+&nbsp; &nbsp; <span class="green">// - select appropriate fitting family and type</span>
+&nbsp; &nbsp; <span class="green">// - place and orient a family instance</span>
+&nbsp; &nbsp; <span class="green">// - set its parameters appropriately</span>
+&nbsp; &nbsp; <span class="green">// - connect it with its neighbours</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> con0 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipes[0], q0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> con = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipe, q0 );
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewElbowFitting( con0, con );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> con1 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipes[1], q1 );
+&nbsp;
+&nbsp; &nbsp; con = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipe, q1 );
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewElbowFitting( con, con1 );
+&nbsp; }
+&nbsp;
+&nbsp; tx.Commit();
+</pre>
+
+<p>Once again, the resulting model looks exactly the same as the one presented previously, generated by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/explicitly-placing-rolling-offset-pipe-elbow-fittings.html#4">
+explicitly placing the elbow fittings</a>.</p>
+
+<p>The hopefully final solution to generate the rolling offset pipe and properly place and connect the elbow fittings is included in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> GitHub
+
+repository, in the external command CmdRollingOffset, and the version discussed here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.6">
+release 2014.0.106.6</a>.</p>
+
+<p>Now back to work again, and catching up with the backlog...</p>
+
+<p><strong>Addendum:</strong> Victor already posted on this topic in Russian:
+
+<a href="http://adn-cis.org/sozdanie-trubyi-s-pomoshhyu-metoda-pipe-create.html">
+Создание трубы с помощью метода Pipe.Create</a> (Making
+
+tube method using Pipe.Create).</p>
+
+<p>The built-in Firefox Tools &gt; Translate Page rendering of this looks useful and interesting to me as well  :-)</p>
+
+<p>Many thanks to Victor for all his help on this!</p>

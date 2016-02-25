@@ -1,0 +1,333 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+- http://inthefold.autodesk.com/in_the_fold/2013/12/autodesk-ranked-1-of-100-public-companies-for-its-ghg-target-setting-methodology-c-fact.html
+
+  Autodesk has committed to reducing its carbon emissions per dollar contribution to GDP by over 9% year over year through 2020, an incredibly long-range goal for a technology company.
+
+  Autodesk has been recognized as the #1 company in a review of corporate emissions performance, demonstrating 'tremendous leadership in shaping corporate sustainability metrics to be more grounded in science.  Employees of Autodesk should be proud of the work being done by their Sustainability Solutions team'.
+
+- AU 2013 classes available on demand
+
+  What skills could advance your career? We've posted recordings of over 200 classes, along with presentations and handouts for the rest of the more 600 classes presented at Autodesk University 2013 in Las Vegas. Get advanced training, explore a new topic, or peer into the future of design software.  Just sign up for a free Autodesk account, and start learning today!
+
+  We recorded screencasts of over 200 classes at Autodesk University 2013. Customers may access the classes, along with video recordings of the live-streamed keynotes, innovation forums, and selected classes, from the AU website for free.  For classes that were not recorded, we have posted the class presentation (in PowerPoint) as well as class handouts. (Please note that not all 650 classes were recorded.)
+  URLs
+  Short URL: http://autode.sk/on-demand
+  Complete URL (seems to work best for LinkedIn): http://au.autodesk.com/au-online/overview
+
+- Bartlett, Dale 
+  Building Coder - Revit 2014 SDK Sample Error (to be confirmed...)
+  C:\a\lib\revit\2014\SDK\Samples\AllViews\CS\AllViews.cs
+  file jira issue
+  AllViews SDK sample
+  Jira Issue REVIT-28365 [AllViews SDK sample: add family name to search key]
+
+- methods that regenerate -- 09102489 [Creating roofs regenerates model?] -- api_call_regenerates_*.png
+
+- 09106212 [Element Cutting]
+
+-->
+
+<h3>Sustainably Chugging Along</h3>
+
+<p>I continue chugging along here, mainly just answering cases.</p>
+
+<p>January and February tend to be peaceful for me after the extreme travelling and conferencing in December.</p>
+
+<p>I will also be reducing my overdue vacation time in the next couple of months, so expect another break or two in the flow.</p>
+
+<p>Here are today's topics I find interesting or have been looking into myself:</p>
+
+<ul>
+<li><a href="#2">Autodesk corporate sustainability</a></li>
+<li><a href="#3">AU 2013 classes available on demand</a></li>
+<li><a href="#4">AllViews Revit SDK sample enhancement</a></li>
+<li><a href="#5">Revit API methods that regenerate</a></li>
+<li><a href="#6">Programmatic Element cutting</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Autodesk Corporate Sustainability</h4>
+
+<p>Matching the great work done by the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/starting-to-clean-up-for-the-break.html#3">
+Building Performance Analysis</a> team,
+
+making strong use of Revit and BIM technologies, Autodesk as a company has committed to
+
+<a href="http://inthefold.autodesk.com/in_the_fold/2013/12/autodesk-ranked-1-of-100-public-companies-for-its-ghg-target-setting-methodology-c-fact.html">
+reducing its carbon emissions</a> per
+
+dollar contribution to GDP by over 9% year over year through 2020, an incredibly long-range goal for a technology company.
+A review of corporate emissions performance recognized Autodesk and its Sustainability Solutions team as absolute leaders in this area, demonstrating
+
+'<a href="http://inthefold.autodesk.com/in_the_fold/2013/12/autodesk-ranked-1-of-100-public-companies-for-its-ghg-target-setting-methodology-c-fact.html">tremendous leadership in shaping corporate sustainability metrics to be more grounded in science</a>.'</p>
+
+
+
+<a name="3"></a>
+
+<h4>AU 2013 Classes Available on Demand</h4>
+
+<p>What skills could advance your career?
+Recordings of over 200 classes have been posted online, along with presentations and handouts for the rest of the more 600 classes presented at Autodesk University 2013 in Las Vegas.
+You can easily get advanced training, explore a new topic, or peer into the future of design software by signing up for a free Autodesk account and starting to learn right away.
+Here is the
+
+<a href="http://au.autodesk.com/au-online/overview">
+AU online overview</a> and a
+
+<a href="http://autode.sk/on-demand">short URL</a> for it.</p>
+
+
+<a name="4"></a>
+
+<h4>AllViews Revit SDK Sample Enhancement</h4>
+
+<p>Dale Bartlett very kindly provided an enhancement to the AllViews Revit SDK sample.
+Says he:</p>
+
+<p>The RvtSamples &gt; Views &gt; All Views command retrieves all of the loaded Title Blocks for user selection in the creation of a series of sheets.
+The code actually builds a collection of Type names using the GetTitleBlocks method, rather than Family:Type names.
+If each Title Block has a default Type of 'Type 1' (recommended), the following is the result:</p>
+
+<center>
+<img src="img/db_all_views_1.png" alt="List with several Type 1 entries"/>
+</center>
+
+<p>Selecting one will result in the first found Type (ChooseTitleBlock) rather than the specific Family:Type.</p>
+
+<p>The above test project contains the following Title Block Families:</p>
+
+<center>
+<img src="img/db_all_views_2.png" alt="Title block families defining several Type 1 entries"/>
+</center>
+
+<p>If a Family has no Types defined, then the default Type name is always listed the same as the Family name, so in most cases the code would work.  I guess that is why it hasn’t been picked up previously.</p>
+
+<p>I fixed this by adding a concatenated FamilyName:FamilyTypeName to the list, and searching for the same to return the appropriate FamilySymbol.Id in the following two methods:</p>
+
+<ul>
+<li>ChooseTitleBlock</li>
+<li>GetTitleBlocks</li>
+</ul>
+
+<p>Here is the resulting modified and tested code:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve the title block to be generated by its name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;name&quot;&gt;</span><span class="green">The title block name</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ChooseTitleBlock( <span class="blue">string</span> name )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">string</span>.IsNullOrEmpty( name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentNullException</span>( <span class="maroon">&quot;name&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> f <span class="blue">in</span> m_allTitleBlocks )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Original SDK code returns first family </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// symbol found, e.g. &quot;Type 1&quot; etc.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//if( name.Equals( f.Name ) )</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Replacement by DJB checks for concatenated </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// family name and type name</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( name.Equals( f.Family.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;:&quot;</span> + f.Name ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_titleBlock = f;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve all available title blocks in </span>
+&nbsp; <span class="gray">///</span><span class="green"> the currently active document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;</span><span class="green">The currently active document</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> GetTitleBlocks( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> filteredElementCollector
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; filteredElementCollector.OfClass(
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+&nbsp; &nbsp; filteredElementCollector.OfCategory(
+&nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_TitleBlocks );
+&nbsp;
+&nbsp; &nbsp; m_allTitleBlocks = filteredElementCollector
+&nbsp; &nbsp; &nbsp; .ToElements();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == m_allTitleBlocks.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">InvalidOperationException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;There is no title block to generate sheet.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span> m_allTitleBlocks )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilySymbol</span> f = element <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Original SDK code saves only symbol name.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//AllTitleBlocksNames.Add( f.Name );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Replacement by DJB saves concatenated </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// family name and type name to ensure </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// uniqueness in list.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; AllTitleBlocksNames.Add( f.Family.Name
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;:&quot;</span> + f.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == m_titleBlock )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_titleBlock = f;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Did I win a t-shirt?</p>
+
+<p>Many thanks for all your help over the year via your Building Coder blog. A lot of people appreciate your efforts I know.</p>
+
+<p>Many thanks to <b>you</b>, Dale, for discovering, fixing and sharing the solution for this issue!</p>
+
+
+
+<a name="5"></a>
+
+<h4>Revit API Methods that Regenerate</h4>
+
+<p>A recent ADN case concerns a performance issue creating a large number of roofs, and why each one of them triggers a regeneration of the model:</p>
+
+<p><strong>Question:</strong> I have a program that uses a temporary transaction inside a transaction group to make changes to the model. It creates a large number of footprint roofs to represent rooms in a 3D view and shows the user the result in a preview control. However, this is taking a long time in a large model. In the debugger, I can see that each call to Document.Create.NewFootPrintRoof is taking up to 10 seconds. The user interface displays the 'Regenerating' message in the status bar several times before my call returns, so it appears that the model is being regenerated at least once for each call.
+
+<p>How can that be?</p>
+
+<p>I am specifying manual regeneration mode. Revit is not supposed to regenerate the model until a transaction is closed, isn't it? How can I generate all the roofs without triggering a regeneration for each one?</p>
+
+<p><strong>Answer:</strong> Sorry, this is working as expected.
+Unfortunately, setting up the roof properly and ensuring consistency requires an internal regeneration.</p>
+
+<p>This is pointed out explicitly in the Revit API documentation in RevitAPI.chm, which says the following about this method: "This method will regenerate the document even in manual regeneration mode."</p>
+
+<p>There are a number of other Revit API methods that regenerate the model internally as well.</p>
+
+<p>You can find them by searching the help file for the string above, which returns the following:</p>
+
+<center>
+<img src="img/api_call_regenerates_1.png" alt="Revit API calls that regenerate the model"/>
+</center>
+
+<p>To see yet a couple of entries more, just search for "regenerate manual regeneration mode":</p>
+
+<center>
+<img src="img/api_call_regenerates_2.png" alt="Revit API calls that regenerate the model"/>
+</center>
+
+<p><strong>Response:</strong> In the case above, switching to using floors instead of roofs speeded the process up by a factor of more than ten.</p>
+
+<p>Out of curiosity: is there a reason that roofs regen and floors don’t?</p>
+
+<p><strong>Answer:</strong> Sure: a floor is generally flat, whereas a roof with angles can generate an extremely complex shape.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Programmatic Element Cutting</h4>
+
+<p>A frequent question is how to cut Revit elements with each other, both in the family and project contexts.</p>
+
+<p>Here is a recent incarnation of the topic that reached me both as an ADN case and a Revit API forum discussion thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Cutting-Elements/td-p/4728179">
+cutting elements</a>:</p>
+
+<p><strong>Question:</strong> I'm trying to write a tool that will cut a beam to a reference plane and I'm not sure if it's possible in the API with SolidSolidCutUtils because of the element type that is a beam or reference plane.
+Here's my code so far:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Step 1&quot;</span>,
+&nbsp; &nbsp; <span class="maroon">&quot;Choose an element as a reference to cut to.&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Reference</span> eRef = m_document.Selection.PickObject(
+&nbsp; &nbsp; ObjectType.Element, <span class="maroon">&quot;Please reference line.&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Step 2&quot;</span>, <span class="maroon">&quot;Choose an element to cut.&quot;</span> );
+&nbsp; <span class="teal">Reference</span> eCut = m_document.Selection.PickObject(
+&nbsp; &nbsp; ObjectType.Element, <span class="maroon">&quot;Please pick an element.&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( eRef != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; eRef.ElementId != <span class="teal">ElementId</span>.InvalidElementId
+&nbsp; &nbsp; &amp;&amp; eCut != <span class="blue">null</span>
+&nbsp; &nbsp; &amp;&amp; eCut.ElementId != <span class="teal">ElementId</span>.InvalidElementId )
+&nbsp; {
+&nbsp; &nbsp; CutElement( eRef, eCut, m_document, doc, activeDoc );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> CutElement( <span class="teal">Reference</span> eRef, <span class="teal">Reference</span> eCut,
+&nbsp; &nbsp; <span class="teal">UIDocument</span> m_document, <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">Document</span> activeDoc)
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//TaskDialog.Show(&quot;Step 2&quot;, &quot;Here&quot;);</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> CutElement = m_document.Document
+&nbsp; &nbsp; &nbsp; .GetElement(eCut).Id.IntegerValue;
+&nbsp; &nbsp; <span class="blue">int</span> ReferenceLine = m_document.Document
+&nbsp; &nbsp; &nbsp; .GetElement(eRef).Id.IntegerValue;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> solidToBeCut = activeDoc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>(CutElement));
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> cuttingSolid = activeDoc.GetElement(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementId</span>(ReferenceLine));
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transaction</span> transaction = <span class="blue">new</span> <span class="teal">Transaction</span>(activeDoc);
+&nbsp; &nbsp; transaction.Start(<span class="maroon">&quot;AddCutBetweenSolids&quot;</span>);
+&nbsp; &nbsp; <span class="teal">SolidSolidCutUtils</span>.AddCutBetweenSolids(
+&nbsp; &nbsp; &nbsp; activeDoc, solidToBeCut, cuttingSolid);
+&nbsp; &nbsp; transaction.Commit();
+&nbsp; }
+</pre>
+
+<p>The problem is I get an error at AddCutBetweenSolids that the parameter solidToBeCut isn't of the right type.
+Is there another method that would accomplish what I'm trying to do or is there a way to fix this method to do what I want?</p>
+
+<p><strong>Answer:</strong> There are several different possible ways to perform Boolean operations between Revit elements.</p>
+
+<p>I put together a collection of pointers to various discussions on The Building Coder concerning
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.30">3D Booleans and Cutting Elements</a> to
+
+help answer your question.</p>
+
+<p>In many cases, within the family environment, the approach you are attempting using SolidSolidCutUtils is one of the best and most effective options.</p>
+
+<p>However, just as you have discovered, it places certain requirements on the input solids.</p>
+
+<p>Just as its name implies, the cutting solid must be a solid.</p>
+
+<p>A reference line definitely does not fulfil this requirement.</p>
+
+<p>You will have to create a solid somehow.</p>
+
+<p>Here is one suggestion of how to achieve this:</p>
+
+<p>Use the reference line you already have and another one perpendicular to it to define a plane, define a large extruded cube based on that plane, and subtract that from your main body.</p>

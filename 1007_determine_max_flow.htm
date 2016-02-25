@@ -1,0 +1,292 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Eric Kuszewski 
+
+HDR duct value extraction
+Duct parameters sample file
+
+/a/src/revit/rme_hdr_value_extraction/
+
+/a/rvt/duct_airflow_params_sample.rvt
+
+-->
+
+<h3>Determining Maximal Flow in HVAC Duct Connectors</h3>
+
+<p>A colleague came up with a request for a simple Revit MEP HVAC utility add-in that I would like to present.</p>
+
+
+<p><strong>Question:</strong> We need to extract some specific ductwork values in Revit MEP and report them to the user.</p>
+
+<p>To begin with, all we need is the largest flow value on each duct, exported to a shared parameter on the duct.</p>
+
+<p>The purpose of the routine is for the users to confirm their duct sizing with this data reflecting the worst case condition.
+For this reason, it is required only on the ducts, as the fittings sizes will be driven by the duct sizes.</p>
+
+<p>I created the following shared parameter file defining the 'Duct Max Airflow' parameter that I would like to populate:</p>
+
+<pre>
+*GROUP ID NAME
+GROUP   1 Mechanical - Airflow
+*PARAM  GUID  NAME   DATATYPE  DATACATEGORY  GROUP  VISIBLE
+PARAM   XXXX  Duct Max Airflow HVAC_AIR_FLOW  1 1
+</pre>
+
+
+
+<p><strong>Answer:</strong> This is a very simple issue, really.
+It requires the following steps:</p>
+
+<ul>
+<li>Retrieve all duct elements.</li>
+<li>For each, retrieve all its HVAC connectors.</li>
+<li>Determine their maximal Flow property value.</li>
+<li>Populate the shared parameter.</li>
+</ul>
+
+<p>The first step is almost always the implementation of a representative, minimal and yet complete sample model to research and test in.
+It needs to contain as few elements as possible to simplify navigation and identification, and still provide examples of all the various situations that need to be handled by the add-in.</p>
+
+<p>Here is a sample file to start with:</p>
+
+<center>
+<img src="img/duct_max_flow_sample_rvt.png" alt="Sample model" width="400"/>
+</center>
+
+<p>You can then explore this model interactively using RevitLookup and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/01/built-in-parameter-enumeration-duplicates-and-bipchecker-update.html">
+BipChecker</a> to
+
+find out how to access the required data.
+Here is an example showing where the desired flow values can be found on the duct connectors:</p>
+
+<center>
+<img src="img/duct_max_flow_snoop.png" alt="Snooping max flow on duct" width="400"/>
+</center>
+
+<p>After some further analysis, we discover that a possible way to structure this add-in breaks it up into the following tasks and methods:</p>
+
+<ul>
+<li><a href="#2">GetConnectorManager</a> &ndash; return the connector manager for a given element.</li>
+<li><a href="#3">GetMaxFlow</a> &ndash; return the max flow for a given set of connectors.</li>
+<li><a href="#4">SetMaxFlowOnElement</a> &ndash; determine the max flow for a given element and set its shared parameter value.</li>
+<li><a href="#5">Execute</a> &ndash; external command mainline: create a transaction, retrieve and process all ducts.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Return the Connector Manager for an Element</h4>
+
+<p>We initially thought we would have to process both ducts and fittings.</p>
+
+<p>They use different properties to access their connector manager.</p>
+
+<p>The following method encapsulates and hides that difference.
+This makes it possible to implement higher level generic methods that handle both types of elements identically:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the given element's connector manager, </span>
+&nbsp; <span class="gray">///</span><span class="green"> using either the family instance MEPModel or </span>
+&nbsp; <span class="gray">///</span><span class="green"> directly from the duct connector manager.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ConnectorManager</span> GetConnectorManager(
+&nbsp; &nbsp; <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Duct</span> duct = e <span class="blue">as</span> <span class="teal">Duct</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> == duct
+&nbsp; &nbsp; &nbsp; ? ( e <span class="blue">as</span> <span class="teal">FamilyInstance</span> ).MEPModel.ConnectorManager
+&nbsp; &nbsp; &nbsp; : duct.ConnectorManager;
+&nbsp; }
+</pre>
+
+<a name="3"></a>
+
+<h4>Return Max Flow for a Connector Set</h4>
+
+<p>The following method iterates over all connectors in the given set and returns the maximum flow value.</p>
+
+<p>The Flow property throws an exception unless the connector belongs to the HVAC or piping domain, so all other connectors are skipped:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve max flow from all the given connectors.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">double</span> GetMaxFlow(
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> flow = 0.0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Connector</span> c <span class="blue">in</span> connectors )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Accessing flow property requires these</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// domains or throws an exception saying </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// &quot;Flow is available only for connectors </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// of DomainHavc and DomainPiping.&quot;</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Domain</span> d = c.Domain;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Domain</span>.DomainHvac != d
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Domain</span>.DomainPiping != d )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( flow &lt; c.Flow )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; flow = c.Flow;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> flow;
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Determine Max Flow for an Element and Set its Shared Parameter</h4>
+
+<p>We use the GUID to identify the 'Duct Max Airflow' shared parameter in a language independent way.</p>
+
+<p>Then all that need to be done to process a duct element is retrieve its connectors, determine their max flow value and populate the parameter, returning an error if the latter fails:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Identify the 'Duct Max Airflow' shared parameter.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Guid</span> _shared_param_duct_max_airflow
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Guid</span>( <span class="maroon">&quot;87b12ca4-8a4c-4731-bf88-f50bccd9c5d4&quot;</span> );
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Set the max flow parameter on the given </span>
+&nbsp; <span class="gray">///</span><span class="green"> element and return true on success.</span>
+&nbsp; <span class="gray">///</span><span class="green"> This is generic, so it can handle both</span>
+&nbsp; <span class="gray">///</span><span class="green"> ducts and fittings. Later, this proved</span>
+&nbsp; <span class="gray">///</span><span class="green"> unnecessary, and we use ot for ducts only.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> SetMaxFlowOnElement( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ConnectorSet</span> connectors
+&nbsp; &nbsp; &nbsp; = GetConnectorManager( e ).Connectors;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = connectors.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> flow = GetMaxFlow( connectors );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} has {1} connector{2} and max flow {3}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ), n,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( n ), flow );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter(
+&nbsp; &nbsp; &nbsp; _shared_param_duct_max_airflow );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">//Util.InfoMsg( &quot;Please ensure that all &quot;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; + &quot;duct and their fittings have a &quot;</span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; + &quot;'Duct Max Airflow' shared parameter.&quot; );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} has no 'Duct Max Airflow' &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;shared parameter.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Store the max flow value in the specified</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// parameter on the given element.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = p.Set( flow );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+</pre>
+
+<p>This method is implemented in a generic fashion that enables it to handle fittings as well as duct elements, although we are currently only using it for the latter.</p>
+
+
+<a name="5"></a>
+
+<h4>Mainline to Retrieve and Process all Ducts</h4>
+
+<p>The external command mainline creates a transaction to enable database modification, retrieves all ducts and processes them one at a time:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == uidoc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="maroon">&quot;Please run this command &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;in a valid document context.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nDucts = 0;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="teal">Util</span>.Caption );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> ducts
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Duct</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Duct</span> duct <span class="blue">in</span> ducts )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( SetMaxFlowOnElement( duct ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nDucts;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Set max flow parameter on {0} duct{1}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; nDucts, <span class="teal">Util</span>.PluralSuffix( nDucts ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>We originally retrieved and processed the fittings in the same manner, but that proved unnecessary, so the relevant code has been commented out again.
+You can still see it in the source code download below, though, in case you have need for that functionality for other purposes.</p>
+
+
+<a name="6"></a>
+
+<h4>Conclusion</h4>
+
+<p>As said, this is all very simple.</p>
+
+<p>Next steps might include adding an external application to define a slightly nicer user interface and implementing additional functionality to populate other parameters, check for open connectors, etc.</p>
+
+<p>For the moment, here is
+
+<a href="zip/FlowParam02.zip">FlowParam02.zip</a> containing
+
+the complete source code, Visual Studio solution and add-in manifest for the command in its current state.</p>

@@ -1,0 +1,279 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+CmdSelectionChanged.cs - Implement and subscribe to a custom element selection changed event using UI Automation
+
+#revitapi
+
+-->
+
+<h3>Element Selection Changed Event</h3>
+
+<p>Many add-in developers are interested in being notified when the current selection changes in the Revit user interface.</p>
+
+<p>Among other things, it led to the implementation of the
+
+<!-- 0443 -->
+<a href="http://thebuildingcoder.typepad.com/blog/2010/09/selection-watcher-using-idling-event.html">
+selection watcher using the Idling event</a> and
+
+was one aspect of the discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html">element level events</a>.</p>
+
+<a name="2"></a>
+
+<h4>Checking for Selection Changes in Idling Event Handler</h4>
+
+<p>Ken Goulding submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html?cid=6a00e553e16897883301348655bd79970c#comment-6a00e553e16897883301348655bd79970c">
+comment</a> on
+
+that, saying:</p>
+
+<blockquote>
+<p>When you mentioned "Element Level", I was hoping that included element selection events, but that does not seem to be the case.</p>
+
+<p>As a work-around, I created this class that subscribes to the application "Idling" event and checks for selection changes.</p>
+
+<p>Given that it is an "Idling" event, I have tried to be as efficient as possible at figuring out whether a change has happened, but there may be a simpler way?</p>
+
+<p>Usage:</p>
+
+<pre class="code">
+  public Result OnStartup( UIControlledApplication a )
+  {
+    selectionChangedWatcher = new SelectionChangedWatcher( a );
+
+    selectionChangedWatcher.SelectionChanged
+      += new EventHandler(
+        selectionChangedWatcher_SelectionChanged);
+
+    // . . .
+</pre>
+
+<p>Here are the PasteBin URLs to the sample implementation code:</p>
+
+<ul>
+<li><a href="http://visualstudio.pastebin.com/X5rBXSA6">Class</a></li>
+<li><a href="http://visualstudio.pastebin.com/aNwEFRkZ">Usage</a></li>
+</ul>
+</blockquote>
+
+
+<a name="3"></a>
+
+<h4>Using a UI Automation Event to Notify Selection Changes</h4>
+
+<p>Vilo submitted a new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html?cid=6a00e553e16897883301bb0807bd22970d#comment-6a00e553e16897883301bb0807bd22970d">
+comment</a> with
+
+an updated idea based on using UI Automation instead.</p>
+
+<p>In Vilo's own words:</p>
+
+<p>As many others Revit API users, I miss the "element selection changed" API access.</p>
+
+<p>As mentioned in this post, there are several solutions, each having some caveats:</p>
+
+<ol>
+<li>Use the OnIdling event to check current selection.
+&nbsp; &ndash; This may not be reliable, because there is no guarantee it will be fired by Revit.
+Secondly, this is an asynchronous method.</li>
+
+<li>Use a Timer to raise an event at a specified interval.
+&nbsp; &ndash; More reliable, but still asynchronous and the more accurate it is (i.e. shorter timer delay), the more unneeded events are generated.</li>
+
+<li>There is a third method that solves all the above "issues":</li>
+</ol>
+
+<p>In Revit, when the user select/unselect an object, there is a special ribbon tab that dynamically changes, its name is "Modify".</p>
+
+<p>Knowing that, and using the standard Autodesk assembly "AdWindows.dll", we can register an event that will be fired when this Tab's title changes.</p>
+
+<p>Here it is the code to subscribe to the event:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( Autodesk.Windows.<span class="teal">RibbonTab</span> tab <span class="blue">in</span>
+&nbsp; &nbsp; Autodesk.Windows.<span class="teal">ComponentManager</span>.Ribbon.Tabs )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( tab.Id == <span class="maroon">&quot;Modify&quot;</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tab.PropertyChanged += PanelEvent;
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>The event handler can look like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> PanelEvent(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; System.ComponentModel.<span class="teal">PropertyChangedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( sender <span class="blue">is</span> Autodesk.Windows.<span class="teal">RibbonTab</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.PropertyName == <span class="maroon">&quot;Title&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//selection changed !</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Not the cleanest way I admit, but until Autodesk adds the relevant API methods, this is (for me) the best.</p>
+
+<p>Update:</p>
+
+<ul>
+<li>The test "if (sender is Autodesk.Windows.RibbonTab)" is not needed.</li>
+<li>The Tab's name is not dependent to current language.</li>
+</ul>
+
+<p>My Revit is in French, and the tab's name is still "Modify" at start (then it changes according to current selection of course).</p>
+
+<p>Limitation:</p>
+
+<ul>
+<li>There is actually a limitation I'm working on: the event is not fired after selecting the 3rd element (and 4th, 5th, ...) in a multiselection.</li>
+</ul>
+
+
+
+<a name="4"></a>
+
+<h4>CmdSelectionChanged</h4>
+
+<p>Jeremy adds: I implemented a new external command
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSelectionChanged.cs">
+CmdSelectionChanged</a> in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> exercising this:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">class</span> <span class="teal">CmdSelectionChanged</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">UIApplication</span> _uiapp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">bool</span> _subscribed = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">void</span> PanelEvent(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; System.ComponentModel.<span class="teal">PropertyChangedEventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( sender <span class="blue">is</span> Autodesk.Windows.<span class="teal">RibbonTab</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected sender to be a ribbon tab&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.PropertyName == <span class="maroon">&quot;Title&quot;</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids = _uiapp
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ActiveUIDocument.Selection.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = ids.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = ( 0 == n )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;&lt;nil&gt;&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ids.Select&lt;<span class="teal">ElementId</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id =&gt; id.IntegerValue.ToString() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;CmdSelectionChanged: selection changed: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + s );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _uiapp = commandData.Application;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( Autodesk.Windows.<span class="teal">RibbonTab</span> tab <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; Autodesk.Windows.<span class="teal">ComponentManager</span>.Ribbon.Tabs )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( tab.Id == <span class="maroon">&quot;Modify&quot;</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _subscribed )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tab.PropertyChanged -= PanelEvent;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _subscribed = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tab.PropertyChanged += PanelEvent;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _subscribed = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;CmdSelectionChanged: _subscribed = {0}&quot;</span>, _subscribed );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Notice that this external command toggles the event subscription on and off on each call.</p>
+
+<p>Obviously this technique would normally not be used in a command, but on startup in an external application.</p>
+
+<p>Also, accessing the ActiveUIDocument.Selection.GetElementIds method in the PanelEvent event handler is absolutely forbidden, since we are not in a valid API context at that point.</p>
+
+<p>A real application would handle this more elegantly and above all legally, e.g. by raising an external event in the PanelEvent event handler, and then accessing the selection set inside the external event handler instead.</p>
+
+<p>Still, for a quick test this works fine.</p>
+
+<p>Here is the result of launching the command, alternately selecting individual Revit elements in the model, clearing the selection set again by clicking into void space, and relaunching the command to terminate the event subscription again:</p>
+
+<pre>
+  $ grep CmdSel /tmp/sel.txt
+  CmdSelectionChanged: _subscribed = True
+  CmdSelectionChanged: selection changed: 121703
+  CmdSelectionChanged: selection changed: &lt;nil&gt;
+  CmdSelectionChanged: selection changed: 121736
+  CmdSelectionChanged: selection changed: &lt;nil&gt;
+  CmdSelectionChanged: selection changed: 121785
+  CmdSelectionChanged: selection changed: &lt;nil&gt;
+  CmdSelectionChanged: selection changed: 121812
+  CmdSelectionChanged: selection changed: &lt;nil&gt;
+  CmdSelectionChanged: selection changed: 121868
+  CmdSelectionChanged: selection changed: &lt;nil&gt;
+  CmdSelectionChanged: _subscribed = False
+</pre>
+
+
+<p>The new external command method CmdSelectionChanged lives in the module
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSelectionChanged.cs">
+CmdSelectionChanged.cs</a> in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.120.0">
+release 2015.0.120.0</a> and later of
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>

@@ -1,0 +1,287 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+- dietrichs
+    /a/special/dietrichs/doc/
+      questions_horatiu_fara.doc
+      questions_revit_api.docx
+
+-->
+
+<h3>View and Family Implementation, Booleans and Performance</h3>
+
+<p>Certain applications require large numbers of similar but different objects, e.g. for framing, scaffolding, steel detailing etc.</p>
+
+<p>Every one of the past few years, Revit has been further enhanced to better still support these kinds of applications and handle larger numbers of families and instances gracefully and performantly. This work is still on-going.</p>
+
+<p>Below, we address a bunch of questions related to creating a new wooden structural BIM application.</p>
+
+<p>One aspect of such applications is the need to generate a great number of drawings to display all the wooden structural elements of a building in the required form:</p>
+
+<ul>
+<li>Floor plans, one or more for each level</li>
+<li>Roof plans, one or more  for each roof</li>
+<li>Building sections</li>
+<li>Individual wall plans, at least one for each wall, could be 2-3 and even ten and more</li>
+<li>Individual beam plans, one for each different type of beam in the building</li>
+</ul>
+
+<p>Here is a list of questions, based on the understanding that Revit represents the real BIM objects in the drawings, so they are always up-to-date with the model.</p>
+
+<p><strong>1)</strong> If I want to represent the real objects in the plans, I understand that I have to generate a view for every element I want to represent on the drawing and place the desired views on a sheet.</p>
+
+<p><strong>1.1)</strong> How do I generate the view of a single element (e.g. a rafter of the roof) so that only this beam is visible in this view? The SketchPlane of the view should have any orientation in space (could be parallel to a roof face). Is this possible?</p>
+
+<p><strong>Answer:</strong> Yes, this is absolutely possible. You can create a separate view for each element, on the fly or permanently. You can set up that view completely as you wish, e.g. for the desired orientation and cut planes. In that view, you can hide all other elements and generate a plan of the single object of interest. I presented examples of using this technique to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/export-walls-and-floors-to-sat.html">
+export walls and floors to individual SAT files</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/driving-cnc-fabrication-and-shared-parameters.html">
+generate DXF files for CNC fabrication of wall parts</a>.</p>
+
+
+<p><strong>1.2)</strong> I also want to add some annotations (dimensions, texts) in this view. Dimensions should be up-to-date with the measured object. I suppose that choosing the correct references automatically solves this problem. In the centre of the beam appears a symbol for the length direction, represented by three blue lines forming a Z shape. This annotation (DetailCurve?) should be kept automatically up-to-date with the geometry of the beam, e.g. be always in the centre of the beam and parallel with the axis of the beam. How can I solve this?</p>
+
+<p><strong>Answer:</strong> Yes, setting up the correct references keeps the dimensioning up to date.
+If you wish to apply other automatic adjustments, you can achieve that using the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">
+dynamic model updater framework DMU</a>,
+
+as demonstrated by the DynamicModelUpdate associative section view SDK Sample.</p>
+
+
+<p><strong>1.3)</strong> How can I display several perspectives of the same element, e.g. front, rear, side and section?</p>
+
+<p><strong>Answer:</strong> Generate an individual view for every perspective and arrange the views on the sheet.</p>
+
+
+<p><strong>1.4)</strong> Does the system support such a big number of views? There could easily be several hundreds for the whole building.</p>
+
+<p><strong>Answer:</strong> Yes.</p>
+
+
+<p><strong>1.5)</strong> Is it possible to prevent the browser displaying this huge amount of views?</p>
+
+<p><strong>Answer:</strong> Yes, there are several ways to achieve this.
+Please take a look at the interesting thread on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Creating-custom-Project-Browser-plugin-Views-apply-Grouping-and/td-p/4791957">
+implementing custom view browsers</a> in
+
+the Revit API discussion forum, and the links mentioned there, e.g. to the
+
+<a href="http://youtu.be/JqRV6SLjJrM">
+Kiwi Codes Project Browser</a> demo.</p>
+
+
+<p><strong>2)</strong> I also imagine another solution to generate the drawing above in Revit could be to generate ModelCurves (or rather DetailCurves directly in the view?) out of the proper projections of the beam, arrange these curves to form the desired layout and add necessary annotations (something like one single view containing everything in the drawing above) and place this view on a sheet. Would such a solution be possible? The disadvantage is that in this situation not the real objects would be represented in the drawings, so I have to manage myself keeping the drawings up-to-date of with the model.</p>
+
+<p>The system we are developing now uses the approach described in 2) but we would prefer to represent the real model in the drawings.</p>
+
+<p><strong>Answer:</strong> This is theoretically possible but extremely hard to accomplish, and you would basically be fighting the system instead of making proper use of it. I totally understand where you are coming from, though. In traditional CAD programming, you get used to having total control and implementing exactly what you need for yourself. In Revit, you should try to forget about all that, especially when
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/porting-an-autocad-application.html">porting an AutoCAD application</a>.
+
+You really need to understand the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/02/bim-versus-free-geometry-and-product-training.html">difference between BIM versus free geometry</a>
+
+before embarking upon a Revit application project.
+Make sure you have proper in-depth product training and really understand the customer needs and optimal best practice workflows.</p>
+
+
+<p><strong>3)</strong> Generating dimensions for the beam in the drawing above, the references for the dimension are special points of the geometry generated by machining. What possibilities do I have to identify these special points? Could I attach some special information to them when they are created, so that I can find them by this information?</p>
+
+<p><strong>Answer:</strong> Interesting question. You can query the geometry of the element, and use geometrical properties to determine the required reference. You can also convert references to stable representations and back again using the ConvertToStableRepresentation and
+ParseFromStableRepresentation methods on the Reference class.
+
+
+<p><strong>3b)</strong> If a new machining appears on the beam, or if an existing machining is deleted, the dimension has to be changed. Can I add new references or delete references from an existing dimension or do I have to delete the dimension and create a new one with the same line as the old one?</p>
+
+<p><strong>Answer:</strong> It is probably simplest and maybe necessary to recreate the dimensioning from scratch.</p>
+
+
+<p><strong>4)</strong> Can I move the line of an existing dimension (in order to prevent it from overlapping with other elements)? Could I even change the direction of the line?</p>
+
+<p><strong>Answer:</strong> I believe so. It may be necessary to recreate the dimension from scratch, though.</p>
+
+
+<p><strong>5)</strong> (incomplete, skipped).
+
+<!--
+<p><strong>5)</strong> In order to create a dimension in “Floor Plans / Level 1” between two structural columns, I called the following function to get their geometry elements:</p>
+
+<p><b>???</b></p>
+
+<p>To retrieve the references for the dimension I used <b>following code</b>:</p>
+
+<p><b>???</b></p>
+
+<p>In the function AddCurvesAndSolids I called geomInst.GetSymbolGeometry in order to be able to get the references for the dimension. Although I found that the retrieved geometry is defined in the local coordinate system of the family symbol, the dimension is created correctly. I tried to call geomInst.GetSymbolGeometry(geomInst.Transform) in order to get the geometry in global coordinates. This time the dimension was not created at all. Why? I would like to understand this mechanism in detail, so that I know what I am doing.</p>
+
+<p>I defined an unbound horizontal line as the line of the dimension:</p>
+
+<p><b>???</b></p>
+
+<p>This is the result:</p>
+
+<p><b>???</b></p>
+
+<p>If I try to drag the dimension, or if I change a property like “Witness line gap to element” in the dialog box “Edit type”, the dimension line becomes parallel to the 2 references, like in the picture below:</p>
+
+<p><b>???</b></p>
+
+<p>Why does this happen?</p>
+-->
+
+<p><strong>6)</strong> While debugging, do I have any chance to see the coordinates of the two endpoints of a bound line in the Quick Watch dialog in Visual Studio?</p>
+
+<p><strong>Answer:</strong> One easy way to see all the data you are interested in at a glance is to create separate variables for them.
+Also, a very powerful way to debug and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">
+interact intimately with the model and API simultaneously</a> is
+
+to use the Revit Python or Ruby scripting shells.</p>
+
+
+<p><strong>7)</strong> While debugging, can I inspect the geometry (displaying coordinates of end points of edges) of a family instance in the Quick Watch dialog in Visual Studio? If this is not possible, is there any tool to help me do this? I tried with RevitLookup, but there I only see the local coordinates of the geometry, not the global ones, after the transform is applied.</p>
+
+<p><strong>Answer:</strong> Please look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/lots-of-clouds.html#6">RevitLookup update on GitHub</a>.
+
+It includes extended functionality for snooping of geometry, FormatOptions and RevitLinkInstances.
+
+I also developed some own tools in that direction, e.g. the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html">
+GeoSnoop .NET boundary curve loop visualisation</a> tool
+
+used for my room editor
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html">
+room and furniture loops</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/security-framing-cross-section-analyser-and-rex.html">
+structural framing cross sections</a>.
+
+You will probably have to develop some of you own as well to achieve exactly what you need.
+I hope you implement the in a fashion generic enough to be useful and shareable with the entire Revit add-in developer community  :-)</p>
+
+
+<p><strong>8)</strong> In the Revit SDK 2014 Samples, the transaction starts very early and includes all preparations for the object to be generated into the database. In other examples I saw that the transaction starts only before a database-resident object is about to be created, all preparations take place before the transaction starts. What is the best practice here?</p>
+
+<p><strong>Answer:</strong> I use the latter approach and would recommend that to you as well.</p>
+
+
+<p><strong>9)</strong>	When I create a CurveArray or CurveArrArray using the Application.Create class, memory is allocated directly in the Revit application and not in the memory of add-in application;  what are the reasons to use the Revit application memory and not allocate these collections directly using new?</p>
+
+<p><strong>Answer:</strong> "Ours is not to wonder why &ndash; ours is but to do or die." That is a design decision made by the Revit API team. Oh yes, it may also have to do with sharing objects and code between the external .NET memory space and the internal Revit universe. In general, we are trying to align the API more closely with the Revit internals, and also empower the API to enable parts of Revit to be implemented based on it, i.e. migrated out from the Revit kernel into the add-in space. This is an important step towards enabling more teams to work together more independently on different areas of the Revit product, similar to the kind of development separation and independence that ObjectARX enabled for AutoCAD.</strong>
+
+
+<p><strong>10)</strong> It is possible to modify the geometry of a beam directly in the project model? Generally, our beams will contains a lot of machinery and almost all beams will have a different geometry. We have only been able to modify the geometry of a beam by modifying the geometry of the family defining it. In that case we should create for each particular beam a new family and there process all changes in the family geometry. There is any other way to do several changes in the geometry of a FamilyInstance object &ndash; JointGeometryUtils in not enough for us?</p>
+
+<p><strong>Answer:</strong> Currently, the only way to modify geometry in the fashion you describe in the project environment is the use of void cuts.
+Here is an overview of some of the available
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">3D Boolean operation and element cutting</a> functionality.</p>
+
+
+<p><strong>11)</strong> We understand that is possible to create complex families based on the parametric values and formulas that take into consideration parameters. Using instance parameters we can manipulate the geometry of each instance of that family types &ndash; one simple example is this
+
+<a href="http://www.revitzone.com/family-creation/107-creating-a-parametric-rafter">creation of a parametric rafter</a>.
+
+Is it possible to add conditional rules such that some parts of the geometry will be generated or not according with some instance parameters values?
+This is related to previous point.</p>
+
+<p><strong>Answer:</strong> Yes. Furthermore, retaining as much of this logic as possible in the family definition seems to be the more performant way to go right now, rather than adding void cuts etc. afterwards in the project.</strong>
+
+
+<p><strong>12)</strong> Using the Revit API we try to create a new family, generate its geometry and load the new family into the project model using Document.LoadFamily(Document, IloadFamilyOptions). We obtain an Exception during the loading process. The same problem appears also in the SDK Sample FreeFormElement and in the BeamMaker project from your blog that do the same thing. We work in Visual Studio 2014. If we save the new family into the new RFA file and then we load it by reading the file, everything works very well. Are there any limitations there when manipulating new families?</p>
+
+<p><strong>Answer:</strong> Are you sure you are using the most current update release?
+I encountered that issue myself and am pretty sure it has been resolved.
+Even if not, all you have to do is save the RFA file and load the family from there, just as you say.
+I implemented code to handle both situations to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/06/creating-and-inserting-an-extrusion-family.html">create and insert an extrusion family</a>.
+
+I recently tested the FreeFormElement SDK sample again and did not observe any such issue.</p>
+
+
+<p><strong>13)</strong> How can I retrieve the relations between beams and architectural elements like walls, roofs, floors, to know which host object the beams belongs to? I understand that openings, doors, for example, have that relationship &ndash; the Host property of the openings returns the wall containing it.</p>
+
+<p><strong>Answer:</strong> There are a number of different ways to retrieve that relationship information, depending on various circumstances.
+In a structural model, the structural analysis support information may return this.
+For a generic solution, you can use ray casting or element filtering based on proximity, e.g. to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/09/filter-for-touching-beams-using-solid-intersection.html">
+filter for touching beams using solid intersection</a> or
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/03/supporting-columns.html#2">
+determine the columns supporting a beam</a>.</p>
+
+
+<p><strong>14)</strong> In case of beams if we create a beam in a work plane defined on the architectural element, will the HostFace property return a reference to the architectural element?</p>
+
+<p><strong>Answer:</strong> That is something you would have to try out for yourself in your own model and under your own specific circumstances.
+The initial tool of choice for such exploration is RevitLookup and the BimChecker.
+For more
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">
+intimately interact with the model and API</a> at
+
+the same time, you could turn to the
+
+<a href="http://code.google.com/p/revitpythonshell">
+Revit Python Shell</a> or
+
+<a href="https://github.com/hakonhc/RevitRubyShell">
+Revit Ruby Shell</a>.
+
+
+
+<p><strong>15)</strong> Revit API we can add only shared parameters, and not project parameters like in Revit UI? Also for a family?</p>
+
+<p><strong>Answer:</strong> Correct.</p>
+
+
+<p><strong>16)</strong> Only one compound structure can be attached to a FootPrintRoof &ndash; is it possible to have different layer structure for each roof face?</p>
+
+<p><strong>Answer:</strong> As far as I know, the compound layer structure is associated with the roof type.
+Therefore, all roofs of a given type will share the same layer structure.
+If you would like it to vary, you will need to use different types for the different faces.</p>
+
+
+<p><strong>17)</strong> Can we create parts of a FootPrintRoof to obtain the layer geometry, similarly as you demonstrate to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">retrieve detailed wall layer geometry</a>?</p>
+
+<p><strong>Answer:</strong> I would assume that the slab can be separated into parts, just like a wall.</p>
+
+
+<p><strong>18)</strong> Do Ceiling and Floor elements have any significant structural difference?</p>
+
+<p><strong>Answer:</strong> Not that I am aware of.</p>
+
+
+<p><strong>19)</strong> Can a Ceiling element be created by API?</p>
+
+<p><strong>Answer:</strong> Not that I am aware of.</p>
+
+<p>Thank you for these interesting questions.
+Here are some more discussions related to performance handling large numbers of family instances and adding Boolean operations to them:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/performance-profiling.html">Performance Profiling</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/beam-maker-using-a-void-extrusion-to-cut.html">Beam Maker Using a Void Extrusion to Cut</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">Boolean Operations and InstanceVoidCutUtils</a></li>
+</ul>
+

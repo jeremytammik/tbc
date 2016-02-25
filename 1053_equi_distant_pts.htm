@@ -1,0 +1,249 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08928276 [How to get evaluate the points using distance on the NurbSpline?]
+
+Senthilkumar C K, Quickpen Intl
+
+-->
+
+<h3>Placing Equidistant Points Along a Curve</h3>
+
+<p>How can one generate equidistant points along a Revit curve element?</p>
+
+<p>This is not completely trivial, since the Revit API only provides functionality to evaluate the curve based on its internal parameterisation, and not based on real world space coordinates.</p>
+
+<p>I recently showed how to create a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/generating-a-midcurve-between-two-curve-elements.html">
+midcurve between two curve elements</a>,
+
+also based on evaluating the two curves in their natural internal parameterisation space.</p>
+
+<p>Now I looked at the task of placing equidistant points along a curve with the distance measured in real world coordinates instead of the curve parameterisation ones, prompted by the following developer query:</p>
+
+
+<p><strong>Question:</strong> I am trying to evaluate equidistant points on a NurbSpline.
+There is a method called Curve.Evaluate.
+It takes a parameter as input.
+I tried to use the following code to find the parameters to calculate the points at the required distances:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">double</span> param1 = curve.GetEndParameter(0);
+&nbsp; <span class="blue">double</span> param2 = curve.GetEndParameter(1);
+&nbsp;
+&nbsp; <span class="blue">double</span> paramCalc = param1 + ((param2 - param1)
+&nbsp; &nbsp; * requiredDist / curveLength);
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> evaluatedPoint = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">if</span> (curve.IsInside(paramCalc))
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> normParam = curve
+&nbsp; &nbsp; &nbsp; .ComputeNormalizedParameter(paramCalc);
+&nbsp;
+&nbsp; &nbsp; evaluatedPoint = curve.Evaluate(
+&nbsp; &nbsp; &nbsp; normParam, <span class="blue">true</span>)));
+&nbsp; }
+</pre>
+
+<p>This code works fine for Arc and Line, but not for splines.</p>
+
+<p>It seems we may need to use the spline knots and weights for the NurbSpline calculations.</p>
+
+<p>Is there any other way to evaluate the points at the required distances for NurbSpline?</p>
+
+<p>I implemented a sample command that places equally spaced circles on a selected curve at distances of 5 feet.
+Here is one result of running it:</p>
+
+<center>
+<img src="img/equi_distant_points_on_curve_1.jpg" alt="Non-equi-distant points along spline curve" width="400"/>
+</center>
+
+<p>As you can see, the points on the arc are placed at the required distance, but not on the spline.</p>
+
+<p>How can I solve this, please?</p>
+
+
+
+<p><strong>Answer:</strong> You will be glad to hear that this can be solved, and it is easy.</p>
+
+<p>As said, I recently discussed generating a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/generating-a-midcurve-between-two-curve-elements.html">
+midcurve between two curve elements</a>.</p>
+
+<p>In that implementation, I move along the curve using a fixed step size in the curve parameter space.</p>
+
+<p>Equal distances in the curve parameter space are transformed to non-equal distances in real world coordinates, especially when moving along a spline with sharp bends in it, as you discovered for yourself in your sample.</p>
+
+<p>Determining points at equidistant positions along the curve, measured along the curve in real world coordinates instead of curve parameterisation coordinates, basically requires integration.
+You need to evaluate the curve step by step in very small increments and measure the sum of distances between the evaluation points until you reach the desired distance, then add a new marker point at that position.</p>
+
+<p>If the number of intermediate vertices returned by the standard Revit API curve Tessellate method is sufficient, you could use those to step along the curve. If you require a higher precision, you can generate the intermediate integration points yourself using the curve Evaluate or ComputeDerivatives method.</p>
+
+<p>I implemented a new external command named EquiDistantPointEval to test a simple implementation of this algorithm.</p>
+
+<p>First, here is the helper method that I adapted from your sample to create the marker circles:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create a horizontal detail curve circle of </span>
+&nbsp; <span class="gray">///</span><span class="green"> the given radius at the specified point.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">DetailArc</span> CreateCircle(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">XYZ</span> location,
+&nbsp; &nbsp; <span class="blue">double</span> radius )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> norm = <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> startAngle = 0;
+&nbsp; &nbsp; <span class="blue">double</span> endAngle = 2 * <span class="teal">Math</span>.PI;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = <span class="blue">new</span> <span class="teal">Plane</span>( norm, location );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Arc</span> arc = <span class="teal">Arc</span>.Create( plane,
+&nbsp; &nbsp; &nbsp; radius, startAngle, endAngle );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> doc.Create.NewDetailCurve(
+&nbsp; &nbsp; &nbsp; doc.ActiveView, arc ) <span class="blue">as</span> <span class="teal">DetailArc</span>;
+&nbsp; }
+</pre>
+
+<p>With that in place, the external command performs the following steps:
+
+<ul>
+<li>Prompt the user to select a curve element.</li>
+<li>Test its validity.</li>
+<li>Extract data from the selected curve.</li>
+<li>Create a list of equi-distant points along the curve.</li>
+<li>Place a marker circle at each point.</li>
+</ul>
+
+<p>Here is the entire implementation of the external command Execute mainline method achieving this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Reference</span> r = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CurveSelectionFilter</span>(),
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick an arc or spline to select path&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == r )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Null pick object reference.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( r );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e || !( e <span class="blue">is</span> <span class="teal">CurveElement</span> ) )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Not a curve element.&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Extract data from the selected curve.</span>
+&nbsp;
+&nbsp; <span class="teal">Curve</span> curve = ( e <span class="blue">as</span> <span class="teal">CurveElement</span> ).GeometryCurve;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">XYZ</span>&gt; tessellation = curve.Tessellate();
+&nbsp;
+&nbsp; <span class="green">// Create a list of equi-distant points.</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( 1 );
+&nbsp;
+&nbsp; <span class="blue">double</span> stepsize = 5.0;
+&nbsp; <span class="blue">double</span> dist = 0.0;
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p = curve.GetEndPoint( 0 );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> q <span class="blue">in</span> tessellation )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == pts.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pts.Add( p );
+&nbsp; &nbsp; &nbsp; dist = 0.0;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; dist += p.DistanceTo( q );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( dist &gt;= stepsize )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; pts.Add( q );
+&nbsp; &nbsp; &nbsp; &nbsp; dist = 0;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; p = q;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Place a marker circle at each point.</span>
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Draw Curves at Points&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> pt <span class="blue">in</span> pts )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CreateCircle( doc, pt, 1 );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>In its current state, it does not support straight lines properly.
+Since the tessellation of those returns just two points, it only places a marker at the start point, if it is shorter than the required distance, and at the start and end point, if it is longer.</p>
+
+<p>Here is the result of running it in your sample model:</p>
+
+<center>
+<img src="img/equi_distant_points_on_curve_2.png" alt="Equi-distant points along spline curve" width="400"/>
+</center>
+
+<p>I hope this answers your question.</p>
+
+<p>Here is
+
+<a href="zip/EquiDistantPointEval.zip">EquiDistantPointEval.zip</a> containing
+
+the full source code, Visual Studio solution and add-in manifest for this external command.</p>
+
+
+
+<a name="2"></a>
+
+<h4>How to Unjoin Lines</h4>
+
+<p>Before we close for today, here is a note to highlight a neat trick that was just mentioned on the Autodesk discussion forum on the topic of
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Unjoin-Lines/td-p/4544099">
+unjoining lines:</a></p>
+
+<p>"For model lines, I believe if you change one of the lines to a different workset it will cause it to be unjoined.
+Then you could move it back to the original workset."</p>

@@ -1,0 +1,189 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Katsuaki Takamizawa (Contingent) 
+FW: TextNote Leader
+
+From: Katsuaki Takamizawa (Contingent)
+Sent: Tuesday, February 18, 2014 9:12 AM
+To: Revit API
+Subject: TextNote Leader
+
+From: Jim Jia 
+Date: Wednesday, February 19, 2014 07:39
+To: "Katsuaki Takamizawa (Contingent)" 
+Subject: RE: TextNote Leader
+
+Hi Katsu,
+
+
+
+Jim
+-->
+
+<h3>TextNote Leader Alignment</h3>
+
+<p>Let us explore <a href="#2">TextNote leader alignment</a>.</p>
+
+<p>Before getting to that, I'll just briefly mention that I still have unused vacation days from last year to use up, so I am going away again, this time on a desert hike near
+
+<a href="http://en.wikipedia.org/wiki/Zagora,_Morocco">Zagora</a> in Morocco.</p>
+
+<center>
+<img src="img/220px_Maroc_dune_de_Chegaga.jpg" alt="Desert dune" width="220"/>
+</center>
+
+<p>No computer, no Internet, no blog...</p>
+
+
+<a name="2"></a>
+
+<h4>TextNote Leader Alignment</h4>
+
+<p>Here is one last topic before I leave, contributed by my colleague
+
+<a href="http://adndevblog.typepad.com/aec/katsuaki-takamizawa.html">Katsuaki Takamizawa</a>, with help from Jim Jia and Pawel Madej of the Revit development team:</p>
+
+<p><strong>Question:</strong> I am calling the NewTextNote method and specifying the leader elbow and text origin at the same height in an attempt to make the second leader segment horizontal.
+
+<p>However, the text is always shifted down a bit like this:</p>
+
+<center>
+<img src="img/textnote_leader_1.jpeg" alt="TextNote leader shifted downwards" width="459"/>
+</center>
+
+<p>As you can see, the text  is shifted downward in comparison to the horizontal detail line segment.</p>
+
+<p>I produced this test by drawing a detail line vertically and then horizontally, running my add-in and picking the points for the leader end, leader elbow, and text position along this detail line.</p>
+
+<p>How can I make the second leader segment horizontal?</p>
+
+
+
+<p><strong>Answer 1:</strong> A workaround to make the second segment horizontal is provided by this code snippet:
+
+<pre class="code">
+&nbsp; <span class="green">// Create text note without leader first</span>
+&nbsp;
+&nbsp; <span class="teal">TextNote</span> text = doc.Create.NewTextNote(
+&nbsp; &nbsp; view, ptTextOrigin, baseVec, ptVec,
+&nbsp; &nbsp; lineWidth, textAlign, strText);
+&nbsp;
+&nbsp; <span class="green">// Create leader for the new text: </span>
+&nbsp; <span class="green">// change the leader elbow and end;</span>
+&nbsp; <span class="green">// note that the elbow's Y should not be </span>
+&nbsp; <span class="green">// changed to keep horizontal!</span>
+&nbsp;
+&nbsp; <span class="blue">if</span> (bLeader)
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Leader</span> noteLeader = text.AddLeader(
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteLeaderTypes</span>.TNLT_STRAIGHT_R);
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use default Y!</span>
+&nbsp;
+&nbsp; &nbsp; noteLeader.Elbow = <span class="blue">new</span> <span class="teal">XYZ</span> (point1.X,
+&nbsp; &nbsp; &nbsp; noteLeader.Elbow.Y, point1.Z );
+&nbsp;
+&nbsp; &nbsp; noteLeader.End = point1;
+&nbsp; }
+</pre>
+
+<p>Note that the workaround unfortunately introduces another issue: the specified elbow end Y doesn’t take effect anymore.</p>
+
+<p><strong>Answer 2:</strong> You can combine the desired text alignment flags using bit-wise Boolean operations.</p>
+
+<p>In your original code, you are using</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TextAlignFlags</span> textAlign
+&nbsp; &nbsp; = <span class="teal">TextAlignFlags</span>.TEF_ALIGN_CENTER;
+</pre>
+
+<p>Try using this instead:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TextAlignFlags</span> textAlign
+&nbsp; &nbsp; = <span class="teal">TextAlignFlags</span>.TEF_ALIGN_MIDDLE
+&nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_CENTER;
+</pre>
+
+<p>The result is close to horizontal:</p>
+
+<center>
+<img src="img/textnote_leader_2.png" alt="TextNote leader almost horizontal" width="332"/>
+</center>
+
+
+
+<p><strong>Response:</strong> I combined the two suggested approaches to obtain a very good result.</p>
+
+<p>Here are some resulting samples using different TextAlignFlags values:</p>
+
+<center>
+<img src="img/textnote_leader_3.jpeg" alt="TextNote leader alignment" width="589"/>
+</center>
+
+<p>Here is the code that I used to generate these:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">XYZ</span> leaderOrigin = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; <span class="maroon">&quot;Pick Leader End&quot;</span> );
+&nbsp;
+&nbsp; <span class="green">//XYZ leaderElbow = uidoc.Selection.PickPoint(</span>
+&nbsp; <span class="green">//&nbsp; &quot;Pick Leader Elbow&quot;);</span>
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> ptTextOrigin = uidoc.Selection.PickPoint(
+&nbsp; &nbsp; <span class="maroon">&quot;Pick Text Origin&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tr = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tr.Start( <span class="maroon">&quot;NewTextNote&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> baseVec = <span class="teal">XYZ</span>.BasisX;
+&nbsp; &nbsp; <span class="teal">XYZ</span> upVec = <span class="teal">XYZ</span>.BasisY;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> lineWidth = 0.06;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//TextAlignFlags textAlign </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; = TextAlignFlags.TEF_ALIGN_CENTER;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//TextAlignFlags textAlign </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; = TextAlignFlags.TEF_ALIGN_MIDDLE </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; | TextAlignFlags.TEF_ALIGN_CENTER;</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TextAlignFlags</span> textAlign
+&nbsp; &nbsp; &nbsp; = <span class="teal">TextAlignFlags</span>.TEF_ALIGN_MIDDLE
+&nbsp; &nbsp; &nbsp; | <span class="teal">TextAlignFlags</span>.TEF_ALIGN_RIGHT;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> strText = <span class="maroon">&quot;ABCDEFGH&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create text note without leader first</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TextNote</span> text = doc.Create.NewTextNote(
+&nbsp; &nbsp; &nbsp; view, ptTextOrigin, baseVec, baseVec,
+&nbsp; &nbsp; &nbsp; lineWidth, textAlign, strText );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Create leader for the new text: </span>
+&nbsp; &nbsp; <span class="green">// change the leader elbow and end;</span>
+&nbsp; &nbsp; <span class="green">// note that the elbow's Y should not be </span>
+&nbsp; &nbsp; <span class="green">// changed to keep horizontal!</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Leader</span> noteLeader = text.AddLeader(
+&nbsp; &nbsp; &nbsp; <span class="teal">TextNoteLeaderTypes</span>.TNLT_STRAIGHT_R );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Use default Y!</span>
+&nbsp;
+&nbsp; &nbsp; noteLeader.Elbow = <span class="blue">new</span> <span class="teal">XYZ</span>( leaderOrigin.X,
+&nbsp; &nbsp; &nbsp; noteLeader.Elbow.Y, leaderOrigin.Z );
+&nbsp;
+&nbsp; &nbsp; noteLeader.End = leaderOrigin;
+&nbsp;
+&nbsp; &nbsp; tr.Commit();
+&nbsp; }
+</pre>
+
+<p>Many thanks to Katsu-san, Jim and Pawel for this useful research and solution!</p>

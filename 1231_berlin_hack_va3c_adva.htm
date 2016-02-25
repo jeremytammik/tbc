@@ -1,0 +1,479 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+- http://forums.Autodesk.com/t5/revit-api/convert-to-survey-points/m-p/5361921
+  avoid converting units
+
+- RvtVa3c update: added support for runtime reading of user settings and switch between indented JSON or not to optionally reduce file size
+  https://github.com/va3c/RvtVa3c
+  https://github.com/va3c/RvtVa3c/releases/tag/2015.0.0.25
+  http://www.blackbeltcoder.com/Articles/winforms/a-custom-settings-class-for-winforms
+  A Custom Settings Class for WinForms
+  by Jonathan Wood, the Black Belt Coder
+
+- /a/doc/revit/blog/img/collada_stl_export_settings.png
+
+- Peter Schlipf ADN All https://internal.autodesk360beta.com/portal/groups/2013071140751/home/ADN+All
+  3 files uploaded
+  P1000349.JPG
+  P1000343.JPG
+  P1000357.JPG
+  collada_stl_export_settings.png
+  tmuhack_us4.jpg
+  tmuhack_m3my.jpg
+
+- http://through-the-interface.typepad.com/through_the_interface/2014/10/autocad-io-api-a-new-batch-processing-web-service.html
+  look at making programmatically making use of AutoCAD core services via a web service
+  one of these days, something similar might become available for Revit as well
+  this is just a personal guess, of course
+
+- http://through-the-interface.typepad.com/through_the_interface/2014/10/adding-speech-recognition-to-our-stereoscopic-google-cardboard-viewer.html
+  theo armour, vA3C initiator
+
+- vA3C update
+  The latest release of the VA3C Viewer is looking good
+  http://va3c.github.io/viewer/va3c-viewer-html5/latest/
+  For example, click on the permalinks tab and then generate an 'autocrapdoodle'. Can you do that with any other viewer?
+  Feedback
+  It would be great to hear from you that something in this effort is worthwhile or useful to you.
+  After all, virtually everything we set out to do back in May is being done - sometimes elegantly, some times no so, but never mind
+  Bugs, broken bits, incomplete stuff: no need to report. These are nearly self-evident.
+  Was what we asked for the right thing to ask for? How would you change things for the better?
+  Next Steps
+  Over the summer, I thought the work on the viewer would finish and I could get back to my 3D mapping work and etc.
+  In the last few weeks, those thoughts have kind of been exploded. I am coming to the realization that we asked for just the tip of the iceberg.
+  Metaphorically, the viewer is can be seen as theatrical stage set. The next step is to use this stage to produce theater.
+  Example
+  You all know about Occulus Rift, Google Cardboard, Magic Leap and the whole virtual reality thing is exploding.
+  A few weeks ago I built a Google Cardboard Three.js Viewer template.
+  http://jaanga.github.io/cookbook/cardboard/readme-reader.html
+  The intention is to build this capability into the vA3C Viewer.
+  But guess who used my templates and got there first? The Autodesk 360 Viewer!?!
+  My new friend (and Jeremy's colleague ) Kean Walmsley was pointed in our direction by Jim Quanci and Cyrille F and he came up with the following which he showed at the recent VR Hackathon here.
+  http://through-the-interface.typepad.com/through_the_interface/2014/10/autocad-io-api-a-new-batch-processing-web-service.html
+  Gearing up for the VR Hackathon
+  Not only that, but he has already built demos on top of my voice recognition template:
+  http://jaanga.github.io/cookbook/voice-commands/readme-reader.html
+  And there's much much more beyond this. But let's keep things simple. Here's what's needed:
+  Team Required
+  From my point of view, this all looks likes the start of a classic Internet disruption by a small start-up.
+  The technology is there, the industry that needs disrupting (AEC) is obediently stagnating. All that's needed is the founders...
+  Theo
+
+
+-->
+
+<h3>Berlin Hackathon Results, 3D Viewer and Web News</h3>
+
+<p>We completed the Berlin hackathon last weekend, and many other noteworthy and exciting things are going on, concerning the Revit API, the 3D web viewers, web services and more:</p>
+
+<ul>
+<li><a href="#2">Berlin hackathon projects and winners</a></li>
+<li><a href="#3">Avoid unnecessary unit conversion</a> &ndash; embrace the natives</li>
+<li><a href="#4">3D viewer news</a></li>
+<li><a href="#5">AutoCAD as a web service</a></li>
+<li><a href="#6">Collada STL ADVA export settings</a></li>
+<li><a href="#7">RvtVa3c update</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Berlin Hackathon Projects and Winners</h4>
+
+<p>The
+
+<a href="https://twitter.com/hashtag/tmuhack">Berlin hackathon</a> completed and the winners were announced last weekend.</p>
+
+<p>I took notes of four teams' project presentations:</p>
+
+<ul>
+<li>US4, us four &ndash;
+social data visualisation in 3D;
+create JSON data to display 3D graph to visualise friends, followers, business contacts, etc. in the browser;
+technology: looked at the Autodesk viewer, thinking of feeding it via OBJ files;
+generating these files is harder than using straight three.js, though;
+extract data from github, twitter, facebook, etc.</li>
+
+<li><a href="https://m3my.github.io">MovieMemory</a> &ndash;
+We built a game using <a href="https://www.firebase.com">Firebase</a>, recently acquired by Google and rather pricey.
+It also uses nodejs, angular, npm, bower and grunt.
+We also looked at Meteor as a smaller, simpler, more self-contained db alternative.
+Some see it <a href="http://differential.io/blog/meteor-vs-angular">Meteor as an alternative to angular</a>;
+Meteor can also be used <a href="http://angularjs.meteor.com/tutorial">in conjunction with Angular</a>.
+We grabbed movie details from both <a href="http://www.imdb.com">imdb</a> and <a href="https://www.wikipedia.org">wikipedia</a>
+and sent them through the <a href="http://www.neofonie.de">neophonie</a> web service to automatically extract keywords for each film.
+The film poster is grabbed from imdb as well.
+Did you know about <a href="http://dbpedia.org/sparql">sparql</a>, enabling you to query wikipedia programmatically as a database?
+Two cards are generated for each film: one with the keywords, the other with the banner.
+The aim is to reveal cards, remember their locations, and match as many pairs as possible.</li>
+
+<li>Shopoolit by Pawan &ndash;
+four sections: popular stores, favourites, inspire;
+add to favourites, add to schedule;
+see details: who is going, with peer to peer rating;
+activity list linked to calendar, saved in list, scroll, share these plans, see number of requests;
+see pending and accepted requests;
+basic profile, photo and basic bio or facebook.</li>
+
+<li>Tourist attraction web scraper by Jake, like 360 cities, and reminiscent of my recent
+<a href="http://poipointer.github.io">PoiPointer</a> project:
+scrape images of tourist attractions for any city, display images, work in app on phone;
+mobile city trip planner;
+when out walking, you see something and don't know what it is;
+take a picture, take image, compare with google images, identify object, return description from wikipedia;
+what technologies? node and amber in front and back, python script to scrape sites.</li>
+</ul>
+
+<p>The first place was awarded the US4 team.
+Here they are after Peter Schlipf presented them the main prize, four smart watches sponsored by Autodesk:</p>
+
+<!--!
+<center>
+<img src="img/tmuhack_us4.jpg" alt="US4 TMUHack winners" width="400"/>
+</center>
+-->
+
+<center>
+<img src="img/tmuhack_us4_2.jpg" alt="US4, TMUHack winners" width="400"/>
+</center>
+
+
+<p>The second place went to the <a href="http://m3my.github.io">MovieMemory</a> team:</p>
+
+<center>
+<img src="img/tmuhack_m3my_2.jpg" alt="MovieMemory, TMUHack runners-up" width="400"/>
+</center>
+
+<p>They were awarded the <a href="http://www.neofonie.de">neophonie</a> prize, a drone helicopter with built-in camcorder.</p>
+
+<p>Here they are during the live presentation of their newly created online <a href="http://moviememory.de">movie memory game</a>:</p>
+
+<center>
+<img src="img/tmuhack_m3my.jpg" alt="MovieMemory, TMUHack runners-up" width="400"/>
+</center>
+
+<p>You can try out MovieMemory live yourself right now.
+You need a partner to get going.
+Simply go to <a href="http://moviememory.de">moviememory.de</a>, copy the game link created and pass it on to your playing partner to start playing right away:</p>
+
+<center>
+<img src="img/moviememory.png" alt="MovieMemory start page" width="460"/>
+</center>
+
+
+<a name="3"></a>
+
+<h4>Avoid Unnecessary Unit Conversion &ndash; Embrace the Natives</h4>
+
+<p>Here is some valuable and sound advice on working in native units and avoiding unnecessary conversions provided by Scott Wilson in his answers to the Revit API discussion thread on
+
+<a href="http://forums.Autodesk.com/t5/revit-api/convert-to-survey-points/m-p/5361921">
+converting survey points</a>:</p>
+
+<p><strong>Question:</strong> I am extracting four corners of a rectangular column.
+My code works perfectly in one project but not in another.
+The only difference between the two that I noticed is that the project and survey points are the same in the first, whereas they differ in the second.</p>
+
+<p><strong>Answer:</strong> From a quick look through the code, it looks like you might be mixing your dimensional units.
+Are the points out by a multiple of 304.8 by any chance?</p>
+
+<p>Halfway through you are converting from feet to millimetres (parameter values h and b); later, you apply a transform (with its translation values in feet) to points created using these metric values.
+I suspect that the error is masked in your first project due to the translation from project to survey points being zero.</p>
+
+<p>I'd suggest leaving all dimensions in feet until you need to display or export them.</p>
+
+<p><strong>Response:</strong> Yes I am multiplying by 304.8 as Revit returns the values in feet but the project is in millimetres.</p>
+
+<p>What should I do to resolve the issue?</p>
+
+<p><strong>Answer:</strong> Why do you need to convert into metric during the calculation?</p>
+
+<p>I can't see anywhere in the code snippet where you are displaying or exporting the interim values, so just leave them all in feet and let Revit work in its native units. <u>If you need the output values in metric, convert them as the last step</u>.</p>
+
+<p>I also just noticed that you are converting the location point rotation into degrees and then round that to the nearest degree.
+You then convert this rounded value back into radians to perform some trig calcs.
+This is going to be quite inaccurate and inconsistent, just leave angles in raw radians without rounding.</p>
+
+<p>Don't convert / mix units or perform rounding mid-way through a calculation, you are just asking for trouble.
+<u>If you are uncomfortable working in feet and radians, I'd suggest making the effort to embrace them</u>.</p>
+
+<p>Many thanks to Scott for this recommendation, and for his numerous other great replies in the Revit API discussion forum!</p>
+
+<p>Please everybody take heed of this very sound advice!</p>
+
+
+<a name="4"></a>
+
+<h4>3D Viewer News</h4>
+
+<p>Theo Armour, initiator of the
+
+<a href="https://va3c.github.io">vA3C open source three.js AEC 3D model viewer</a> posted
+
+an update on the current vA3C status and the following call to action:</p>
+
+<blockquote>
+<p>The <a href="http://va3c.github.io/viewer/va3c-viewer-html5/latest">latest release of the vA3C Viewer</a> is looking good.</p>
+<p>It would be great to hear from you that something in this effort is worthwhile or useful to you.</p>
+<p>Virtually everything we set out to do back in May is being done &ndash; sometimes elegantly, some times not so, but never mind.</p>
+<p>Over the summer, I thought the work on the viewer would finish and I could get back to my 3D mapping work and etc.</p>
+<p>In the last few weeks, those thoughts have kind of been exploded. I am coming to the realization that we asked for just the tip of the iceberg.</p>
+<p>Metaphorically, the viewer is can be seen as theatrical stage set. The next step is to use this stage to produce theatre.</p>
+<p>For example, you all know Oculus Rift, Google Cardboard, Magic Leap and the whole virtual reality thing is exploding.</p>
+<p>A few weeks ago I built a <a href="http://jaanga.github.io/cookbook/cardboard/readme-reader.html">Google cardboard three.js viewer template</a>.</p>
+<p>The intention is to build this capability into the vA3C Viewer.</p>
+<p>But guess who used my templates and got there first? The Autodesk 360 Viewer!</p>
+<p>My new friend (and Jeremy's colleague) Kean Walmsley was pointed in our direction by Jim Quanci and Cyrille Fauvel and started <a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/autocad-io-api-a-new-batch-processing-web-service.html">gearing up for the VR Hackathon</a>.</p>
+<p>Not only that, but he has already built demos on top of my <a href="http://jaanga.github.io/cookbook/voice-commands/readme-reader.html">voice recognition template</a> and produced the series of further exciting results listed below.</p>
+<p>And there's much, much more beyond this. </p>
+<p>From my point of view, this all looks like the start of a classic Internet disruption by a small start-up.</p>
+<p>The technology is there; the industry that needs disrupting (AEC) is obediently stagnating.</p>
+<p>All that's needed is the founders...</p>
+</blockquote>
+
+<p>Here is an overview if Kean's recent posts:</p>
+
+<ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/gearing-up-for-the-vr-hackathon.html">Gearing up for the VR Hackathon</a></li>
+<li>Creating a stereoscopic viewer for Google Cardboard using the Autodesk 360 viewer:</li>
+<ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/creating-a-stereoscopic-viewer-for-google-cardboard-using-the-Autodesk-360-viewer-part-1.html">Part 1</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/creating-a-stereoscopic-viewer-for-google-cardboard-using-the-Autodesk-360-viewer-part-2.html">Part 2</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/creating-a-stereoscopic-viewer-for-google-cardboard-using-the-Autodesk-360-viewer-part-3.html">Part 3</a></li>
+</ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/vr-hackathon-2014-in-sf.html">VR Hackathon 2014 in SF</a></li>
+</ul>
+
+<p>Too exciting to miss!</p>
+
+
+<a name="5"></a>
+
+<h4>AutoCAD as a Web Service</h4>
+
+<p>After all the exciting 3D stuff listed above, Kean went on to write about
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2014/10/autocad-io-api-a-new-batch-processing-web-service.html">
+making programmatic use of the AutoCAD core services via a web service</a>.</p>
+
+<p>This is another topic that every application developer should be thinking about and aware of.</p>
+
+<p>Just as Theo points out, things are really taking off!</p>
+
+
+<a name="6"></a>
+
+<h4>Collada STL ADVA Export Settings</h4>
+
+<p>Talking about the 3D viewer, I built my daughter Marie a new writing desk, and a friend of hers created this model of Maria's room to discuss our plan:</p>
+
+<!--
+<center>
+<iframe
+  id="AEC-viewer"
+  title="AEC Kitchen Model"
+  width="470"
+  height="264"
+  src="https://s3.amazonaws.com/FastViewer/index.html?file=Revit_Kitchen/0.svf"
+  frameborder="0"
+  name="aec_viewer">
+&lt;div class="UserGeneric"&gt;The current browser does not support Web pages that contain the IFRAME element. To use this Web Part, you must use a browser that supports this element, such as Internet Explorer 7.0 or later.&lt;/div&gt;
+</iframe>
+</center>
+-->
+
+<p>He had to explore a bit to get the Collada STL export setting right for the model to display correctly in the Autodesk View and Data API viewer; here they are:</p>
+
+<center>
+<img src="img/collada_stl_export_settings.png" alt="Collada STL export settings for the Autodesk View and Data API" width="482"/>
+</center>
+
+
+<a name="7"></a>
+
+<h4>Custom User Settings Storage and RvtVa3c Update</h4>
+
+<p>Back to the Revit API and the vA3C viewer again, and based on the discussion with David and Theo on the
+
+<a href="https://github.com/va3c/viewer/issues/6">failure to load a big model</a>,
+
+I tried reducing the file size of the JSON geometry output produced by the RvtVa3c three.js and vA3C editor model exporter and added support for runtime reading of user settings and switching between indented and non-indented JSON.</p>
+
+<p>The necessary switch is provided by the JsonConvert class defined by the Newtonsoft.Json library that I am using to serialise the classes collected from the custom exporter to JSON, and set like this in its call to serialise them:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Formatting</span> formatting
+&nbsp; &nbsp; = <span class="teal">UserSettings</span>.JsonIndented
+&nbsp; &nbsp; &nbsp; ? <span class="teal">Formatting</span>.Indented
+&nbsp; &nbsp; &nbsp; : <span class="teal">Formatting</span>.None;
+&nbsp;
+&nbsp; <span class="teal">File</span>.WriteAllText( _filename,
+&nbsp; &nbsp; <span class="teal">JsonConvert</span>.SerializeObject(
+&nbsp; &nbsp; &nbsp; _container, formatting, settings ) );
+</pre>
+
+<p>I implemented a new class UserSettings to provide a simple way for the end user to control this property.</p>
+
+<p>I obviously considered using the built-in .NET user settings classes, but they interact rather heavily with the operating system and can be difficult to use in the context of a Revit add-in.</p>
+
+<p>I also considered using a custom implementation, e.g. this
+
+<a href="http://www.blackbeltcoder.com/Articles/winforms/a-custom-settings-class-for-winforms">
+custom settings class for WinForms</a> by
+
+Jonathan Wood, the Black Belt Coder.</p>
+
+<p>In the end, however, I preferred to avoid all hassles with other people's code and paradigms and simply write my own.</p>
+
+<p>My UserSettings class checks whether a file with the same name and location as the Revit add-in exists, except the filename extension DLL is replaced by TXT.
+If so, it reads the user preferences from there.
+If not, it creates a new file using the default value that can easily be modified by the user.</p>
+
+<p>To support its parsing of a Boolean value, I implemented this new utility method to read a true or false value from a string:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Extract a true or false value from the given</span>
+&nbsp; <span class="gray">///</span><span class="green"> string, accepting yes/no, Y/N, true/false, T/F</span>
+&nbsp; <span class="gray">///</span><span class="green"> and 1/0. We are extremely tolerant, i.e., any</span>
+&nbsp; <span class="gray">///</span><span class="green"> value starting with one of the characters y, n,</span>
+&nbsp; <span class="gray">///</span><span class="green"> t or f is also accepted. Return false if no </span>
+&nbsp; <span class="gray">///</span><span class="green"> valid Boolean value can be extracted.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> GetTrueOrFalse(
+&nbsp; &nbsp; <span class="blue">string</span> s,
+&nbsp; &nbsp; <span class="blue">out</span> <span class="blue">bool</span> val )
+&nbsp; {
+&nbsp; &nbsp; val = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( s.Equals( <span class="teal">Boolean</span>.TrueString,
+&nbsp; &nbsp; &nbsp; <span class="teal">StringComparison</span>.OrdinalIgnoreCase ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; val = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( s.Equals( <span class="teal">Boolean</span>.FalseString,
+&nbsp; &nbsp; &nbsp; <span class="teal">StringComparison</span>.OrdinalIgnoreCase ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( s.Equals( <span class="maroon">&quot;1&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; val = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( s.Equals( <span class="maroon">&quot;0&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; s = s.ToLower();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="maroon">'t'</span> == s[0] || <span class="maroon">'y'</span> == s[0] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; val = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="maroon">'f'</span> == s[0] || <span class="maroon">'n'</span> == s[0] )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+</pre>
+
+<p>That is used to determine the value of the UserSettings class JsonIndented property like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">UserSettings</span>
+{
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _JsonIndent = <span class="maroon">&quot;JsonIndent&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _error_msg_format
+&nbsp; &nbsp; = <span class="maroon">&quot;Invalid settings in '{0}':\r\n\r\n{1}&quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;\r\n\r\nPlease add {2} = {3} or {4}.&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> SyntaxError( <span class="blue">string</span> path, <span class="blue">string</span> s )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; _error_msg_format, path, s, _JsonIndent,
+&nbsp; &nbsp; &nbsp; <span class="teal">Boolean</span>.TrueString, <span class="teal">Boolean</span>.FalseString ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> JsonIndented
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = <span class="teal">Assembly</span>.GetExecutingAssembly()
+&nbsp; &nbsp; &nbsp; &nbsp; .Location;
+&nbsp;
+&nbsp; &nbsp; &nbsp; path = <span class="teal">Path</span>.ChangeExtension( path, <span class="maroon">&quot;txt&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( path ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">File</span>.WriteAllText( path,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _JsonIndent + <span class="maroon">&quot;=&quot;</span> + <span class="teal">Boolean</span>.TrueString );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Created a new user settings file at '{0}'.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; path ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s1 = <span class="teal">File</span>.ReadAllText( path );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = s1.IndexOf( _JsonIndent );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> SyntaxError( path, s1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = s1.Substring( i
+&nbsp; &nbsp; &nbsp; &nbsp; + _JsonIndent.Length );
+&nbsp;
+&nbsp; &nbsp; &nbsp; i = s.IndexOf( <span class="maroon">'='</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &gt; i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> SyntaxError( path, s1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; s = s.Substring( i + 1 ).Trim();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> rc;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetTrueOrFalse( s, <span class="blue">out</span> rc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> SyntaxError( path, s1 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Editing the automatically generated file and specifying an invalid Boolean value such as the string "a non-Boolean value" produces the following error message:</p>
+
+<center>
+<img src="img/rvtva3c_JSON_indent_invalid_boolean.png" alt="RvtVa3c invalid Boolean value error message" width="416"/>
+</center>
+
+<p>Please excuse the overkill  :-)</p>
+
+<p>The entire updated RvtVa3c custom exporter add-in implementation is provided in the
+
+<a href="https://github.com/va3c/RvtVa3c">RvtVa3c GitHub repository</a>,
+
+and the version discussed above is
+
+<a href="https://github.com/va3c/RvtVa3c/releases/tag/2015.0.0.26">release 2015.0.0.26</a>.</p>
+
+<p>Enjoy!</p>

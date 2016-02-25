@@ -1,0 +1,324 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+Rudolf Honke Re: Geburtstag/Worksharing
+
+- /a/doc/au/2013/doc2/ $ ls *888*
+  dv1888_worksharing_api_handout.pdf	dv1888_worksharingapiapplication.zip
+  dv1888_worksharing_api_presentation.pdf
+  super vortrag auf AU von scott conover, den du auch unbedingt zur kenntnis nehmen musst:
+  http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html
+  Rudolf Honke Re: Geburtstag/Worksharing
+
+Mohamed Ali El Hani, M.Ing, IMPARARIA RE: Question- Duplicating Exact Wall Geometry with Opening
+
+- IMPARARIA Mohamed Ali El Hani, M.Ing
+  Re: Question- Duplicating Exact Wall Geometry with Opening
+  new topic 5.47
+
+-->
+
+<h3>Worksharing and Duplicating Element Geometry</h3>
+
+<p>I had two more interesting email conversations on Revit API questions, on
+
+<a href="#2">add-ins in a worksharing environment</a> and
+
+<a href="#3">duplicating element geometry for detailing and fabrication</a>.</p>
+
+
+<p>Actually, both of these topics have been discussed in the past, so a lot of the work I did was to dig out the existing material again to make these developer partners happy.</p>
+
+<p>Today I therefore have an opportunity to talk about the Revit API and nothing but the Revit API again for a change, after all the web related stuff in the past few posts.</p>
+
+<p>We will probably return to more web related stuff in the next few ones as well, since I am in Darmstadt right now, getting ready for my presentation on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.46">
+Autodesk View and Data API</a>,
+
+<i>Interaktives 3D Modell in beliebige Webseiten einbetten</i>,
+
+at
+
+<a href="https://cluster.ems-secure.de/registrations/autodesk/au.2014/ems.registration.php">Autodesk University Germany</a> here tomorrow.</p>
+
+<p>Following that, next weekend, I will be attending the third and final hackathon this month in
+
+<a href="http://www.meetup.com/TechMeetups-Berlin/events/161213342">Berlin</a>,
+
+after spending the past two weekends at the hackathons in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/hackzrh-fluelisee-memento-jobs-and-books.html#2">
+Zurich</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/brussels-hackathon-and-determining-pipe-wall-thickness.html#2">
+Brussels</a>.</p>
+
+<p>Finally, to wrap up for today, my son Christopher, sound recording professional, also pointed out a funny video demonstrating a truly
+
+<a href="#4">
+inimitable presentation style</a> that
+
+I definitely find worth taking a look at.</p>
+
+
+
+
+<a name="2"></a>
+
+<h4>Add-ins in a Worksharing Environment</h4>
+
+<p>Scott Conover presented an absolutely invaluable class at Autodesk University 2013,
+
+<b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1888">DV1888</a></b>,
+
+on <i>Making Revit Add-ins That Cooperate with Worksharing</i>,
+
+followed by a lively and highly competent roundtable discussion
+
+<b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=3464">DV3464-R</a></b>:</p>
+
+<blockquote>
+<p>Are you having issues supporting your add-ins in a workshared environment? Have you hit situations where elements can’t be edited or updated due to conflicts? As a follow-up discussion to DV1888, join this roundtable session to further discuss the techniques that are available to developers to operate on workshared models.</p>
+</blockquote>
+
+<p>I mentioned these sessions
+
+<!-- 1062 1071 -->
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-idling-and-benchmarking-timer.html">before</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html#5">after</a> the
+
+event and promised to publish the full material and roundtable notes sometime.</p>
+
+<p>Apparently, that time has now come, and the long-awaited
+
+<a href="2.1">roundtable session notes</a> are
+
+included below.</p>
+
+<p>This information is too important to ignore, and too complex to understand without some expert guidance.</p>
+
+<p>I was prompted to return to this material by the following questions:</p>
+
+<p><strong>Question:</strong> I have a question about worksharing.</p>
+
+<p>I need to store global document settings for several different users.</p>
+
+<p>How can I achieve this effectively in a worksharing environment?</p>
+
+<p>I first tried to use the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/devblog-devcamp-element-and-project-wide-data.html">ProjectInfo approach</a>.</p>
+
+<p>That is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devlab-munich.html">
+problematic in a workshared environment</a>,
+
+since this element is
+
+<a href="="http://thebuildingcoder.typepad.com/blog/2014/05/properties-in-dwf-ifc-tables-and-extensible-storage.html#4">
+shared between all users</a>.</p>
+
+<p>Using a DataStorage element is not an immediate solution, since it can cause into similar issues, as discussed in the thread on
+
+<a href="http://forums.autodesk.com/t5/revit-api/extensible-storage-in-a-worksharing-environment-any-tips/m-p/5112392">
+tips for extensible storage in a worksharing environment</a>.</p>
+
+<p>I am a bit unclear about the whole topic, to tell the truth.</p>
+
+<ul>
+<li>When am I an <i>owner</i>, and when a <i>borrower</i> of an element?</li>
+
+<li>Who has write permission?</li>
+
+<li>How do I request access to an element?</li>
+
+<li>In another scenario, I can be the owner of an element, but it is out of date.</li>
+
+<li>All of this also applies to data storage elements.</li>
+</ul>
+
+<p>This all seems rather complex.</p>
+
+<p>Now I would like to explore the API possibilities, e.g. those implemented in WorksharingUtils, etc.</p>
+
+<p>Oops... Unfortunately, the Revit API does not even appear to provide any such class...</p>
+
+<p>The end user tutorial offers enough information on this to get started, so I have lots to read about to understand the product workflow better...</p>
+
+
+<p><strong>Answer:</strong> You should take a look at Scott Conover's Autodesk University 2013 class and roundtable on this topic presented in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html">AU day two with worksharing and API roundtables</a>.</p>
+
+
+<p><strong>Response:</strong> "Sorry, this session is no longer available"...</p>
+
+<p>I was only able to download the audio recording and am listening to that now.</a>
+
+
+<p><strong>Answer:</strong> For your convenience, I uploaded my local copy of Scott's material:</p>
+
+<ul>
+<li><a href="file:////a/doc/au/2013/doc2/dv1888_worksharing_api_handout.pdf">Handout</a></li>
+<li><a href="file:////a/doc/au/2013/doc2/dv1888_worksharing_api_presentation.pdf">Slide deck</a></li>
+<li><a href="file:////a/doc/au/2013/doc2/dv1888_worksharingapiapplication.zip">Sample code</a></li>
+</ul>
+
+<p>Scott later pointed out that it is in fact also still available online from the AU web site via:</p>
+
+<ul>
+<li><a href="http://au.autodesk.com">Autodesk University</a></li>
+<li><a href="http://au.autodesk.com/au-online/overview">Classes on demand</a></li>
+<li>Search for 'dv1888'</li>
+<!-- <li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2013/revit-for-architects/dv1888"></a></li> -->
+<li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2013/revit-for-architects/dv1888">DV1888</a>:
+<i>Facing the Elephant in the Room: Making Revit Add-ins That Cooperate with Worksharing</i></li>
+</ul>
+
+<p>The roundtable recording
+
+<a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2013/revit-for-architects/dv3464-r">
+DV3464-R</a>:
+
+<i>Making Revit Add-ins That Cooperate with Worksharing: A Roundtable Session</i> is also still posted.</p>
+
+<p>The AU site highlights the upcoming conference and new classes, and yet all the old ones are still available by searching the online course catalog for the presenter name or class number.</p>
+
+
+<p><strong>Response:</strong> That is exactly what I need!</p>
+
+<p>Very detailed and down to earth.</p>
+
+<p><strong>Answer:</strong> As a follow-up, here are the long-awaited notes from the roundtable session:</p>
+
+
+
+<!--
+
+/a/doc/au/2013/doc/dv3464-r_making_revit_add-ins_cooperate_with_worksharing_roundtable.rtf
+
+-->
+
+<a name="2.1"></a>
+
+<h4>Add-ins in a Worksharing Environment &ndash; Roundtable Session Notes</h4>
+
+<p>Notes from the Roundtable Session <b>DV3464-R</b> on <i>Making Revit Add-ins That Cooperate with Worksharing</i> on
+
+December 4, 2013, with Sasha Crotty, Scott Conover, Jeremy Tammik and a dozen expert Revit API and product user participants.</p>
+
+<p>Worksets are used differently in every company, too many variables.</p>
+<p><u>Example usage:</u> Extract sheet parameters for drawing lists, 5-7 buildings in a campus, ca. 60 models, need consolidated drawing list. Open models view journal script, open without worksets. Batch process PDF, open with all worksets. Close Revit using UI automation code and handle dialogues. Open detached is slower than closing in the journal.</p>
+<p>Caching element information use unique id. Store document identifier, e.g. path or link instance id. Tracking elements for lighting. If too many elements change, the results are invalidated.</p>
+<p>Autoinsertion with families? Autocreate workset for a given object? The API can currently not create new worksets. Some people moved away from this approach. I have seven worksets and want no more.</p>
+<p>Have to check in all changes at once, not just selected elements.</p>
+<p><u>Restricting User Access:</u> For us the best answer is not to have worksets. Most uses of multiple worksets are misuses, e.g. for visibility. We set up visibility right in the template and need no worksets.</p>
+<p>Elements are still loaded (at least partially) with worksets, just not displayed.</p>
+<p>Discipline specific models? We put different disciplines into a single workset and in a single model.</p>
+<p>We used to have 30 worksets. We ran into problems. Mix of dumb and smart users. We use worksets to restrict access, e.g. prohibit plumber from moving a duct. We may have 7-8 worksets per trade. We have model managers.</p>
+<p>All of our views have view templates assigned that drive the display, separate for display and design.</p>
+<p>Two completely different approaches.</p>
+<p><u>Add-in Editing Conflicts and Data Storage:</u> Error messages a re self-explanatory to our users, so we see no need to hide those. Might be more elegant moving to separate DataStorage elements. The DataStorage element ends up in a special workset, named Data Storage Elements. It does matter what workset it is in, because it will not be accessible otherwise depending on what worksets are open. Closed versus locked workset? Use the standard workset or a hidden one. I cannot create new worksets programmatically. It would be nice to specify the workset. I wish that default behaviour for DataStorage elements would be to go someplace that is independent of this whole thing, and as a developer you have an option to specify something different. Issue resolved.</p>
+<p><u>Add-in Misbehaviour Handling and Loading:</u> As an in-house developer, I can just display exceptions to the user and they will bring them to us; it cuts debugging time way down.</p>
+<p>Deployment is a challenge, even for AppStore add-ins.</p>
+<p>When Revit shuts down, my add-in opens and external application, waits for Revit to shut down, and then copies the add-ins to a local file.</p>
+<p>You can load add-ins dynamically, but not unload. You can load an add-in from a byte stream to avoid file issues.</p>
+<p><u>Updater:</u> There are different flavours of things being updated, and via updater is different from other updates. Idling event is still user changes, so only updaters is different. An updater is like a regeneration, in that it triggers regeneration of other elements. System change, e.g. regeneration and updater, versus user change.</p>
+<p><u>File Operations:</u> We have no files at all that are owned by single users, except families, but they are handled differently anyway. Maintaining and controlling standards, ensuring everything is in the right workset, worksets are locked out, eliminate boring stuff and focus on design.</p>
+<p><u>Working with Revit Server?</u> Yes, since 2012. We had disasters and abandoned it. We love it. Server 2012 did not play nicely for us. We are the most up-to-date and running on virtual machines. Our save times went down to almost nothing. Network speed? Ca. 100 Mbit. We have not had any crashes in 2.5 years. Riverbed. 2008 technology to 2013. Yes, expensive. We did run without, and it was a bit slower. We tweaked our settings and worked with Michael Brandy, and it flies. We even put a Revit Server in our single user offices. We would love to learn all the details of your solution.
+Automate saving a new central to server?
+How about an updater that can run on the central model?</p>
+
+<!--
+<p>Conclusion</p>
+<p>Scott: Check whether save to central on a Revit Server works, and mention it on the blog?</p>
+-->
+
+
+
+<a name="3"></a>
+
+<h4>Exporting Individual Element Geometry</h4>
+
+<p>I put together a new topic collection for The Building Coder on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.47">
+exporting individual element geometry</a>,
+
+prompted by the following conversation:</p>
+
+<p><strong>Question:</strong> We need to duplicate the exact geometry of a Revit Architecture element, e.g. a wall, including its openings, to a new frozen element.
+The purpose is to have the exact geometry of the wall without the windows or doors.</p>
+<p>We tried to use the Get_geometry method but found no way to re-create a new element from it.</p>
+<p>We are a fan of your blog, and any help is appreciated.</p>
+
+
+<p><strong>Answer:</strong> You cannot recreate all of the exact geometry in a new element.</p>
+
+<p>Revit geometry is basically read-only.</p>
+
+<p>This is obvious and unavoidable.</p>
+
+<p>Revit is parametric.</p>
+
+<p>The geometry is not.</p>
+
+<p>Still, the new DirectShape provides and easy way to duplicate at least some of the geometry, as long as it is not curved or complicated.</p>
+
+<p>On the other hand, I do not think you should be doing this at all.</p>
+
+<p>You will mess up your BIM.</p>
+
+<p>Remember, the BIM is an <b><i>exact</i></b> representation of reality.</p>
+
+<p>In reality, you cannot simply duplicate a wall.</p>
+
+<p>If you want another wall, you have to build a new one.</p>
+
+<p><strong>Response:</strong> Thank you for the quick answer. I agree with you on the fact that it’ll mess up the BIM, but the use case is to extract an independent sub-set of the geometry and send it to a drafting supplier without the context.</p>
+<p>So, the purpose is to extract the exact Wall geometry with opening and save it in a dead geometry as RVT, IFC, DWG, or something.</p>
+
+<p><strong>Answer:</strong> That is a totally different way of putting things.</p>
+
+<p>I provided several different pretty full-fledged solutions for similar tasks on The Building Coder, and now defined this as a new topic group for you, on
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.47">
+exporting individual element geometry</a>:</p>
+
+<ul>
+<li>Exporting walls and floors to SAT:</li>
+
+<!-- 0698 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/01/export-walls-and-floors-to-sat.html">Export Walls and Floors to SAT</a></li>
+</ul>
+
+<li>Exporting wall parts to DXF for CNC fabrication:</li>
+
+<!-- 0906 1044 1071 1080 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html">Export Wall Parts Individually to DXF</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/exportcncfab-on-github-and-revitlookup-update.html">ExportCncFab on GitHub and RevitLookup Update</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/au-day-2-worksharing-and-revit-2014-api-roundtables.html#3">AU 2013 Class FB2938 &ndash; Design to Fabrication</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/driving-cnc-fabrication-and-shared-parameters.html">Driving CNC Fabrication and Shared Parameters</a></li>
+</ul>
+
+<li>Saving a solid to a SAT file:</li>
+
+<!-- 1023 1026 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/how-to-save-a-solid-to-a-file.html">How to Save a Solid to a File</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/saving-a-solid-to-a-sat-file-implementation.html">Saving a Solid to a SAT File Implementation</a></li>
+</ul>
+</ul>
+
+<p><strong>Response:</strong> Thanks  a lot Jeremy for the answer. This is exactly what we are looking for.</p>

@@ -1,0 +1,204 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08759845 [Issue with zooming UIView for PreviewControl when it is loaded]
+
+Qiuming ChenSUZHOU BIMCLOUD SOFTWARE TECHNOLOGY
+
+-->
+
+<h3>AppStore Advice and Zooming in a Preview Control</h3>
+
+<p>Let's look at another quick
+
+<a href="#4">
+PreviewControl question</a>.</p>
+
+<p>First, however, please note:</p>
+
+
+<a name="2"></a>
+
+<h4>Portathon Day 2</h4>
+
+<p>Today is the second day of the Portathon!</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/earn-100-submitting-an-autodesk-exchange-app.html">Earn $100 Submitting an Autodesk Exchange App</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/exchange-app-videos-and-devtv-youtube-channel.html">Exchange App Videos</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/adn-training-material-on-github-and-portathon-reminder.html#2">Portathon reminder and video</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/cloud-and-appstore-usage-grows-portathon-reminder.html">Cloud and AppStore usage growth</a></li>
+</ul>
+
+<p>Everything went well yesterday, and today we continue.</p>
+
+<p>Last chance to earn your hundred bucks!</p>
+
+
+
+<a name="3"></a>
+
+<h4>Advice on Submitting an App to the Exchange Store</h4>
+
+<p>While we are on the topic of the exchange store and Portathon event, let me mention some points that arose in one case we handled yesterday.</p>
+
+<p>I recently mentioned Paul Kinnane's enthusiastic
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/access-to-individual-elements-in-linked-projects.html#5">
+feedback on the custom exporter</a>.</p>
+
+<p>Paul went on to submit his Octane renderer add-in as an app to the Autodesk Exchange Store and ran into some issues which triggered a couple of recommendations that seem worthwhile sharing:</p>
+
+<p><strong><a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html?cid=6a00e553e168978833019aff45e7ea970c#comment-6a00e553e168978833019aff45e7ea970c"></a>Question:</strong> I am in the process of migrating the plugin to the Store compatible .bundle format instead of loading from <code>C:\ProgramData\Autodesk\Revit\Addins\2014</code>.
+However, I cannot get the plugin to load into Revit when the files are in <code>C:\ProgramData\Autodesk\ApplicationPlugins\OctaneRender for Revit.bundle</code>.</p>
+
+<p>In summary &ndash; when all the required .addin, .dat and .dll files are in <code>C:\ProgramData\Autodesk\Revit\Addins\2014</code>, the plugin is correctly added to the Add-Ins toolbar. But copying those files into the above .bundle folder results in the plugin not appearing on the toolbar. No error is raised. No amount of adding or editing xml files, putting the DLLs in Contents, etc. seems to help. I watched all the Autodesk videos on this and read all the docs. Can you advise how I can best resolve this issue pls?</p>
+
+<p><strong>Answer:</strong> Do you plan to submit your plugin as an exchange store app this week?</p>
+
+<p>If so, let's make sure we get it fixed during the Portathon at the latest.</p>
+
+<p>Have you downloaded and installed any other apps? You could use them to compare with own your setup.</p>
+
+<p>Does your add-in no longer load at all, or is it just a problem that it does not load dynamically during runtime, without restarting Revit?</p>
+
+<p>I heard of an issue regarding the new AllowLoadIntoExistingSession tag in the add-in manifest file, so it would be good to ensure that your problem is different.</p>
+
+<p>Another thing to check is your XML file encoding:
+In my experience, you can use
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/snow-and-woe-with-manifest-files.html">
+any encoding you want in the Revit add-in manifest</a>, but it must correspond to the coding specified in the corresponding XML file tag, i.e.,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html#3">
+the tag must tell the truth</a>.</p>
+
+
+<p><strong><a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html?cid=6a00e553e168978833019aff5983a6970b#comment-6a00e553e168978833019aff5983a6970b"></a>Response:</strong> Thanks for all the suggestions Jeremy.</p>
+
+<p>The plugin does not load even after a Revit restart.</p>
+
+<p>It may be my Revit knowledge, but I found getting the plugin to run under the other Autodesk CAD packages to be relatively straightforward &ndash; and they also provide a reasonable level of diagnosis, whereas with Revit I was unable to determine if the plugin had in fact loaded or not. This is compounded by not being able to run Revit directly from the Visual Studio debugger (it crashes), so there is a need to run Revit from the desktop then attach in Visual Studio, by which time you may have missed some debug opportunities when the plugin loads.</p>
+
+<p>AllowLoadIntoExistingSession is not present in the add-in file.</p>
+
+<p>My suspicion is that the plugin does not load from the <code>C:\ProgramData\Autodesk\ApplicationPlugins</code> folder because Revit is not loading the required DLLs when it's in that folder, whereas they are loaded from <code>C:\ProgramData\Autodesk\Revit\Addins\2014</code>. But diagnosing this is very difficult. The other possibility is as you say, that it could be an XML issue.</p>
+
+<p>To add to my confusion, I downloaded your latest OBJ exporter, compiled it, copied (dll & addin) into <code>C:\ProgramData\Autodesk\Revit\Addins\2014</code> and the ObjExport.dll did not load. I had to put ObjExport.dll into the Revit 2014 executable folder to get it to load.</p>
+
+<p>There needs to be a log file to indicate what is and is not being loaded, and if it's not being loaded, why.</p>
+
+<p>Thanks again for your suggestions and comments.
+Very much appreciated.</p>
+
+<p><strong>Answer:</strong> Sorry to hear about your struggles, and thank you for your appreciation.</p>
+
+<p>I have no issues launching Revit from the Visual Studio 2010 debugger.
+When I do that, I can see my add-in being loaded by Revit in the debug output window.</p>
+
+<p>Just copying the .NET assembly DLL and the add-in manifest to the ApplicationPlugins is not sufficient.
+The add-in manifest is only read when you place it in the Addins folder.
+The ApplicationPlugins location requires a PackageContents.xml file instead.
+So you must have missed one or two small details in the docs after all  :-)</p>
+
+<p>Anyway, as you presumably know, we are running the Autodesk Exchange Store
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/09/multireferenceannotation-example.html">
+Portathon event today</a>.</p>
+
+<p>I therefore passed on your query to both the Revit API development team and my colleagues dealing with the exchange store, and they reply as follows:</p>
+
+<ol>
+<li>Do you have a PackageContents.xml file in the bundle folder?
+Revit is configured to look for Revit apps inside the PackageContents.xml files in this location.
+It is not configured to directly load .addin files from there.
+If the plugin is working from <code>C:\ProgramData\Autodesk\Revit\Addins\2014</code>, which seems to be the case, and you are ready to submit it to the appstore, we would generate a PackageContents.xml file for you and you can test it from there.</p></li>
+
+<li>We created an installer using the files submitted by the publisher. It seems to be working fine. The add-in is getting loaded for Revit 2014. The bundle will be placed in <code>%ProgramData%\Autodesk\ApplicationPlugin</code>.
+We will be testing the app next week and contact the publisher regarding this directly.</p></li>
+</ol>
+
+<p>I hope this matches you intentions!</p>
+
+<p><strong><a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html?cid=6a00e553e168978833019aff5c8e9a970c#comment-6a00e553e168978833019aff5c8e9a970c"></a>Response:</strong>
+Thank you Jeremy.
+Yes that very much matches our intentions.</p>
+
+<p>Back to the main topic:</p>
+
+
+
+<a name="4"></a>
+
+<h4>Zooming in a Preview Control</h4>
+
+<p><strong>Question:</strong> I have a question about the preview control.</p>
+
+<p>I am displaying a solid paint by AVF in a 3D view in the preview control.
+Painting the solid works fine.</p>
+
+<p>However, I am having an issue trying to zoom and centre once the preview control is loaded.</p>
+
+<p>My code looks something like this:</p>
+
+<pre class="code">
+&nbsp; previewControl.Loaded += <span class="blue">new</span> RoutedEventHandler(
+&nbsp; &nbsp; PreviewControl_Loaded);
+&nbsp;
+&nbsp; <span class="green">// . . .</span>
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> PreviewControl_Loaded(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">EventArgs</span> args)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> pvControl = sender <span class="blue">as</span> <span class="teal">PreviewControl</span>;
+&nbsp; &nbsp; <span class="blue">var</span> viewBoundingBox = _solid.GetBoundingBox();
+&nbsp; &nbsp; pvControl.UIView.ZoomAndCenterRectangle(
+&nbsp; &nbsp; &nbsp; viewBoundingBox.Min, viewBoundingBox.Max);
+&nbsp; }
+</pre>
+
+<p>It doesn't work at all.</p>
+
+<p>If I add a button and register a separate click event to call the UIView ZoomAndCenterRectangle method with the min and max points of the solid bounding box, it works as I want.</p>
+
+<p>It seems that the UIView method will only work after the view is displayed in the preview control.</p>
+
+<p>Is there any way to zoom the preview control before displaying the view?</p>
+
+
+<p><strong>Answer:</strong> Cool.</p>
+
+<p>I am somewhat surprised and impressed to hear that you are able to zoom in the view after the control has been displayed.</p>
+
+<p>I was under the impression that you had no programmatic access to control the preview control at all once it has been instantiated.</p>
+
+<p>I thought the only programmatic control was the instantiation itself, when you pass in the document and view id.</p>
+
+<p>If you wish the preview control to be automatically zoomed to a specific region before it is displayed, I would suggest zooming the view that you pass in to the control correctly <b>before</b> instantiating it.</p>
+
+<p>For the sake of completeness, here are pointers to the previously available preview control samples and resolved issues:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/revit-2013-and-its-api.html#2">Preview control</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#2">DevCamp session on the Revit 2013 UI API enhancements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/06/devcamp-day-two.html#23">PreviewControlSimple</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#4">UIAPI Revit SDK sample</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/08/vacation-time-and-various-notes.html#4">Preview control with linked document</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/issue-using-a-preview-control-in-a-macro.html">Using a preview control in a macro</a></li>
+</ul>
+
+
+<a name="5"></a>
+
+<h4>Vacation Time</h4>
+
+<p>The Portathon event is my last activity here before heading off on vacation for ten days.</p>
+
+<p>I will be taking the computer with me, but I do not expect to publish anything or answer any comments before I return.</p>
+
+<p>Take care and enjoy yourselves while I am away!</p>

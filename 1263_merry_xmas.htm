@@ -1,0 +1,507 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+0506_merry_xmas.htm
+
+... and a Happy New Year!</h3>
+
+http://adndevblog.typepad.com/aec/2014/12/adn-wishes-you-a-merry-little-christmas.html
+
+Jaime
+
+Balaji -- /a/doc/revit/blog/zip/xmas-tree.html
+
+Kevin
+
+
+-->
+
+<h3>The Building Coder wishes you a Merry Christmas!</h3>
+
+<p>Christmas arrived already, and here I am, still wrapping up for the winter break.</p>
+
+<p>Let me share a couple of Christmas greetings from my friends and colleagues in the Autodesk Developer Network ADN and elsewhere:</p>
+
+
+<ul>
+<li><a href="#2">Kevin Vandecar</a></li>
+<li><a href="#3">Balaji Ramamoorthy</a></li>
+<li><a href="#4">Jaime Rosales Duque</a></li>
+<li><a href="#5">Claude Karfiol</a></li>
+<li><a href="#6">Aaron Lu</a></li>
+<li><a href="#7">The Building Coder wishes you a Merry Christmas!</a></li>
+<li><a href="#8">Final Words from Roland Zelles and Victor Hugo</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Kevin Vandecar</h4>
+
+<p>Happy holidays to everyone!</p>
+
+<p>Have a great time off!</p>
+
+<p>I had a chance to learn something new in 3DS Max recently when someone asked if I could make something with an image file list showing animated clouds.</p>
+
+<p>I also realized that I could export from Camtasia as GIF. So took the 3DS Max file and ran it through that. Quality is similar, but might be a little degraded… also, file size jumped I guess because there is only compression per frame in the GIF, rather than overall file.</p>
+
+<p>Here is the result of learning how that works (you may need to click the image to see the animation):</p>
+
+<center>
+<img src="img/xmas-2014-c-proj.gif" alt="Kevin's Christmas tree" width="400"/>
+</center>
+
+<p>The tree in the video is a typical artificial tree.</p>
+
+<p>Saving the planet, and completed my cloud learning.</p>
+
+<p>Hahaha, HO, HO, HO!</p>
+
+
+<a name="3"></a>
+
+<h4>Balaji Ramamoorthy</h4>
+
+<p>ADN wishes you a Merry Christmas and Happy New Year!</p>
+
+<p>Here is an
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/12/var-renderer-scene.html">
+animated JavaScript WebGL Christmas tree with lots of gifts</a> for you.</p>
+
+<!--
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script type="text/javascript">
+
+  var renderer, scene, camera;
+  var group = [];
+  var animate = true;
+
+  var spotlightswitch = 0;
+
+  var spotLight1 = null;
+  var spotLight2 = null;
+  var spotLight3 = null;
+
+  var spotlightcolors = [0xff0000, 0x00ff00,0x0000ff];
+
+  $(function(){
+     var obj = new ChristmasTree();
+  });
+
+  function ChristmasTree()
+  {
+    var container = document.getElementById("xmas-tree");
+
+    //container.style.width = window.innerWidth + 'px';
+    //container.style.height = window.innerHeight + 'px';
+
+    WIDTH = parseInt(container.style.width, 10);
+    HEIGHT = parseInt(container.style.height, 10);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColorHex( 0x87ceeb, 1 );
+    container.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+
+    var fov = 40;
+    var aspect = WIDTH / HEIGHT;
+    camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+    camera.position.set(0, 10, 30);
+    camera.lookAt(new THREE.Vector3(0, 10, 0));
+    scene.add(camera);
+
+    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    directionalLight.position.set( 0, 1, 0 );
+    scene.add( directionalLight );
+
+    spotLight1 = new THREE.SpotLight(spotlightcolors[0], 0.8);
+    spotLight1.position.set(0, 0, 10);
+    scene.add(spotLight1);
+
+    spotLight2 = new THREE.SpotLight(spotlightcolors[1], 0.8);
+    spotLight2.position.set(0, 0, 20);
+    scene.add(spotLight2);
+
+    spotLight3 = new THREE.SpotLight(spotlightcolors[2], 0.8);
+    spotLight3.position.set(0, 0, 30);
+    scene.add(spotLight3);
+
+    var maxrady = 20 * Math.tan(deg2rad(fov * 0.5));
+    var maxradx = aspect * maxrady;
+
+    // Vertical trunk of length 20
+    var layers = 12
+    var trunklen = 20;
+    drawCylinder(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, trunklen, 0), -1);
+
+    for (var j = 0; j < layers; j++)
+    {
+      var branchlen = maxrady * ((layers-j)/layers);
+
+      if(j != layers-1)
+      {
+        var angle = 2 * Math.PI / 10;
+        for (var i = 0; i < 10; i++)
+        {
+          group[10*j + i] = new THREE.Object3D();
+          drawBranch(branchlen, 10*j + i);
+
+          group[10*j + i].rotation.z += (Math.PI / 3);
+          group[10*j + i].rotation.y += (angle * i);
+
+          group[10*j + i].position.y += ((j+1) * (trunklen/layers));
+          scene.add(group[10*j + i]);
+        }
+      }
+      else
+      { // Top most layer, no rotation
+        group[10*j] = new THREE.Object3D();
+        drawBranch(branchlen, 10*j);
+
+        group[10*j].position.y += ((j+1) * (trunklen/layers));
+        scene.add(group[10*j]);
+      }
+    }
+
+    render();
+  };
+
+  function drawBranch(branchlen, branchnumber)
+  {
+    drawCylinder(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, branchlen, 0), branchnumber);
+
+    var X;
+    var Y;
+    var pts = findPoints(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, branchlen, 0));
+    for ( i = 1; i < pts.vertices.length; i ++ )
+    {
+      var pt = pts.vertices[i];
+      console.log("Point : %d %d %d", pt.x, pt.y, pt.z);
+      //drawCircle(2, pt);
+      if(i == 1)
+        X = branchlen * 0.3;
+      Y = pt.y;
+
+      var rad1 = (X - X * Math.sin(Math.PI / 6) * Math.sin(Math.PI / 6));
+      var nextX = pt.x + rad1;
+      var nextY = pt.y + (X * Math.sin(Math.PI / 6) * Math.cos(Math.PI / 6));
+
+      var angle = 2 * Math.PI / 10;
+
+      var giftleaf = Math.floor((Math.random() * 30) + 1)
+      var gifttype = Math.floor((Math.random() * 2) + 1)
+
+      for (var j = 0; j <= 10; j++)
+      {
+        var ep = new THREE.Vector3(pt.x + rad1 * Math.cos(angle * j), nextY, pt.z + rad1 * Math.sin(angle * j));
+        drawCylinder(pt, ep, branchnumber);
+
+        if(j == giftleaf)
+        {
+          if(gifttype == 1)
+            drawSphere(0.4, ep, branchnumber);
+          else
+            drawBox(0.5, 0.6, 0.2, ep, branchnumber);
+        }
+      }
+
+      X = nextX;
+    }
+  }
+
+  function findPoints(sp, ep)
+  {
+    var curve = new THREE.LineCurve3(sp, ep);
+    var path = new THREE.CurvePath();
+    path.add(curve);
+    var pts = path.createPointsGeometry(5);
+    return pts;
+  }
+
+  function deg2rad(deg)
+  {
+    var conv = Math.PI / 180;
+    return (deg * conv);
+  }
+
+  function drawSphere(radius, pos, branchnumber)
+  {
+    var spheremat;
+
+    var giftcolor = Math.floor((Math.random() * 3) + 1)
+    if(giftcolor == 1)
+    {
+      spheremat = new THREE.MeshLambertMaterial(
+        {color : 0xff0000, shading: THREE.FlatShading }
+      );
+    }
+    else if(giftcolor == 2)
+    {
+      spheremat = new THREE.MeshLambertMaterial(
+        {color : 0x00ff00, shading: THREE.FlatShading }
+      );
+    }
+    else
+    {
+      spheremat = new THREE.MeshLambertMaterial(
+      {color : 0x0000ff, shading: THREE.FlatShading }
+      );
+    }
+
+    // 5 divisions along latitude and longitude directions
+    var sphere = new THREE.Mesh( new THREE.SphereGeometry(radius, 5, 5),  spheremat);
+    sphere.position.set(pos.x, pos.y, pos.z);
+
+    if(branchnumber == -1)
+      scene.add(sphere);
+    else
+      group[branchnumber].add(sphere);
+  }
+
+  function drawBox(lx, ly, lz, pos, branchnumber)
+  {
+    var boxmat;
+
+    var giftcolor = Math.floor((Math.random() * 3) + 1)
+    if(giftcolor == 1)
+    {
+      boxmat = new THREE.MeshLambertMaterial(
+        {color : 0xff0000, shading: THREE.FlatShading }
+      );
+    }
+    else if(giftcolor == 2)
+    {
+      boxmat = new THREE.MeshLambertMaterial(
+        {color : 0x00ff00, shading: THREE.FlatShading }
+      );
+    }
+    else
+    {
+      boxmat = new THREE.MeshLambertMaterial(
+      {color : 0x0000ff, shading: THREE.FlatShading }
+      );
+    }
+
+    box = new THREE.Mesh( new THREE.BoxGeometry(lx, ly, lz),  boxmat);
+    box.position.set(pos.x, pos.y, pos.z);
+
+    if(branchnumber == -1)
+      scene.add(box);
+    else
+      group[branchnumber].add(box);
+  }
+
+  // Thanks to jdregister
+  // From http://stackoverflow.com/questions/15139649/three-js-two-points-one-cylinder-align-issue
+  function drawCylinder(vstart, vend, branchnumber)
+  {
+    var HALF_PI = Math.PI * .5;
+    var distance = vstart.distanceTo(vend);
+    var position  = vend.clone().add(vstart).divideScalar(2);
+
+    var material = new THREE.MeshLambertMaterial({color:0x00FF00});
+    var cylinder = new THREE.CylinderGeometry(0.05,0.05,distance,8,1,false);
+
+    var orientation = new THREE.Matrix4();//a new orientation matrix to offset pivot
+    var offsetRotation = new THREE.Matrix4();//a matrix to fix pivot rotation
+    var offsetPosition = new THREE.Matrix4();//a matrix to fix pivot position
+    orientation.lookAt(vstart,vend,new THREE.Vector3(0,1,0));//look at destination
+    offsetRotation.makeRotationX(HALF_PI);//rotate 90 degs on X
+    orientation.multiply(offsetRotation);//combine orientation with rotation transformations
+    cylinder.applyMatrix(orientation)
+
+    var mesh = new THREE.Mesh(cylinder, material);
+    mesh.position=position;
+    if(branchnumber == -1)
+      scene.add(mesh);
+    else
+      group[branchnumber].add(mesh);
+  }
+
+  var last = Date.now();
+
+  function render()
+  {
+    if(animate)
+    {
+      requestAnimationFrame(render);
+
+      var now = Date.now();
+
+      var dt = now - last;
+
+      last = now;
+
+      var angleincr = 0.005 * Math.PI / 180 * dt;
+
+      if(group)
+      {
+        for(var i=0; i < group.length; i++)
+          group[i].rotation.y += (angleincr * 2);
+
+      }
+
+      if(spotlightswitch > 15)
+      {
+        spotlightswitch = 0;
+        if(spotLight1)
+          spotLight1.color.setHex( spotlightcolors[Math.floor((Math.random() * 3) + 1)] );
+
+        if(spotLight2)
+          spotLight2.color.setHex( spotlightcolors[Math.floor((Math.random() * 3) + 1)] );
+
+        if(spotLight3)
+          spotLight3.color.setHex( spotlightcolors[Math.floor((Math.random() * 3) + 1)] );
+      }
+      else
+        spotlightswitch ++;
+    }
+
+  renderer.render(scene, camera);
+  }
+</script>
+
+<center>
+<div id="xmas-tree" style="border:1px solid blue;width:350px;height:350px;"></div>
+</center>
+
+<p>Hope you like it :)</p>
+
+-->
+
+<p>(Jeremy adds: I initially placed it inline in this post, but it does not scroll well, so please look at it on Balaji's original page instead :-)</p>
+
+
+<a name="4"></a>
+
+<h4>Jaime Rosales Duque</h4>
+
+<p>I was inspired by Balaji's pretty cool post and created
+
+<a href="http://adndevblog.typepad.com/aec/2014/12/adn-wishes-you-a-merry-little-christmas.html">
+a merry little Christmas tree</a> for the AEC blog:</p>
+
+<center>
+<iframe
+  allowfullscreen="true" frameborder="0" height="400" mozallowfullscreen="true"
+  src="https://autodesk634.autodesk360.com/shares/public/SH7f1edQT22b515c761e43b2d1e7ee6e0a3f?mode=embed"
+  webkitallowfullscreen="true" width="400"></iframe>
+</center>
+
+<p>Hope you guys like it.</p>
+
+<p>Merry Christmas and Happy New Year to all of you.</p>
+
+<p>Enjoy the time with your love ones and can’t wait for 2015!</p>
+
+
+<a name="5"></a>
+
+<h4>Claude Karfiol</h4>
+
+<p>My friend Claude sent me his Shabbat Shalom greeting last Friday.
+It is quite provocative &ndash; and funny, in an English sort of way &ndash; as well as providing some food for thought.
+It turned out to be one of the Christmas messages that touched me most.</p>
+
+<p>Claude, in turn, attributes it to his friend Josh.</p>
+
+<p>Please skip this if you prefer not being provoked:</p>
+
+<center>
+<img src="img/burning_armchair.jpeg" alt="Burning armchair" width="317"/>
+</center>
+
+<blockquote>
+<p>May your Christmas tree burn brightly and remind you of other places in the world lacking a cease-fire.
+
+</br>May your heating break down and let you feel how much warmth a human being requires.
+
+</br>May the stench of your decomposing neighbour remind you how quickly it can be too late for many things in life.
+
+</br>May terrorists abduct you and let you feel how much you love life and how much you are wasting it daily with useless stuff.
+
+</br>May your Facebook account be deleted on New Year's Eve and show you the meaning of real friends.
+
+</br>May all this help open your heart and deepen your compassion, wisdom, humility and gratitude.
+</blockquote>
+
+<p>Thank you, dear Josh. So sad you are fictional.
+Still, your good wishes definitely reached and touched us.</p>
+
+
+<a name="6"></a>
+
+<h4>Aaron Lu</h4>
+
+<p>The biggest Christmas gift for Revit API add-in developers comes from Aaron Lu.</p>
+
+<p>Aaron only recently joined the ADN team, jumped right into supporting the Revit API, and published a whole ream of helpful solutions on the AEC DevBlog:</p>
+
+<ul>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-align-2-pipes-through-center-lines.html">
+Align two pipes through centre lines</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-rebarcreatefromcurves-throws-unable-to-create-a-rebarshape-based-on-the-given-curves.html">
+Rebar.CreateFromCurves throws: Unable to create a RebarShape based on the given curves</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/types-not-supported-by-elementclassfilter.html">
+Types not supported by ElementClassFilter</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-those-exceptions.html">
+Those Exceptions</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/code-formatting-in-typepad-blog.html">
+Code formatting in TypePad blog</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-how-to-get-switch-system-from-familyinstance.html">
+How to get switch system from FamilyInstance</a></li>
+
+<li><a href="http://adndevblog.typepad.com/aec/2014/12/revitapi-how-to-get-dwgexportoptions.html">
+How to get DWGExportOptions</a></li>
+
+</ul>
+
+<p>Thank you, Aaron, and congratulations!</p>
+
+
+
+
+
+<a name="7"></a>
+
+<h4>The Building Coder wishes you a Merry Christmas!</h4>
+
+<p>I wish you a Very Merry Christmas and a Happy New Year!</p>
+
+<p>Thank you very much for all your inspiring interest and appreciation.</p>
+
+<p>I look forward to exploring and sharing many new exciting Revit API topics and projects with you in the year to come!</p>
+
+<p>Even more exciting, we have a whole new universe to discover, enabled by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/12/back-from-the-conference-tour-and-wrapping-up.html#7">
+ubiquitous 3D in the web</a>!</p>
+
+
+
+<a name="8"></a>
+
+<h4>Final Words from Roland Zelles and Victor Hugo</h4>
+
+<blockquote>
+<p>The future has several names.
+</br>For the weak, it is the impossible;
+</br>for the fainthearted, it is the unknown;
+</br>but for the valiant, it is the opportunity.</p>
+<p style="text-align: right"><i>Victor Hugo, Les Misérables</i></p>
+</blockquote>

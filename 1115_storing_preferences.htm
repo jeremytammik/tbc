@@ -1,0 +1,130 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Revit-API/How-to-store-plugin-Preferences/m-p/4844497
+
+dimi_christop
+Re: How to store plugin Preferences
+2014-03-05 01:56 PM in reply to: peterjegan
+
+Hi
+
+the C#  Visual Studio User Settings suggested by @peterjegan worked fine.
+
+Neverheless in my case its was even easier sinc I wanted user setting for Windows Forms entries. There is a way to associate user settings with a Windows Form component inside the Form Designer. This means even less code for reading/writing.
+
+http://msdn.microsoft.com/en-us/library/wabtadw6%28v=vs.110%29.aspx
+
+The only CAVEAT I found is that you have to call save before closing the Form otherwise the settings get lost.
+
+Properties.Settings.Default.Save();
+
+dimi_christop
+Re: How to store plugin Preferences
+2014-02-28 04:07 PM in reply to: dimi_christop
+
+Thanks for the nice links,
+
+the setting are not project specific so I will give the using settings of @peterjegan a try.
+
+ollikat
+Re: How to store plugin Preferences
+2014-02-28 06:35 AM in reply to: peterjegan
+
+Another approach could be so called Extensible Storage mechanism in Revit API. That would allow you to save project specific settings. I mean a scenario where user wants to have different settings in different project. You can read more about it from BuildingCoder block
+
+http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html
+
+But if you are just trying to store information, that doesn't have direct relationship to Revit project, then it might be better to use mechanism that peterjegan suggested.
+
+peterjegan
+Re: How to store plugin Preferences
+2014-02-27 05:35 PM in reply to: dimi_christop
+
+If you are using Visual Studio C#, there is feature made exactly for this. Have a look at "Using settings in C#" here: http://msdn.microsoft.com/en-us/library/aa730869(v=vs.80).aspx This is what I do. Some people who want more control will develop their own system, but I suggest starting here. It is really easy and effective.
+
+http://msdn.microsoft.com/en-us/library/aa730869(v=vs.80).aspx
+
+dimi_christop
+How to store plugin Preferences
+2014-02-27 05:11 PM
+
+Hi
+
+I am trying to find a way to store user preferences for my plugin.
+
+These preferences are file paths, import options etc. so that the next time the user runs the plugin all the choices he made the fist time he used the plugin stay the same.
+
+Is there an API functionality which helps in this? Are there any guidlines how to do that? any user experience in the Forum about this issue.
+
+Thanks in advance
+
+Dimi
+
+-->
+
+<h3>Storing Revit Add-in Settings</h3>
+
+<p>Here is another tip from the Revit API discussion forum that seems worthwhile cleaning up and making easy to find, on
+
+<a href="http://forums.autodesk.com/t5/Revit-API/How-to-store-plugin-Preferences/m-p/4844497">
+how to store plugin preferences</a>,
+
+raised and discussed by
+
+<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1951637">
+Dimi</a>,
+
+<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1090898">
+peterjegan</a> and
+
+<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/774564">
+ollikat</a>:</p>
+
+<p><strong>Question:</strong> I am trying to find a way to store user preferences for my plugin.</p>
+
+<p>These preferences are file paths, import options etc. so that the next time the user runs the plugin, all the choices he made the fist time he used the plugin stay the same.</p>
+
+<p>Are there any guidelines how to achieve this, or API functionality that helps?</p>
+
+
+<p><strong>Answer:</strong> If the settings you wish to store are Revit project specific, you can save them in the RVT document in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/04/extensible-storage.html">
+Extensible Storage</a> via
+
+the Revit API. This would fit a scenario where a user wants to have different settings in different projects. Here are some more
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">
+extensible storage topics</a>.</p>
+
+<p>If your settings contain general add-in related information that has no direct relationship with the Revit project, it might be better to use the dedicated Visual Studio C# feature made exactly for this purpose:
+
+<a href="http://msdn.microsoft.com/en-us/library/aa730869(v=vs.80).aspx">
+Using settings in C#</a>.
+
+<p>This is very easy and effective system for storing add-in data.</p>
+
+<p>Some people who want more control develop their own system, but I suggest starting here.</p>
+
+
+<p><strong>Response:</strong> The C#  Visual Studio User Settings system suggested above worked fine.</p>
+
+<p>Nevertheless, in my case, it's even easier, since I am storing user settings for Windows Forms entries.</p>
+
+<p>You can easily associate user settings with Windows Form components inside the Form Designer:
+
+<a href="http://msdn.microsoft.com/en-us/library/wabtadw6%28v=vs.110%29.aspx">
+How to: Create Application Settings Using the Designer</a>.</p>
+
+<p>This means even less code for reading and writing.</p>
+
+<p>The only caveat I found is that you have to call save before closing the form, otherwise the settings will be lost:</p>
+
+<pre class="code">
+  Properties.Settings.Default.Save();
+</pre>

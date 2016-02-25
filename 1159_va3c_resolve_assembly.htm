@@ -1,0 +1,279 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>Assembly Resolver</h3>
+
+<p>One of the
+
+<a href="">
+RvtVa3c</a>
+
+<a href="...#3">
+implementation aspects</a>
+
+that I mentioned was the fact that we ran into some problems using the standard .NET Microsoft System.Runtime.Serialization.Json.DataContractJsonSerializer class and chose to replace it with
+
+the more reliable <a href="http://james.newtonking.com/json">Json.NET</a> component instead.</p>
+
+<p>Serialisation is required by our early decision to define and generate the three.js JSON file format by representing all the required objects, their properties and relationships by a set of C# classes.</p>
+
+<p>We instantiate and populate these classes in our custom exporter context implementation and serialise them out to JSON to generate the output file used to represent the BIM for the va3c viewer.</p>
+
+<p>A little bit too late, Ben pointed out that we could have saved ourselves the whole effort of implementing and populating a C# class hierarchy by using
+
+<a href="https://github.com/va3c/GHva3c/blob/master/GHva3c/GHva3c/va3c_geometry.cs">
+dynamic JSON and the System.Dynamic.ExpandoObject</a> instead,
+
+as he does in his
+
+<a href="https://github.com/va3c/GHva3c">GHva3c Grasshopper va3c exporter</a>.</p>
+
+<p>Anyway, we continued down the path of C# class definition and serialisation to generate the JSON output file starting from the root three.js scene object.</p>
+
+<p>The original code using a DataContractJsonSerializer to serialise it and thus generate the JSON output looked like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">using</span>( <span class="teal">FileStream</span> stream
+&nbsp; &nbsp; = <span class="teal">File</span>.OpenWrite( filename ) )
+&nbsp; {
+&nbsp; &nbsp; DataContractJsonSerializer serialiser
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> DataContractJsonSerializer(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Va3cScene</span> ) );
+&nbsp;
+&nbsp; &nbsp; serialiser.WriteObject( stream, _scene );
+&nbsp; }
+</pre>
+
+<p>This became too buggy at a certain point.
+For instance, when writing to the same file repeatedly, the end of the updated file still contained data from the previous version, obviously corrupting the entire structure.</p>
+
+<p>It can be easily replaced by the following code using Json.NET:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">JsonSerializerSettings</span> settings
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JsonSerializerSettings</span>();
+&nbsp;
+&nbsp; settings.NullValueHandling
+&nbsp; &nbsp; = <span class="teal">NullValueHandling</span>.Ignore;
+&nbsp;
+&nbsp; <span class="teal">File</span>.WriteAllText( _filename,
+&nbsp; &nbsp; <span class="teal">JsonConvert</span>.SerializeObject( _scene,
+&nbsp; &nbsp; &nbsp; <span class="teal">Formatting</span>.Indented, settings ) );
+</pre>
+
+<p>On the first run, though, this caused our external command to fail with an error reporting that the Newtonsoft.Json.dll assembly could not be loaded.</p>
+
+<p>This is due to .NET restrictions requiring proper .NET application behaviour.</p>
+
+<p><a href="http://thebuildingcoder.typepad.com/blog/2010/04/addin-manifest-and-guidize.html">As mentioned</a>,
+
+one way to resolve this issue is to install the entire application in a sub-folder of the Revit.exe directory, which is not always feasible.</p>
+
+
+<!--
+
+it is recommended to place the add-in into the Revit Program folder in the same location as Revit.exe.
+
+http://thebuildingcoder.typepad.com/blog/2010/08/network-access-to-add-in-manifest-and-icons.html
+
+http://www.dreamincode.net/forums/topic/210163-dll-in-subfolder-exe-file-not-found-exception/
+
+http://www.chilkatsoft.com/p/p_502.asp
+
+-->
+
+<p>If it lives elsewhere, the restriction can be somewhat circumvented using a .NET assembly resolver.</p>
+
+<p>I mentioned this beast in the past, e.g. discussing the RvtUnit project for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/revit-add-in-unit-testing.html">
+Revit Add-in unit testing</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/security-framing-cross-section-analyser-and-rex.html#6">
+using REX without the REX framework</a>.</p>
+
+<p>Matt sets up such resolution handlers on a regular basis, so he quickly typed the following code from scratch by heart to implement and register it in the main RvtVa3c exporter method ExportView3D:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Custom assembly resolver to find our support</span>
+&nbsp; <span class="gray">///</span><span class="green"> DLL without being forced to place our entire </span>
+&nbsp; <span class="gray">///</span><span class="green"> application in a subfolder of the Revit.exe</span>
+&nbsp; <span class="gray">///</span><span class="green"> directory.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; CurrentDomain_AssemblyResolve(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">ResolveEventArgs</span> args )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( args.Name.Contains( <span class="maroon">&quot;Newtonsoft&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename = <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; &nbsp; System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetExecutingAssembly().Location );
+&nbsp;
+&nbsp; &nbsp; &nbsp; filename = <span class="teal">Path</span>.Combine( filename,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Newtonsoft.Json.dll&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">File</span>.Exists( filename ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> System.Reflection.<span class="teal">Assembly</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .LoadFrom( filename );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Export a given 3D view to JSON using</span>
+&nbsp; <span class="gray">///</span><span class="green"> our custom exporter context.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> ExportView3D( <span class="teal">View3D</span> view3d, <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">AppDomain</span>.CurrentDomain.AssemblyResolve
+&nbsp; &nbsp; &nbsp; += CurrentDomain_AssemblyResolve;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = view3d.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Va3cExportContext</span> context
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Va3cExportContext</span>( doc, filename );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CustomExporter</span> exporter = <span class="blue">new</span> <span class="teal">CustomExporter</span>(
+&nbsp; &nbsp; &nbsp; doc, context );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Note: Excluding faces just suppresses the </span>
+&nbsp; &nbsp; <span class="green">// OnFaceBegin calls, not the actual processing </span>
+&nbsp; &nbsp; <span class="green">// of face tessellation. Meshes of the faces </span>
+&nbsp; &nbsp; <span class="green">// will still be received by the context.</span>
+&nbsp;
+&nbsp; &nbsp; exporter.IncludeFaces = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; exporter.ShouldStopOnError = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; exporter.Export( view3d );
+&nbsp; }
+</pre>
+
+<p>For completeness sake, here is the rest of the external command mainline implementation, prompting for interactive use of the output filename and folder, stored for reuse in subsequent runs in the same session:</p>
+
+<pre class="code">
+<span class="blue">&nbsp;#region</span> SelectFile
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the last user selected output folder</span>
+&nbsp; <span class="gray">///</span><span class="green"> in the current editing session.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">string</span> _output_folder_path = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return true is user selects and confirms</span>
+&nbsp; <span class="gray">///</span><span class="green"> output file name and folder.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> SelectFile(
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> folder_path,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> filename )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SaveFileDialog</span> dlg = <span class="blue">new</span> <span class="teal">SaveFileDialog</span>();
+&nbsp;
+&nbsp; &nbsp; dlg.Title = <span class="maroon">&quot;JSelect SON Output File&quot;</span>;
+&nbsp; &nbsp; dlg.Filter = <span class="maroon">&quot;JSON files|*.js&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != folder_path
+&nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; folder_path.Length )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; dlg.InitialDirectory = folder_path;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; dlg.FileName = filename;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="teal">DialogResult</span>.OK == dlg.ShowDialog();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; filename = <span class="teal">Path</span>.GetFileName( dlg.FileName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; folder_path = <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; &nbsp; filename );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// SelectFile</span>
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( doc.ActiveView <span class="blue">is</span> <span class="teal">View3D</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename = doc.PathName;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == filename.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; filename = doc.Title;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == _output_folder_path )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; _output_folder_path = <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; filename = <span class="teal">Path</span>.GetFileName( filename ) + <span class="maroon">&quot;.js&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( SelectFile( <span class="blue">ref</span> _output_folder_path,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">ref</span> filename ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; filename = <span class="teal">Path</span>.Combine( _output_folder_path,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ExportView3D( doc.ActiveView <span class="blue">as</span> <span class="teal">View3D</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;va3c&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;You must be in 3D view to export.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+</pre>
+
+<p>For the custom exporter code populating the objects representing the three.js scene hierarchy and the entire add-in implementation, please refer to the
+
+<a href="https://github.com/va3c/RvtVa3c">RvtVa3c GitHub repository</a> and the
+
+<a href="https://github.com/va3c/RvtVa3c .... ">Va3cExportContext implementation</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>External Command Lifecycle</h4>
+
+<p>Matt added an additional consideration:</p>
+
+
+<p><strong>Question:</strong> I realized one thing that I didn't do here that I sometimes address &ndash; but it would make the blog post code a bit more complicated.</p>
+
+<p>Do you know what the lifecycle is of a Revit command? Does it get disposed afterwards, or is it re-used, or left alive? I have a vague feeling that it doesn't “go away” right away.</p>
+
+<p>As such, because we've registered this event on the current appDomain, you might still be getting callbacks into this event after you leave this app and run the next command (which can be confusing).</p>
+
+<p>To address this, you would define the callback event handler first, add it, and then remove the handler at the end when the command ended.</p>
+
+<p>So &ndash; it's up to you if that's a complexity that should be addressed or not? Because this example is only loading the Newtonsoft JSON specifically, it's pretty harmless.</p>
+
+<p><strong>Answer:</strong> A new external command implementation class is instantiated each time you launch the command, as I painfully discovered searching for a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-idling-and-benchmarking-timer.html#2">
+solution to the RoomEditorApp idling issues</a>:
+
+"each new external command invocation generates a new different class instance."</p>
+
+<p>For this reason, I was unable to unsubscribe from an external event that was subscribed to from an external command, and changed the subscriber to be the external application instead of the external command.</p>

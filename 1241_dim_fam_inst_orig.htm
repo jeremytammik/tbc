@@ -1,0 +1,415 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10168974 [Create Dimension]
+
+/a/doc/revit/blog/ $ bl 1229 1230 1231
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/berlin-hackathon-begin.html">Berlin Hackathon Begin</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/attached-detail-groups-and-inverse-relationships.html">Attached Detail Groups and Inverse Relationships</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/berlin-hackathon-results-3d-viewer-and-web-news.html">Berlin Hackathon Results, 3D Viewer and Web News</a></li>
+</ul>
+
+-->
+
+<h3>Picking Pairs and Dimensioning Family Instance Origin</h3>
+
+<p>We looked at various aspects of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.45">creating dimensioning</a> in
+
+the past.
+There is still one glaring omission, though: how to dimension to a family instance origin point.</p>
+
+<p>Let's take a look at that, after quickly mentioning the official announcement of the movie matching game that we created at the recent Berlin hackathon.</p>
+
+<p>Actually, coincidentally, I discuss two topics today that are both completely and utterly dedicated to picking pairs: the Movie Match MasterY game, matching pairs of cards representing films, and my new pair picker utility class, for selecting pairs of Revit elements of a given type:</p>
+
+<ul>
+<li><a href="#2">Movie Match MasterY</a></li>
+<li><a href="#3">Creating dimensioning referencing family instance origin</a></li>
+<li><a href="#4">JtPairPicker pair picker utility class</a></li>
+<li><a href="#5">Download</a></li>
+</ul>
+
+
+
+
+<a name="2"></a>
+
+<h4>Movie Match MasterY</h4>
+
+<p>As reported during the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/berlin-hackathon-begin.html">Berlin hackathon</a>, its
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/attached-detail-groups-and-inverse-relationships.html">progress</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/berlin-hackathon-results-3d-viewer-and-web-news.html">results</a>,
+
+I was part of the
+
+<a href="https://github.com/m3my">m3my team</a> creating the
+
+<a href="https://m3my.github.io">Movie Match MasterY</a> movie matching memory game.</p>
+
+<p>We were forced to rename it from the original <i>MovieMemory</i>, because the German company Ravensburger has a trademark on 'Memory' in numerous countries, causing Apple to
+
+<a href="https://www.google.de/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=memory%20ravensburger%20trademark">
+ban all games whose name contains 'Memory' from its AppStore</a>.</p>
+
+<p>Anyway, here is now the (German)
+
+<a href="http://blog.neofonie.de/2014/11/12/wie-mit-hilfe-von-textanalysen-und-natural-language-processing-ein-moviegame-entstand/">
+Movie Match MasterY announcement</a> on the
+
+<a href="http://www.neofonie.de">Neofonie</a> tech blog.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Creating Dimensioning Referencing Family Instance Origin</h4>
+
+<p>Back to the Revit API and the main topic for today:</p>
+
+<p><strong>Question:</strong> I know how to create dimensioning between two family edges.</p>
+
+<p>How can I create dimensioning between the centre point or origin point of the family, however?</p>
+
+<p>Here is an example showing the two situations with manually generated dimensioning:</p>
+
+<center>
+<img src="img/dimension_instance_edge_or_origin_before.png" alt="Dimensioning family instance edge versus origin" width="280"/>
+</center>
+
+<p><strong>Answer:</strong> The secret lies in accessing the hidden elements embedded within the family instance and definition.</p>
+
+<p>In your case, you can use the non-visible family instance geometry origin point.</p>
+
+<p>Turn on both ComputeReferences and IncludeNonVisibleObjects when you request the geometry from the family instances:</p>
+
+<pre class="code">
+&nbsp; _opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; _opt.ComputeReferences = <span class="blue">true</span>;
+&nbsp; _opt.IncludeNonVisibleObjects = <span class="blue">true</span>;
+</pre>
+
+<p>The geometry of the hidden elements includes a point from which you can retrieve a reference to use to define your dimensioning.</p>
+
+<p>The current version of RevitLookup enables you to query and explore non-visible objects in the element geometry:</p>
+
+<center>
+<img src="img/snoop_non_visible_objects.png" alt="RevitLookup accessing non-visible geometry" width="600"/>
+</center>
+
+<p>Navigate into the geometry element collection of geometry objects to explore the point object we are looking for:</p>
+
+<center>
+<img src="img/snoop_non_visible_geometry_element_point.png" alt="RevitLookup displaying family instance geometry element point" width="600"/>
+</center>
+
+<p>As always, the most up-to-date version of RevitLookup is available from the
+
+<a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>.</p>
+
+<p>Based on that, I implemented the following rather compact helper method retrieving the non-visible family instance element geometry, extracting the Point object and returning a reference to it:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve the given family instance's</span>
+&nbsp; <span class="gray">///</span><span class="green"> non-visible geometry point reference.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Reference</span> GetFamilyInstancePointReference(
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> fi.get_Geometry( _opt )
+&nbsp; &nbsp; &nbsp; .OfType&lt;<span class="teal">Point</span>&gt;()
+&nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Point</span>, <span class="teal">Reference</span>&gt;( x =&gt; x.Reference )
+&nbsp; &nbsp; &nbsp; .FirstOrDefault();
+&nbsp; }
+</pre>
+
+<p>I implemented a new external command CmdDimensionInstanceOrigin in The Building Coder samples to make use of that to pick the two family instances in your sample model and create dimensioning between them like this:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+<span class="blue">class</span> <span class="teal">CmdDimensionInstanceOrigin</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">static</span> <span class="teal">Options</span> _opt = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">JtPairPicker</span>&lt;<span class="teal">FamilyInstance</span>&gt; picker
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtPairPicker</span>&lt;<span class="teal">FamilyInstance</span>&gt;( uidoc );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Result</span> rc = picker.Pick();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Result</span>.Failed == rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;We need at least two &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;FamilyInstance elements in the model.&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="teal">Result</span>.Succeeded == rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FamilyInstance</span>&gt; a = picker.Selected;
+&nbsp;
+&nbsp; &nbsp; &nbsp; _opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; &nbsp; _opt.ComputeReferences = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; _opt.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>[] pts = <span class="blue">new</span> <span class="teal">XYZ</span>[2];
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span>[] refs = <span class="blue">new</span> <span class="teal">Reference</span>[2];
+&nbsp;
+&nbsp; &nbsp; &nbsp; pts[0] = ( a[0].Location <span class="blue">as</span> <span class="teal">LocationPoint</span> ).Point;
+&nbsp; &nbsp; &nbsp; pts[1] = ( a[1].Location <span class="blue">as</span> <span class="teal">LocationPoint</span> ).Point;
+&nbsp;
+&nbsp; &nbsp; &nbsp; refs[0] = GetFamilyInstancePointReference( a[0] );
+&nbsp; &nbsp; &nbsp; refs[1] = GetFamilyInstancePointReference( a[1] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CmdDimensionWallsIterateFaces</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .CreateDimensionElement( doc.ActiveView,
+&nbsp; &nbsp; &nbsp; &nbsp; pts[0], refs[0], pts[1], refs[1] );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+}
+</pre>
+
+<p>Besides accessing the required point and reference, it makes use of my new <a href="#3">JtPairPicker class described below</a> to select the two family instances.</p>
+
+<p>Here is the result of running the new command in your sample model:</p>
+
+<center>
+<img src="img/dimension_instance_edge_or_origin_after.png" alt="Programmatically generated dimensioning to family instance origin" width="280"/>
+</center>
+
+<p>The dimensioning element at the bottom right is the programmatically generated one.</p>
+
+
+<a name="4"></a>
+
+<h4>JtPairPicker Pair Picker Utility Class</h4>
+
+<p>The external command implementation above is very succinct.</p>
+
+<p>To a large extent, this is due to my new JtPairPicker pair picker utility class.</p>
+
+<p>It can be used whenever you wish to automatically retrieve or interactively select two elements of the same type.</p>
+
+<p>For a maximum of flexibility, comfort and efficiency in testing the command, it supports three different possibilities for selecting the two elements:</p>
+
+<ul>
+<li>Run in a model containing exactly two parallel offset pipe elements, they will be automatically selected.</li>
+<li>If no two elements of the required type exist in the model, the command is aborted.</li>
+<li>If more than two such elements exist, we check whether some have been pre-selected before launching the command. If so, the first two are used.</li>
+<li>Otherwise, the user is prompted to interactively (post-) select two elements of the required type.</li>
+</ul>
+
+<p>The implementation is based on my code selecting two pipes for creating
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/explicitly-placing-rolling-offset-pipe-elbow-fittings.html">
+rolling offset pipe elbow fittings</a>,
+
+in which the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/calculating-a-rolling-offset-between-two-pipes.html#2">
+pipe selection implementation</a> constitutes
+
+the major part of the code.</p>
+
+<p>Extracting that into a separate utility class saves a lot of space!</p>
+
+<p>I therefore converted this to a generic templated class and used it in the dimensioning example above to retrieve or pick the two family instances.</p>
+
+<p>Here is the full class implementation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Pick a pair of elements of a specific type.</span>
+<span class="gray">///</span><span class="green"> If exactly two exist in the entire model,</span>
+<span class="gray">///</span><span class="green"> take them. If there are less than two, give</span>
+<span class="gray">///</span><span class="green"> up. If elements have been preselected, use</span>
+<span class="gray">///</span><span class="green"> those. Otherwise, prompt for interactive</span>
+<span class="gray">///</span><span class="green"> picking.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">class</span> <span class="teal">JtPairPicker</span>&lt;T&gt; <span class="blue">where</span> T : <span class="teal">Element</span>
+{
+&nbsp; <span class="teal">UIDocument</span> _uidoc;
+&nbsp; <span class="teal">Document</span> _doc;
+&nbsp; <span class="teal">List</span>&lt;T&gt; _a;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Allow selection of elements of type T only.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">ElementsOfClassSelectionFilter</span>&lt;T2&gt; : <span class="teal">ISelectionFilter</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowElement( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> e <span class="blue">is</span> T2;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> AllowReference( <span class="teal">Reference</span> r, <span class="teal">XYZ</span> p )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> JtPairPicker( <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; _uidoc = uidoc;
+&nbsp; &nbsp; _doc = _uidoc.Document;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return selection result.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">IList</span>&lt;T&gt; Selected
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _a;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Run the automatic or interactive </span>
+&nbsp; <span class="gray">///</span><span class="green"> selection process.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Pick()
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Retrieve all T elements in the entire model.</span>
+&nbsp;
+&nbsp; &nbsp; _a = <span class="blue">new</span> <span class="teal">List</span>&lt;T&gt;(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( _doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( T ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;T&gt;() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = _a.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are less than two, </span>
+&nbsp; &nbsp; <span class="green">// there is nothing we can do.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 &gt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If there are exactly two, pick those.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 == n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// There are more than two to choose from.</span>
+&nbsp; &nbsp; <span class="green">// Check for a pre-selection.</span>
+&nbsp;
+&nbsp; &nbsp; _a.Clear();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = _uidoc.Selection;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = sel.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; n = ids.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} pre-selected elements.&quot;</span>, n );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// If two or more T elements were pre-</span>
+&nbsp; &nbsp; <span class="green">// selected, use the first two encountered.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; T e = _doc.GetElement( id ) <span class="blue">as</span> T;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != e,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;only elements of type T can be picked&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _a.Add( e );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 2 == _a.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Found two pre-selected &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;elements of desired type and &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;ignoring everything else.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// None or less than two elements were pre-</span>
+&nbsp; &nbsp; <span class="green">// selected, so prompt for an interactive </span>
+&nbsp; &nbsp; <span class="green">// post-selection instead.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 2 != _a.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _a.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Select first element.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementsOfClassSelectionFilter</span>&lt;T&gt;(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick first element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _a.Add( _doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> T );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Select second element.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = sel.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ElementsOfClassSelectionFilter</span>&lt;T&gt;(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please pick second element.&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; _a.Add( _doc.GetElement( r.ElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> T );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Download</h4>
+
+<p>As always, the most up to date version of The Building Coder samples is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version including the new JtPairPicker class and CmdDimensionInstanceOrigin external command described above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.0">
+release 2015.0.116.0</a>.</p>

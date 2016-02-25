@@ -1,0 +1,384 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/newcrossfitting-nondescriptive-exception-thrown/td-p/2824298
+
+/a/rvt/TestCrossFitting.rvt
+Z:\a\rvt\TestCrossFitting.rvt
+
+-->
+
+<h3>NewCrossFitting Connection Order</h3>
+
+<p>A long, long time ago, Davex raised a very pertinent question on the error message and
+
+<a href="http://forums.autodesk.com/t5/revit-api/newcrossfitting-nondescriptive-exception-thrown/td-p/2824298">
+nondescriptive exception thrown</a> by
+
+the attempted creation of a new Revit MEP 2014 cross fitting.</p>
+
+<p>I finally get around to addressing that.
+I very much hope that Davex also figured it out in the meantime...</p>
+
+
+<p><strong>Question:</strong> I am attempting to create a cross fitting by calling Owner.Document.Create.NewCrossFitting, passing in 4 connectors to pipes that are on the same plane and lie along orthogonal lines.
+I've verified that the connectors are all at the same point.</p>
+
+<p>When I try to call NewCrossFitting, an InvalidOperationException is thrown, with a message stating the obvious:</p>
+
+<pre>
+  "failed to insert cross"
+</pre>
+
+<p>Are there many scenarios where this exception can be thrown, or does it have one specific meaning?  If the former, is there a way to make a feature request of the Revit developers to write exception descriptions that aren't totally useless?</p>
+
+<!--
+<p>I attached a complete simple external command and the test model to reproduce the issue.</p>
+
+<p>It failed to create cross fittings.</p>
+
+<p>Steps:</p>
+1.       Compile the command, and load it.
+2.       Start the command.
+3.       Window select the four pipes in the model.
+4.       You will see the task dialog showing it failed to insert the cross fitting.
+-->
+
+<p>By the way, many other Revit MEP API method descriptions in the Revit API help file RevitAPI.chm and the developer guide are also very short indeed.
+I hope that more information about them will be made available one of these days.</p>
+
+
+<p><strong>Answer:</strong> The API expects the four cross fitting connectors to be specified in the order main – main – side - side. When the input pipes are selected using the PickElementsByRectangle method, they end up cross selected, and the connection order passed in is main-side-main-side. Once you switch the order back to the expected sequence, the cross fitting will be successfully added.</p>
+
+<p>I agree that the exception messages could be improved to warn users about these kinds of expectations. Part of problem is that in the distant past, these handwritten APIs were often created separately from the internal source code. It is a long overdue project to remove all the  handwritten APIs.</p>
+
+
+<p><strong>Response:</strong> Thanks very much for pointing to the way out.
+This works like a charm.</p>
+
+<p>I once tried to swap the second with the fourth parameters and that failed as well, so I never tried the other order.</p>
+
+<p>The secret is indeed the parameter order: main-main-side-side.</p>
+
+<p>Thanks to Joe Ye and Liang Zhu for clarifying this.</p>
+
+
+
+<a name="2"></a>
+
+<h4>The Building Coder Sample CmdNewCrossFitting Command</h4>
+
+<p>I added the solution to The Building Coder samples as a new external command CmdNewCrossFitting.</p>
+
+<p>Among other things, it demonstrates use of a newly implemented Element extension method GetCurve, the PickElementsByRectangle selection functionality, ensuring that exactly 2, 3 or 4 pipes are selected, and last but not least, the NewTeeFitting and NewCrossFitting methods:</p>
+
+<ul>
+<li><a href="#3">The Element extension method GetCurve</a></li>
+<li><a href="#4">Pipe direction</a></li>
+<li><a href="#5">Parallel pipes predicate</a></li>
+<li><a href="#6">CmdNewCrossFitting implementation</a></li>
+<li><a href="#7">Results</a></li>
+<li><a href="#8">Download</a></li>
+</ul>
+
+<p>By the way, the NewElbowFitting that is also used below was already exercised by the CmdRollingOffset command implemented to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/01/explicitly-placing-rolling-offset-pipe-elbow-fittings.html">explicitly place rolling offset elbow fittings</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>The Element Extension Method GetCurve</h4>
+
+<p>I implemented a new extension method for the Revit API Element class to provide direct access to the geometrical Curve element encapsulated in the Element Location property, if it exists:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">JtElementExtensionMethods</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the curve from a Revit database Element </span>
+&nbsp; <span class="gray">///</span><span class="green"> location curve, if it has one.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Curve</span> GetCurve( <span class="blue">this</span> <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != e.Location,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected an element with a valid Location&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> lc = e.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != lc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected an element with a valid LocationCurve&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> lc.Curve;
+&nbsp; }
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Pipe Direction</h4>
+
+<p>The analysis of the geometrical pipe relationships with each other obviously requires us to determine their direction. That is provided by the following trivial method:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the normalised direction of the given pipe.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="teal">XYZ</span> GetPipeDirection( <span class="teal">Pipe</span> pipe )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Curve</span> c = pipe.GetCurve();
+&nbsp; &nbsp; <span class="teal">XYZ</span> dir = c.GetEndPoint( 1 ) - c.GetEndPoint( 1 );
+&nbsp; &nbsp; dir = dir.Normalize();
+&nbsp; &nbsp; <span class="blue">return</span> dir;
+&nbsp; }
+</pre>
+
+<a name="5"></a>
+
+<h4>Parallel Pipes Predicate</h4>
+
+<p>A similarly trivial comparison of the directions of two given pipes tells us whether they are parallel or not:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Are the two given pipes parallel?</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">bool</span> IsPipeParallel( <span class="teal">Pipe</span> p1, <span class="teal">Pipe</span> p2 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Line</span> c1 = p1.GetCurve() <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; <span class="teal">Line</span> c2 = p2.GetCurve() <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Sin( c1.Direction.AngleTo(
+&nbsp; &nbsp; &nbsp; c2.Direction ) ) &lt; 0.01;
+&nbsp; }
+</pre>
+
+
+<a name="6"></a>
+
+<h4>CmdNewCrossFitting Implementation</h4>
+
+<p>With these tools in hand, we are now ready for the interesting part.</p>
+
+<p>We prompt the user to select 2, 3 or 4 pipes.</p>
+
+<p>The selection process continues until she succeeds in doing so or cancels, in which case the ensuing exception is handled gracefully.</p>
+
+<p>The number of pipes selected determines whether an elbow, tee or cross fitting is inserted.</p>
+
+<p>The geometric relationships between the pipes are used to determine the correct order to pass in the connectors to the respective creation methods.</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Element</span>&gt; pipes = <span class="blue">null</span>;
+&nbsp; <span class="blue">int</span> n = 0;
+&nbsp;
+&nbsp; <span class="green">// Ensure that 2, 3 or 4 pipes are selected.</span>
+&nbsp;
+&nbsp; <span class="blue">while</span>( n &lt; 2 || 4 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( 0 != n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;You picked {0} pipe{1}. &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Please only pick 2, 3 or 4.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = app.ActiveUIDocument.Selection;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ISelectionFilter</span> filter = <span class="blue">new</span> <span class="teal">CmdRollingOffset</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">PipeElementSelectionFilter</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; pipes = sel.PickElementsByRectangle(
+&nbsp; &nbsp; &nbsp; &nbsp; filter, <span class="maroon">&quot;Please pick some pipes.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">InvalidOperationException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; n = pipes.Count;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> pt = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;CreateConnector&quot;</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( pipes.Count() &lt;= 1 )
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Pipe</span> pipe1 = pipes[0] <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp; &nbsp; <span class="teal">Pipe</span> pipe2 = pipes[1] <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Curve</span> curve1 = pipe1.GetCurve();
+&nbsp; &nbsp; <span class="teal">Curve</span> curve2 = pipe2.GetCurve();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = curve1.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q1 = curve1.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p2 = curve2.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q2 = curve2.GetEndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( q1.DistanceTo( p2 ) &lt; 0.1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pt = ( q1 + p2 ) * 0.5;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( q1.DistanceTo( q2 ) &lt; 0.1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pt = ( q1 + q2 ) * 0.5;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( p1.DistanceTo( p2 ) &lt; 0.1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pt = ( p1 + p2 ) * 0.5;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( p1.DistanceTo( q2 ) &lt; 0.1 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; pt = ( p1 + q2 ) * 0.5;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Please select two pipes &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;with near-by endpoints.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> c1 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipe1, pt );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Connector</span> c2 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; pipe2, pt );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( pipes.Count() == 2 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( IsPipeParallel( pipe1, pipe2 ) == <span class="blue">true</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewUnionFitting( c1, c2 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewElbowFitting( c1, c2 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( pipes.Count() == 3 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> pipe3 = pipes[2] <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v1 = GetPipeDirection( pipe1 );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v2 = GetPipeDirection( pipe2 );
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v3 = GetPipeDirection( pipe3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> c3 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; &nbsp; pipe3, pt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Sin( v1.AngleTo( v2 ) ) &lt; 0.01 ) <span class="green">//&#24179;&#34892;</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewTeeFitting( c1, c2, c3 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="green">//v1, &#21644;v2 &#22402;&#30452;.</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Sin( v3.AngleTo( v1 ) ) &lt; 0.01 ) <span class="green">//v3, V1 &#24179;&#34892;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewTeeFitting( c3, c1, c2 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="green">//v3, v2 &#24179;&#34892;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewTeeFitting( c3, c2, c1 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( pipes.Count() == 4 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> pipe3 = pipes[2] <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Pipe</span> pipe4 = pipes[3] <span class="blue">as</span> <span class="teal">Pipe</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> c3 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; &nbsp; pipe3, pt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Connector</span> c4 = <span class="teal">Util</span>.GetConnectorClosestTo(
+&nbsp; &nbsp; &nbsp; &nbsp; pipe4, pt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//&#20197;&#20174;&#21738;c1&#20026;&#20837;&#21475;.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The required connection order for a cross </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// fitting is main &#8211; main &#8211; side - side.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( IsPipeParallel( pipe1, pipe2 ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewCrossFitting(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c1, c2, c3, c4 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( IsPipeParallel( pipe1, pipe3 ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewCrossFitting(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c1, c3, c2, c4 );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot insert cross fitting&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ex.Message );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( IsPipeParallel( pipe1, pipe4 ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doc.Create.NewCrossFitting(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c1, c4, c2, c3 );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Result</h4>
+
+<p>Here is the initial starting point with four perpendicular pipes meeting in a common point:</p>
+
+<center>
+<img src="img/cross_fitting_pipes.png" alt="Four pipes meeting in a point" width="452"/>
+</center>
+
+<p>The result of running the CmdNewCrossFitting command and selecting all four pipes now looks like this:</p>
+
+<center>
+<img src="img/cross_fitting_result.png" alt="The resulting cross fitting"/>
+</center>
+
+
+<a name="8"></a>
+
+<h4>Download</h4>
+
+<p>The most up to date version of The Building Coder samples is always provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version described above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.115.0">
+release 2015.0.115.0</a>.</p>

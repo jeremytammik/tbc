@@ -1,0 +1,126 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+07790937 [Revit Lookup error]
+Saeed KarshenasMarquette Univ
+
+-->
+
+<h3>RevitLookup is on GitHub and You are Invited to Collaborate</h3>
+
+<p>I sincerely hope that everybody reading this is aware of the power and importance of RevitLookup, has already installed it, and is an avid user.</p>
+
+<p>If you do not know what I am talking about, please read these previous posts on the topic, noting that it was previously named RvtMgdDbg, short for 'Revit managed debugging tool':</p>
+
+<!-- 101 204 238 370 909 923 -->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/rvtmgddbg.html">RvtMgdDbg</a>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/fixing-rvtmgddbg-for-mep-connectors.html">Fixing RvtMgdDbg for MEP Connectors</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/10/rvtmgddbg-for-revit-2010.html">RvtMgdDbg for Revit 2010</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/revitlookup-update.html">RevitLookup Update</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/units-and-revitlookup.html">Units and RevitLookup</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/getting-started-with-the-revit-api.html">Getting Started with the Revit API</a></li>
+</ul>
+
+<p>RevitLookup is currently included in the Revit SDK or Software Developer Kit that can be downloaded from the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.
+
+<p>In a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/the-adn-sample-adnrme-for-revit-mep-2014.html?cid=6a00e553e1689788330191034be6cc970c#comment-6a00e553e1689788330191034be6cc970c">
+comment</a> on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/06/the-adn-sample-adnrme-for-revit-mep-2014.html">
+AdnRme sample</a>,
+
+Matt Mason of
+
+<a href="http://imaginit.com/software-solutions/building-architecture/IMAGINiT-Clarity-Workshare">
+IMAGINiT Technologies</a> suggested
+
+hosting it on GitHub instead, to facilitate community enhancements.</p>
+
+<p>I talked this over with the development team and now finally got around to doing it.</p>
+
+
+<a name="2"></a>
+
+<h4>RevitLookup GitHub Repository</h4>
+
+<p>RevitLookup now lives in its own
+
+<a href="https://github.com/jeremytammik/RevitLookup">
+RevitLookup repository</a> on GitHub.</p>
+
+<p>I already integrated some enhancements for structural models provided by Thomas Fink of
+
+<a href="http://www.sofistik.com">SOFiSTiK AG</a>.</p>
+
+<p>I made Matt Mason a collaborator on this project and he added some generic enhancements of his own as well, with no need for me to intervene at all in any way.</p>
+
+<p>The current version on GitHub thus already sports some improvements over the standard SDK one, so I would suggest you upgrade to that right away.
+Simply clone it to your desktop, compile, and replace your existing .NET assembly DLL with the new one.</p>
+
+
+<a name="3"></a>
+
+<h4>Invitation to Collaborate</h4>
+
+<p>I am happy to welcome anyone else as well who would like to collaborate on this project.</p>
+
+<p>To begin with, however, to get to know you a little, I would suggest that you use 'Fork & Pull' approach as opposed to the 'Shared Repository' approach, so that I can see what you plan to do.</p>
+
+<p>For details on how to go about this, please look at</p>
+
+<ul>
+<li><a href="https://help.github.com/articles/using-pull-requests">Using Pull Requests</a></li>
+<li><a href="http://gun.io/blog/how-to-github-fork-branch-and-pull-request">How to GitHub: Fork, Branch, Track, Squash and Pull Request</a></li>
+</ul>
+
+<p>Before you can contribute anything at all, of course, you need to discover a problem and fix it.</p>
+
+<p>Here are some words from an old ADN case on such an issue:</p>
+
+
+<a name="4"></a>
+
+<h4>Fixing RevitLookup</h4>
+
+<p><strong>Question:</strong> I have used RevitLookup with Revit Architecture without any problems.</p>
+
+<p>When I use it with Revit Structure it works as long as I do not try to snoop a rebar.</p>
+
+<p>Is there a version of RevitLookup that can snoop rebar elements?</p>
+
+<p>Without a software like RevitLookup it would be very time consuming to learn how to access rebar data.</p>
+
+
+<p><strong>Answer:</strong> You can fix any problems that you encounter in RevitLookup yourself, if you like.</p>
+
+<p>Simply run RevitLookup in the Visual Studio debugger, select the offending Revit element, and see what is causing the problem.</p>
+
+<p>Normally, an exception is thrown, which terminates the operation.</p>
+
+<p>If you add an exception handler around the offending line, then all the other information will still be displayed.</p>
+
+<p>That is a cheap fix and workaround solution.</p>
+
+<p>A better solution, of course, is to implement an improved handling of the problematic element, which is often also quite simple.</p>
+
+<p>I haven discussed several such improvements in the past on the blog, e.g.,
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/08/fixing-rvtmgddbg-for-mep-connectors.html">
+fixing RevitLookup for MEP connectors</a>.</p>
+
+<p>You have the source. The power is in your hands.</p>
+
+<p>With the new repository in place, any useful enhancements can easily be integrated into the main stream for all to share and enjoy.</p>
+
+<p>Good luck and have fun debugging and enhancing RevitLookup together!</p>
+

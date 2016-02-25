@@ -1,0 +1,124 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- Cloud Accelerator
+
+- http://www.bdcnetwork.com/bim-becomes-vdc
+  BIM becomes VDC &ndash; A case study in disruption by John Tobin, LEED AP
+
+- 10195315 [Close and relinquish without saving or syncing through the API]
+
+-->
+
+<h3>Cloud Accelerator, VDC and Transaction Groups</h3>
+
+<p>Wow, hark these cool topics for today:</p>
+
+<ul>
+<li><a href="#2">Autodesk Cloud Accelerator workshop invitation</a></li>
+<li><a href="#3">BIM becomes VDC</a></li>
+<li><a href="#4">Using Transaction Groups to Relinquish Elements Without Saving or Syncing</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Autodesk Cloud Accelerator Workshop Invitation</h4>
+
+<p>Autodesk just announced the
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/11/get-ready-for-the-autodesk-cloud-accelerator-program.html">
+2015 Autodesk Cloud Accelerator</a>,
+
+a two-week workshop in March 2015 in our San Francisco office for up to 14 creative software developers.</p>
+
+<p>For two weeks, March 9 to March 20, 2015, participants will work intensively on their chosen project with the help, support, and training of the Autodesk Cloud engineering teams.  This includes daily classes by industry experts on important aspects of cloud development and 1 on 1 help from these experts in real time. At the end of the Accelerator, you will also have the opportunity to present your prototype to senior Autodesk Executives.</p>
+
+<center>
+<img src="img/cloud_accelerator.jpg" alt="Autodesk Cloud Accelerator" width="250"/>
+</center>
+
+<p>If you are interested in joining the adventure, please look at Stephen Preston's more detailed invitation to
+
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2014/11/get-ready-for-the-autodesk-cloud-accelerator-program.html">
+get ready for the Autodesk cloud accelerator program</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>BIM Becomes VDC</h4>
+
+<p>Some people are still struggling to contend that BIM is hype.</p>
+
+<p>Whatever are they going to say about VDC, virtual design and construction?</p>
+
+<p>That seems to be the direction the industry is heading right now.</p>
+
+<p>To learn more, take a look at
+
+<a href="http://www.bdcnetwork.com/bim-becomes-vdc">
+BIM becomes VDC</a>,
+
+<i>A case study in disruption</i>, by John Tobin, LEED AP.</p>
+
+
+<a name="4"></a>
+
+<h4>Using Transaction Groups to Relinquish Elements Without Saving or Syncing</h4>
+
+<p><strong>Question:</strong> I have a valid local file open in Revit which has been modified by my add-in.
+Can I programmatically close this file without syncing, saving, or leaving any elements checked out by the current user?</p>
+
+<p>It's possible to relinquish un-modified elements using the WorksharingUtils.RelinquishOwnership method.
+However, this will not relinquish the modified elements.</p>
+
+<p>The documentation for Document.Close also doesn't mention anything about relinquishing checked out elements.</p>
+
+<p>So, is the only way to do this to close without saving, re-open the same model, and then call RelinquishOwnership?</p>
+
+<p><strong>Answer:</strong> Thank you for your interesting query.</p>
+
+<p>One obvious approach would be to encapsulate all of the changes performed by your add-in in a transaction group and roll that back again before terminating your add-in command sequence.</p>
+
+<p><strong>Response:</strong> Yeah, rolling back a transaction is the obvious things to do.
+Unfortunately with the tool I'm working on a number of transactions will have been committed before it decides that it needs to discard the changes.</p>
+
+<p>What about a TransactionGroup?</p>
+
+<p>If I commit transactions that check out elements inside a transaction group and then roll back the transaction group will this also relinquish the checked out elements?</p>
+
+<p>At least at then those elements would not longer be modified, so Relinquish should work.</p>
+
+<p><strong>Answer:</strong> Yes, exactly.
+I was not sure whether that was obvious to you, which is why I pointed it out.</p>
+
+<p>Some Revit API interactions do in fact require a committed transaction, or a whole series of sequential committed transactions, in order to fulfil certain tasks.</p>
+
+<p>All of these transactions can be fully committed, and will still be rolled back if the entire series is encapsulated in a transaction group.</p>
+
+<p>Here is the description of the TransactionGroup class in the Revit API help file RevitAPI.chm:</p>
+
+<div style="color:darkblue">
+
+<p>Transaction groups aggregate a number of transactions.</p>
+
+<p>A transaction group controls whether transactions committed inside the group should stay committed or should be all discarded. If the group is committed, all the transactions remain committed, but if the transaction group is rolled back instead, all the inner, already committed transactions will be undone (and removed).</p>
+
+<p>There are two ways of committing a group &ndash; Commit and Assimilate. By committing, all transactions committed inside a group stay as they are, while by assimilating, all inner transactions will be merged into a single transaction.</p>
+
+<p>A transaction group can only be started when no transaction is active, and must be closed only after the last transaction started inside the group is finished, i.e. after it was either committed or rolled back.</p>
+
+<p>Transaction groups may be nested inside each other with the restriction that every nested transaction group is entirely contained (opened and closed) in the parent transaction group.</p>
+
+</div>
+
+<p>Just like transactions themselves, the simplest, most effective and fool proof way of handling transaction groups in .NET code is to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+encapsulate them in a 'using' statement</a>.</p>
+
+<p>I hope this helps.</p>

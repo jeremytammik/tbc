@@ -1,0 +1,176 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+- class diagram
+  08662948 [2014 Revit Object Model]
+  http://forums.autodesk.com/t5/Autodesk-Revit-API/2014-Revit-Object-Model/m-p/4357581
+
+-->
+
+
+<h3>Split Personality and Revit API Class Diagram</h3>
+
+<p>Developers have been requesting a Revit API class diagram for years.</p>
+
+<p>There used to be one back in the dawn of time, up
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/no-revit-api-class-diagram.html">
+until the Revit 2010 API</a>.</p>
+
+<p>Now the question came up again with a happy resolution in the
+
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread on the
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/2014-Revit-Object-Model/m-p/4357581">2014 Revit object model</a>.</p>
+
+<p>Before I get to that, I have an important personal announcement to make:</p>
+
+
+<a name="2"></a>
+
+<h4>The 3D Web Coder Commenced, Embarked, Blasted Off and Away</h4>
+
+<p>In an attempt to clarify the purpose of my being, or
+
+<a href="https://en.wikipedia.org/wiki/Dissociative_identity_disorder">
+multiple beings</a>,
+
+you will be glad to hear that I split off my schizophrenic cloud and mobile
+
+<a href="https://en.wikipedia.org/wiki/Alter_ego">alter</a>
+
+into a new blog,</p>
+
+<br/>
+
+<p style="text-align:center; font-size:xx-large; font-weight:bold; color:darkorange;">
+<a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a></p>
+
+<br/>
+
+<p>Many of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/cloud">cloud</a> and
+
+<a href="http://thebuildingcoder.typepad.com/blog/mobile">mobile</a> related
+
+topics that I discussed here in the past will be handled there by that part of me from now on.</p<>
+
+<p>So far, The 3D Web Coder is still getting started and looking at things like this:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-brackets-editor.html">The web enabled Brackets editor</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">The Node.js server platform</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/preparing-for-processing-query-string-server-arguments.html">A JavaScript function to process query strings</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/processing-query-strings-in-javascript-and-node.html">Processing query strings in JavaScript and Node</a></li>
+</ul>
+
+<p>The next step will be to run a server live and accessible somewhere on the big wild worldwide web, e.g., using a service such as
+
+<a href="http://www.herokuapp.com">Heroku</a>.
+
+<p>Once I have that in place, I can move on more interesting &ndash; e.g., graphical &ndash; aspects such as using them to drive 2D and 3D graphics.</p>
+<p>For 2D, think exporting a Revit floor plan to a web server displaying it using SVG in conjunction with relevant associated metadata.</p></p>
+
+<p>Obviously, these two alters will have to talk with each other, at least now and then.</p>
+
+<p>I wish both my alters all the best and lots of fun exploring and documenting their respective domains!</p>
+
+
+
+<a name="3"></a>
+
+<h4>The Revit API Class Diagram</h4>
+
+<p>Back to the Revit API and the
+
+<a href="http://forums.autodesk.com/t5/Autodesk-Revit-API/2014-Revit-Object-Model/m-p/4357581">
+Revit API object model</a> discussion thread:</p>
+
+<p><strong>Question:</strong>
+
+I am getting back into programming using the Revit API. The last version of the API that I used was 2010. Back then there was a graphical representation of the Revit Object Model in PNG format (Revit API Class Diagram.png). I have not been able to locate one for the Revit 2014 Object model. Does anyone know if one exists?</p>
+
+<p><strong>Answer:</strong>
+
+I am sorry, we haven't provided an API class chart for years. The Revit API has been growing rapidly in the past years and it became impractical at some point to try to fit everything in one single chart.</p>
+
+<p>The Revit 2010 version is indeed the last one provided officially.</p>
+
+<p>The Building Coder discussed the fact that
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/no-revit-api-class-diagram.html">no Revit API class diagram</a> is
+
+available, explaining more details, what tools to use instead, and how you might be able to create one for yourself.</p>
+
+
+<p><strong>Response:</strong>
+
+Call me a little crazy but I actually like these things (visual diagrams of API).
+For a person who doesn't know what exactly they are looking for in an API to do a certain function or item then it's really nice to quickly glance and be able to have a visual of how things are structured.
+So the visual person in me likes them and can remember something on a diagram like this, versus going through text documents, a lot easier.
+I know it's a lot, but I have used the Inventor object model chart for programs on numerous occasions.</p>
+
+<p><strong>Answer:</strong>
+
+I did a quick check on the Internet and came up with an
+
+<a href="https://sachabarbs.wordpress.com/category/autodiagrammer-my-reflector-addin">
+enhanced version of AutoDiagrammer</a>,
+
+mentioned in the discussion listed above, plus a neat suggestion on stackoverflow on
+
+<a href="http://stackoverflow.com/questions/8152000/how-to-get-a-nice-class-diagram-for-built-in-net-classes">
+how to get a nice class diagram for built-in .NET classes</a> using
+
+built-in Visual Studio tools, as far as I understand.</p>
+
+<p>Would you like to try it on the Revit API and let us know what you come up with?</p>
+
+<p><strong>Response:</strong>
+
+I did a quick test of the approach described in the link Jeremy suggested.
+I can confirm that this works in Visual Studio 2013 &ndash; although I had to drag and drop from a class view instead of the object browser.</p>
+
+<p>I've attached the result generated after a couple of 'expand/layout diagram':</p>
+
+<ul>
+<li><a href="zip/ClassDiagram_2015_Revit_DB.pdf">ClassDiagram_2015_Revit_DB.pdf</a></li>
+<li><a href="zip/ClassDiagram_2015.zip">ClassDiagram_2015.zip</a></li>
+</ul>
+
+<p>When I zoom the PDF to about 1600% it's readable, but I'm sure the layout can be improved with a little more effort &nbsp; :-) &nbsp; (It covers the 2015 Revit.DB namespace, by the way).</p>
+
+<p><strong>Answer:</strong>
+
+Well done! Thank you for trying it out!</p>
+
+<p>I added it to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+
+<p>The Revit.DB namespace class diagram is available as
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/ClassDiagram_2015_Revit_DB.cd">
+ClassDiagram_2015_Revit_DB.cd</a> in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.120.2">
+release 2015.0.120.2</a> and later.</p>
+
+<p>It really is very hard to navigate and read, though:</p>
+
+<center>
+<img src="img/ClassDiagram_2015_Revit_DB.png" alt="Revit.DB namespace class diagram" width="400"/>
+</center>
+
+<p>The image above is showing less than a tenth of the width.</p>
+
+<p>Now we just need a volunteer to format it nicely...</p>
+
+<p>Many thanks to Peter
+
+(<a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/2663907">pjohan13</a>)
+
+for jumping in again and trying this out!</p>

@@ -1,0 +1,217 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+10721171 [Get reference planes in family instance]
+
+http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html?cid=6a00e553e16897883301b7c788f437970b#comment-6a00e553e16897883301b7c788f437970b
+
+10721742 [Create dimension to wall wrap at insert?]
+
+#revitapi #adsk #bim #adskdevnetwrk #3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>How to Retrieve Dimensioning References</h3>
+
+<p>Several cases recently came up asking how to obtain references to programmatically create dimensioning elements.</p>
+
+<p>These hints expand on the recently discussed topic of creating
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/picking-pairs-and-dimensioning-family-instance-origin.html">
+dimensioning between family instance insertion points</a>.</p>
+
+<p>They were raised by the following queries on how to retrieve suitable references for dimensioning:</p>
+
+<ul>
+<li><a href="#2">Dimensioning to family instance centre reference planes</a></li>
+<li><a href="#3">Dimensioning between a grid and an edge of a face</a></li>
+<li><a href="#4">Dimensioning to the wall opening wrapping location</a></li>
+</ul>
+
+<p>Before getting to that, I'll just add that I returned safe and sound from the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/cloning-a-solid-angelhack-3d-web-fest-and-dubai.html">
+Dubai hackathon</a> that I mentioned last Friday.</p>
+
+<p>I reported on the event during the weekend, discussing
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/dubai-hackathon-preparation-and-viewer-workshop.html#6">hackathon preparation</a> in general, the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/dubai-hackathon-preparation-and-viewer-workshop.html#7">View and Data API workshop</a> and the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/dubai-hackathon-project-presentation-notes.html">hackathon projects presented</a>.</p>
+
+<p>Back to the Revit API and the topic at hand:</p>
+
+
+<a name="2"></a>
+
+<h4>Dimensioning to Family Instance Centre Reference Planes</h4>
+
+<p><strong>Question:</strong>
+
+I want to get the reference planes in a family instance for dimension creation with the API.</p>
+
+<p>For example, use the API to create a dimension between the centre references of two windows.</p>
+
+<p>The following test code, for example, does not find the reference planes I need:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> ListFamilyGeometry( <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Reference</span> r;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; .<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = doc.GetElement( r )
+&nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( fi == <span class="blue">null</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Transform</span> transform = fi.GetTransform();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> data = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Options</span> options = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; options.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> go <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; fi.get_Geometry( options ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; data += go.GetType().ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Environment</span>.NewLine;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( go <span class="blue">is</span> <span class="teal">GeometryInstance</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryInstance</span> gi = go <span class="blue">as</span> <span class="teal">GeometryInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> goSymbol <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; gi.GetSymbolGeometry() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; data += <span class="maroon">&quot; - &quot;</span> + goSymbol.GetType().ToString()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Environment</span>.NewLine;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( goSymbol <span class="blue">is</span> <span class="teal">Line</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = goSymbol <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; makeLine( doc, transform.OfPoint(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; line.GetEndPoint( 0 ) ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; transform.OfPoint( line.GetEndPoint( 1 ) ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;data&quot;</span>, data );
+&nbsp; }
+</pre>
+
+<p><strong>Answer:</strong>
+
+I assume you have read about <a href="http://thebuildingcoder.typepad.com/blog/2014/11/picking-pairs-and-dimensioning-family-instance-origin.html">dimensioning between family instance origins</a>.</p>
+
+<p>If your window symbols have their insertion points at the same location as the centre reference, you could use that approach.</p>
+
+<p>To address your real requirement, though, you need to retrieve the centre references directly.</p>
+
+<p>Here are some important aspects that you need to keep in mind to retrieve the references to create dimensioning between the centre references of two family instances, e.g. windows:</p>
+
+<ul>
+<li>IncludeNonVisibleGeometry is required to be set, just as you have done in your sample code snippet.</li>
+<li>The geometry must be extracted from a view where the reference would be useful.  In the example below, no View is passed to the geometry options.  In that case, the model level geometry is extracted, which lacks view specific references like reference planes orthogonal to the view.</li>
+<li>Once you pass in a suitable view and obtain these extra references, there is nothing to identify them.  You  have to analyse the geometry to figure out which one is the 'centre' one.  For 2D views, reference planes may be returned as lines (Curve instances) instead of planes.</li>
+</ul>
+
+<p>These aspects have been mentioned in the past; still, I hope it helps to spell them out explicitly again here and now.</p>
+
+
+<a name="3"></a>
+
+<h4>Dimensioning Between a Grid and an Edge of a Face</h4>
+
+<p>The following query was raised by Samer Habib in a
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html?cid=6a00e553e16897883301b7c788f437970b#comment-6a00e553e16897883301b7c788f437970b">comment</a> on
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a>:</p>
+
+<p><strong>Question:</strong>
+
+I am trying to create a new dimension between a grid and an edge of a face.</p>
+
+<p>I get the reference of grid by grid.Curve.reference and I get the reference of the face edge.</p>
+
+<p>However, in the NewDimension method the references argument requires an array of geometric references to which the dimension is to be bound.</p>
+
+<p>The grid does not seem to have any such geometric reference.</p>
+
+<p>Therefore, when I call the NewDimension method, it throws an 'Invalid number of references' error.</p>
+
+<p>How can I solve this, please?</p>
+
+<p><strong>Answer:</strong>
+
+The answer is exactly the same as above:</p>
+
+<p>Please note the description of <a href="http://thebuildingcoder.typepad.com/blog/2014/11/picking-pairs-and-dimensioning-family-instance-origin.html">dimensioning between instance insertion points</a>, plus these additional important aspects:</p>
+
+<ul>
+<li>Set IncludeNonVisibleGeometry when requesting the element geometry.</li>
+<li>The geometry must be extracted from a view where the reference would be useful. In the example below, no View is passed to the geometry options. In that case, the model level geometry is extracted, which lacks view specific references like reference planes orthogonal to the view.</li>
+<li>Once you pass in a suitable view and obtain these extra references, there is nothing to identify them. You have to analyse the geometry to figure out which one is the one you need. For instance, for 2D views, reference planes may be returned as lines (Curve instances) instead of planes.</li>
+</ul>
+
+<p><strong>Response:</strong>
+
+Yes!</p>
+
+<p>I now set the options like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Options</span> goption = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; goption.ComputeReferences = <span class="blue">true</span>;
+&nbsp; goption.IncludeNonVisibleObjects = <span class="blue">true</span>;
+&nbsp; goption.View = doc.ActiveView;
+</pre>
+
+<p>That returns the grid geometry and the problem is solved.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Dimensioning to the Wall Opening Wrapping Location</h4>
+
+<p>Here is another query on dimensioning to a specific location that does not directly provide any built-in references of its own:</p>
+
+<p><strong>Question:</strong>
+
+Can the API be used to create a dimension to the wrapping location of an insert in a wall?</p>
+
+<p>Here is an example of the desired dimension:</p>
+
+<center>
+<img src="img/dimension_to_wall_opening_wall_wrap_location.png" alt="Dimension to wall opening wall wrap location" width="309"/>
+</center>
+
+<p>If it is not possible to get a reference to this location, can the location be found so a detail line can be created which could be used for the dimension?</p>
+
+<p><strong>Answer:</strong>
+
+Yes, this location can be found as described in the discussion on <a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">retrieving detailed wall layer geometry</a>. </p>

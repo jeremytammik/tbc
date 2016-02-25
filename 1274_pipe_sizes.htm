@@ -1,0 +1,100 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html#comment-6a00e553e16897883301b7c73f5a49970b
+
+bc_migr_2015_g.txt
+
+Autodesk Waltham - MEP.rvt
+
+pipesizes.txt
+
+-->
+
+<h3>List Pipe Sizes and More Obsolete API Usage Removal</h3>
+
+<p>I was ill for a few days last week, with a fever and a virus.</p>
+
+<p>I also made a quick trip to Moscow, where we held the final event in this year's sequence of DevDays conferences.</p>
+
+<p>For the first time in my life, I gave my presentations in a woolly hat  :-)</p>
+
+<p>I also rented my first <a href="https://www.airbnb.com">airbnb</a> flat ever, on Arbat street in the center of town, and was pretty happy with that.</p>
+
+<p>I returned back to Switzerland on Friday, and back to health during the weekend.</p>
+
+<p>During last week, I also preformed quite a bit of cleanup on the Revit API code samples on GitHub, continuing the on-going task of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/determining-intersecting-elements-and-continued-futureproofing.html#2">
+eliminating all deprecated API usage</a> before
+
+the methods and properties become obsolete and are completely removed.</p>
+
+<p>Another enhancement was the addition of a new external command CmdListPipeSizes prompted by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html?cid=6a00e553e16897883301b7c73f5a49970b#comment-6a00e553e16897883301b7c73f5a49970b">
+Drew's suggestion</a> on
+
+how to obtain a list of all pipe sizes being used in a project, based on a code snippet provided in the Revit API help file RevitAPI.chm description of the Segment class.</p>
+
+<p>It retrieves all pipe segments in the project and lists their nominal, outer and inner diameter to a text file:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _filename = <span class="maroon">&quot;C:/pipesizes.txt&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> FootToMmString( <span class="blue">double</span> a )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.FootToMm( a )
+&nbsp; &nbsp; &nbsp; .ToString( <span class="maroon">&quot;0.##&quot;</span> )
+&nbsp; &nbsp; &nbsp; .PadLeft( 8 );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List all the pipe segment sizes in the given document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;doc&quot;&gt;&lt;/param&gt;</span>
+&nbsp; <span class="blue">void</span> GetPipeSegmentSizes(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> segments
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Segment</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamWriter</span> file = <span class="blue">new</span> <span class="teal">StreamWriter</span>(
+&nbsp; &nbsp; &nbsp; _filename, <span class="blue">true</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Segment</span> segment <span class="blue">in</span> segments )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; file.WriteLine( segment.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">MEPSize</span> size <span class="blue">in</span> segment.GetSizes() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; file.WriteLine( <span class="blue">string</span>.Format( <span class="maroon">&quot;&nbsp; {0} {1} {2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FootToMmString( size.NominalDiameter ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FootToMmString( size.InnerDiameter ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FootToMmString( size.OuterDiameter ) ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Running it in the Autodesk Waltham office MEP sample model <i>Autodesk Waltham - MEP.rvt</i> generates this
+
+<a href="zip/pipesizes.txt">pipesizes.txt output file</a>.</p>
+
+<p>As always,
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples GitHub repository</a> hosts
+
+the most up-to-date version, including:</p>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.8">release 2015.0.116.8</a> &ndash; updated copyright year to 2015</li>
+<li><a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.9">release 2015.0.116.9</a> &ndash; eliminated obsolete API usage, <a href="zip/bc_migr_2015_g.txt">15 warnings left</a></li>
+<li><a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.117.0">release 2015.0.117.0</a> &ndash; implemented CmdListPipeSizes</li>
+</ul>

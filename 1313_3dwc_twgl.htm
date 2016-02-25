@@ -1,0 +1,275 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+#revitapi #3dwebcoder #webgl #3dweb #html5 #nodejs #heroku
+
+akn_include
+
+-->
+
+
+<h3>Live Rendering of 3D Revit Element Geometry in a Remote WebGL Viewer</h3>
+
+<p>Today, I'll implement live real-time export of 3D geometry from a Revit add-in to a web-hosted WebGL viewer.</p>
+
+<p>This is an enhancement to the initial version
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/exporting-3d-element-geometry-to-a-webgl-viewer.html">
+exporting 3D element geometry to a WebGL viewer</a>,
+which just generated data that I copied and pasted to hard-code it into the
+<a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL viewer</a> as
+a proof of concept.</p>
+
+<p>Meanwhile, I enhanced the WebGL viewer in various ways to prepare it for this real-time live connection, mainly by adding a REST API and support for HTTP POST:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-a-node-rest-api-server.html">Implementing a Node REST API server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-node-server-http-post-get-vs-post.html">Implementing HTTP POST</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/post-data-and-swig-driven-webgl-viewer-node-server.html">Adding a view engine</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/node-server-rendering-using-either-swig-and-handlebars.html">POST geometry data to the viewer</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/cleaner-node-server-rest-api-implementation.html">Cleaning up the Node server REST API implementation</a></li>
+</ul>
+
+<p>Now that the viewer sports a REST API accepting POST data, the time has come to drive it directly from the Revit add-in instead of copy and paste of hard-coded geometry data into the viewer.
+
+<p>Here are the steps I took to achieve this:</p>
+
+<ul>
+<li><a href="#2">Package geometry data into JSON</a></li>
+<li><a href="#3">Send an HTTP POST Request and Display Result in Browser</a></li>
+<li><a href="#4">Install Node.js on Windows</a></li>
+<li><a href="#5">Demo</a></li>
+<li><a href="#6">Download</a></li>
+<li><a href="#7">Next steps</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Package Geometry Data into JSON</h4>
+
+<p>I retrieve the geometry to be rendered by analysing the element geometry of a selected Revit element and generating lists of face vertices, normal vectors and indices to represent it.</p>
+
+<p>In the initial implementation, I just printed this data to the debug console for manual copy and paste to the viewer.</p>
+
+<p>Now I package that data into a JSON string for rendering via the <a href="#3">DisplayWgl</a> method like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; faceIndices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">int</span>&gt; faceVertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">int</span>&gt;();
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; faceNormals = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+
+&nbsp; . . .
+
+&nbsp; <span class="green">// Scale the vertices to a [-1,1] cube </span>
+&nbsp; <span class="green">// centered around the origin. Translation</span>
+&nbsp; <span class="green">// to the origin was already performed above.</span>
+&nbsp;
+&nbsp; <span class="blue">double</span> scale = 2.0 / FootToMm( MaxCoord( vsize ) );
+&nbsp;
+&nbsp; <span class="blue">string</span> sposition = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; faceVertices.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; i =&gt; ( i * scale ).ToString( <span class="maroon">&quot;0.##&quot;</span> ) ) );
+&nbsp;
+&nbsp; <span class="blue">string</span> snormal = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; faceNormals.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; f =&gt; f.ToString( <span class="maroon">&quot;0.##&quot;</span> ) ) );
+&nbsp;
+&nbsp; <span class="blue">string</span> sindices = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; faceIndices.ConvertAll&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; i =&gt; i.ToString() ) );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;position: [{0}],&quot;</span>, sposition );
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;normal: [{0}],&quot;</span>, snormal );
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;indices: [{0}],&quot;</span>, sindices );
+&nbsp;
+&nbsp; <span class="blue">string</span> json_geometry_data =
+&nbsp; &nbsp; <span class="maroon">&quot;{ \&quot;position\&quot;: [&quot;</span> + sposition
+&nbsp; &nbsp; + <span class="maroon">&quot;],\n\&quot;normal\&quot;: [&quot;</span> + snormal
+&nbsp; &nbsp; + <span class="maroon">&quot;],\n\&quot;indices\&quot;: [&quot;</span> + sindices
+&nbsp; &nbsp; + <span class="maroon">&quot;] }&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;json: &quot;</span> + json_geometry_data );
+&nbsp;
+&nbsp; DisplayWgl( json_geometry_data );
+</pre>
+
+<p>With that in hand, it is time for the exciting stuff.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Send an HTTP POST Request and Display Result in Browser</h4>
+
+<p>The DisplayWgl implements the following tasks:</p>
+
+<ul>
+<li>Define the base URL and REST API route on the WebGL rendering server</li>
+<li>Support switching between a locally hosted or remote Heroku-hosted server</li>
+<li>Receive a JSON package defining the geometry data to be rendered</li>
+<li>Package the JSON string into a POST data package</li>
+<li>Sends it via a HTTP POST request to the server</li>
+<li>Retrieve the HTTP result</li>
+<li>Store it in a local file</li>
+<li>Display it in the browser</li>
+</ul>
+
+<p>The implementation looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle between a local server and</span>
+&nbsp; <span class="gray">///</span><span class="green"> a remote Heroku-hosted one.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="blue">bool</span> UseLocalServer = <span class="blue">false</span>;
+
+  . . .
+
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Invoke the node.js WebGL viewer web server.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Use a local or global base URL and an HTTP POST</span>
+&nbsp; <span class="gray">///</span><span class="green"> request passing the 3D geometry data as body.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> DisplayWgl( <span class="blue">string</span> json_geometry_data )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> base_url = UseLocalServer
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;http://127.0.0.1:5000&quot;</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;https://nameless-harbor-7576.herokuapp.com&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> api_route = <span class="maroon">&quot;api/v2&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> uri = base_url + <span class="maroon">&quot;/&quot;</span> + api_route;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">HttpWebRequest</span> req = <span class="teal">WebRequest</span>.Create( uri ) <span class="blue">as</span> <span class="teal">HttpWebRequest</span>;
+&nbsp;
+&nbsp; &nbsp; req.KeepAlive = <span class="blue">false</span>;
+&nbsp; &nbsp; req.Method = <span class="teal">WebRequestMethods</span>.<span class="teal">Http</span>.Post;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Turn our request string into a byte stream.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">byte</span>[] postBytes = <span class="teal">Encoding</span>.UTF8.GetBytes( json_geometry_data );
+&nbsp;
+&nbsp; &nbsp; req.ContentLength = postBytes.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Specify content type.</span>
+&nbsp;
+&nbsp; &nbsp; req.ContentType = <span class="maroon">&quot;application/json; charset=UTF-8&quot;</span>; <span class="green">// or just &quot;text/json&quot;?</span>
+&nbsp; &nbsp; req.Accept = <span class="maroon">&quot;application/json&quot;</span>;
+&nbsp; &nbsp; req.ContentLength = postBytes.Length;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Stream</span> requestStream = req.GetRequestStream();
+&nbsp; &nbsp; requestStream.Write( postBytes, 0, postBytes.Length );
+&nbsp; &nbsp; requestStream.Close();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">HttpWebResponse</span> res = req.GetResponse() <span class="blue">as</span> <span class="teal">HttpWebResponse</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> result;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamReader</span> reader = <span class="blue">new</span> <span class="teal">StreamReader</span>(
+&nbsp; &nbsp; &nbsp; res.GetResponseStream() ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; result = reader.ReadToEnd();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> filename = <span class="teal">Path</span>.GetTempFileName();
+&nbsp; &nbsp; filename = <span class="teal">Path</span>.ChangeExtension( filename, <span class="maroon">&quot;html&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamWriter</span> writer = <span class="teal">File</span>.CreateText( filename ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; writer.Write( result );
+&nbsp; &nbsp; &nbsp; writer.Close();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; System.Diagnostics.<span class="teal">Process</span>.Start( filename );
+&nbsp; }
+</pre>
+
+<p>I wonder whether there might be an easier or more efficient way to transfer the HTTP result to the browser than saving it to a local file.</p>
+
+<p>There are probably more efficient methods, but this approach is hard to beat for easy of use.</p>
+
+
+<a name="4"></a>
+
+<h4>Install Node.js on Windows</h4>
+
+<p>For local testing, I initially thought I would run the node.js server on the Mac and access that from the Windows virtual machine.</p>
+
+<p>However, I was unable to access the Mac localhost running my local node server from Parallels.</p>
+
+<p>Happily, it took one single click to install node.js on the Windows virtual machine and then run the unmodified code inside the virtual box:</p>
+
+<p>Just go to <a href="https://nodejs.org">nodejs.org</a> and click the big green Install button.</p>
+
+<p>After doing so, I could immediately run the existing server locally inside the box:</p>
+
+<center>
+<img src="img/twgl_node_js_windows.png" alt="NodeWebGL running locally on Windows" width="516"/>
+</center>
+
+<p>It worked fine locally.</p>
+
+<p>Next, I switched to the remote viewer.</p>
+
+<p>That worked as well with no problem.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Demo</h4>
+
+<p>Here is a quick <a href="https://youtu.be/qBjbb_Wv6Qk">one-minute video</a> showing the TwglExport Revit add-in and the Heroku-hosted node.js WebGL server NodeWebGL in concerted action:</p>
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/qBjbb_Wv6Qk" frameborder="0" allowfullscreen></iframe>
+</center>
+
+
+<a name="6"></a>
+
+<h4>Download</h4>
+
+<p>The entire TwglExport source code, Visual Studio solution and add-in manifest are provided in the
+
+<a href="https://github.com/jeremytammik/TwglExport">TwglExport GitHub repository</a>,
+
+and the version presented here is
+
+<a href="https://github.com/jeremytammik/TwglExport/releases/tag/2015.0.0.3">release 2015.0.0.3</a>.</p>
+
+<p>The complete node server implementation is available from the
+<a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL GitHub repo</a>,
+and the version discussed here is
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/0.2.7">0.2.7</a>.</p>
+
+
+
+<a name="7"></a>
+
+<h4>Next Steps</h4>
+
+<p>The Revit element traversal is currently totally simplistic.</p>
+
+<p>It grabs the first non-empty solid it can find and renders that with no questions asked.</p>
+
+<p>This will not work for a family instance, for instance &ndash; please pardon the pun &ndash; to access any solid contained in its geometry, you have to navigate through the geometry instance level first.</p>
+
+<p>I could obviously  enhance the geometry traversal, as we already did for numerous other add-ins, e.g. the
+<a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-multiple-solid-support.html">
+OBJ exporter</a>.</p>
+
+<p>That would be silly, though.</p>
+
+<p>It is much easier to implement a
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">
+custom exporter</a> and grab the geometry from that.</p>
+
+<p>No more worries about elements, transformations, instances and all that stuff.</p>
+
+<p>Stay tuned and have fun!</p>

@@ -1,0 +1,301 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+#revitapi #adsk #bim #geometry #3dwebcoder @MEPpated #augi #au2015
+#ah8 #augi #au2015 #dotnet #csharp #adskdevnetwrk
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>CNC Direct &ndash; Export Wall Parts to DXF and SAT</h3>
+
+<p>I implemented the Revit ExportCncFab add-in back in 2013 to export Revit wall parts to DXF or SAT for CNC fabrication.</p>
+
+<p>The full source code, Visual Studio solution and add-in manifest lives in the
+<a href="https://github.com/jeremytammik/ExportCncFab">ExportCncFab GitHub repository</a>.</p>
+
+<p>The project was prompted by William Spier, who recently published a nice 12-minute YouTube video
+<a href="https://www.youtube.com/watch?v=uNJ9RTppqoU">Revit to CNC Direct</a> describing and demonstrating its practical use and application:</p>
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/uNJ9RTppqoU" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>In William's words: "Asked Jeremy to write a DLL that allows users to export multiple objects as discrete, individually named DXF files.
+So doing means you can export native Revit geometry to DXF, resulting in fabrication ready files like gyp wall board, structural steel gussets, or anything you can conceive of that has a level of accuracy that allows it to be CNC ready, as it exists in the Revit model."</p>
+
+<p>Due to popular request, I now migrated this add-in from Revit 2014 to Revit 2015 and on to 2016, documenting all issues encountered en route.</p>
+
+<p>Before getting to that, here are the previous discussions of this project and a couple of its implementation aspects:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html">Export Wall Parts Individually to DXF</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/10/exportcncfab-on-github-and-revitlookup-update.html">ExportCncFab on GitHub</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/12/driving-cnc-fabrication-and-shared-parameters.html">Driving CNC Fabrication and Shared Parameters</a></li>
+</ul>
+
+<p>Now, let's look at the two migrations in more detail:</p>
+
+
+<a name="2015.0"></a>
+
+<h4>Migrating ExportCncFab from Revit 2014 to Revit 2015</h4>
+
+<p>I performed the standard steps to migrate a Revit add-in from Revit 2014 to Revit 2015:</p>
+
+<ul>
+<li>Changed Revit API assembly references</li>
+<li>Changed the .NET framework version from 4.0 to 4.5</li>
+<li>Updated the copyright message and version information assembly properties defined in AssemblyInfo.cs</li>
+<li>Compiled, generating <a href="zip/export_cnc_fab_migr_2015_a.txt">zero errors and six warnings</a></li>
+<li>Published flat migration as <a href="https://github.com/jeremytammik/ExportCncFab/releases/tag/2015.0.0.0">release 2015.0.0.0</a></li>
+</ul>
+
+<p>The good news is that the flat migrated add-in compiles successfully.</p>
+
+<p>The warnings are not really bad news, either; they just indicate usage of some deprecated API functionality, which is completely normal.</p>
+
+<p>I fixed them right away in order to simplify to continued migration to the next major release.</p>
+
+<p>The six warnings are actually just three, with some repetitions:</p>
+
+<ul>
+<li><code>Autodesk.Revit.UI.Selection.Selection.Elements</code> is obsolete: This property is deprecated in Revit 2015. Use GetElementIds() and SetElementIds instead.</li>
+<li><code>Autodesk.Revit.DB.Element.get_Parameter(string)</code> is obsolete: This property is obsolete in Revit 2015, as more than one parameter can have the same name on a given element. Use Element.Parameters to obtain a complete list of parameters on this Element, or Element.GetParameters(String) to get a list of all parameters by name, or Element.LookupParameter(String) to return the first available parameter with the given name.</li>
+<li><code>Autodesk.Revit.DB.Definitions.Create(string, Autodesk.Revit.DB.ParameterType, bool)</code> is obsolete: This method is deprecated in Revit 2015. Use Create(Autodesk.Revit.DB.ExternalDefinitonCreationOptions) instead.</li>
+</ul>
+
+<p>Let's take a closer look at these three warnings and how to fix them:</p>
+
+<ul>
+<li><a href="#2015.1">Replacing Selection.Elements by GetElementIds</a></li>
+<li><a href="#2015.2">Replacing Element.get_Parameter by Element.GetParameters</a></li>
+<li><a href="#2015.3">Using ExternalDefinitonCreationOptions</a></li>
+</ul>
+
+
+<a name="2015.1"></a>
+
+<h4>Replacing Selection.Elements by GetElementIds</h4>
+
+<p>Instead of accessing a collection of the currently selected elements directly, Revit now provides a list of their element ids.</p>
+
+<p>The code updated to compile with no warnings in Revit 2015 looks like this, with the obsolete code commented out:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Iterate over all pre-selected parts</span>
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt; ids = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Selection</span> sel = uidoc.Selection;
+&nbsp;
+&nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; selIds = sel.GetElementIds(); <span class="green">// 2015</span>
+&nbsp;
+&nbsp; <span class="green">//if( 0 &lt; sel.Elements.Size ) // 2014</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; selIds.Count ) <span class="green">// 2015</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//foreach( Element e in sel.Elements ) // 2014</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> selIds ) <span class="green">// 2015</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( id );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !( e <span class="blue">is</span> <span class="teal">Part</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; ErrorMsg( <span class="maroon">&quot;Please pre-select only gyp wallboard&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; parts before running this command.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Part</span> part = e <span class="blue">as</span> <span class="teal">Part</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; // . . .
+</pre>
+
+
+
+<a name="2015.2"></a>
+
+<h4>Replacing Element.get_Parameter by Element.GetParameters</h4>
+
+<p>Multiple parameters of the same name can be attached to a single Revit element.</p>
+
+<p>In order to force developers to handle this possibility in a fool-proof way, the get_Parameter method taking a parameter name is deprecated in Revit 2015 and can be replaced by the GetParameters method that returns a collection of all the parameters of the given name instead.</p>
+
+<p>Here is an example of some Revit 2014 code that causes the corresponding warning:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the parameter definition from</span>
+&nbsp; <span class="gray">///</span><span class="green"> the given element and parameter name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Definition</span> GetDefinition(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( parameter_name );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Definition</span> d = ( <span class="blue">null</span> == p )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : p.Definition;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+</pre>
+
+
+<p>Here is  possibly way of fixing this to compile cleanly in Revit 2015:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the parameter definition from</span>
+&nbsp; <span class="gray">///</span><span class="green"> the given element and parameter name.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Definition</span> GetDefinition(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Parameter</span>&gt; ps = e.GetParameters( parameter_name );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = ps.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( 1 &gt;= n,
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected maximum one shared parameters &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;named &quot;</span> + parameter_name );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Definition</span> d = ( 0 == n )
+&nbsp; &nbsp; &nbsp; ? <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; : ps[0].Definition;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+</pre>
+
+
+<a name="2015.3"></a>
+
+<h4>Using ExternalDefinitonCreationOptions</h4>
+
+<p>This is the code used to define the ExportCncFab shared parameters in Revit 2014 using the DefinitionGroup.Definitions.Create method:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Create the category set for binding</span>
+&nbsp;
+&nbsp; <span class="teal">CategorySet</span> catSet = app.Create.NewCategorySet();
+&nbsp;
+&nbsp; <span class="teal">Category</span> cat = doc.Settings.Categories.get_Item(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Parts );
+&nbsp;
+&nbsp; catSet.Insert( cat );
+&nbsp;
+&nbsp; <span class="teal">Binding</span> binding = app.Create.NewInstanceBinding(
+&nbsp; &nbsp; catSet );
+&nbsp;
+&nbsp; <span class="green">// Retrieve or create shared parameter group</span>
+&nbsp;
+&nbsp; <span class="teal">DefinitionGroup</span> group
+&nbsp; &nbsp; = f.Groups.get_Item( _definition_group_name )
+&nbsp; &nbsp; ?? f.Groups.Create( _definition_group_name );
+&nbsp;
+&nbsp; <span class="green">// Retrieve or create the three parameters;</span>
+&nbsp; <span class="green">// we could check if they are already bound, </span>
+&nbsp; <span class="green">// but it looks like Insert will just ignore </span>
+&nbsp; <span class="green">// them in that case.</span>
+&nbsp;
+&nbsp; <span class="teal">Definition</span> definition
+&nbsp; &nbsp; = group.Definitions.get_Item( _is_exported )
+&nbsp; &nbsp; ?? group.Definitions.Create( _is_exported,
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.YesNo, <span class="blue">true</span> );
+&nbsp;
+&nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+&nbsp;
+&nbsp; definition
+&nbsp; &nbsp; = group.Definitions.get_Item( _exported_first )
+&nbsp; &nbsp; ?? group.Definitions.Create( _exported_first,
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Text, <span class="blue">true</span> );
+&nbsp;
+&nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+&nbsp;
+&nbsp; definition
+&nbsp; &nbsp; = group.Definitions.get_Item( _exported_last )
+&nbsp; &nbsp; ?? group.Definitions.Create( _exported_last,
+&nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Text, <span class="blue">true</span> );
+&nbsp;
+&nbsp; doc.ParameterBindings.Insert( definition, binding,
+&nbsp; &nbsp; <span class="teal">BuiltInParameterGroup</span>.PG_GENERAL );
+</pre>
+
+<p>In Revit 2015, this causes deprecated API usage warnings prompting to use the ExternalDefinitonCreationOptions class instead.</p>
+
+<p>To avoid fixing this three times over and using extremely long wrapped lines to do so, I defined the local static CreateNewDefinition helper method to handle this for 2015 and replace the calls to group.Definitions.Create above:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">Definition</span> CreateNewDefinition(
+&nbsp; &nbsp; <span class="teal">DefinitionGroup</span> group,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name,
+&nbsp; &nbsp; <span class="teal">ParameterType</span> parameter_type )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//return group.Definitions.Create( </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; parameter_name, parameter_type, true ); // 2014</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> group.Definitions.Create(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ExternalDefinitonCreationOptions</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; parameter_name, parameter_type ) ); <span class="green">// 2015</span>
+&nbsp; }
+</pre>
+
+<p>It now compiles with zero errors and zero warnings.</p>
+
+<p>This state of things is published as <a href="https://github.com/jeremytammik/ExportCncFab/releases/tag/2015.0.0.2">release 2015.0.0.2</a>.</p>
+
+
+
+<a name="2016.0"></a>
+
+<h4>Migrating ExportCncFab from Revit 2015 to Revit 2016</h4>
+
+<p>The flat migration from Revit 2015 to Revit 2016 generates one trivial but nonetheless irritating <a href="zip/export_cnc_fab_migr_2016_a.txt">error CS0246</a> affecting the CreateNewDefinition method that we just introduced above:</p>
+
+<ul><li>The type or namespace name 'ExternalDefinitonCreationOptions' could not be found (are you missing a using directive or an assembly reference?)</li></ul>
+
+<p>This is simply due to a typo in the original Revit 2015 API class name that has been rectified in Revit 2016.</p>
+
+<p>The fix is equally trivial and obvious: add the missing letter 'i'.</p>
+
+<p>The new implementation including commented obsolete code now looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">static</span> <span class="teal">Definition</span> CreateNewDefinition(
+&nbsp; &nbsp; <span class="teal">DefinitionGroup</span> group,
+&nbsp; &nbsp; <span class="blue">string</span> parameter_name,
+&nbsp; &nbsp; <span class="teal">ParameterType</span> parameter_type )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">//return group.Definitions.Create( </span>
+&nbsp; &nbsp; <span class="green">//&nbsp; parameter_name, parameter_type, true ); // 2014</span>
+&nbsp;
+&nbsp; &nbsp; <span class="green">//return group.Definitions.Create(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; new ExternalDefinitonCreationOptions(</span>
+&nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; parameter_name, parameter_type ) ); // 2015</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> group.Definitions.Create(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ExternalDefinitionCreationOptions</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; parameter_name, parameter_type ) ); <span class="green">// 2016</span>
+&nbsp; }
+</pre>
+
+<p>Once that was fixed, no more errors or warnings were generated.</p>
+
+<p>This initial Revit 2016 version is published as <a href="https://github.com/jeremytammik/ExportCncFab/releases/tag/2016.0.0.0">release 2016.0.0.0</a>.</p>
+
+<p>I hope you find this useful and look forward to hearing how you are making use of it!</p>

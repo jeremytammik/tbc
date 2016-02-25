@@ -1,0 +1,142 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+08964373 [Determine whether parameter is type or instance]
+
+Miroslav Schonauer Re: determine whether a given parameter from ParameterBindings is type or instance -- 08964373
+-->
+
+<h3>Determining Whether Parameter is Type or Instance Bound</h3>
+
+<p>Here is a question that came up now and then in the past, on how to determine whether a given parameter retrieved from the document shared parameter bindings is bound to a type or instances.</p>
+
+<p><strong>Question:</strong> I have not been able to find a way in which to determine if a parameter is a type or instance in the Revit API.
+The only reference I could find was to the FamilyParameter.IsInstance property.
+However, this only works if you are in the family editor.
+I need to determine whether parameters in the project file are set to type or instance.
+Is there a way?</p>
+
+<p><strong>Answer:</strong> Normally, you could just check the source element class.</p>
+
+<p>The Parameter.Element property tells you the element to which a given parameter belongs.</p>
+
+<p>If it is derived from the ElementType base class, you have a type parameter, else an instance one.</p>
+
+<p>However, if you are iterating over the parameter definitions in the document ParameterBindings container, you have no element available to check.</p>
+
+<p>The parameter itself will not contain this information, since it is generic and does not need to know how it will be used.</p>
+
+<p>The ParameterBindings contains a map of definitions and bindings, so let's take a closer look at the latter.</p>
+
+<p>Here are some previous discussions on the InstanceBinding and TypeBinding binding subclasses, and on checking instance versus type and shared versus not for family parameters:</h4>
+
+<ul>
+<li>Creating a <a href="http://thebuildingcoder.typepad.com/blog/2009/06/model-group-shared-parameter.html">Model Group Shared Parameter</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/adding-a-category-to-a-parameter-binding.html">Adding a Category to a Parameter Binding</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/shared-type-parameter.html">Shared Type Parameter</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/04/adding-a-category-to-a-shared-parameter-binding.html">Adding a Category to a Shared Parameter Binding</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/categories-collection-item-accessor-fails.html">Categories Collection Item Accessor Fails</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/familyparameter-isshared-property.html">FamilyParameter IsShared Property</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/changing-a-family-parameter-from-type-to-instance.html">Changing a Family Parameter from Type to Instance</a></li>
+</ul>
+
+<p>Let's go back to basics for a moment and look at the Revit API help file RevitAPI.chm documentation of the classes involved:</p>
+
+<p>The <b>ElementBinding</b> class is a base class for all types of binding that attach to an element.</p>
+
+<p>The <b>TypeBinding</b> class is derived from ElementBinding and defines objects used to bind a property to a Revit type, such as a wall type.</p>
+
+<p>This differs from instance bindings in that the property is then shared by all instances that use that type. Changing the parameter for one type affects all other instances that use that type.</p>
+
+<p>Sample code is included that shows how to create a TypeBinding instance to add a shared parameter to a wall type.</p>
+
+<p>The <b>InstanceBinding</b> class, derived from ElementBinding, defines objects used to bind a parameter definition and a parameter to each instance of an element, such as a wall.</p>
+
+<p>Once bound, the parameter appears on all instances of the element and changing the parameter on any one single instance will not change the value on any other instance.</p>
+
+<p>Sample code is included that shows how to create an InstanceBinding instance to add a shared parameter to all walls.</p>
+
+<p>So in your case, we should be able to identify the binding type by looking at the type of the binding instance.</p>
+
+<p>I reimplemented an obsolete test command in The Building Coder samples that never did anything useful in the past, CmdListSharedParams, to classify instance versus type shared parameter definitions.</p>
+
+<p>It is very simple.
+All you need to do it retrieve the binding and check whether it is an instance or type one.
+The entire external read-only command implementation looks like this:</p>
+
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+<span class="blue">class</span> <span class="teal">CmdListSharedParams</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BindingMap</span> bindings = doc.ParameterBindings;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = bindings.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0} shared parementer{1} defined{2}&quot;</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ), <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionBindingMapIterator</span> it
+&nbsp; &nbsp; &nbsp; &nbsp; = bindings.ForwardIterator();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( it.MoveNext() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Definition</span> d = it.Key <span class="blue">as</span> <span class="teal">Definition</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Binding</span> b = it.Current <span class="blue">as</span> <span class="teal">Binding</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( b <span class="blue">is</span> <span class="teal">ElementBinding</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;all Binding instances are ElementBinding instances&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( b <span class="blue">is</span> <span class="teal">InstanceBinding</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; || b <span class="blue">is</span> <span class="teal">TypeBinding</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;all bindings are either instance or type&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// All definitions obtained in this manner</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// are InternalDefinition instances, even</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// if they are actually associated with</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// shared parameters, i.e. external.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( d <span class="blue">is</span> <span class="teal">InternalDefinition</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;all definitions obtained from BindingMap are internal&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> sbinding = ( b <span class="blue">is</span> <span class="teal">InstanceBinding</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;instance&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;type&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;{0}: {1}&quot;</span>, d.Name, sbinding );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>The updated version of
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples</a> CmdListSharedParams
+
+command described above is published as
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.105.3">
+release 2014.0.105.3</a>.
+
+
+<p>Many thanks to Miro for clarifying this again and his trusty old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/adding-a-category-to-a-shared-parameter-binding.html">
+HelperParams.cs</a> module.</p>

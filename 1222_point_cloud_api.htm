@@ -1,0 +1,288 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/point-cloud-indexer-api/m-p/5306679
+http://forums.autodesk.com/t5/revit-api/point-cloud-indexer-api/td-p/5274325
+
+Mikhail Viner-Bykovskiy RE: point cloud indexer sample
+
+- http://forums.autodesk.com/t5/revit-api/point-cloud-indexer-api/m-p/5306679
+  1268637 [Point Cloud Indexer Plugin API] by Adam Nagy
+  revit point cloud indexer nagy
+  ADN AEC Customization Newsletter - BIM Edition - Summer 2011
+  http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=17971830
+  http://forums.autodesk.com/t5/revit-architecture/batch-pcg-creation-using-autodesk-point-cloud-indexer/td-p/3238878
+  http://thebuildingcoder.typepad.com/blog/2011/11/au-begins-and-point-cloud-overview.html
+  https://github.com/adamenagy/RevitPointCloudIndexer
+  'Point Cloud Indexing API' was a separate subfolder of the Revit 2013 API; it disappeared in Revit 2014
+  the point cloud engine was replaced by ReCap; maybe that affected the indexer as well
+  rumour had it that the indexing api was insulated from the changes
+  arkady gilman is the expert
+
+-->
+
+<h3>Point Cloud Indexing Update</h3>
+
+<p>The Point Cloud API has changed a bit in the past couple of years, and it is time for an update of the previous
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/au-begins-and-point-cloud-overview.html">
+point cloud overview</a> from 2011.</p>
+
+<p>My re-exploration of this topic was triggered by Henrik's Revit API discussion forum thread on the
+
+<a href="http://forums.autodesk.com/t5/revit-api/point-cloud-indexer-api/m-p/5306679">point cloud indexer API</a>:</p>
+
+<p><strong>Question:</strong> Is there an API or another way to programmatically access the Indexer of PointClouds?</p>
+
+<p>I am referring to the dialog that pops up when you try to import a different format point cloud, e.g., e57.</p>
+
+<p>Do you have an example of the Indexer API?
+Or is it possible to access the functions through python?
+Or command line, maybe?</p>
+
+<p>Besides this we have another question that maybe you can answer as well:
+We have had some questions if Revit / Recap, when it converts from e.g. .fls to .rcs, moves points into a grid structure?
+It is questions from land surveyors, who believe this is the case, and mention that it is not suitable for their work if they can't count on that the points are in the same position as when they scan.
+Do you know if this is the case?</p>
+
+
+<p><strong>Answer:</strong> Wow, that was a pretty chase...</p>
+
+<p>For your convenience, I put together a dedicated
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.43">point cloud</a>
+
+topic group on The Building Coder listing the discussions published so far.</p>
+
+<p>However, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/11/au-begins-and-point-cloud-overview.html">
+Point Cloud Indexer API</a> provided
+
+by the Revit 2012 API is now deprecated.</p>
+
+<p>Before discovering that, Adam Nagy republished his
+
+<a href="https://github.com/adamenagy/RevitPointCloudIndexer">Revit 2012 point cloud indexer</a>
+
+sample for Revit 2012 on GitHub.</p>
+
+<p>It would in theory be interesting to hear whether it works as is or can be modified to work with Revit 2015.</p>
+
+<p>You could fork Adam's repository, keep track of the changes, and send him a pull request when done to ask him to merge them back in.</p>
+
+<p>As said, though, this API is now deprecated and may not be usable at all.</p>
+
+<p>I found another discussion on
+
+<a href="http://forums.autodesk.com/t5/revit-architecture/batch-pcg-creation-using-autodesk-point-cloud-indexer/td-p/3238878">
+batch PCG creation using Autodesk point cloud indexer</a> that confirms this.</p>
+
+<p>Once that was clear, I asked the development team about the current status.</p>
+
+<p>Their initial response was, "We moved away from writing indexers, right? ReCap SDK should be where customers go now?"</p>
+
+<p>Indeed, that just about summarises it.</p>
+
+<p>Arkady Gilman and his colleagues provided some more detail and background information as follows:</p>
+
+<p>The Revit team no longer writes indexers, just uses the ones provided by the Recap team.
+We still do indexing of raw data into Recap format in Revit, though.</p>
+
+<p>The Revit 2013 API for alternative point cloud engine is deprecated.
+Please do not implement another engine.
+Use ReCap instead.</p>
+
+<p>Similarly, PCG is deprecated and should not be used.</p>
+
+<p>Revit has an indexer, i.e. a separate executable that is launched when you want to insert a file other than RCP or RCS (e.g. PTX, PTS of FLS).
+This indexer is in fact a 'headless' version of ReCap.
+So adding a 'codec' (I think they use this term) for ReCap will automatically make new format available for Revit indexer as well.
+In general, the Revit indexer is intended for a novice, sporadic user.
+We assume that people using point clouds 'for real' will use ReCap to index and register scans before importing the data to Revit.</p>
+
+<p>ReCap may be making and supporting the standalone indexer at some point.
+Revit probably only uses our thin UI for converting old (PCG) point cloud files into the ReCap format (RCP, RCS).</p>
+
+<p>Can you clarify what you are trying to do? Do you want to index some new 'raw' data format that ReCap does not currently recognize?</p>
+
+<p>From the thread it is not clear exactly what you want to achieve.</p>
+
+<p>You ask: We have had some questions if Revit / Recap, when it converts from e.g. .fls to .rcs, moves points into a grid structure? It is questions from land surveyors, who believe this is the case, and mention that it is not suitable for their work if they can't count on that the points are in the same position as when they scan. Do you know if this is the case?</p>
+
+<p>The answer is that ReCap indexing does not alter point coordinates; they are completely sacred. </p>
+
+<p>What do you mean by 'moving points into a grid structure'?
+ReCap stores points in a spatial tree, but this is just the method used to quickly find points within a given part of space.</p>
+
+<p>There is whole separate issue w/regard to what happens with different scans when they are registered with respect to one another.</p>
+
+
+<p><strong>Response:</strong> First of all thank you very much for your answers this is really great. &nbsp; :-)</p>
+
+<p>To explain what we are doing: I am part of a research group called CITA (Center for IT and Architecture) at the school of architecture in Copenhagen, Denmark.</p>
+
+<p>We are part of an EU funded research project called <a href="http://www.duraark.eu">duraark</a>, which deals with the life circle of architectural knowledge, in this case ifc and e57 formats.</p>
+
+<p>The project deals with how a long-term archive of architectural knowledge can be set up and integrated into the workflows of the stakeholders involved in the architectural disciplines.</p>
+
+<p>For this we are developing methods of e.g. extracting metadata and verifying quality from point clouds and from comparison of point clouds and BIM models.</p>
+
+<p>Because the majority of the stakeholders are working in Autodesk products, we want to be able to integrate these extraction, comparison and quality checking tools into Revit.</p>
+
+<p>At the moment we are considering using Dynamo for prototyping the integrated workflow of our stakeholders.</p>
+
+<p>At the end of the project, we will hopefully have a plugin for Revit &nbsp; :-)</p>
+
+<p>To answer your questions:</p>
+
+<p>1. "Can you clarify what you are trying to do? Do you want to index some new 'raw' data format that ReCap does not currently recognize? From the thread it is not clear exactly what you want to achieve."</p>
+
+<p>The first thing we want to be able to do is to visualize .e57 point clouds in Revit without having to go through and open them in Recap to transform them into the rcs format.</p>
+
+<p>One idea I just had now for this was maybe to be able to access "the separate executable that is launched when you want to insert a file other than RCP or RCS" ('the headless' version of ReCap) through command line. And in this way be able to visualize and link e57 point clouds in Revit with full control over the files generated and linked to Revit from within Dynamo and python.</p>
+
+<p>Would a command line solution be possible?</p>
+
+<p>Or can you see another way?</p>
+
+<p>Is there an API for Recap?</p>
+
+<p>2. "... if they can't count on that the points are in the same position as when they scan. Do you know if this is the case?"</p>
+
+<p>I do not know for sure if this is the case.
+It was a comment I got from one of our stakeholders.
+As you say that "ReCap indexing does not alter point coordinates; they are completely sacred", then I will assume this really is the case.</p>
+
+<p>Again thanks for your replies and I hope this clarifies what we are trying to achieve. And I hope it sounds interesting from your point of view.</p>
+
+
+<p><strong>Answer:</strong> Thank you for your answers.</p>
+
+<p>Here is some more feedback from the development team:</p>
+
+<p>Long term preservation of architectural knowledge sounds interesting and I’m glad Autodesk tools are used for this!</p>
+
+<p>As far as I understood, the input format is E57, which ReCap can index and so can Revit (using its standalone indexer).</p>
+
+<p>I am puzzled by the client’s desire not to use ReCap for indexing. I would ask if his scans are already 'registered', i.e. unified in one E57 file per building.</p>
+
+<p>If so, then I understand his desire to write a script to automate E57 to RCS conversion of the large number of files.
+Our standalone indexer can be used for that; we had this use case in mind from the beginning, although I don’t know if anybody is actually using such a workflow.</p>
+
+<p>I found the following description:</p>
+
+<p>The indexer program is called AdPointcloudIndexer.exe and is located in the Program folder in Revit installation.</p>
+
+<p>The command line for the indexer is:</p>
+
+<blockquote>
+<code>AdPointcloudindexer [/batch] [/pluginspath=PathToPluginsFolder] InputFile [OutputFile]</code>
+</blockquote>
+
+<p>Where:</p>
+
+<ul>
+<li>InputFile: must be specified; all other parameters are optional;</li>
+<li>OutputFile: If specified is the resulting RCP file from the conversion. If no file is specified, then the resulting file is same base filename as the input file, and placed in the same folder as the input file. If the output file already exists, a prompt will be provided asking the user if they wish to overwrite it or not.</li>
+</ul>
+
+/batch causes the following to be true:
+
+<ul>
+<li>No progress will be reported as the indexer operates.</li>
+<li>No end of process reporting will be done.</li>
+<li>If the output file already exists, an error is generated to stderr and the indexing terminated.</li>
+</ul>
+
+<p>The /pluginspath argument specifies the folder to look for plugins, and defaults to a folder named 'plugins\Point Clouds Codecs' under the folder where the indexer exe resides.</p>
+
+<p>The thread discussing
+
+<a href="http://forums.autodesk.com/t5/revit-architecture/batch-pcg-creation-using-autodesk-point-cloud-indexer/td-p/3238878">
+batch PCG creation using Autodesk point cloud indexer</a> also
+
+refers to this usage.</p>
+
+<!--
+
+Thanks Ryan!
+
+Thank you,
+Arkady Gilman
+
+From: Ryan Frenz
+Sent: Friday, October 17, 2014 11:50 AM
+To: Arkady Gilman; Seth Koterba; Samuel Yang
+Cc: Jeremy Tammik; Kyle Bernhardt; Aaron C Morris; Ronald Poelman
+Subject: RE: Standalone indexer, ReCap "unification", "GRid", etc.
+
+Hey Arkady,
+
+We’re aware of this discussion and have had it in several forums now J.  The only ‘movement’ of points would be due to precision loss in the RCS format.  RCS stores points to the nearest ‘milli-unit’, where ‘unit’ is usually meters (so, millimeters).  So a coordinate of say 0.1234 meters would be saved as 0.123 in the RCS file.
+
+Any subsequent points which clamp to the same value in that space (e.g. 0.1231 or 0.1229) are discarded.  This isn’t a ‘unification’ so much as a simple removal of statistically-equivalent points.
+
+Obviously, this makes a big assumption about the precision of the capture instrument.  We’re discussing ways to remove that assumption – but it’s certainly valid for land surveying (and related) applications.
+
+The short/public answer is that ReCap doesn’t modify the input points in any statistically-meaningful way.
+
+Ryan
+
+From: Arkady Gilman
+Sent: Friday, October 17, 2014 9:54 AM
+To: Seth Koterba; Ryan Frenz; Samuel Yang
+Cc: Jeremy Tammik; Kyle Bernhardt
+Subject: Standalone indexer, ReCap "unification", "GRid", etc.
+
+Dear All,
+
+Jeremy Tammik pointed to an interesting discussion about point clouds. This is about converting E57 files to RCP with the purpose of using them in Revit. We pointed the customer to our standalone indexer that can be used in batch mode.
+
+There is one topic in this thread though, however, that I initially dismissed, but which was repeated by another user in the latest posting and worries me:
+
+[09-30-2014]
+We have had some questions if Revit / Recap, when it converts from e.g. .fls to .rcs, moves points into a grid structure? It is questions from land surveyors, who believe this is the case, and mention that it is not suitable for their work if they can't count on that the points are in the same position as when they scan.
+
+[10-16-2014]
+Recap's Unification will unify points into a "Grid"
+I have found that Recap seems slower than the standalone indexer from revit.
+We do a lot of pointlcoud work, and recap is too slow compared to revits indexer.
+
+Does this ring a bell? I would be very surprised to hear that ReCap alters coordinates of any incoming points. I was thinking that “unification” involves dropping some points considered less reliable or less “informative”, but remaining points carry their original coordinates. Is this correct? I guess it may still be possible that this “pruning process” is organized in such a way that remaining points are close to some implied grid, just to ensure roughly uniform distribution in space. Is this correct? If so this may explain the impression of the users that points are on a grid.
+
+BTW does “unification” happen even when there is single input file?
+I wouldn’t be surprised that Revit indexer works faster, because it might be using older ReCap SDK that does less stuff (no segmentation or unification).
+
+Cheers
+
+Arkady Gilman, Ph.D.
+Sr. Software Architect, IPG-BCG
+Autodesk, Inc.
+1560 Trapelo Rd., Waltham, MA 02451
+ph:  (781)839-5353   fax: (781)464-5432
+
+
+-----
+http://forums.autodesk.com/t5/revit-api/point-cloud-indexer-api/m-p/5344959
+
+arkady.gilman (Visitor) posted a new Reply in Revit API on 2014-10-17 06:26 PM:
+
+Re: Point CLoud Indexer API
+
+We confirmed with ReCap developers that ReCap does not change point coordinates to put points on a "Grid".
+
+It does round coordinates to the nearest millimeter (if you use meters as the base units). If this is not what you observe, could you give an example?
+
+tjohnson (Member) posted a new Reply in Revit API on 2014-10-18 03:44 AM:
+
+Re: Point CLoud Indexer API
+
+The unification happens when you export the file out. Not on the indexing.
+
+-->

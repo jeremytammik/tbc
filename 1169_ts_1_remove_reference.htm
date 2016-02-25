@@ -1,0 +1,215 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Håvard Dagsvik Re: Removing references
+
+-->
+
+<h3>Technical Summit Day 1 and Removing References</h3>
+
+<p>Today was the first day of the Autodesk internal Technical Summit in Toronto, and pretty exciting.</p>
+
+<p>Also, I just had a note from Norway on how to <a href="#3">remove references</a> that looks worthwhile sharing.</p>
+
+<p>So here is a list of today's multifaceted topics:</p>
+
+<ul>
+<li><a href="#3">Recent rendering research</a></li>
+<li><a href="#4">JavaScript optimisation</a></li>
+<li><a href="#5">Spherical harmonics</a></li>
+<li><a href="#6">Web app packages</a></li>
+<li><a href="#7">Removing RVT links</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Technical Summit Day 1</h4>
+
+<p>This being an internal meeting, I cannot talk openly about all the topics covered.</p>
+
+<p>A couple of titbits that I found especially exciting are based on openly available research, though, so I can't do much harm mentioning those.</p>
+
+
+<a name="3"></a>
+
+<h4>R<sup>3</sup> &ndash; Recent Rendering Research</h4>
+
+<p>One talk discussed viewing and rendering and mentioned these exciting recent results that are all being incorporated:</p>
+
+<ul>
+<li>Normalized Blinn Shading &ndash; Hoffman, Naty, 'Crafting Physically Motivated Shading Models for Game Development', SIGGRAPH 2010</li>
+
+<li>HDR image based diffuse and reflection, with pre-computed BRDF stored in mipmaps &ndash; Lagarde, S.,
+
+<a href="http://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering">
+AMD Cubemapgen for physically based rendering</a></li>
+
+<li>Alchemy Ambient Obscurance &ndash; McGuire et al, “The Alchemy Screen-Space Ambient Obscurance Algorithm”, HPG 2011</li>
+</ul>
+
+<a name="4"></a>
+
+<h4>JavaScript Optimisation</h4>
+
+<p>The same presentation also mentioned some impressive tips and tricks for enhancing JavaScript performance, e.g. encoding metadata requiring quick lookup in SQL tables, then mapping those tables to JSON arrays.</p>
+
+<p>Further fundamental JavaScript performance optimisation recommendations include:</p>
+
+<ul>
+<li>Use worker threads for expensive operations</li>
+<li>Avoid allocating objects</li>
+<li>Avoid expensive data representation that requires heavy processing</li>
+<ul>
+<li>Use ArrayBuffer or Array instead of Object (hashmap) to hold collections</li>
+
+<li>Use
+<a href="http://divergentcoder.com/Coding/2011/02/22/aos-soa-explorations-part-1.html">
+SoA instead of AoS representation</a> for
+large lists of things</li>
+
+</ul>
+<li>Dereference unused objects to get them garbage collected</li>
+<li>Cache the invariants (avoid repeated calls/references)</li>
+<li>The browsers have excellent profilers &ndash; use them!</li>
+</ul>
+
+
+
+<a name="5"></a>
+
+<h4>Rotation Invariant Spherical Harmonics for Shape Classification</h4>
+
+<p>Check out this fascinating paper on
+
+<a href="http://kops.ub.uni-konstanz.de/bitstream/handle/urn:nbn:de:bsz:352-231423/Vranic_231423.pdf?sequence=3">
+Tools for 3D-Object Retrieval: Karhunen-Loeve Transform and Spherical Harmonics</a> by
+
+D.V. Vrani&cacute;, D. Saupe, and J. Richter.</p>
+
+<p>For practical use, it obviously needs to implement some kind of grouping of buckets of similar shapes, which is a completely different additional story...</p>
+
+
+<a name="6"></a>
+
+<h4>Highly Recommended Web App Packages</h4>
+
+<p>Are you building any kind of web application at all?</p>
+
+<p>You certainly should be, nowadays, if you are a professional application developer.</p>
+
+<p>If not, you should be aware that most bits and pieces of functionality of those 2 GB footprint desktop applications can be rebuilt in a browser with much smaller footprint in very short time. So if you don't do it, somebody else is going to pretty soon.</p>
+
+<p>Here is a pretty comprehensive list of useful packages that help a lot in supporting numerous best practices for a web app:</p>
+
+<ul>
+<li>Angular JS &ndash; <a href="https://angularjs.org">angularjs.org</a></li>
+<li>Require JS &ndash; <a href="http://requirejs.org">requirejs.org</a></li>
+<li>Twitter Bootstrap &ndash; <a href="http://getbootstrap.com">getbootstrap.com</a></li>
+<li>CSS Less &ndash; <a href="http://lesscss.org">lesscss.org</a></li>
+<li>Yeoman &ndash; <a href="http://yeoman.io">yeoman.io</a>, including:</li>
+<ul>
+<li>Bower &ndash; <a href="http://bower.io">bower.io</a> &ndash; Package Manager for managing dependencies for the web (i.e. Maven/NuGet)</li>
+<li>Grunt &ndash; <a href="http://gruntjs.com">gruntjs.com</a> &ndash; Building Web Apps and Task Runner, e.g. for:</li>
+<ul>
+<li>Minification (JavaScript, HTML, CSS)</li>
+<li>Concatenate JavaScript Files</li>
+<li>JSDoc</li>
+<li>ESLint</li>
+<li>Less to CSS Conversion</li>
+<li>Running Unit Tests</li>
+</ul>
+</ul>
+<li>Testing</li>
+<ul>
+<li>Jasmine &ndash; <a href="http://jasmine.github.io">jasmine.github.io</a> &ndash; Testing framework</li>
+<li>Karma &ndash; <a href="http://karma-runner.github.io/0.12/index.html">karma-runner.github.io</a> &ndash; Test Runner</li>
+<li>Protractor &ndash; <a href="https://github.com/angular/protractor">github.com/angular/protractor</a> &ndash; End to end test framework for Angular JS</li>
+</ul>
+</ul>
+
+<p>By the way, Angular also provides the best tutorial for anything I have ever seen,
+
+<a href="http://angular.codeschool.com">Shaping up with Angular.js</a>.</p>
+
+<p>You absolutely must check it out, if only to be impressed by the level of didactics that is achievable today.</p>
+
+
+<p>There was a lot more, of course... I am really looking forward to day 2!</p>
+
+
+
+<a name="7"></a>
+
+<h4>Removing RVT Links</h4>
+
+<p>Back to the everyday Revit API, here is a question raised and immediately answered by H&aring;vard Dagsvik of
+
+<a href="http://www.cad-q.com/no">
+Cad Quality as</a>:</p>
+
+<p><strong>Question:</strong> I'm trying to remove RVT links from a project.</p>
+
+<p>This code works fine:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> RemoveRvtLinks( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> elemColl
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">RevitLinkType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">ElementId</span>&gt; eIds = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">RevitLinkType</span> r <span class="blue">in</span> elemColl )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r <span class="blue">is</span> <span class="teal">RevitLinkType</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">RevitLinkType</span> rvtLink = r <span class="blue">as</span> <span class="teal">RevitLinkType</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == rvtLink || rvtLink.IsNestedLink )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; eIds.Add( rvtLink.Id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; doc.Delete( eIds );
+&nbsp; }
+</pre>
+
+<p>I'm using RevitLinkType instead of RevitLinkedInstance to avoid the Revit UI message saying that 'the last instance has been removed; do you want to remove the reference'.</p>
+
+<p>The catch is that if the link is Unloaded, Not Found or for some reason not present both will throw an exception.</p>
+
+<p>The API doesn’t seem to provide a 'Remove' method for links, only Document.Delete.</p>
+
+<p>But in such cases there is nothing to delete.</p>
+
+<p>Is this possible to do at all?</p>
+
+<p><strong>Answer:</strong> Apparently yes.</p>
+
+<p>After further testing, I can confirm that the code above works both on unloaded and not found links.</p>
+
+<p>Here is a cleaned-up and slightly more succinct version using LINQ avoiding the duplicate casts above:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> RemoveRvtLinks2( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> links =
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">RevitLinkType</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = links.Cast&lt;<span class="teal">RevitLinkType</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">RevitLinkType</span>&gt;( r =&gt; !( r.IsNestedLink ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">RevitLinkType</span>, <span class="teal">ElementId</span>&gt;( r =&gt; r.Id )
+&nbsp; &nbsp; &nbsp; &nbsp; .ToList&lt;<span class="teal">ElementId</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; doc.Delete( ids );
+&nbsp; }
+</pre>

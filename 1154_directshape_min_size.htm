@@ -1,0 +1,274 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09578484 [Tolerance] Dan IosifS.C. Computing Approach S.R.L.
+
+Erik Eriksson 
+Monday, December 16, 2013 19:25
+Re: DirectShape-funktionen i 2015
+
+-->
+
+<h3>DirectShape Performance and Minimum Size</h3>
+
+<p>One of the exciting API enhancements in Revit 2015 is the Import API functionality providing the new
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#3.09">
+DirectShape and TessellatedShapeBuilder</a> classes.</p>
+
+<p>These enable significant <a href="#2">performance enhancements</a> and powerful new possibilities for generating libraries and importing geometry, especially repetitive shapes.</p>
+
+<p>On the other hand, the same limitations on <a href="#3">minimum size</a> apply as in the past.</p>
+
+
+<a name="2"></a>
+
+<h4>DirectShape Performance</h4>
+
+<p>Regarding the performance, here is a first enthusiastic reaction and quick report from a developer after the initial introduction during the beta phase last December:</p>
+
+<p>I examined the DirectShape functionality a little.</p>
+
+<p>My results are very interesting.</p>
+
+<p>I implemented a benchmark generating 'room solids'.</p>
+
+<p>In the past, I had to create a new family for this, define its geometry using freeform elements, save the family, load it into the project and place an instance.</p>
+
+<p>That method took about 2 hours for 1390 rooms and increased the file size by about 60 Kb per room.</p>
+
+<p>My first alternative test implementation using DirectShape elements takes 40 seconds in total and increases the file size by 2 Kb per room.</p>
+
+<p>This offers fantastic new possibilities to create quick "permanent" geometry!</p>
+
+<p>Not to mention how much simpler the code is now!</p>
+
+<p>Knowing the Revit API, there is one obvious limitation, though...</p>
+
+
+<a name="3"></a>
+
+<h4>DirectShape Minimum Size</h4>
+
+<p>Here is a question that came up a couple of times now:</p>
+
+<p><strong>Question:</strong> I created a DirectShape in Revit 2015 from a collection of faces using TessellatedShapeBuilder.</p>
+
+<p>The minimum length for edges accepted by Revit is 0.0026 feet. If I use 0.0025 feet Revit crashes.</p>
+
+<p>Can I change this tolerance?</p>
+
+<p>Or is any other way to construct DirectShape elements that accepts edges smaller than 0.0026 feet?</p>
+
+<p><strong>Answer:</strong> Unfortunately, the answer is no and no.</p>
+
+<p>This tolerance cannot be changed, and I am not aware of any other way to create DirectShape elements to circumvent that limitation.</p>
+
+<p>You
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">
+have to think big</a> when
+
+creating objects in Revit, to the chagrin of people wishing to represent very detailed metal and sub-millimetre wood construction.</p>
+
+<p>The limitation in creating individual model line segments lies around 1/16 of an inch, and the same applies to DirectShape element edges.</p>
+
+<p>I implemented a little external command to test this.</p>
+
+<p>It defines a static Boolean switch variable named <code>Iterate_until_crash</code>.</p>
+
+<p>It is set to false by default, in which case the external command simply creates a DirectShape tetrahedron with an edge length of 0.5 feet like this:</p>
+
+<center>
+<img src="img/direct_shape_min_size_1.png" alt="DirectShape tetrahedron" width="138"/>
+</center>
+
+<p>It reports its accomplished task like this in the Visual Studio debugging output window:</p>
+
+<pre>
+Creating DirectShape tetrahedron with side length 0.5...
+</pre>
+
+<p>When Iterate_until_crash is set to true, the code enters an infinite loop creating successive DirectShape elements in each iteration, each with half of the preceding edge length.</p>
+
+<p>It throws and exception quite soon, though, so none of the shapes end up being committed, and the debug output now reports:</p>
+
+<pre>
+Creating DirectShape tetrahedron with side length 0.5...
+Creating DirectShape tetrahedron with side length 0.25...
+Creating DirectShape tetrahedron with side length 0.125...
+Creating DirectShape tetrahedron with side length 0.0625...
+Creating DirectShape tetrahedron with side length 0.03125...
+Creating DirectShape tetrahedron with side length 0.015625...
+Creating DirectShape tetrahedron with side length 0.0078125...
+Creating DirectShape tetrahedron with side length 0.00390625...
+Creating DirectShape tetrahedron with side length 0.001953125...
+</pre>
+
+<ul>
+<li>A first chance exception of type 'Autodesk.Revit.Exceptions.InvalidOperationException' occurred in RevitAPI.dll</li>
+<li>Creating DirectShape tetrahedron with side length 0.001953125 threw exception 'could not create consistent vertex list'</li>
+</ul>
+
+<p>The exception is passed back to the standard Revit failure handler:</p>
+
+<center>
+<img src="img/direct_shape_min_size_2.png" alt="DirectShape minimum size"/>
+</center>
+
+<p>Here is the entire external command implementation:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> DirectShapeMinSize
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Set this to true to iterate through smaller </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> and smaller tetrahedron sizes until we hit</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Revit's precision limit.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">bool</span> Iterate_until_crash = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Find GraphicsStyle</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">GraphicsStyle</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">GraphicsStyle</span> style = collector.Cast&lt;<span class="teal">GraphicsStyle</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; .FirstOrDefault&lt;<span class="teal">GraphicsStyle</span>&gt;( gs =&gt; gs.Name.Equals( <span class="maroon">&quot;&lt;Sketch&gt;&quot;</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> graphicsStyleId = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( style != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; graphicsStyleId = style.Id;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Modify document within a transaction</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create DirectShape&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> length = 1; <span class="green">// foot</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">do</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; length = 0.5 * length;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Creating DirectShape tetrahedron with side length {0}...&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; length );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; args = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( 3 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilder</span> builder = <span class="blue">new</span> <span class="teal">TessellatedShapeBuilder</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.OpenConnectedFaceSet( <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( <span class="teal">XYZ</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisX );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisY );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.AddFace( <span class="blue">new</span> <span class="teal">TessellatedFace</span>( args, <span class="teal">ElementId</span>.InvalidElementId ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( <span class="teal">XYZ</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisX );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.AddFace( <span class="blue">new</span> <span class="teal">TessellatedFace</span>( args, <span class="teal">ElementId</span>.InvalidElementId ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( <span class="teal">XYZ</span>.Zero );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisY );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.AddFace( <span class="blue">new</span> <span class="teal">TessellatedFace</span>( args, <span class="teal">ElementId</span>.InvalidElementId ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisX );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisY );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; args.Add( length * <span class="teal">XYZ</span>.BasisZ );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.AddFace( <span class="blue">new</span> <span class="teal">TessellatedFace</span>( args, <span class="teal">ElementId</span>.InvalidElementId ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; builder.CloseConnectedFaceSet();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderResult</span> result
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = builder.Build(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderTarget</span>.Solid,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderFallback</span>.Abort,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; graphicsStyleId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Pre-release code from DevDays</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//DirectShape ds = DirectShape.CreateElement(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; doc, result.GetGeometricalObjects(), &quot;A&quot;, &quot;B&quot;);</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//ds.SetCategoryId(new ElementId(</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; BuiltInCategory.OST_GenericModel));</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Code updated for Revit UR1</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> categoryId = <span class="blue">new</span> <span class="teal">ElementId</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_GenericModel );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">DirectShape</span> ds = <span class="teal">DirectShape</span>.CreateElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, categoryId, <span class="maroon">&quot;A&quot;</span>, <span class="maroon">&quot;B&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ds.SetShape( result.GetGeometricalObjects() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ds.Name = <span class="maroon">&quot;Test&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">while</span>( Iterate_until_crash &amp;&amp; 0 &lt; length );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> e )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Creating DirectShape tetrahedron with side length {0} &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;threw exception '{1}'&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; length, e.Message );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = e.Message;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>For your convenience, here is
+
+<a href="zip/DirectShapeMinSize.zip">DirectShapeMinSize.zip</a> providing
+
+the complete source code, Visual Studio solution and add-in manifest for the DirectShapeMinSize external command.</p>

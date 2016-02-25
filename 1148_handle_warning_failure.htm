@@ -1,0 +1,178 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+09404799 [Handling of Revit MEP warning messages via API?]
+Kerwin KassulkerDaikin Applied
+
+09396140 [Error not resolved by Failure API (Revit Meridian PR10)]
+Marius MuresanCADsoft Romania
+
+http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32
+
+-->
+
+<h3>On Handling Warnings and Failures</h3>
+
+<p>Many aspects of
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">
+detecting and handling dialogues and failures</a> have
+
+been discussed in the past.</a>
+
+<p>Let's look at this area again, based on two recent questions, a basic and an advanced one, and also mention some Revit 2015 enhancements to the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>:</p>
+
+<ul>
+<li><a href="#2">Programmatic handling of warning messages</a></li>
+<li><a href="#3">Resolving failures using the Failure API</a></li>
+<li><a href="#4">Revit 2015 enhancements to the Revit developer centre</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Programmatic Handling of Warning Messages</h4>
+
+<p><strong>Question:</strong> Is it possible with the Revit MEP 2011 API to handle warning messages?</p>
+
+<p>For instance, when batch processing files, if a warning message occurs, i.e. a modal dialogue halting the program is displayed, I would like to intercept the event, capture the warning message and disable the display of the modal dialog.</p>
+
+<p>Furthermore, if warning messages can be handled, can error messages be handled via the API as well? For instance, if an error occurs within the application while processing files, can I programmatically determine the error number, take appropriate action and then cancel the modal error message that would normally be displayed interactively?</p>
+
+
+<p><strong>Answer:</strong> Yes, this handling of warning messages as you describe is possible, and more so, absolutely common, in three different levels of increasing complexity and power:</p>
+
+<ul>
+<li>Simple: DialogBoxShowing event</li>
+<li>More complex and powerful: Failure API</li>
+<li>Massive, beyond the Revit API: Windows Hook</li>
+</ul>
+
+<p>Here is a grand overview over all three approaches to
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">
+detect and handle warning and error messages and failures</a>.</p>
+
+<p>The answer is to the second question is yes as well, and the explanation is also included in that material.</p>
+
+<p>For handling errors gracefully, the Failure API is probably the most suitable approach, as illustrated by the following situation.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Resolving Failures Using the Failure API</h4>
+
+<p><strong>Question:</strong> In my add-in, editing a door family via Revit API throws an error message.</p>
+
+<p>The failure API cannot resolve the error and the error dialog is shown to the user.</p>
+
+<p>In Revit 2014, I was able to silently resolve the error, and no message was shown to the user.</p>
+
+
+<p><strong>Answer:</strong> You need to call the SetProcessingResult method on the event argument and specify ProceedWithCommit like this:</p>
+
+<pre class="code">
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> DoFailureProcessing(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; FailuresProcessingEventArgs args )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FailuresAccessor</span> fa = args.GetFailuresAccessor();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Inside event handler, get all warnings</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">FailureMessageAccessor</span>&gt; a
+&nbsp; &nbsp; &nbsp; &nbsp; = fa.GetFailureMessages();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> count = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FailureMessageAccessor</span> failure <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Failure&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; failure.GetDescriptionText() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; fa.ResolveFailure( failure );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; ++count;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; count
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; args.GetProcessingResult()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; == <span class="teal">FailureProcessingResult</span>.Continue )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; args.SetProcessingResult(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FailureProcessingResult</span>.ProceedWithCommit );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+</pre>
+
+<p>The code snippet in the Revit API developer guide on
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-52A45CC1-3BB4-48B4-BFC7-F6F8666C2AA4">
+handling failures</a> does
+
+not make that call to SetProcessingResult, because it is only deleting warnings.</p>
+
+<p>That works fine, because deleting a warning is an "instant" operation: leaving the event result unchanged (it defaults to "continue") produces the desired result &ndash; there are no warnings left to display.</p>
+
+<p>Errors are not removed by resolveErrors &ndash; only subsequent regeneration will actually remove them.
+The removal may also fail &ndash; resolution is not guaranteed to succeed.
+So a call to SetProcessingResult with FailureProcessingResult.ProceedWithCommit is required.</p>
+
+
+<a name="4"></a>
+
+<h4>Revit 2015 Enhancements to the Revit Developer Centre</h4>
+
+<p>As you certainly know, the most up-to-date version of the Revit SDK is always provided in the
+
+<a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+
+<p>Besides that, several other important learning resources provided there have now also been updated for Revit 2015:</p>
+
+<ul>
+<li>
+<a href="http://images.autodesk.com/adsk/files/REVIT2015SDK0.msi">Revit 2015 SDK (Update April 11, 2014)</a> (msi &ndash; 242779Kb)
+</li>
+
+<li>
+<a href="http://www.autodesk.com/revitapi-help">Revit API Developer Guide</a> online on Autodesk Help to learn from and contribute to
+</li>
+
+<li>
+DevTV Introduction to Revit 2015 Programming Part 1 &ndash; a short video tutorial demonstrating the basic steps to start developing with the Revit .NET API &ndash;
+<a href="http://download.autodesk.com/media/adn/RevitDevTV2015Recording/Revit%20DevTV%202015.html">View online</a>
+| <a href="http://download.autodesk.com/media/adn/Revit_2015_DevTV_EN.zip">Download</a>
+</li>
+
+<li>
+DevTV Introduction to Revit 2015 Programming Part 2 &ndash; a short video tutorial demonstrating selection and filtering API through a Room Renumbering application &ndash;
+<a href="http://www.youtube.com/watch?v=zL8pQRJbcyA">View online</a>
+| <a href="http://download.autodesk.com/media/adn/DevTVRevitNet2015.zip">Download</a>
+</li>
+
+<li><a href="http://images.autodesk.com/adsk/files/Revit2015APITraining.zip">Revit 2015 API Labs</a></li>
+
+</ul>
+
+<p>I just noticed that the Revit Developer Centre link to the Developers Guide is currently still pointing to the Revit 2014 version.</p>
+
+<p>As I mentioned when discussing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a>,
+
+the updated
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">
+Revit 2015 API Developers Guide</a> is
+
+already online as well, and the link on the Developer Centre needs to be updated to point to that instead.</p>
+
+
+<a href="">
+</a>

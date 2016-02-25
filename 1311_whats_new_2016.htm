@@ -1,0 +1,1415 @@
+﻿<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!-- #revitapi #aecdev #bim #architecture #adskdevnetwrk-->
+
+<h3>What's New in the Revit 2016 API</h3>
+
+<p>Here is the online version of the 'What's New' section of the Revit 2016 API help file.</p>
+
+<p>The information provided here is extracted from the document 'Revit Platform API Changes and Additions.docx' provided with the Revit SDK.
+As said, is also included in the 'What's New' section in the Revit API help file RevitAPI.chm.</p>
+
+<p>This is very important information, even for later reference. The explanation of the changes and enhancements are well worth referring to later on as well, to understand how things work together the way they do.</p>
+
+<p>I am putting it online to ensure that this valuable information is available through web searches.</p>
+
+<p>To look up the introduction of older features, here are links to the previous 'What's New in the API' discussions:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+</ul>
+
+<p>For more detailed information, please refer to the complete API documentation in the SDK and the online
+<a href="http://help.autodesk.com/view/RVT/2016/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API Developers Guide</a>
+provided within the
+<a href="http://help.autodesk.com/view/RVT/2016/ENU">Revit 2016 Help</a>.</p>
+
+<p>For an introduction and quick overview of the main highlights of the new API functionality and a couple of sample application demonstrating their use, please refer to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/revit-2016-api-news-and-devdays-online-recording.html">
+Revit 2016 API News and DevDays Online Recording</a>.</p>
+
+<p>Before diving into the API news, a note on RevitLookup:</p>
+
+<ul>
+<li><a href="#2">RevitLookup for Revit 2016 updated again</a></li>
+<li><a href="#3">Major changes and renovations to the Revit API</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>RevitLookup for Revit 2016 Updated Again</h4>
+
+<p>I released the first version of RevitLookup for Revit 2016 two days ago, and am following up with a little fix.</p>
+
+<p>In the post-build event, the previous version was copying the add-in manifest and DLL assembly it produced to the Revit 2015 add-ins folder.</p>
+
+<p>Happily I happened to try to make use of it in Revit 2015 and thus noticed quite soon, because obviously the 2016 version did not work there.</p>
+
+<p>The new updated version with that rectified is provided in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2016.0.0.7">release 2016.0.0.7</a></p>
+
+<p>In general, you can simply grab the latest version from the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>.</p>
+
+<p>If you need a version for Revit 2015, the latest available one for that is <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2015.0.0.8">release 2015.0.0.8</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h3>Major changes and renovations to the Revit API</h3>
+
+<p>This document consists of two main sections, on API changes and additions:</p>
+
+<ul>
+<li><a href="#4">API Changes</a></li>
+<ul>
+<li><a href="#4.01">NewFamilyInstance() exception when presented inactive FamilySymbols</a></li>
+<li><a href="#4.02">TextNote and Leader API behavior and interface changes</a></li>
+<li><a href="#4.03">DatumPlane API (Levels, Grids, Reference Planes) changes</a></li>
+<li><a href="#4.04">Structural API changes</a></li>
+<li><a href="#4.05">Geometry API behavior and interface changes</a></li>
+<li><a href="#4.06">Energy Analysis and gbXML API changes</a></li>
+<li><a href="#4.07">RevisionSettings API changes</a></li>
+<li><a href="#4.08">ExternalDefinitionCreationOptions</a></li>
+<li><a href="#4.09">MirrorElements</a></li>
+<li><a href="#4.10">ReferenceIntersector</a></li>
+<li><a href="#4.11">BaseImportOptions</a></li>
+<li><a href="#4.12">BoundarySegment</a></li>
+<li><a href="#4.13">ParameterType enum change</a></li>
+<li><a href="#4.14">Schedule view rotation behavior</a></li>
+<li><a href="#4.15">Creating HostedSweeps (Fascia, Gutter, SlabEdge)</a></li>
+<li><a href="#4.16">DirectShape API and behavioral changes</a></li>
+<li><a href="#4.17">Wire API behavioral changes</a></li>
+<li><a href="#4.18">BrowserOrganization enum namespace change</a></li>
+<li><a href="#4.19">AdaptivePointOrientationType enumerated items renamed</a></li>
+<li><a href="#4.20">CompoundStructure.SetLayers() behavioral change</a></li>
+<li><a href="#4.21">API events &ndash; behavioral change</a></li>
+<li><a href="#4.22">Collections removed from API</a></li>
+<li><a href="#4.23">Methods and properties removed from API </a></li>
+<li><a href="#4.24">Classes removed from API</a></li>
+</ul>
+
+<li><a href="#5">API Additions</a></li>
+<ul>
+<li><a href="#5.01">Worksharing API additions</a></li>
+<li><a href="#5.02">Parameter API additions</a></li>
+<li><a href="#5.03">Geometry API additions</a></li>
+<li><a href="#5.04">Custom Export API improvements</a></li>
+<li><a href="#5.05">Export API additions</a></li>
+<li><a href="#5.06">Dimension API additions</a></li>
+<li><a href="#5.07">Reinforcement API additions</a></li>
+<li><a href="#5.08">Structural Analytical Model API additions</a></li>
+<li><a href="#5.09">MEP Fabrication API</a></li>
+<li><a href="#5.10">View3D additions</a></li>
+<li><a href="#5.11">ScheduleDefinition </a></li>
+<li><a href="#5.12">StairsType API changes</a></li>
+<li><a href="#5.13">ElectricalSetting API additions</a></li>
+<li><a href="#5.14">PanelScheduleView</a></li>
+<li><a href="#5.15">FamilyInstance additions</a></li>
+<li><a href="#5.16">Category API additions</a></li>
+<li><a href="#5.17">Family API additions</a></li>
+<li><a href="#5.18">ComponentRepeater additions</a></li>
+<li><a href="#5.19">Point cloud API additions</a></li>
+<li><a href="#5.20">Application additions</a></li>
+<li><a href="#5.21">Thin lines options</a></li>
+<li><a href="#5.22">3D view API additions</a></li>
+<li><a href="#5.23">UI API additions</a></li>
+<li><a href="#5.24">AddInUtility API additions</a></li>
+</ul>
+</ul>
+
+
+<a name="4"></a>
+<h3>API changes</h3> <!-- h1 -->
+
+<a name="4.01"></a>
+<h3NewFamilyInstance() exception when presented inactive FamilySymbols</h3> <!-- h2 -->
+
+<ul>
+<li>All NewFamilyInstance() overloads on Autodesk.Revit.Creation.Document and Autodesk.Revit.Creation.ItemFactoryBase now check to ensure that the input FamilySymbol is active (FamilySymbol.IsActive). Symbols that are not used in the document may be deactivated to conserve memory and regeneration time. When the symbol is inactive, its geometry is empty and cannot be accessed. In order to access the geometry of a symbol that is not active in the document, the symbol should first be activated by calling FamilySymbol.Activate().</li>
+<li>If the symbol is not active the method will now throw. This prevents the situation where the new FamilyInstance created will not generate proper geometry or intersections with related elements.</li>
+</ul>
+
+<a name="4.02"></a>
+<h3>TextNote and Leader API behavior and interface changes</h3> <!-- h2 -->
+<p>The Revit API classes related to TextNotes and Leaders have been significantly renovated.</p>
+<h4>TextElement class</h4> <!-- h3 -->
+<p>New methods and properties</p>
+<ul>
+<li>TextElement.Width &ndash; Width of the area of the text content</li>
+<ul><li>This replaces <b>TextNote.LineWidth</b></li></ul>
+<li>TextElement.HorizontalAlignment &ndash; Horizontal alignment of the text content within the text box of the element.</li>
+<li>TextElement.VerticalAlignment &ndash; Vertical alignment of the text content within the text box of the element.</li>
+<ul><li>Collectively, these two new properties replace <b>TextNote.Align</b></li></ul>
+<li>TextElement.KeepRotatedTextReadable &ndash; A flag to control how text behaves within a rotated text box.</li>
+<li>TextElement.IsTextWrappingActive &ndash; A flag identifying whether text-wrapping is currently active in this text element or not.</li>
+</ul>
+
+<h4>TextNote class</h4> <!-- h3 -->
+<p>New methods and properties </p>
+<ul>
+<li>TextNote.Create &ndash; Creates a new text note element with the given properties. This includes a TextNoteOptions object, which encapsulates several options used for creating notes.</li>
+<ul>
+<li>This replaces <b>ItemFactoryBase.NewTextNote()</b></li>
+<li>This change also fixes an issue where creating a text note would incorrectly wrap text lines to be too short</li>
+</ul>
+<li>TextNote.LeaderCount &ndash; The number of leader objects currently attached to the text note.</li>
+<li>TextNote.LeaderLeftAttachment &ndash; Gets/sets the attachment position of leaders on the left side of the text note.</li>
+<li>TextNote.LeaderRightAttachment &ndash; Gets/sets the attachment position of leaders on the right side of the text note.</li>
+<li>TextNote.GetLeaders &ndash; Returns a collection of leaders currently attached to the text note.</li>
+<ul>
+<li>This replaces <b>TextNote.Leaders</b></li>
+</ul>
+</ul>
+
+
+<h4>Leaders</h4> <!-- h3 -->
+<p>The LeaderArray class has been deprecated, thus members which referred to it have been replaced:</p>
+<ul>
+<li><b>Deprecated member &rarr; Replacement</b></li>
+<li>TextNote.Leaders &rarr; TextNote.GetLeaders()</li>
+<li>AnnotationSymbol.Leaders &rarr; AnnotationSymbol.GetLeaders()</li>
+</ul>
+<p>The Leader class now includes new members:</p>
+<ul>
+<li>Leader.Anchor &ndash; Anchor point of the Leader.</li>
+<li>Leader.LeaderShape &ndash; Geometric style of the leader.</li>
+<li>Leader.IsOwned &ndash; Validates that the leader is attached to (owned by) a valid element, such as an annotation tag.</li>
+</ul>
+<a name="4.03"></a>
+<h3>DatumPlane API (Levels, Grids, Reference Planes) changes</h3> <!-- h2 -->
+<h4>DatumPlane</h4> <!-- h3 -->
+<p>The new class: </p>
+<ul>
+<li>Autodesk.Revit.DB.DatumPlane</li>
+</ul>
+<p>is now a base class for element types that represent a datum surface (level, grid or reference plane)</p>
+<p>This base classes offers many new methods and properties:</p>
+<ul>
+<li>DatumPlane.ShowBubble() &ndash; Shows bubble in the specified view. </li>
+<li>DatumPlane.HideBubble() &ndash; Hides bubble in the specified view.</li>
+<li>DatumPlane.IsBubbleVisibleInView() &ndash; Identifies if the bubble is visible or not in a view. </li>
+<li>DatumPlane.HasBubble() &ndash; Identifies if the DatumPlane has bubble or not.</li>
+<li>DatumPlane.IsVisibleInView() &ndash; Checks if the datum plane is visible in the specified view. </li>
+<li>DatumPlane.Maximize3DExtents() &ndash; Maximize the 3D extents of datum plane.</li>
+<li>DatumPlane.GetDatumExtentType() &ndash; Identifies if the end of the datum plane is aligned with 3D extents or is set to vary specifically in the indicated view.</li>
+<li>DatumPlane.SetDatumExtentType() &ndash; Sets whether or not the end of the datum plane is aligned with 3D extents or is set to vary specifically in the indicated view. </li>
+<li>DatumPlane.GetCurvesInView() &ndash; Gets the extents to match the curves within a view. </li>
+<li>DatumPlane.SetCurveInView() &ndash; Sets the extents to match the curve. </li>
+<li>DatumPlane.IsCurveValidInView() &ndash; Checks if the curve is valid to be as the extents for the datum plane in a view. The curve must be bound and coincident with the original one of the datum plane.</li>
+<li>DatumPlane.GetPropagationViews() &ndash; Gets a list of candidate views which are parallel to the current view and to which the 2D extents of the datum may be propagated.</li>
+<li>DatumPlane.PropagateToViews() &ndash; Propagates the 2D extents applied to this datum to the specified parallel views. </li>
+<li>DatumPlane.IsLeaderValid() &ndash; Checks if the specified leader is valid for the datum plane in the given view. </li>
+<li>DatumPlane.GetLeader() &ndash; Gets a copy of the leader applied to the indicated end of the datum plane. </li>
+<li>DatumPlane.SetLeader() &ndash; Sets the leader to the indicated end of the datum plane. </li>
+<li>DatumPlane.AddLeader() &ndash; Adds leader to the indicated end of the datum plane. </li>
+</ul>
+
+
+<h4>Level</h4> <!-- h3 -->
+<p>Some members related to levels have been obsoleted and replaced:</p>
+
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>Level.LevelType &rarr; Element.GetTypeId(), Element.ChangeTypeId()</li>
+<li>Level.PlaneReference &rarr; Level.GetPlaneReference()</li>
+<li>ItemFactoryBase.NewLevel() &rarr; Level.Create()</li>
+</ul>
+
+<h4>Grid</h4> <!-- h3 -->
+<p>Some members related to grids have been added, or obsoleted and replaced:</p>
+
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>Grid.GridType &rarr; Element.GetTypeId(), Element.ChangeTypeId()</li>
+<li>Grid.ExtendToAllLevels() &rarr; DatumPlane.MaximizeExtents()</li>
+<li>N/A &rarr; Grid.SetVerticalExtents() &ndash; Adjusts the grid to extend through only the vertical range between bottom and top.</li>
+<li>Autodesk.Revit.Creation.Document.NewGrid() &rarr; Grid.Create()</li>
+<li>Autodesk.Revit.Creation.Document.NewGrids() &rarr; Use Grid.Create() repeated as necessary.</li>
+</ul>
+
+<h4>ReferencePlane</h4> <!-- h3 -->
+<p>Some members related to levels have been obsoleted and replaced:</p>
+
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>ReferencePlane.Plane &rarr; ReferencePlane.GetPlane()</li>
+<li>ReferencePlane.Reference &rarr; ReferencePlane.GetReference()</li>
+</ul>
+
+<a name="4.04"></a>
+<h3>Structural API changes</h3> <!-- h2 -->
+<h4>ContFooting and ContFootingType class and members renamed</h4> <!-- h3 -->
+<p>The ContFooting and ContFootingType classes have been replaced by new classes:</p>
+<ul>
+<li>WallFoundation</li>
+<li>WallFoundationType</li>
+</ul>
+
+<p>The following members have been modified or added to WallFoundation:</p>
+
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>ContFooting.FootingType &rarr; WallFoundation.GetFoundationType(), WallFoundation.SetFoundationType()</li>
+<li>Document.NewFoundationWall(ContFootingType, Wall) &rarr; Document.NewFoundationWall(WallFoundationType, Wall)</li>
+<li>N/A &rarr; WallFoundation.WallId</li>
+</ul>
+
+<h4>AnalyticalModel</h4> <!-- h3 -->
+
+<ul>
+<li>AnalyticalModel.GetLocalCoordinateSystem() now supports cylindrical walls and bent analytical model sticks.</li>
+</ul>
+
+<h4>AnalyticalModelSweptProfile class renamed and relocated</h4> <!-- h3 -->
+<p>The class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structural.AnalyticalModelSweptProfile</li>
+</ul>
+<p>has been renamed and moved to become:</p>
+<ul>
+<li>Autodesk.Revit.DB.SweptProfile</li>
+</ul>
+<p>All members of the class stay the same.</p>
+<p>Two members have been transferred from the AnalyticalModel class to the FamilyInstance class:</p>
+<ul>
+<li><b>Removed member &rarr; New/replacement member</b></li>
+<li>AnalyticalModel.HasSweptProfile &rarr; FamilyInstance.HasSweptProfile</li>
+<li>AnalyticalModel.GetSweptProfile() &rarr; FamilyInstance.GetSweptProfile()</li>
+</ul>
+
+
+
+<h4>Loads</h4> <!-- h3 -->
+<p>The Revit API classes related to Loads have been significantly renovated.</p>
+<p>The new class</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.LoadBase</li>
+</ul>
+<p>has been introduced as a new base class for PointLoad, LineLoad and AreaLoad. Properties of this class affect properties of all 3 types of loads:</p>
+<ul>
+<li>LoadBase.LoadCaseId &ndash; read/write property representing the load case for this load</li>
+<li>LoadBase.IsHosted</li>
+<li>LoadBase.LoadCase</li>
+<li>LoadBase.IsReaction</li>
+</ul>
+<p>In the subclasses of LoadBase, there are some new members, and many members have been deprecated and replaced, as shown in the following table.</p>
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>PointLoad.Force &rarr; PointLoad.ForceVector</li>
+<li>PointLoad.Moment &rarr; PointLoad.MomentVector</li>
+<li>N/A &rarr; PointLoad.Point &ndash; this property is now read/write.</li>
+<li>LineLoad.Point[] &rarr; LineLoad.StartPoint, LineLoad.EndPoint, LineLoad.SetPoints()</li>
+<li>LineLoad.Force[], LineLoad.Force1, LineLoad.Force2 &rarr; LineLoad.ForceVector1, LineLoad.ForceVector2</li>
+<li>LineLoad.Moment[], LineLoad.Moment1, LineLoad.Moment2 &rarr; LineLoad.MomentVector1, LineLoad.MomentVector2</li>
+<li>LineLoad.UniformLoad &rarr; LineLoad.IsUniform</li>
+<li>N/A &rarr; LineLoad.IsProjected</li>
+<li>Document.NewLineLoad() &rarr; LineLoad.Create()</li>
+<li>AreaLoad.NumLoops, AreaLoad.NumCurves[], AreaLoad.Curve[] &rarr; AreaLoad.GetLoops(), AreaLoad.SetLoops()</li>
+<li>AreaLoad.Force[], AreaLoad.Force1, AreaLoad.Force2, AreaLoad.Force3 &rarr; AreaLoad.ForceVector1, AreaLoad.ForceVector2, AreaLoad.ForceVector3</li>
+<li>AreaLoad.RefPoint[] &rarr; AreaLoad.GetRefPoint()</li>
+<li>N/A &rarr; AreaLoad.IsProjected</li>
+<li>N/A &rarr; AreaLoad.Area</li>
+<li>Document.NewAreaLoad() &rarr; AreaLoad.Create()</li>
+</ul>
+
+<h4>Load cases and load combinations</h4> <!-- h3 -->
+<p>The Revit API classes related to Load Cases and Load Combinations have been significantly renovated. This has introduced new members to the LoadCombnation, LoadCase, LoadNature and LoadUsage class, and resulted in several previously existing member being marked deprecated and replaced, as shown in this table:</p>
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>Document.NewLoadCombination() &rarr; LoadCombination.Create()</li>
+<li>LoadCombination.CombinationCaseName[] &rarr; LoadCombination.GetCaseOrCombinationIds(), obtain the name from associated LoadCase element</li>
+<li>LoadCombination.CombinationNatureName[] &rarr; LoadCombination.GetCaseOrCombinationIds(), obtain the name from associated LoadNature element</li>
+<li>LoadCombination.Factor[], LoadCombination.NumberOfComponents &rarr; LoadCombination.GetComponents(), LoadCombination.SetComponents()</li>
+<li>LoadCombintation.UsageName[], LoadCombination.NumberOfUsages &rarr; LoadCombination.GetUsageIds(), LoadCombination.SetUsageIds()</li>
+<li>LoadCombination.CombinationState, LoadCombination.CombinationStateIndex &rarr; LoadCombination.State (translate the enum to string or int as required)</li>
+<li>LoadCombination.CombinationType, LoadCombination.CombinationTypeIndex &rarr; LoadCombination.Type (translate the enum to string or int as required)</li>
+<li>N/A &rarr; LoadCombination.IsThirdPartyGenerated</li>
+<li>Document.NewLoadCase() &rarr; LoadCase.Create()</li>
+<li>N/A &rarr; LoadCase.Name is now connected to this element's name properly</li>
+<li>N/A &rarr; LoadCase.Number</li>
+<li>N/A &rarr; LoadCase.NatureId</li>
+<li>N/A &rarr; LoadCase.NatureCategory</li>
+<li>Document.NewLoadNature() &rarr; LoadNature.Create()</li>
+<li>N/A &rarr; LoadNature.Name is now connected to this element's name properly</li>
+<li>Document.NewLoadUsage() &rarr; LoadUsage.Create()</li>
+<li>N/A &rarr; LoadUsage.Name is now connected to this element's name properly</li>
+</ul>
+
+<h4>LoadComponent</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.LoadComponent</li>
+</ul>
+<p>is responsible for association of LoadCase or LoadCombination ids as factors in the load combination.</p>
+<h4>BoundaryConditions</h4> <!-- h3 -->
+<p>In the BoundaryConditions class, there are some new members, and some members have been deprecated and replaced, as shown in the following table.</p>
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>BoundaryConditions.AssociatedLoad, BoundaryConditions.associateWithLoad() &rarr; BoundaryConditions.AssociatedLoadId</li>
+<li>N/A &rarr; BoundaryConditions.HostElementId</li>
+<li>BoundaryConditions.Curve[] &rarr; BoundaryConditions.GetCurve()</li>
+<li>BoundaryConditions.NumCurves, BoundaryConditions.Curve[] &rarr; BoundaryConditions.GetLoops()</li>
+</ul>
+<h4>RebarShapeDefinition</h4> <!-- h3 -->
+<p>New validation has been introduced to confirm that the name of a shared parameter to be added was notalready used by another shared parameter on the element. This new validation was added to methods:</p>
+<ul>
+<li>RebarShapeDefinition.AddParameter()</li>
+<li>RebarShapeDefinition.AddFormulaParameter()</li>
+</ul>
+<p>and this situation will now trigger an exception.</p>
+<a name="4.05"></a>
+<h3>Geometry API behavior and interface changes</h3> <!-- h2 -->
+<h4>PlanarFace</h4> <!-- h3 -->
+<p>The properties:</p>
+<ul>
+<li>PlanarFace.Normal</li>
+<li>PlanarFace.Vector[int]</li>
+</ul>
+<p>have been obsoleted.</p>
+<p>The replacement properties are:</p>
+<ul>
+<li>PlanarFace.FaceNormal</li>
+<li>PlanarFace.XVector</li>
+<li>PlanarFace.YVector</li>
+</ul>
+<p>Note that PlanarFace.FaceNormal will return a vector consistently pointing out of the solid that this face is a boundary for (if it is a part of a solid) (unlike PlanarFace.Normal which it replaced).</p>
+
+<h4>Curve.MakeBound() and Curve.MakeUnbound()</h4> <!-- h3 -->
+<p>These previously threw an exception if the Curve was marked read-only (IsReadOnly). These methods now will succeed, but cause the read-only Curve handle to automatically contain a copy of the original curve which is disconnected from its source. It is still not possible to modify a read-only geometry object directly through manipulation of its geometry.</p>
+
+<h4>CurveLoop iteration</h4> <!-- h3 -->
+<p>When iterating Curves contained in a CurveLoop, a copy is now received instead of a reference to the original CurveLoop Curve. This is to prevent possible instability due to attempting to modify the CurveLoop's Curves directly, or if the CurveLoop is collected by the garbage collector while a Curve is still in use.</p>
+
+<h4>CurveLoop.CreateViaThicken()</h4> <!-- h3 -->
+<p>This method now enforces that the thickness value parameter will result in a curve which exceed Revit's short curve tolerance (Application.ShortCurveTolerance).</p>
+
+<h4>Point creation</h4> <!-- h3 -->
+<p>New methods to create a Point object had been added.</p>
+<ul>
+<li>Point.Create(XYZ) creates a Point at given coordinates.</li>
+<li>Point.Create(XYZ, ElementId) creates a Point at given coordinates and associates with it a GStyle with the specified ElementId</li>
+</ul>
+<p>The methods replace the deprecated:</p>
+<ul>
+<li>Autodesk.Revit.Creation.Application.NewPoint()</li>
+</ul>
+
+<h4>TessellatedShapeBuilderOutcome</h4> <!-- h3 -->
+<p>The enumerated value SolidOrSheet has been removed from this outcome, and replaced by separate values Solid and Sheet. That allows the TessellatedShapeBuilder caller to detect if the builder was able to create a true solid or an open manifold ("sheet")..</p>
+
+<a name="4.06"></a>
+<h3>Energy Analysis and gbXML API changes</h3> <!-- h2 -->
+
+<h4>EnergyAnalysisDetailModel creation from building elements and volumes</h4> <!-- h3 -->
+<p>The function:</p>
+<ul>
+<li>EnergyAnalysisDetailModel.Create()</li>
+</ul>
+<p>now offers the ability to create energy model based on analysis of building element boundaries and volumes (set EnergyAnalysisDetailModelOptions.EnergyModelType to BuildingElement). This option matches the default energy model creation used by Revit's user interface. The generated energy model is affected by settings in EnergyDataSettings, including the option to use the new enumerated value:</p>
+<ul>
+<li>AnalysisMode.ConceptualMassesAndBuildingElements</li>
+</ul>
+<p>This option sets the generation of the EnergyAnalysisDetailModel to use the combination of conceptual masses and building elements.</p>
+<h4>EnergyAnalysisDetailModelOptions</h4>
+<p>The new property:</p>
+<ul>
+<li>EnergyAnalysisDetailModelOptions.EnergyModelType</li>
+</ul>
+<p>indicates whether the energy model is based on rooms/spaces or building elements.. Options are:</p>
+<ul>
+<li>SpatialElement &ndash; Energy model based on rooms or spaces. This is the default for calls when this option is not set, and matches behavior in Revit 2015.</li>
+<li>BuildingElement &ndash; Energy model based on analysis of building element volumes.</li>
+</ul>
+<h4>Lifecycle of EnergyAnalysisDetailModel elements</h4> <!-- h3 -->
+<p>Users and API application are now able to create a persistent energy model which can be activated in displays and views. As a result,</p>
+<ul>
+<li>EnergyAnalysisDetailModel.Create()</li>
+</ul>
+<p>now requires a transaction to be active so the new elements can be created in the associated document.</p>
+<p>The new function:</p>
+<ul>
+<li>EnergyAnalysisDetailModel.GetMainEnergyAnalysisDetailModel()</li>
+</ul>
+<p>returns the main EnergyAnalysisDetailModel contained in the given document &ndash; this is the model that may be displayed in associated views.</p>
+<p>As a result of this behavioral change, the class EnergyAnalysisDetailModel and the sub-objects EnergyAnalysisSpace, EnergyAnalysisSurface, and EnergyAnalysisOpening are now subclasses of Element. These elements can be found by element filtering and other Revit API tools.</p>
+<p>Because the energy model is now an element, the function:</p>
+<ul>
+<li>EnergyAnalysisDetailModel.Destroy()</li>
+</ul>
+<p>has been obsoleted in favor of using Document.Delete() on the EnergyAnalysisDetailModel instead to remove the model and all associated elements.</p>
+<p>It is recommended that applications call Document.Delete() on the EnergyAnalysisDetailModel elements that they create, but any energy models created after the main energy model will be deleted automatically before document saving or synchronization.</p>
+
+<h4>EnergyAnalysisSpace API changes</h4> <!-- h3 -->
+<p>The property:</p>
+<ul>
+<li>EnergyAnalysisSpace.SpaceName</li>
+</ul>
+<p>has been renamed from EnergyAnalysisSpace.Name. This change was necessary due to the inherited Name property on the new parent class, Element.</p>
+<h4>EnergyAnalysisSurface API changes</h4> <!-- h3 -->
+<p>The properties:</p>
+<ul>
+<li>EnergyAnalysisSurface.SurfaceName</li>
+<li>EnergyAnalysisSurface.SurfaceId</li>
+</ul>
+<p>have been renamed from EnergyAnalysisSurface.Name and EnergyAnalysisSurface.Id. These changes were necessary due to the inherited Name and Id properties on the new parent class, Element.</p>
+<h4>EnergyAnalysisOpening API changes</h4> <!-- h3 -->
+<p>The properties:</p>
+<ul>
+<li>EnergyAnalysisOpening.OpeningName</li>
+<li>EnergyAnalysisOpening.OpeningId</li>
+</ul>
+<p>have been renamed from EnergyAnalysisOpening.Name and EnergyAnalysisOpening.Id. These changes were necessary due to the inherited Name and Id properties on the new parent class, Element.</p>
+
+<h4>Export to gbXML behavioral changes</h4> <!-- h3 -->
+<p>The method:</p>
+<ul>
+<li>Document.Export(string, string, GBXMLExportOptions)</li>
+</ul>
+<p>no longer generates the energy model. It is now required that there be a main energy model stored in the document before this export is invoked. If no energy model of the designated type exists prior to the call to export, this method will throw an exception.</p>
+
+<a name="4.07"></a>
+<h3>RevisionSettings API changes</h3> <!-- h2 -->
+<p>Enhanced RevisionSettings provide greater control over Revision numbering.</p>
+
+<h4>Alphanumeric revision settings</h4> <!-- h3 -->
+<p>Alphanumeric revision settings replace the Alphabetic setting available prior to 2016.</p>
+<p>The new class AlphanumericRevisionSettings offers the following members:</p>
+<ul>
+<li>AlphanumericRevisionSettings.Prefix &ndash; a prefix to be prepended to each revision number with alphanumeric type.</li>
+<li>AlphanumericRevisionSettings.Suffix &ndash; a suffix to be appended to each revision number with alphanumeric type.</li>
+<li>AlphanumericRevisionSettings.GetSequence() &ndash; the sequence is a ist of arbitrary strings to be used in consecutive sequence as revision numbers.</li>
+<li>AlphanumericRevisionSettings.SetSequence()</li>
+</ul>
+<p>The enumerated value:</p>
+<ul>
+<li>RevisionNumberType.Alphanumeric </li>
+</ul>
+<p>replaces the now removed RevisionNumberType.Alphabetic.</p>
+<p>In the RevisionSettings class, new members were introduced to provide access to the AlphanumericRevisionSettings:</p>
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>RevisionSettings.GetRevisionAlphabet() &rarr; RevisionSettings.GetAlphanumericRevisionSettings()
+<br/>For 2016, GetRevisionAlphabet() returns information if the revision can be represented with alphabetic settings; otherwise, an exception is thrown.</li>
+<li>RevisionSettings.SetRevisionAlphabet() &rarr; RevisionSettings.SetAlphanumericRevisionSettings()
+<br/>For 2016, SetRevisionAlphabet() redirects to set up an alphanumeric revision setting.</li>
+</ul>
+
+<h4>Numeric revision settings</h4> <!-- h3 -->
+<p>The new class NumericRevisionSettings offers the following members:</p>
+<ul>
+<li>NumericRevisionSettings.Prefix &ndash; a prefix to be prepended to each revision number with numeric type.</li>
+<li>NumericRevisionSettings.Suffix &ndash; a suffix to be appended to each revision number with numeric type.</li>
+<li>NumericRevisionSettings.StartNumber property &ndash; the value to be used as the first number in the sequence of numeric revisions.</li>
+</ul>
+<p>The numeric revision settings can be accessed from:</p>
+<ul>
+<li>RevisionSettings.GetNumericRevisionSettings()</li>
+<li>RevisionSettings.SetNumericRevisionSettings()</li>
+</ul>
+
+<a name="4.08"></a>
+<h3>ExternalDefinitionCreationOptions</h3> <!-- h2 -->
+<p>The class:</p>
+<ul>
+<li>ExternalDefinitionCreationOptions</li>
+</ul>
+<p>has been renamed from ExternalDefinitonCreationOptions to correct a spelling error.</p>
+<a name="4.09"></a>
+<h3>MirrorElements</h3> <!-- h2 -->
+<p>The new overload:</p>
+<ul>
+<li>ElementTransformUtils.MirrorElements(Document, ICollection&lt;ElementId&gt;, Plane, bool)</li>
+</ul>
+<p>allows mirroring with or without copying the elements first. The previously existing overload has been obsoleted in favor of this new method.</p>
+
+<a name="4.10"></a>
+<h3>ReferenceIntersector</h3> <!-- h2 -->
+<p>The behavior of ReferenceIntersector with the flag:</p>
+<ul>
+<li>ReferenceIntersector.FindReferencesInRevitLinks</li>
+</ul>
+<p>set to true has been improved. Previously, an applied filter was ignored when returning elements encountered in Revit links, and any element encountered would be returned. Now the filter will be evaluated for the elements found in the links, and those elements returned only if they pass the filter. Note that results may not be as expected if the filter applied is geometric (such as a BoundingBox filter or ElementIntersects filter). This is because the filter will be evaluated for linked elements in the coordinates of the linked model, which may not match the coordinates of the elements as they appear in the host model. Also, ElementFilters that accept a Document and/or ElementId as input during their instantiation will not correctly pass elements that appear in the link, because the filter will not be able to match link elements to the filter's criteria.</p>
+<p>As before, if a list of target ElementIds is set, references in links will be returned only if the ElementId matches the id of the intersected RevitLinkInstance, and the ids will not be compared with the target list.</p>
+
+<a name="4.11"></a>
+<h3>BaseImportOptions</h3> <!-- h2 -->
+<p>The new property:</p>
+<ul>
+<li>BaseImportOptions.ReferencePoint</li>
+</ul>
+<p>replaces the BaseImportOptions.SetRefPoint() and BaseImportOptions.GetRefPoint() methods.</p>
+
+<a name="4.12"></a>
+<h3>BoundarySegment</h3> <!-- h2 -->
+<p>As a cleanup, the unused duplicate classes Autodesk.Revit.DB.Architecture.BoundarySegment and Autodesk.Revit.DB.Mechanical.BoundarySegment have been removed from the API. The API interfaces already used Autodesk.Revit.DB.BoundarySegment instead.</p>
+<p>The following changes were made to the BoundarySegment class:</p>
+<ul>
+<li><b>Deprecated member &rarr; New/replacement member</b></li>
+<li>BoundarySegment.Document &rarr; There is no replacement as this class will not carry a reference to the created document after this property is removed.</li>
+<li>BoundarySegment.Element &rarr; BoundarySegment.ElementId</li>
+<li>BoundarySegment.Curve &rarr; BoundarySegment.GetCurve()</li>
+<li>N/A &rarr; BoundarySegment.LinkElementId &ndash; the element id of the element in a link instance that forms this boundary.</li>
+</ul>
+
+<a name="4.13"></a>
+<h3>ParameterType enum change</h3> <!-- h2 -->
+<p>The enumerated value ParameterType.Image has been reordered internally in the ParameterType enumeration. Be sure to rebuild all API clients that use ParameterType and to only compare ParameterType values to each other and not to their internal integer values.</p>
+
+<a name="4.14"></a>
+<h3>Schedule view rotation behavior</h3> <!-- h2 -->
+<p>Some improvements have been made to API behavior for ScheduleSheetInstance if the instance is currently pinned (Element.Pinned is true):</p>
+<ul>
+<li>Settting ScheduleSheetInstance.Rotation will throw an exception.</li>
+<li>Viewport parameter VIEWPORT_ATTR_ORIENTATION_ON_SHEET cannot be modified.</li>
+</ul>
+<a name="4.15"></a>
+<h3>Creating HostedSweeps (Fascia, Gutter, SlabEdge)</h3> <!-- h2 -->
+<p>The validation of the input edges for:</p>
+<ul>
+<li>Autodesk.Revit.DB.Creation.Document.NewFascia()</li>
+<li>Autodesk.Revit.DB.Creation.Document.NewGutter()</li>
+<li>Autodesk.Revit.DB.Creation.Document.NewSlabEdge()</li>
+</ul>
+<p>has been relaxed, and should allow edges that are also allowed by the Revit UI.</p>
+
+<a name="4.16"></a>
+<h3>DirectShape API and behavioral changes</h3> <!-- h2 -->
+<h4>DirectShapes in families</h4> <!-- h3 -->
+<p>DirectShape elements can now be added directly to families and their geometry will be reflected in instances of that family placed in a host document.</p>
+
+<h4>DirectShape category</h4> <!-- h3 -->
+<p>DirectShape elements may now only be assigned to top-level Model categories.</p>
+
+<h4>WireframeBuilder and DirectShape support for curves and points</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>WireframeBuilder</li>
+</ul>
+<p>supports input of curves and points to form a geometry representation. This representation can be assigned to or appended to the geometry shown by a DirectShape or DirectShapeType element.</p>
+<p>Curves and points can also now be directly passed to DirectShapes and DirectShapeType via SetShape(ShapeBuilder) or AppendShape(ShapeBuilder).</p>
+
+<h4>ViewShapeBuilder</h4> <!-- h3 -->
+<p>The methods:</p>
+<ul>
+<li>ViewShapeBuilder.SetShape(DirectShape)</li>
+<li>ViewShapeBuilder.SetShape(DirectShapeType)</li>
+</ul>
+<p>have been deprecated. Their replacements are DirectShape.SetShape(ShapeBuilder) and DirectShapeType.SetShape(ShapeBuilder).</p>
+
+<h4>DirectShape options</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>DirectShapeOptions</li>
+</ul>
+<p>offers options that the API developer can use to control the behavior of created DirectShape elements. Options can be set on either DirectShape or DirectShapeType.</p>
+
+<h4>Referencing option</h4> <!-- h3 -->
+<p>DirectShape elements now support by default element references, including dimensions, alignments, and face hosting, as well as snapping.</p>
+<p>The property:</p>
+<ul>
+<li>DirectShapeOptions.ReferencingOption</li>
+</ul>
+<p>supports options related to the referenceablility of the DirectShape or DirectShapeType &ndash; if set to NotReferenceable, the geometry may not be used for dimensioning, snapping, alignment, or face-hosting. The element may still be selected by the user for operations which do not reference individual geometry objects.</p>
+
+<h4>RoomBounding option</h4> <!-- h3 -->
+<p>DirectShape elements now supports the ability to participate in room boundary calculations, if they are of an appropriate category for room boundary calculations, and if the associated "Room Bounding" parameter is set to true.</p>
+<p>The property:</p>
+<ul>
+<li>DirectShapeOptions.RoomBoundingOption</li>
+</ul>
+<p>identifies whether the DirectShape supports an option for the "Room Bounding" parameter to permit participation in room boundary calculations. The default value is NotApplicable, but this will be changed automatically to SetByParameter for applicable DirectShapes.</p>
+
+<a name="4.17"></a>
+<h3>Wire API behavioral changes</h3> <!-- h2 -->
+<p>Several methods offer modified behavior from Revit 2015, so that they work in a manner more consistent with the Revit UI.</p>
+<ul>
+<li>Wire.Create() &ndash; in Revit 2016, after creating the wire, the wire ends display on the device boundary, not the device connector position.</li>
+<li>Wire.ConnectTo() &ndash; in Revit 2016, if the wire is already connected when this method is used, the old connection will be disconnected and the wire connected to the new target.</li>
+<li>Wire.RemoveVertex() &ndash; in Revit 2016, if the wire vertex is already connected to an element, this method will fail to remove the vertex.
+<br/>In order to remove this vertex, it should be disconnected first, then removed, and then reconnected (if required).</li>
+<li>Wire.InsertVertex() &ndash; in Revit 2016, if the start vertex already connects to an element, it is not permtted to insert a new vertex before the start vertex. </li>
+<li>Connector.ConnectTo() &ndash; in Revit 2016, if one device already connects multiple wires, only the affected wire's connection will be removed or changed.</li>
+</ul>
+
+<a name="4.18"></a>
+<h3>BrowserOrganization enum namespace change</h3> <!-- h2 -->
+<p>The enumerated type BrowserOrganizationType has been moved to the Autodesk.Revit.DB namespace.</p>
+<a name="4.19"></a>
+<h3>AdaptivePointOrientationType enumerated items renamed</h3> <!-- h2 -->
+<p>All items of this enumerated type were renamed to better align the names with the corresponding text in the Revit UI. The numeric values of the items weren't modified, allowing existing applications to work. However, to be able to rebuild an application, all point orientations need to be changed to their respective new names.</p>
+<ul>
+<li><b>Old name &rarr; New Name</b></li>
+<li>HostReferenceStrictly &rarr; ToHost</li>
+<li>HostReferenceAutoFlip &rarr; ToHostAndLoopSystem</li>
+<li>PlacementVertical &rarr; ToGlobalZthenHost</li>
+<li>PlacementOrthogonal &rarr; ToGlobalXYZ</li>
+<li>FamilyVertical &rarr; ToInstanceZthenHost</li>
+<li>FamilyOrthogonal &rarr; ToInstance</li>
+</ul>
+
+<a name="4.20"></a>
+<h3>CompoundStructure.SetLayers() behavioral change</h3> <!-- h2 -->
+<p>The method:</p>
+<ul>
+<li>CompoundStructure.SetLayers()</li>
+</ul>
+<p>now unsets the structural material layer index automatically.. Code that needs this property to be set after changing layers will need to set it explicitly.</p>
+
+<a name="4.21"></a>
+<h3>API events &ndash; behavioral change</h3> <!-- h2 -->
+<p>Although the Revit API has never officially supported such a work-flow it is now enforced that registering to and unregistering from events must happen while executing on the main thread. An exception will be thrown if an external application attempts to register to (or unregister from) events from outside of valid API context.</p>
+
+<a name="4.22"></a>
+<h3>Collections removed from API</h3> <!-- h2 -->
+<p>The following unused Revit API collection types have been removed from the API in 2016:</p>
+<ul>
+<li>Autodesk.Revit.DB.Strucure.LoadTypeBaseSet</li>
+<li>Autodesk.Revit.DB.Strucure.PointLoadTypeSet</li>
+<li>Autodesk.Revit.DB.Strucure.LineLoadTypeSet</li>
+<li>Autodesk.Revit.DB.Strucure.AreaLoadTypeSet</li>
+<li>Autodesk.Revit.DB.Mechanical.SpaceTagTypeSet</li>
+<li>Autodesk.Revit.DB.AnnotationSymbolTypeSet</li>
+<li>Autodesk.Revit.DB.BoundarySegmentArray</li>
+<li>Autodesk.Revit.DB.BoundarySegmentArrayArray</li>
+<li>Autodesk.Revit.DB.AreaTagTypeSet</li>
+<li>Autodesk.Revit.DB.BeamSystemTypeSet</li>
+<li>Autodesk.Revit.DB.FamilySymbolSet</li>
+<li>Autodesk.Revit.DB.Architecture.FasciaTypeSet</li>
+<li>Autodesk.Revit.DB.FloorTypeSet</li>
+<li>Autodesk.Revit.DB.GenericFormSet</li>
+<li>Autodesk.Revit.DB.GridTypeSet</li>
+<li>Autodesk.Revit.DB.Architecture.GutterTypeSet</li>
+<li>Autodesk.Revit.DB.LevelTypeSet</li>
+<li>Autodesk.Revit.DB.MaterialSet</li>
+<li>Autodesk.Revit.DB.Structure.RebarBarTypeSet</li>
+<li>Autodesk.Revit.DB.Structure.RebarHookTypeSet</li>
+<li>Autodesk.Revit.DB.Structure.RebarCoverTypeSet</li>
+<li>Autodesk.Revit.DB.Structure.RebarShapeSet</li>
+<li>Autodesk.Revit.DB.RoofTypeSet</li>
+<li>Autodesk.Revit.DB.Architecture.BoundarySegmentArray</li>
+<li>Autodesk.Revit.DB.Architecture.BoundarySegmentArrayArray</li>
+<li>Autodesk.Revit.DB.Architecture.RoomTagTypeSet</li>
+<li>Autodesk.Revit.DB.SlabEdgeTypeSet</li>
+<li>Autodesk.Revit.DB.TextNoteTypeSet</li>
+<li>Autodesk.Revit.DB.Structure.TrussTypeSet</li>
+<li>Autodesk.Revit.DB.ViewSheetSets</li>
+<li>Autodesk.Revit.DB.WallTypeSet</li>
+<li>Autodesk.Revit.DB.InstanceArray</li>
+<li>Autodesk.Revit.DB.MeshArray</li>
+<li>Autodesk.Revit.DB.GeometryObjectArray</li>
+<li>Autodesk.Revit.DB.SolidArray</li>
+<li>Autodesk.Revit.DB.Mechanical.BoundarySegmentArray</li>
+<li>Autodesk.Revit.DB.Mechanical.BoundarySegmentArrayArray</li>
+<li>Autodesk.Revit.DB.CurtainSystemTypeSet</li>
+<li>Autodesk.Revit.DB.DimensionTypeSet</li>
+<li>Autodesk.Revit.DB.SpotDimensionTypeSet</li>
+<li>Autodesk.Revit.DB.ContFootingTypeSet</li>
+</ul>
+
+<a name="4.23"></a>
+<h3>Methods and properties removed from API </h3> <!-- h2 -->
+<p>The following previously deprecated methods and properties have been removed from the API:</p>
+<ul>
+<li>Autodesk.RevitAddIns.RevitProduct.Language</li>
+<li>Autodesk.Revit.Creation.Document.NewViewDrafting()</li>
+<li>Autodesk.Revit.DB.Electrical.Wire Autodesk.Revit.Creation.Document.NewWire(Curve, View, Connector, Connector, WireType, WiringType);</li>
+<li>Autodesk.Revit.DB.Plumbing.Pipe Autodesk.Revit.Creation.Document.NewPipe(XYZ, Connector, PipeType)</li>
+<li>Autodesk.Revit.DB.Plumbing.Pipe Autodesk.Revit.Creation.Document.NewPipe(Connector, Connector, PipeType)</li>
+<li>Autodesk.Revit.DB.Element.Parameter[System.String]</li>
+<li>Autodesk.Revit.DB.PointOnEdge.PointOnEdge(Reference, double)</li>
+<li>Autodesk.Revit.DB.CurtainGridLine.Move(XYZ)</li>
+<li>Autodesk.Revit.DB.Line.get_Bound(XYZ, XYZ)</li>
+<li>Autodesk.Revit.DB.Line.get_Unbound(XYZ, XYZ)</li>
+<li>Autodesk.Revit.DB.Definitions.Create(System.String, ParameterType)</li>
+<li>Autodesk.Revit.DB.Definitions.Create(System.String, ParameterType, bool)</li>
+<li>Autodesk.Revit.DB.Definitions.Create(System.String, ParameterType, bool, System.Guid%)</li>
+<li>Autodesk.Revit.DB.ViewSheet.Views</li>
+<li>Autodesk.Revit.DB.Analysis.EnergyAnalysisOpening.OriginatingElementId</li>
+<li>Autodesk.Revit.DB.Analysis.EnergyAnalysisSpace.SpatialElementId</li>
+<li>Autodesk.Revit.DB.Analysis.EnergyAnalysisSurface.OriginatingElementId</li>
+<li>Autodesk.Revit.DB.ViewSheet.GetAllProjectRevisionIds()</li>
+<li>Autodesk.Revit.DB.ViewSheet.GetAdditionalProjectRevisionIds()</li>
+<li>Autodesk.Revit.DB.ViewSheet.SetAdditionalProjectRevisionIds(ICollection&lt;ElementId&gt;)</li>
+<li>Autodesk.Revit.DB.LayerModifier.Seperator</li>
+<li>Autodesk.Revit.DB.Units.GetDisplayUnitType()</li>
+<li>Autodesk.Revit.DB.Units.SetDecimalSymbolAndGrouping(DecimalSymbol, DigitGroupingSymbol, DigitGroupingAmount);</li>
+<li>Autodesk.Revit.DB.Units.IsValidDecimalSymbolAndGrouping(DecimalSymbol, DigitGroupingSymbol, DigitGroupingAmount)</li>
+<li>Autodesk.Revit.DB.FormatOptions.FormatOptions(UnitSymbolType, DisplayUnitType)</li>
+<li>Autodesk.Revit.DB.FormatOptions.GetRounding()</li>
+<li>Autodesk.Revit.DB.FormatOptions.HasRounding()</li>
+<li>Autodesk.Revit.DB.FormatOptions.UseGrouping</li>
+<li>Autodesk.Revit.DB.FormatOptions.GetName()</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.GetLayout(UVGridlineType)</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.SetLayout(UVGridlineType, SpacingRuleLayout)</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.GetNumber(UVGridlineType)</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.SetNumber(UVGridlineType, int)</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.GetDistance(UVGridlineType)</li>
+<li>Autodesk.Revit.DB.DefaultDivideSettings.SetDistance(UVGridlineType, double)</li>
+<li>Autodesk.Revit.DB.FabricArea.Create(Document, Element, IList&lt;CurveLoop&gt;, XYZ, XYZ)</li>
+<li>Autodesk.Revit.DB.FabricArea.GetCurveElementIds()</li>
+<li>Autodesk.Revit.DB.Structure.AreaReinforcement.Create(Document, Element, IList&lt;Curve&gt;, XYZ)</li>
+<li>Autodesk.Revit.DB.Structure.AreaReinforcement.GetCurveElementIds()</li>
+<li>Autodesk.Revit.DB.Structure.PathReinforcement.Create(Document, Element, IList&lt;Curve&gt;, Boolean)</li>
+<li>Autodesk.Revit.DB.Structure.RebarHookType.GetDefaultHookLength(double)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.IsValidProjectionType(AnalyticalElementSelector, AnalyticalDirection, AnalyticalProjectionType)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.IsValidDirectionForProjection(AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.IsValidSelectorAndDirection(AnalyticalElementSelector, AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.IsValidProjectionDatumPlane(AnalyticalElementSelector, AnalyticalDirection, ElementId)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.HasAlignment(AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.GetAnalyticalProjectionType(AnalyticalElementSelector, AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.SetAnalyticalProjectionType(AnalyticalElementSelector, AnalyticalDirection, AnalyticalProjectionType)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.GetAlignmentMethod(AnalyticalElementSelector, AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.SetAlignmentMethod(AnalyticalElementSelector, AnalyticalDirection, AnalyticalAlignmentMethod)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.GetAnalyticalProjectionDatumPlane(AnalyticalElementSelector, AnalyticalDirection)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.SetAnalyticalProjectionDatumPlane(AnalyticalElementSelector, AnalyticalDirection, ElementId)</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalModel.IsSurface()</li>
+<li>Autodesk.Revit.DB.TableSectionData.InsertColumn(int, bool)</li>
+<li>Autodesk.Revit.DB.FormatValueOptions.AreValidForUnitType(UnitType)</li>
+<li>Autodesk.Revit.DB.UnitFormatUtils.FormatValueToString(Units, UnitType, Double, Boolean, Boolean)</li>
+<li>Autodesk.Revit.DB.UnitFormatUtils.FormatValueToString(Units, UnitType, Double, Boolean, Boolean, FormatValueOptions)</li>
+<li>Autodesk.Revit.DB.ValueParsingOptions.FormatOptions</li>
+<li>Autodesk.Revit.DB.Material.MaterialCagtegory</li>
+<li>Autodesk.Revit.DB.View.SurfaceTransparency</li>
+<li>Autodesk.Revit.DB.View.ShowEdges</li>
+<li>Autodesk.Revit.DB.View.ShowSilhouettes</li>
+<li>Autodesk.Revit.DB.View.SilhouetteLineStyleId</li>
+<li>Autodesk.Revit.DB.WorksetConfiguration.CloseAll()</li>
+<li>Autodesk.Revit.DB.WorksetConfiguration.OpenLastViewed()</li>
+<li>Autodesk.Revit.DB.IFC.IFCAnyHandle.SetAttribute(System.String name, System.Collections.Generic.ICollection&lt;IFCAnyHandle &gt; values);</li>
+<li>Autodesk.Revit.DB.IFC.IFCAnyHandle.SetAttribute(System.String name, System.Collections.Generic.ICollection&lt;System.String &gt; values);</li>
+<li>Autodesk.Revit.DB.IFC.IFCAnyHandle.SetAttribute(System.String name, System.Collections.Generic.ICollection&lt;double&gt; values);</li>
+<li>Autodesk.Revit.DB.IFC.IFCAnyHandle.SetAttribute(System.String name, System.Collections.Generic.ICollection&lt;int&gt; values);</li>
+<li>Autodesk.Revit.DB.IFC.IFCAnyHandle.SetAttribute(System.String name, System.Collections.Generic.ICollection&lt;bool&gt; values);</li>
+<li>Autodesk.Revit.UI.Selection.Selection.Elements</li>
+</ul>
+
+<a name="4.24"></a>
+<h3>Classes removed from API</h3> <!-- h2 -->
+<p>The following previously deprecated classes have been removed from the API:</p>
+<ul>
+<li>Autodesk.Revit.DB.Plumbing.PipeConnectionType</li>
+<li>Autodesk.Revit.UI.Selection.SelElementSet</li>
+<li>Autodesk.Revit.DB.IFC.ExporterIFCRegistry</li>
+</ul>
+
+
+<a name="5"></a>
+<h3>API additions</h3> <!-- h1 -->
+
+<a name="5.01"></a>
+<h3>Worksharing API additions</h3> <!-- h2 -->
+<h4>Workset creation</h4> <!-- h3 -->
+<p>The new static method:</p>
+<ul>
+<li>Workset.Create()</li>
+</ul>
+<p>creates a new Workset.</p>
+<h4>WorksetTable operations</h4> <!-- h3 -->
+<p>New static methods:</p>
+<ul>
+<li>WorksetTable.RenameWorkset() &ndash; Renames the Workset.</li>
+<li>WorksetTable.IsWorksetNameUnique() &ndash; Checks if the given Workset name is unique in the document.</li>
+</ul>
+<p>The new method:</p>
+<ul>
+<li>WorksetTable.SetActiveWorksetId()</li>
+</ul>
+<p>sets the active Workset.</p>
+<a name="5.02"></a>
+<h3>Parameter API additions</h3> <!-- h2 -->
+<h4>Elements that store a reference to a parameter</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>ParameterElement</li>
+</ul>
+<p>is an Element that stores information about a particular user-defined parameter in the document. This parameter's id is used when referencing that user-defined parameter. The ParameterElement class exposes:</p>
+<ul>
+<li>ParameterElement.GetDefinition()</li>
+</ul>
+<p>The new class:</p>
+<ul>
+<li>SharedParameterElement</li>
+</ul>
+<p>is an Element that stores the definition of a shared parameter which is loaded into the document. This class is a child of ParameterElement, and exposes the following additional members:</p>
+<ul>
+<li>GuidValue &ndash; The Guid that identifies this shared parameter.</li>
+<li>Create() &ndash; Creates a new shared parameter element in the document representing the parameter stored in the input ExternalDefinition.</li>
+<li>Lookup() &ndash; Finds the shared parameter element that corresponds to the given Guid.</li>
+</ul>
+
+<a name="5.03"></a>
+<h3>Geometry API additions</h3> <!-- h2 -->
+<h4>Create loft</h4> <!-- h3 -->
+<p>The new method:</p>
+<ul>
+<li>GeometryCreationUtilities.CreateLoftGeometry()</li>
+</ul>
+<p>creates a solid or open shell geometry by lofting between a sequence of curve loops.</p>
+<h4>Solid &ndash; copy</h4> <!-- h3 -->
+<p>The new method:</p>
+<ul>
+<li>SolidUtils.Clone()</li>
+</ul>
+<p>creates a new Solid which is a copy of the input Solid.</p>
+<h4>Solid &ndash; create transformed</h4> <!-- h3 -->
+<p>The new method:</p>
+<ul>
+<li>SolidUtils.CreateTransformed()</li>
+</ul>
+<p>creates a new Solid which is the transformation of the input Solid.</p>
+<h4>Solid &ndash; cut with half-space</h4> <!-- h3 -->
+<p>The new methods:</p>
+<ul>
+<li>BooleanOperationsUtils.CutWithHalfSpace()</li>
+<li>BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid()</li>
+</ul>
+<p>produce a solid which is the intersection of the input Solid with the half-space on the positive side of the given Plane. The positive side of the plane is the side to which Plane.Normal points. The first function creates a new Solid with the results, while the second modifies the existing solid (which must be a solid created by the application instead of one obtained from a Revit element).</p>
+<h4>Curve &ndash; set graphics style</h4> <!-- h3 -->
+<p>The new method:</p>
+<ul>
+<li>Curve.SetGraphicsStyleId()</li>
+</ul>
+<p>Sets the graphics style id for the curve. Many methods in the Revit API will not use the graphics style associated to this curve. For example, curves used as portions of the sketch of an element will not read this property. Newly created curve elements will not use this value either, as they inherit their graphical properties from their associated category.</p>
+<h4>CurveLoop &ndash; transform</h4> <!-- h3 -->
+<p>The new methods:</p>
+<ul>
+<li>CurveLoop.Transform()</li>
+<li>CurveLoop.CreateViaTransform()</li>
+</ul>
+<p>allow transformation of an existing CurveLoop. The former transforms the curves contained within the CurveLoop (modifying itself), while the latter creates a copy of the original curve loop containing the transformed curves. In both cases, the new/modified CurveLoop is guaranteed to be valid with all consituent curves contiguous (assuming that the curves were contiguous in the input curve loop).</p>
+<h4>FaceSecondDerivatives</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.FaceSecondDerivatives</li>
+</ul>
+<p>contains second partial derivatives of a face at a specified point.</p>
+<h4>Face.ComputeSecondDerivatives</h4> <!-- h3 -->
+<p>The new method:</p>
+<ul>
+<li>Face.ComputeSecondDerivatives</li>
+</ul>
+<p>allows users to access second coordinate derivatives of a face.</p>
+
+<a name="5.04"></a>
+<h3>Custom Export API improvements</h3> <!-- h2 -->
+<p>The API allowing custom export of 3D views and their contents has been extended to allow for more data in the output.</p>
+<h4>IExportContext</h4> <!-- h3 -->
+<p>IExportContext is now a base class for two other interfaces that support different contents on export. This base class contains methods that are common to both the leaf interfaces. Although it is still possible to use classes deriving directly from this base interface (for backward compatibility), future applications should implement the new leaf interfaces only.</p>
+<h4>IPhotoRenderContext</h4> <!-- h3 -->
+<p>This new leaf interface should be used for processing elements in the view in the same manner that Revit's Render command does. This is equivalent to what IExportContext allowed in Revit 2015 and earlier.</p>
+<h4>IModelExportContext</h4> <!-- h3 -->
+<p>This new interface should be used for processing elements in the view in the same manner that Revit's processes them in 3D views. This context supports additional contents including model curves and text as shown in the 3D views. The new interface methods are:</p>
+<ul>
+<li>OnCurve &ndash; export of a geometric curve, such as lines, arcs, Bezier curves, etc. </li>
+<li>OnPolyline &ndash; export of a polyline element </li>
+<li>OnPoint &ndash; export of a point element </li>
+<li>OnLineSegment &ndash; export of a tessellated line segment </li>
+<li>OnPolylineSegments &ndash; export of a tessellated polyline segments </li>
+<li>OnText &ndash; export of text annotation elements </li>
+</ul>
+<p>The methods of this interface use the following new classes:</p>
+<table style="margin-left: 20px">
+<tr><td>ModelCurveNode</td><td>A base class of output nodes that represent various model curves.</td></tr>
+<tr><td>CurveNode</td><td>An output node that represents a model curve.</td></tr>
+<tr><td>PolylineNode</td><td> An output node that represents a 3D polyline.</td></tr>
+<tr><td>PointNode</td><td> An output node that represents a 3D point</td></tr>
+<tr><td>LineSegment</td><td>An output node that represents a tessellated line segment</td></tr>
+<tr><td>PolylineSegment</td><td>An output node that represents a tessellated polyline segments.</td></tr>
+<tr><td>TextNode</td><td>An output node representing a text annotation object.</td></tr>
+<tr><td>FormatedTextRun</td><td>A structure that defines a single run of a formatted text.</td></tr>
+<tr><td>LineProperties</td><td>A structure that provides access to pen properties of exported lines/curves</td></tr>
+</table>
+
+<a name="5.05"></a>
+<h3>Export API additions</h3> <!-- h2 -->
+<h4>DWFExportOptions</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>DWFExportOptions.ExportTexture</li>
+</ul>
+<p>sets an option indicating whether to export textures from Revit to 3D DWF files.</p>
+<h4>BaseExportOptions</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>BaseExportOptions.PreserveCoincidentLines</li>
+</ul>
+<p>sets an option indicating whether the export process to DWG, DXF or DGN preserves coincident lines during export.</p>
+<p>There is a newly supported string value for:</p>
+<ul>
+<li>BaseExportOptions.LayerMapping</li>
+</ul>
+<p>The value "DGN7" can be used only for DGN export.</p>
+<a name="5.06"></a>
+<h3>Dimension API additions</h3> <!-- h2 -->
+<h4>Dimension class</h4> <!-- h3 -->
+<p>The following new members have been added to support adjustment of the text location and corresponding leaders of a given single dimension:</p>
+<ul>
+<li>Dimension.Origin &ndash; returns the origin of the dimension (the middle point of the dimension line that makes up the dimension).</li>
+<li>Dimension.LeaderEndPosition &ndash; a read/write property representing the position of the dimension's leader end point.</li>
+<li>Dimension.TextPosition &ndash; a read/write property representing the position of the dimension text's drag point.</li>
+<li>Dimenson.IsTextPositionAdjustable() &ndash; indicates if this dimension is supported to get and set TextPosition/LeaderPosition.</li>
+<li>Dimension.ResetTextPosition() &ndash; resets the text position of the dimension to the initial position determined by its type and parameters.</li>
+</ul>
+<h4>DimensionSegment</h4> <!-- h3 -->
+<p>The following new members have been added to support adjustment of the text location and corresponding leaders of a given dimension segment in a multi-segment dimension:</p>
+<ul>
+<li>DimensionSegment.LeaderEndPosition &ndash; a read/write property representing the position of the dimension segment's leader end point.</li>
+<li>DimensionSegment.TextPosition &ndash; a read/write property representing the position of the dimension segment's text's drag point.</li>
+<li>DimensionSegment.IsTextPositionAdjustable() &ndash; indicates if this dimension segment is supported to set/get TextPosition/LeaderPosition</li>
+<li>DimensionSegment.ResetTextPosition() &ndash; resets the text position of the segment to the initial position determined by its type and parameters.</li>
+</ul>
+<a name="5.07"></a>
+<h3>Reinforcement API additions</h3> <!-- h2 -->
+<h4>RebarContainer</h4> <!-- h3 -->
+<p>The new element RebarContainer represents an aggregation of multiple Rebar sets. At this time it can only be created via the API. The advantages of using a RebarContainer are:</p>
+<ul>
+<li>Defining new types of rebar distributions not possible with the Revit user interface</li>
+<li>Improve rebar performance by combining multiple rebar sets into the definition of a single element</li>
+</ul>
+<p>A RebarContainer element contains a collection of RebarContainerItem objects. RebarContainerItem is a new class offering an API similar to that of the Rebar element. RebarContainerItems can be created directly or duplicated from the properties of an existing Rebar element. RebarContainer has support for iteration of the items directly from the RebarContainer object.</p>
+<h4>RebarContainer API</h4>
+<p>RebarContainer offers several collections of APIs similar to those offered by Rebar for management of rounding settings, presentation in a given view, and host. In addition, it offers the following members for management of the container and its items:</p>
+<ul>
+<li>RebarContainer.Create() &ndash; Creates a new instance of a RebarContainer element within the project.</li>
+<li>RebarContainer.AppendItemFromRebar() &ndash; Appends an Item to the RebarContainer. Fills its data on base of the Rebar.</li>
+<li>RebarContainer.AppendItemFromCurves() &ndash; Appends an Item to the RebarContainer. Fills its data on base of the Rebar.</li>
+<li>RebarContainer.AppendItemFromRebarShape() &ndash; Appends an Item to the RebarContainer. Fills its data on base of the Rebar.</li>
+<li>RebarContainer.AppendItemFromCurvesAndShape() &ndash; Appends an Item to the RebarContainer. Fills its data on base of the Rebar.</li>
+<li>RebarContainer.RemoveItem() &ndash; Removes Item from the RebarContainer.</li>
+<li>RebarContainer.ClearItems() &ndash; Clears all the Items stored in this RebarContainer element.</li>
+<li>RebarContainer.Contains() &ndash; Checks if the RebarContainer has this item as one of its members.</li>
+<li>RebarContainer.ItemsCount &ndash; The count of Items in this RebarContainer.</li>
+</ul>
+<h4>RebarContainerItem API</h4>
+<p>RebarContainerItem offers many of the same APIs that Rebar offers, along with a few new members that allow management of the item within its parent container:</p>
+<ul>
+<li>RebarContainerItem.SetFromRebar() &ndash; Set an instance of a RebarContainerItem element according to the parameters list</li>
+<li>RebarContainerItem.SetFromCurves() &ndash; Set an instance of a RebarContainerItem element according to the parameters list.</li>
+<li>RebarContainerItem.SetFromRebarShape() &ndash; Set an instance of a RebarContainerItem element, as an instance of a RebarShape. </li>
+<li>RebarContainerItem.SetFromCurvesAndShape() &ndash; Set an instance of a RebarContainerItem element according to the parameters list.</li>
+<li>RebarContainerItem.BarTypeId &ndash; The identifier of the rebar bar type.</li>
+</ul>
+
+<h4>RebarContainerType API</h4>
+<p>The new class:</p>
+<ul>
+<li>RebarContainerType</li>
+</ul>
+<p>represents the type element used in the generation of a RebarContainer.</p>
+<h4>RebarContainer parameters management</h4>
+<p>The new class:</p>
+<ul>
+<li>RebarContainerParameterManager</li>
+</ul>
+<p>allows an application to manage and apply parameter overrides to a RebarContainer parameter. Normally parameters of the RebarContainer are derived from the parameters of the individual items it contains (if the parameter exists and has the same value in all items, it will exist and have the same value in the RebarContainer, while if the parameters are different in the individual items, the parameter will display without a value). Overrides allow an application to set a different value for a given parameter, or to add new shared parameters directly to the individual RebarContainer element.</p>
+<p>The method:</p>
+<ul>
+<li>RebarContainer.GetParametersManager</li>
+</ul>
+<p>returns an object used to manage parameters of the RebarContainer.</p>
+<p>The following methods are provided by the RebarContainerParameterManager class:</p>
+<ul>
+<li>RebarContainerParameterManager.AddOverride &ndash; Adds an override for the given parameter as its value will be displayed for the RebarContainer element.</li>
+<li>RebarContainerParameterManager.RemoveOverride &ndash; Removes an overridden value from the given parameter.</li>
+<li>RebarContainerParameterManager.ClearOverrides &ndash; Clears any overridden values from all parameters of the associated RebarContainer element.</li>
+<li>RebarContainerParameterManager.SetOverriddenParameterReadonly &ndash; Sets this overridden parameter to be read-only.</li>
+<li>RebarContainerParameterManager.SetOverriddenParameterModifiable &ndash; Sets this overridden parameter to be modifiable.</li>
+<li>RebarContainerParameterManager.IsOverriddenParameterModifiable &ndash; Checks if overridden parameter is modifiable.</li>
+<li>RebarContainerParameterManager.IsParameterOverridden &ndash; Checks if the parameter has an override.</li>
+<li>RebarContainerParameterManager.IsRebarContainerParameter &ndash; Checks if the parameter is a RebarContainer parameter</li>
+<li>RebarContainerParameterManager.AddSharedParameterAsOverride &ndash; Adds a shared parameter as one of the parameter overrides stored by this RebarContainer element.</li>
+</ul>
+<h4>Bent Fabric Sheets</h4> <!-- h3 -->
+<p>It is possible using the Revit 2016 API to create a fabric sheet bent along bending curves. This is not possible in the Revit user interface.</p>
+<p>It is not possible to convert a Fabric Sheet between flat and bent.</p>
+<p>The following members allow creation and modification of bend fabric sheets:</p>
+<ul>
+<li>FabricSheet.Create(.., CurveLoop BendProfile) &ndash; creates a bent fabric sheet driven by the input BendProfile</li>
+<li>FabricSheet.GetBendProfile() &ndash; gets the curves that drive the shape of bent fabric sheet</li>
+<li>FabricSheet.SetBendProfile() &ndash; modifies the curves that drive the shape of bent fabric sheet</li>
+<li>FabricSheet.GetBendProfileWithFillets() &ndash; gets the curves that drive the shape of bent fabric sheet.including automatically generated fillets if they exist</li>
+<li>FabricSheet.IsBent &ndash; identifies if the fabric sheet is bent or flat</li>
+<li>FabricSheet.BentFabricBendDirection &ndash; read/write to control which set of wires will be bent</li>
+<li>FabricSheet.bentFabricWiresOrientation &ndash; read/write to control the bars' orientation</li>
+<li>FabricSheet.bentFabricLongitudinalCutLength &ndash; read/write to control a cut to be applied &ndash; if the sheet should be shortened and the amount</li>
+</ul>
+<h4>PathReinforcement additions</h4> <!-- h3 -->
+<p>The new static method:</p>
+<ul>
+<li>PathReinforcement.Create() &ndash; Creates a new PathReinforcement object from an array of curves and given Rebar Shape id.</li>
+</ul>
+<p>New methods:</p>
+<ul>
+<li>PathReinforcement.GetOrCreateDefaultRebarShape() &ndash; Creates a new RebarShape object with a default name or returns existing one which fulfills PathReinforcement bending data requirements</li>
+<li>PathReinforcement.IsAlternatingLayerEnabled() &ndash; checks if the alternating bars exist in the Path Reinforcement instance.</li>
+<li>PathReinforcement.IsValidRebarShapeId() &ndash; checks if the ElementId corresponds to valid RebarShape for use in Path Reinforcement.</li>
+<li>PathReinforcement.IsValidPrimaryBarOrientation() &ndash; checks the orientation is valid for primary bars.</li>
+<li>PathReinforcement.IsValidAlternatingBarOrientation() &ndash; checks the orientation is valid for alternating bars.</li>
+</ul>
+<p>New properties:</p>
+<ul>
+<li>PathReinforcement.PrimaryBarShapeId &ndash; The RebarShape element that defines the shape of the primary bars of the PathReinforcement.</li>
+<li>PathReinforcement.PrimaryBarOrientation &ndash; The orientation of the primary bars.</li>
+<li>PathReinforcement.AlternatingBarShapeId &ndash; The RebarShape element that defines the shape of the alternating bars of the PathReinforcement.</li>
+<li>PathReinforcement.AlternatingBarOrientation &ndash; The orientation of the alternating bars.</li>
+</ul>
+<h4>Reinforcement Settings API additions</h4> <!-- h3 -->
+<p>The new methods:</p>
+<ul>
+<li>ReinforcementSettings.GetReinforcementAbbreviationTag()</li>
+<li>ReinforcementSettings.GetReinforcementAbbreviationTags()</li>
+<li>ReinforcementSettings.SetReinforcementAbbreviationTag()</li>
+</ul>
+<p>provide access to the settings related to tagging abbreviations for area or path reinforcement.</p>
+<h4>Reinforcement rounding API additions</h4> <!-- h3 -->
+<p>The new members:</p>
+<ul>
+<li>RebarRoundingManager.TotalLengthRoundingMethod</li>
+<li>RebarRoundingManager.SegmentLengthRoundingMethod</li>
+<li>RebarRoundingManager.ApplicableTotalLengthRoundingMethod</li>
+<li>RebarRoundingManager.ApplicableSegmentLengthRoundingMethod</li>
+<li>FabricRoundingManager.TotalLengthRoundingMethod</li>
+<li>FabricRoundingManager.ApplicableTotalLengthRoundingMethod</li>
+</ul>
+<p>provide access to the rounding method applied to different values found in reinforcement lengths. The new property:</p>
+<ul>
+<li>FormatOptions.RoundingMethod</li>
+</ul>
+<p>specifies the rounding method used to for specific format options. This property is currently only supported for Rebar parameters. FormatOptions objects used in other contexts must contain the default rounding method (Nearest).</p>
+<a name="5.08"></a>
+<h3>Structural Analytical Model API additions</h3> <!-- h2 -->
+<h4>Member Forces for Analytical Model</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>MemberForces</li>
+</ul>
+<p>defines the internal forces and moments applied to the start or end of an AnalyticalModelStick element. Access these forces through the new methods:</p>
+<ul>
+<li>AnalyticalModelStick.GetMemberForces() &ndash; Gets the Member Forces associated with the element.</li>
+<li>AnalyticalModelStick.SetMemberForces() &ndash; Sets and adds Member Forces to the element.</li>
+<li>AnalyticalModelStick.RemoveMemberForces() &ndash; Removes Member Forces defined for the given position.</li>
+<li>AnalyticalModelStick.RemoveAllMemberForces() &ndash; Removes all Member Forces associated with the element.</li>
+</ul>
+<h4>AnalyticalModelStick</h4> <!-- h3 -->
+<p>New Methods:</p>
+<ul>
+<li>AnalyticalModelStick.GetLocalCoordinateSystem(XYZ point) &ndash; Get the local coordinate system in a specified point on the analytical model.</li>
+<li>AnalyticalModelStick.GetLocalCoordinateSystem(double parameter) &ndash; Get the local coordinate system in a specified point on the analytical model.</li>
+</ul>
+<h4>AnalyticalModelSurface</h4> <!-- h3 -->
+<p>New Method:</p>
+<ul>
+<li>AnalyticalModelSurface.GetLocalCoordinateSystem(XYZ point): allow to possess LCS in specified point on analytical model</li>
+</ul>
+<p>Change in the SurfaceElementProjectionZ enumeration:</p>
+<p>The enumerated value SurfaceElementProjectionZ.Center has been replaced by SurfaceElementProjectionZ.CenterOfElement.</p>
+<a name="5.09"></a>
+<h3>MEP Fabrication API</h3> <!-- h2 -->
+<p>The new MEP Fabrication API allows users to connect various FabricationConfigurations to Revit. With a FabricationConfiguration, they can create and use FabricationParts in their project, and define connectors to those parts.</p>
+<h4>FabricationConfiguration</h4> <!-- h3 -->
+<p>The new class FabricationConfiguration contains information about the fabrication configuration settings used by the project. Using this class, users can get and set the fabrication configuration settings for the document. They can also load and unload services, reload the fabrication configuration, get loaded services, get fabrication specifications, get material and insulation information from the configuration, and get connector information.</p>
+<p>The new static method:</p>
+<ul>
+<li>FabricationConfiguration.GetFabricationConfiguration</li>
+</ul>
+<p>gets the fabrication configuration element in the document.</p>
+<p>Some new methods include:</p>
+<ul>
+<li>static FabricationConfiguration.GetFabricationConfiguration &ndash; Gets the fabrication configuration settings in the document.</li>
+<li>FabricationConfiguration.SetConfiguration() &ndash; Sets the fabrication configuration for the document.</li>
+<li>FabricationConfiguration.LoadServices() &ndash; Load the specified fabrication services into the project.</li>
+<li>FabricationConfiguration.UnloadServices() &ndash; Unload the specified fabrication services from the project.</li>
+<li>FabricationConfiguration.ReloadConfiguration() &ndash; Reloads the fabrication configuration from its source fabrication configuration.</li>
+<li>FabricationConfiguration.GetAllSpecifications() &ndash; Gets all specification identifiers in the fabrication configuration.</li>
+<li>FabricationConfiguration.GetAllLoadedServices() &ndash; Returns all the loaded fabrication services.</li>
+</ul>
+<h4>FabricationService</h4> <!-- h3 -->
+<p>The new class FabricationService is part of the fabrication configuration and defines what FabricationServiceButtons can be used.</p>
+<p>Some new properties include:</p>
+<ul>
+<li>FabricationService.Name &ndash; The name of the service.</li>
+<li>FabricationService.TabCount &ndash; The number of tabs in the service.</li>
+</ul>
+<p>Some new methods include:</p>
+<ul>
+<li>FabricationService.GetButtonCount() &ndash; Gets the number of buttons for a given tab in the service. </li>
+<li>FabricationService.GetButton() &ndash; Gets the service button for a given tab index and button index from the service. </li>
+</ul>
+<h4>FabricationPart</h4> <!-- h3 -->
+<p>The new class FabricationPart represents a fabrication component in the Autodesk Revit MEP product. Using this class, users can create, place, move and align fabrication parts in a Revit model. Users can also get or set the dimensions of the fabrication part, and get the fabrication hosted information and rod information.</p>
+<p>Some new methods include:</p>
+<ul>
+<li>static FabricationPart.Create() &ndash; Creates a fabrication part based on a FabricationServiceButton.</li>
+<li>static FabricationPart.CreateHanger() &ndash; Creates a fabrication hanger on another fabrication part.</li>
+<li>static FabricationPart.AlignPartByConnectors() &ndash; Moves and aligns fabrication part by one of its connectors to align to another connector.</li>
+<li>FabricationPart.GetDimensionValue() &ndash; Gets the value of fabrication dimension.</li>
+<li>FabricationPart.SetDimensionValue() &ndash; Sets the fabrication dimension value.</li>
+<li>FabricationPart.GetHostedInfo() &ndash; Gets the fabrication hosted element information.</li>
+<li>FabricationPart.GetRodInfo() &ndash; Gets the fabrication rod information.</li>
+</ul>
+<h4>FabricationServiceButton</h4> <!-- h3 -->
+<p>The new class FabricationServiceButton defines a button used in a FabricationService. A fabrication service button defines what items to use for different conditions.</p>
+<p>Some new methods include:</p>
+<ul>
+<li>FabricationServiceButton.GetConditionLowerValue() &ndash; Gets the condition lower value for a given condition.</li>
+<li>FabricationServiceButton.GetContionUpperValue() &ndash; Gets the condition upper value for a given condition.</li>
+<li>FabricationServiceButton.IsAHanger()-Checks if the fabrication service button is a hanger.</li>
+</ul>
+<h4>Other Fabrication Classes</h4> <!-- h3 -->
+<p>The following fabrication-based classes are also added to Revit:</p>
+<ul>
+<li>FabricationPartType &ndash; Defines the type of a FabricationPart.</li>
+<li>FabricationRodInfo &ndash; Gives rod information for a FabricationPart.</li>
+<li>FabricationHostedInfo &ndash; Contains hosting information for a FabricationPart and provides the ability to disconnect from the host.</li>
+<li>FabricationConnectorInfo &ndash; Contains information about the connectors of a FabricationPart.</li>
+<li>FabricationUtils &ndash; Provides a new method to check the validity of connections.</li>
+<li>FabricationDimensionDefinition &ndash; Contains information about a fabrication dimension. </li>
+<li>FabricationConfigurationInfo &ndash; Contains information about the properties of a FabricationConfiguration.</li>
+<li>ConfigurationReloadInfo &ndash; Contains results from reloading a FabricationConfiguration.</li>
+<li>ConnectionValidationInfo &ndash; Contains connection-related warnings generated by reloading a FabricationConfiguration. </li>
+</ul>
+<h4>Other Fabrication API related changes</h4> <!-- h3 -->
+<h4>Connector API</h4>
+<p>Several new members were added to the Connector class:</p>
+<ul>
+<li>Connector.Id &ndash; A unique identifier to identify this connector.</li>
+<li>Connector.GetFabricationConnectorInfo() &ndash; Gets fabrication connectivity information from a connector.</li>
+<li>Connector.GetMEPConnectorInfo() &ndash; Gets MEP connector information from a connector.</li>
+</ul>
+<p>In addition, the new static method:</p>
+<ul>
+<li>Pipe.IsPipingConnector()</li>
+</ul>
+<p>checks if the given connector is a valid piping connector.</p>
+<a name="5.10"></a>
+<h3>View3D additions</h3> <!-- h2 -->
+<p>Several new methods provide support for switching camera targets and for switching between perspective and isometric for a 3D view:</p>
+<ul>
+<li>View3D.CanResetCameraTarget() &ndash; Checks whether the camera target can be reset for this view.</li>
+<li>View3D.ResetCameraTarget() &ndash; Resets the camera target to the center of the field of view. </li>
+<li>View3D.CanToggleBetweenPerspectiveAndIsometric() &ndash; Checks whether the view can toggle between Perspective and isometric.</li>
+<li>View3D.ToggleToPerspective() &ndash; Toggles the view to perspective.</li>
+<li>View3D.ToggleToIsometric() &ndash; Toggles the view to isometric.</li>
+</ul>
+<a name="5.11"></a>
+<h3>ScheduleDefinition </h3> <!-- h2 -->
+<p>New Properties:</p>
+<ul>
+<li>ScheduleDefinition.ShowTitle &ndash; Indicates if the title will be displayed in the schedule.</li>
+<li>ScheduleDefinition.ShowHeaders &ndash; Indicates if the headers will be displayed in the schedule.</li>
+</ul>
+<a name="5.12"></a>
+<h3>StairsType API changes</h3> <!-- h2 -->
+<p>The properties:</p>
+<ul>
+<li>StairsType.LeftSideSupportType</li>
+<li>StairsType.RightSideSupportType</li>
+</ul>
+<p>are now correctly allowed to be set when the left or right string style is set to Closed.</p>
+<a name="5.13"></a>
+<h3>ElectricalSetting API additions</h3> <!-- h2 -->
+<p>The following new properties have been exposed:</p>
+<ul>
+<li>ElectricalSetting.CircuitSequence &ndash; Accesses the circuit sequence numbering schema</li>
+<li>ElectricalSetting.CircuitNamePhaseA &ndash; Accesses the circuit naming by phase (Phase A Label).</li>
+<li>ElectricalSetting.CircuitNamePhaseB &ndash; Accesses the circuit naming by phase (Phase B Label).</li>
+<li>ElectricalSetting.CircuitNamePhaseC &ndash; Accesses the circuit naming by phase (Phase C Label).</li>
+</ul>
+<a name="5.14"></a>
+<h3>PanelScheduleView</h3> <!-- h2 -->
+<p>New Methods</p>
+<ul>
+<li>PanelScheduleView.GetCellsBySlotNumber () &ndash; Returns a range of cells for the given slot number</li>
+<li>PanelScheduleView.CanMoveSlotTo() &ndash; Verifies if can circuits in the source slot to the specific slot.</li>
+<li>PanelScheduleView.MoveSlotTo() &ndash; Move the circuits in the source slot to the specific slot.</li>
+</ul>
+<a name="5.15"></a>
+<h3>FamilyInstance additions</h3> <!-- h2 -->
+<p>The new method:</p>
+<ul>
+<li>FamilyInstance.HasModifiedGeometry() &ndash; Identifies if the geometry of this FamilyInstance has been modified from the automatically generated default.</li>
+</ul>
+<p>New properties and methods introduced for reading the information about spatial calculation point(s) directly from family instances:</p>
+<ul>
+<li>FamilyInstance.HasSpatialElementCalculationPoint &ndash; Identifies if this instance has a single SpatialElementCalculationPoint used as the search point for Revit to identify if the instance is inside a room or space.</li>
+<li>FamilyInstance.HasSpatialElementFromToCalculationPoints &ndash; Identifies if this instance has a pair of SpatialElementCalculationPoints used as the search points for Revit to identify if the instance lies between up to two rooms or spaces. The points determine which room or space is considered the "from" and which is considered the "to" for a family instance which connects two rooms or spaces, such as a door or window.</li>
+<li>FamilyInstance.GetSpatialElementCalculationPoint() &ndash; Gets the location of the calculation point for this instance.</li>
+<li>FamilyInstance.GetSpatialElementFromToCalculationPoints() &ndash; Gets the locations for the calculation points for this instance. For a family instance which connects two rooms or spaces, such as a door or window, the points determine which room or space is considered the "from" and which is considered the "to".</li>
+</ul>
+<a name="5.16"></a>
+<h3>Category API additions</h3> <!-- h2 -->
+<p>The new static methods:</p>
+<ul>
+<li>Category.GetCategory(Document, ElementId)</li>
+<li>Category.GetCategory(Document, BuildInCategory)</li>
+</ul>
+<p>act as a shortcut to lookup and return a Category object.</p>
+<a name="5.17"></a>
+<h3>Family API additions</h3> <!-- h2 -->
+<h4>Family.GetFamilyTypeParameterValues method</h4> <!-- h3 -->
+<p>Returns all applicable values for a <b>FamilyType</b> parameter of a family.</p>
+<p>The values are Element Ids of all family types that match the category specified by the definition of the given parameter. The elements are either of class <b>ElementType</b> or <b>NestedFamilyTypeReference</b>. The second variant is for the types that are nested in families and thus are not accessible otherwise.</p>
+<h4>NestedFamilyTypeReference class</h4> <!-- h3 -->
+<p>A class representing a proxy element for a nested family type.</p>
+<p>In Revit, this element represents a value of a <b>FamilyType</b> parameter of a loaded family. Each such element corresponds to a nested FamilyType element in the original family document where the family was defined. This element stores only basic information about the nested FamilyType, such as the name of the Type, name of the Family, and a Category.</p>
+<p>It is possible to obtain a set of applicable elements of this class for a particular FamilyType parameter of a family by calling Family.<b>GetFamilyTypeParameterValues</b>.</p>
+<h4>Creation of adaptive component instances</h4> <!-- h3 -->
+<p>The new constructor:</p>
+<ul>
+<li>FamilyInstanceCreationData(Autodesk::Revit::DB::FamilySymbol^ symbol, System::Collections::Generic::IList<Revit::DB::XYZ^>^ adaptivePoints)</li>
+</ul>
+<p>creates an instance of a class wrapping the arguments used to place adaptive components. This may be more efficient than placing individual adaptive components one-by-one.</p>
+<a name="5.18"></a>
+<h3>ComponentRepeater additions</h3> <!-- h2 -->
+<p>New Methods</p>
+<ul>
+<li>ComponentRepeater.CanElementBeRepeated() &ndash; Determines whether an element can be repeated using the RepeatElements method. </li>
+<li>ComponentRepeater.RemoveRepeaters() &ndash; Removes component repeaters from the document, but leaves the individual repeated components in their respective locations and hosted on their original hosts.</li>
+</ul>
+<a name="5.19"></a>
+<h3>Point cloud API additions</h3> <!-- h2 -->
+<p>The new method:</p>
+<ul>
+<li>PointCloudType.GetPath()</li>
+</ul>
+<p>gets the path of the link source from which the points are loaded.</p>
+<p>The new property:</p>
+<ul>
+<li>Application.PointCloudsRootPath</li>
+</ul>
+<p>gets the root path for point cloud files. This root path is used by Revit to calculate relative paths to point cloud files.</p>
+<a name="5.20"></a>
+<h3>Application additions</h3> <!-- h2 -->
+<h4>Application.BackgroundColor</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>Application.BackgroundColor</li>
+</ul>
+<p>allows read and write of the background color to use for model views in this session.</p>
+<h4>Application.OptimizePerformanceDuringRedraw</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>Application.OptimizePerformanceDuringRedraw</li>
+</ul>
+<p>enables or disables the option to allow view manipulation during redraw.</p>
+<h4>Application.IsLoggedIn</h4> <!-- h3 -->
+<p>The new static property:</p>
+<ul>
+<li>Application.IsLoggedIn</li>
+</ul>
+<p>checks if the user is logged in from this session to their Autodesk account.</p>
+<h4>Application.LoginUserId</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>Application.LoginUserId</li>
+</ul>
+<p>returns the user id of the user currently logged in. This is an internal id used by Autodesk to represent the logged in user. This user id is in human unrecognizable form. In conjunction with the Autodesk Exchange Store Entitlement REST API, a publisher of an Autodesk Exchange Store application can verify if the current user has purchased their app from the store. For more information about the Exchange Store, please refer to www.autodesk.com/developapps.</p>
+<h4>Application.IsSubscriptionUpdate</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>Application.IsSubscriptionUpdate</li>
+</ul>
+<p>checks if the running Revit is a subscription update.</p>
+<h4>Application.ShowGraphicalWarningHangerDisconnects</h4> <!-- h3 -->
+<p>The new property</p>
+<ul>
+<li>Application.ShowGraphicalWarningHangerDisconnects</li>
+</ul>
+<p>indicates whether or not to show the graphical warnings for Fabrication Hanger disconnects.</p>
+<a name="5.21"></a>
+<h3>Thin lines options</h3> <!-- h2 -->
+<p>A utility class <b>ThinLinesOptions</b> is added that contains the setting related to the Thin Lines options which affects the display in the UI.</p>
+<p>The static property:</p>
+<ul>
+<li>ThinLinesOptions.AreThinLinesEnabled </li>
+</ul>
+<p>defines if the 'Thin Lines' setting is on or off in this session.</p>
+<a name="5.22"></a>
+<h3>3D view API additions</h3> <!-- h2 -->
+<h4>ViewNavigationToolSettings</h4> <!-- h3 -->
+<p>The new class</p>
+<ul>
+<li>ViewNavigationToolSettings</li>
+</ul>
+<p>carries settings related to the View Cube and other view navigation tools. There is one element carrying these settings in each document. Use:</p>
+<ul>
+<li>ViewNavigationToolSettings.GetViewNavigationToolSettings(Document)</li>
+</ul>
+<p>to obtain it.</p>
+<p>The methods:</p>
+<ul>
+<li>ViewNavigationToolSettings.GetHomeCamera() &ndash; Returns an object of type HomeCamera which has information about the camera and view.</li>
+<li>ViewNavigationToolSettings.IsHomeCameraSet() &ndash; Checks if the home view is set in the settings.</li>
+</ul>
+<h4>HomeCamera</h4> <!-- h3 -->
+<p>The new class HomeCamera contains information about the camera and view for the Home view orientation stored in the model.</p>
+<p>New properties:</p>
+<ul>
+<li>HomeCamera.EyePosition</li>
+<li>HomeCamera.Center</li>
+<li>HomeCamera.UpDirection</li>
+<li>HomeCamera.Pivot</li>
+<li>HomeCamera.LeftAngleOfFieldOfView</li>
+<li>HomeCamera.RightAngleOfFieldOfView</li>
+<li>HomeCamera.TopAngleOfFieldOfView</li>
+<li>HomeCamera.BottomAngleOfFieldOfView</li>
+<li>HomeCamera.OrthogonalProjectionWidth</li>
+<li>HomeCamera.OrthogonalProjectionHeight</li>
+<li>HomeCamera.ViewId</li>
+</ul>
+<a name="5.23"></a>
+<h3>UI API additions</h3> <!-- h2 -->
+<h4>UIDocument.SaveAs</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.UI.UISaveAsOptions</li>
+</ul>
+<p>offers options for UIDocument.SaveAs method as below.</p>
+<p>The new overload method:</p>
+<ul>
+<li>UIDocument.SaveAs(UISaveAsOptions)</li>
+</ul>
+<p>takes a UISaveAsOptions parameter to allow the dialog prompting the user to overwrite existing files to be shown or suppressed.</p>
+<h4>TableViewUIUtils.TestCellAndPromptToEditTypeParameter</h4> <!-- h3 -->
+<p>The new static method:</p>
+<ul>
+<li>TableViewUIUtils.TestCellAndPromptToEditTypeParameter(TableView, SectionType, int, int)</li>
+</ul>
+<p>involves the Revit UI and operate on schedule views or MEP electrical panel schedules, and prompts the end-user to control whether a type parameter contained in the specified table cell should be allowed edited,</p>
+<p>It replaced the method:</p>
+<ul>
+<li>TableView.IsOkToEditParam()</li>
+</ul>
+<p>which has been removed completely in Revit 2016.</p>
+<h4>SetupEnergySimulationDialog</h4> <!-- h3 -->
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.UI.SetupEnergySimulationDialog</li>
+</ul>
+<p>represents the Revit dialog which typically precedes invocation of an Energy Simulation run on the Green Building Studio server to get user selection of project and run info.</p>
+<p>New methods and properties:</p>
+<ul>
+<li>SetupEnergySimulationDialog.Show() &ndash; Shows the SetupEnergySimulationDialog to the user as a modal dialog. The user has the option to select the project and run name, these can be ready by the application when the user closes the dialog.</li>
+<li>SetupEnergySimulationDialog.ProjectId &ndash; The identifier of the project (on the Green Building Studio server) that was selected by the user.</li>
+<li>SetupEnergySimulationDialog.ProjectName &ndash; The project name (representing a project on the Green Building Studio server) selected or supplied by the user.</li>
+<li>SetupEnergySimulationDialog.RunName &ndash; The name of the analysis run that was supplied by the user.</li>
+</ul>
+<a name="5.24"></a>
+<h3>AddInUtility API additions</h3> <!-- h2 -->
+<h4>RevitProduct.IsSubscriptionUpdate</h4> <!-- h3 -->
+<p>The new property:</p>
+<ul>
+<li>RevitProduct.IsSubscriptionUpdate</li>
+</ul>
+<p>allows users to check if a particular Revit is a subscription update.</p>

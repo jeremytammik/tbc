@@ -1,0 +1,136 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/extensible-storage-in-a-worksharing-environment-any-tips/m-p/5410485
+
+-->
+
+<h3>Extensible Storage in a Worksharing Environment</h3>
+
+<p>Here is a thread from the Revit API discussion forum on working with
+
+<a href="http://forums.autodesk.com/t5/revit-api/extensible-storage-in-a-worksharing-environment-any-tips/m-p/5410485">
+extensible storage in a worksharing environment</a> between
+
+Scott Wilson, Cshha, Erik Eriksson and Arno&scaron;t L&ouml;bel, Sr. Principal Engineer of the Autodesk Revit R&D team, that I find valuable and therefore edited and reproduced here, for preservation and clarity.</p>
+
+<p>By the way, if this topic is of interest and importance to you and your add-ins, you will probably also be interested in Scott Conover's Autodesk University 2013 class on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/worksharing-and-duplicating-element-geometry.html#2">
+making Revit add-ins that cooperate with worksharing</a> that
+
+Erik refers to below:</p>
+
+<p><strong>Scott:</strong>
+
+My add-ons make heavy use of the extensible storage API for custom manufacturing data and intelligent updating (I've pretty much got my own parametric constraint layer running in the background that kicks in whenever one of "my" elements is modified).</p>
+
+<p>Up until now I've explicitly stated to my users that worksharing is not supported as I've not even considered this functionality within my storage and dynamic update systems and I'm sure that things will get pretty messed up. I've not had much experience with worksharing from a user's point of view so it is new territory for me. My current project will benefit greatly if I'm able to successfully support worksharing. So I've been doing some preliminary testing.</p>
+
+<p>An interesting behaviour that I've found is that the same DataStorage element can be updated in several different local files concurrently without Revit giving any warning as it usually does when the user manually edits a visible element that someone else has already modified. This results in the other files becoming out-of synch and marked as invalid once one of the files is synchronised.</p>
+
+<p>This is a big concern for me and I'll be investigating further to see what I can do to manage this but I would greatly appreciate input from anyone that has experience with this and has some tips they can share.</p>
+
+<p><strong>Scott:</strong>
+
+Never mind, if I modify a DataStorage element and then attempt to modify it again from a different user account, Revit will put a stop to it and send an edit request as expected, which is a huge relief. I guess I'll carry on then &ndash; :-)</p>
+
+<p>I was testing using multiple local files using the same user account. It turns out that Revit locks the checked out elements to the user account only without regard for which local document file it is being modified with. Therefore allowing all kinds of shenanigans if a user somehow creates and makes changes to multiple local copies.</p>
+
+<p>Still interested in any gotchas and / or best practice advice anyone has regarding worksharing and extensible storage.</p>
+
+<p><strong>Cshha:</strong>
+
+What I do is create an element automatically when data first needs to be stored and remove the element in the OnDocumentSynchronizing (before sync) event.  I also check for an existing element during the OnDocOpened event in case the user closed their local file without synchronizing, or if Revit crashed.</p>
+
+<p>Without knowing more about your application requirements, I have no idea if this approach will work for you.</p>
+
+<p>In my application, the data that I store in a DataStorage element is uploaded to an external database when the user synchronizes, so there is no need to keep this information in the central model.</p>
+
+<p>An idea that may work if you need to keep the DataStorage elements in the central model would be to create a parameter for the username on each of these elements.  That way, each distinct user only would ever modify an element corresponding to their username.</p>
+
+<p>On another note &ndash; NEVER use 2 different local files with the same username.  If you want to open 2 local files on the same machine at the same time, change your username in the 2nd instance of Revit to something else.  If you try to user the same username in both, you will almost certainly run into issues where you will not be able to synchronize one of the 2 instances.</p>
+
+<p><strong>Scott:</strong>
+
+Excellent information, thank you.</p>
+
+<p>The external database idea sounds great, but unfortunately I need to keep the DataStorage elements in the model. I think my best bet will be to refactor my storage structure into task oriented domains so that multiple users are less likely to modify the same elements concurrently. I also found that I can explicitly check the elements in and out using WorkSharingUtils so that's handy.</p>
+
+<p>I'll also do something similar to you using the OnDocOpened / OnDocClosing events to check if the data elements need synchronisation. As there is no way for the user to know whether DataStorage elements are already owned by another user (without creating some form of indicator using the API anyway), I think it will be best to keep the elements unlocked as much as possible to reduce instances where a transaction needs to be rolled back because the updater couldn't modify its auxiliary data.</p>
+
+<p>You wrote: "On another note &ndash; NEVER use 2 different local files with the same username.  If you want to open 2 local files on the same machine at the same time, change your username in the 2nd instance of Revit to something else.  If you try to user the same username in both, you will almost certainly run into issues where you will not be able to synchronize one of the 2 instances."</p>
+
+<p>Yeah, it was a surprise to me that it worked like that. It's probably common knowledge to those familiar with worksharing, but I thought that Revit would have used a combination of user name and some form of Id for the local document. It is what it is though and it's only a problem when the user is being sloppy, so I guess they deserve it &ndash; ;-)</p>
+
+<p><strong>Erik:</strong>
+
+One more tip.</p>
+<p>If you are using a Dynamic Updater, this behaves very interesting the sense that it does not require the element to be "not edible" thus free for editing. So one user can change something, and then another and then a third without any synchronizing with central in between if you are using dynamic updaters.</p>
+<p>Look at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/10/worksharing-and-duplicating-element-geometry.html#2">
+AU 2013 worksharing class</a>, where Scott Conover explains this.</p>
+
+<p><strong>Arno&scaron;t:</strong>
+
+Regarding the last comment/tip.</p>
+
+<p>It is correct that Revit does not require an element to be "checked out" during dynamic updates and allows API users to make modifications to it on different local files. It is because these modifications count as 'calculated' changes. However, it is expected that applications that do this are making 'logical' and 'consistent' changes in their calculated modifications. After all, Revit requires all updaters to be the same on all local machines, thus it ought to be expected those upgrades react the same way to the same changes.</p>
+
+<p>For example, let's assume an updater that updates an external storage element that holds a calculated area of all walls. On one machine the first user changes one wall, and the updater updates the calculated element (without the requirement to check it out). Then a second user changes a different wall, and naturally the updater on his machine updates the area too, very likely to a different value. Now the second user syncs, which will pickup changes from the other user, and since there were changes to walls, the updater will run again and recalculates the area based on the combined changes. Then, when the first user eventually synchronizes with the central, his updater will trigger too on the wall changes and will therefore perform recalculation again. Fortunately (and hopefully), this recalculation will yield the same final value. In fact, an updater should always check whether a change is needed and only make necessary modifications (even though most setters perform this check automatically; that is the intention, anyway.)</p>
+
+<p>This is basically how Revit's regeneration works internally and how models stay consistent in work-sharing requirement. Of course, the system could be abused by dynamic updaters that perform random changes, but we do not really anticipate such scenarios.</p>
+
+<p><strong>Scott:</strong>
+
+Thanks to Erik for the heads-up on the updater synchronisation.</p>
+
+<p>Thanks also to Arnošt for the in-depth explanation, it's much easier to avoid side effects when you know how the rest of the system behaves.</p>
+
+<p><strong>Erik:</strong>
+
+I'm gonna carry on this discussion because there are some gaps in my knowledge here that maybe Arnost could fill =)</p>
+
+<p>I've been hard testing the use of Dynamic Updaters to update things on checked out elements (not owned by the user executing the updater).</p>
+<p>My findings so far are:</p>
+
+<p>You are always allowed to change the parameter of an element owned by someone else in your local file. But it seems like if the parameter value of the user that actually owns the element is not null he will always overwrite your value when he synchronizes with central. So it will work one time per parameter (you change the checked out parameter and synchronize -&gt; the owner synchronizes and gets the value and will now overwrite any value you write). So, from this, my theory is that Revit pushes all the parameter values, excluding null, whether or not they've been changed or into the central file.</p>
+<p>Can you verify this Arnost?</p>
+
+<p>Furthermore, working with extensible storage: the entities are not even handled. If you create one and attach to an element during the dynamic update event nothing will get saved.</p>
+<p>Can you also verify this Arnost?</p>
+
+<p>The last would actually be very useful for us. A suggestion would be to add a property to the schema that says if its "volatile" or not (i.e. it can be changed by others not owning the element).</p>
+
+<p>EDIT: I looked at the AU-video with Scott Conover again and I can verify that it's the case that the owner will overwrite all changes, no matter what the owner changed.</p>
+
+<p><strong>Arno&scaron;t:</strong>
+
+I am afraid there could be a long discussion about the topics you’ve raised. Before I go to any further comments, however, please allow me to briefly answer your question in a very simple and straight matter: Yes, it is indeed what it is. What you experience is expected Revit behaviour.</p>
+
+<p>I had to think about a few scenarios, actually, and discuss some with my colleagues too. We all come to the same conclusion that I have already stated in my statement above. The case of parameters seems to be simpler to wrap our heads around. I believe it all starts with the design of your updater. If you write it so it modifies a parameter on an element that has not changed (unless by a computed change) you better make also sure the parameter does not get used for anything else. Unexpectedly changed, I mean. I think that makes sense. To me anyway. For example, if you make your updater update one field in the title block, it makes the updater the controller of the field and nobody else should be able to change it. It is the same for parameters. It is expected that an Updater is always available on all local machines and that it behaves deterministically – that is the same changes on local machines will make the local updaters performing exactly the same way.</p>
+
+<p>It could be argued that it is different with EStorage, since it is completely API-controlled. However, we concluded that, again, in this case as well the current behaviour is correct. If the updater (or the updater’s add-in) 'allows' an EStorage data come differently from the central file, then the updater (or the add-in) is perhaps not written correctly. I can imagine it could be rather difficult to come up with a satisfactory design of such an updater, but here we believe that we would risk more than we may gain if we change the current policy to something else. We may eventually find some suitable solutions to the problem you described (or similar problems) if we hear from a lot of our customers about how limiting the current behaviour is. However, as it is always the case, we need to know what the actual problems are our users try to solve. Only that can give us ideas for how the problems could be mitigated.</p>
+
+<p><strong>Erik:</strong>
+
+Sure it makes perfect sense. Its good to get it confirmed though.</p>
+<p>However one would really like to get some way of being able to carry out quicker updates.</p>
+
+<p>Imagine if one were to implement a chat in the Revit API. There would be some serious lag to the discussions.</p>
+
+<p>I've been giving it some thought recently and the design of the worksharing environment feels kind of crippled.</p>
+<p>Instead of having a central server application that handles all requests, you let the clients handle the central file, one at the time.</p>
+
+<p>I'm not the best guy at this, but its like Revit's worksharing is like Microsoft Access, but we want it to be like Microsoft SQL (this analogy has a lot of errors, but Points out the main problem).</p>
+
+<p>I understand that there is a massive amount of work behind this solution and that it most likely was the best-suited option at the time of creation.</p>
+
+<p>I guess that's part of what Revit server does.</p>
+
+<p>Thank you for your time.</p>

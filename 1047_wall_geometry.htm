@@ -1,0 +1,122 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+08854561 [retrieve Geometry of Walls, Doors and Windows in C#]
+
+-->
+
+<h3>Wall Compound Layer, Other Geometry and Licenses</h3>
+
+<p>Below, we take another quick look at the issue of <a href="#2">licenses</a>.</p>
+
+<p>First, here is a pretty basic question that keeps reappearing, so I summarise some existing results for everybody's convenience:</p>
+
+
+<p><strong>Question:</strong> How can I programmatically retrieve the coordinates of a wall boundary, especially the geometry of the finished interior and exterior layers?</p>
+
+<p>I wish to export the building blueprint to GML.</p>
+
+<p>I would also like to know how to achieve the same for the geometry of doors and windows.</p>
+
+<p>Some C# sample code would be very helpful.</p>
+
+
+<p><strong>Answer:</strong> We discussed the topic of retrieving geometry in all conceivable variations here in the past, so numerous C# samples for achieving that are returned immediately by simply searching the web for
+
+<a href="http://lmgtfy.com/?q=building+coder+get_geometry">
+building coder get_geometry</a>.</p>
+
+<p>You will also find a number of examples of retrieving element geometry in the Revit SDK samples.
+Again, just search globally for 'get_Geometry'.</p>
+
+<p>For specific details on the location of wall layers and their boundaries, here are some of different aspects we already looked at:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">Wall compound layers</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/compound-wall-layer-volumes.html">Compound wall layer volumes</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/10/retrieving-detailed-wall-layer-geometry.html">Retrieving detailed wall layer geometry</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/interior-side-of-a-wall.html">Interior side of a wall</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/01/identifying-wall-compound-layers-and-parts.html">Identifying wall compound layers and parts</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/updating-wall-compound-layer-structure.html">Updating the wall compound layer structure</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-the-compound-structure-core-and-shell-layers.html">Setting the compound structure core and shell layers</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/09/creating-an-offset-wall.html">Creating an offset wall</a></li>
+</ul>
+
+<p>Talking about wall boundaries, we had an extensive related discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/determining-a-room-boundary-segment-generating-element.html">
+determining the room boundary segment generating element</a> &ndash;
+
+a wall, in fact, nine time out of ten &ndash; just yesterday, pointing to numerous previous examples of retrieving room boundaries, ray shooting to discover neighbouring elements, and also looking at the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/determining-a-room-boundary-segment-generating-element.html#4">
+spatial element boundary location</a> options.
+
+<p>That should provide more than enough information for most wall layer related issues.</p>
+
+<p>Good luck, and have fun!</p>
+
+
+<a name="2"></a>
+
+<h4>More on Licenses</h4>
+
+<p>Now that I pointed out
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-building-coder-samples-on-github.html#2">
+the importance of a license</a>,
+
+several people asked me to say more about this complex topic, both from inside and outside of Autodesk.</p>
+
+<p>Actually, maybe, it is pretty simple, and the legalese and numerous variations just make it <b>appear</b> complex.</p>
+
+<p>I looked at the
+
+<a href="http://creativecommons.org">
+Creative Commons</a> license
+
+and like it a lot at first glance, but there seems to be some discussion on
+
+<a href="https://github.com/github/choosealicense.com">
+applying a Creative Commons license to software</a>,
+
+especially GitHub projects.</p>
+
+<p>That discussion led me to the exhaustive
+
+<a href="https://www.gnu.org/licenses/license-list.html#Unlicense">
+GNU list of licenses and comments about them</a>,
+
+including a guide on
+
+<a href="https://www.gnu.org/licenses/license-recommendations.html">
+how to choose a license for your own work</a>.</p>
+
+<p>Being GNU, the recommendations veer heavily towards the
+
+<a href="http://en.wikipedia.org/wiki/Copyleft">
+Copyleft</a>,
+
+which is not suitable for commercial software, including many Revit and other Autodesk software add-ins.</p>
+
+<p>However, it also states: "In these special situations where copyleft is not appropriate, we recommend the
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0">
+Apache License 2.0</a>."</p>
+
+<p>After reading through the Apache license, as far as I can fathom it, that makes a lot of sense, and I am considering switching to it from the MIT license that I chose for my initial GitHub projects.</p>
+
+<p>Actually, searching the GNU list more thoroughly for the MIT license, I found this entry:</p>
+
+<p>"<a href="http://directory.fsf.org/wiki/License:Expat">Expat License</a>:
+This is a lax, permissive non-copyleft free software license, compatible with the GNU GPL.
+It is sometimes ambiguously referred to as the <b><i>MIT License</i></b>.
+For substantial programs it is better to use the Apache 2.0 license since it blocks patent treachery."</p>
+
+<p>Since my samples are all not very substantial, I am not worrying about the warning in the last statement, but I will indeed switch to the Apache 2 license for future submissions.</p>
+
+<p>It has the added advantage of apperaing right at the top of the new GitHub repository license selection list  :-)</p>

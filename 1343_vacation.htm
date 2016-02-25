@@ -1,0 +1,244 @@
+<head>
+<meta http-equicenter="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/about-mouse-click-event/m-p/5716129
+http://forums.autodesk.com/t5/revit-api/set-instance-parameters-at-insertion-or-modification/m-p/5715477
+http://forums.autodesk.com/t5/revit-api/create-a-surface-through-revit-api/m-p/5714843
+
+#revitapi #adsk #bim #3dwebcoder #cloud #geometry #aec
+#restapi
+#revitapi #adsk #bim #3dwebcoder #grevit #restapi
+#dotnet #csharp #python
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #csharp #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+#adskdevnetwrk
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>Clicks, DMU, Surfaces, FireRating Feedback, Vacation</h3>
+
+<p>Let me list some of the topics we discussed today in the Revit API discussion forum before I head off for vacation:</p>
+
+<ul>
+<li><a href="#2">Reacting to Windows mouse clicks in Revit</a>.</li>
+<li><a href="#3">Reacting to changes and setting parameters using DMU or DocumentChanged</a>.</li>
+<li><a href="#4">Creating a surface in Revit</a>.</li>
+<li><a href="#5">FireRating in the Cloud feedback</a>.</li>
+<li><a href="#6">Vacation Time Now</a>.</li>
+</ul>
+
+<p>Summer has seriously arrived in Europe, and the weather is really good as well, for a change.</p>
+
+<a name="1"></a>
+
+<p>I took advantage of it this weekend and climbed the Alphubel (4201 m) from the Täschhütte:</p>
+
+<center>
+<img src="img/alphubeljoch_alphubel.jpg" alt="Alphubel 4201 m" width="400"/>
+</center>
+
+<p>We planned to go up the standard route over the SE ridge and then took the E face instead.
+Unfortunately, we only stayed on the summit for about 20 minutes, admiring the splendid view, hurrying down again fast to avoid the snow getting too soft in the sunshine for a comfortable descent.</p>
+
+<p>Before I leave, let's highlight a couple of the topics we discussed today on the
+<a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">
+Revit API discussion forum</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Reacting to Windows Mouse Clicks in Revit</h4>
+
+<p><strong>Question:</strong>
+
+I am thinking about some Revit API such that I can select a lamp, and using double click or right click with the mouse to do something.</p>
+
+<p>Is there some function can be used for the application above?</p>
+
+<p><strong>Answer:</strong>
+
+The Revit API does not provide any specific support for this.</p>
+
+<p>Also, I am not sure whether it will help you users if you modify the behaviour of the standard Revit user interface.
+I would suggest always working with the system, not against it.
+Note that
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">
+Revit has a very clear idea of best practice and optimal workflows</a>.</p>
+
+<p>Still, there is nothing to stop you from using the Windows and .NET API to determine the single and double clicks and doing whatever you like with them.</p>
+
+<p>However, always be aware that you need to be inside a valid Revit API context to make calls to the Revit API.</p>
+
+<p>If you use the Windows API to determine a mouse click, you will not be in a valid Revit API context; you will basically be in a
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+modeless context and driving Revit from outside</a> if you wish to access the API.</p>
+
+<p>It is possible to determine what element is under the mouse cursor, once you have access to Revit API functionality, e.g., using the
+<a href="http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html">UIView, Windows coordinates and ReferenceIntersector</a>.</p>
+
+<p>Good luck playing with this!</p>
+
+
+<a name="3"></a>
+
+<h4>Reacting to Changes and Setting Parameters using DMU or DocumentChanged</h4>
+
+<p><strong>Question:</strong>
+
+Last week I was trying to develop some extra functionality within Revit that automatically registers when and who adds or modifies family types and instances. To realize this I introduced some project parameters that are assigned to the specific families. What I am trying to do is that when something is added or modified, the parameters automatically are set. So far, so good.</p>
+
+<p>I've tried multiple solutions but until now I just can't figure out the last step. To retrieve the element id's I've tried a DocumentChanged event that does find the right id's but, because the event isn't meant for changing or manipulating elements in any way whatsoever, I got stuck.</p>
+
+<p>Another solution I've tried is the use of IUpdaters. When it comes to modifying it does the job fairly good job. However, copying elements doesn't work seem to work properly: when I copy an instance, the parameters of the newly created element are set to the values of the original element. Besides this issue I stumbled upon a bigger problem: adding instances. Where the DocumentChanged event retrieves all the elements, the IUpdater can't retrieve the last element because the timing comes in a bit earlier than the DocumentChanged event. Example: when I'm placing a wall chain of three walls, the first two walls are set properly but the parameters of the last one comes empty.</p>
+
+<p>My question: how can I retrieve all added and modified elements (or corresponding id's) and change there associated parameters?</p>
+
+<p><strong>Answer:</strong>
+
+I think you are absolutely on the right track.</p>
+
+<p>You are apparently missing one really fundamental important piece, though:</p>
+
+<p>The
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">
+dynamic model updater or DMU</a> interaction
+happens in the same transaction as the operation that triggers it.</p>
+
+<p>The document changed event is called after the transaction has been closed.</p>
+
+<p>Also, the latter can no longer make any changes to the model; it is a read-only event.</p>
+
+<p>If you need to collect information from both of these events &ndash; which you apparently do &ndash; you certainly can, no problem whatsoever.</p>
+
+<p>One possibility to afterwards process and save this info in parameters on the modified and copied elements would be to temporarily subscribe to the
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">
+Idling event</a>.</p>
+
+<p>In the Idling event handler, you can modify the model again as you wish, i.e., save your data, and also immediately unsubscribe from the Idling event again.</p>
+
+<p>Here is a dedicated discussion on
+<a href="http://thebuildingcoder.typepad.com/blog/2012/06/documentchanged-versus-dynamic-model-updater.html">
+DocumentChanged versus dynamic model updater</a>.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Creating a Surface in Revit</h4>
+
+<p><strong>Question:</strong>
+
+I need to create a surface in Revit API with some points. The surface can be anything, like a roof, a floor, or another component. The surface is not plane. Is there any command that can do this? Or I need to find a way to divide the surface in little plans?</p>
+
+<p><strong>Answer:</strong>
+
+Here is a solution for create a floor from points:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; {
+&nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Create a Floor&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = 4;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] points = <span class="blue">new</span> <span class="teal">XYZ</span>[n];
+&nbsp; &nbsp; points[0] = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; points[1] = <span class="blue">new</span> <span class="teal">XYZ</span>( 10.0, 0.0, 0.0 );
+&nbsp; &nbsp; points[2] = <span class="blue">new</span> <span class="teal">XYZ</span>( 10.0, 10.0, 0.0 );
+&nbsp; &nbsp; points[3] = <span class="blue">new</span> <span class="teal">XYZ</span>( 0.0, 10.0, 0.0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curve = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; i++ )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = <span class="teal">Line</span>.CreateBound( points[i],
+&nbsp; &nbsp; &nbsp; &nbsp; points[(i &lt; n-1) ? i + 1 : 0] );
+&nbsp;
+&nbsp; &nbsp; &nbsp; curve.Append( line );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; doc.Create.NewFloor( curve, <span class="blue">true</span> );
+&nbsp;
+&nbsp; &nbsp; tx.Commit();
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+</pre>
+
+<p>Note that the document modification happens within a transaction, and the transaction is encapsulated in and handled by a <code>using</code> statement, because
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">
+using <code>using</code> automagically disposes and rolls back</a>.</p>
+
+<p>The Building Coder provides a similar method to
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/create-a-filled-region-to-use-as-a-mask.html">
+create a FilledRegion</a>.</p>
+
+<p>You have a quite large number of options, really.</p>
+
+<p>It depends on what you really need, of course.</p>
+
+<p>You can also start by looking at the
+<a href="http://thebuildingcoder.typepad.com/blog/2009/07/revit-form-creation-api.html">
+form creation API</a>.</p>
+
+<p>That is pretty old, though.</p>
+
+<p>The newest and maybe easiest option might be
+<a href="http://thebuildingcoder.typepad.com/blog/2015/02/from-hack-to-app-obj-mesh-import-to-directshape.htm">
+using the DirectShape element</a>.</p>
+
+<p>Nowadays,
+<a href="http://thebuildingcoder.typepad.com/blog/2015/07/intersect-solid-filter-avf-and-directshape-for-debugging.html#5">
+DirectShape is one of the easiest methods to create and visualise geometry</a> in a Revit model.</p>
+
+<p>So maybe I would actually start by looking at that.</p>
+
+
+<a name="5"></a>
+
+<h4>FireRating in the Cloud Feedback</h4>
+
+<p>I received some really nice feedback from
+<a href="https://twitter.com/troygates">@TroyGates</a> on the
+<a href="https://github.com/jeremytammik/FireRatingCloud">FireRating in the Cloud</a> project that I would like to share:</p>
+
+<blockquote>
+<p>Check out
+<a href="https://twitter.com/jeremytammik">@jeremytammik</a>
+<a href="https://twitter.com/hashtag/revit">#Revit</a> API
+example for automating door fire rating parameters from a database
+<a href="http://thebuildingcoder.typepad.com/blog/2015/07/grevit-firerating-in-the-cloud-demo-deployment-vacation.html#2">
+FireRating in the Cloud</a></p>
+<p>@jeremytammik your fire rating db gives me so many ideas for future api projects, thanks!!</p>
+</blockquote>
+
+<p>That was indeed my intention!</p>
+
+<p>Many thanks, Troy, for your nice appreciation!</p>
+
+<p>I hope this helps inspire many others as well.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Vacation Time Now</h4>
+
+<p>On that happy note, let me take my leave...</p>
+
+<p>I'll be away on vacation for the next few weeks, relaxing in Switzerland and climbing another mountain or two, hopefully.</p>
+
+<p>I wish you a wonderful summer!</p>

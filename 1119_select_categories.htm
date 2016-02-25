@@ -1,0 +1,445 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>Selecting Visible Categories from a Set of Views</h3>
+
+<p>Today I look at interactively picking specific categories to export to the simplified 2D BIM editor cloud database from a list of all categories retrieved from a collection of elements displayed in a given set of plan views.</p>
+
+<p>This is the second instalment of implementing the new RoomEditorApp features required for my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/back-from-desert-and-two-happy-events.html#3">
+generic 2D simplified BIM editor</a> Tech
+
+Summit presentation.</p>
+
+<p>Specifically, I now address steps 4 and 5 in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html">
+tentative workflow</a>:
+
+<ol>
+<li>Launch the RoomEditorApp export plan views command.</li>
+<li>Display a list of plan views in a popup window.</li>
+<li>Select views to be exported and click OK.</li>
+<li>Display a list of categories in a popup window.</li>
+<li>Select categories to be exported and click OK.</li>
+<li>Store relevant graphical and non-graphical information in a cloud database.</li>
+<li>Navigate and display simplified model on mobile device.</li>
+<li>Edit graphical and non-graphical information.</li>
+<li>Update Revit BIM either interactively or real-time.</li>
+</ol>
+
+<p>The list of categories to choose from should obviously not include all categories present in the Revit project, only those relevant to the elements in the selected views.</p>
+
+<p>Therefore, it makes sense to implement a category collector helper class to determine the categories of interest based on the views selected in step 3.</p>
+
+<p>For each view, we determine the elements of potential interest displayed in it.
+From those, we collect all the distinct categories.
+In this case, 'distinct categories' is defined as 'categories having different element ids'.</p>
+
+<p>This distinction is achieved by implementing a category equality comparer class that considers two categories the same if their element id is equal.
+This comparer class is passed in to the generic dictionary class instance used to collect the categories.
+Without the element id comparer, it would contain a large number of duplicate entries.</p>
+
+<p>The dictionary uses the category instances as keys.
+This enables us to easily pass them in as selectable items to a checked list box in the .NET category selection form for the interactive user selection step 5.</p>
+
+<p>Consequently, I implement one helper and two new main classes to achieve these steps and update the external command to drive them:</p>
+
+<ul>
+<li><a href="#3">CategoryEqualityComparer</a> &ndash; Implement an equality comparer to ensure that categories with the same category id compare equal.</li>
+<li><a href="#4">CategoryCollector</a> &ndash; Collect categories from elements displayed in a given set of views.</li>
+<li><a href="#5">FrmSelectCategories</a> &ndash; Interactive category selection form.</li>
+<li><a href="#6">CmdUploadViews</a> &ndash; Drive the view and category selection.</li>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>CategoryEqualityComparer</h4>
+
+<p>An equality comparer implements the IEqualityComparer interface, requiring the two methods Equals and GetHashCode.</p>
+
+<p>They are straightforward to implement based on the category element id:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Categories with the same element id equate to</span>
+&nbsp; <span class="gray">///</span><span class="green"> the same category. Without this, many, many,</span>
+&nbsp; <span class="gray">///</span><span class="green"> many duplicates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">CategoryEqualityComparer</span>
+&nbsp; &nbsp; : <span class="teal">IEqualityComparer</span>&lt;<span class="teal">Category</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> Equals( <span class="teal">Category</span> x, <span class="teal">Category</span> y )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> x.Id.IntegerValue.Equals(
+&nbsp; &nbsp; &nbsp; &nbsp; y.Id.IntegerValue );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> GetHashCode( <span class="teal">Category</span> obj )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> obj.Id.IntegerValue.GetHashCode();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+<a name="4"></a>
+
+<h4>CategoryCollector</h4>
+
+<p>The CategoryCollector collects the distinct categories from all the elements of interest displayed in a given set of views.</p>
+
+<p>The elements of interest are those that we might potentially wish to represent in the simplifier BIM editor cloud database and viewer.</p>
+
+<p>There are an infinite number of ways to define what that might mean, so you will almost certainly have to adapt the detailed decision to your specific needs.</p>
+
+<p>This is related to the question of how to select all model elements or visible 3D elements from a project, to which we already discussed quite a wide range of answers:</p>
+
+<!--
+
+ls *model*: 0140 0254 0453 0454
+
+ls *visib*: 0255 1002
+
+-->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/selecting-model-elements.html">
+Valid category and non-empty geometry</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/select-model-elements-2.html">
+Ditto, and eliminate certain categories</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/visible-elements.html">
+Valid category and neither category nor element is hidden</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/selecting-model-elements.html">
+Based on the Category.HasMaterialQuantities property</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/model-elements-revisited.html">
+Based on the elements visible in a default 3D view</a></li>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/determining-absolutely-all-visible-elements.html">Using a custom exporter</a></li>
+
+</ul>
+
+<p>The last three of these are all very effective.</p>
+
+<p>In this case, I chose to combine two of them, using a filtered element collector based on the view plus checking the Category.HasMaterialQuantities property.</p>
+
+<p>The category collector implements a couple of additional bookkeeping variables to count the number of views, total elements and elements with Category.HasMaterialQuantities set for reporting purposes.</p>
+
+<p>The entire view iteration, element selection, category collection and reporting takes place in the constructor:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Collect all categories of all visible</span>
+&nbsp; <span class="gray">///</span><span class="green"> elements in a given set of views.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">CategoryCollector</span> : <span class="teal">Dictionary</span>&lt;<span class="teal">Category</span>, <span class="blue">int</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Number of view selected.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">int</span> _nViews;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Number of elements in all selected views </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> including repetitions.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">int</span> _nElements;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Number of elements whose category have </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> material quantities in all selected views</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> including repetitions.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">int</span> _nElementsWithCategorMaterialQuantities;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> CategoryCollector( <span class="teal">IList</span>&lt;<span class="teal">ViewPlan</span>&gt; views )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( <span class="blue">new</span> <span class="teal">CategoryEqualityComparer</span>() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; _nViews = views.Count;
+&nbsp; &nbsp; &nbsp; _nElements = 0;
+&nbsp; &nbsp; &nbsp; _nElementsWithCategorMaterialQuantities = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; _nViews )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = views[0].Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> a;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> views )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc, v.Id )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .WhereElementIsViewIndependent();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> a )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++_nElements;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = e.Category;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != cat
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; cat.HasMaterialQuantities )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++_nElementsWithCategorMaterialQuantities;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( cat ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Add( cat, 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++<span class="blue">this</span>[cat];
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Selected {0} categor{1} from &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{2} view{3} displaying {4} element{5}, &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{6} with HasMaterialQuantities=true&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; Count, <span class="teal">Util</span>.PluralSuffixY( Count ),
+&nbsp; &nbsp; &nbsp; &nbsp; _nViews, <span class="teal">Util</span>.PluralSuffix( _nViews ),
+&nbsp; &nbsp; &nbsp; &nbsp; _nElements, <span class="teal">Util</span>.PluralSuffix( _nElements ),
+&nbsp; &nbsp; &nbsp; &nbsp; _nElementsWithCategorMaterialQuantities );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I executed this selection process in a very simple model with just three views, Level 0, Level 1 and Site, and pared down the number of categories selected to just five in the end: Curtain Panels, Doors, Furniture, Structural Columns, Walls.</p>
+
+<p>Here are the results for some of the other alternatives I explored before choosing the final filtering approach:</p>
+
+<ul>
+<li>14 categories &ndash; all elements listed in the given set of views: Cameras, Curtain Panels, Curtain Wall Grids, Curtain Wall Mullions, Doors, Elevations, Furniture, Project Base Point, Room Tags, Rooms, Structural Columns, Survey Point, Views, Walls.</li>
+
+<li>13 categories &ndash; not view specific, eliminating Room Tags: Cameras, Curtain Panels, Curtain Wall Grids, Curtain Wall Mullions, Doors, Elevations, Furniture, Project Base Point, Rooms, Structural Columns, Survey Point, Views, Walls.</li>
+
+<li>12 categories &ndash; non-empty bounding box, eliminating Project Base Point and Survey Point: Cameras, Curtain Panels, Curtain Wall Grids, Curtain Wall Mullions, Doors, Elevations, Furniture, Room Tags, Rooms, Structural Columns, Views, Walls.</li>
+
+<li>5 categories &ndash; Category.HasMaterialQuantities, eliminating all of the above and more: Curtain Panels, Doors, Furniture, Structural Columns, Walls.</li>
+
+</ul>
+
+
+<a name="5"></a>
+
+<h4>FrmSelectCategories</h4>
+
+<p>Once the categories to present to the user have been pared down to the ones of potential interest, we can display them in a checked list box in a .NET form for the user to make the final interactive selection.</p>
+
+<p>The category selection form FrmSelectCategories is similar to the view selection form
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/using-generic-collections-with-filters-and-forms.html#2">
+FrmSelectViews</a> that
+
+we discussed last week, except that we pass the pre-defined list of categories from the category collector discussed above straight into the constructor:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Interactive category selection form.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">FrmSelectCategories</span> : <span class="teal">Form</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Category</span>&gt; _categories;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Initialise the category selector</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> with the given list of categories.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;categories&quot;&gt;&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> FrmSelectCategories(
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">Category</span>&gt; categories )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; InitializeComponent();
+&nbsp;
+&nbsp; &nbsp; &nbsp; _categories = categories;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Initialise the category selector with</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> the list of categories passed in to </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> the constructor and check them all.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> FrmSelectCategories_Load(
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; &nbsp; <span class="teal">EventArgs</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; checkedListBox1.DataSource = _categories;
+&nbsp; &nbsp; &nbsp; checkedListBox1.DisplayMember = <span class="maroon">&quot;Name&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Set all entries to be initially checked.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = checkedListBox1.Items.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; checkedListBox1.SetItemChecked( i, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Access the selected categories after the</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> form has been successfully completed.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="teal">Category</span>&gt; GetSelectedCategories()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> checkedListBox1.CheckedItems
+&nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Category</span>&gt;().ToList&lt;<span class="teal">Category</span>&gt;();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+
+
+<a name="6"></a>
+
+<h4>CmdUploadViews</h4>
+
+<p>The categories retrieved by the category collector are sorted alphabetically before populating the interactive selection form checked list box.</p>
+
+<p>Just like the first form, the second one is properly parented by attaching it to the main Revit application window handle.</p>
+
+<p>Here is the entire updated command implementation:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> <span class="teal">ComponentManager</span> = Autodesk.Windows.<span class="teal">ComponentManager</span>;
+<span class="blue">using</span> <span class="teal">IWin32Window</span> = System.Windows.Forms.<span class="teal">IWin32Window</span>;
+<span class="blue">using</span> <span class="teal">DialogResult</span> = System.Windows.Forms.<span class="teal">DialogResult</span>;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> RoomEditorApp
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdUploadViews</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">IWin32Window</span> revit_window
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">JtWindowHandle</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ComponentManager</span>.ApplicationWindow );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == doc )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Please run this command in a valid&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; Revit project document.&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FrmSelectViews</span> form = <span class="blue">new</span> <span class="teal">FrmSelectViews</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == form.ShowDialog(
+&nbsp; &nbsp; &nbsp; &nbsp; revit_window ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">ViewPlan</span>&gt; views = form.GetSelectedViews();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = views.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} Plan View{1} Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> list = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; views.Select&lt;<span class="teal">Element</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg2( caption, list );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Category</span>&gt; categories
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Category</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">CategoryCollector</span>( views ).Keys );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Sort categories alphabetically by name</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// to display them in selection form.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; categories.Sort(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">delegate</span>( <span class="teal">Category</span> c1, <span class="teal">Category</span> c2 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Compare( c1.Name, c2.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FrmSelectCategories</span> form2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FrmSelectCategories</span>( categories );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DialogResult</span>.OK == form2.ShowDialog(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; revit_window ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categories = form2.GetSelectedCategories();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = categories.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; caption = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} Categor{1} Selected&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffixY( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; list = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; categories.Select&lt;<span class="teal">Category</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg2( caption, list );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Executing the external command in my simple test model displays the following forms and reports:</p>
+
+<p>Plan view selection form:</p>
+
+<center>
+<img src="img/category_select_1_views.png" alt="Plan view selection form" width="217"/>
+</center>
+
+<p>Plan view selection report:</p>
+
+<center>
+<img src="img/category_select_2_view_report.png" alt="Plan view selection report" width="366"/>
+</center>
+
+<p>Category selection form:</p>
+
+<center>
+<img src="img/category_select_3_categories.png" alt="Category selection form" width="217"/>
+</center>
+
+<p>Category selection report:</p>
+
+<center>
+<img src="img/category_select_4_category_report.png" alt="Category selection report" width="366"/>
+</center>
+
+
+<a name="7"></a>
+
+<h4>Download</h4>
+
+<p>For the complete source code, Visual Studio solution and add-in manifest, please refer to the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp GitHub repository</a>.</p>
+
+<p>The version discussed above is stored as
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.2.2">release 2014.0.2.2</a>.</p>

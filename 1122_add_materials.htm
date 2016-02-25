@@ -1,0 +1,352 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+
+-->
+
+<h3>Adding New Materials from List Enhancements</h3>
+
+<p>A weekend post, for a change.</p>
+
+<p>There is just too much going on!</p>
+
+<p>I recently
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated.html">
+reimplemented the AddMaterials add-in</a> for
+
+Revit 2014, updating the simple little Revit 2011 system to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/add-new-materials-from-list.html#2">
+generate new materials in a Revit project</a> based
+
+on a list of required material properties stored in an Excel spreadsheet.</p>
+
+<p>Luke submitted a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated.html?cid=6a00e553e16897883301a73d9bb66c970d#comment-6a00e553e16897883301a73d9bb66c970d">
+comment</a> on
+
+that, asking:</p>
+
+<p><strong>Question:</strong> I have built the solution and created an XLSX file.
+The add-in runs and says that it has added materials, but I don't see them in the Material Browser in 2014.
+Can you please provide an example of the Excel file so that I can ensure the formatting I'm using is correct?</p>
+
+<p><strong>Answer:</strong> Just as I suspected, taking a quick look at what is happening in the debugger immediately revealed the problem.</p>
+
+<p>Two problems, in fact:</p>
+
+<ol>
+<li>Your spreadsheet does indeed specify the required CSI values.
+However, these values need to refer to existing materials in your project file.
+If no such materials exist, the addition of the new materials will fail, because the system will not have a source material to copy.</li>
+
+<li>The final report has a bug.
+It refers twice to the variable nRows, counting the number of spreadsheet rows read, and never to nMaterialAdded, the number of materials added. Therefore, your flawed input was not reported.</li>
+</ol>
+
+<p>I started off by fixing the error message.</p>
+
+<p>The original format string includes the placeholders {0} and {1} twice, and {2} and {3} not at all.</p>
+
+<p>I fixed the final report formatting string like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} row{1} successfully parsed and &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} material{3} added.&quot;</span>,
+&nbsp; &nbsp; nRows, PluralSuffix( nRows ),
+&nbsp; &nbsp; nMaterialAdded, PluralSuffix(
+&nbsp; &nbsp; &nbsp; nMaterialAdded ) );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit AddMaterials&quot;</span>, msg );
+</pre>
+
+<p>Now, when I run the add-in with your sample material spreadsheet in a default empty architectural project, I receive the following final report message:</p>
+
+<center>
+<img src="img/add_materials_report_zero.png" alt="Zero materials added" width="366"/>
+</center>
+
+<p>Next, I manually added the first one of the source materials requested by your input spreadsheet via Manage &gt; Materials > Brick, Common > Duplicate and named it "CSI 03", as specified in the CSI column of your input spreadsheet.</p>
+
+<p>Now, at least the ContainsKey method returns true for that material, and the duplication code is executed.</p>
+
+<p>Unfortunately, that leads to the next error, saying that a dictionary key is not found:</p>
+
+<center>
+<img src="img/add_materials_key_not_found.png" alt="Dictionary key not found error" width="471"/>
+</center>
+
+<p>This is caused by the cutPattern variable, whose value is "N/A" and yet is used as a key into the materials dictionary.
+That call obviously fails, because no material named "N/A" is defined.</p>
+
+<p>I adapted the code to check the surPattern and cutPattern variables for "N/A" values before trying to retrieve materials for them, like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _not_available = <span class="maroon">&quot;N/A&quot;</span>;
+
+&nbsp; <span class="blue">if</span>( 0 &lt; surPattern.Length
+&nbsp; &nbsp; &amp;&amp; !surPattern.Equals( _not_available ) )
+&nbsp; {
+&nbsp; &nbsp; myMaterial.SurfacePatternId
+&nbsp; &nbsp; &nbsp; = fillPatterns[surPattern].Id;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; cutPattern.Length
+&nbsp; &nbsp; &amp;&amp; !cutPattern.Equals( _not_available ) )
+&nbsp; {
+&nbsp; &nbsp; myMaterial.CutPatternId
+&nbsp; &nbsp; &nbsp; = fillPatterns[cutPattern].Id;
+&nbsp; }
+</pre>
+
+<p>Now all problems in the code have been resolved and the "N/A" string is gracefully handled, I get a sensible reporting message stating that one material was added (provided one source material exists):</p>
+
+<center>
+<img src="img/add_materials_report_one.png" alt="One material added" width="366"/>
+</center>
+
+<p>There are still a couple of issues that make this system less than fool-proof, i.e., require a minimum intelligence on the side of the user:</p>
+
+<ul>
+<li>If the number of materials added is less than the number of spreadsheet rows read, some materials were not added, for some reason.</li>
+<li>If some of the requested materials were not added, it is left up to you to figure out which they were.</li>
+</ul>
+
+<p>Experience shows that requiring awareness on the part of the user is a rather steep request  :-)</p>
+
+<p>The add-in can obviously easily be improved to fix these issues.</p>
+
+<p>That should really be left as an exercise to you, dear reader.</p>
+
+<p>I am sure I can trust you to take care of it.</p>
+
+<p>I still decided to help a little bit more, by maintaining a list of the names of the materials added, instead of just an integer variable counting them:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; materials_added = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+</pre>
+
+<p>Then I can enhance the report like this:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">int</span> n = materials_added.Count;
+&nbsp;
+&nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} row{1} successfully parsed and &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;{2} material{3} added:&quot;</span>,
+&nbsp; &nbsp; nRows, PluralSuffix( nRows ),
+&nbsp; &nbsp; n, PluralSuffix( n ) );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span> dlg = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; <span class="maroon">&quot;Revit AddMaterials&quot;</span> );
+&nbsp;
+&nbsp; dlg.MainInstruction = msg;
+&nbsp;
+&nbsp; dlg.MainContent = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; materials_added ) + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; dlg.Show();
+</pre>
+
+<p>With that enhancement, the report now looks like this:</p>
+
+<center>
+<img src="img/add_materials_report_names.png" alt="Names listed of all materials added" width="366"/>
+</center>
+
+<p>It still remains the responsibility of the user to notice that more rows were specified and parsed than materials added, and to figure out which failed.
+At least the names of the materials added successfully are listed.</p>
+
+<p>For the sake of completeness, here is the entire source code of the updated external command:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _not_available = <span class="maroon">&quot;N/A&quot;</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> _input_file_name = <span class="maroon">&quot;C:/RevitAPI/MaterialList.xlsx&quot;</span>;
+&nbsp;
+<span class="green">//const string _input_file_name = &quot;Z:/a/doc/revit/blog/zip/MaterialList.xlsx&quot;;</span>
+&nbsp;
+<span class="blue">static</span> <span class="blue">string</span> PluralSuffix( <span class="blue">int</span> i )
+{
+&nbsp; <span class="blue">return</span> 1 == i ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span>;
+}
+&nbsp;
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="green">// Create dictionary of existing </span>
+&nbsp; <span class="green">// materials keyed by their name.</span>
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Material</span>&gt; materials
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Material</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Material</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">Material</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name );
+&nbsp;
+&nbsp; <span class="green">// Ditto for fill patterns.</span>
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">FillPatternElement</span>&gt; fillPatterns
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FillPatternElement</span> ) )
+&nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FillPatternElement</span>&gt;()
+&nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">FillPatternElement</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name );
+&nbsp;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; Excel.<span class="teal">Application</span> excel
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Excel.<span class="teal">Application</span>();
+&nbsp;
+&nbsp; &nbsp; excel.Visible = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; Excel.<span class="teal">Workbook</span> workbook = excel.Workbooks.Open(
+&nbsp; &nbsp; &nbsp; _input_file_name, 0, <span class="blue">true</span>, 5, <span class="maroon">&quot;&quot;</span>, <span class="maroon">&quot;&quot;</span>, <span class="blue">true</span>,
+&nbsp; &nbsp; &nbsp; Excel.<span class="teal">XlPlatform</span>.xlWindows, <span class="maroon">&quot;\t&quot;</span>, <span class="blue">false</span>,
+&nbsp; &nbsp; &nbsp; <span class="blue">false</span>, 0, <span class="blue">true</span>, 1, 0 );
+&nbsp;
+&nbsp; &nbsp; Excel.<span class="teal">Worksheet</span> worksheet = (Excel.<span class="teal">Worksheet</span>)
+&nbsp; &nbsp; &nbsp; workbook.Worksheets.get_Item( 1 );
+&nbsp;
+&nbsp; &nbsp; Excel.<span class="teal">Range</span> range = worksheet.UsedRange;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> nRows = 0;
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; materials_added = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> iRow = 5;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Add Materials&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">null</span> != range.Cells[iRow, 1].Value2 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> matName = (<span class="blue">string</span>) range.Cells[iRow, 1].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; matName += <span class="maroon">&quot; &quot;</span> + (<span class="blue">string</span>) range.Cells[iRow, 2].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; matName += <span class="maroon">&quot; &quot;</span> + (<span class="blue">string</span>) range.Cells[iRow, 3].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( matName != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> red = (<span class="blue">double</span>) range.Cells[iRow, 4].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> green = (<span class="blue">double</span>) range.Cells[iRow, 5].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> blue = (<span class="blue">double</span>) range.Cells[iRow, 6].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> transparency = (<span class="blue">double</span>) range.Cells[iRow, 8].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> surPattern = (<span class="blue">string</span>) range.Cells[iRow, 9].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> cutPattern = (<span class="blue">string</span>) range.Cells[iRow, 10].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Identity data of material class to duplicate.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> CSI = (<span class="blue">string</span>) range.Cells[iRow, 11].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( materials.ContainsKey( CSI ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> materialCSI = materials[CSI];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> myMaterial
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = materialCSI.Duplicate( matName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Color</span> matColor = <span class="blue">new</span> <span class="teal">Color</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( red.ToString() ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( green.ToString() ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( blue.ToString() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.Color = matColor;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.Transparency
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="blue">int</span>) transparency;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; surPattern.Length
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !surPattern.Equals( _not_available ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.SurfacePatternId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = fillPatterns[surPattern].Id;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; cutPattern.Length
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !cutPattern.Equals( _not_available ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.CutPatternId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = fillPatterns[cutPattern].Id;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; materials_added.Add( matName );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; ++nRows;
+&nbsp; &nbsp; &nbsp; &nbsp; ++iRow;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; workbook.Close( <span class="blue">true</span>, <span class="blue">null</span>, <span class="blue">null</span> );
+&nbsp; &nbsp; excel.Quit();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> n = materials_added.Count;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} row{1} successfully parsed and &quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{2} material{3} added:&quot;</span>,
+&nbsp; &nbsp; &nbsp; nRows, PluralSuffix( nRows ),
+&nbsp; &nbsp; &nbsp; n, PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">TaskDialog</span> dlg = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Revit AddMaterials&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; dlg.MainInstruction = msg;
+&nbsp;
+&nbsp; &nbsp; dlg.MainContent = <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; materials_added ) + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; dlg.Show();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;Revit AddMaterials Exception:\n&quot;</span>
+&nbsp; &nbsp; &nbsp; + ex.ToString();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+}
+</pre>
+
+<p>The code is actually shorter than all the explanations provided  :-)</p>
+
+<p>I hope these enhancements help:</p>
+
+<ul>
+<li>Understanding the system</li>
+<ul>
+<li>From the user point of view</li>
+<li>From the coding point of view</li>
+</ul>
+<li>Using the system</li>
+<ul>
+<li>As an end user utility</li>
+<li>Adding more enhancements as an add-in developer</li>
+</ul>
+</ul>
+
+<p>For the complete source code, Visual Studio solution and add-in manifest, please refer to the
+
+<a href="https://github.com/jeremytammik/AddMaterials">AddMaterials GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/AddMaterials/releases/tag/2014.0.0.1">
+release 2014.0.0.1</a>.</p>
+
+<p>Good luck!</p>

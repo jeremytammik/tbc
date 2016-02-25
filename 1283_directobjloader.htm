@@ -1,0 +1,1344 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>From Hack to App &ndash; OBJ Mesh Import to DirectShape</h3>
+
+<p>I already took a couple of looks at the DirectShape element in the past:</p>
+
+<!-- 1154 1239 -->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">DirectShape Performance and Minimum Size</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/11/directshape-versus-families-category-and-texture.html">DirectShape versus Families, Category and Texture</a></li>
+</ul>
+
+<p>A much deeper investigation was prompted by Eric Boehlke of <a href="http://truevis.com">truevis.com</a>,
+
+knowledgeable in architecture and above all in photogrammetry.</p>
+
+<p>Eric visited the DevHack at Autodesk University in December 2014.
+Together, right there and then, we put together a prototype Revit add-in that reads an OBJ file and creates a DirectShape element from it.</p>
+
+<p>Eric continued working on it at his end, adding a user interface and submitting it to the
+
+<a href="https://apps.exchange.autodesk.com">
+Autodesk Exchange AppStore</a> as Revit
+
+<a href="https://apps.exchange.autodesk.com/RVT/en/Detail/Index?id=appstore.exchange.autodesk.com%3ameshimport1421090501_windows64%3aen">Mesh Import from OBJ files</a>,
+
+while I maintained a non-UI open source GitHub version named
+
+<a href="https://github.com/jeremytammik/DirectObjLoader">DirectObjLoader</a>.</p>
+
+<p>Here is a rather lengthy and overdue summary of our correspondence on this and all the numerous issues we encountered and solved involving both the Revit API and the AppStore submission.</p>
+
+<p>Please note that Eric is by no means a professional or even experienced programmer, so he deserves extra honours for the feat of implementing and submitting his very own AppStore app!</p>
+
+<p><strong>Question:</strong>
+
+<!-- 2014-12-02 -->
+
+I have found some code for reading OBJ in C#,
+
+<a href="https://github.com/ChrisJansson/ObjLoader">ObjLoader by ChrisJansson</a>,
+
+but it is over my head.</p>
+
+<p>I got your
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">DirectShapeMinSize</a> add-in
+
+running in Revit.</p>
+
+<p>Some mash-up of the two programs may be the answer.</p>
+
+<!--
+<p>Eric B. has invited you to work in the following shared folder:</p>
+
+<a href="https://drive.google.com/folderview?id=0B_UPhfVzWDkxbTVtNFJQdGlWaWc&usp=sharing_eid&invite=CKaty4UO">https://drive.google.com/folderview?id=0B_UPhfVzWDkxbTVtNFJQdGlWaWc&usp=sharing_eid&invite=CKaty4UO</a>
+
+<p>I set up a
+
+<a href="https://drive.google.com/?tab=mo&authuser=0#folders/0B_UPhfVzWDkxbTVtNFJQdGlWaWc">OBJ to DirectShape
+</a> Google
+
+Drive folder for sharing files and shared it with you.</p>
+-->
+
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-03 -->
+
+<!--
+I see a problem in the call to:</p>
+
+<pre class="code">
+&nbsp; builder.OpenConnectedFaceSet( <span class="blue">false</span> );
+</pre>
+
+<p>The isSolid argument is false, actually, not true, so no solids are being requested.</p>
+-->
+
+I implemented an initial version
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.0">2015.0.0.0</a> using the .NET
+
+<a href="http://nugetmusthaves.com/Package/FileFormatWavefront">FileFormatWavefront</a> NuGet package based on Dave Kerr's
+
+<a href="https://github.com/dwmkerr/file-format-wavefront">file-format-wavefront</a> GitHub library
+
+that successfully loads the fire hydrant OBJ file:</p>
+
+<center>
+<img src="img/directobjloader_fire_hydrant_closed_directshape_rvt.jpg" alt="Fire hydrant DirectShape" width="150"/>
+</center>
+
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-03 -->
+
+This is going to be very useful. I tested a new app that turns laser scan points to mesh (and can export OBJ). Brilliant software!</p>
+
+<p>I gave them a scan and it converted it for me, instantly.</p>
+
+<p>Is there any generic mesh element in Revit? Or maybe we are on the right track and it's some other problem. Do you have access to OBJ import code from other Autodesk apps?</p>
+
+<p><strong>Answer:</strong>
+
+There is a generic mesh geometric object.
+That is not a database element.
+The direct shape is the most 'meshy' database element.</p>
+
+<p>Nope, I have no access to any internal Revit code, and I don't want any  :-)</p>
+
+<p>Have you done any documenting at all of what you have done so far or where you would like to go with this?</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-03 -->
+
+Since you got the software working in one case, perhaps it is a question of giving the right mesh.
+I'll have to experiment with meshes.
+I really want to get it working, though.</p>
+
+<p>Points in ReCap:</p>
+
+<center>
+<img src="img/directobjloader_1.png" alt="Points in ReCap" width="400"/>
+</center>
+
+<p>Mesh in Memento:</p>
+
+<center>
+<img src="img/directobjloader_2.png" alt="Points in Memento" width="400"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-03 -->
+
+You might want to download the current updated
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.1">version 2015.0.0.1</a> that
+
+stores the last selected OBJ folder persistently across sessions.</p>
+
+<p>I may go ahead and publish what we have so far as is.</p>
+
+<p>One idea: I could also add STL import to the same add-in.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-04 -->
+
+I spoke with your colleague, Angel Velez, today.</p>
+
+<p>He is the super IFC importer programmer.
+That importer is very similar to our effort.
+He recommended seeing his
+
+<a href="http://sourceforge.net/projects/ifcexporter/files/2015/">IFC source code</a> on
+
+SourceForge, especially "IfcFacetedBrep".</p>
+
+<p>For our code, he suggested changing the "builder.Build" call to:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TessellatedShapeBuilderResult</span> r
+&nbsp; &nbsp; = builder.Build(
+&nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderTarget</span>.AnyGeometry,
+&nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderFallback</span>.Mesh,
+&nbsp; &nbsp; &nbsp; graphicsStyleId );
+</pre>
+
+<p>OR</p>
+
+<pre class="code">
+&nbsp; <span class="teal">TessellatedShapeBuilderResult</span> r
+&nbsp; &nbsp; = builder.Build(
+&nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderTarget</span>.Mesh,
+&nbsp; &nbsp; &nbsp; <span class="teal">TessellatedShapeBuilderFallback</span>.Salvage,
+&nbsp; &nbsp; &nbsp; graphicsStyleId );
+</pre>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-04 -->
+
+Great guy to ask, great suggestions!</p>
+
+<p>I implemented
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.2">version 2015.0.0.2</a> to
+
+use mesh + salvage instead of solid + abort when building the DirectShape.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-04 -->
+
+YES!!!!!!</p>
+
+<p>Mesh + Salvage produce this:</p>
+
+<center>
+<img src="img/directobjloader_3.png" alt="Gargoyle in Revit" width="400"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-04 -->
+
+Congratulations!</p>
+
+<p>Can you do a pull request from GitHub?</p>
+
+<p>I'll write a blog post draft on this, but that may take a while.</p>
+
+<p>Will you write anything at all about your motivation and workflow?</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-05 -->
+
+Our baby has just been born. Let's be patient about documenting it.</p>
+
+<p>Can direct shape go into a Family RFA?</p>
+
+<p>I heard a rumour that the current release cannot display Direct Shapes in RFA, but a future version may.</p>
+
+<p>I would like to run with this app, refine it with an options dialog, error checking, etc., and publish in the Autodesk Exchange Store as was recommended to us by the DevDays keynote speaker. It should be of value to many.</p>
+
+<p>It was a great week. I hope you made some good connections.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-05 -->
+
+I confirmed that it works with the gargoyle.</p>
+
+<p>Okey-doke, fine by me.</p>
+
+<p>Great news, in fact, I am very glad!</p>
+
+<p>Go for it!</p>
+
+<p>I would also suggest adding STL import functionality.</p>
+
+<p>I can do that.</p>
+
+<p>I would like to continue updating the minimalist version on GitHub.</p>
+
+<p>Are you thinking of continuing to work on that same public version, or forking an own version for the appstore thingy?</p>
+
+<p>Do you want it to remain free and open source including your enhancements?</p>
+
+<p>I would like it to remain one version and open source on GitHub.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-05 -->
+
+I think that's a good plan.
+I think I'd make my own version with a UI with the goal to publish in the Store.</p>
+
+<p>Another thing that would be easy to implement is: have it try a solid, first, on failure, go to mesh, then salvage. Or, it could be a user option to attempt making a solid to save time as most solids will fail.</p>
+
+<p>A tricky thing to implement would be to get some material/color on the faces. Wikipedia provides
+
+<a href="http://en.wikipedia.org/wiki/Wavefront_.obj_file">some OBJ info</a>.</p>
+
+<p>If the RVT template had 256 materials in it, each with a color corresponding to the old AutoCAD colors, that could get some rough materials on the faces, perhaps. From the MTL file:</p>
+
+<ul>
+<li>The ambient color of the material is declared using Ka. Color definitions are in RGB where each channel's value is between 0 and 1.
+</br>
+<pre>
+Ka 1.000 1.000 1.000 # white
+</pre>
+</li>
+</ul>
+
+<p>Hence, I think RGB would be calculated by multiplying the Ka numbers by 256.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-05 -->
+
+If you look at the code, you will note I added a Config class.</p>
+
+<p>One of its options is "TryToCreateSolids".</p>
+
+<p>Great minds think alike.</p>
+
+<p>I am confident that we can get colours to work fine as well, and maybe textures also.</p>
+
+<p>Revit does not work with 256 predefined colours, but full RGB.</p>
+
+<p>More info on colours in OBJ and Revit:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-colours.html">OBJ model exporter with colours</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-transparency-support.html">OBJ model exporter with transparency support</a></li>
+</ul>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-05 -->
+
+Right. I am thinking to pre-make 256 RVT Materials, one for each of the ACAD 256 colors. I wouldn't make a Material for 256^3 colors!</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-05 -->
+
+That is not necessary.
+Just make one, or none, because you can then duplicate a material and assign it a new colour on the fly when you need it.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-10 -->
+
+I converted another file and went from an SVG image of a logo, to TinkerCAD, to OBJ, to Memento (to re-size), to our importer app in Revit.</p>
+
+<p>Amazing, eh?</p>
+
+<!--
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-10
+
+Yes, indeed.looking good.</p>
+
+<p>Is this the current version, unchanged?</p>
+
+<p>Do you update from GitHub when I add new tweaks?</p>
+
+<p><strong>Response:</strong>
+-->
+
+<!-- 2014-12-10 -->
+
+<p>It will need much tweaking before it can be really used easily in projects.
+An important feature to add will be a scale factor input.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-10 -->
+
+The input scaling factor makes a lot of sense, so I went ahead and implemented an input scaling factor stored in config file.</p>
+
+<p>It can be used, for instance, to generate this gargoyle and a half:</p>
+
+<center>
+<img src="img/directobjloader_gargoyle2.png" alt="Gargoyle and a half" width="344"/>
+</center>
+
+<p>Check it out on GitHub in the
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.3">version 2015.0.0.3</a>.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-11 -->
+
+Is there a form somewhere to input the scale factor? I didn't see it.</p>
+
+<p>Here is another import:</p>
+
+<center>
+<img src="img/directobjloader_9.png" alt="Shopping cart" width="400"/>
+</center>
+
+<p>I had to process it though Memento for it to import into Revit.</p>
+
+<p>The original OBJ produces this dialog:</p>
+
+<center>
+<img src="img/directobjloader_10.png" alt="Original shopping cart exception" width="400"/>
+</center>
+
+<p>I uploaded the two 'cart' files to the Google folder. The first one fails.</p>
+
+<p>There may be a memory limit to build a Direct Shape. Perhaps the IFC software checks for it.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-11 -->
+
+1. Regarding the 'form somewhere to input the scale factor':</p>
+
+<p>No, of course not.
+User interfaces are for wimps.
+You have to edit the config file located in the same place as the DLL and add-in manifest:</p>
+
+<pre>
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">configuration</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">appSettings</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">defaultFolderObj</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">C:\a\vs\DirectObjLoader\test</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">inputScaleFactor</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">0.5</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">tryToCreateSolids</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">true</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">maxFileSize</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">50000000</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">add</span><span class="blue"> </span><span class="red">key</span><span class="blue">=</span>&quot;<span class="blue">maxNumberOfVertices</span>&quot;<span class="blue"> </span><span class="red">value</span><span class="blue">=</span>&quot;<span class="blue">100000</span>&quot;<span class="blue"> /&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">appSettings</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">configuration</span><span class="blue">&gt;</span>
+</pre>
+
+<p>2. Regarding the two 'cart' files:</p>
+
+<p>It should be possible to handle that error more gracefully.</p>
+
+<p>I took a look at the new sample files and see the cause of it now.</p>
+
+<p>Again, it has to do with the OBJ file format, how it is populated, and our lack of understanding of it.</p>
+
+<p>If you look at the code, the current implementation grabs all the faces from this loop:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> obj_load_result.Model.UngroupedFaces )
+</pre>
+
+<p>This provides a sensible result in the cart-exported file, which I successfully imported into Revit like this:</p>
+
+<center>
+<img src="img/directobjloader_shopping_cart.png" alt="Shopping cart ungrouped" width="260"/>
+</center>
+
+<p>The problem with the 'unexported' file is not memory.</p>
+
+<p>It has a higher intelligence, that is all.</p>
+
+<p>In the 'unexported' file, the result.Model.UngroupedFaces collection is empty.</p>
+
+<p>Instead, the OBJ model defines 17 named OBJ groups:</p>
+
+<center>
+<img src="img/directobjloader_groups.png" alt="DirectObjLoader groups" width="256"/>
+</center>
+
+<p>This is presumably much better, because the groups carry information and structure, whereas ungrouped faces do not.</p>
+
+<p>So your 'export' procedure is probably destroying model structure and valuable information.</p>
+
+<p>The  importer is currently ignoring groups, however.</p>
+
+<p>I added an error message on zero faces in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.4">version 2015.0.0.4</a>,
+
+so you have a more graceful exit, at least.</p>
+
+<p>I also added a first stab at support for groups in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.5">version 2015.0.0.5</a>.</p>
+
+<p>The result for the 'unexported' shopping cart is not good yet, though.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-11 -->
+
+I think it's acceptable to have an error/fail dialog when there is something too complicated in the file for importing. Running the OBJ through Memento to decimate it may often be a good thing.</p>
+
+<p>Looks like the OBJ format can get very sophisticated:
+
+<a href="http://paulbourke.net/dataformats/obj">paulbourke.net/dataformats/obj</a>.</p>
+
+<p>Under the heading Grouping, he explains the syntax and gives several examples of Group usage.</p>
+
+<p>Yesterday, I tried to use <a href="http://meshlab.sourceforge.net">Meshlab</a> to convert a point cloud to a mesh.  I got it to make a mesh regarding the points but need to experiment more because it was very far off. There are all kinds of unexplained parameters in the Meshlab UI.</p>
+
+<p>I haven't heard back from <a href="http://thinkboxsoftware.com">thinkboxsoftware.com</a>,
+
+who were showing some nice software at AU that converts points to mesh.
+
+<p>Ultimately, I imagine selecting points in Revit and converting them to a mesh. Someday...</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-11 -->
+
+I found one improvement, closing the face set off for each OBJ group, and implemented that in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.6">version 2015.0.0.6</a>.</p>
+
+<p>The result with that enhancement is still not perfect, though.
+It looks like this:</p>
+
+<center>
+<img src="img/directobjloader_shopping_cart_groups_2.png" alt="Shopping cart groups 2" width="300"/>
+</center>
+
+<p>Some progress at least.</p>
+
+<p>I also uploaded the <a href="https://github.com/jeremytammik/StlImport">STL importer</a> to GitHub.</p>
+
+<p>It includes two sample files to load.</p>
+
+<p>Even more to play with!</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-12 -->
+
+Excellent. (I think I saw that cart in back of the Market Basket on the train tracks.)</p>
+
+<p>I was thinking, What if there was a separate shape element created for each Group if there are any extant?
+Hence, a loop the same as the main mesh for each Group.
+Do you think that would work?</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-12 -->
+
+Indeed excellent.</p>
+
+<p>When you put on your thinking cap, you deliver.</p>
+
+<p>This is the result of loading the shopping cart and closing off each OBJ group into an own separate DirectShape element:</p>
+
+<center>
+<img src="img/directobjloader_shopping_cart_groups_3.png" alt="Shopping cart groups 3" width="308"/>
+</center>
+
+<p>So it looks like we are done with this for the moment, with
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.7">version 2015.0.0.7</a>.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-12 -->
+
+Splendid work, Jeremy.
+You have gone from Cubism to Realism in your artistic style.</p>
+
+<p>After 14 years, OBJ can be imported to Revit.</p>
+
+<p>May the thinking cap will remain on...</p>
+
+<!-- <p><strong>Response:</strong> -->
+
+<!-- 2014-12-19 -->
+
+<p>I was working on a facade model for a client yesterday. The client does not want to pay for laser scanning, yet. We went out and took 50 pictures, then uploaded to Recap360 and turned the photos into a mesh. After editing the mesh in Memento, it comes into Revit fine. The problems are scaling and position -- rotation and UCS of mesh. These things are able to be edited in Memento; it's tricky, though.</p>
+
+<p>The units in the API when making the Direct Shape are feet, yes? I need to figure out how Memento is scaling the numbers for the vectors in its exported OBJ.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-20 -->
+
+Yes, all Revit linear database units are feet.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-23 -->
+
+Memento is very helpful.</p>
+
+<p>Some OBJs do not import into Revit well. Memento can fix holes, etc.</p>
+
+<p>Imported OBJ found online:</p>
+
+<center>
+<img src="img/directobjloader_4.png" alt="Cessna with holes in Revit" width="400"/>
+</center>
+
+<p>Imported OBJ fixed in Memento:</p>
+
+<center>
+<img src="img/directobjloader_5.png" alt="Cessna fixed in Memento" width="400"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-23 -->
+
+Well, good for Memento, and good for you!</p>
+
+<p>Yes, well...</p>
+
+<p>This may be an issue with Revit.</p>
+
+<p>More probably, I believe, it has something to do with the OBJ toolkit library we are using.</p>
+
+<p>Or with the OBJ file format, which we are supporting in an incomplete and untested fashion.</p>
+
+<p>Actually, go ahead and send me the two files and I will see whether I notice any of our assumptions being violated.</p>
+
+<p>For instance, we assume triangles or quadrilaterals. Maybe some of the OBJ polygons have more than four corners?</p>
+
+<p>Notice how the Memento version below has triangulated everything?</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-23 -->
+
+I think the culprit is "s" = smoothing group, cf.
+
+<a href="http://www.martinreddy.net/gfx/3d/OBJ.spec">www.martinreddy.net/gfx/3d/OBJ.spec</a>:</p>
+
+<blockquote>
+<p>"Smoothing group statements let you identify elements over which normals are to be interpolated to give those elements a smooth, non-faceted appearance.  This is a quick way to specify vertex normals."</p>
+</blockquote>
+
+<p>Even Memento does not seem to handle those groups properly. Hence, I filled the holes using the error-checking functions in Memento.</p>
+
+<p>After initial Open in Memento:</p>
+
+<center>
+<img src="img/directobjloader_6.png" alt="Cessna initially opened in Memento" width="400"/>
+</center>
+
+<p>But MeshLab does better! I opened the original OBJ and then exported OBJ -- MeshLab converted everything without any other processing.</p>
+
+<center>
+<img src="img/directobjloader_7.png" alt="Cessna in MeshLab" width="400"/>
+</center>
+
+<p>That OBJ into Revit (best of all):</p>
+
+<center>
+<img src="img/directobjloader_8.png" alt="Cessna in Revit" width="400"/>
+</center>
+
+<p>I think simply a warning that the OBJ contains a Smoothing group or a Merging group is adequate, currently.</p>
+
+<p>By the way, I just wrote this post about importing a
+
+<a href="http://revitlearningclub.blogspot.com/2014/12/photogrammetry-mesh-into-revit-as-point.html">
+photogrammetry mesh into Revit as a point cloud</a>.</p>
+
+<p>The method of determining a mesh's scale will be similar for the DirectObjLoader to work correctly, except the scaling factor will ultimately be to feet, not meters.</p>
+
+
+<a name="5"></a>
+
+<h4>User Interface</h4>
+
+<!-- <p><strong>Response:</strong> -->
+
+<!-- 2014-12-27 -->
+
+<p>I have a UI working except for a Material selector, and the LinkLabel.</p>
+
+<p>It is slow going for me because I am so bad at C#. I am getting through it, though, with much searching, trial, and error.</p>
+
+<center>
+<img src="img/directobjloader_12.png" alt="User interface" width="345"/>
+</center>
+
+<p>The category can be picked from a drop down list:</p>
+
+<center>
+<img src="img/directobjloader_13.png" alt="Category drop down" width="349"/>
+</center>
+
+<p>This is the way to go for the TessellatedShapeBuilder, I think:</p>
+
+<pre class="code">
+  TessellatedShapeBuilderTarget.AnyGeometry,
+  TessellatedShapeBuilderFallback.Mesh,
+</pre>
+
+<p>The graphics style comes out differently for AnyGeometry and Mesh, but I think I found a workaround.</p>
+
+<p>I have also found a way to turn "closed" points in a laser scan point cloud into a mesh using MeshLab. Bringing into Revit and changing Material is fun  :-)</p>
+
+<center>
+<img src="img/directobjloader_11.png" alt="Adding materials in Revit" width="400"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-30 -->
+
+I believe that the options used by the <a href="https://github.com/jeremytammik/StlImport">STL importer</a> support all combinations of target geometry + fallback that make sense.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-02 -->
+
+I made a
+
+<a href="http://truevis.com/revit-mesh-import/">Mesh Import landing page</a>.</p>
+
+<p>I was thinking to have a drop down list of available Revit Materials in the UI, and to assign one Material to the whole shapes as they are created. You have some code snippets on your blog about getting Materials but I couldn't get them to work. I'm sure the IFC importer does that somewhere but the code is too complicated for me.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Smoothing</h4>
+
+
+<p>A problem with the importer as you wrote it is that the smoothing or 's' data in the OBJ are not used or used correctly.  See attached 'sandal.obj'. When I process an OBJ through Mesh Lab or Memento, the 's' data get converted to faces. That is an adequate workaround at this time. My challenge this week is to get the app published without too much feature creep.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-02 -->
+
+I fixed the OBJ loader to support faces with more than four vertices in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.9">version 2015.0.0.9</a>.</p>
+
+<p>This enables partial loading of the sandal.obj sample file, but with some holes, similar to the untreated Cessna:</p>
+
+<!--
+<center>
+<img src="img/sandal_with_gaps.png" alt="Sandal with gaps in Revit" width="400"/>
+</center>
+-->
+
+<p>You want to watch out with your Memento clean-up... it destroys the OBJ groups and thus looses important model structure information.</p>
+
+<p>Here is the complete Cessna cleaned up by Memento:</p>
+
+<center>
+<img src="img/cessna-exported-from-Memento.png" alt="Cessna exported from Memento" width="400"/>
+</center>
+
+<p>Here is the original one with model structure but lacking some faces:</p>
+
+<center>
+<img src="img/cessna_with_groups_and_missing_faces.png" alt="Cessna with groups and missing faces" width="400"/>
+</center>
+
+<p>I switched TessellatedShapeBuilder target from Mesh to AnyGeometry as well, and it does indeed look a bit better.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-02 -->
+
+I think AnyGeometry attempts to make a solid.
+If a solid is made, dimensions can work on it.</p>
+
+<p>The bigger issue is the smoothing data that are not processed in the original OBJ. I am okay with it for now. From searching around it looks like many apps don't handle smoothing with OBJs. Paraphrasing the founder of LinkedIn: "If you are not embarrassed by the first release of your product, you worked on it too long".</p>
+
+<p>Attached is another difficult OBJ. Running it though MeshLab and turning it to triangles fixes it, though.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-04 -->
+
+I do not believe the tessellated face builder supports smoothing.</p>
+
+<p>The inverse operation, using the custom exporter to generate an OBJ output, would happily support this, though.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-04 -->
+
+There must be a way to handle the smoothing stuff, and just make facets, since MeshLab and Memento do it.
+I just don't know how to do it.</p>
+
+<p>This
+
+<a href="https://github.com/mrdoob/three.js/blob/master/utils/converters/obj/convert_obj_three.py">convert_obj_three.py</a> Python
+
+code from three.js seems to handle smoothing in OBJ.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-04 -->
+
+As already said, the DirectShape generator provided by the Revit API does not support smoothing.</p>
+
+<p>It is pure geometry.</p>
+
+<p>Smoothing is pure rendering.</p>
+
+<p>No connection, no workaround.</p>
+
+<p>Forget it.</p>
+
+
+<a name="7"></a>
+
+<h4>Pyramid Problem &ndash; OBJ File Vertex Index Error</h4>
+
+<p><strong>Response:</strong>
+
+<!-- 2014-12-30 -->
+
+I have one OBJ that causes an error.  It's a pyramid and I think it's causing a 0 size face attempt. But I don't know for sure. I can send the file if you want to check it.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2014-12-30 -->
+
+I can take a look at the pyramid problem, sure.</p>
+
+<p>I also want to look at that plane and check whether it has faces with more than four vertices...</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-02 -->
+
+I provided two pyramid OBJs that crash the importer as I have it using AnyGeometry and fallback as Mesh.
+I tried to debug it, but didn't solve the problem, yet.</p>
+
+<p>Here is where "pyramid.obj" fails:</p>
+
+<pre>
+System.ArgumentOutOfRangeException was unhandled by user code
+Message=Index was out of range.
+Must be non-negative and less than the size of the collection.
+</pre>
+
+<p>Do you get that error, too?</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-02 -->
+
+I would say there is an error in the pyramid OBJ file.</p>
+
+<p>How was it created?</p>
+
+<p>Look:</p>
+
+<pre>
+# OBJ file created by ply_to_obj.c
+#
+g Object001
+
+v  0  0  0
+v  1  0  0
+v  1  1  0
+v  0  1  0
+v  0.5  0.5  1.6
+
+f  5  2  3
+f  4  5  3
+f  6  3  2
+f  5  6  2
+f  4  6  5
+f  6  4  3
+</pre>
+
+<p>It defines five vertices.</p>
+
+<p>They are numbered 0, 1, 2, 3, and 4.</p>
+
+<p>The faces refer to faces numbers 2, 3, 4, 5 and 6.</p>
+
+<p>That is wrong.</p>
+
+<p>In addition, though, I ran into a strange problem debugging this.</p>
+
+<p>I fixed the vertex indices in the face by subtracting 2 from each one, but the add-in was still working with the old data.</p>
+
+<p>Currently, I can only imagine that the OBJ parsing library is caching something that it should not.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-02 -->
+
+Yes, I think you are right. MeshLab brings it in without complaining but part of it appears to go to infinity.</p>
+
+<p>That OBJ was from a web page with lots of OBJs.</p>
+
+<p>I'd like to catch the error something like this, and just end the command. Is there a way to break out of the command from inside the loop if that error is encountered?</p>
+
+<pre class="code">
+  if (vertices.Count &gt; i.vertex)
+  {
+    MessageBox.Show("Error: Face and vertex quantities do not match.");
+    return Result.Cancelled;
+  }
+</pre>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-02 -->
+
+Check out the new
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.12">version 2015.0.0.12</a>:
+
+abort and display error message on invalid OBJ file due to face vertex index exceeding total vertex count.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-04 -->
+
+Thanks. Looks like you added messages to the top of the debug messages.
+Do you know of a method to cleanly quit an API app when an error is found?</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-04 -->
+
+Do you mean abort and close down and exit the add-in? Or simply abort the current external command execution, but remain loaded for a renewed attempt?</p>
+
+<p>The former is not really common or supported by the Revit API. It would be possible, but why would you want that?</p>
+
+<p>The latter is exactly what I now do.</p>
+
+<p>It is achieved by returning from the external command Execute method.
+Its return values are Succeeded, Cancelled or Failed.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-04 -->
+
+I'd like to cleanly show an error message, then exit. Currently one gets a pile of debug stuff in the message when there is an error.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-04 -->
+
+Regarding exiting cleanly, I already explained:</p>
+
+<p>Return from the external command Execute method.
+Its return values are Succeeded, Cancelled or Failed.</p>
+
+<p>The 'pile of debug stuff' comes from an unhandled exception.</p>
+
+<p>You can either add a catch-all exception handler round your entire command and then decide for yourself what information is displayed before you return from Execute, or you can handle each exception separately in a targeted manner.</p>
+
+<p>The latter is only possible once you know what the exception is and what is causing it, though.</p>
+
+<p>I can add a catch-all exception handler to demonstrate, if you like.</p>
+
+<p>I implemented two exception handlers in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.13">version 2015.0.0.13</a>.</p>
+
+<p>Please test and let me know how it goes.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-05 -->
+
+What running your release DLL with "pyramid.obj" gets:</p>
+
+<center>
+<img src="img/directobjloader_14.png" alt="Invalid vertex index error message" width="400"/>
+</center>
+
+<p>Good.</p>
+
+
+
+
+<a name="8"></a>
+
+<h4>Submitted to Autodesk Exchange Apps and Ribbon Panel Icon</h4>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-04 -->
+
+I did it. You can see the Store page preview here.
+I'm sure I will update it, but I wanted to get it out to the world as soon as possible.</p>
+
+<p>Thank you for all of your help. I'll give you a copy when it gets approved.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-04 -->
+
+I think you can remove the PDB files from the distribution:</p>
+
+<pre>
+$ unzip -l eb_MeshImportRelease1.zip
+
+Archive:  eb_MeshImportRelease1.zip
+
+  Length     Date   Time    Name
+ --------    ----   ----    ----
+   119808  01-03-15 20:22   MeshImport.dll
+    34304  01-03-15 20:22   MeshImport.pdb
+      463  01-02-15 13:21   MeshImport.addin
+    17887  12-16-14 21:00   FileFormatWavefront.xml
+    56832  12-16-14 21:00   FileFormatWavefront.pdb
+    19456  12-16-14 21:00   FileFormatWavefront.dll
+ --------                   -------
+   248750                   6 files
+</pre>
+
+<p>Probably, you can also remove the XML file.</p>
+
+<p>It looks like the FileFormatWavefront library API documentation to me.</p>
+
+<p>It might also possible contain the FileFormatWavefront library error messages, but I think not.</p>
+
+<p>I think this is all you need:</p>
+
+<pre>
+   119808  01-03-15 20:22   MeshImport.dll
+      463  01-02-15 13:21   MeshImport.addin
+    19456  12-16-14 21:00   FileFormatWavefront.dll
+</pre>
+
+<p>Good luck getting it approved and launched.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-12 -->
+
+Do you know of any apps that have the code published which have also gotten in the App Store?</p>
+
+<p>I am having trouble getting the ribbon stuff all correct for them.</p>
+
+<p>There doesn't seem to be any template or sample code that shows how to get everything ready to publish. Do you have any advice?</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-12 -->
+
+There is lots of sample code for that.</p>
+
+<p>Many of my apps have that as well.</p>
+
+<p>All you need to do is implement an external application, define a button to invoke the  external command that you already have, and remove the external command itself from the add-in manifest.</p>
+
+<p>All the ADN add-ins of the month that we published a whole series of were converted to AppStore apps, and their code is available, e.g. my StringSearch add-in became ADNPlugin-StringSearch.dll.</p>
+
+<p>I can easily implement it for you sometime.</p>
+
+<p>I checked the project, and it already defines an external application as well as the external command.</p>
+
+<p>The external command is visible in the AddIns &gt; External Tools menu, and it should not be.</p>
+
+<p>The external application defines a custom panel in the AddIns tab that launches the same external command as well, and that is what you want.</p>
+
+<p>I removed the external command entry from the add-in manifest in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.15">version 2015.0.0.15</a>,
+
+and now all should be well.</p>
+
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-13 -->
+
+I got my add-in file working but haven't figured out how to have a single image as its button.
+I don't know how to get the icon to work in a ribbon, yet.
+The guy from Exchange Apps is trying to send me some sample code, so I may be able to copy that.</p>
+
+<p>I also need to make ContextualHelp F1 work.</p>
+
+<p>The Building Coder provides some clues. As always, I have to hack around for days before I get it done.</p>
+
+<p>Yes, your SLN now works as a ribbon button with no icon.</p>
+
+<p>I'm sure I am missing something very obvious to you, here.
+Where and how do I add the button with its image?
+Easy?</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-13 -->
+
+Send the images that you want to use along.</p>
+
+<p>Note they need the right size and resolution, c.f. below.</p>
+
+<p>Two things:</p>
+
+<ul>
+<li>Populate the button with a bitmap.</li>
+<li>For the sake of practicality, embed the image icon into the DLL.</li>
+</ul>
+
+<p>Otherwise, you have to copy a stupid separate image file around with your assembly DLL.</p>
+
+<p>Everything you need and much more is on the blog, in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.26">PushButtonData usage examples</a>.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-13 -->
+
+Yes, I am sure your blog has all the clues, and I keep using it, but actually putting it all together remains a big challenge for me.</p>
+
+<p>This is also not working for me:</p>
+
+<pre>
+  <span class="blue">using</span> System.Windows.Media.Imaging;
+</pre>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-13 -->
+
+The using statement can cause an error if the corresponding .NET assembly DLL has not been added to the project references.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-14 -->
+
+Found System.Windows.Media.Imaging!</p>
+
+<p>Hacked, and hacked, and ....... did it!</p>
+
+<center>
+<img src="img/directobjloader_15.png" alt="Mesh import ribbon panel icon" width="157"/>
+</center>
+
+<p>I referenced the Revit API Developers Guide Walkthrough:
+
+<a href="http://help.autodesk.com/view/RVT/2015/ENU/?guid=GUID-01F579CB-AB46-4C00-86E4-D189510D3774">Add Hello World Ribbon Panel</a>.</p>
+
+<p>I got the images as "Embedded Resources" in my project. It is crucial to add the PNGs one at a time in VS! I wasted several hours because VS lets you load multiple existing files into the project, but if you do it that way, it doesn't let you change them to "Embedded Resources".</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-15 -->
+
+I never ever heard of such a problem and cannot really believe that such a problem exists.</p>
+
+<p>Anyway, I added the icon you provided as an embedded resource command icon to the GitHub
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.16">version 2015.0.0.16</a>:</p>
+
+<center>
+<img src="img/directobjloader_16.png" alt="DirectObjLoader ribbon panel icon using embedded resources" width="468"/>
+</center>
+
+
+<a name="9"></a>
+
+<h4>Try/catch suggestion</h4>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-01-23 -->
+
+I submitted an
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/issues/1">Issue #1</a>:</p>
+
+<p>I suggest adding try/catch around builder.AddFace:</p>
+
+<pre class="code">
+  try
+  {
+    builder.AddFace(new TessellatedFace(corners,
+    ElementId.InvalidElementId));
+  }
+  catch
+  {
+    // remember something went wrong here..
+  }
+</pre>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-01-23 -->
+
+I updated the code with a catch-all exception handler in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.17">version 2015.0.0.17</a>.
+
+I would like to narrow it down to the specific exception thrown, though.</p>
+
+
+
+<a name="10"></a>
+
+<h4>The App is Live in the Store</h4>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-02-03 -->
+
+The
+
+<a href="https://apps.exchange.autodesk.com/RVT/en/Detail/Index?id=appstore.exchange.autodesk.com%3ameshimport1421090501_windows64%3aen">MeshImport</a>
+
+app is now live and for sale at $50 in the Autodesk Store.</p>
+
+<p>I couldn't have done it without you.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-02-03 -->
+
+<p><span style="font-size:xx-large; font-weight:bold; color:orange; text-decoration:blink;">congratulations!</span></p>
+
+<p>Did you pop a bottle of bubbly?</p>
+
+<p>Chin-chin!</p>
+
+<p>Your <a href="http://truevis.com/revit-mesh-import">Revit mesh import</a> web page still says "coming soon..."</p>
+
+<p>You might want to fix that.</p>
+
+<p>I would like to summarise our discussions and iterative development process as a blog post on the topic "from hack to app".</p>
+
+<p>Please keep me up to date how it goes for you with this.</p>
+
+<p>If there is anything else I can do to help, just give us a ring.</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-02-03 -->
+
+No, just made a post
+
+<a href="http://www.revitforum.org/commercial-free-add-ins-extensions/23119-mesh-import.html">announcing Mesh Import</a> on
+
+the Revit Forum.</p>
+
+<p>The thread includes some discussion and enthusiasm after publication of the app, plus some really cool realistic renderings.</p>
+
+<center>
+<img src="img/mesh_import_bed_test.jpg" alt="Mesh Import bed test" width="400"/>
+</center>
+
+
+<a name="11"></a>
+
+<h4>Troubleshooting Page</h4>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-02-15 -->
+
+I added a <a href="http://truevis.com/troubleshoot-revit-mesh-import">troubleshooting page</a> for
+the Mesh Import app.</p>
+
+<p>A man from Italy who is doing historic renovation work sent me a photogrammetry-created mesh; I show what I did to get it into Revit.</p>
+
+<p>I should do something to catch the mesh too big error.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-02-15 -->
+
+I am still pondering the 'hack to app' blog post  :-)</p>
+
+<p>Yes, every potential expected error should be caught and handled gracefully, mainly meaning that a sensible message is presented to the user explaining what went wrong and what steps to take to fix it.
+Pointing to a troubleshooting web page is a great solution!</p>
+
+<p>To catch the error and add code to handle it, simply run the app and generate the error inside the Visual Studio debugger.</p>
+
+<p>Visual Studio should tell you exactly what exception is thrown.</p>
+
+<p>Store that information and add a dedicated exception handler for it.
+In the exception handler, display a message explaining everything to the user.</p>
+
+<p>I'll happily help.</p>
+
+<p>Just let me know.</p>
+
+<p>Can I download the mesh causing the error anywhere?</p>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-02-15 -->
+
+I sent you the original file.
+It has about 1.2 million faces.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-02-15 -->
+
+Got it:</p>
+
+<pre>
+Exception generating DirectShape 'Mesh':
+cannot create a geometry object in a requested mode as result will be too big to handle
+</pre>
+
+<p>One simple check one could make is to post a warning to the user if the number of vertices exceeds 100.000, or 300.000, or whatever limit one would like to set.</p>
+
+<p>The vertices are all collected and counted and scaled anyway, before anything else happens.</p>
+
+<p>At that point, it would be sensible to tell the user:</p>
+
+<p>"Excuse me, but you are loading a mesh defining ... vertices. We suggest using no more than ..., since Revit will refuse to handle such a large mesh anyway. Please refer to the troubleshooting page at <a href="http://truevis.com/troubleshoot-revit-mesh-import">http://truevis.com/troubleshoot-revit-mesh-import</a> for suggestions on how to reduce the mesh size."</p>
+
+<p>I implemented</p>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.18">version 2015.0.0.18</a> &ndash; implemented Config.MaxNumberOfVertices and graceful exit on too many mesh vertices</li>
+<li><a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.19">version 2015.0.0.19</a> &ndash; implemented contextual help for external command push button in ribbon panel</li>
+</ul>
+
+<p><strong>Response:</strong>
+
+<!-- 2015-02-15 -->
+
+That was fast. Thanks for the advice, too.</p>
+
+<p>I have sold one copy of the app &ndash; that was very exciting.</p>
+
+<p><strong>Answer:</strong>
+
+<!-- 2015-02-15 -->
+
+Found some more errors and added an immediate bail-out message if the file is to large in
+
+<a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.20">version 2015.0.0.20</a>:
+
+implemented Config.MaxFileSize check for huge file sizes and abort before trying to load them.</p>
+
+
+
+<a name="12"></a>
+
+<h4>DirectObjLoader Version History</h4>
+
+<p>The most up-to-date version of the GitHub version of this app is provided by the
+
+<a href="https://github.com/jeremytammik/DirectObjLoader">DirectObjLoader repository</a>.</p>
+
+<p>Here is a complete list of the versions created so far, illustrating the functionality described above step by step:</p>
+
+<ul>
+<li>2014-12-02 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.0">2015.0.0.0</a> initial version with Eric Boehlke loaded fire hydrant</li>
+<li>2014-12-03 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.1">2015.0.0.1</a> added config class to store last folder between sessions</li>
+<li>2014-12-05 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.2">2015.0.0.2</a> use mesh + salvage instead of solid + abort when building the DirectShape per suggestion from angel velez via eric boehlke and gargoyle is now successfully loaded</li>
+<li>2014-12-10 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.3">2015.0.0.3</a> implemented input scaling factor stored in config file, cf. gargoyle2.png</li>
+<li>2014-12-11 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.4">2015.0.0.4</a> added face count and error message on zero faces</li>
+<li>2014-12-11 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.5">2015.0.0.5</a> added initial primitive test support for groups as well as ungrouped faces, result directobjloader_shopping_cart_groups.png</li>
+<li>2014-12-11 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.6">2015.0.0.6</a> call OpenConnectedFaceSet for each OBJ group, result directobjloader_shopping_cart_groups_2.png</li>
+<li>2014-12-11 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.6">2015.0.0.6</a> name DirectShape element same as input file</li>
+<li>2014-12-12 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.7">2015.0.0.7</a> create separate DirectShape element for each OBJ group, add appGuid and name shapes better, result directobjloader_shopping_cart_groups_3.png</li>
+<li>2014-12-12 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.8">2015.0.0.8</a> capitalise and replace underscore by space in DirectShape element name</li>
+<li>2015-01-02 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.9">2015.0.0.9</a> added support for faces with more than four vertices, enabling successful load of sandal.obj</li>
+<li>2015-01-02 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.10">2015.0.0.10</a> switched TessellatedShapeBuilder target from Mesh to AnyGeometry</li>
+<li>2015-01-02 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.11">2015.0.0.11</a> set TessellatedShapeBuilder LogString and LogInteger properties</li>
+<li>2015-01-02 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.12">2015.0.0.12</a> abort and display error message on invalid OBJ file due to face vertex index exceeding total vertex count</li>
+<li>2015-01-05 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.13">2015.0.0.13</a> added two exception handlers for loading OBJ file and generating DirectShape</li>
+<li>2015-01-12 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.14">2015.0.0.14</a> removed external command from add-in manifest, leaving only the external application</li>
+<li>2015-01-12 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.15">2015.0.0.15</a> fixed a logical error handling nFaces and nFacesTotal count</li>
+<li>2015-01-15 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.16">2015.0.0.16</a> display command button icon stored in embedded resources</li>
+<li>2015-01-23 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.17">2015.0.0.17</a> wrapped call to AddFace in an own exception handler and added a debug log reporting count of faces added and failed</li>
+<li>2015-02-15 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.18">2015.0.0.18</a> implemented Config.MaxNumberOfVertices and graceful exit on too many mesh vertices</li>
+<li>2015-02-15 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.19">2015.0.0.19</a> implemented contextual help for external command push button in ribbon panel</li>
+<li>2015-02-15 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.20">2015.0.0.20</a> implemented Config.MaxFileSize check for huge file sizes and abort before trying to load them</li>
+<li>2015-02-17 <a href="https://github.com/jeremytammik/DirectObjLoader/releases/tag/2015.0.0.21">2015.0.0.21</a> published blog post</li>
+</ul>

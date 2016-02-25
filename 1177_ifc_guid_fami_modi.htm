@@ -1,0 +1,87 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+
+
+-->
+
+<h3>IFC GUID Algorithm Update and Family Modification</h3>
+
+<p>Two short topics for today, an important little
+
+<a href="#2">IFC GUID algorithm bug fix</a> and
+
+some thoughts on
+
+<a href="#3">detecting family modification</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>IFC GUID Algorithm in C# Update</h4>
+
+<p>Håkon Clausen implemented a bug fix update and created a GitHub repository for the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html">
+IFC GUID algorithm in C#</a> that
+
+he originally published back in June 2010.</p>
+
+<p>Here are the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/06/ifc-guid-algorithm-in-c.html#2">
+details on the update</a>
+
+and a direct link to his
+
+<a href="https://github.com/hakonhc/IfcGuid">
+IfcGuid GitHub repository</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Detecting Family Modification</h4>
+
+<p>For ages, content creators and developers have been asking how to prevent users from modifying their families, or at least for foolproof ways to detect such changes.</a>
+
+<p>Here is a typical query:</p>
+
+<p><strong>Question:</strong> I keep being asked how the user can be prevented from tinkering with my components.</p>
+
+<p>I cannot and will not implement any such barrier, since the resulting system would be much too rigid.</p>
+
+<p>However, it would be very helpful if I could detect whether any changes have been made to the family.</p>
+
+<p>For instance, a parameter value could be set to zero as soon as a family is copied or modified.</p>
+
+<p>That would allow my add-in or a model tester to define a filter to see which components were manually created and need additional attention.</p>
+
+<p><strong>Answer:</strong> You really need to discuss this with a content creation expert.</p>
+
+<p>I do believe there are some tricks that I am not properly aware of, e.g. placing parameters in nested families and thus restricting access to them.</p>
+
+<p>The Revit 2015 API provides one important new feature in this area, read-only parameters that can only be set programmatically and are not modifiable manually at all.
+For more on this, look at the section
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html#2.04">
+shared parameter creation &ndash; description and user modifiability</a>.
+
+<p>Finally, the following cool idea comes to mind spontaneously:</p>
+
+<ul>
+<li>Define and implement a standard method to create a binary lump of some kind from a family definition. For instance, you could use the result of calling the EditFamily method on it and then saving to an external file.</li>
+<li>Calculate a checksum for the binary lump.</li>
+<li>Save the checksum value in a read-only parameter or in extensible storage, possibly in encrypted form.</li>
+</ul>
+
+<p>From now on, every time you encounter an instance of this family, you can recalculate the current checksum value that it produces and compare it with the stored original value.</p>
+
+<p>I would hope that a proper implementation of this would enable you to detect changes in the way you wish.</p>
+
+<p>I would appreciate hearing from you, dear reader, about other suggestions and solutions for this.</p>
+
+<p>Thank you!</p>

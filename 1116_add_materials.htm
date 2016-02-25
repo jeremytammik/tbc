@@ -1,0 +1,357 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+Settings.Materials and Settings.FillPatterns removed.
+
+Excel interaction changed a little.
+
+Added some LINQ tricks to convert to dictionaries and look up by name.
+
+http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html
+
+The property of the Settings class:
+
+  Settings.FillPatterns
+
+has been removed. FillPatterns may be found by the following approaches:
+
+  Use of a FilteredElementCollector filtering on class FillPatternElement
+  Use of the static methods of FillPatternElement:
+    FillPatternElement.GetFillPattern(Document, ElementId)
+    FillPatternElement.GetFillPatternByName (Document, string)
+
+Hi Jeremy,
+
+The example
+
+http://thebuildingcoder.typepad.com/files/addmaterials01.zip
+
+From the blog
+
+http://thebuildingcoder.typepad.com/blog/2010/08/add-new-materials-from-list.html
+
+helps me a lot.
+
+But it is hard to bring it from R2010 to R2014 because there are a lot of changes.
+
+Do you have addmaterials01 example for R2014?
+
+Already thanks.
+
+Met vriendelijke groeten,
+
+Wim De Winter
+
+tel: 03/2720312
+gsm: 0473/683588
+Geo-IT bvba
+Potvlietlaan 3
+2600 Antwerpen
+www.geoit.be
+
+Van: Jeremy Tammik [mailto:jeremy.tammik@autodesk.com]
+Verzonden: woensdag 15 januari 2014 11:20
+Aan: Wim De Winter
+Onderwerp: Re: AdskLib API
+
+hi wim,
+
+nice to hear from you.
+
+have you looked at all for this yourself?
+
+i googled for "adsklib api":
+
+http://lmgtfy.com/?q=adsklib+api
+
+i see the following:
+
+http://www.revitforum.org/third-party-add-ins-api-r-d/17911-programmatically-create-adsklib-file.html
+
+http://www.revitforum.org/third-party-add-ins-api-r-d/17911-programmatically-create-adsklib-file-2.html
+
+and that seems to just about cover it.
+
+long live google.
+
+it seems to suggest just what you say, and also hints that no other solution is known.
+
+best regards,
+
+jeremy
+
+From: Wim De Winter 
+Date: Wednesday, January 15, 2014 11:00
+To: Jeremy Tammik 
+Subject: AdskLib API
+
+Hello,
+
+We have met at developers days in Paris dd 9 dec 2013.
+
+As Autodesk reseller and developer I'm looking for a solution for quickly importing materials in the adsklib material bib from Autodesk.
+We have create a PostGreSql database with materials, description and keynote numbers, that can be edit with multiple users.
+We want to import this materials in the adsklib.
+
+Maybe import CSV or Excel to AdskLib?
+Do you have a solution or example code to use the AdskLib API.
+
+Already thanks
+
+Met vriendelijke groeten,
+
+Wim De Winter
+
+tel: 03/2720312
+gsm: 0473/683588
+Geo-IT bvba
+Potvlietlaan 3
+2600 Antwerpen
+www.geoit.be
+
+-->
+
+<h3>Adding New Materials from List Updated</h3>
+
+<p>Back in the year 2010, I discussed a simple little system based on a Revit add-in named AddMaterials to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/add-new-materials-from-list.html#2">
+generate new materials in a Revit project</a> based
+
+on a list of required material properties stored in an Excel spreadsheet.</p>
+
+<p>The input data includes:</p>
+
+<ul>
+<li>Material Name</li>
+<ul>
+<li>Code</li>
+<li>Title</li>
+<li>Strength</li>
+</ul>
+</li>
+<li>Graphics</li>
+<ul>
+<li>RGB colour values</li>
+<li>Transparency</li>
+<li>Surface pattern</li>
+<li>Cut pattern</li>
+</ul>
+</li>
+<li>Identity
+<ul>
+<li>Filter criteria</li>
+<li>Descriptive information</li>
+<li>Custom parameters</li>
+</ul>
+</li>
+</ul>
+
+<p>All the further workflow details are described in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/08/add-new-materials-from-list.html#2">
+original post</a>,
+
+of course.</p>
+
+<p>The add-in was implemented for Revit 2011, and quite a bit of the required Revit API functionality has changed since then, so an update of this system seems in order.</p>
+
+<p>Here are some of the things that have changed:</p>
+
+<ol>
+<li>The document Settings class no longer provides the Materials and FillPatterns properties.</li>
+<li>The Color class constructor requires RGB arguments.</li>
+<li>The Material class SurfacePattern and CutPattern properties have been replaced by properties taking element ids.</li>
+</ol>
+
+<p>These changes, that accumulated over three major releases of the Revit API, can be rather baffling for an API newbie.</p>
+
+<p>Here are the methods I used to update to the Revit 2014 API functionality:</p>
+
+<ol>
+<li>Use filtered element collectors to access the document materials and fill patterns, and LINQ to generate dictionaries mapping the element names to instances.</li>
+<li>Provide RGB arguments to the Color constructor.</li>
+<li>Set the material surface and cut patterns using element ids.</li>
+</ol>
+
+<p>At the same time, I took this opportunity to clean up the code a bit, e.g. by eliminating global variables and removing unnecessary casts.</p>
+
+<p>Here is the complete updated implementation of the AddMaterials add-in for Revit 2014:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Excel = Microsoft.Office.Interop.Excel;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> AddMaterials
+{
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">string</span> PluralSuffix( <span class="blue">int</span> i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 1 == i ? <span class="maroon">&quot;&quot;</span> : <span class="maroon">&quot;s&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create dictionary of existing </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// materials keyed by their name.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Material</span>&gt; materials
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Material</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">Material</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">Material</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Ditto for fill patterns.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">FillPatternElement</span>&gt; fillPatterns
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FillPatternElement</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Cast&lt;<span class="teal">FillPatternElement</span>&gt;()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToDictionary&lt;<span class="teal">FillPatternElement</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; e.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; Excel.<span class="teal">Application</span> excel
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> Excel.<span class="teal">Application</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; excel.Visible = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename = <span class="maroon">&quot;C:/RevitAPI/MaterialList.xlsx&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; Excel.<span class="teal">Workbook</span> workbook = excel.Workbooks.Open(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; filename, 0, <span class="blue">true</span>, 5, <span class="maroon">&quot;&quot;</span>, <span class="maroon">&quot;&quot;</span>, <span class="blue">true</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Excel.<span class="teal">XlPlatform</span>.xlWindows, <span class="maroon">&quot;\t&quot;</span>, <span class="blue">false</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">false</span>, 0, <span class="blue">true</span>, 1, 0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; Excel.<span class="teal">Worksheet</span> worksheet = (Excel.<span class="teal">Worksheet</span>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; workbook.Worksheets.get_Item( 1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; Excel.<span class="teal">Range</span> range = worksheet.UsedRange;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nRows = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> nMaterialAdded = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> iRow = 5;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Add Materials&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">null</span> != range.Cells[iRow, 1].Value2 )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> matName = (<span class="blue">string</span>) range.Cells[iRow, 1].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; matName += <span class="maroon">&quot; &quot;</span> + (<span class="blue">string</span>) range.Cells[iRow, 2].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; matName += <span class="maroon">&quot; &quot;</span> + (<span class="blue">string</span>) range.Cells[iRow, 3].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( matName != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> red = (<span class="blue">double</span>) range.Cells[iRow, 4].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> green = (<span class="blue">double</span>) range.Cells[iRow, 5].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> blue = (<span class="blue">double</span>) range.Cells[iRow, 6].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> transparency = (<span class="blue">double</span>) range.Cells[iRow, 8].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> surPattern = (<span class="blue">string</span>) range.Cells[iRow, 9].Value2;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> cutPattern = (<span class="blue">string</span>) range.Cells[iRow, 10].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Identity data of material class to duplicate</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> CSI = (<span class="blue">string</span>) range.Cells[iRow, 11].Value2;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( materials.ContainsKey( CSI ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> materialCSI = materials[CSI];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Material</span> myMaterial
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = materialCSI.Duplicate( matName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Color</span> matColor = <span class="blue">new</span> <span class="teal">Color</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( red.ToString() ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( green.ToString() ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Byte</span>.Parse( blue.ToString() ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.Color = matColor;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.Transparency
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = (<span class="blue">int</span>) transparency;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.SurfacePatternId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = fillPatterns[surPattern].Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; myMaterial.CutPatternId
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = fillPatterns[cutPattern].Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nMaterialAdded;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nRows;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++iRow;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; workbook.Close( <span class="blue">true</span>, <span class="blue">null</span>, <span class="blue">null</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; excel.Quit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Revit AddMaterials&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0} row{1} successfully parsed and &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{0} material{1} added.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nRows, PluralSuffix( nRows ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; nMaterialAdded,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PluralSuffix( nMaterialAdded ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Revit AddMaterials Exception:\n&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + ex.ToString();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Note the nice use of the generic ToDictionary method to convert from a filtered element collector to a dictionary in one fell swoop.</p>
+
+<p>For the complete source code, Visual Studio solution and add-in manifest, please refer to the
+
+<a href="https://github.com/jeremytammik/AddMaterials">AddMaterials GitHub repository</a>.</p>
+
+<p>The version discussed above is
+
+<a href="https://github.com/jeremytammik/AddMaterials/releases/tag/2014.0.0.0">release 2014.0.0.0</a>.</p>
+
+<p>I hope you find this useful and instructive.</p>
+
+<p><strong>Addendum:</strong> This utility has been updated.
+
+Please check out the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/03/adding-new-materials-from-list-updated-again.html">
+enhancements in release 2014.0.0.1</a>.</p>

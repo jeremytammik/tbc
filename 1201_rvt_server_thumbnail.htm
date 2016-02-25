@@ -1,0 +1,84 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>
+</head>
+
+<!--
+
+09926155 [Error at requesting thumbnail using REST (RLA)]
+
+-->
+
+<h3>Revit Server Thumbnail Requires Redistributable</h3>
+
+<p>Here is a quick answer to a simple Revit Server question to close for this week:</p>
+
+<p><strong>Question:</strong> My application retrieves thumbnails of models stored on Revit Server 2014 via REST calls using the following code:</p>
+
+<pre class="prettyprint">
+  WebRequest request = WebRequest.Create(
+    "http://&lt;ServerName&gt;"
+    + "/RevitServerAdminRESTService2014"
+    + "/AdminRESTService.svc/&lt;folder&gt;"
+    + "|demorevitserver_ab.rvt/thumbnail"
+    + "?width=200&height=200" );
+
+  request.Method = "GET";
+
+  request.Headers.Add( "User-Name",
+    "d5783faa-3548-4e6e-be9a-aeca05c59352" );
+
+  request.Headers.Add( "User-Machine-Name",
+    "MyComputerXyz" );
+
+  request.Headers.Add( "Operation-GUID",
+    Guid.NewGuid().ToString() );
+
+  // Next line fails
+  // The remote server returned an error:
+  // (500) Internal Server Error.
+
+  WebResponse response = request.GetResponse();
+</pre>
+
+<p>I checked the log file AdminRESTService.log on the server and do not see what the problem could be there.</p>
+
+<p>How can I solve this, please?</p>
+
+
+<p><strong>Answer:</strong> In this case, the log file does not reveal the exact cause of the failure.</p>
+
+<p>However, we analysed a similar case in the past.
+The problem there turned out to be that the 'Microsoft Visual C++ 2010 Redistributable (x64)' was not installed on the server.</p>
+
+<p>Please check whether this is also the cause in your case.</p>
+
+<p>The installer has meanwhile been updated to include the required component.</p>
+
+
+<p><strong>Response:</strong> I finally found a solution that works for me: installing both the 'Microsoft Visual C++ 2010 Redistributable x64’ and the 'Microsoft Visual C++ 2012 Redistributable x64’ solves the problem.</p>
+
+<p>So not only the 2010 version as you suggested, but both the 2010 and 2012 versions.</p>
+
+
+<a name="2"></a>
+
+<h4>Stop Suffering</h4>
+
+<p>Let's end the week with another quick answer to an apparently not-so-simple question, some sound non-technical advice.</p>
+
+<p>If you are suffering from anything at all that is not of a physical nature,
+
+<a href="http://en.wikipedia.org/wiki/Bob_Newhart">
+Bob Newhart</a> has
+
+the following simple and effective remedial advice to offer &ndash;
+
+<a href="https://www.youtube.com/watch?v=Ow0lr63y4Mw">Stop It</a>:</p>
+
+<center>
+<iframe width="420" height="315" src="https://www.youtube.com/embed/Ow0lr63y4Mw" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<p>Some professional friends of mine tell me that they do indeed keep this advice in mind when offering support for their clients.</p>

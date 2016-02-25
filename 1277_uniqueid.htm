@@ -1,0 +1,152 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/understanding-the-use-of-the-uniqueid/m-p/5474167
+
+very interesting and valuable
+
+-->
+
+<h3>Understanding the Use of the UniqueId</h3>
+
+<p>Here is a thread from the Revit API discussion forum on
+
+<a href="http://forums.autodesk.com/t5/revit-api/understanding-the-use-of-the-uniqueid/m-p/5474167">
+understanding the use of the UniqueId</a> between
+
+Erik Eriksson and Arno&scaron;t L&ouml;bel, Sr. Principal Engineer of the Autodesk Revit R&amp;D team, that I find very valuable and therefore edited, for preservation and clarity:</p>
+
+<p><strong>Question:</strong>
+
+In the early days, I thought that ElementId was a stable way of finding elements in a document, then I learned that UniqueId was the proper way.</p>
+<p>But I haven't been able to find enough coherent information about it to really understand it and I've been reading lately that we should use the UniqueId as an identifier in multifile projects (multiple central files), because it's only guaranteed to be unique in one central file.</p>
+<p>This is what I've learned so far (From Jeremy Tammik's Blog among others):</p>
+<p>The UniqueId 40 is characters long and made up from 2 parts, the first is internally called the EpisodeId and the second is the hexadecimal representation of the element id. I've read that people complain about the fact that two Revit files from the same template will have the same UniqueIds for the elements that are created in the template. So I guess that the EpisodeId cannot be used as a "file guid".</p>
+<p>However, its stated by Arnost Lobel that the UniqueId's purpose (one of many?) is to have a stable way of identifying elements in a workshared environment, because the elementId of an element can change.</p>
+<p>OK, then, but if the last part of the uniqueid is the elementid in hexadecimal form, won't that change the uniqueid also?</p>
+<p>I've also found in a forum post that first part is connected to the WorksetId.</p>
+<p>With all this in mind, is the best way of identifying elements in a multifile to create a guid for each element and store it to them using a locked and hidden parameter (or extensible storage)?</p>
+<p>Thanks for any help figuring this out!</p>
+
+<p><strong>Answer:</strong>
+
+Sigh... :-/ I truly believe we made a disservice to our Revit users when we named UniqueId the way we did, for it seems to keep on being misunderstood in spite of many of us trying to shed more light on the problems with identifying model elements. I'll try again to straighten up some of the confusion, and my  hope is that I'll make it better, not worse.</p>
+
+<p>Erik, I think you may actually be on the point in your very first sentence: "ElementId was a stable way of finding elements in a document, then I learned that UniqueId was the proper way."</p>
+
+<p>The most important part of the sentence is the  "a" in "a document", since the purpose of both kinds of IDs is to identify elements in a single model, not in a bunch of models. In other words: none of the IDs can uniquely identify elements across unrelated documents in spite of the name it was given to the UniqueID class. Universal uniqueness of identifiers is simply something that cannot be done. If one takes an existing file and makes a copy of it, no one would probably expect elements to change their Ids in that copied file.</p>
+
+<p>So, with that "universal uniqueness" hopefully out of our way, we have only two aspects to discuss:</p>
+
+<p>Regular Ids (integers) can identify elements in a model uniquely as long as the model is not work-shared. It is because Revit does not change the Ids after they were issued, and it also always increments the Ids before assigning them to new elements. That means Ids are never reused. If an element is deleted, its Id will not be used for anything else.</p>
+
+<p>In a work-shared environment, regular Ids cannot be stable, understandably. I'll demonstrate it in an example:</p>
+
+<p>Consider two users, UA and UB. One creates an empty central file. Then both users create their respective local files from it. Now, say UA creates a wall. It will be assigned Id = 1005 (for example). If UB also creates one wall it will also be given Id = 1005, since both users started off with the same file and Revit increments element Ids linearly. Let's continue: UA saves to central, thus her wall gets there first with its original Id (1005). If UB then syncs, first the wall from the other user will be brought in with it's original Id. Revit will notice that the same Id already exist locally. Since all elements must have unique Ids within a file, something's got to give; Revit takes UB's wall and assigns it a new Id, say 1006, and uploads that wall to the central file. After UA gets the latest too, both users and the central file as well will have two walls with Ids 1005 and 1006, respectively.</p>
+
+<p>I hope that makes sense. Let's go on with the second one.</p>
+
+<p>Unique Ids (strings) can identify elements uniquely even in a work-shared file. What this basically means is that, unlike regular Ids which may collide when two local versions are merged together and thus one (or more) of the Ids must be re-issued (as I illustrated in the aforementioned example), Unique Ids do not collide, therefore they do not have to be reissued; they merge with no problem.</p>
+
+<p>What that means in practice I'll again try to demonstrate on an example:</p>
+
+<p>An external application creates a new Beam element in a local file. It takes and stores its unique Id &ndash; say it is "ABCD-1234" (a string!!). Then the user goes on making more changes while his co-workers make even more changes in their local files. At some point they all sync with the central file. If, after that point in time, the external application operating on the first user's computer asks for an element to be fetched by providing its UniqueId =  "ABCD-1234", the application will obtain the very same Beam element, providing it still exists.</p>
+
+<p>I think this should be the end of the story. Please note that I used the sample "ABCD-1234" value of an unique Ids on purpose, because I believe it is for the best if users do not try to understand what the parts of an unique Id are and how can one try to decipher it. Please keep in mind that it was not meant to be deciphered. No matter what Revit does internally with a unique Id, it has one and only purpose to Revit programmers (both internal and external, in fact) &ndash; it identifies an element in a work-shared model. Once you have an element's unique Id, you can use it to locate the element within the model.</p>
+
+<p>One more note before I stop typing, mainly to address Erik's last question. Neither regular element Ids nor Unique Ids can safely identify elements across multiple unrelated documents. If there is someone who requires such a universal identification system for organizing elements in whatever models, that person/company would have to create some kind of a controlled database. I presume it would not be a particularly easy task.</p>
+
+<p>Post Scriptum: A post too long? That's what holidays are for! :-)</p>
+
+<p><strong>Response (from Scott Wilson):</strong>
+
+Excellent info, thanks.</p>
+
+<p>I think I'll go and re-code my GetElementIdFromUniqueId() method now so that it actually performs the lookup instead of extracting it from the string to save time. I wasn't aware of the work-sharing issue and this will save me some headaches in the future I'm sure.</p>
+
+<p><strong>Response:</strong>
+
+Thank you for your reply! Actually, I tested it myself, I was too curious to want to wait for a reply.</p>
+
+<p>So for anyone curious about this: the first part is related to the workset that the element was created in and the second is the hexadecimal representation of the elementid. However the worksharing part is not the workset uniqueId (even though its a guid and not a string).</p>
+<p>However, I've not yet tried to force the elementid to change on synchronization, like you talk about. So I don't understand how they cannot collide on merge.</p>
+
+<p>I understand that you have your reasons for not disclosing how the uniqueid is created; I'm still curious about it =)</p>
+<p>And with the level of "experimenting" going on with it I think you should disclose as much as possible to help developers from doing stuff that you know cannot be done.</p>
+
+<p>Regarding the copying of a file, I fully understand that the uniqueids would be the same, and that's the way we want them to be =)</p>
+<p>But because I don't have the information that you do about the inner workings of the uniqueid I'll just have to take your word for it, when you say that they are not safe to use in multifile environments.</p>
+
+<p>However multifile projects are something that we "in-the-trenches" have to face all the time. I'd say more than half of our projects have more than one file and because of this there are a lot of companies that develop these off-site databases and those who I've talked to use the uniqueid to identify elements. I hope that there are not 100s of projects that are going to have unexplainable behaviour because of this limitation.</p>
+
+<p><strong>Answer:</strong>
+
+Erik wrote: "And with the level of 'experimenting' going on with it I think you should disclose as much as possible to help developers from doing stuff that you know cannot be done."</p>
+
+<p>I can both concur and oppose the statement. If we can agree that what I have already disclosed so far about the nature of unique Ids is in fact as much as is actually possible, than I second your notion. I must, however, decline to go even further below the surface. I beg your forgiveness and rely on your understanding, for I must insist that in some cases less is more. By my revealing more internal details about the structure of unique Ids I could put a serious roadblock on our future development and compromise our freedom to innovate (re-factor). I often dig deep below the lid of the Revit API (more often than others do, I believe), but in this particular case I truly believe that what I have stated is what users need and should know.</p>
+
+<p>That being said, perhaps I can make one more step forward by posting the following statement:</p>
+
+<p>"If and only if your environment guarantees that all files in that environments are genuinely unique, then and only then you can also expect that all elements in all your Revit models will have their unique Ids truly unique (in that domain). This is correct for versions up to 2015, and 2016 will be the same." I do not expect us changing the policy in the foreseeable future, but we should be free to do so, should we find a very good reason for it.</p>
+
+<p>I believe, however, that such an environment is very hard to create and maintain. I would even expect that making sure that all model documents are unique (in a controlled domain) may be hard but possible to accomplish (please do not forget about templates &ndash; you always need to start from scratch), but unless you also create all families by yourself, it may be as hard as practically impossible to guarantee that all files that ever get included into the domain have been created uniquely (i.e. never by copying).</p>
+
+<p>Erik wrote: "But because I don't have the information that you do about the inner workings of the uniqueid I'll just have to take your word for it, when you say that [it is] not safe to use in multi-file environments."</p>
+
+<p>I am not sure what the concern here is; I can only repeat what I've said: If you can guarantee that none of your files is created as a copy or from the same template, then (and only then) all your elements across all your documents will have their UniqueIds unique. It is because UniqueIds do (still as of today) in fact contain GUIDs, which makes them genuinely unique. However, since Revit is not an application that itself requires uniqueness of documents (neither models, nor templates, families, etc.), we cannot make that generic statement claiming that UniqueIds will universally identify a model element no matter where and how the element originated from. I believe that is a fair statement.</p>
+
+<p><strong>Response:</strong>
+
+I appreciate your frankness about the API and I do understand that you need freedom to change the way uniqueId works.</p>
+
+<p>I now have one of the answers I was looking for: I can use the uniqueId in multifile environments if I make sure that there are no duplicate Revit documents.</p>
+
+<p>Thanks Arnost!</p>
+
+<p><strong>Answer:</strong>
+
+I am glad your curiosity has been satisfied, Erik.</p>
+
+<p>However, reading your confirmation I wonder if I expressed my statements as clearly as I intended to. In order to clear up any possible misunderstanding I think I better restate one important detail again.</p>
+
+<p>Erik, you do realize that two documents that start off the same template files are in fact duplicates, to a degree, which means that such documents are very likely to contain elements with identical unique Ids? That applies to both project and family documents as well. And since our content team most likely created Revit standard library families with just a few templates, it would in effect mean that not only you could not start any of your document with a template, you also should not use any of the standard families installed with Revit (and most likely you should avoid families from any third party as well.) That is, if you want to avoid duplications of documents in order to have the guarantee of truly unique elements in the scope your company domain.</p>
+
+<p>Thank you.</p>
+
+<p><strong>Response:</strong>
+
+My curiosity can never be satisfied, thankfully =)</p>
+
+<p>Yes, if you copy a Project document or family document the uniqueids inside the 2 copies will be the same.</p>
+<p>This is what I expected and that's perfectly fine.</p>
+<p>I'm concerned with finding instances and types in mature models and in that case this will do.</p>
+
+<p>Thanks again.</p>
+
+
+<a name="2"></a>
+
+<h4>MilanoJS Meetup</h4>
+
+<p>I am leaving for Milano today.
+I will be working from there during the coming week.</p>
+
+<p>Among other things, I will prepare for the Tuesday February 10
+
+<a href="http://milanojs.com">Milano JS</a> meetup and presentation of the
+
+<a href="https://developer-autodesk.github.io">View and Data API</a>.</p>
+
+<p>Check out our new interactive online
+
+<a href="http://developer-autodesk.github.io/LmvQuickStartSlides">View and Data API slide deck</a>!</p>
+
+<center>
+<img src="img/milanojs.png" alt="Milano JS" width="312"/>
+</center>
+
+<p>Looking forward to seeing you at the meetup next Tuesday, if you happen to be in the area!</p>

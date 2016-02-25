@@ -1,0 +1,462 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+http://blog.csdn.net/joexiongjin/article/details/41090861
+
+REVIT-52648 [API: ElementIntersectsSolidFilter and ElementIntersectsElementFilter fail on curved wall]
+
+-->
+
+<h3>Determining Intersecting Elements and Continued Futureproofing</h3>
+
+<p>I continued cleaning up the obsolete API usage in The Building Coder samples, and took a look at a new blog post by Joe Ye:</p>
+
+<ul>
+<li><a href="#2">Eliminating more obsolete API usage</a></li>
+<li><a href="#3">Determining all family instances intersecting an element</a></li>
+<li><a href="#4">Updated element selection utility methods</a></li>
+<li><a href="#5">Intersection results and download</a></li>
+<li><a href="#6">Explanation: joined geometry removes intersection</a></li>
+<!--
+<li><a href="#4">Even read-only Revit API calls are not thread safe</a></li>
+<li><a href="#5">AU, DevDays and Darth Vader</a></li>
+-->
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Eliminating More Obsolete API Usage</h4>
+
+<p>I continue in my battle against the obsolete API usage warnings after the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html#5">
+initial migration to Revit 2015</a> and
+
+subsequently finally
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/migrating-deprecated-api-and-2d-boolean-operations.html#3">
+getting started migrating deprecated API</a>.</p>
+
+<p>I now removed the following ten warnings, all of them with the number CS0618, leaving
+
+<a href="zip/bc_migr_2015_e.txt">35 remaining</a> to
+
+be fixed:</p>
+
+<ul>
+<li>CmdCollectorPerformance.cs: Autodesk.Revit.DB.Element.get_Parameter(string) is obsolete, as more than one parameter can have the same name on a given element.</li>
+<li>CmdCoordsOfViewOnSheet.cs: Autodesk.Revit.DB.ViewSheet.Views is obsolete.  Use GetAllPlacedViews instead.</li>
+<li>CmdRollingOffset.cs: Autodesk.Revit.Creation.Document.NewPipe is obsolete. Please use Pipe.Create instead.</li>
+<li>CmdNewDuctSystem.cs: Autodesk.Revit.UI.Selection.Selection.Elements is obsolete. Use GetElementIds instead.</li>
+<li>CmdTransformedCoords.cs: Autodesk.Revit.UI.Selection.Selection.Elements is obsolete. Use GetElementIds instead.</li>
+<li>CmdUnrotateNorth.cs: Autodesk.Revit.UI.Selection.Selection.Elements is obsolete. Use GetElementIds instead.</li>
+<li>CmdWindowHandle.cs: Autodesk.Revit.UI.Selection.SelElementSet is obsolete. Use GetElementIds instead.</li>
+<li>CmdWindowHandle.cs: Autodesk.Revit.UI.Selection.Selection.Elements is obsolete. Use GetElementIds instead.</li>
+<li>CmdWindowHandle.cs: Autodesk.Revit.UI.Selection.SelElementSet is obsolete. Use GetElementIds instead.</li>
+<li>CmdWindowHandle.cs: Autodesk.Revit.UI.Selection.Selection.Elements is obsolete. Use GetElementIds instead.</li>
+</ul>
+
+<p>As always, the most up to date version of The Building Coder samples is provided in
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version described here is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.4">
+release 2015.0.116.4</a>.</p>
+
+
+<a name="3"></a>
+
+<h4>Determining all Family Instances Intersecting an Element</h4>
+
+<p>My colleague
+
+<a href="http://adndevblog.typepad.com/aec/joe-ye.html">
+Joe Ye</a> left
+
+Autodesk and is now independently active with <a href="http://www.glsbim.com">gisbim.com</a> or <i>Mount of Olives</i>.</p>
+
+<p>He is still actively supporting and blogging about Revit programming, though, partially as a consultant for Autodesk, e.g. in this explanation on how to
+
+<a href="http://blog.csdn.net/joexiongjin/article/details/41090861">how to retrieve all columns intersecting a wall</a>.</p>
+
+<p>Of course, this can be solved addressing the more general issue of retrieving all family instances of a specific type intersecting a given BIM element.</p>
+
+<p><strong>Question:</strong> How can I find all columns intersecting a given wall?</p>
+
+<p><strong>Answer:</strong> The Revit API does not provide direct access to query the relationship between the pillars and wall.</p>
+
+<p>However, you can easily obtain it indirectly through the API using an intersecting element filter, e.g. one of the two classes ElementIntersectsElementFilter or ElementIntersectsSolidFilter.
+The latter requires a solid, the former takes a BIM element and uses its existing solid geometry.
+For more information on these, please refer to the Revit API help file RevitAPI.chm.</p>
+
+<p>Here is Joe's sample code demonstrating this:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Find intersections between family instances and a selected element&nbsp; </span>
+&nbsp;
+&nbsp; <span class="teal">Reference</span> Reference = uidoc.Selection.PickObject(
+&nbsp; &nbsp; <span class="teal">ObjectType</span>.Element, <span class="maroon">&quot;Select element that will &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;be checked for intersection with all family &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;instances&quot;</span> );
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = doc.GetElement( reference );
+&nbsp;
+&nbsp; <span class="teal">GeometryElement</span> geomElement = e.get_Geometry(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Options</span>() );
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = <span class="blue">null</span>;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> geomObj <span class="blue">in</span> geomElement )
+&nbsp; {
+&nbsp; &nbsp; solid = geomObj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( solid = !<span class="blue">null</span> ) <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; solid ) );
+&nbsp;
+&nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Revit&quot;</span>, collector.Count() +
+&nbsp; &nbsp; <span class="maroon">&quot;Family instances intersect with selected element (&quot;</span>
+&nbsp; &nbsp; + element.Category.Name + <span class="maroon">&quot;ID:&quot;</span> + element.Id + <span class="maroon">&quot;)&quot;</span> );
+</pre>
+
+<p>I could not resist cleaning this up a bit and adding some LINQ and other generic and functional twiddles to achieve the following enhancements:</p>
+
+<ul>
+<li>Foolproof the solid selection by skipping null and empty solids.</li>
+<li>Improve the result message and add element information.</li>
+<li>List the element ids of all the intersecting instances.</li>
+</ul>
+
+<p>Here is the resulting implementation:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Retrieve all family instances intersecting a</span>
+<span class="gray">///</span><span class="green"> given BIM element, e.g. all columns </span>
+<span class="gray">///</span><span class="green"> intersecting a wall.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">void</span> GetInstancesIntersectingElement( <span class="teal">Element</span> e )
+{
+&nbsp; <span class="teal">Document</span> doc = e.Document;
+&nbsp;
+&nbsp; <span class="teal">Solid</span> solid = e.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() )
+&nbsp; &nbsp; .OfType&lt;<span class="teal">Solid</span>&gt;()
+&nbsp; &nbsp; .Where&lt;<span class="teal">Solid</span>&gt;( s =&gt; <span class="blue">null</span> != s &amp;&amp; !s.Edges.IsEmpty )
+&nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> intersectingInstances
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>( solid ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = intersectingInstances.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">string</span> result = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">&quot;{0} family instance{1} intersect{2} the &quot;</span>
+&nbsp; &nbsp; + <span class="maroon">&quot;selected element {3}{4}&quot;</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; ( 1 == n ? <span class="maroon">&quot;s&quot;</span> : <span class="maroon">&quot;&quot;</span> ),
+&nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; <span class="blue">string</span> id_list = 0 == n
+&nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; : <span class="blue">string</span>.Join( <span class="maroon">&quot;, &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; intersectingInstances
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">Element</span>, <span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x =&gt; x.Id.IntegerValue.ToString() ) )
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;.&quot;</span>;
+&nbsp;
+&nbsp; <span class="teal">Util</span>.InfoMsg2( result, id_list );
+}
+</pre>
+
+<p>After some hesitation, I even took the plunge and decided to actually test this before pushing to GitHub.</p>
+
+<p>I modified the CmdCollectorPerformance external command temporarily to test this method, changing its transaction mode from automatic to read-only and adding these lines of code:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Element</span> wall = <span class="teal">Util</span>.SelectSingleElementOfType(
+&nbsp; &nbsp; uidoc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ), <span class="maroon">&quot;a wall&quot;</span>, <span class="blue">true</span> );
+&nbsp;
+&nbsp; GetInstancesIntersectingElement( wall );
+</pre>
+
+<p>That led to some fixes in the utility class selection methods, a few more obsolete API usage removals, plus the discovery that the HasRequestedType method probably never previously worked as intended.</p>
+
+
+<a name="4"></a>
+
+<h4>Updated Element Selection Utility Methods</h4>
+
+<p>Here is a long overdue update to The Building Coder samples element selection utility methods:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> SelectSingleElement(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; &nbsp; <span class="blue">string</span> description )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">ViewType</span>.Internal == uidoc.ActiveView.ViewType )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Error&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Cannot pick element in this view: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + uidoc.ActiveView.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Reference</span> r = uidoc.Selection.PickObject(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ObjectType</span>.Element,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Please select &quot;</span> + description );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> uidoc.Document.GetElement( r ); <span class="green">// 2012</span>
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions.<span class="teal">OperationCanceledException</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> GetSingleSelectedElement(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = uidoc.Selection.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 1 == ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e = uidoc.Document.GetElement( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> e;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">bool</span> HasRequestedType(
+&nbsp; &nbsp; <span class="teal">Element</span> e,
+&nbsp; &nbsp; <span class="teal">Type</span> t,
+&nbsp; &nbsp; <span class="blue">bool</span> acceptDerivedClass )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> rc = <span class="blue">null</span> != e;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Type</span> t2 = e.GetType();
+&nbsp;
+&nbsp; &nbsp; &nbsp; rc = t2.Equals( t );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !rc &amp;&amp; acceptDerivedClass )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; rc = t2.IsSubclassOf( t );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> rc;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">Element</span> SelectSingleElementOfType(
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; &nbsp; <span class="teal">Type</span> t,
+&nbsp; &nbsp; <span class="blue">string</span> description,
+&nbsp; &nbsp; <span class="blue">bool</span> acceptDerivedClass )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e = GetSingleSelectedElement( uidoc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !HasRequestedType( e, t, acceptDerivedClass ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = <span class="teal">Util</span>.SelectSingleElement(
+&nbsp; &nbsp; &nbsp; &nbsp; uidoc, description );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> HasRequestedType( e, t, acceptDerivedClass )
+&nbsp; &nbsp; &nbsp; ? e
+&nbsp; &nbsp; &nbsp; : <span class="blue">null</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve all pre-selected elements of the specified type,</span>
+&nbsp; <span class="gray">///</span><span class="green"> if any elements at all have been pre-selected. If not,</span>
+&nbsp; <span class="gray">///</span><span class="green"> retrieve all elements of specified type in the database.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;a&quot;&gt;</span><span class="green">Return value container</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;uidoc&quot;&gt;</span><span class="green">Active document</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;t&quot;&gt;</span><span class="green">Specific type</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">True if some elements were retrieved</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> GetSelectedElementsOrAll(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a,
+&nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc,
+&nbsp; &nbsp; <span class="teal">Type</span> t )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">ICollection</span>&lt;<span class="teal">ElementId</span>&gt; ids
+&nbsp; &nbsp; &nbsp; = uidoc.Selection.GetElementIds();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; ids.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.AddRange( ids
+&nbsp; &nbsp; &nbsp; &nbsp; .Select&lt;<span class="teal">ElementId</span>,<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; id =&gt; doc.GetElement( id ) )
+&nbsp; &nbsp; &nbsp; &nbsp; .Where&lt;<span class="teal">Element</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e =&gt; t.IsInstanceOfType( e ) ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; a.AddRange( <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; .OfClass( t ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> 0 &lt; a.Count;
+&nbsp; }
+</pre>
+
+<p>With the new selection code in place, the project now produces
+
+<a href="zip/bc_migr_2015_e.txt">32 obsolete API warning messages</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Intersection Results and Download</h4>
+
+<p>Back to the intersection test.</p>
+
+<p>The Revit SDK sample FindReferencesByDirection/FindColumns includes a suitable model for the intersection test, FindColumns-Basic.rvt:</p>
+
+<center>
+<img src="img/columns_intersecting_wall_sample.png" alt="FindColumns-Basic.rvt sample model" width="400"/>
+</center>
+
+<p>In the original implementation of this sample, described in
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/using-avf-to-display-intersections-and-highlight-rooms.html">AVF displays intersections</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2011/12/using-avf-to-display-intersections-and-highlight-rooms.html#2">FindColumns Using Geometry Creation and Booleans</a>,
+the resulting intersections are graphically highlighted using the Analysis Visualisation Framework for easy interactive comparison.</p>
+
+<center>
+<img src="img/wall_column_intersections_avf.png" alt="Wall-column intersections highlighted using AVF" width="340"/>
+</center>
+
+<p>When picking the straight wall, the following result is reported, more or less as expected:</p>
+
+<center>
+<img src="img/columns_intersecting_wall_1.png" alt="Columns intersecting straight wall" width="366"/>
+</center>
+
+<p>Actually, looking at it more closely, we would probably expect more than just two intersections.</p>
+
+<p>The curved wall is even worse and reports zero intersecting instances.</p>
+
+<p>I added code to compare the result of the solid intersection filter with the element one:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Solid</span> solid = e.get_Geometry( <span class="blue">new</span> <span class="teal">Options</span>() )
+&nbsp; &nbsp; .OfType&lt;<span class="teal">Solid</span>&gt;()
+&nbsp; &nbsp; .Where&lt;<span class="teal">Solid</span>&gt;( s =&gt; <span class="blue">null</span> != s &amp;&amp; !s.Edges.IsEmpty )
+&nbsp; &nbsp; .FirstOrDefault();
+&nbsp;
+&nbsp; <span class="teal">FilteredElementCollector</span> intersectingInstances
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementIntersectsSolidFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; solid ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> n1 = intersectingInstances.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; intersectingInstances
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) )
+&nbsp; &nbsp; &nbsp; .WherePasses( <span class="blue">new</span> <span class="teal">ElementIntersectsElementFilter</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; e ) );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = intersectingInstances.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( n.Equals( n1 ),
+&nbsp; &nbsp; <span class="maroon">&quot;expected solid intersection to equal element intersection&quot;</span> );
+</pre>
+
+<p>The results are identical for both filters.</p>
+
+<p>I'll keep you posted when I find a solution for this problem.</p>
+
+<p>As always, the updated version of The Building Coder samples is available from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">its GitHub repository</a>,
+
+and the version including the GetInstancesIntersectingElement method and updated element selection is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2015.0.116.5">
+release 2015.0.116.5</a>.</p>
+
+
+
+<a name="6"></a>
+
+<h4>Explanation: Joined Geometry Removes Intersection</h4>
+
+<p>I received an immediate and satisfying answer to my question above from Scott Conover, who explains:</p>
+
+<p>These filters are working as designed.</p>
+
+<p>The concrete columns intersecting the wall are joined to the wall. Thus their geometry gets automatically adjusted to not trigger an item in the interference checking tool that is the basis for the ElementIntersectsElementFilter implementation, and the solids are not considered overlapping.</p>
+
+<p>If you place or move a steel column instance to be interfering with the wall instead of the concrete ones, it will work as you expect.</p>
+
+<p>I covered this in my geometry class at Autodesk University 2012, cf. the following quote from the
+
+<a href="http://thebuildingcoder.typepad.com/files/cp4011_conover.pdf">
+handout document</a>:</p>
+
+<!--
+<a href="http://au.autodesk.com/?nd=event_class&amp;session_id=9124&amp;jid=1725932">CP4011</a> 'Geometric Progression: Further Analysis of Geometry Using the Autodesk Revit 2012 API',
+-->
+
+<blockquote>
+<p>The element filters:</p>
+
+<ul>
+<li>ElementIntersectsElementFilter </li>
+<li>ElementIntersectsSolidFilter </li>
+</ul>
+
+<p>pass elements whose actual 3D geometry intersects the 3D geometry of the target object.</p>
+
+<p>With ElementIntersectsElementFilter, the target object is another element. The intersection is determined with the same logic used by Revit to determine if an interference exists during generation of an Interference Report. (This means that some combinations of elements will never pass this filter, such as concrete members which are automatically joined at their intersections). Also, elements which have no solid geometry, such as Rebar, will not pass this filter.</p>
+
+<p>With ElementIntersectsSolidFilter, the target object is any solid. This solid could have been obtained from an existing element, created from scratch using the routines in GeometryCreationUtilities, or the result of a secondary operation such as a Boolean operation. Similar to the ElementIntersectsElementFilter, this filter will not pass elements which lack solid geometry.</p>
+
+<p>Both filters can be inverted to match elements outside the target object volume.</p>
+</blockquote>
+
+<p>Thank you, Scott, for the clarification!</p>
+
+
+<a name="7"></a>
+
+<p><strong>Addendum:</strong> Joe Ye adds:</p>
+
+<p>Yes, Mount of Olives is the right translation, and the meaning of Gan Lan Shan (橄榄山) is indeed the mount of olives.</p>
+
+<p>I use the term GLS Soft as the unique common company name for both Chinese and English.</p>
+
+<p>I am hiring employees. It is hard to find full time Revit developers. It seems I have to educate some green hands to become full time employees.</p>
+
+<p>Regarding finding the walls around a column, here is an alternative approach:</p>
+
+<p>As you say, the ElementIntersectsElementFilter does not find the joined column when both the wall and the column are concrete and they have therefore been automatically combined.</p>
+
+<p>In this case, it is recommended to use the ElementIntersectsSolidFilter instead, passing in the column's original geometry solid.</p>
+
+<p>See you soon in Las Vegas!</p>

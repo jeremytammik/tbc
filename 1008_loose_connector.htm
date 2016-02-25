@@ -1,0 +1,177 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Eric Kuszewski 
+
+HDR duct value extraction
+Duct parameters sample file
+
+/a/src/revit/rme_hdr_value_extraction/
+
+/a/rvt/duct_airflow_params_sample.rvt
+
+-->
+
+<h3>Open MEP Connector Warning</h3>
+
+<p>I presented a little utility add-in yesterday that
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/determining-maximal-flow-in-hvac-duct-connectors.html">
+determines the maximal flow</a> in
+
+HVAC duct connectors and populates a shared parameter with the result.</p>
+
+<p>It received positive feedback, and triggered an additional request for new functionality:</p>
+
+<p><strong>Response:</strong> Looks great!
+This is a huge step forward.
+The routine runs as expected, and actually uncovered a disconnect in my sample model.
+I was also then able to run it successfully on other, bigger models with no issues.</p>
+
+<p>One situation where we may improve the functionality might be where duct has an open end. Here are two examples of this:</p>
+
+<center>
+<img src="img/duct_max_flow_open_end_1.png" alt="Open connector" width="400"/>
+<br/>
+<img src="img/duct_max_flow_open_end_2.png" alt="Open connector" width="400"/>
+</center>
+
+<p>In these scenarios, flow calculations are incorrect because the duct is open.
+In the other instances you will see an endcap in this position.
+It is best practice in Revit (and life) to close these systems.</p>
+
+
+<p><strong>Answer:</strong> Thank you for testing and confirming that it does the job.</p>
+
+<p>Regarding the loose connectors, I actually implemented a quite serious application for checking those a while back, mainly as one of the early samples demonstrating use of the Idling event in Revit 2011 and 2012:</p>
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/modeless-loose-connectors.html">Modeless loose connectors</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/08/modeless-loose-connector-navigator-update.html">Modeless loose connector navigator update</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/09/yet-another-modeless-update.html">Yet another modeless update</a></li>
+</ul>
+
+<p>The modeless loose connector navigator is a complete tool in its own right, though, enabling you to navigate through a modeless list of all unconnected connecters and manipulate the model at the same time, jumping back and forth as you like.</p>
+
+<p>I have not updated it for 2014, though, and actually not even for 2013  :-)</p>
+
+<p>So putting some minimal functionality into the new sample to check for open connectors instead makes good sense.</p>
+
+<p>Each Connector instance provides a property IsConnected that can be used to check whether it is open or not.</p>
+
+<p>It is therefore very easy to use LINQ to determine the number of open connectors, i.e. whose IsConnected property returns false, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ConnectorSet</span> connectors
+&nbsp; &nbsp; = GetConnectorManager( e ).Connectors;
+&nbsp;
+&nbsp; <span class="blue">int</span> nUnconnected = connectors
+&nbsp; &nbsp; .Cast&lt;<span class="teal">Connector</span>&gt;()
+&nbsp; &nbsp; .Count&lt;<span class="teal">Connector</span>&gt;( c =&gt; !c.IsConnected );
+&nbsp;
+&nbsp; <span class="blue">bool</span> hasOpenConnectors = 0 &lt; nUnconnected;
+&nbsp;
+&nbsp; <span class="blue">string</span> s = 0 == nUnconnected
+&nbsp; &nbsp; ? <span class="blue">string</span>.Empty
+&nbsp; &nbsp; : <span class="blue">string</span>.Format( <span class="maroon">&quot; with {0} open connector{1}&quot;</span>,
+&nbsp; &nbsp; &nbsp; nUnconnected, <span class="teal">Util</span>.PluralSuffix( nUnconnected ) );
+</pre>
+
+<p>I added that code to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/determining-maximal-flow-in-hvac-duct-connectors.html#4">
+SetMaxFlowOnElement</a> method
+
+that I presented yesterday, and added some support for reporting back if any open connectors at all are found in the model.</p>
+
+<p>This leads to an additional clause in the result message displayed at the end stating how many elements have open connectors:</p>
+
+<center>
+<img src="img/duct_max_flow_result_msg.png" alt="Duct iteration result message" width="400"/>
+</center>
+
+<p>The additional clause is omitted if the number is zero, as it normally should be.</p>
+
+<p>The detailed information on the offending elements is provided by the log in the Visual Studio debug output console window (copy and paste to an editor or view source to see the truncated lines in full):</p>
+
+<pre>
+Duct &lt;630420 Mitered Elbows&gt; has 2 connectors and max flow 22.08.
+. . .
+Duct &lt;630695 Short Radius&gt; has 2 connectors and max flow 4.58.
+Duct &lt;630991 Mitered Elbows&gt; has 2 connectors and max flow 0.
+Duct &lt;630992 Mitered Elbows&gt; has 2 connectors and max flow 0 with 1 open connector.
+Duct &lt;630995 Mitered Elbows&gt; has 2 connectors and max flow 4.58.
+. . .
+Duct &lt;631007 Short Radius&gt; has 2 connectors and max flow 4.58.
+Duct &lt;631074 Mitered Elbows&gt; has 2 connectors and max flow 0.
+Duct &lt;631075 Mitered Elbows&gt; has 6 connectors and max flow 8.33 with 1 open connector.
+Duct &lt;631077 Mitered Elbows&gt; has 2 connectors and max flow 4.58.
+. . .
+Duct &lt;632298 Mitered Elbows&gt; has 2 connectors and max flow 8.33.
+
+Set MEP Duct Flow Parameter:
+  Set max flow parameter on 43 ducts,
+  2 of which have open connectors.
+</pre>
+
+<p>Here is
+
+<a href="zip/FlowParam03.zip">FlowParam03.zip</a> containing
+
+the complete source code with the updated method implementations using LINQ as described above, the Visual Studio solution and the add-in manifest for this add-in.</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk University Class Catalog Preview</h4>
+
+<p>The
+
+<a href="http://au.typepad.com/files/au-2013-class-catalog-preview-082613.xls">
+AU 2013 class catalog preview</a> (2.5 Mb xls)
+
+listing the classes available at Autodesk University in Las Vegas in December is now available for download.</p>
+
+<p>I verified that mine are all present and intact:</p>
+
+<ul>
+<li><b>DV1736</b> &ndash; Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device &ndash; This presentation demonstrates real-time, round-trip editing of a simplified 2D rendering of an Autodesk Revit intelligent model on any mobile device with no need to install any additional software whatsoever beyond a web browser. How can this be achieved? A Revit software add-in exports polygon renderings of room boundaries and other elements such as furniture and equipment to a cloud-based repository that is implemented using an Apache CouchDB NoSQL database. On the mobile device, the repository is queried and the data rendered in a standard browser using server-side generated JavaScript and SVG. The rendering supports graphical editing, specifically translation and rotation of the furniture and equipment. Modified transformations are saved back to the cloud database. The Revit add-in picks up these changes and updates the Revit intelligent model in real-time. All of the components used are completely open source, except for Revit itself. This is an advanced class for experienced programmers.</li>
+
+<li><b>DV1914</b> &ndash; Revit API Expert Roundtable: Open House on the Factory Floor &ndash; Interact with a panel of Autodesk Revit API experts from Autodesk to get answers to your questions and discuss all relevant topics of your choice. If you are writing add-ins for Revit software, then this is the perfect forum to get to know better the people who shape the APIs you work with and to explain your views, ideas, and problems directly face-to-face. Note that prior .NET programming and Revit programming experience is required and that this class is not suitable for beginners.</li>
+
+<li><b>DV2010</b> &ndash; Advanced Revit 2014 API Features and Samples &ndash; This class focuses on some of the major new Autodesk Revit 2014 API features. We look at API access to the project browser, dockable panels, copy and paste, command launching, the graphics pipeline, schedule formatting, and additions to the view API including demonstration and discussion of sample code. We also provide an overview of all the new Revit 2014 SDK samples. Note that prior .NET and Revit programming experience is required and that this class is not suitable for beginners.</li>
+</ul>
+
+<p>Since popular classes often fill up quite quickly, you can use this spreadsheet to get started on your selections and help ensure that you can register for the classes you want when registration opens on September 12.</p>
+
+
+<a name="3"></a>
+
+<h4>Songbird Dies, Long Live Nightingale</h4>
+
+<p>Completely unrelated to the Revit API, you may have noticed that I dabble with music now and then and was using Songbird a my main playing and tagging tool on Mac.</p>
+
+<p>Well,
+
+<a href="http://techcrunch.com/2013/06/14/songbird-sings-its-last-tune-as-music-service-runs-out-of-money-and-plans-to-shut-down-june-28">
+Songbird shut down</a> as
+
+a company in June, and I now moved on to
+
+<a href="http://getnightingale.com">Nightingale</a>
+
+that is touted as its
+
+<a href="http://www.makeuseof.com/tag/nightingale-a-faster-cleaner-cross-platform-fork-of-songbird-music-player">worthy</a>
+
+<a href="http://www.linuxjournal.com/node/1096940">successor</a>
+
+and looking good to me so far.</p>
+
+<p>I am also using
+
+<a href="http://www.virtualdj.com/">VirtualDJ</a> when I want to cross-fade nicely from one song to the next in a playlist.</p>

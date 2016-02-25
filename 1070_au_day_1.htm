@@ -1,0 +1,367 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<h3>AU Day 1, Revit 2014 API Class, Keynote, DevLab and Rotated Bounding Box Rotation</h3>
+
+<h3>AU Day 1, Revit 2014 API Class and Bounding Box Rotation</h3>
+
+<p>Tuesday was the first real day at AU after the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html">
+DevDay</a> pre-event conference yesterday.</p>
+
+<p>Here are my main activities of the day in chronological order:</p>
+
+<ul>
+<li><a href="#2">Advanced Revit 2014 API features and samples</a></li>
+<li><a href="#3">AU Keynote by Jeff and Carl</a></li>
+<li><a href="#4">DevLab and bounding box rotation</a></li>
+<li><a href="#5">Adding a marker at the Revit project origin</a></li>
+<li><a href="#6">Download</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Advanced Revit 2014 API Features and Samples</h4>
+
+<p>I presented my first class
+
+<a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=2010">
+DV2010 &ndash; Advanced Revit 2014 API Features and Samples</a> right
+
+away starting at the very first moment of AU, at eight in the morning.</p>
+
+<p>Here is the most up-to-date
+
+<a href="file:///a/doc/revit/au/2013/doc/dv2010_advanced_revit_2014_api_handout.pdf">
+handout</a> and
+
+<a href="file:///a/doc/revit/au/2013/doc/dv2010_advanced_revit_2014_api_slides.pdf">
+slide deck</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Keynote</h4>
+
+<p>As usual, the keynote presentation was given by Jeff Kowalski and Carl Bass, with Jeff focusing on ideas and long-term vision and Carl presenting real live usage examples of existing products.</p>
+
+<p>Jeff expounded on the power and advantages of collaboration and open source, and how the Autodesk 360 platform supports that.
+He suggested picking a class by chance, to learn something completely new, mentioned reverse mentoring, where young people mentor older experienced folk, pointed out how much there is to learn from each other, e.g. using reverse innovation, consciously looking outside, beyond what you and everybody else thinks is possible, to learn, unlearn and relearn.</p>
+
+<p>Carl highlighted a number of different original and creative companies making use of new technologies to save huge amounts of time and effort, e.g.:
+
+<ul>
+<li>Orphanage guitars via fusion 360 to create custom made guitars involving the customer directly in the process.</li>
+
+<li>Aston Martin creating a new car, concept sketches, Sketchbook, Alias, CNC-generated clay model, post processed including hand sculpting, laser scanned to bring it back into Alias, completing the cycle to market in record time.</li>
+
+<li><a href="http://www.autodeskplm360.com">PLM 360</a> cloud-based example with a four month adoption period, to search for data and create documentation</li>
+
+<li>Prosthetic leg collaboration project using A360 and CAM 360.</li>
+
+<li>Airport project complexity BIM developer share coordinate using BIM 360 Glue thousands of hours saved BIM 360 Field solve problems in real-time, Infraworks 360, ReCap point cloud image based 3D modelling, the only input you can really trust, saving thousands of hours of modelling work.</li>
+
+<li>BioLite building a stove scaled up by a factor of 500 from the normal design on short notice using SIM 360.</li>
+
+<li>Bot & Dolly film and robots Maya animate robots in real life the way you would normally animate virtual characters.
+Complete control of robot motion in time and space.
+Robot "Iris" danced for us.
+For a sample, look at
+
+<a href="http://www.youtube.com/watch?v=lX6JcybgDFo">Box</a> on YouTube.
+</li>
+</ul>
+
+<iframe width="420" height="236" src="http://www.youtube.com/embed/lX6JcybgDFo" frameborder="0" allowfullscreen></iframe>
+
+<p>According to Carl, the most important things to look at in the coming days are Autodesk 360 and computational design, e.g. Dynamo.
+It currently drives Revit.
+Being open source, it can be adapted by anyone for other products as well, and an implementation driving Inventor has already been unveiled.</p>
+
+<p>Lots of great new technology to discover, and more than 500 classes to choose from.</p>
+
+
+<a name="4"></a>
+
+<h4>DevLab and Bounding Box Rotation</h4>
+
+<p>DevLab was active, lots of questions addressed.</p>
+
+<p>One little issue I was able to capture was this snippet of code to calculate the max and min of a rotated bounding box, initially inspired by Angel Velez, Revit developer, and heavily edited by your humble scribe:</p>
+
+<p>Angel pointed out that if you wish to calculate the result of rotating a bounding box representing a rectangle around the origin in the XY plane, you cannot simply rotate the min and max points, because the rotated max point may easily end up being 'smaller' in some coordinate than the rotated min.</p>
+
+<p>One way to work around that is to extract all four bounding box corners, rotate each of them and determine new min and max values from those.</p>
+
+<p>I implemented this little helper method to generate the four XY corner points of a bounding box, flattened onto its minimum Z elevation:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the four XYZ corners of the given </span>
+&nbsp; <span class="gray">///</span><span class="green"> bounding box in the XY plane at the minimum </span>
+&nbsp; <span class="gray">///</span><span class="green"> Z elevation in the order lower left, lower </span>
+&nbsp; <span class="gray">///</span><span class="green"> right, upper right, upper left:</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span>[] GetCorners( <span class="teal">BoundingBoxXYZ</span> b )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> z = b.Min.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">XYZ</span>[] {
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( b.Min.X, b.Min.Y, z ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( b.Max.X, b.Min.Y, z ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( b.Max.X, b.Max.Y, z ),
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">XYZ</span>( b.Min.X, b.Max.Y, z )
+&nbsp; &nbsp; };
+&nbsp; }
+</pre>
+
+<p>In order to be able to use the standard .NET Min and Max methods to extract the min and max points from the rotated corners, I need to use a flavour of the XYZ point and vector class which implements the IComparable interface.</p>
+
+<p>To obtain that, I implemented this little XyzComparable wrapper class:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span><span class="green"> </span>
+&nbsp; <span class="gray">///</span><span class="green"> XYZ wrapper class implementing IComparable. </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span><span class="green"> </span>
+&nbsp; <span class="blue">class</span> <span class="teal">XyzComparable</span> : <span class="teal">XYZ</span>, <span class="teal">IComparable</span>&lt;<span class="teal">XYZ</span>&gt;
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> XyzComparable( <span class="teal">XYZ</span> a )
+&nbsp; &nbsp; &nbsp; : <span class="blue">base</span>( a.X, a.Y, a.Z )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">int</span> <span class="teal">IComparable</span>&lt;<span class="teal">XYZ</span>&gt;.CompareTo( <span class="teal">XYZ</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Util</span>.Compare( <span class="blue">this</span>, a );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>It makes use of my pre-existing XYZ Compare utility method:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">int</span> Compare( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">int</span> d = Compare( p.X, q.X );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = Compare( p.Y, q.Y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == d )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; d = Compare( p.Z, q.Z );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> d;
+&nbsp; }
+</pre>
+
+<p>With all of that in place, the bounding box rotation ends up quite simple and readable:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return a rotated bounding box around </span>
+&nbsp; <span class="gray">///</span><span class="green"> the origin in the XY plane.</span>
+&nbsp; <span class="gray">///</span><span class="green"> We cannot just rotate the min and max points, </span>
+&nbsp; <span class="gray">///</span><span class="green"> because the rotated max point may easily end</span>
+&nbsp; <span class="gray">///</span><span class="green"> up being 'smaller' in some coordinate than the </span>
+&nbsp; <span class="gray">///</span><span class="green"> min. To work around that, we extract all four </span>
+&nbsp; <span class="gray">///</span><span class="green"> bounding box corners, rotate each of them and</span>
+&nbsp; <span class="gray">///</span><span class="green"> determine new min and max values from those.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">private</span> <span class="blue">static</span> <span class="teal">BoundingBoxXYZ</span> RotateBoundingBox(
+&nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> b,
+&nbsp; &nbsp; <span class="teal">Transform</span> t )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> height = b.Max.Z - b.Min.Z;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Four corners: lower left, lower right, </span>
+&nbsp; &nbsp; <span class="green">// upper right, upper left:</span>
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span>[] corners = <span class="teal">Util</span>.GetCorners( b );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XyzComparable</span>[] cornersTransformed
+&nbsp; &nbsp; &nbsp; = corners.Select&lt;<span class="teal">XYZ</span>, <span class="teal">XyzComparable</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; p =&gt; <span class="blue">new</span> <span class="teal">XyzComparable</span>( t.OfPoint( p ) ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToArray();
+&nbsp;
+&nbsp; &nbsp; b.Min = cornersTransformed.Min();
+&nbsp; &nbsp; b.Max = cornersTransformed.Max();
+&nbsp; &nbsp; b.Max += height * <span class="teal">XYZ</span>.BasisZ;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> b;
+&nbsp; }
+</pre>
+
+<p>In order to test this new functionality, I dug up the old
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/element-bounding-box.html">
+CmdBoundingBox</a> implementation
+
+from The Building Coder samples, from one of the very first posts back in the year 2008.</p>
+
+<p>It prompts you to select an element and used to just report its bounding box coordinates in a message box.</p>
+
+<p>I modified that to draw model lines for the box instead, again making use of the GetCorners method defined above to extract the four vertices required.
+This also obviously requires changing the command's transaction mode from read-only to manual and adding a transaction, since the model line creation modifies the database.</p>
+
+<p>To test the rotation functionality, I call the RotateBoundingBox method with a 60 degree rotation transformation and print and display the result like this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">UIApplication</span> app = commandData.Application;
+&nbsp; <span class="teal">UIDocument</span> uidoc = app.ActiveUIDocument;
+&nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e = <span class="teal">Util</span>.SelectSingleElement(
+&nbsp; &nbsp; uidoc, <span class="maroon">&quot;an element&quot;</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">&quot;No element selected&quot;</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// Trying to call this property returns the</span>
+&nbsp; <span class="green">// compile time error: Property, indexer, or</span>
+&nbsp; <span class="green">// event 'BoundingBox' is not supported by</span>
+&nbsp; <span class="green">// the language; try directly calling</span>
+&nbsp; <span class="green">// accessor method 'get_BoundingBox( View )'</span>
+&nbsp;
+&nbsp; <span class="green">//BoundingBoxXYZ b = e.BoundingBox[null];</span>
+&nbsp;
+&nbsp; <span class="teal">View</span> v = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">BoundingBoxXYZ</span> b = e.get_BoundingBox( v );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == b )
+&nbsp; {
+&nbsp; &nbsp; v = commandData.View;
+&nbsp; &nbsp; b = e.get_BoundingBox( v );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == b )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg(
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e )
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; has no bounding box.&quot;</span> );
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; tx.Start( <span class="maroon">&quot;Draw Model Line Bounding Box Outline&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( b.Transform.IsIdentity,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected identity bounding box transform&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> in_view = ( <span class="blue">null</span> == v )
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;model space&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;view &quot;</span> + v.Name;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Element bounding box of {0} in &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;{1} extends from {2} to {3}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( e ),
+&nbsp; &nbsp; &nbsp; &nbsp; in_view,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Min ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Max ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; creator.DrawPolygon( <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.GetCorners( b ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Transform</span> rotation = <span class="teal">Transform</span>.CreateRotation(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span>.BasisZ, 60 * <span class="teal">Math</span>.PI / 180.0 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; b = RotateBoundingBox( b, rotation );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Bounding box rotated by 60 degrees &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;extends from {0} to {1}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Min ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( b.Max ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; creator.DrawPolygon( <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.GetCorners( b ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; tx.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>I tested that on a single wall element, with the following resulting model lines displaying the original and rotated bounding boxes:</p>
+
+<center>
+<img src="img/bounding_box_rotated.png" alt="Original and rotated bounding box" width="350"/>
+</center>
+
+<p>See how skewed it gets?</p>
+
+<p><strong>Addemdum</strong> by Angel Velez:
+this code assumes that the rotation is in XY only, hence the 'flattening' of the bounding box cube to 4 points.
+If you wanted to make it applicable to a truly arbitrary rotation, you would take the 8 points of the cube &ndash; so factor Min.Z and Max.Z into it &ndash; then you wouldn’t have to do any 'add Z back in at the end' hacks.
+Of course, you also have to do an extra 4 transforms.</p>
+
+<p>That would add a significant amount of complecxity, however, and the above should cover the most common cases by far.</p>
+
+<a name="5"></a>
+
+<h4>Adding a Marker at the Revit Project Origin</h4>
+
+<p>In order to understand properly and analyse the rotation results, we obviously need to know around which point it is taking place.</p>
+
+<p>It would be handy to add a marker at a specific point in the Revit model, in this case at the origin.</p>
+
+<p>One way to achieve this, was described by the Revit Clinic discussing
+
+<a href="http://revitclinic.typepad.com/my_weblog/2009/01/the-2-mile-barrier.html">the two mile barrier</a>:
+
+"If you want to be sure, the easiest method is to import a DWG file that contains a circle or X at AutoCAD's 0,0 and make sure to select the option origin-to-origin while importing the DWG file.  This will show you exactly where the Revit origin is located (centre of the circle or x).
+Here is an
+
+<a href="zip/revit-origin-dwg.dwg">
+AutoCAD file with a symbol at the origin</a>."</p>
+
+<p>When importing the DWG into my model using Insert &gt; Import CAD, I left all the default setting values except the following:</p>
+
+<ul>
+<li>Import units: Custom factor: 0.5</li>
+<li>Positioning: Auto - Origin to Origin</li>
+</ul>
+
+<center>
+<img src="img/origin_marker_import.png" alt="Importing the origin marker DWG" width="600"/>
+</center>
+
+<p>You can admire the resulting origin marker in the screen snapshot above, along with model lines displaying the positions of the original and rotated bounding box.</p>
+
+
+<a name="6"></a>
+
+<h4>Download</h4>
+
+<p>The updated version of this command is available from
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples">
+The Building Coder samples GitHub repository</a> and
+
+the version discussed above is
+
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2014.0.106.0">
+release 2014.0.106.0</a>.</p>
+
+<p>Have fun, and wish me a good quick sleep, since there are only a very few hours left before my next meeting...</p>

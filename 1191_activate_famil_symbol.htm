@@ -1,0 +1,190 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!-- 09573393 [Revit Replace Curtain Wall Question] workaround to activate famly symbol before using it -->
+
+<h3>Activate Your Family Symbol Before Using It</h3>
+
+<p>Here is an interesting case with a simple solution that was rather hard to discover.</p>
+
+<p>In summary, you need to ensure that all family symbols are activated before making use of them.</p>
+
+
+<p><strong>Question:</strong> I'm having a strange problem when replacing curtain walls by windows in Revit 2014.</p>
+
+<p>When I run my add-in command, all the curtain walls are successfully replaced by the window family instances.</p>
+
+<p>All except the first also cut the hosting wall in the proper manner.</p>
+
+<p>The first one, however, does not.</p>
+
+<p>When I manually use the Cut tool, the first window will also behave properly and cut the wall like the others do.</p>
+
+<p>I don't understand why the first window doesn't cut the wall and all the following ones do.</p>
+
+<p>Can you please tell me what I am doing wrong?</p>
+
+<p><strong>Answer:</strong> The first thing I notice looking at your add-in solution is that you have not
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/08/set-copy-local-to-false.html">
+set the 'Copy Local' flag to false</a> on
+
+your Revit API assemblies.</p>
+
+<p>Please always do that.
+Otherwise, your debugger may not work properly.
+It also causes your zip file to be 16 MB in size instead of 6 KB.</p>
+
+<p>I tested the behaviour in both Revit 2014 and Revit 2015 and can reproduce exactly what you say.</p>
+
+
+
+<p><strong>Response:</strong> Thank you for your reply.
+I really need this to work, so do you think it is possible to implement the following manual workaround in the API?</p>
+
+<p>In the user interface, I can use this workaround:</p>
+
+<ol>
+<li>Launch the 'Cut Geometry' command.</li>
+<li>Select the wall.</li>
+<li>Select the 'hidden' window.</li>
+</ol>
+
+<p>This will cut the window opening in the wall the way I want it to.</p>
+
+<p>Can this be achieved programmatically?
+For instance, is there a way to call the 'Cut geometry' command in the API?
+I read something about SolidSolidCutUtils, but couldn't find any way to use that in this case.</p>
+
+<p><strong>Answer:</strong> I don't know off-hand.
+To determine whether the cut geometry command can be driven programmatically, you can check your journal file, retrieve the command id, and try it out as described in this discussion on how to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/programmatic-custom-add-in-external-command-launch.html">
+programmatically launch an add-in command</a>.</p>
+
+<p>More information on using the PostCommand API is provided by the overview of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">
+What's New in the Revit 2014 API</a> and the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2014/04/revit-2015-api-news-devdays-online-recording.html">
+Revit 2015 API news and DevDays Online recording</a>.</p>
+
+
+
+<p><strong>Response:</strong> I tried the PostCommand method.
+Does it provide any way to pass in parameters to the command  being launched?</p>
+
+<p>I found this:</p>
+
+<pre class="code">
+&nbsp; app.PostCommand(
+&nbsp; &nbsp; <span class="teal">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp; &nbsp; &nbsp; <span class="teal">PostableCommand</span>.CutGeometry ) );
+</pre>
+
+<p>It does indeed launch the CutGeometry command.
+At that point, Revit waits for user input.
+Specifically, it waits for the user to select two elements.</p>
+
+<p>I tried to specify them programmatically through the current selection set like this:</p>
+
+<pre class="code">
+&nbsp; Selection sel = app.ActiveUIDocument.Selection;
+&nbsp; sel.Elements.Add(element to be cut);
+&nbsp; sel.Elements.Add(element that makes the cut);
+</pre>
+
+<p>Revit doesn't react to that, however.</p>
+
+<p>I also tried to use some kind of constructor option, and that failed as well:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">PostableCommand</span>.CutGeometry(
+&nbsp; &nbsp; host, cutting element);
+</pre>
+
+<p>So my next question: when using PostCommand, how can I trigger the pick element option or, alternatively, how can I tell the cut geometry tool which elements need to be cut?</p>
+
+<p><strong>Answer:</strong> Have you read the Revit API documentation and the blog posts describing
+
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3">PostCommand</a>?</p>
+
+<p>They should actually be clear about this.</p>
+
+<p>No, sorry, you cannot pass in any arguments to it.</p>
+
+<p>It really does launch the standard interactive user interface command and prompts the user for input in the normal manner.</p>
+
+<p>I'm sorry if that is not what you need.</p>
+
+
+<p><strong>Response:</strong> Too bad PostCommand cannot be parameter driven.
+So in all, I still cannot progress.
+The ugly workaround I am currently using is to copy the first window, delete it and place it again.
+So, I am really looking forward to a better solution.
+I cannot see any errors in my code.</p>
+
+
+<p><strong>Answer:</strong> I am glad to hear that you have a workaround, at least.
+Congratulations on that.</p>
+
+<p>While further exploring this issue, we discovered the following:</p>
+
+<p>This is an interesting issue &ndash; I can reproduce it as described in 2015.
+No matter the order of curtain walls deleted and replacement windows added, the first replacement window does not intersect/cut the wall.
+I tested this vs. the provided code by using Insert(0) instead of Add() to build the list of curtain walls to remove.</p>
+
+<p>If I delete the first wall in the UI first, the problem transitions to the next one when the code is run.</p>
+
+<p>I experimented with separating the delete and create calls by a call to regenerate, and also into separate transactions, with no improvement.</p>
+
+<p>Finally, we discovered the following explanation for this behaviour:</p>
+
+<p>The reason is that a FamilySymbol does not regenerate when it is created.
+The first time it regenerates is in commit transaction.
+Therefore, when the first window is placed in the wall, the symbol of the window does not regenerate immediately, so some data is not prepared and no opening is generated.
+A regeneration is needed after creating a family instance.</p>
+
+<p>The way things stand right now in the Revit API, you need to activate a family symbol before using it.
+This is the single missing step to get the code working.
+Basically, the extra step is simply:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( !symbol.IsActive )
+&nbsp; { symbol.Activate(); doc.Regenerate(); }
+</pre>
+
+<p>These statements need to be executed before calling NewFamilyInstance.</p>
+
+<p>This is the proper technique for the developer to get things working in shipping releases.</p>
+
+<p>It seems like using NewFamilyInstance with an un-activated symbol is bad.
+Perhaps it will be prevented in future releases, since the results cause the model to be in an indeterminate state.</p>
+
+<p>Here is a slightly larger code snippet demonstrating a simple real world use of this statement:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">if</span>( doc.LoadFamily( filenaam, <span class="blue">out</span> nested ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> s <span class="blue">in</span> nested.GetFamilySymbolIds() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; symbol = doc.GetElement( s ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !symbol.IsActive )
+&nbsp; &nbsp; &nbsp; &nbsp; symbol.Activate();
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp; trans.Commit();
+</pre>
+
+<p><strong>Response:</strong> Thank you for the workaround!</p>
+
+<p>It works fine and is a faster solution than my previous one.</p>

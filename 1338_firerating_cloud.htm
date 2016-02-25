@@ -1,0 +1,176 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<script src="google-code-prettify/run_prettify.js"></script>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+file:///Users/jta/a/doc/revit/tbc/0828_export_param_excel.htm
+
+#revitapi #adsk #bim #3dwebcoder #aec #dotnet #csharp #python
+#responsivedesign #typepad #adskdevnetwrk
+#ah8 #augi #au2015 #dotnet #csharp #geometry #dynamobim
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+@MEPpated
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+
+<h3>FireRating and the Revit Python Shell in the Cloud as Web Servers</h3>
+
+<p>In the past few days, <a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a> documented the first steps of research for a re-implementation of the Revit SDK FireRating sample in the cloud, and Daren Thomas pointed out his new project driving Revit and the Revit Python Shell through a REST API:</p>
+
+<ul>
+<li><a href="#2">The FireRating Revit SDK sample</a></li>
+<li><a href="#3">FireRating data structure</a></li>
+<li><a href="#4">FireRating in the cloud</a></li>
+<li><a href="#5">Revit and the Revit Python Shell as a REST API driven web server</a></li>
+</ul>
+
+<p>Summer has arrived in Switzerland!
+This entire week is expected to be hot and sunny with temperatures up to 36 degrees Celsius.
+The Rhine is full of swimmers in the middle of the city of Basle, competing for space with the barges:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2015/2015-07-01_basel/619_swimmers_barge.jpg" alt="Swimmers and a barge in the Rhine in the middle of Basel" width="400"/>
+</center>
+
+
+
+<a name="2"></a>
+
+<h4>The FireRating Revit SDK Sample and ADN Xtra Labs</h4>
+
+<p>The venerable old FireRating Revit SDK sample has proved extremely useful over the years.</p>
+
+<p></p>
+
+<p>I described it in detail in the discussion on <a href="http://thebuildingcoder.typepad.com/blog/2012/09/exporting-parameter-data-to-excel.html">exporting parameter data to Excel, and re-importing</a>.</p>
+
+<p>It is a VB.NET add-in, implementing the following three steps in three separate external commands:</p>
+
+<ul>
+<li>Create a shared parameter to hold a fire rating value for all door family instances.</li>
+<li>Export the fire rating for all instances to an Excel spreadsheet.</li>
+<li>Import the (possibly modified) fire rating values back from the selected Excel spreadsheet into the project and update the respective shared parameter values on all instances.</li>
+</ul>
+
+<p>These three also found their way into the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/06/adn-labs-xtra-multi-version-add-ins-and-cnc-direct.html#2">
+ADN Xtra labs</a>,
+where they are implemented twice over, in C# as well as VB.NET, in three corresponding external commands:</p>
+
+<ul>
+<li>Lab4_3_1_CreateAndBindSharedParam</li>
+<li>Lab4_3_2_ExportSharedParamToExcel</li>
+<li>Lab4_3_3_ImportSharedParamFromExcel  </li>
+</ul>
+
+
+
+<a name="3"></a>
+
+<h4>FireRating Data Structure</h4>
+
+<p>The entire FireRating data management consists of storing the following four columns of data in the external spreadsheet, with one row of data populated for each door instance:</p>
+
+<ul>
+<li>Element id</li>
+<li>Level</li>
+<li>Tag</li>
+<li>Fire rating</li>
+</ul>
+
+<p>The level and tag data are actually never used by the application.</p>
+
+<p>Being rather old and unwary, the sample uses the element id to identify the individual door instances.</p>
+
+<p>That is strongly discouraged, since the element id can be modified by worksharing operations.</p>
+
+<p>When associating external data with an individual Revit element, you should always use its unique id instead.</p>
+
+<p>Furthermore, the element id can only be used to identify elements within one single Revit project, since it is currently more or less just a simple consecutive integer number assigned to reach element in the order of its creation.</p>
+
+<p>The unique id is globally unique though, across all Revit project in the universe &ndash; always assuming that you have not made copies of a project, in which case the unique ids of the existing elements will obviously be copied as well.</p>
+
+
+<a name="4"></a>
+
+<h4>FireRating in the Cloud</h4>
+
+<p>I started looking at how to update the FireRating sample to a cloud-based implementation making use of one single global <a href="https://www.mongodb.org">mongoDB</a> <a href="https://en.wikipedia.org/wiki/NoSQL">NoSQL</a> database to hold the data for any number of Revit projects.</p>
+
+<center>
+<img src="img/mongodb.png" alt="mongoDB" width="153"/>
+</center>
+
+<p>For the sake of compatibility and completeness, I retain the unused level and tag data.</p>
+
+<p>I will obviously replace the element id of the door instances by their unique id; being unique, we can use it across projects.</p>
+
+<p>Here are the explorations I made so far:</p>
+
+<!-- 0033 0034 -->
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html">
+My First Mongo Database</a> &ndash; installation, tools, and storing the door instance data.</li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">
+Implementing Mongo Database Relationships</a> &ndash; RVT project identification, storing the project data and handling the door-project relationship.</li>
+</ul>
+
+<!--
+<p>So far, we have installed the NoSQL
+<a href="https://www.mongodb.org">mongoDB</a> database, implemented a
+<a href="http://mongoosejs.com">mongoose</a> based node.js database server to drive it, and explored how to
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">
+represent the simple door-project relationship</a>
+between the Revit RVT project file and the door family instances whose fire rating is being processed.</p>
+-->
+
+<p>Here are the plans for the next steps, which &ndash; actually, hopefully, as usual, as always &ndash; will take a lot longer to explain and document than to implement:</p>
+
+<ul>
+<li>Add a REST API to populate and query the database programmatically.</li>
+<li>Implement a Revit add-in exercising the REST API from C# .NET.</li>
+<li>Re-implement the complete round-trip FireRating Revit SDK sample functionality.</li>
+</ul>
+
+<p>Keep an eye on
+<a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a> to see how we address these steps.</p>
+
+
+
+<a name="5"></a>
+
+<h4>Revit and the Revit Python Shell as a REST API Driven Web Server</h4>
+
+<p>Daren Thomas, author of the <a href="https://github.com/architecture-building-systems/revitpythonshell">
+Revit Python Shell</a>, points out a new and exciting project, providing full web-based REST API access to Revit and the Python Shell:</p>
+
+<blockquote>
+<p>I finally finished an article that I spent a lot of time working on, <a href="http://darenatwork.blogspot.ch/2015/06/embedding-webserver-in-autodesk-revit_30.html">
+embedding a web server in Revit</a> &ndash; the initial idea was born two years ago!</p>
+
+<p>This post (including full code on GitHub) explains how to turn Revit into a web server with a REST interface using the RevitPythonShell!</p>
+
+<p>I used this technique in two projects already and am quite pleased with the results &ndash; two papers I wrote are based on the ability to access BIM data from a scientific workflow tool (like
+<a href="https://en.wikipedia.org/wiki/Kepler_scientific_workflow_system">
+Kepler</a> or
+<a href="https://en.wikipedia.org/wiki/VisTrails">
+VisTrails</a>), and having a REST API to drive the functionality makes this a snap!</p>
+
+<p>I used your idea for
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-schedule-api-and-access-to-schedule-data.html">
+exporting a schedule to CSV</a> as an example to discuss the technique.</p>
+
+<p>Also, this can very easily be implemented in C# too, as it uses .NET classes for all the heavy lifting.</p>
+</blockquote>
+
+<p>Read <a href="http://darenatwork.blogspot.ch/2015/06/embedding-webserver-in-autodesk-revit_30.html">the article</a> for the full story and all the links.</p>
+
+<p>Thank you very much, Daren, for this exciting and powerful project!</p>

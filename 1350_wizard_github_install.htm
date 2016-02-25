@@ -1,0 +1,197 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head>
+
+<!--
+
+#revitapi #adsk #bim #aec #adskdevnetwrk #dotnet #csharp #3dwebcoder #restapi #python
+#geometry
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#stingray #adsklabs #cloud #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+
+
+Revit API, Jeremy Tammik, akn_include
+
+-->
+
+<h3>Revit Add-In Wizard GitHub Installer</h3>
+
+<p>I recently mentioned the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#2">
+unrestricted VendorId</a> in
+Revit 2016, and pointed out that I would like to update the
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit add-in wizards</a> accordingly.</p>
+
+<p>I now went ahead and did so, adding a couple of other enhancements as well along the way &ndash; oh, and I did some work on putting my personal calendar online, as well:</p>
+
+<ul>
+<li><a href="#1">Sharing a calendar via GCal, Google API, and GitHub Pages</a>.</li>
+<li><a href="#2">Visual Studio Revit add-in wizards on GitHub</a>.</li>
+<li><a href="#3">Updated VendorId tag value</a>.</li>
+<li><a href="#4">Wizard installer batch file</a>.</li>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Sharing a Calendar via GCal, Google API, and GitHub Pages</h4>
+
+<p>I fiddled around a bit in the past two days to share my calendar online via the cloud, for personal convenience and to provide access to friends and colleagues.</p>
+
+<p>Here is an overview of the steps I took:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html#2">My Text Based Calendar</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html#3">The pcal PostScript calendar program</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html#4">The Google Calendar API</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html#5">Adding an event to the Google calendar</a></li>
+</ul>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#2">Google OAuth credential handling</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#3">Date and time parsing and formatting</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#4">Adding a calendar event</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#5">Mainline</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#6">GitHub pages</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/08/adding-gcal-entries-using-google-calendar-api.html#7">GitHub repository</a></li>
+</ul>
+
+<p>Back to the Revit API...</p>
+
+
+<a name="2"></a>
+
+<h4>Visual Studio Revit Add-in Wizards on GitHub</h4>
+
+<p>I created a new
+<a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">VisualStudioRevitAddinWizard GitHub repository</a> to
+host the wizards and simplify the tracking of changes I make along the way.</p>
+
+<p>It includes
+<a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases">
+releases</a> supporting all versions of Revit from Revit 2012 onwards.</p>
+
+
+<a name="3"></a>
+
+<h4>Updated VendorId Tag Value</h4>
+
+<p>I updated the default VendorId tag from <code>TBC_</code>, The Building Coder Autodesk registered developer symbol or RDS, to
+<code>com.typepad.thebuildingcoder</code>, the reversed version of its domain name, as recommended by the Revit developer guide, in the
+<a href="http://help.autodesk.com/view/RVT/2016/ENU">Revit 2016 online help</a> &gt;
+Developers &gt; Revit API Developers Guide &gt; Introduction &gt; Add-In Integration &gt;
+<a href="http://help.autodesk.com/view/RVT/2016/ENU/?guid=GUID-4FFDB03E-6936-417C-9772-8FC258A261F7">Add-in Registration</a>.</p>
+
+<p>The wizard now generates an add-in manifest file looking like this:</p>
+
+<pre class="prettyprint">
+<span class="blue">&lt;?</span><span class="maroon">xml</span><span class="blue"> </span><span class="red">version</span><span class="blue">=</span>&quot;<span class="blue">1.0</span>&quot;<span class="blue"> </span><span class="red">encoding</span><span class="blue">=</span>&quot;<span class="blue">utf-8</span>&quot;<span class="blue">?&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Command</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Text</span><span class="blue">&gt;</span>Command RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Text</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Description</span><span class="blue">&gt;</span>Some description for RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Description</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>RevitAddin1.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>RevitAddin1.Command<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>9d12d875-a6f8-44dc-b346-ec29e4153527<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<b><span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>com.typepad.thebuildingcoder<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span></b>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>The Building Coder, http://thebuildingcoder.typepad.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">AddIn</span><span class="blue"> </span><span class="red">Type</span><span class="blue">=</span>&quot;<span class="blue">Application</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Name</span><span class="blue">&gt;</span>Application RevitAddin1<span class="blue">&lt;/</span><span class="maroon">Name</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>RevitAddin1.dll<span class="blue">&lt;/</span><span class="maroon">Assembly</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>RevitAddin1.App<span class="blue">&lt;/</span><span class="maroon">FullClassName</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>c38b3dfc-2b1c-463f-a871-0943bb947f08<span class="blue">&lt;/</span><span class="maroon">ClientId</span><span class="blue">&gt;</span>
+<b><span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorId</span><span class="blue">&gt;</span>com.typepad.thebuildingcoder<span class="blue">&lt;/</span><span class="maroon">VendorId</span><span class="blue">&gt;</span></b>
+<span class="blue">&nbsp; &nbsp; &lt;</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>The Building Coder, http://thebuildingcoder.typepad.com<span class="blue">&lt;/</span><span class="maroon">VendorDescription</span><span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;/</span><span class="maroon">AddIn</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">RevitAddIns</span><span class="blue">&gt;</span>
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Wizard Installer Batch File</h4>
+
+<p>Once I was at it anyway, I thought about how to further simplify installation of the wizard.</p>
+
+<p>The wizard template files need to be zipped up into an archive file which is then placed in the corresponding Visual Studio project template file subdirectory, as described repeatedly, e.g. for the last
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/autodesk-university-q1-adn-labs-and-wizard-update.html#5">
+update of the Visual Studio add-in wizards</a>.</p>
+
+<p>That can be simplified and automated by setting up a suitable batch file, so I did.</p>
+
+<p>Here is the first version of <code>install.bat</code>, also included in the GitHub repo:</p>
+
+<pre class="prettyprint">
+@echo off
+set "D=C:\Users\%USERNAME%\Documents\Visual Studio 2012\Templates\ProjectTemplates"
+set "F=%TEMP%\Revit2016AddinWizardCs2.zip"
+echo Creating C# wizard archive %F%...
+cd cs
+zip -r "%F%" *
+cd ..
+echo Copying C# wizard archive to %D%\Visual C#...
+copy "%F%" "%D%\Visual C#"
+set "F=%TEMP%\Revit2016AddinWizardVb2.zip"
+echo Creating VB wizard archive %F%...
+cd vb
+zip -r "%F%" *
+cd ..
+echo Copying VB wizard archive to %D%\Visual Basic...
+copy "%F%" "%D%\Visual Basic"
+</pre>
+
+<p>With that in place, and the command line
+<a href="http://gnuwin32.sourceforge.net/packages/zip.htm">
+zip utility for Windows</a> installed,
+download and installation consists of the following simple two-step process:</p>
+
+<ul>
+<li>Clone the GitHub repository:</li>
+<pre>
+C:&gt; git clone https://github.com/jeremytammik/VisualStudioRevitAddinWizard
+</pre>
+<li>Run <code>install.bat</code>:</li>
+<pre>
+C:&gt; install.bat
+Z:\a\doc\revit\tbc\src\VisualStudioRevitAddinWizard>install.bat
+Creating C# wizard archive C:\Users\tammikj\AppData\Local\Temp\Revit2016AddinWizardCs2.zip...
+  adding: App.cs (deflated 54%)
+  adding: Command.cs (deflated 59%)
+  adding: Properties/ (stored 0%)
+  adding: Properties/AssemblyInfo.cs (deflated 56%)
+  adding: RegisterAddin.addin (deflated 66%)
+  adding: TemplateIcon.ico (deflated 76%)
+  adding: TemplateRevitCs.csproj (deflated 70%)
+  adding: TemplateRevitCs.vstemplate (deflated 62%)
+Copying C# wizard archive to C:\Users\tammikj\Documents\Visual Studio 2012\Templates\ProjectTemplates\Visual C#...
+        1 file(s) copied.
+Creating VB wizard archive C:\Users\tammikj\AppData\Local\Temp\Revit2016AddinWizardVb2.zip...
+  adding: AdskApplication.vb (deflated 68%)
+  adding: AdskCommand.vb (deflated 58%)
+  adding: My Project/ (stored 0%)
+  adding: My Project/AssemblyInfo.vb (deflated 54%)
+  adding: RegisterAddin.addin (deflated 67%)
+  adding: TemplateIcon.ico (deflated 76%)
+  adding: TemplateRevitVb.vbproj (deflated 72%)
+  adding: TemplateRevitVb.vstemplate (deflated 62%)
+Copying VB wizard archive to C:\Users\tammikj\Documents\Visual Studio 2012\Templates\ProjectTemplates\Visual Basic...
+        1 file(s) copied.
+</pre>
+</ul>
+
+<p>I hope this works out for you as well.</p>
+
+<p>Please let me know if you hit any snags.</p>
+
+<p>Better still, fork the GitHub repo, fix them, and request a pull. Thank you!</p>
+
+<p>Happy weekend!</p>

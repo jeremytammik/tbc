@@ -1,0 +1,612 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<h3>RoomEditorApp Idling and Benchmarking Timer</h3>
+
+<p>I solved my two RoomEditorApp
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-architecture-and-external-application.html#4">
+Idling issues</a>!</p>
+
+<p>They were especially worrying due to the fact that I am planning to present this application in my Autodesk university class DV1736 on <i>Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device</i>.</p>
+
+<p>By the way, you should now enrol in the AU classes you are interested in &ndash; unless you already did :-)</p>
+
+<p>Go to the
+
+<a href="https://events.au.autodesk.com/connect/publicDashboard.ww">
+AU class catalogue</a>,
+
+sign in, click 'View All Classes', use the filters or keyword search to locate an event you want to schedule and add it to your personal schedule using the scheduling options and blue plus sign.</p>
+
+<p>Here are my four classes, updated from the AU
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/08/open-mep-connector-warning.html#2">
+class catalogue preview</a> version:</p>
+
+<ul>
+<li><b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1736">DV1736</a></b> &ndash;
+Cloud-Based, Real-Time, Round-Trip, 2D Revit Model Editing on Any Mobile Device &ndash;
+This presentation demonstrates real-time, round-trip editing of a simplified 2D rendering of an Autodesk Revit intelligent model on any mobile device with no need to install any additional software whatsoever beyond a web browser. How can this be achieved? A Revit software add-in exports polygon renderings of room boundaries and other elements such as furniture and equipment to a cloud-based repository that is implemented using an Apache CouchDB NoSQL database. On the mobile device, the repository is queried and the data rendered in a standard browser using server-side generated JavaScript and SVG. The rendering supports graphical editing, specifically translation and rotation of the furniture and equipment. Modified transformations are saved back to the cloud database. The Revit add-in picks up these changes and updates the Revit intelligent model in real-time. All of the components used are completely open source, except for Revit itself. This is an advanced class for experienced programmers
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/99/handout_1736_dv1736_2d_revit_model_editor_handout.pdf">handout</a> and
+<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1736/104/presentation_1736_dv1736_2d_revit_model_editor_slides.pdf">slides</a>).</li>
+
+<li><b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=1914">DV1914</a></b> &ndash;
+Revit API Expert Roundtable: Open House on the Factory Floor &ndash;
+Interact with a panel of Autodesk Revit API experts from Autodesk to get answers to your questions and discuss all relevant topics of your choice. If you are writing add-ins for Revit software, then this is the perfect forum to get to know better the people who shape the APIs you work with and to explain your views, ideas, and problems directly face-to-face. Note that prior .NET programming and Revit programming experience is required and that this class is not suitable for beginners
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1914/85/handout_1914_dv1914_revit_api_expert_roundtable_handout.pdf">handout</a> and
+<a href="http://aucache.autodesk.com/au2013/sessionsFiles/1914/83/presentation_1914_dv1914_revit_api_expert_roundtable_slides.pdf">slides</a>).</li>
+
+<li><b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=2010">DV2010</a></b> &ndash;
+Advanced Revit 2014 API Features and Samples &ndash;
+This class focuses on some of the major new Autodesk Revit 2014 API features. We look at API access to the project browser, dockable panels, copy and paste, command launching, the graphics pipeline, schedule formatting, and additions to the view API including demonstration and discussion of sample code. We also provide an overview of all the new Revit 2014 SDK samples. Note that prior .NET and Revit programming experience is required and that this class is not suitable for beginners
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/2010/101/handout_2010_dv2010_advanced_revit_2014_api_handout.pdf">handout</a> and
+<a href="http://aucache.autodesk.com/au2013/sessionsFiles/2010/106/presentation_2010_dv2010_advanced_revit_2014_api_slides.pdf">slides</a>).</li>
+
+<li><b><a href="https://events.au.autodesk.com/connect/sessionDetail.ww?SESSION_ID=3464">DV3464-R</a></b> &ndash;
+Making Revit Add-ins That Cooperate with Worksharing: A Roundtable Session &ndash;
+Are you an Autodesk Revit-based software developer who has run into issues supporting your add-ins in a workshared environment? Have you hit situations where elements can’t be edited or updated due to conflicts? As a followup discussion to “DV1888: Facing the Elephant in the Room: Making Revit Add-ins That Cooperate with Worksharing”, join this roundtable session to further discuss the techniques that are available to developers to operate on workshared models. Bring questions from your own development experience or more detailed questions inspired by the lecture and discuss the possibilities with a group of experienced Revit API developers. Knowledge of C# and Revit API is required, and prior experience with Revit worksharing will be helpful
+(<a href="http://aucache.autodesk.com/au2013/sessionsFiles/3464/374/presentation_3464_Worksharing%20API%20Roundtable.pdf">slides</a>).</li>
+</ul>
+
+<p>Back to my RoomEditorApp, though, and the nitty-gritty details of resolving my Idling issues.</p>
+
+
+<a name="2"></a>
+
+<h4>RoomEditorApp Idling Issues</h4>
+
+<p>I recently wrote about my updated Revit 2014 version of the RoomEditorApp, the Revit add-in part of my cloud-based real-time round-trip 2D Revit model editing application, the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/roomeditorapp-for-revit-2014-on-github.html">
+RoomEditorApp GitHub repository</a> and its
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-architecture-and-external-application.html">
+architecture and external application</a> implementation.</p>
+
+<p>In closing, I mentioned two worrying
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/roomeditorapp-architecture-and-external-application.html#4">
+Idling related problems</a>:</p>
+
+<ul>
+<li>Unsubscribing from the Idling event had no effect.</li>
+<li>Decreased responsiveness of the Idling event.</li>
+</ul>
+
+<p>Happily, and somewhat surprisingly, I yesterday resolved them both.</p>
+
+<p>The issue with the unsubscription was easy, as I recently discovered and discussed the cause.</p>
+
+<p>I was still worried that I might have to switch back to Revit 2013 for the demo due to the unresponsiveness, however.</p>
+
+<p>Luckily, I thought of adding some benchmarking instrumentation code to find out where the issue was, and that helped find and fix the root cause.</p>
+
+<p>It was my own fault  :-)</p>
+
+<p>Here are the steps:</p>
+
+<ul>
+<li><a href="#3">Fixing the RoomEditorApp Idling unsubscription</a></li>
+<li><a href="#4">Adding a benchmarking timer</a></li>
+<li><a href="#5">Benchmarking instrumentation</a></li>
+<li><a href="#6">Initial benchmarking results and conclusion</a></li>
+<li><a href="#7">Improving the CouchDB sequence number query</a></li>
+<li><a href="#8">Twiddling with Idling responsiveness</a></li>
+<li><a href="#9">Download</a></li>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>Fixing the RoomEditorApp Idling Unsubscription</h4>
+
+<p>My attempts to unsubscribe from the Idling event were failing due to the fact that each new external command invocation generates a new different class instance.
+The unsubscribing instance was therefore providing a different member method to unsubscribe than the original one used to subscribe, so the original just kept going, as explained in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/singleton-application-versus-multiple-command-instances.html">
+singleton application versus multiple command instances</a>.</p>
+
+<p>That was really easy to fix, since I only had to modify the external application to keep track of the handler used to subscribe, and reuse that specific stored method delegate when unsubscribing again.</p>
+
+<p>I published the fix in
+
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.16">release 2014.0.0.16</a>.</p>
+
+
+<a name="4"></a>
+
+<h4>Adding a Benchmarking Timer</h4>
+
+<p>While I was at it, I decided to spend at least a little time trying to understand the cause for this unresponsiveness.</p>
+
+<p>But where to start?</p>
+
+<p>Well, first of all, I needed to understand where the time was actually being consumed.</p>
+
+<p>To do so, I looked at my
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/01/timer-code-for-benchmarking.html">
+timer code for benchmarking</a> and
+
+the JtTimer class that I used to create some
+
+<a href=""http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">
+filtered element collector benchmarks</a>.</p>
+
+<p>Here is the spruced up version that I ended up using for the following tests:</p>
+
+<pre class="code">
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Performance timer for profiling purposes.</span>
+<span class="gray">///</span><span class="green"> For a full description, please refer to</span>
+<span class="gray">///</span><span class="green"> http://thebuildingcoder.typepad.com/blog/2010/03/performance-profiling.html</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">JtTimer</span> : <span class="teal">IDisposable</span>
+{
+<span class="blue">&nbsp; #region</span> Internal TimeRegistry class
+&nbsp; <span class="blue">class</span> <span class="teal">TimeRegistry</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Internal data and helper methods
+&nbsp; &nbsp; <span class="blue">class</span> <span class="teal">Entry</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> Time { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> Calls { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Entry</span>&gt; _collection
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="teal">Entry</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Return the percentage based on total time.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;value&quot;&gt;</span><span class="green">value</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;totalTime&quot;&gt;</span><span class="green">total time</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;&lt;/returns&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">double</span> GetPercent(
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> value,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> totalTime )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0 == totalTime
+&nbsp; &nbsp; &nbsp; &nbsp; ? 0
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="teal">Math</span>.Round( value * 100 / totalTime, 2 );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Internal data and helper methods</span>
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Add new duration for specified key.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> AddTime(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> key,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> duration )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Entry</span> e;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( _collection.ContainsKey( key ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e = _collection[key];
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; e = <span class="blue">new</span> <span class="teal">Entry</span>();
+&nbsp; &nbsp; &nbsp; &nbsp; _collection.Add( key, e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; e.Time += duration;
+&nbsp; &nbsp; &nbsp; ++e.Calls;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Write the report of the results to a text file.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> WriteResults(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> description,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> totalTime )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Set up text file path:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> strReportPath = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Path</span>.GetTempPath(), <span class="maroon">&quot;PerformanceReport.txt&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FileStream</span> fs = <span class="blue">new</span> <span class="teal">FileStream</span>( strReportPath,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">FileMode</span>.OpenOrCreate, <span class="teal">FileAccess</span>.Write );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">StreamWriter</span> streamWriter = <span class="blue">new</span> <span class="teal">StreamWriter</span>( fs );
+&nbsp; &nbsp; &nbsp; streamWriter.BaseStream.Seek( 0, <span class="teal">SeekOrigin</span>.End );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Sort output by percentage of total time used:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; lines = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; &nbsp; &nbsp; &nbsp; _collection.Count );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">KeyValuePair</span>&lt;<span class="blue">string</span>, <span class="teal">Entry</span>&gt; pair
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> _collection )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Entry</span> e = pair.Value;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; lines.Add( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{0,10:0.00}%{1,10:0.00}{2,8}&nbsp;&nbsp; {3}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GetPercent( e.Time, totalTime ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Math</span>.Round( e.Time, 2 ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Calls,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pair.Key ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; lines.Sort();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> header
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="maroon">&quot; Percentage&nbsp;&nbsp; Seconds&nbsp;&nbsp; Calls&nbsp;&nbsp; Process&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = <span class="teal">Math</span>.Max( header.Length,
+&nbsp; &nbsp; &nbsp; &nbsp; lines.Max&lt;<span class="blue">string</span>&gt;( x =&gt; x.Length ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != description
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; description.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; n = <span class="teal">Math</span>.Max( n, description.Length );
+&nbsp; &nbsp; &nbsp; &nbsp; header = description + <span class="maroon">&quot;\r\n&quot;</span> + header;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> separator = <span class="maroon">&quot;-&quot;</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( 0 &lt; n-- )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; separator += <span class="maroon">&quot;-&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; streamWriter.WriteLine( separator );
+&nbsp; &nbsp; &nbsp; streamWriter.WriteLine( header );
+&nbsp; &nbsp; &nbsp; streamWriter.WriteLine( separator );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> line <span class="blue">in</span> lines )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; streamWriter.WriteLine( line );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; streamWriter.WriteLine( separator + <span class="maroon">&quot;\r\n&quot;</span> );
+&nbsp; &nbsp; &nbsp; streamWriter.Close();
+&nbsp; &nbsp; &nbsp; fs.Close();
+&nbsp; &nbsp; &nbsp; <span class="teal">Process</span>.Start( strReportPath );
+&nbsp; &nbsp; &nbsp; _collection.Clear();
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Internal TimeRegistry class</span>
+&nbsp;
+&nbsp; <span class="blue">string</span> _key;
+&nbsp; <span class="teal">Stopwatch</span> _timer;
+&nbsp; <span class="blue">double</span> _duration = 0;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Performance timer constructor.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name=&quot;what_are_we_testing_here&quot;&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Key describing code to be timed</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; <span class="blue">public</span> JtTimer( <span class="blue">string</span> what_are_we_testing_here )
+&nbsp; {
+&nbsp; &nbsp; Restart( what_are_we_testing_here );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Automatic disposal when the the using statement</span>
+&nbsp; <span class="gray">///</span><span class="green"> block finishes: the timer is stopped and the</span>
+&nbsp; <span class="gray">///</span><span class="green"> time is registered.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> <span class="teal">IDisposable</span>.Dispose()
+&nbsp; {
+&nbsp; &nbsp; Stop();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Write and display a report of the timing</span>
+&nbsp; <span class="gray">///</span><span class="green"> results in a text file.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Report( <span class="blue">string</span> description )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TimeRegistry</span>.WriteResults(
+&nbsp; &nbsp; &nbsp; description, _duration );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Restart the measurement from scratch.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Restart( <span class="blue">string</span> what_are_we_testing_here )
+&nbsp; {
+&nbsp; &nbsp; _key = what_are_we_testing_here;
+&nbsp; &nbsp; _timer = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Stop the timer.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Stop()
+&nbsp; {
+&nbsp; &nbsp; _timer.Stop();
+&nbsp; &nbsp; _duration = _timer.Elapsed.TotalSeconds;
+&nbsp; &nbsp; <span class="teal">TimeRegistry</span>.AddTime( _key, _duration );
+&nbsp; }
+}
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Benchmarking Instrumentation</h4>
+
+<p>To use the timer, I equipped various methods of interest with a using call to its constructor, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the last sequence number.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">int</span> LastSequenceNumber
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;LastSequenceNumber&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ChangeOptions</span> opt = <span class="blue">new</span> <span class="teal">ChangeOptions</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CouchChanges</span>&lt;<span class="teal">DbFurniture</span>&gt; changes
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = _db.GetChanges&lt;<span class="teal">DbFurniture</span>&gt;( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CouchChangeResult</span>&lt;<span class="teal">DbFurniture</span>&gt; r
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = changes.Results.Last&lt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CouchChangeResult</span>&lt;<span class="teal">DbFurniture</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> r.Sequence;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>As you can see, I just add the using statement and a call to the JtTimer constructor to each method I would like to track performance for, nothing else.</p>
+
+<p>All the rest is handled automatically by the JtTimer destructor and other internal methods.</p>
+
+<p>I also added a call to instantiate a top-level timer keeping track of the total time and reporting results each time subscription is started and stopped, respectively, like this:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Subscription debugging timer.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">JtTimer</span> _timer = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Toggle on and off subscription to </span>
+&nbsp; <span class="gray">///</span><span class="green"> automatic cloud updates.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">void</span> ToggleSubscription(
+&nbsp; &nbsp; <span class="teal">EventHandler</span>&lt;<span class="teal">IdlingEventArgs</span>&gt; handler )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( Subscribed )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling -= _handler;
+&nbsp; &nbsp; &nbsp; _handler = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _subscribe;
+&nbsp; &nbsp; &nbsp; _timer.Stop();
+&nbsp; &nbsp; &nbsp; _timer.Report( <span class="maroon">&quot;Subscription timing&quot;</span> );
+&nbsp; &nbsp; &nbsp; _timer = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Unsubscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribing...&quot;</span> );
+&nbsp; &nbsp; &nbsp; _uiapp.Idling += handler;
+&nbsp; &nbsp; &nbsp; _handler = handler;
+&nbsp; &nbsp; &nbsp; _buttons[3].ItemText = _unsubscribe;
+&nbsp; &nbsp; &nbsp; _timer = <span class="blue">new</span> <span class="teal">JtTimer</span>( <span class="maroon">&quot;Subscription&quot;</span> );
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">&quot;Subscribed.&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+</pre>
+
+<p>Here are all the occurrences of the string "JtTimer" in the entire project (copy and paste somewhere or view source to see truncated lines in full):</p>
+
+<pre>
+Find all "JtTimer", Find Results 1, "Entire Solution", "*.cs"
+  App.cs(34):           static JtTimer _timer = null;
+  App.cs(234):          _timer = new JtTimer( "Subscription" );
+  CmdSubscribe.cs(43):  using( JtTimer pt = new JtTimer( "OnIdling" ) )
+  DbUpdater.cs(59):     using( JtTimer pt = new JtTimer( "DbUpdater ctor" ) )
+  DbUpdater.cs(166):    using( JtTimer pt = new JtTimer( "UpdateBim" ) )
+  JtTimer.cs(3):        // JtTimer.cs - performance profiling timer
+  JtTimer.cs(25):       public class JtTimer : IDisposable
+  JtTimer.cs(157):      public JtTimer( string what_are_we_testing_here )
+  Properties\AssemblyInfo.cs(61):  // 2013-11-18 - 2014.0.0.17 - added JtTimer
+  RoomEditorDb.cs(24):  using( JtTimer pt = new JtTimer( "RoomEditorDb ctor" ) )
+  RoomEditorDb.cs(52):  using( JtTimer pt = new JtTimer( "LastSequenceNumber" ) )
+  RoomEditorDb.cs(81):  using( JtTimer pt = new JtTimer( "LastSequenceNumberChanged" ) )
+  Matching lines: 12
+  Matching files: 6
+  Total files searched: 21
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Initial Benchmarking Results and Conclusion</h4>
+
+<p>In the beginning, I was not stopping the top-level timer properly, so I had no grand total, and therefore no percentages.</p>
+
+<p>The very first result looked like this, with just two timers active, showing that I was headed in the right direction:</p>
+
+<pre>
+------------------------------------------
+Subscription timing
+ Percentage   Seconds   Calls   Process
+------------------------------------------
+      0.00%      0.04       1   UpdateBim
+      0.00%     41.73     420   OnIdling
+------------------------------------------
+</pre>
+
+<p>This already tells me that the Idling event handler is consuming a lot of time, whereas the actual BIM update is quick.</p>
+
+<p>Adding a few more timers here and there starts producing useful results:</p>
+
+<pre>
+---------------------------------------------------
+Subscription timing
+ Percentage   Seconds   Calls   Process
+---------------------------------------------------
+      0.00%      0.00       1   DbUpdater ctor
+      0.00%      0.05       1   UpdateBim
+      0.00%      3.27      51   RoomEditorDb ctor
+      0.00%     76.40     480   OnIdling
+      0.00%     80.35      49   LastSequenceNumber
+---------------------------------------------------
+</pre>
+
+<p>The LastSequenceNumber property is eating up absolutely all the time!</p>
+
+<p>It is called once before we start subscribing to the Idling event, and then from inside the event handler.</p>
+
+<p>All of the Idling event handler time is consumed by calls to this property.</p>
+
+<p>I already showed the method implementation as an example of the <a href="#5">benchmarking instrumentation</a>.</p>
+
+<p>Looking more closely at this method, I noted that it retrieves <b><i>all</i></b> the furniture documents from the database in order to determine the most recent sequence number.
+The sequence number is used to afterwards retrieve all database changes that occurred after a certain point.</p>
+
+<p>This call will obviously take longer and longer time the more entries we add to the database.</p>
+
+
+<a name="7"></a>
+
+<h4>Improving the CouchDB Sequence Number Query</h4>
+
+<p>In the calls made to the LastSequenceNumber property from the Idling event handler, it is used only to check whether any new changes occurred.</p>
+
+<p>At that point, we already have an initial sequence number to start from, and can ask the database to return only changes that occurred after that point in time, using a 'since' argument, e.g. like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Determine whether the given sequence number</span>
+&nbsp; <span class="gray">///</span><span class="green"> matches the most up-to-date status.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">bool</span> LastSequenceNumberChanged( <span class="blue">int</span> since )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">JtTimer</span> pt = <span class="blue">new</span> <span class="teal">JtTimer</span>(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;LastSequenceNumberChanged&quot;</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ChangeOptions</span> opt = <span class="blue">new</span> <span class="teal">ChangeOptions</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; opt.Since = since;
+&nbsp; &nbsp; &nbsp; opt.IncludeDocs = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CouchChanges</span>&lt;<span class="teal">DbFurniture</span>&gt; changes
+&nbsp; &nbsp; &nbsp; &nbsp; = _db.GetChanges&lt;<span class="teal">DbFurniture</span>&gt;( opt );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CouchChangeResult</span>&lt;<span class="teal">DbFurniture</span>&gt; r
+&nbsp; &nbsp; &nbsp; &nbsp; = changes.Results.LastOrDefault&lt;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">CouchChangeResult</span>&lt;<span class="teal">DbFurniture</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> == r || since &lt; r.Sequence,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected monotone growing sequence number&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span> != r &amp;&amp; since &lt; r.Sequence;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Replacing the call to the LastSequenceNumber property by a call to the new LastSequenceNumberChanged method in the Idling event handler shows a huge improvement:</p>
+
+<pre>
+----------------------------------------------------------
+Subscription timing
+ Percentage   Seconds   Calls   Process
+----------------------------------------------------------
+      0.00%      0.00       1   DbUpdater ctor
+      0.00%      0.11       1   UpdateBim
+      0.00%      3.25    1741   RoomEditorDb ctor
+      0.00%      5.35       1   LastSequenceNumber
+      0.00%     19.79    1738   LastSequenceNumberChanged
+      0.00%     23.55    1951   OnIdling
+----------------------------------------------------------
+</pre>
+
+<p>Now a much larger number of calls to the RoomEditorDb constructor and the LastSequenceNumberChanged method can be completed in much less time.</p>
+
+<p>The one and only initial call to LastSequenceNumber is still awfully expensive and could probably also be improved, but the LastSequenceNumberChanged method is quick, and the whole Idling handling is immediately much more responsive.</p>
+
+
+
+<a name="8"></a>
+
+<h4>Twiddling with Idling Responsiveness</h4>
+
+<p>I added the Stop method to the timer class and call when unsubscribing from Idling, as shown above in the <a href="#5">benchmarking instrumentation</a> code.</p>
+
+<p>That switches on the top-level timer providing the 100% measurement and enables the percentage calculations, like this:</p>
+
+<pre>
+----------------------------------------------------------
+Subscription timing
+ Percentage   Seconds   Calls   Process
+----------------------------------------------------------
+      0.00%      0.00       1   DbUpdater ctor
+      0.25%      0.05       1   UpdateBim
+      8.85%      1.67     486   LastSequenceNumberChanged
+     16.06%      3.03     489   RoomEditorDb ctor
+     17.05%      3.22   48667   OnIdling
+     27.89%      5.27       1   LastSequenceNumber
+    100.00%     18.89       1   Subscription
+----------------------------------------------------------
+</pre>
+
+<p>With a more responsive behaviour, I am able to experiment a bit.
+For instance, I removed the stopwatch in the Idling event handler again, call SetRaiseWithoutDelay immediately, and ignore 99 out of hundred calls to the Idling event handler.
+As you can see, the Idling handler is called a hundred times for each check of the LastSequenceNumberChanged property:</p>
+
+<pre>
+----------------------------------------------------------
+Subscription timing
+ Percentage   Seconds   Calls   Process
+----------------------------------------------------------
+      0.00%      0.00       2   DbUpdater ctor
+      0.11%      0.08       2   UpdateBim
+      4.46%      3.23    1693   RoomEditorDb ctor
+      8.35%      6.05       1   LastSequenceNumber
+     21.72%     15.73    1689   LastSequenceNumberChanged
+     27.39%     19.84  168900   OnIdling
+    100.00%     72.44       1   Subscription
+----------------------------------------------------------
+</pre>
+
+<p>The one single call to the LastSequenceNumber property costs more time than almost 500 calls to LastSequenceNumberChanged and almost 50000 calls to the Idling event handler.</p>
+
+<p>Whew.</p>
+
+
+<a name="9"></a>
+
+<h4>Download</h4>
+
+<p>This application lives in the
+
+<a href="https://github.com/jeremytammik/RoomEditorApp">
+RoomEditorApp GitHub repository</a> and
+
+the versions discussed above are:
+
+<ul>
+<li><a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.16">
+2014.0.0.16</a> with
+
+the unsubscription fixed as described in the discussion of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/11/singleton-application-versus-multiple-command-instances.html">
+singleton application versus multiple command instances</a>.
+</li>
+
+<li>
+<a href="https://github.com/jeremytammik/RoomEditorApp/releases/tag/2014.0.0.17">
+2014.0.0.17</a> with
+
+added benchmarking timer and code, new JtTimer class, RoomEditorDb.LastSequenceNumber identified as the culprit, LastSequenceNumberChanged implemented, which only retrieves new changes and saves a huge amount of time, so the Idling event handling is now responsive and snappy.</li>
+
+</ul>
+
+<p>I hope that this is of interest to you for numerous reasons.</p>
+
+<p>The most important lesson should be: please benchmark your code!</p>

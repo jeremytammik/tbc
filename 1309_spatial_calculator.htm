@@ -1,0 +1,322 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+Silvio Guido Re: AEC Hackathon in Dallas
+Natalia Polikarpova Re: need your help with twitter or blogging
+
+wall net and gross surface
+http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565
+
+10536988 [Door/Window Areas]
+
+http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html?cid=6a00e553e16897883301b8d0ec5711970c#comment-6a00e553e16897883301b8d0ec5711970c
+
+https://github.com/jeremytammik/SpatialElementGeometryCalculator
+
+http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html?cid=6a00e553e16897883301b7c7789a82970b#comment-6a00e553e16897883301b7c7789a82970b
+
+https://github.com/jeremytammik/SpatialElementGeometryCalculator/issues/1
+improvements for multiple rooms and multiple subfaces
+
+https://github.com/jeremytammik/SpatialElementGeometryCalculator/pull/2
+Rework based on comment on blog
+
+#revitapi #bim #3dweb #3dviewapi #threejs #webgl #angelhack #aechackathon
+
+-->
+
+<h3>Gross and Net Wall Area Calculation Enhancement</h3>
+
+<p>We make further enhancements to the on-going project to determine gross and net areas and volumes, obviously a fundamental issue to BIM.</p>
+
+<p>And I have more news to share as well:</p>
+
+<ul>
+<li><a href="#1">Playing with my WebGL viewer</a></li>
+<li><a href="#2">WebGL Developers meetup in NYC April 21</a></li>
+<li><a href="#3">AEC Hackathon in Dallas May 1-3</a></li>
+<li><a href="#4">Angelhack in Dubai May 7-9</a></li>
+<li><a href="#5">Angelhack in Athens June 5-7</a></li>
+<li><a href="#6">Wall area calculation handling multiple openings in multiple walls in multiple rooms</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<h4>Playing with my WebGL Viewer</h4>
+
+<p>My last post was on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/exporting-3d-element-geometry-to-a-webgl-viewer.html">
+exporting 3D element geometry to a WebGL viewer</a>.</p>
+
+<p>If this is of interest to you, you absolutely must check out two subsequent
+
+<a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a> posts on the
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">desktop driven WebGL viewer</a> and
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-node-server-with-github-and-heroku-repo-sync.html">converting it to a node.js server</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>WebGL Developers Meetup in NYC April 21</h4>
+
+<p>Get ready for our <a href="http://www.meetup.com/NYC-WebGL-Developers/events/221871315">WebGL Developers Meetup in NYC</a> on Tuesday April 21.</p>
+
+<p>Come and join Jim Quanci <a href="https://twitter.com/jimquanci">@jimquanci</a> from Autodesk to learn how to easily add 3D viewing functionality to your web and mobile apps using <a href="https://developer.autodesk.com">View and Data API</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>AEC Hackathon in Dallas May 1-3</h4>
+
+<p>As an AEC developer, you will certainly not want to miss the <a href="http://aechackathon.com/aec-hackathon-dallas">AEC Hackathon 2.2 in Dallas</a>.</p>
+
+<p>We will be on site to show the <a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a> and of course help all hackers on our AEC products.</p>
+
+
+<a name="4"></a>
+
+<h4>Angelhack in Dubai May 7-9</h4>
+
+<p>Of special interest to me personally, of course:</p>
+
+<p>I will be going to the <a href="http://angelhack.com/hackathon/dubai-2015">Angelhack in Dubai</a> on May 7-9.</p>
+
+<p>Since the weekend is on Friday and Saturday there, we have scheduled an
+
+<a href="http://www.meetup.com/I-love-3D-Dubai/events/221497781">Angel workshop</a> meetup session on Thursday evening, where, once again, I will be presenting on the
+
+<a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a> and anything else you want to learn.</p>
+
+<p>Then you will be fully primed and up to speed for the subsequent hackathon!</p>
+
+<p>I am looking forward to meeting you there!</p>
+
+
+
+
+<a name="5"></a>
+
+<h4>Angelhack in Athens June 5-7</h4>
+
+<p>Same thing again... of special interest to me personally:</p>
+
+<p>I will be going to the <a href="http://angelhack.com/hackathon/athens-2015">Angelhack in Athens</a> on June 5-7.</p>
+
+<p>Again, we have scheduled an
+
+<a href="http://www.meetup.com/I-love-3D-Athens/events/221674308">Angel workshop</a> meetup
+session on Friday evening to get us all well prepared and up to speed for the subsequent hackathon.</p>
+
+<p>I am looking forward to meeting you there!</p>
+
+
+
+
+<a name="6"></a>
+
+<h4>Wall Area Calculation Handling Multiple Openings in Multiple Walls in Multiple Rooms</h4>
+
+<p>I recently presented a promising solution to address this in the discussion on
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html">
+calculating gross and net wall areas</a>,
+publishing the initial VB.NET solution by Phillip Miller of <a href="">Kiwi Codes Solutions Ltd</a> and
+an enhanced C# implementation in the
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator GitHub repository</a> incorporating
+the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html#comment-6a00e553e16897883301b8d0eee480970c">
+suggestion</a> by Vilo to
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html">
+use FindInserts to retrieve all openings in all wall types</a>.</p>
+
+<p><a href="http://hclausen.net">Håkon Clausen</a> responded to that in this
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html?cid=6a00e553e16897883301b7c7789a82970b#comment-6a00e553e16897883301b7c7789a82970b">
+comment</a>:</p>
+
+I found two issues with this solution after playing around with it for some hours.
+
+<ol>
+<li>In contrast to the "Calculating Gross and Net Wall Areas" solution, after getting the wall inserts with FindInserts it does not check that the inserts actually belongs to the room and thus removes inserts to other rooms if the wall is part of multiple rooms. This will of course lead to wrong result. Checking the instance room/toroom/fromroom parameter like the previous solution rectifies this.</li>
+<li>If a wall has multiple faces or subfaces, the opening area is subtracted multiple times. Take e.g. the hall from the 2013 basic sample (or any room with a wall with multiple doors to other rooms. This will make calwallAreaMinusOpenings report a negative wall area. Creating a gross sum for each wall, then looping through the walls found and calculate the opening area once seems to be an approach.</li>
+</ol>
+
+<p>I added that to the SpatialElementGeometryCalculator GitHub repository as
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/issues/1">issue #1, improvements for multiple rooms and multiple subfaces</a>, and
+suggested to Håkon to fork the repo, add his changes to that, and create a pull request for me to merge them back in.</p>
+
+<p>He did so and created
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/pull/2">pull request #2, rework based on comment on blog</a>.</p>
+
+<p>For your convenience, here is the updated implementation:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="blue">var</span> app = commandData.Application;
+&nbsp; <span class="blue">var</span> doc = app.ActiveUIDocument.Document;
+&nbsp; <span class="teal">Result</span> rc;
+&nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp; <span class="blue">try</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> roomCol = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> e <span class="blue">in</span> roomCol )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( room == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( room.Location == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> sebOptions = <span class="blue">new</span> <span class="teal">SpatialElementBoundaryOptions</span>
+&nbsp; &nbsp; &nbsp; { SpatialElementBoundaryLocation
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">SpatialElementBoundaryLocation</span>.Finish
+&nbsp; &nbsp; &nbsp; };
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> calc = <span class="blue">new</span> Autodesk.Revit.DB
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">SpatialElementGeometryCalculator</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; doc, sebOptions );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> results = calc
+&nbsp; &nbsp; &nbsp; &nbsp; .CalculateSpatialElementGeometry( room );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// To keep track of each wall and </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// its total area in the room</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">var</span> walls = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">double</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> results.GetGeometry().Faces )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> subface <span class="blue">in</span> results
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .GetBoundaryFaceInfo( face ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( subface.SubfaceType
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; != <span class="teal">SubfaceType</span>.Side ) { <span class="blue">continue</span>; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> wall = doc.GetElement( subface
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .SpatialBoundaryElement.HostElementId )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">HostObject</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( wall == <span class="blue">null</span> ) { <span class="blue">continue</span>; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> grossArea = subface.GetSubface().Area;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !walls.ContainsKey( wall.UniqueId ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; walls.Add( wall.UniqueId, grossArea );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; walls[wall.UniqueId] += grossArea;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> id <span class="blue">in</span> walls.Keys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> wall = (<span class="teal">HostObject</span>) doc.GetElement( id );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">var</span> openings = CalculateWallOpeningArea(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall, room );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Room: {2} Wall: {0} Area: {1} m2\r\n&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.get_Parameter( <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK ).AsString(),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SqFootToSquareM( walls[id] - openings ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; room.get_Parameter( <span class="teal">BuiltInParameter</span>.ROOM_NUMBER ).AsString() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Room Boundaries&quot;</span>, s );
+&nbsp; &nbsp; rc = <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;Room Boundaries&quot;</span>,
+&nbsp; &nbsp; &nbsp; ex.Message + <span class="maroon">&quot;\r\n&quot;</span> + ex.StackTrace );
+&nbsp; &nbsp; rc = <span class="teal">Result</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">return</span> rc;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Convert square feet to square meters</span>
+<span class="gray">///</span><span class="green"> with two decimal places precision.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">double</span> SqFootToSquareM(
+&nbsp; <span class="blue">double</span> sqFoot )
+{
+&nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Round( sqFoot * 0.092903, 2 );
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Calculate wall area minus openings. Temporarily</span>
+<span class="gray">///</span><span class="green"> delete all openings in a transaction that is</span>
+<span class="gray">///</span><span class="green"> rolled back.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">private</span> <span class="blue">static</span> <span class="blue">double</span> CalculateWallOpeningArea(
+&nbsp; <span class="teal">HostObject</span> wall,
+&nbsp; <span class="teal">Room</span> room )
+{
+&nbsp; <span class="blue">var</span> doc = wall.Document;
+&nbsp; <span class="blue">var</span> wallAreaNet = wall.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED ).AsDouble();
+&nbsp;
+&nbsp; <span class="blue">var</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc );
+&nbsp; t.Start( <span class="maroon">&quot;Temp&quot;</span> );
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> id <span class="blue">in</span> wall.FindInserts(
+&nbsp; &nbsp; <span class="blue">true</span>, <span class="blue">true</span>, <span class="blue">true</span>, <span class="blue">true</span> ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> insert = doc.GetElement( id );
+&nbsp; &nbsp; <span class="blue">if</span>( insert <span class="blue">is</span> <span class="teal">FamilyInstance</span>
+&nbsp; &nbsp; &nbsp; &amp;&amp; IsInRoom( room, (<span class="teal">FamilyInstance</span>) insert ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; doc.Delete( id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; doc.Regenerate();
+&nbsp; <span class="blue">var</span> wallAreaGross = wall.get_Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED ).AsDouble();
+&nbsp; t.RollBack();
+&nbsp;
+&nbsp; <span class="blue">return</span> wallAreaGross - wallAreaNet;
+}
+&nbsp;
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+<span class="gray">///</span><span class="green"> Predicate to determine whether the given </span>
+<span class="gray">///</span><span class="green"> family instance belongs to the given room.</span>
+<span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+<span class="blue">static</span> <span class="blue">bool</span> IsInRoom(
+&nbsp; <span class="teal">Room</span> room,
+&nbsp; <span class="teal">FamilyInstance</span> f )
+{
+&nbsp; <span class="teal">ElementId</span> rid = room.Id;
+&nbsp; <span class="blue">return</span> ( ( f.Room != <span class="blue">null</span> &amp;&amp; f.Room.Id == rid )
+&nbsp; &nbsp; || ( f.ToRoom != <span class="blue">null</span> &amp;&amp; f.ToRoom.Id == rid )
+&nbsp; &nbsp; || ( f.FromRoom != <span class="blue">null</span> &amp;&amp; f.FromRoom.Id == rid ) );
+}
+</pre>
+
+<p>Many thanks to Håkon for suggesting, implementing and sharing this with us all!</p>
+
+<p>The complete source code, Visual Solution files and add-in manifests for both the original, now outdated, VB.NET and the enhanced C# implementations are hosted by the
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator GitHub repository</a>.</p>
+
+<p>The improved version by Håkon presented here is
+
+<a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2015.0.0.3">
+release 2015.0.0.3</a>.</p>
+
+<p>I look forward to hearing how you can make use of this.</p>
+
+<p>Further enhancements are welcome!</p>
+
+<p>Enjoy.</p>

@@ -1,0 +1,467 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+</head>
+
+<!--
+
+/a/rvt/three_dwg_imports.rvt
+/a/rvt/three_dwg_imports-ListOfImportedData.txt
+
+Z:\a\rvt\three_dwg_imports.rvt
+
+-->
+
+
+<h3>List All Import Instances</h3>
+
+<p>Have you ever wondered whether you have any duplicate imported CAD instances in your model?</p>
+
+<p>My colleague Nikolay Shulga from the Revit development team implemented a nice little end user utility to answer this question.
+By the way, Nikolay and I go back a long time, way back in the beginning of the
+
+<a href="https://en.wikipedia.org/wiki/BuildingSMART">
+IAI and IFC project</a>,
+
+decades ago, in previous lives...</p>
+
+<p>In Nikolay's own words:</p>
+
+<p>A while ago I wrote a prototype app to list ImportInstance objects in a Revit project. The idea is to list duplicate instances &ndash; people importing the same data multiple times &ndash; and perhaps do other useful things.</p>
+
+<p>I don’t think I can maintain that app &ndash; not enough bandwidth and demand to make it a part of Revit. I’m wondering whether you could make a blog entry out of the idea &ndash; hopefully someone picks it up and makes something out of it. If you can figure out a way to make it an open source app, even better.</p>
+
+<ul>
+<li><b>Motivation</b> &ndash; People often import drawings &ndash; usually DWG, of course, but could be DGN &ndash; multiple times in current-view-only mode. That grows the size of the project, creates performance issues. We found that people don’t often know what data is imported or linked. That was an analysis tool that was developed for a specific project, look at performance issues related to imported data.</li>
+<li><b>Spec</b> &ndash; The formal spec is short: 'Let’s list the imported data and report it in a minimally useful way'.</li>
+<li><b>Implementation</b> &ndash; Well, you have it already; see below &nbsp; :-)</li>
+<li><b>Cool API aspects</b> &ndash; None, apart from the fact that simple stuff, if applied correctly, can add a disproportional amount of value.</li>
+<li><b>Cool ways to use it</b> &ndash; Well, data exchange is not cool, but necessary. This helps users to keep their data in better shape &ndash; police against multiple imports, know what is in the file.</li>
+<li><b>How it can be enhanced</b> &ndash; One idea we had was to have an imported data browser, similar to standard Revit view browser &ndash; or, perhaps, enhance the view browser.</li>
+<li><b>A suitable sample model</b> &ndash; Simply create a Revit project, import a DWG multiple times and run the tool.</li>
+</ul>
+
+<p>Here is the entire implementation:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Collections.Specialized;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">using</span> Autodesk.Revit.UI.Selection;
+<span class="blue">using</span> System.IO;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> ListImportInstances
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> A generic interface to report imported </span>
+&nbsp; <span class="gray">///</span><span class="green"> data found in a specific project.&nbsp; </span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">interface</span> <span class="teal">IReportImportData</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">bool</span> init( <span class="blue">string</span> projectName );
+&nbsp; &nbsp; <span class="blue">void</span> startReportSection( <span class="blue">string</span> sectionName );
+&nbsp; &nbsp; <span class="blue">void</span> logItem( <span class="blue">string</span> item );
+&nbsp; &nbsp; <span class="blue">void</span> setWarning();
+&nbsp; &nbsp; <span class="blue">void</span> done();
+&nbsp; &nbsp; <span class="blue">string</span> getLogFileName();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">class</span> <span class="teal">SimpleTextFileBasedReporter</span> : <span class="teal">IReportImportData</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> SimpleTextFileBasedReporter()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> init( <span class="blue">string</span> projectFileName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> outcome = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; m_currentSection = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; m_warnUser = <span class="blue">false</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 != projectFileName.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_projectFileName = projectFileName;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_projectFileName = <span class="maroon">&quot;Default&quot;</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; m_logFileName = System.IO.<span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; &nbsp; &nbsp; System.IO.<span class="teal">Path</span>.GetDirectoryName( m_projectFileName ),
+&nbsp; &nbsp; &nbsp; &nbsp; System.IO.<span class="teal">Path</span>.GetFileNameWithoutExtension(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_projectFileName ) ) + <span class="maroon">&quot;-ListOfImportedData.txt&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Construct log file name from projectFileName </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// and try to open file. Project file name is </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// assumed to be valid (expected to be called </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// on an open doc).</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_outputFile = <span class="blue">new</span> <span class="teal">StreamWriter</span>( m_logFileName );
+&nbsp; &nbsp; &nbsp; &nbsp; m_outputFile.WriteLine( <span class="maroon">&quot;List of imported CAD data in &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + projectFileName );
+&nbsp; &nbsp; &nbsp; &nbsp; outcome = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">UnauthorizedAccessException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;You are not authorized to create &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + m_logFileName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">ArgumentNullException</span> ) <span class="green">// oh, come on.</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;That's just not fair. Null argument for StreamWriter()&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.<span class="teal">ArgumentException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Failed to create &quot;</span> + m_logFileName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.IO.<span class="teal">DirectoryNotFoundException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;That's not supposed to happen: directory not found: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + System.IO.<span class="teal">Path</span>.GetDirectoryName( m_projectFileName ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.IO.<span class="teal">PathTooLongException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The OS thinks the file name &quot;</span> + m_logFileName
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; is too long&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.IO.<span class="teal">IOException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;An IO error has occurred while writing to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + m_logFileName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( System.Security.<span class="teal">SecurityException</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;The OS thinks your access rights to &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + System.IO.<span class="teal">Path</span>.GetDirectoryName( m_projectFileName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; are insufficient&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> outcome;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> startReportSection( <span class="blue">string</span> sectionName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; endReportSection();
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine( sectionName );
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp;
+&nbsp; &nbsp; &nbsp; m_currentSection = sectionName;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> logItem( <span class="blue">string</span> item )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine( item );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> setWarning()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_warnUser = <span class="blue">true</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> done()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; endReportSection();
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine( <span class="maroon">&quot;The End&quot;</span> );
+&nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp; &nbsp; &nbsp; m_outputFile.Close();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Display &quot;done&quot; dialog, potentially open log file</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span> doneMsg = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( m_warnUser )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doneMsg = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Potential issues found. Please review the log file&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; doneMsg = <span class="blue">new</span> <span class="teal">TaskDialog</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;FindImports completed successfully&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; doneMsg.AddCommandLink(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialogCommandLinkId</span>.CommandLink1,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Review &quot;</span> + m_logFileName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span>( doneMsg.Show() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="teal">TaskDialogResult</span>.CommandLink1:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Display the log file</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Process</span>.Start( <span class="maroon">&quot;notepad.exe&quot;</span>, m_logFileName );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> getLogFileName()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_logFileName;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> endReportSection()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != m_currentSection )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp; &nbsp; &nbsp; &nbsp; m_outputFile.WriteLine( <span class="maroon">&quot;End of &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + m_currentSection );
+&nbsp; &nbsp; &nbsp; &nbsp; m_outputFile.WriteLine();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> m_projectFileName;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> m_logFileName;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">StreamWriter</span> m_outputFile;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> m_currentSection;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Tell the user to review the log file</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">bool</span> m_warnUser;
+&nbsp; }
+&nbsp;
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> listImports( <span class="teal">Document</span> doc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> col
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ImportInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">NameValueCollection</span> listOfViewSpecificImports
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">NameValueCollection</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">NameValueCollection</span> listOfModelImports
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">NameValueCollection</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">NameValueCollection</span> listOfUnidentifiedImports
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">NameValueCollection</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> col )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Collect all view-specific names.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e.ViewSpecific )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> viewName = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> viewElement = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.OwnerViewId );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; viewName = viewElement.Name;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">catch</span>( Autodesk.Revit.Exceptions
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="teal">ArgumentNullException</span> ) <span class="green">// just in case</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; viewName = <span class="teal">String</span>.Concat(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Invalid View ID: &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.OwnerViewId.ToString() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e.Category )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listOfViewSpecificImports.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; importCategoryNameToFileName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Category.Name ), viewName );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listOfUnidentifiedImports.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Id.ToString(), viewName );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listOfModelImports.Add(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; importCategoryNameToFileName(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.Category.Name ), e.Name );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IReportImportData</span> logOutput
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">SimpleTextFileBasedReporter</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !logOutput.init( doc.PathName ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">TaskDialog</span>.Show( <span class="maroon">&quot;FindImports&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unable to create report file&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listOfViewSpecificImports.HasKeys() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput.startReportSection(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;View Specific Imports&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listResults( listOfViewSpecificImports,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listOfModelImports.HasKeys() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput.startReportSection( <span class="maroon">&quot;Model Imports&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listResults( listOfModelImports, logOutput );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( listOfUnidentifiedImports.HasKeys() )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput.startReportSection(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Unknown import instances&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listResults( listOfUnidentifiedImports,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !sanityCheckViewSpecific(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; listOfViewSpecificImports, logOutput ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logOutput.setWarning();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//TaskDialog.Show(&quot;FindImportedData&quot;, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&quot;Possible issues found. Please review the log file&quot;);</span>
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; logOutput.done();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> This is an import category. It is created from </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> a CAD file name, with appropriate (number) added. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> We want to use the file name as a key for our </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> list of import instances, so strip off the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> brackets. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> importCategoryNameToFileName(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> catName )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> fileName = catName;
+&nbsp; &nbsp; &nbsp; fileName = fileName.Trim();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( fileName.EndsWith( <span class="maroon">&quot;)&quot;</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> lastLeftBracket = fileName.LastIndexOf( <span class="maroon">&quot;(&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( -1 != lastLeftBracket )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fileName = fileName.Remove( lastLeftBracket ); <span class="green">// remove left bracket</span>
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> fileName.Trim();
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> listResults(
+&nbsp; &nbsp; &nbsp; <span class="teal">NameValueCollection</span> listOfImports,
+&nbsp; &nbsp; &nbsp; <span class="teal">IReportImportData</span> logFile )
+&nbsp; &nbsp; {
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">String</span> key <span class="blue">in</span> listOfImports.AllKeys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; logFile.logItem( key + <span class="maroon">&quot;: &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + listOfImports.Get( key ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Run a few basic sanity checks on the list of </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> view-specific imports. </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> View-specific sanity is not the same as model </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> sanity. Neither is necessarily sane.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> True means possibly sane, false means probably </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> not.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">bool</span> sanityCheckViewSpecific(
+&nbsp; &nbsp; &nbsp; <span class="teal">NameValueCollection</span> listOfImports,
+&nbsp; &nbsp; &nbsp; <span class="teal">IReportImportData</span> logFile )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; logFile.startReportSection(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Sanity check report for view-specific imports&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> status = <span class="blue">true</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Count number of entities per key.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">String</span> key <span class="blue">in</span> listOfImports.AllKeys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>[] levels = listOfImports.GetValues( key );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( levels != <span class="blue">null</span> &amp;&amp; levels.GetLength( 0 ) &gt; 1 )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; logFile.logItem( <span class="maroon">&quot;CAD data &quot;</span> + key
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot; appears to have been imported in &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;Current View Only mode multiple times. &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;It is present in views &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + listOfImports.Get( key ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; status = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> status;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">UIDocument</span> uidoc = uiapp.ActiveUIDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; listImports( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Many thanks to Nikolay for sharing this!</p>
+
+<p>I followed his instructions and created the following trivial minimal sample model with three imports of a 2D DWG to test it:</p>
+
+<center>
+<img src="img/three_dwg_imports.png" alt="Three DWG import instances" width="510"/>
+</center>
+
+<p>Launching the external command generates a report of duplicate instances, stores it in a text file and displays the following task dialogue, with a command link to view the file:</p>
+
+<center>
+<img src="img/ListImportInstances01.png" alt="ListImportInstances task dialogue with command link" width="446"/>
+</center>
+
+<p>Clicking the command link opens the text in the default application, in this case Notepad:</p>
+
+<center>
+<img src="img/ListImportInstances02.png" alt="ListImportInstances report on duplicate instances" width="571"/>
+</center>
+
+<p>As always, the most up-to-date version including the full source code, Visual Studio solution and add-in manifest is provided by the
+
+<a href="https://github.com/jeremytammik/ListImportInstances">ListImportInstances GitHub repository</a>.</p>
+
+<p>The version presented above is
+
+<a href="https://github.com/jeremytammik/ListImportInstances/releases/tag/2015.0.0.1">release 2015.0.0.1</a>.</p>
+
+<p>I am looking forward to hearing from you how you make use of and enhance this.</p>
+
+<p>Please feel free to fork and submit pull requests.</p>

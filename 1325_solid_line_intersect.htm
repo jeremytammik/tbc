@@ -1,0 +1,329 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<style type="text/css">p.en { font-style: italic; }</style>
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script>-->
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/revit-api/nurbspline-creation-error/m-p/5653109
+
+10790357 [GeometryCreationUtilities]
+
+#revitapi #adsk #bim #adskdevnetwrk #geometry
+#au2015 #dotnet #csharp #3dwebcoder
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #cloud #mobile #vr #ecommerce
+
+Revit API, Jeremy Tammik, akn_include
+akn_include
+
+-->
+
+
+<h3>Geometry Creation and Line Intersection Exceptions</h3>
+
+<p>Today, let's look at some geometry related questions, a small enhancement of the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/connecting-desktop-cloud-lines-and-grid-segments.html#3">
+line intersection</a> we discussed two days ago, NURB spline and solid creation:</p>
+
+<ul>
+<li><a href="#2">Creating a NURB spline</a></li>
+<li><a href="#3">GeometryCreationUtilities, moving and copying solids</a></li>
+<li><a href="#4">Line intersection enhancements</a></li>
+<li><a href="#5">Built-in parameter checker for Revit 2016</a></li>
+<li><a href="#6">1001 discussion forum posts</a></li>
+</ul>
+
+
+
+<a name="2"></a>
+
+<h4>Creating a NURB Spline</h4>
+
+<p>This question was raised by anarchyfree in the Revit API discussion thread on a
+<a href="http://forums.autodesk.com/t5/revit-api/nurbspline-creation-error/m-p/5653109">
+NurbSpline creation error</a>:</p>
+
+<p><strong>Question:</strong>
+
+I'm working on a Revit plugin that in part accepts curves from Rhino that can be used to create a beam in Revit.</p>
+<p>My code works well, when controlpoints of curve are greater than or equal to four. But with three control points arises a problem.</p>
+<p>How can I draw three control points curve in Revit API?</p>
+
+<pre class="code">
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; ctrPoints = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp;
+&nbsp; ctrPoints.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( Utils.mmToFeet( 72500.017337 ),
+&nbsp; &nbsp; Utils.mmToFeet( -5072.522765 ), Utils.mmToFeet( 0 ) ) );
+&nbsp; ctrPoints.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( Utils.mmToFeet( 105082.371745 ),
+&nbsp; &nbsp; Utils.mmToFeet( -748.798009 ), tils.mmToFeet( 0 ) ) );
+&nbsp; ctrPoints.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( Utils.mmToFeet( 117899.12727 ),
+&nbsp; &nbsp; Utils.mmToFeet( -15572.997171 ), Utils.mmToFeet( 0 ) ) );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; weights = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; weights.Add( 1 );
+&nbsp; weights.Add( 1 );
+&nbsp; weights.Add( 1 );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="blue">double</span>&gt; knots = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">double</span>&gt;();
+&nbsp; knots.Add( 0 );
+&nbsp; knots.Add( 0 );
+&nbsp; knots.Add( 0 );
+&nbsp; knots.Add( 52464.568605 );
+&nbsp; knots.Add( 52464.568605 );
+&nbsp; knots.Add( 52464.568605 );
+&nbsp;
+&nbsp; <span class="teal">NurbSpline</span> detailNurbSpline = <span class="teal">NurbSpline</span>.Create(
+&nbsp; &nbsp; ctrPoints, weights, knots, 3, <span class="blue">false</span>, <span class="blue">true</span> );
+</pre>
+
+<center>
+<img src="img/nurbspline_3_control_points.png" alt="NURB spline with three control points" width="278"/>
+</center>
+
+<p><strong>Answer:</strong>
+
+Congratulations on your interesting project!</p>
+
+<p>I am glad to hear that it is working well.</p>
+
+<p>Would you like to share some of it here? I am sure there would be a lot of interest in that.</p>
+
+<p>To answer your question:</p>
+
+<p>The exception thrown when this code is run explains that there must be at least degree + 1 control points.</p>
+
+<p>Since the degree passed in is 3, this code violates that rule.</p>
+
+<p>Revit’s version of creating splines is NurbSpline.Create([control points], [weights]).</p>
+
+<p>It automatically sets the degree based on the number of points as described in this internal comment:</p>
+
+<pre>
+  <span class="green">// Use degree 1 for two CPs, degree 2 for three CPs,</span>
+  <span class="green">// and degree 3 for four or more CPs.</span>
+</pre>
+
+
+
+
+
+<a name="3"></a>
+
+<h4>GeometryCreationUtilities, Moving and Copying Solids</h4>
+
+<p><strong>Question:</strong>
+
+How can I move / turn solid objects that are formed by methods of the class GeometryCreationUtilities?</p>
+<p>Functioning code example desired.</p>
+
+<p>AND</p>
+
+<p>How can I make a copy of a solid object which is formed by methods of the class GeometryCreationUtilities?</p>
+<p>Functioning code example desired.</p>
+
+<p><strong>Answer:</strong>
+
+Happy to see you are exploring the Revit API.</p>
+
+<p>I hope you are aware that <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41">the Revit API is very different</a> from many other APIs for non-parametric CAD systems:</p>
+
+<p>The most important thing with Revit programming is to understand the product, user workflow and best practices before you even start thinking about programming anything.</p>
+
+<p>Regarding your questions:</p>
+
+<p>I assume you know that the GeometryCreationUtilities only create non-persistent in-memory objects.</p>
+
+<p>They are not Revit database elements and will not be stored in the Revit model.</p>
+
+<p>The remarks on the GeometryCreationUtilities class state that the shapes created by these utilities are not a part of any Revit document, but can be used in conjunction with other geometric utilities from within API applications.</p>
+
+<p>As you can see from the Revit API help file RevitAPI.chm (have you installed that, and looked at it?), the objects generated by the GeometryCreationUtilities class are instances of the Solid class.</p>
+
+<p>You can see what operations are possible on these objects by looking at the list of Solid class members.</p>
+
+<p>I do not see any possibility to move or turn a Solid after it has been created.</p>
+
+<p>Remember, in a parametric CAD system,. solids are just views of parametric elements.</p>
+
+<p>Therefore, there is no provision for modifying solids. They are just a read-only representation of the parametric BIM.</p>
+
+<p>You are more lucky with your second question, though.</p>
+
+<p>A possibility to create a copy of an existing solid was just introduced in the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#5.03">
+Revit 2016 Geometry API additions</a>:</p>
+
+<span class="darkblue">
+
+<h4>Solid &ndash; copy</h4>
+
+<p>The new method:</p>
+
+<ul><li>SolidUtils.Clone()</li></ul>
+
+<p>creates a new Solid which is a copy of the input Solid.</p>
+
+<h4>Solid &ndash; create transformed</h4>
+
+<p>The new method:</p>
+
+<ul><li>SolidUtils.CreateTransformed()</li></ul>
+
+<p>creates a new Solid which is the transformation of the input Solid.</p>
+
+</span>
+
+<p>Funnily enough, we actually explored the topic of <a href="http://thebuildingcoder.typepad.com/blog/2015/05/cloning-a-solid-angelhack-3d-web-fest-and-dubai.html#6">cloning a solid</a> just three weeks ago.
+The comments on that post also discuss workarounds for achieving this before the advent of the SolidUtils Clone method.</p>
+
+<p>Here is a rather contrived and completely untested code sample snippet demonstrating how to extract and clone the first non-empty solid encountered in a given Revit element:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Solid</span> GetFirstSolidClone( <span class="teal">Element</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> clone = <span class="blue">null</span>;
+&nbsp; &nbsp; <span class="teal">Options</span> opt = <span class="blue">new</span> <span class="teal">Options</span>();
+&nbsp; &nbsp; <span class="teal">GeometryElement</span> geo = e.get_Geometry( opt );
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; 0 &lt; solid.Faces.Size )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> clone = <span class="teal">SolidUtils</span>.Clone( solid );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> clone;
+&nbsp; }
+</pre>
+
+<p>I hope this helps.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Line Intersection Enhancements</h4>
+
+<p>Two days ago, I discussed the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/connecting-desktop-cloud-lines-and-grid-segments.html#3">
+line intersection</a> suggested by Magson Leone.</p>
+
+<p>While editing that text, the thought struck me:</p>
+
+<p>What happens if the two given lines are:</p>
+
+<ul>
+<li>coincident</li>
+<li>parallel</li>
+</ul>
+
+<p>In the first case, the intersection of the two is the line itself, infinitely many points.</p>
+
+<p>In the second case, there is no intersection, zero points.</p>
+
+<p>I do not see either of these two cases being handled properly.</p>
+
+<p>Do you have any suggestions?</p>
+
+<p>Do you have any test cases?</p>
+
+<p>We should test for (i) collinearity and (ii) coincidence.</p>
+
+<p><b><i>If</i></b> we want to achieve perfection.</p>
+
+<p>The way it is now, I expect an exception will simply be thrown?</p>
+
+<p>Magson very kindly replies:</p>
+
+<p>Eu fiz o teste que você sugeriu para ver se ocorresse algum erro nos casos de linhas coincidentes e paralelas e realmente o erro aconteceu.
+Então eu acrescentei algumas linhas no código para fazer esta verificação usando o método double.IsInfinity().
+Com esta mudança, nos casos em que x ou y for um número infinito o ponto p5 não será criado e valor de retorno será nulo.</p>
+
+<p class="en">I tested the method as you suggested and confirmed the expected errors for coincident and parallel lines.
+I added a check using double.IsInfinity to detect and handle these more gracefully.
+With this enhancement, <code>p5</code> is not calculated if <code>x</code> or <code>y</code> would be infinite, and the method simply returns <code>null</code>.</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return the 2D intersection point between two </span>
+&nbsp; <span class="gray">///</span><span class="green"> unbounded lines defined in the XY plane by the </span>
+&nbsp; <span class="gray">///</span><span class="green"> start and end points of the two given curves. </span>
+&nbsp; <span class="gray">///</span><span class="green"> By Magson Leone.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Return null if the two lines are coincident,</span>
+&nbsp; <span class="gray">///</span><span class="green"> in which case the intersection is an infinite </span>
+&nbsp; <span class="gray">///</span><span class="green"> line, or non-coincident and parallel, in which </span>
+&nbsp; <span class="gray">///</span><span class="green"> case it is empty.</span>
+&nbsp; <span class="gray">///</span><span class="green"> https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="teal">XYZ</span> Intersection( <span class="teal">Curve</span> c1, <span class="teal">Curve</span> c2 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = c1.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q1 = c1.GetEndPoint( 1 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> p2 = c2.GetEndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q2 = c2.GetEndPoint( 1 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> v1 = q1 - p1;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v2 = q2 - p2;
+&nbsp; &nbsp; <span class="teal">XYZ</span> w = p2 - p1;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p5 = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> c = ( v2.X * w.Y - v2.Y * w.X )
+&nbsp; &nbsp; &nbsp; / ( v2.X * v1.Y - v2.Y * v1.X );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="blue">double</span>.IsInfinity( c ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> x = p1.X + c * v1.X;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> y = p1.Y + c * v1.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; p5 = <span class="blue">new</span> <span class="teal">XYZ</span>( x, y, 0 );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> p5;
+&nbsp; }
+</pre>
+
+<p>I updated
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> accordingly.
+The version providing the enhanced Util.Intersection method to gracefully handle parallel or coincident lines described above is
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.120.2">
+release 2016.0.120.2</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Built-in Parameter Checker for Revit 2016</h4>
+
+<p>Remy van den Bor of ICN Solutions b.v. thanked me for
+<a href="http://forums.autodesk.com/t5/revit-api/revitlookup-for-revit-2016-is-here/m-p/5600976">
+migrating RevitLookup to Revit 2016</a> and asked whether
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.34">
+BipChecker</a>, the built-in parameter checker, is it still being maintained.</p>
+
+<p>That prompted me to migrate it right there and then.</p>
+
+<p>It was one of the easiest migrations ever.</p>
+
+<p>Not one single warning ensued.</p>
+
+<p>The new
+<a href="https://github.com/jeremytammik/BipChecker/releases/tag/2016.0.0.0">
+release 2016.0.0.0 of BipChecker for Revit 2016</a> is now available from the
+<a href="https://github.com/jeremytammik/BipChecker">BipChecker GitHub repository</a>.</p>
+
+<p>Enjoy!</p>
+
+
+<a name="6"></a>
+
+<h4>1001 discussion forum posts</h4>
+
+<p>In answering Remy's request for the BipChecker migration, I posted my 1001<sup>st</sup> Autodesk discussion forum post:</p>
+
+<center>
+<img src="img/jeremy_1001_posts.png" alt="±Jeremy's 1001st Autodesk discussion forum post" width="125"/>
+</center>
+
+<p>:-)</p>

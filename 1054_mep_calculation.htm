@@ -1,0 +1,180 @@
+<head>
+<link rel="stylesheet" type="text/css" href="bc.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<!--
+
+http://forums.autodesk.com/t5/Revit-API/Generic-add-in-error-on-HTML-generation/td-p/4601525
+
+-->
+
+<h3>User MEP Calculation Sample on GitHub</h3>
+
+<p>I published the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/user-mep-calculation-sample.html">
+user MEP calculation sample</a> a
+
+couple of months ago as an example of making use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-revit-2013-mep-api-and-external-services.html#3">
+external services framework</a> to
+
+redefine the algorithms used for internal calculations in Revit.
+
+<p>Nmulder is happily making use of this to redefine pipe pressure loss calculations, but running into a
+
+<!-- small problem that he describes in the Autodesk Revit API discussion thread on -->
+
+<a href="http://forums.autodesk.com/t5/Revit-API/Generic-add-in-error-on-HTML-generation/td-p/4601525">
+generic add-in error on HTML generation</a> that
+
+I hoped to be able to sort out:</p>
+
+<p><strong>Question:</strong> I have been playing around with the Revit API recently in order to provide alternative pipe pressure loss calculations for some of our users.
+Much thanks to the code provided by
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/user-mep-calculation-sample.html">
+Jeremy Tammik</a> or
+
+this never would have been possible for me.
+I have made the necessary code changes for our calculation needs which is working.</p>
+
+<p>My problem is really more of an annoyance.
+We cannot export a pipe pressure loss report to HTML.
+It reports this error:</p>
+
+<center>
+<img src="img/user_mep_calc_xslt_error.png" alt="XSLT not found error" width="400"/>
+</center>
+
+<p>It is complaining that the required .xslt file it is looking for is not at the specified location but it is:</p>
+
+<center>
+<img src="img/user_mep_calc_addin_location.png" alt="Add-in location" width="400"/>
+</center>
+
+<p>I have done what debugging and code checking I know how to do but can't fix it.</p>
+
+<p>We can export to .csv just fine.
+I just don't like a fully working piece of code.</p>
+
+<p>Thanks!</p>
+
+
+<p><strong>Answer:</strong> You don't like fully working code?</p>
+
+<p>Sounds like M$ and windoze to me...  :-)</p>
+
+<p>Anyway, since this is an important piece of base functionality, I took your question as an opportunity to re-examine the code and publish it on GitHub in order to simplify future enhancements.</p>
+
+<p>It now lives in the
+
+<a href="https://github.com/jeremytammik/UserMepCalculation">UserMepCalculation GitHub repository</a>.</p>
+
+<p>I immediately created
+
+<a href="https://github.com/jeremytammik/UserMepCalculation/releases/tag/1.0.0.0">
+release 1.0.0.0</a> to
+
+reflect the version published as a static archive file in the original
+
+<a href="http://thebuildingcoder.typepad.com/blog/2013/07/user-mep-calculation-sample.html">
+user MEP calculation sample</a>,
+
+then bumped the version to
+
+<a href="https://github.com/jeremytammik/UserMepCalculation/releases/tag/2014.0.0.0">
+release 2014.0.0.0</a> while
+
+exploring your XSLT path issue.</p>
+
+<p>The following code in the HtmlStreamWriter constructor generates the XSLT file path:</p>
+
+<pre class="code">
+&nbsp; xmlFileName = System.IO.<span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; <span class="teal">PressureLossReportHelper</span>.instance.Doc
+&nbsp; &nbsp; &nbsp; .Application.RecordingJournalFilename );
+&nbsp;
+&nbsp; <span class="blue">if</span>( xmlFileName != <span class="blue">null</span> &amp;&amp; xmlFileName.Length &gt; 0 )
+&nbsp; &nbsp; xmlFileName = xmlFileName
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\\UserPressureLossReport&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">DateTime</span>.Now.Millisecond.ToString() + <span class="maroon">&quot;.xml&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">string</span> strPath = <span class="blue">typeof</span>(
+&nbsp; &nbsp; UserPressureLossReport.<span class="teal">WholeReportSettingsDlg</span> )
+&nbsp; &nbsp; &nbsp; .Assembly.Location;
+&nbsp;
+&nbsp; xsltFileName = <span class="teal">Path</span>.Combine(
+&nbsp; &nbsp; <span class="teal">Path</span>.GetDirectoryName( <span class="teal">Path</span>.GetDirectoryName(
+&nbsp; &nbsp; &nbsp; strPath ) ),
+&nbsp; &nbsp; <span class="maroon">&quot;output&quot;</span>, <span class="maroon">&quot;UserPressureLossReport.xslt&quot;</span> );
+&nbsp;
+&nbsp; xmlWriter = <span class="teal">XmlWriter</span>.Create( xmlFileName );
+</pre>
+
+<p>On my system, the resulting file path ends up being
+
+<cose>"C:/a/vs/UserMepCalculation/output/UserPressureLossReport.xslt"</cose>.</p>
+
+<p>Accordingly, I created a subfolder named 'output' in my UserMepCalculation root directory and copied the original PressureLossReport.xslt file included with Revit in the AddIns/MEP
+Calculation directory to that location.</p>
+
+<p>The following lines of code in the SaveDataToHTML.save method check the existence of this file:</p>
+
+<pre class="code">
+&nbsp; <span class="green">// Check if the xslt file exists</span>
+&nbsp;
+&nbsp; <span class="blue">if</span> (!<span class="teal">File</span>.Exists(writer.XsltFileName))
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> subMsg = <span class="teal">ReportResource</span>.xsltFileSubMsg
+&nbsp; &nbsp; &nbsp; .Replace(<span class="maroon">&quot;%FULLPATH%&quot;</span>, writer.XsltFileName );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">UIHelperFunctions</span>.postWarning(
+&nbsp; &nbsp; &nbsp; <span class="teal">ReportResource</span>.htmlGenerateTitle,
+&nbsp; &nbsp; &nbsp; <span class="teal">ReportResource</span>.xsltFileMsg, subMsg );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">false</span>;
+&nbsp; }
+</pre>
+
+<p>For a moment, it appeared to me as if I could reproduce your problem, since I saw the following error message:</p>
+
+<center>
+<img src="img/user_mep_calc_xslt_error_jt.png" alt="My own XSLT renaming error" width="366"/>
+</center>
+
+<p>Alas, that problem was simply due to the fact that I forgot to rename the file properly:</p>
+
+<pre>
+  C:\a\vs\UserMepCalculation\output &gt;
+    ren PressureLossReport.xslt UserPressureLossReport.xslt
+</pre>
+
+<p>After renaming, everything worked as expected.</p>
+
+<p>The full path of the missing XSLT file is not shown in your error message above.
+Did you use the debugger to explore where exactly it really is looking?</p>
+
+<p>You show the location of your XSLT file in the Revit add-ins folder.
+Did you change the code <b>not</b> to look for it in an 'output' subdirectory?</p>
+
+<p>I would agree that the code is somewhat inscrutable, and beg your pardon for that.</p>
+
+<p>It was extracted from internal structures and still carries some excess baggage.</p>
+
+<p>I removed as much of that as I could during my original cleanup.</p>
+
+<p>The end result of this is that I cannot reproduce your issue or provide any help in resolving it, beyond asking you to look at the places mentioned above in the debugger and simplify them or adapt them better to your needs to resolve this issue.</p>
+
+<p>One thing I would suggest trying out is to simply skip this error message once by using the 'set next statement' option in the debugger, and see whether the output is correctly produced anyway.
+The error statement might be erroneous in itself, you know.</p>
+
+<p>In any case, please feel free to fork or branch the
+
+<a href="https://github.com/jeremytammik/UserMepCalculation">UserMepCalculation GitHub repository</a> to
+
+add any enhancements you would like to share, and I will hopefully be able to merge them into the main stream.</p>
+
+<p>Thank you!</p>
