@@ -1,0 +1,68 @@
+<h3>The Revit SDK Contents</h3>
+
+<p>The Revit SDK or Software Developer Kit is included in every Revit product installation CD. You can search the installation for a file named *sdk*.zip. In Revit 2009, it is named 'Revit 2009 SDK.zip' and located in a subdirectory 'Utilities\Common\Software Development Kit'. It can also be downloaded from the public <a href="http://www.autodesk.com/developrevit">Revit developer center</a> which can be reached via www.autodesk.com &gt; Communities &gt; Developers &gt; Products &amp; Technologies &gt; Revit Architecture and Revit Structure, or from the members-only <a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&amp;id=5017413&amp;linkID=4901650">ADN web site</a> .</p>
+
+<p>The contents of the Revit SDK are basically for documentation purposes only. All that is really needed to allow a Revit plug-in to run is the Revit API .NET assembly RevitAPI.dll, which is always present in every Revit installation and located in the Program subfolder, the same place as Revit.exe itself. Additionally, you need a development environment to compile your plug-in. The standard development environment we normally use is Microsoft Visual Studio. You can also use the free Visual Studio express version with reduced functionality, or any other .NET development environment. Alternatively, in Revit 2009, you can use the Visual Studio Tools for Application or VSTA environment which is included with the Revit product instead of compiling an external .NET plug-in assembly.</p>
+
+<p>Let us look at the contents of the Revit SDK in more detail. Here are the documents present in the top level directory</p>
+
+<ul>
+<li>Read Me First.doc</li>
+<li>Getting Started Revit API 2009.doc</li>
+<li>Add-On Applications and Non-Power Users.doc</li>
+<li>Revit API Diagram.dwf</li>
+<li>Revit SDK License.rtf</li>
+<li>Revit VSTA User Manual.pdf</li>
+<li>RevitAPI.chm</li>
+</ul>
+
+<p>'Read Me First.doc' provides a brief overview over the SDK contents and is the first place to start exploring. The next step is 'Getting Started Revit API 2009.doc', which explains the basic paradigms and architecture, how to create a Revit plug-in, and many further details. A graphical overview of the API class hierarchy is provided by 'Revit API Diagram.dwf'. The license is provided in a separate file, and a detailed user manual for VSTA, the Visual Studio Tools for Applications, which can be used to create macros inside of Revit instead of loading them as external plug-ins separately compiled in an external development environment.</p>
+
+<p>The main help file is RevitAPI.chm, which lists all the classes provided in the API and their properties and methods. It does not do much to explain how these classes work together to solve specific programming tasks. For that, the best source of information is the collection of samples, which we will discuss in detail later.</p>
+
+<p>There are two more documents to mention in this context, even though they are not present in the standard SDK release:</p>
+
+<ul>
+<li>Guide to placing Family Instances with the API.doc</li>
+<li>Revit_2008_api_user_manual.pdf</li>
+</ul>
+
+<p>The guide to placing family instances is a recent addition to the Revit SDK update. Unfortunately, it did not make it into the Revit 2009 web update 1 in June 2008, so it will be added to the next version of the SDK. Currently, it is only available from the ADN web site in the 
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&amp;id=11234791&amp;linkID=4901650">Revit knowledgebase</a> 
+
+or in the 
+
+<a href="http://adn.autodesk.com/adn/servlet/index?siteID=4814862&amp;id=5017413&amp;linkID=4901650">updated version of the Revit SDK web update 1</a> 
+
+which was posted to ADN after the public release of the Revit product web update 1.</p>
+
+<p>The Revit API user manual is a work in progress and is also planned to be included in the standard SDK at some future point in time. Currently, the 
+
+<a href="http://adn.autodesk.com/adn/servlet/file/revit_2008_api_user_manual.pdf?siteID=4814862&id=10589406">draft version</a>
+
+is available from the ADN web site 
+
+<a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&id=10236013&linkID=4901650">Revit 2008 Samples and Documents</a> 
+
+page.</p>
+
+<p>In addition to the documents listed above, the SDK root folder also includes the following subdirectories:</p>
+
+<ul><li>API Changes</li>
+
+<li>Add-in Manager</li>
+
+<li>Revit Structure</li>
+
+<li>VSTA Samples</li>
+
+<li>Samples</li></ul>
+
+<p>API Changes lists the changes between the current and the previous version of the API and is useful for migrating existing applications. The changes are documented in an xml file Added.xml and displayed through an XSLT generated view. XSLT stands for XSL Transformation or eXtensible Stylesheet Language Transformation. An XSL style sheet transforms the XML data into a specific view in the browser. </p>
+
+<p>The Add-in Manager is a utility application for loading and managing plug-ins and is accompanied by its own documentation. </p>
+
+<p>A set of additional documentation is provided specifically for Revit Structure in an own folder. Some VSTA samples are provided.</p>
+
+<p>Finally, we have the largest component of the SDK by far, the SDK samples. The SDK samples provide over a hundred real live examples of how the API classes work together to solve specific programming tasks, ranging from the very simple to pretty complex.</p>

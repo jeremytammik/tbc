@@ -1,0 +1,125 @@
+<h3>Debugging a Revit Add-In</h3>
+
+<p>I often hear the question how to unload a Revit add-in. Unfortunately, this is not possible, due to the fundamental .NET framework mechanisms used to load and manage the plug-ins. Revit manages one AppDomain which is used to load all add-in classes.</p>
+
+<p>It would theoretically be possible to unload the entire AppDomain to remove the loaded add-ins. I once tried to implement a system to unload a Revit plug-in by implementing a cascaded pair of IExternalCommand classes. In the first one A, which I registered as an external command in Revit.ini, I set up my own AppDomain, into which I loaded the second class B. When invoking the command implemented by A, I was able to trap the arguments passed in to A.Execute() and invoke and pass them on to B.Execute() without problems. I was also able to delete the AppDomain I had created, thus removing B from the system memory. Unfortunately, something in the .NET framework was still keeping the secondary assembly DLL file locked, so I was unable to overwrite or delete it.</p>
+
+<p>But what I really want to point out here is that there is normally no need to unload Revit add-ins for debugging purposes, because running Revit from the debugger, opening a ready-prepared test model and loading and executing the add-in can be achieved using just a handful of keystrokes and in a matter of a very few seconds. Let us go through the steps for setting up such a system one by one.</p>
+
+<p>For completeness sake, and to ensure that we are really all on the same page, I suggest we start from scratch with a brand new Revit add-in project. That means that we will be going through the same steps as those described in the DevTV presentation and webcast recording mentioned in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/08/getting-started.html">getting started</a>
+
+post. Here is the short version of the description to set up a new Revit add-in:</p>
+
+<ul>
+<li>Start Visual Studio 2005.</li>
+<li>Create a new VB or CS .NET project: File &gt; New &gt; Project... &gt; Visual Basic or Visual C# &gt; Class Library.</li>
+<li>Specify the project name and location, for instance DebugTest and C:\tmp\revit.</li>
+<li>This generates a complete skeleton application.</li>
+<li>Rename the class from Class1 to Command, simply to follow a common Revit add-in practice. I do this by clicking on the file name in the solution explorer and renaming that. It automatically renames the class contained in it as well.</li>
+</ul>
+
+<p>From here on, there are some small differences between C# and VB. For C#, we can proceed as follows:</p>
+
+<ul>
+<li>Remove the unneeded references to System.Data and System.Xml.</li>
+<li>Add a reference to RevitAPI.dll by right clicking on the project references in the solution explorer and selecting Add Reference.</li>
+<li>Do not forget to set the 'Copy Local' flag to False. You do so by opening the properties of RevitAPI.dll. See 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/the-sdk-samples.html">The SDK Samples Solution</a>
+
+for a more detailed explanation of this step.</li>
+<li>Remove the unneeded using statements for System.Collections.Generic and System.Text in the command class source file.</li>
+<li>Add a line at the top saying 'using Autodesk.Revit;'. Note that Intellisense jumps in as soon as you have typed 'Autodesk.', so you almost never need to fully type out any identifier.</li>
+<li>Specify the IExternalCommand parent class for Command by adding ": IExternalCommand" after "public class Command". Note here as well that Intellisense saves you from typing anything but the first few characters of the class name.</li>
+<li>Implement the Execute() method by right clicking on IExternalCommand in the source code and selecting Implement Interface &gt; Implement Interface. This generates the source code for Execute(), which I generally reformat a little to make it more readable.</li>
+<li>Replace the automatically generated exception throwing code by a valid return value, e.g. "return IExternalCommand.Result.Succeeded;"</li>
+</ul>
+
+<p>The completed C# code might look like this:</p>
+
+<pre style="LINE-HEIGHT: 100%; BACKGROUND-COLOR: lightgrey">
+using System;
+using Autodesk.Revit;
+
+namespace DebugTest
+{
+  public class Command : IExternalCommand
+  {
+    public IExternalCommand.Result Execute( 
+      ExternalCommandData commandData, 
+      ref string message, 
+      ElementSet elements )
+    {
+      return IExternalCommand.Result.Succeeded;
+    }
+  }
+}
+</pre>
+
+<p>For VB, the equivalent steps are:</p>
+
+<ul>
+<li>Add a reference to RevitAPI.dll by opening the project, selecting the References tab, and clicking Add...</li>
+<li>Do not forget to set the 'Copy Local' flag to False. You do so by opening the properties of RevitAPI.dll. See 
+
+<a href="06">The SDK Samples Solution</a>
+
+for a more detailed explanation of this step.</li>
+<li>Remove the unneeded references to System.Data and System.Xml.</li>
+<li>Add a line at the top saying 'Imports Autodesk.Revit'. Note that Intellisense jumps in as soon as you have typed 'Autodesk.', so you almost never need to fully type out any identifier.</li>
+<li>Specify the IExternalCommand parent class for Command by adding a new line saying "Implements IExternalCommand" after "Public Class Command". Note here as well that Intellisense saves you from typing anything but the first few characters of the class name.</li>
+<li>Implement the Execute() method. In VB, you do not have the 'Implement Interface' option provided for C#, but you can go to the definition of IExternalCommand and copy the code from there.</li>
+</ul>
+
+<p>The completed VB code might look like this:</p>
+
+<pre style="LINE-HEIGHT: 100%; BACKGROUND-COLOR: lightgrey">
+Imports Autodesk.Revit
+
+Public Class Command
+    Implements IExternalCommand
+    Function Execute( _
+    ByVal commandData As ExternalCommandData, _
+    ByRef message As String, _
+    ByVal elements As ElementSet) _
+    As Autodesk.Revit.IExternalCommand.Result _
+    Implements Autodesk.Revit.IExternalCommand.Execute
+        Return IExternalCommand.Result.Succeeded
+    End Function
+End Class
+</pre>
+</li>
+
+<p>Both the C# and VB projects now compile and are ready to be loaded into Revit.</p>
+
+<p>Remember that the goal of this exercise is to explain how to set up the debugger and a Revit project to be able to very efficiently run, test and debug the code, make changes to and recompile the source code, and restart Revit to get back to the same testing scenario again with a minimum of fuss.</p>
+
+<p>As we already know, in order to load an add-in into Revit, we need to make it known to Revit first via an entry into Revit.ini, which is located in the same directory as Revit.exe. I add the following lines to Revit.ini:</p>
+
+<pre style="LINE-HEIGHT: 100%; BACKGROUND-COLOR: lightgrey">
+[ExternalCommands]
+ECCount=1
+
+ECName1=Debug Test
+ECDescription1=Sample add-in for Revit API blog
+ECAssembly1=C:\tmp\revit\DebugTest\DebugTest\bin\Debug\DebugTest.dll
+ECClassName1=DebugTest.Command
+</pre>
+
+<p>When finished editing Revit.ini, make sure to copy the entire file path to the clipboard by right clicking on the Revit.ini file tab in the Visual Studio editor. The reason is that this almost exactly provides the full path name that we require to specify Revit.exe as the debugging process in the next step.</p>
+
+<p>Now we can set up Revit.exe as the debugging application. In C#, this is done by right clicking on the project in the solution explorer and selecting Properties in the context menu. In VB, we simply double click My Project. Select the Debug tab, select the radio button Start external program, and add the full path of Revit.exe. Since we already have the full path of Revit.ini in the clipboard, all we need to do is paste it in and change the three last characters to replace the file extension ini by exe.</p>
+
+<p>Now we can start up Revit.exe simply by hitting the F5 key, or selecting the Visual Studio menu entry Debug &gt; Start Debugging.</p>
+
+<p>If you do not automatically pre-load a Revit model through the command line arguments, you will have to manually select a project before you can load and start testing, so obviously it is better to specify a start-up model. Once a model has been loaded and the full Revit menu is displayed, you can load the add-in.</p>
+
+<p>Note that if you make sure that your current project appears first in the Revit Tools &gt; External Tools menu, you can run it with a minimum of keystrokes by simply typing Alt + T, &lt;Return&gt;, &lt;Return&gt;.</p>
+
+<p>Once you have tested your current issue and wish to recompile the updated code, the fastest way to exit Revit and get back to the compilation environment is to simply stop the debugger using the Visual Studio menu entry Debug > Stop Debugging or Shift + F5.</p>
+
+<p>Finally, to pre-load a specific model when starting up Revit in the Visual Studio debugger, simply add the full path to the Revit RVT file in the Debug tab Start options, Command line arguments.</p>
+
+<p>Once all of this is set up, and believe me it is faster to set up than to explain, you should be able to jump in and out of your full debugging and testing scenario within a matter of seconds.</p>
