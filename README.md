@@ -1,6 +1,6 @@
 # tbc &ndash; The Building Coder blog source
 
-Source of [The Building Coder](http://thebuildingcoder.typepad.com) Revit API blog.
+Source and chronological index for [The Building Coder](http://thebuildingcoder.typepad.com) Revit API blog.
 
 The repository hosts all the HTML, CSS and markdown source text for The Building Coder.
 
@@ -21,8 +21,10 @@ Enjoy.
 
 Jeremy Tammik,
 [The Building Coder](http://thebuildingcoder.typepad.com) and
-[The 3D Web Coder](http://the3dwebcoder.typepad.com), Autodesk Inc.
-
+[The 3D Web Coder](http://the3dwebcoder.typepad.com),
+[ADN](http://www.autodesk.com/adn)
+[Open](http://www.autodesk.com/adnopen),
+[Autodesk Inc.](http://www.autodesk.com)
 
 ## License
 
